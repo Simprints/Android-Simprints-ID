@@ -10,18 +10,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.createActivity
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
@@ -218,7 +218,7 @@ class LoginActivityTest {
 
     private fun createRoboLoginActivity() = createRoboLoginActivity(null)
     private fun createRoboLoginActivity(intent: Intent?) =
-        RobolectricHelper.createActivity<LoginActivity>(intent)
+        createActivity<LoginActivity>(intent)
 
     private fun injectHowToResolveScannerAppIntent(): ResolveInfo {
         // Pretend that ScannerQR app is installed

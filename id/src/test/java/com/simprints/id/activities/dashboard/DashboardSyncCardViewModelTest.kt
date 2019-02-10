@@ -12,9 +12,9 @@ import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -28,14 +28,14 @@ import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.RobolectricTestMocker
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testframework.common.livedata.testObserver
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -90,7 +90,7 @@ class DashboardSyncCardViewModelTest {
     fun setUp() {
         UnitTestConfig(this, module, preferencesModule).fullSetup()
 
-        val sharedPref = RobolectricHelper.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
+        val sharedPref = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
         RobolectricTestMocker
             .initLogInStateMock(sharedPref, remoteDbManagerMock)

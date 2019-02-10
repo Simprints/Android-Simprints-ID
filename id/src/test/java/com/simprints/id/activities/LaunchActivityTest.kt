@@ -3,19 +3,19 @@ package com.simprints.id.activities
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.mockSettingsPreferencesManager
+import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.TestApplication
-import com.simprints.testframework.unit.robolectric.RobolectricHelper
+import com.simprints.testframework.unit.robolectric.createActivity
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
@@ -180,7 +180,7 @@ class LaunchActivityTest {
         mockSettingsPreferencesManager(settingsPreferencesManager, parentalConsentExists, generalConsentOptions, parentalConsentOptions, LANGUAGE, PROGRAM_NAME, ORGANIZATION_NAME)
     }
 
-    private fun createRoboLaunchActivity() = RobolectricHelper.createActivity<LaunchActivity>()
+    private fun createRoboLaunchActivity() = createActivity<LaunchActivity>()
 
     companion object {
         private const val LANGUAGE = "en"

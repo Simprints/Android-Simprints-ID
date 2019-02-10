@@ -14,8 +14,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule.*
-import com.simprints.id.commontesttools.replaceRemoteDbManagerApiClientsWithFailingClients
-import com.simprints.id.commontesttools.replaceSecureApiClientWithFailingClientProvider
+import com.simprints.id.commontesttools.state.replaceRemoteDbManagerApiClientsWithFailingClients
+import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.tools.RandomGenerator

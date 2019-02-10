@@ -6,8 +6,8 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.testframework.common.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver

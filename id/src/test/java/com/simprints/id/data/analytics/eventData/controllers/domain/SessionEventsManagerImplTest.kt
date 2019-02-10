@@ -18,7 +18,7 @@ import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import io.reactivex.Completable

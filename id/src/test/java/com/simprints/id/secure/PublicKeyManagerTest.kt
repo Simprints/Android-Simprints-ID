@@ -2,13 +2,13 @@ package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.commontesttools.givenNetworkFailurePercentIs
+import com.simprints.testframework.common.retrofit.givenNetworkFailurePercentIs
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.testtools.retrofit.FakeResponseInterceptor
+import com.simprints.testframework.common.retrofit.FakeResponseInterceptor
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers

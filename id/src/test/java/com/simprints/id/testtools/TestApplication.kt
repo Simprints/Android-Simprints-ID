@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.roboletric
+package com.simprints.id.testtools
 
 import com.simprints.id.Application
 

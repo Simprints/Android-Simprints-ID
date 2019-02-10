@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.models.*
-import com.simprints.id.commontesttools.createMockBehaviorService
+import com.simprints.testframework.common.retrofit.createMockBehaviorService
 import io.reactivex.Single
 import retrofit2.Call
 import retrofit2.Response

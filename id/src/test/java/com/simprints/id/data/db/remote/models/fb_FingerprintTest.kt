@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote.models
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.testtools.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libsimprints.FingerIdentifier

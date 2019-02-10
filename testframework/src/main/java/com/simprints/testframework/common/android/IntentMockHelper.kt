@@ -1,4 +1,4 @@
-package com.simprints.id.session.callout
+package com.simprints.testframework.common.android
 
 import android.content.Intent
 import android.os.Bundle
