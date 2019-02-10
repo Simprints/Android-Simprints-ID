@@ -70,7 +70,7 @@ android {
     testBuildType "debug"
 
     sourceSets {
-        String sharedTestDir = 'src/sharedTest/java'
+        String sharedTestDir = 'src/commontesttools/java'
         test {
             java.srcDir sharedTestDir
         }
@@ -79,8 +79,16 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -114,14 +122,6 @@ repositories {
         credentials {
             username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
             password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
-        }
-    }
-}
-
-android {
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
         }
     }
 }
@@ -230,11 +230,11 @@ dependencies {
 
     testImplementation 'androidx.test:monitor:1.1.1'
     testImplementation "androidx.test.ext:junit:1.1.0"
-    testImplementation "androidx.test:core:$androidx_version"
+    testImplementation "androidx.test:core:1.1.0"
     testImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
 
-    androidTestUtil 'androidx.test:orchestrator:1.1.0'
+    androidTestUtil 'androidx.test:orchestrator:1.1.1'
 
     implementation "org.checkerframework:checker-compat-qual:2.5.3"
     testImplementation "com.google.truth:truth:0.42"
