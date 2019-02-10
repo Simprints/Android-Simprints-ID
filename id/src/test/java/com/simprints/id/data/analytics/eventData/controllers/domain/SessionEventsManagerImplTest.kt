@@ -15,7 +15,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
-import com.simprints.id.commontesttools.sessionEvents.mockSessionEventsManager
+import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testtools.TestApplication
