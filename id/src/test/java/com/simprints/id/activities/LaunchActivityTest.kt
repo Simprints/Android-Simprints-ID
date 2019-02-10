@@ -13,7 +13,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.testtools.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.createActivity

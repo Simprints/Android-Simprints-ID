@@ -4,6 +4,7 @@ import android.app.Instrumentation
 import android.content.Context
 import androidx.annotation.NonNull
 import androidx.test.runner.AndroidJUnitRunner
+import com.simprints.id.commontesttools.TestApplication
 
 // Not used - useful if a custom Application is required
 class UiTestsRunner : AndroidJUnitRunner() {

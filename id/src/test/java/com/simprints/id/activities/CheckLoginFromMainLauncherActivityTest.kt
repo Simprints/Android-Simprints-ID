@@ -13,7 +13,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testtools.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.state.RobolectricTestMocker.initLogInStateMock

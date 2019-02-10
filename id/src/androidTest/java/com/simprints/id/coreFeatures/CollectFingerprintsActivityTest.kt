@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
-import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY

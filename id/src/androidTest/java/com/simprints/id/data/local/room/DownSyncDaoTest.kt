@@ -3,7 +3,7 @@ package com.simprints.id.data.local.room
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.SyncStatusDatabase

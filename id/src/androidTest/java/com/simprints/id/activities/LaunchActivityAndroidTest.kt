@@ -13,7 +13,7 @@ import androidx.test.rule.GrantPermissionRule
 import androidx.test.runner.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.R
-import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule

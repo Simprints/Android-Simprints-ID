@@ -10,7 +10,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.Constants
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.testframework.common.syntax.assertThrows
 import com.simprints.testframework.common.syntax.verifyExactly

@@ -3,7 +3,7 @@ package com.simprints.id.service
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule

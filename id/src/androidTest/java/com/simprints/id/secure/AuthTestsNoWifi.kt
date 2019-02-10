@@ -5,7 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY

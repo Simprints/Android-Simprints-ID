@@ -1,4 +1,4 @@
-package com.simprints.id.testtools
+package com.simprints.id.commontesttools
 
 import com.simprints.id.Application
 
