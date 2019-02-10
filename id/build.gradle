@@ -145,7 +145,7 @@ dependencies {
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location
     implementation deps.support.material
-    implementation(deps.arch_components.work)
+    implementation deps.arch_components.work
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
@@ -199,7 +199,7 @@ dependencies {
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
 
-    // Android test - https://developer.android.com/training/testing/release-notes
+    // Android test
     androidTestImplementation deps.simprints.mockscanner
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
@@ -214,7 +214,7 @@ dependencies {
     androidTestImplementation deps.testing.work
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
-    androidTestImplementation(deps.testing.truth)
+    androidTestImplementation deps.testing.truth
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
