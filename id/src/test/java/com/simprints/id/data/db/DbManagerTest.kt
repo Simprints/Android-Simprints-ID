@@ -3,7 +3,7 @@ package com.simprints.id.data.db
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.testframework.common.retrofit.createMockBehaviorService
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -19,7 +19,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.sync.SyncApiMock
+import com.simprints.id.sync.PeopleApiServiceMock
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testframework.unit.mockserver.mockNotFoundResponse
 import com.simprints.testframework.unit.mockserver.mockSuccessfulResponse
@@ -168,7 +168,7 @@ class DbManagerTest {
             createdAt = null
         })
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SyncApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val testObservable = dbManager.savePerson(fakePerson).test()
@@ -216,7 +216,7 @@ class DbManagerTest {
     fun loadingPersonMissingInLocalAndWithNoConnection_shouldTriggerDataError() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SyncApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val result = mutableListOf<Person>()

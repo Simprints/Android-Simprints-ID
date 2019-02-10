@@ -33,6 +33,9 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':libcommon')
 
+    // Android
+    implementation 'androidx.multidex:multidex:2.0.1'
+
     // Testing base
     implementation 'androidx.test:monitor:1.1.1'
     implementation "androidx.test.ext:junit:1.1.0"

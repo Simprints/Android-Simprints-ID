@@ -13,7 +13,7 @@ import retrofit2.mock.Calls
 
 // It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
-class SyncApiMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
+class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
 
     override fun uploadPeople(projectId: String, patientsJson: HashMap<String, List<fb_Person>>): Single<Result<Void?>> {
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)

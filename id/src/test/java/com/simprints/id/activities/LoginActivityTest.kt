@@ -21,6 +21,7 @@ import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEvents
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.createActivity
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*

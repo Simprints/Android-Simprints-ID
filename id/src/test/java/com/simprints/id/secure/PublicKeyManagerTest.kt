@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.common.retrofit.givenNetworkFailurePercentIs
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
@@ -86,6 +86,6 @@ class PublicKeyManagerTest {
         val mockRetrofit = MockRetrofit.Builder(retrofit)
             .networkBehavior(networkBehavior)
             .build()
-        return ApiServiceMock(mockRetrofit.create(SecureApiInterface::class.java))
+        return SecureApiServiceMock(mockRetrofit.create(SecureApiInterface::class.java))
     }
 }

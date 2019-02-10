@@ -1,4 +1,4 @@
-package com.simprints.id.activities
+package com.simprints.testframework.unit.robolectric
 
 import android.content.Context
 import androidx.multidex.MultiDex
