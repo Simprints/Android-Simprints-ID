@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.any
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager

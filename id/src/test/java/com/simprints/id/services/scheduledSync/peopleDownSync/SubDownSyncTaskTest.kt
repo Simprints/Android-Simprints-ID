@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.*
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.id.commontesttools.di.TestAppModule

@@ -10,7 +10,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.data.analytics.AnalyticsManager

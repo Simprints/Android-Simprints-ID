@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired

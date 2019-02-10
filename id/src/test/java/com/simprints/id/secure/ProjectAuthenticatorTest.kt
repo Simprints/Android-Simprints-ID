@@ -4,7 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -17,15 +16,19 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.network.SimApiClient
+import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.id.testtools.state.mockLoginInfoManager
 import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.retrofit.createMockBehaviorService
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -91,7 +94,7 @@ class ProjectAuthenticatorTest {
         val authenticator = LegacyCompatibleProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
-            ApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
+            SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator
@@ -123,5 +126,11 @@ class ProjectAuthenticatorTest {
 
         testObserver
             .assertError(IOException::class.java)
+    }
+
+    private fun getMockAttestationManager(): AttestationManager {
+        val attestationManager = mock<AttestationManager>()
+        whenever(attestationManager.requestAttestation(anyNotNull(), anyNotNull())).thenReturn(Single.just(AttestToken("google_attestation")) )
+        return attestationManager
     }
 }

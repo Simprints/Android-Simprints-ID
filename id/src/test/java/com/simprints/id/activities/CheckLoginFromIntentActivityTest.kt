@@ -26,6 +26,7 @@ import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.assertActivityStarted
 import com.simprints.testframework.unit.robolectric.createActivity
 import com.simprints.testframework.unit.robolectric.getSharedPreferences

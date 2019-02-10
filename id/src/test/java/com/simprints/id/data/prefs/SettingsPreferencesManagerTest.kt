@@ -3,7 +3,7 @@ package com.simprints.id.data.prefs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

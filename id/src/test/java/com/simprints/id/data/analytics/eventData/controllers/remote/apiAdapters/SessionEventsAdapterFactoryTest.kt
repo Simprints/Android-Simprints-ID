@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
 
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPoolType

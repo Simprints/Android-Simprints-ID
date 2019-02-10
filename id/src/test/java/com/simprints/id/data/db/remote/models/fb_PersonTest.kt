@@ -2,7 +2,7 @@ package com.simprints.id.data.db.remote.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.toRealmFingerprint
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
