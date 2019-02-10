@@ -1,4 +1,4 @@
-package com.simprints.id.testTools
+package com.simprints.id.testtools
 
 import android.Manifest
 import android.app.Activity
@@ -16,6 +16,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.libsimprints.Constants
+import com.simprints.testframework.android.log
 import java.util.*
 
 object ActivityUtils {

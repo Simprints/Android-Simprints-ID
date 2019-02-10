@@ -1,8 +1,9 @@
-package com.simprints.id.testTools
+package com.simprints.id.testtools
 
 import android.content.Context
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testTools.exceptions.TestingSuiteError
+import com.simprints.id.testtools.exceptions.TestingSuiteError
+import com.simprints.testframework.android.log
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

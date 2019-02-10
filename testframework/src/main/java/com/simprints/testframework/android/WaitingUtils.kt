@@ -1,4 +1,4 @@
-package com.simprints.id.testTools
+package com.simprints.testframework.android
 
 import android.os.SystemClock
 import androidx.test.espresso.IdlingPolicies.getMasterIdlingPolicy

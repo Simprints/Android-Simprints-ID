@@ -1,37 +1,36 @@
 package com.simprints.id.coreFeatures
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.TestApplication
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.scanner.ScannerManager
+import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testSnippets.collectFingerprintsPressScan
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testSnippets.skipFinger
 import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.ActivityUtils.getCurrentActivity
-import com.simprints.id.testTools.ActivityUtils.launchCollectFingerprintsActivity
-import com.simprints.id.testTools.ScannerUtils.setupScannerForCollectingFingerprints
+import com.simprints.id.testtools.ActivityUtils.getCurrentActivity
+import com.simprints.id.testtools.ActivityUtils.launchCollectFingerprintsActivity
+import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.common.syntax.whenever
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Assert
@@ -43,19 +42,21 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
+class CollectFingerprintsActivityTest : FirstUseLocal {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter })
     }
@@ -68,15 +69,13 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

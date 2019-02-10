@@ -9,10 +9,14 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.testTools.*
-import com.simprints.id.testTools.StringUtils.getResourceString
+import com.simprints.id.testtools.*
+import com.simprints.testframework.android.StringUtils.getResourceString
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.libsimprints.*
+import com.simprints.testframework.android.log
+import com.simprints.testframework.android.tryOnSystemUntilTimeout
+import com.simprints.testframework.android.tryOnUiUntilTimeout
+import com.simprints.testframework.android.waitOnUi
 import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 

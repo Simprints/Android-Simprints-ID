@@ -1,11 +1,11 @@
 package com.simprints.id.data.local
 
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.toDomainPerson
-import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import io.realm.Realm
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

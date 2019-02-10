@@ -1,13 +1,13 @@
 package com.simprints.id.testTemplates
 
 import androidx.test.InstrumentationRegistry
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.testTools.models.TestProject
-import com.simprints.id.testTools.remote.RemoteTestingManager
+import com.simprints.id.testtools.models.TestProject
+import com.simprints.id.testtools.remote.RemoteTestingManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
 
@@ -28,7 +28,7 @@ import io.realm.RealmConfiguration
  *     @Inject lateinit var remoteDbManager: RemoteDbManager
  *
  *     override var module by lazyVar {
- *         AppModuleForAndroidTests(app,
+ *         TestAppModule(app,
  *             randomGeneratorRule = MockRule)
  *     }
  *
@@ -36,7 +36,7 @@ import io.realm.RealmConfiguration
  *     override fun setUp() {
  *         app = InstrumentationRegistry.getTargetContext().applicationContext as Application
  *         super<DaggerForAndroidTests>.setUp()
- *         testAppComponent.inject(this)
+ *         testAppComponent.injectClassFromComponent(this)
  *
  *         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
  *

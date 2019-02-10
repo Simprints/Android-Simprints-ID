@@ -1,9 +1,13 @@
 package com.simprints.id.service
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.Application
+import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -11,21 +15,15 @@ import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelect
 import com.simprints.id.data.analytics.eventData.models.local.RlSession
 import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.commontesttools.DefaultTestConstants
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.testTools.tryOnUiUntilTimeout
+import com.simprints.id.testtools.ActivityUtils
+import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libsimprints.SimHelper
+import com.simprints.testframework.android.tryOnUiUntilTimeout
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Assert
@@ -37,17 +35,15 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class GuidSelectionServiceTest : DaggerForAndroidTests(), FirstUseLocal {
+class GuidSelectionServiceTest : FirstUseLocal {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
-        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
-    }
-
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             randomGeneratorRule = DependencyRule.MockRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             analyticsManagerRule = DependencyRule.MockRule,
@@ -66,16 +62,14 @@ class GuidSelectionServiceTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DefaultTestConstants.DEFAULT_REALM_KEY, randomGeneratorMock)
         setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
 
         app.initDependencies()
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

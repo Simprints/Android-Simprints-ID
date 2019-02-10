@@ -2,6 +2,7 @@ package com.simprints.id.activities
 
 import android.content.Intent
 import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -11,34 +12,33 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import androidx.test.runner.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.doReturn
-import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.TestApplication
 import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.waitOnUi
+import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libcommon.Person
 import com.simprints.libscanner.Scanner
 import com.simprints.libsimprints.Constants
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.android.waitOnUi
+import com.simprints.testframework.common.syntax.anyNotNull
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
@@ -51,7 +51,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
+class LaunchActivityAndroidTest : FirstUseLocal {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
@@ -62,12 +64,12 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             dbManagerRule = DependencyRule.SpyRule,
             randomGeneratorRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
@@ -84,9 +86,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 

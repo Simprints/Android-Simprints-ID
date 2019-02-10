@@ -17,6 +17,7 @@ android {
         versionCode 135
         versionName "2018.4.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     bundle {
@@ -76,6 +77,10 @@ android {
         androidTest {
             java.srcDir sharedTestDir
         }
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 }
 
@@ -228,6 +233,8 @@ dependencies {
     testImplementation "androidx.test:core:$androidx_version"
     testImplementation 'android.arch.core:core-testing:1.1.1'
     androidTestImplementation 'android.arch.core:core-testing:1.1.1'
+
+    androidTestUtil 'androidx.test:orchestrator:1.1.0'
 
     implementation "org.checkerframework:checker-compat-qual:2.5.3"
     testImplementation "com.google.truth:truth:0.42"

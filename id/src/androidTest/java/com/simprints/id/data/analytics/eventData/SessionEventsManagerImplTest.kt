@@ -1,11 +1,20 @@
 package com.simprints.id.data.analytics.eventData
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import androidx.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.Application
+import com.simprints.id.TestApplication
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -20,31 +29,22 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
-import com.simprints.id.commontesttools.*
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.testTools.ActivityUtils
-import com.simprints.id.testTools.tryOnSystemUntilTimeout
-import com.simprints.id.testTools.waitOnUi
+import com.simprints.id.testtools.ActivityUtils
+import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.android.tryOnSystemUntilTimeout
+import com.simprints.testframework.android.waitOnUi
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -62,7 +62,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
+class SessionEventsManagerImplTest : FirstUseLocal {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
@@ -77,12 +79,12 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(
+    private val module by lazy {
+        TestAppModule(
             app,
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
@@ -109,15 +111,13 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
 
     @Before
     override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         app.initDependencies()
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
@@ -138,7 +138,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     fun createSession_shouldReturnASession() {
         val result = sessionEventsManagerSpy.createSession().test()
 
-        result.waitForCompletionAndAssertNoErrors()
+        result.awaitAndAssertSuccess()
         val newSession = result.values().first()
         verifySessionIsOpen(newSession)
     }
@@ -219,7 +219,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
         // There is not activeSession open or pending in the db. So it should fail, but it swallows the error
         sessionEventsManagerSpy.updateSession {
             it.location = null
-        }.test().waitForCompletionAndAssertNoErrors()
+        }.test().awaitAndAssertSuccess()
     }
 
     @Test

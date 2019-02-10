@@ -1,18 +1,17 @@
 package com.simprints.id.data.secure
 
 import androidx.test.InstrumentationRegistry
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.Application
+import com.simprints.id.TestApplication
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
+import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.assertThrows
-import com.simprints.id.tools.RandomGeneratorImpl
-import com.simprints.id.tools.delegates.lazyVar
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotSame
 import org.junit.Before
@@ -24,20 +23,15 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SecureDataManagerTest : DaggerForAndroidTests() {
+class SecureDataManagerTest {
 
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app)
-    }
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     @Before
-    override fun setUp() {
-        app = InstrumentationRegistry.getTargetContext().applicationContext as Application
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        AndroidTestConfig(this).fullSetup()
         app.initDependencies()
     }
 

@@ -2,7 +2,6 @@ package com.simprints.id.activities
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -12,7 +11,13 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.work.WorkManager
 import com.simprints.id.R
+import com.simprints.id.TestApplication
 import com.simprints.id.activities.dashboard.DashboardActivity
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -21,26 +26,20 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.di.AppModuleForAndroidTests
-import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.di.DependencyRule
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.testframework.common.syntax.whenever
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
-import com.simprints.id.testTools.LoginManagerTest
-import com.simprints.id.testTools.models.TestProject
-import com.simprints.id.testTools.remote.RemoteTestingManager
-import com.simprints.id.testTools.tryOnUiUntilTimeout
-import com.simprints.id.testTools.waitOnSystem
+import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.LoginManagerTest
+import com.simprints.id.testtools.models.TestProject
+import com.simprints.id.testtools.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.android.tryOnUiUntilTimeout
+import com.simprints.testframework.android.waitOnSystem
+import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -55,7 +54,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
+class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
@@ -64,6 +63,8 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
     }
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     override lateinit var testProject: TestProject
 
@@ -82,13 +83,13 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private val syncScope
         get() = syncScopesBuilder.buildSyncScope()!!
 
-    override var preferencesModule: TestPreferencesModule by lazyVar {
+    private val preferencesModule by lazy {
         TestPreferencesModule(
             settingsPreferencesManagerRule = DependencyRule.SpyRule)
     }
 
-    override var module by lazyVar {
-        AppModuleForAndroidTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             remoteDbManagerRule = DependencyRule.SpyRule,
             randomGeneratorRule = DependencyRule.MockRule,
             secureDataManagerRule = DependencyRule.SpyRule)
@@ -102,9 +103,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Before
     override fun setUp() {
-        app = ApplicationProvider.getApplicationContext()
-        super<DaggerForAndroidTests>.setUp()
-        testAppComponent.inject(this)
+        AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         Realm.init(app)
         super<FirstUseLocalAndRemote>.setUp()
@@ -155,7 +154,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         }
 
         tryOnUiUntilTimeout(10000, 20) {
-            Espresso.onView(withId(R.id.dashboardCardSyncDescription))
+            onView(withId(R.id.dashboardCardSyncDescription))
                 .check(matches(withText(not(String.format(app.getString(R.string.dashboard_card_syncing), "")))))
         }
 
