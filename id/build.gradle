@@ -5,7 +5,10 @@ apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'realm-android'
+
+//Required to import Realm manually (no plugin)
+import io.realm.transformer.RealmTransformer
+android.registerTransform(new RealmTransformer())
 
 android {
     compileSdkVersion 28
@@ -171,12 +174,18 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
-    //implementation "org.checkerframework:checker-compat-qual:2.5.5"
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     annotationProcessor deps.dagger.compiler
     kapt deps.dagger.compiler
-    compileOnly deps.realm_support.glassfish_annotation
+
+    implementation deps.realm.annotations
+    implementation(deps.realm.kotlin) {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    }
+    implementation deps.realm.android
+    kapt deps.realm.annotations_processor
+    compileOnly deps.realm.glassfish_annotation
 
     // Test
     testImplementation deps.simprints.mockscanner
