@@ -259,7 +259,7 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
 
     @After
     override fun tearDown() {
-        //super.tearDown()
+        super.tearDown()
     }
 
     private fun signOut() {
