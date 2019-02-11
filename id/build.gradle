@@ -16,7 +16,7 @@ android {
         multiDexEnabled true
         versionCode 135
         versionName "2018.4.3"
-        testInstrumentationRunner "com.simprints.id.testtools.TestApplicationJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 

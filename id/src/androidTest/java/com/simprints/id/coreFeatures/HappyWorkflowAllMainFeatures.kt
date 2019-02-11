@@ -3,7 +3,7 @@ package com.simprints.id.coreFeatures
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.LargeTest
 import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @LargeTest
 class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null
@@ -61,7 +61,7 @@ class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
     @Before
     override fun setUp() {
         log("HappyWorkflowAllMainFeatures.setUp()")
-        AndroidTestConfig(this, module)
+        AndroidTestConfig(this, module).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 

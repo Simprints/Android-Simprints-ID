@@ -1,7 +1,7 @@
 package com.simprints.id.testtools
 
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
@@ -14,7 +14,7 @@ class AndroidTestConfig<T : Any>(
     private val preferencesModule: TestPreferencesModule? = null
 ) {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
     fun fullSetup() =

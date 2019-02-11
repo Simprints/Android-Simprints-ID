@@ -1,19 +1,18 @@
 package com.simprints.id.activities
 
 import android.content.Intent
-import androidx.test.InstrumentationRegistry
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
-import androidx.test.runner.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.doReturn
+import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
@@ -53,7 +52,7 @@ import javax.inject.Inject
 @LargeTest
 class LaunchActivityAndroidTest : FirstUseLocal {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
@@ -92,7 +91,7 @@ class LaunchActivityAndroidTest : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
+        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

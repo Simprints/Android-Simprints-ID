@@ -25,7 +25,7 @@ import com.simprints.testframework.unit.mockserver.mockNotFoundResponse
 import com.simprints.testframework.unit.mockserver.mockSuccessfulResponse
 import com.simprints.testframework.unit.mockserver.mockServerProblemResponse
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.testframework.common.syntax.spy

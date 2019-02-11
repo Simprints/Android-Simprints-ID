@@ -8,7 +8,7 @@ import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.testframework.common.retrofit.FakeResponseInterceptor
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers

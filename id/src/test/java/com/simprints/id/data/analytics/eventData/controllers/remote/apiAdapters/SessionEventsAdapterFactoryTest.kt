@@ -15,7 +15,7 @@ import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
 import com.simprints.id.commontesttools.sessionEvents.*
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Test
