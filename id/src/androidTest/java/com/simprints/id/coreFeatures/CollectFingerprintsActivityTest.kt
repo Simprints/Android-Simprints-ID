@@ -31,7 +31,6 @@ import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
 import com.simprints.testframework.common.syntax.whenever
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Assert
 import org.junit.Before
@@ -75,7 +74,6 @@ class CollectFingerprintsActivityTest : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

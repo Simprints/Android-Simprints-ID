@@ -40,7 +40,6 @@ import com.simprints.testframework.android.waitOnUi
 import com.simprints.testframework.common.syntax.anyNotNull
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
@@ -91,7 +90,6 @@ class LaunchActivityAndroidTest : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

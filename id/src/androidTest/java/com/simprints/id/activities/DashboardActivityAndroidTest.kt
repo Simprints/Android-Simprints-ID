@@ -41,7 +41,6 @@ import com.simprints.testframework.android.tryOnUiUntilTimeout
 import com.simprints.testframework.android.waitOnSystem
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
@@ -105,7 +104,6 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
     override fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
-        Realm.init(app)
         super<FirstUseLocalAndRemote>.setUp()
 
         mockBeingSignedIn()

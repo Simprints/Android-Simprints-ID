@@ -22,7 +22,6 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.After
 import org.junit.Before
@@ -72,7 +71,6 @@ class AuthTestsHappyWifi : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()

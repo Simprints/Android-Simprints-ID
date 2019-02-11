@@ -46,7 +46,6 @@ import com.simprints.testframework.android.waitOnUi
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
 import junit.framework.TestCase.*
@@ -117,7 +116,6 @@ class SessionEventsManagerImplTest : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
