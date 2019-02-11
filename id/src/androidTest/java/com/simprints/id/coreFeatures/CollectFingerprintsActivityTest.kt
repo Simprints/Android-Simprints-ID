@@ -20,7 +20,6 @@ import com.simprints.id.testSnippets.collectFingerprintsPressScan
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testSnippets.skipFinger
 import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.ActivityUtils.getCurrentActivity
 import com.simprints.id.testtools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testtools.AndroidTestConfig
@@ -31,7 +30,6 @@ import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
 import com.simprints.testframework.common.syntax.whenever
-import io.realm.RealmConfiguration
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -41,12 +39,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class CollectFingerprintsActivityTest : FirstUseLocal {
+class CollectFingerprintsActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
@@ -67,14 +62,10 @@ class CollectFingerprintsActivityTest : FirstUseLocal {
     @Inject lateinit var scannerManager: ScannerManager
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
 
         preferencesManager.calloutAction = CalloutAction.REGISTER
     }

@@ -27,7 +27,6 @@ import com.simprints.id.exceptions.safe.setup.*
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -40,7 +39,6 @@ import com.simprints.testframework.android.waitOnUi
 import com.simprints.testframework.common.syntax.anyNotNull
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,15 +47,12 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class LaunchActivityAndroidTest : FirstUseLocal {
+class LaunchActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
@@ -83,14 +78,10 @@ class LaunchActivityAndroidTest : FirstUseLocal {
     @Inject lateinit var scannerManagerSpy: ScannerManager
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
 
         preferencesManager.calloutAction = CalloutAction.REGISTER
     }
