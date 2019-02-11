@@ -101,7 +101,7 @@ def simprints = [
     mockscanner: "com.simprints:mockscanner:2018.3.0"
 ]
 
-def mockito_version = "2.24.0"
+def mockito_version = "2.22.0"
 def espresso_version = "3.1.2-alpha01"
 def roboletric_version = "4.2-beta-1"
 def testing = [
