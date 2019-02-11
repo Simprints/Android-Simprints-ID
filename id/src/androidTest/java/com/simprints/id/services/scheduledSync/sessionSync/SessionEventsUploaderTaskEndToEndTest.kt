@@ -20,8 +20,8 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.TestProjectRule
 import com.simprints.id.testtools.adapters.toCalloutCredentials
 import com.simprints.id.testtools.models.TestProject
 import com.simprints.id.testtools.remote.RemoteTestingManager
@@ -34,8 +34,6 @@ import com.simprints.mockscanner.MockScannerManager
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.observers.TestObserver
-import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,14 +42,12 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
+class SessionEventsUploaderTaskEndToEndTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
-
-    override lateinit var testProject: TestProject
+    @get:Rule val testProjectRule = TestProjectRule()
+    private lateinit var testProject: TestProject
 
     @Rule
     @JvmField
@@ -80,7 +76,7 @@ class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
@@ -89,7 +85,7 @@ class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
             FingerIdentifier.LEFT_THUMB to true,
             FingerIdentifier.LEFT_INDEX_FINGER to true))
 
-        super<FirstUseLocalAndRemote>.setUp()
+        testProject = testProjectRule.testProject
         signOut()
     }
 
@@ -112,11 +108,6 @@ class SessionEventsUploaderTaskEndToEndTest : FirstUseLocalAndRemote {
 
         val response = RemoteTestingManager.create().getSessionCount(testProject.id)
         Truth.assertThat(response.count).isEqualTo(nSession)
-    }
-
-    @After
-    override fun tearDown() {
-        super.tearDown()
     }
 
     private fun executeUpload(): TestObserver<Void> {

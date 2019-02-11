@@ -59,15 +59,15 @@ class AndroidTestConfig<T : Any>(
         return this
     }
 
-    fun initDependencies(): AndroidTestConfig<T> {
-        app.initDependencies()
-        return this
-    }
-
     fun clearData(): AndroidTestConfig<T> {
         StorageUtils.clearApplicationData(app)
         StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
         StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
+        return this
+    }
+
+    fun initDependencies(): AndroidTestConfig<T> {
+        app.initDependencies()
         return this
     }
 

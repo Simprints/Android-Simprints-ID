@@ -31,9 +31,9 @@ import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.LoginManagerTest
+import com.simprints.id.testtools.TestProjectRule
 import com.simprints.id.testtools.models.TestProject
 import com.simprints.id.testtools.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
@@ -41,10 +41,8 @@ import com.simprints.testframework.android.tryOnUiUntilTimeout
 import com.simprints.testframework.android.waitOnSystem
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
-import io.realm.RealmConfiguration
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,7 +51,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
+class DashboardActivityAndroidTest {
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
@@ -65,11 +63,10 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    override lateinit var testProject: TestProject
+    @get:Rule val testProjectRule = TestProjectRule()
+    private lateinit var testProject: TestProject
 
     @Rule @JvmField val launchActivityRule = ActivityTestRule(DashboardActivity::class.java, false, false)
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
@@ -101,10 +98,10 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
     private var peopleOnServer = mutableListOf<Person>()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
-        super<FirstUseLocalAndRemote>.setUp()
+        testProject = testProjectRule.testProject
 
         mockBeingSignedIn()
         signOut()
@@ -253,11 +250,6 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
                 DEFAULT_REALM_KEY,
                 testProject.legacyId),
             token.token)
-    }
-
-    @After
-    override fun tearDown() {
-        super.tearDown()
     }
 
     private fun signOut() {
