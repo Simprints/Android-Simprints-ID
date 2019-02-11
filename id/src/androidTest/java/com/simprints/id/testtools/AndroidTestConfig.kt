@@ -19,7 +19,18 @@ class AndroidTestConfig<T : Any>(
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
     fun fullSetup() =
-        initComponent().inject().initRealm()
+        initComponent()
+            .inject()
+            .initRealm()
+            .initDependencies()
+
+    /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
+     * Useful for setting up mocks before the Application is created */
+    fun fullSetupWith(block: () -> Unit): AndroidTestConfig<T> {
+        val config = initComponent().inject().initRealm()
+        block()
+        return config.initDependencies()
+    }
 
     fun initComponent(): AndroidTestConfig<T> {
 
@@ -39,6 +50,11 @@ class AndroidTestConfig<T : Any>(
 
     fun initRealm(): AndroidTestConfig<T> {
         Realm.init(app)
+        return this
+    }
+
+    fun initDependencies(): AndroidTestConfig<T> {
+        app.initDependencies()
         return this
     }
 }

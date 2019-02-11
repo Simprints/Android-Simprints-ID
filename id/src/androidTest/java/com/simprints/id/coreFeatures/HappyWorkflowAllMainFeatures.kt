@@ -65,8 +65,6 @@ class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
-        app.initDependencies()
-
         super<FirstUseLocalAndRemote>.setUp()
 
         signOut()
