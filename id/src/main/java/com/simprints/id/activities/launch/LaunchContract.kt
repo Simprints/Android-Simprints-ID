@@ -28,7 +28,6 @@ interface LaunchContract {
         fun addParentalConsentTabWithText(parentalConsentText: String)
         fun isCurrentTabParental(): Boolean
         fun requestPermissions(permissions: ArrayList<String>): Observable<Permission>
-        fun getLocationProvider(): ReactiveLocationProvider
     }
 
     interface Presenter : BasePresenter {

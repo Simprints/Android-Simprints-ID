@@ -30,6 +30,7 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libcommon.Person
 import com.simprints.libscanner.ButtonListener
@@ -53,6 +54,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var locationProvider: LocationProvider
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -90,6 +92,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         startSetup()
     }
 
+    @SuppressLint("CheckResult")
     private fun startSetup() {
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
@@ -191,12 +194,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             }
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission", "CheckResult")
     private fun collectLocationIfPermitted(permissions: List<Permission>) {
         if (!permissionsAlreadyRequested &&
             permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
             val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-            view.getLocationProvider()
+            locationProvider
                 .getUpdatedLocation(req)
                 .firstOrError()
                 .observeOn(AndroidSchedulers.mainThread())
