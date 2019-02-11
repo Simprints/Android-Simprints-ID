@@ -1,8 +1,8 @@
 package com.simprints.id.coreFeatures
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
@@ -10,9 +10,9 @@ import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.TestProjectRule
 import com.simprints.id.testtools.adapters.toCalloutCredentials
 import com.simprints.id.testtools.models.TestProject
 import com.simprints.id.tools.RandomGenerator
@@ -20,8 +20,6 @@ import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
 import com.simprints.testframework.android.log
-import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,14 +28,12 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
+class HappyWorkflowAllMainFeatures {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
-
-    override lateinit var testProject: TestProject
+    @get:Rule val testProjectRule = TestProjectRule()
+    private lateinit var testProject: TestProject
 
     @Rule @JvmField val enrolTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
     @Rule @JvmField val enrolTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
@@ -59,13 +55,13 @@ class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
     }
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         log("HappyWorkflowAllMainFeatures.setUp()")
         AndroidTestConfig(this, module).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
-        super<FirstUseLocalAndRemote>.setUp()
+        testProject = testProjectRule.testProject
 
         signOut()
     }
@@ -169,11 +165,6 @@ class HappyWorkflowAllMainFeatures : FirstUseLocalAndRemote {
         fullHappyWorkflow()
         matchingActivityVerificationCheckFinished(verifyTestRule4)
         verificationNotAMatch(verifyTestRule4, person1)
-    }
-
-    @After
-    override fun tearDown() {
-        super.tearDown()
     }
 
     private fun signOut() {
