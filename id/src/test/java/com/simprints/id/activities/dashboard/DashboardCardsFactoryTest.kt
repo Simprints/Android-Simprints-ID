@@ -63,10 +63,11 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     override fun setUp() {
         app = (ApplicationProvider.getApplicationContext() as TestApplication)
         FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
+
         super.setUp()
         testAppComponent.inject(this)
         dbManager.initialiseDb()
-        initWorkManagerIfRequired(app)
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
