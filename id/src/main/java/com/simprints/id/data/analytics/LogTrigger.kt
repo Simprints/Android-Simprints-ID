@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics
 
-enum class LogPrompter {
+enum class LogTrigger {
     UI,
     NETWORK,
     SCANNER,

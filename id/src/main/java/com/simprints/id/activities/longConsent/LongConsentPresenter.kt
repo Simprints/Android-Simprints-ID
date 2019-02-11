@@ -2,7 +2,7 @@ package com.simprints.id.activities.longConsent
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -52,10 +52,10 @@ class LongConsentPresenter(val view: LongConsentContract.View,
     }
 
     override fun logMessageToAnalyticsWithUIPrompt(message: String) {
-        anayticsManager.logInfo(AnalyticsTags.LONG_CONSENT, LogPrompter.UI, message)
+        anayticsManager.logInfo(AnalyticsTags.LONG_CONSENT, LogTrigger.UI, message)
     }
 
     private fun logMessageToAnalyticsWithNetworkPrompt(message: String) {
-        anayticsManager.logInfo(AnalyticsTags.LONG_CONSENT, LogPrompter.NETWORK, message)
+        anayticsManager.logInfo(AnalyticsTags.LONG_CONSENT, LogTrigger.NETWORK, message)
     }
 }

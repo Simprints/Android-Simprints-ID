@@ -4,7 +4,7 @@ import android.app.Activity
 import com.simprints.id.R
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
@@ -100,6 +100,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogPrompter.UI, message)
+        analyticsManager.logInfo(AnalyticsTags.REFUSAL, LogTrigger.UI, message)
     }
 }

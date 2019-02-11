@@ -9,7 +9,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -73,5 +73,5 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
     }
 
     private fun logMessageToAnalytics(message: String) =
-        analyticsManager.logInfo(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
+        analyticsManager.logInfo(AnalyticsTags.SYNC, LogTrigger.NETWORK, message)
 }

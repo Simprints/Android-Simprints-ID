@@ -2,7 +2,7 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
@@ -161,11 +161,11 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     override fun logMessageToAnalyticsWithUIPrompt(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogPrompter.UI, message)
+        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogTrigger.UI, message)
     }
 
     private fun logMessageToAnalyticsWithNetworkPrompt(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogPrompter.NETWORK, message)
+        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogTrigger.NETWORK, message)
     }
 
     companion object {
