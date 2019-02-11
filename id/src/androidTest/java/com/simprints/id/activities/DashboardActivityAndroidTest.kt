@@ -10,8 +10,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.work.WorkManager
+import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.commontesttools.TestApplication
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
@@ -64,7 +64,7 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
         private const val SIGNED_ID_USER = "some_user"
     }
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     override lateinit var testProject: TestProject
 

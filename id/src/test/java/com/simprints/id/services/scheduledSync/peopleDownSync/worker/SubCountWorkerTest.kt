@@ -20,7 +20,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import io.reactivex.Single

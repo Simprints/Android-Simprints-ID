@@ -1,10 +1,9 @@
 package com.simprints.id.data.secure
 
-import androidx.test.InstrumentationRegistry
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import androidx.test.runner.AndroidJUnit4
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
@@ -25,7 +24,7 @@ import javax.inject.Inject
 @SmallTest
 class SecureDataManagerTest {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @Inject lateinit var preferencesManager: PreferencesManager
 
@@ -38,7 +37,7 @@ class SecureDataManagerTest {
     @Test
     fun createLocalDbKeyForDifferentProjects_shouldProduceDifferentKeys() {
 
-        val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
+        val keystoreManager = KeystoreManagerImpl(app)
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager, RandomGeneratorImpl())
 
         secureDataManager.setLocalDatabaseKey("project_id1", "legacy_key")
@@ -53,7 +52,7 @@ class SecureDataManagerTest {
     @Test
     fun createLocalDbKeysForSameProjectId_shouldProduceTheSameLocalKey() {
 
-        val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
+        val keystoreManager = KeystoreManagerImpl(app)
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 
         secureDataManager.setLocalDatabaseKey("project_id3", "legacy_key")
@@ -68,7 +67,7 @@ class SecureDataManagerTest {
     @Test
     fun noLocalKey_shouldThrowAnError() {
 
-        val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getTargetContext())
+        val keystoreManager = KeystoreManagerImpl(app)
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 
         assertThrows<MissingLocalDatabaseKeyException> {
@@ -79,7 +78,7 @@ class SecureDataManagerTest {
     @Test
     fun invalidEncryptedData_shouldThrowAnError() {
 
-        val keystoreManager = spy(KeystoreManagerImpl(InstrumentationRegistry.getTargetContext()))
+        val keystoreManager = spy(KeystoreManagerImpl(app))
         doReturn("wrong_encryption").`when`(keystoreManager).encryptString(anyNotNull())
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 

@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
@@ -64,7 +64,7 @@ import javax.inject.Inject
 @SmallTest
 class SessionEventsManagerImplTest : FirstUseLocal {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null

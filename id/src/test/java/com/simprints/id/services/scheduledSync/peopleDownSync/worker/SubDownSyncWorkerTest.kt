@@ -19,7 +19,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
 import io.reactivex.Completable

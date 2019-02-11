@@ -8,7 +8,7 @@ import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.testtools.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

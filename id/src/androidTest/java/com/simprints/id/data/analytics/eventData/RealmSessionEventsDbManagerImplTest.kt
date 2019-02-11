@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
@@ -38,7 +38,7 @@ import javax.inject.Inject
 @SmallTest
 class RealmSessionEventsDbManagerImplTest : FirstUseLocal {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     override var peopleRealmConfiguration: RealmConfiguration? = null
     override var sessionsRealmConfiguration: RealmConfiguration? = null

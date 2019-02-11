@@ -4,7 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
-import com.simprints.id.commontesttools.TestApplication
+import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
@@ -35,7 +35,7 @@ import javax.inject.Inject
 @LargeTest
 class AuthTestsHappyWifi : FirstUseLocal {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     private val invalidCredentials = TestCalloutCredentials(
         "beefdeadbeefdeadbeef",
