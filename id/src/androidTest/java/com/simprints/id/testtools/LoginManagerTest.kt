@@ -2,6 +2,7 @@ package com.simprints.id.testtools
 
 import android.content.SharedPreferences
 import com.nhaarman.mockito_kotlin.doReturn
+import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -16,6 +17,7 @@ class LoginManagerTest {
     fun setUpSignedInState(sharedPrefs: SharedPreferences,
                            secureDataManagerMock: SecureDataManager,
                            remoteDbManagerMock: RemoteDbManager,
+                           localDbManager: LocalDbManager,
                            projectId: String,
                            legacyApiKey: String,
                            userId: String,
@@ -38,5 +40,6 @@ class LoginManagerTest {
         doReturn(localDbKey).`when`(secureDataManagerMock).getLocalDbKeyOrThrow(anyNotNull())
         whenever(remoteDbManagerMock.getCurrentFirestoreToken()).thenReturn(Single.just(token))
 
+        localDbManager.signInToLocal(secureDataManagerMock.getLocalDbKeyOrThrow(projectId))
     }
 }

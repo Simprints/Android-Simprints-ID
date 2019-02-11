@@ -84,7 +84,6 @@ class RealmSessionEventsDbManagerImplTest : FirstUseLocal {
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        app.initDependencies()
         super<FirstUseLocal>.setUp()
 
         signOut()

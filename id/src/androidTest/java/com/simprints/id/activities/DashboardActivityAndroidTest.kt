@@ -107,7 +107,6 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
         super<FirstUseLocalAndRemote>.setUp()
 
         mockBeingSignedIn()
-        app.initDependencies()
         signOut()
 
         mockGlobalScope()
@@ -244,6 +243,7 @@ class DashboardActivityAndroidTest : FirstUseLocalAndRemote {
             app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
             secureDataManagerSpy,
             remoteDbManagerSpy,
+            localDbManager,
             testProject.id,
             testProject.legacyId,
             SIGNED_ID_USER,

@@ -31,7 +31,6 @@ class SecureDataManagerTest {
     @Before
     fun setUp() {
         AndroidTestConfig(this).fullSetup()
-        app.initDependencies()
     }
 
     @Test
