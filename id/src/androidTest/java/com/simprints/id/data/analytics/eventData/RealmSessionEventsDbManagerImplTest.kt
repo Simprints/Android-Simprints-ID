@@ -20,14 +20,12 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.testframework.common.syntax.whenever
-import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,12 +34,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class RealmSessionEventsDbManagerImplTest : FirstUseLocal {
+class RealmSessionEventsDbManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     private val testProjectId1 = "test_project1"
     private val testProjectId2 = "test_project2"
@@ -78,13 +73,10 @@ class RealmSessionEventsDbManagerImplTest : FirstUseLocal {
         get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        super<FirstUseLocal>.setUp()
 
         signOut()
 

@@ -18,13 +18,11 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.SimHelper
 import com.simprints.testframework.android.tryOnUiUntilTimeout
-import io.realm.RealmConfiguration
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -34,12 +32,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class GuidSelectionServiceTest : FirstUseLocal {
+class GuidSelectionServiceTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     private val module by lazy {
         TestAppModule(app,
@@ -60,15 +55,11 @@ class GuidSelectionServiceTest : FirstUseLocal {
     @Rule @JvmField val scanTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module).fullSetupWith {
             setupRandomGeneratorToGenerateKey(DefaultTestConstants.DEFAULT_REALM_KEY, randomGeneratorMock)
             setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
         }
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
     }
 
     @Test

@@ -17,13 +17,10 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
-import io.realm.RealmConfiguration
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -32,7 +29,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsHappyWifi : FirstUseLocal {
+class AuthTestsHappyWifi {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -44,9 +41,6 @@ class AuthTestsHappyWifi : FirstUseLocal {
     )
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -64,14 +58,10 @@ class AuthTestsHappyWifi : FirstUseLocal {
     private val mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
 
         signOut()
     }
@@ -198,11 +188,6 @@ class AuthTestsHappyWifi : FirstUseLocal {
         launchAppFromIntentEnrol(invalidCredentials.toLegacy(), loginTestRule)
         ensureConfigError()
         signOut()
-    }
-
-    @After
-    override fun tearDown() {
-        super.tearDown()
     }
 
     private fun signOut() {

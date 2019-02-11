@@ -16,10 +16,8 @@ import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingC
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
-import io.realm.RealmConfiguration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,12 +26,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AuthTestsNoWifi : FirstUseLocal {
+class AuthTestsNoWifi {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule
     @JvmField
@@ -55,14 +50,10 @@ class AuthTestsNoWifi : FirstUseLocal {
     }
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module).fullSetup()
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
         replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy, remoteSessionsManagerSpy)
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
     }
 
     @Test

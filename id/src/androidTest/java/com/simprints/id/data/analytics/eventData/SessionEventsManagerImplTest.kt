@@ -30,7 +30,6 @@ import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
@@ -46,11 +45,9 @@ import com.simprints.testframework.android.waitOnUi
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.whenever
-import io.realm.RealmConfiguration
 import io.realm.Sort
 import junit.framework.TestCase.*
 import org.json.JSONObject
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -61,12 +58,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SessionEventsManagerImplTest : FirstUseLocal {
+class SessionEventsManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-
-    override var peopleRealmConfiguration: RealmConfiguration? = null
-    override var sessionsRealmConfiguration: RealmConfiguration? = null
 
     @Rule @JvmField val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
@@ -109,25 +103,16 @@ class SessionEventsManagerImplTest : FirstUseLocal {
         }
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-
-        peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
-        sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
-        super<FirstUseLocal>.setUp()
 
         signOut()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,
             FingerIdentifier.LEFT_INDEX_FINGER to true))
-    }
-
-    @After
-    override fun tearDown() {
-        super.tearDown()
     }
 
     @Test

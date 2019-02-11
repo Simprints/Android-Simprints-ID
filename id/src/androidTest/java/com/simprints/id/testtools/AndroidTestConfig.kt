@@ -2,8 +2,13 @@ package com.simprints.id.testtools
 
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.id.Application
+import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
+import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
 import com.simprints.testframework.common.dagger.injectClassFromComponent
@@ -22,12 +27,13 @@ class AndroidTestConfig<T : Any>(
         initComponent()
             .inject()
             .initRealm()
+            .clearData()
             .initDependencies()
 
     /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
      * Useful for setting up mocks before the Application is created */
     fun fullSetupWith(block: () -> Unit): AndroidTestConfig<T> {
-        val config = initComponent().inject().initRealm()
+        val config = initComponent().inject().initRealm().clearData()
         block()
         return config.initDependencies()
     }
@@ -56,5 +62,18 @@ class AndroidTestConfig<T : Any>(
     fun initDependencies(): AndroidTestConfig<T> {
         app.initDependencies()
         return this
+    }
+
+    fun clearData(): AndroidTestConfig<T> {
+        StorageUtils.clearApplicationData(app)
+        StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
+        StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
+        return this
+    }
+
+    companion object {
+        private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY)
+        val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
+        val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
     }
 }
