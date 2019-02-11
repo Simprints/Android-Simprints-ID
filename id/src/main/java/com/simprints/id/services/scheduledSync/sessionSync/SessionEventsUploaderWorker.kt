@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -72,8 +72,8 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
     }
 
     private fun logMessageToAnalytics(message: String) =
-        analyticsManager.logInfo(AnalyticsTags.SESSION, LogPrompter.NETWORK, message)
+        analyticsManager.logInfo(AnalyticsTags.SESSION, LogTrigger.NETWORK, message)
 
     private fun logWarningToAnalytics(message: String) =
-        analyticsManager.logWarning(AnalyticsTags.SESSION, LogPrompter.NETWORK, message)
+        analyticsManager.logWarning(AnalyticsTags.SESSION, LogTrigger.NETWORK, message)
 }

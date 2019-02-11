@@ -3,7 +3,7 @@ package com.simprints.id.scanner
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
@@ -15,7 +15,6 @@ import com.simprints.libscanner.ScannerUtils
 import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import io.reactivex.Completable
-import timber.log.Timber
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                               val analyticsManager: AnalyticsManager,
@@ -172,6 +171,6 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     }
 
     private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.SCANNER_SETUP, LogPrompter.SCANNER, message)
+        analyticsManager.logInfo(AnalyticsTags.SCANNER_SETUP, LogTrigger.SCANNER, message)
     }
 }

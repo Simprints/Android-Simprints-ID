@@ -15,7 +15,7 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
@@ -351,7 +351,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogPrompter.UI, message)
+        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogTrigger.UI, message)
     }
 
     companion object {

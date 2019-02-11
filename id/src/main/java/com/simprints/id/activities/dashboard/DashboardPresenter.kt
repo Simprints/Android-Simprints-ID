@@ -5,15 +5,15 @@ import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -82,7 +82,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
         viewModel.viewModelState.onSyncActionClicked = {
-            analyticsManager.logInfo(AnalyticsTags.SYNC, LogPrompter.UI,"Dashboard card sync button clicked")
+            analyticsManager.logInfo(AnalyticsTags.SYNC, LogTrigger.UI,"Dashboard card sync button clicked")
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()

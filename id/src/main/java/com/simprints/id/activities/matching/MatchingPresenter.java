@@ -8,7 +8,7 @@ import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.AnalyticsTags;
-import com.simprints.id.data.analytics.LogPrompter;
+import com.simprints.id.data.analytics.LogTrigger;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
@@ -42,7 +42,6 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import io.reactivex.functions.BiConsumer;
-import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
@@ -373,6 +372,6 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void logMessageToAnalytics(String message) {
-        analyticsManager.logInfo(AnalyticsTags.MATCHING, LogPrompter.UI, message);
+        analyticsManager.logInfo(AnalyticsTags.MATCHING, LogTrigger.UI, message);
     }
 }

@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogPrompter
+import com.simprints.id.data.analytics.LogTrigger
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -69,10 +69,10 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     }
 
     private fun logMessageToAnalytics(message: String) =
-        analyticsManager.logInfo(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
+        analyticsManager.logInfo(AnalyticsTags.SYNC, LogTrigger.NETWORK, message)
 
     private fun logWarningToAnalytics(message: String) =
-        analyticsManager.logWarning(AnalyticsTags.SYNC, LogPrompter.NETWORK, message)
+        analyticsManager.logWarning(AnalyticsTags.SYNC, LogTrigger.NETWORK, message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
