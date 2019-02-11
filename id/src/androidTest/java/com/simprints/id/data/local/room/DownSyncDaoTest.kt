@@ -26,8 +26,7 @@ class DownSyncDaoTest {
     @Before
     fun createDb() {
         val app = ApplicationProvider.getApplicationContext<Application>()
-        db = Room.inMemoryDatabaseBuilder(
-            app, SyncStatusDatabase::class.java).build()
+        db = Room.inMemoryDatabaseBuilder(app, SyncStatusDatabase::class.java).build()
         downSyncDao = db?.downSyncDao
     }
 

@@ -24,7 +24,6 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.SimHelper
 import com.simprints.testframework.android.tryOnUiUntilTimeout
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.junit.Assert
 import org.junit.Before
@@ -69,7 +68,6 @@ class GuidSelectionServiceTest : FirstUseLocal {
 
         app.initDependencies()
 
-        Realm.init(app)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration
         sessionsRealmConfiguration = FirstUseLocal.defaultSessionRealmConfiguration
         super<FirstUseLocal>.setUp()
