@@ -17,11 +17,7 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForDefaultFingers(): Preference
 
-        fun getSyncAndSearchConfigurationPreference(): Preference
-
-        fun getAppVersionPreference(): Preference
-
-        fun getScannerVersionPreference(): Preference
+        fun getPreferenceForAbout(): Preference
 
         fun getKeyForLanguagePreference(): String
 
@@ -29,11 +25,7 @@ interface SettingsPreferenceContract {
 
         fun getKeyForDefaultFingersPreference(): String
 
-        fun getKeyForSyncAndSearchConfigurationPreference(): String
-
-        fun getKeyForAppVersionPreference(): String
-
-        fun getKeyForScannerVersionPreference(): String
+        fun getKeyForAboutPreference(): String
 
         fun setSelectModulePreferenceEnabled(enabled: Boolean)
 
@@ -42,6 +34,8 @@ interface SettingsPreferenceContract {
         fun showToastForTooManyModulesSelected(maxModules: Int)
 
         fun showToastForInvalidSelectionOfFingers()
+
+        fun openSettingAboutActivity()
     }
 
     interface Presenter : BasePresenter
