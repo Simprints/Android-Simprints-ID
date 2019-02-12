@@ -408,6 +408,7 @@
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
     <string name="title_activity_settings_about">About</string>
 
+    <!--Settings Preferences titles and summaries-->
     <string name="preference_app_details_title">App Details</string>
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>

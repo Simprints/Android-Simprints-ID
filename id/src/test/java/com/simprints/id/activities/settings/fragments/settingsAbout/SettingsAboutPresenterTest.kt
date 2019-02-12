@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsAboutPresenterTest: RxJavaTest, DaggerForTests() {
+class SettingsAboutPresenterTest {
 
     companion object {
         const val PREFERENCE_KEY_FOR_SYNC_AND_SEARCH = "select_sync_and_search"
@@ -33,7 +33,7 @@ class SettingsAboutPresenterTest: RxJavaTest, DaggerForTests() {
     private val viewMock: SettingsAboutContract.View = mock(SettingsAboutContract.View::class.java)
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         presenter = spy(SettingsAboutPresenter(viewMock, mock()))
     }
 

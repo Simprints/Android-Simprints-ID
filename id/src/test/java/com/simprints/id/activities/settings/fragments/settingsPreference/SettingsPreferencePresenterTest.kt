@@ -6,10 +6,8 @@ import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
-import junit.framework.Assert
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +18,7 @@ import org.robolectric.annotation.Config
 @Suppress("UsePropertyAccessSyntax")
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsPreferencePresenterTest: RxJavaTest, DaggerForTests() {
+class SettingsPreferencePresenterTest {
 
     companion object {
         const val PREFERENCE_KEY_FOR_MODULE = "select_modules"
@@ -33,7 +31,7 @@ class SettingsPreferencePresenterTest: RxJavaTest, DaggerForTests() {
     private val viewMock: SettingsPreferenceContract.View = Mockito.mock(SettingsPreferenceContract.View::class.java)
 
     @Before
-    override fun setUp() {
+    fun setUp() {
         presenter = Mockito.spy(SettingsPreferencePresenter(viewMock, mock()))
     }
 
