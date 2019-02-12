@@ -20,7 +20,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.pref_about)
+        addPreferencesFromResource(R.xml.pref_app_details)
         setHasOptionsMenu(true)
 
         val component = (activity.application as Application).component

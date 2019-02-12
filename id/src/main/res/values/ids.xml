@@ -8,5 +8,5 @@
     <string name="preference_select_language_key">select_language_preference_key</string>
     <string name="preference_select_fingers_key">select_fingers_preference_key</string>
     <string name="preference_select_modules_key">select_modules_preference_key</string>
-    <string name="preference_about_key">about_preference_key</string>
+    <string name="preference_app_details_key">app_details_preference_key</string>
 </resources>

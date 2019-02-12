@@ -398,7 +398,7 @@
     <string name="settings_sync_launch">Sync upon launch</string>
     <string name="settings_background_sync">Background Sync</string>
     <string name="settings_general">GENERAL</string>
-    <string name="settings_about">App Details</string>
+    <string name="settings_app_details">APP DETAILS</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_scanner_version">Scanner Version</string>
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
@@ -408,7 +408,7 @@
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
     <string name="title_activity_settings_about">About</string>
 
-    <string name="preference_about_title">App Details</string>
+    <string name="preference_app_details_title">App Details</string>
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
