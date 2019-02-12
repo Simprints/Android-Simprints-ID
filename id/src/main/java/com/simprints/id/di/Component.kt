@@ -29,6 +29,7 @@ import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
@@ -78,7 +79,7 @@ interface AppComponent {
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncPeriodicFlusherWorker: PeopleUpSyncPeriodicFlusherWorker)
-    fun inject(settingsPreferencePresenter: com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter)
+    fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(longConsentPresenter: LongConsentPresenter)
     fun inject(scannerManager: ScannerManager)
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
