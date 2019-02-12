@@ -398,7 +398,7 @@
     <string name="settings_sync_launch">Sync upon launch</string>
     <string name="settings_background_sync">Background Sync</string>
     <string name="settings_general">GENERAL</string>
-    <string name="settings_about">ABOUT</string>
+    <string name="settings_about">App Details</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_scanner_version">Scanner Version</string>
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
