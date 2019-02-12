@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="@string/settings_about">
+    <PreferenceCategory android:title="@string/settings_app_details">
         <Preference
             android:key="@string/preference_app_version_key"
             android:title="@string/preference_app_version_title" />

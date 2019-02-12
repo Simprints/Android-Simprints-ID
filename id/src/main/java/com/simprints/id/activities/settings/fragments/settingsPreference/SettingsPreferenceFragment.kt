@@ -63,7 +63,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         findPreference(getKeyForAboutPreference())
 
     override fun getKeyForAboutPreference(): String =
-        getString(R.string.preference_about_key)
+        getString(R.string.preference_app_details_key)
 
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
         getPreferenceForSelectModules().isEnabled = enabled
