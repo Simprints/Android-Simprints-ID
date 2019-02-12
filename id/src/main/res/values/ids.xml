@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preference_app_version_key">app_version_preference_key</string>
+    <string name="preference_scanner_version_key">scanner_version_preference_key</string>
+    <string name="preference_sync_and_search_key">sync_and_search_preference_key</string>
+    <string name="preference_device_id_key">device_id_preference_key</string>
+    <string name="preference_logout_key">logout_preference_key</string>
+    <string name="preference_select_language_key">select_language_preference_key</string>
+    <string name="preference_select_fingers_key">select_fingers_preference_key</string>
+    <string name="preference_select_modules_key">select_modules_preference_key</string>
+    <string name="preference_app_details_key">app_details_preference_key</string>
+</resources>
