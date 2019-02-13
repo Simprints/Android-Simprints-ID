@@ -2,12 +2,11 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockito_kotlin.*
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
-import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
@@ -26,15 +25,14 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.common.syntax.*
 import com.simprints.testframework.unit.mockserver.assertPathUrlParam
 import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
@@ -180,7 +178,7 @@ class SubDownSyncTaskTest {
             rl_SyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
-        doNothing().whenever(downSyncDao).insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture())
+        whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
 
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
@@ -197,7 +195,7 @@ class SubDownSyncTaskTest {
         Assert.assertEquals(downSyncStatusAfterRealmMigration.id, downSyncDao.getStatusId(subScope))
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientUpdatedAt, lastPatientUpdateAt.time)
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientId, lastPatientId)
-        verify(localDbMock, atLeast(1)).deleteSyncInfo(anyNotNull())
+        verifyAtLeast(1, localDbMock) { deleteSyncInfo(anyNotNull()) }
     }
 
     private fun runDownSyncAndVerifyConditions(
@@ -218,17 +216,17 @@ class SubDownSyncTaskTest {
             lastPatientUpdatedAt = lastPatientUpdateAt))
 
         val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).doReturn(Completable.complete())
+        whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).thenReturn(Completable.complete())
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
-        doNothing().whenever(downSyncDao).updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture())
+        whenever(downSyncDao) { updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture()) } thenDoNothing {}
 
         val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
-        verify(localDbMock, times(batches)).insertOrUpdatePeopleInLocal(anyNotNull())
-        verify(downSyncDao, times(batches)).updateLastPatientId(anyString(), anyString())
-        verify(downSyncDao, times(batches + 1)).updateLastSyncTime(anyString(), anyLong())
+        verifyExactly(batches, localDbMock) { insertOrUpdatePeopleInLocal(anyNotNull()) }
+        verifyExactly(batches, downSyncDao) { updateLastPatientId(anyString(), anyString()) }
+        verifyExactly(batches + 1, downSyncDao) { updateLastSyncTime(anyString(), anyLong()) }
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
@@ -238,7 +236,7 @@ class SubDownSyncTaskTest {
     }
 
     private fun doReturnScopeFromBuilder(scope: SyncScope) {
-        doReturn(scope).`when`(syncScopeBuilderSpy).buildSyncScope()
+        whenever(syncScopeBuilderSpy) { buildSyncScope() } thenReturn scope
     }
 
     private fun prepareResponseForSubScope(subSyncScope: SubSyncScope, nPeople: Int) =
@@ -262,14 +260,14 @@ class SubDownSyncTaskTest {
 
     private fun doReturnDownSyncStatusFromRoom(downSyncStatus: DownSyncStatus?) {
         downSyncStatus?.let {
-            whenever(downSyncDao.getDownSyncStatusForId(anyString())).doReturn(downSyncStatus)
+            whenever(downSyncDao.getDownSyncStatusForId(anyString())).thenReturn(downSyncStatus)
         }
     }
 
     private fun doNothingForDownStatusInRoom() {
-        doNothing().whenever(downSyncDao).updateLastSyncTime(anyString(), anyLong())
-        doNothing().whenever(downSyncDao).updatePeopleToDownSync(anyString(), anyInt())
-        doNothing().whenever(downSyncDao).updateLastPatientId(anyString(), anyString())
+        whenever(downSyncDao) { updateLastSyncTime(anyString(), anyLong()) } thenDoNothing {}
+        whenever(downSyncDao) { updatePeopleToDownSync(anyString(), anyInt()) } thenDoNothing {}
+        whenever(downSyncDao) { updateLastPatientId(anyString(), anyString()) } thenDoNothing {}
     }
 
 
@@ -278,7 +276,7 @@ class SubDownSyncTaskTest {
     }
 
     private fun doNothingForInsertPeopleToLocalDb(localDbMock: LocalDbManager) {
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).doReturn(Completable.complete())
+        whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
     }
 
     private fun mockSuccessfulResponseForDownloadPatients(patients: List<fb_Person>): MockResponse? {

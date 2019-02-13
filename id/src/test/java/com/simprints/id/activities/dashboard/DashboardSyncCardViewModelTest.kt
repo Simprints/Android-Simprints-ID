@@ -5,10 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
@@ -34,7 +30,10 @@ import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testframework.common.livedata.testObserver
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.verifyExactly
+import com.simprints.testframework.common.syntax.verifyOnce
 import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Before
@@ -42,6 +41,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -112,7 +112,7 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
         Truth.assert_().that(lastState?.peopleToUpload).isEqualTo(2)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(3)
-        verify(dbManagerMock, times(1)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyOnce(dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
     @Test
@@ -253,7 +253,7 @@ class DashboardSyncCardViewModelTest {
 
     private fun mockCounters(peopleInDb: Int? = null, peopleToUpload: Int? = null, peopleToDownload: Int? = null) {
         peopleInDb?.let {
-            whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
+            whenever(localDbManagerMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(peopleToUpload))
         }
 
         peopleInDb?.let {
@@ -289,15 +289,15 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
-        verify(localDbManagerMock, times(requiredCallsToInitTotalCounter)).getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(any(), any(), any(), any()) }
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
-        verify(dbManagerMock, times(times)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyExactly(times, dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
 
     }
 
     private fun verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter: Int) {
-        verify(dbManagerMock, times(requiredCallToInitAndUpdateUpSyncCounter)).getPeopleCountFromLocalForSyncScope(anyNotNull())
+        verifyExactly(requiredCallToInitAndUpdateUpSyncCounter, dbManagerMock) { getPeopleCountFromLocalForSyncScope(anyNotNull()) }
     }
 }

@@ -2,8 +2,6 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.activities.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -19,6 +17,7 @@ import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
+import org.mockito.ArgumentMatchers.any
 import org.mockito.stubbing.Answer
 
 object RobolectricTestMocker {
@@ -80,8 +79,8 @@ object RobolectricTestMocker {
 
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         whenever { localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull()) } thenReturn Completable.complete()
-        whenever { localDbManagerSpy.loadPersonFromLocal(any()) } thenReturn Single.error(IllegalStateException())
-        whenever { localDbManagerSpy.getPeopleCountFromLocal(any(), any(), any(), any()) } thenReturn Single.error(IllegalStateException())
+        whenever { localDbManagerSpy.loadPersonFromLocal(anyNotNull()) } thenReturn Single.error(IllegalStateException())
+        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 
@@ -90,8 +89,8 @@ object RobolectricTestMocker {
     }
 
     fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
-        whenever { sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull()) } thenReturn Single.error(IllegalStateException())
-        whenever { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(any()) } thenReturn Completable.complete()
+        whenever { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } thenReturn Single.error(IllegalStateException())
+        whenever { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(anyNotNull()) } thenReturn Completable.complete()
         return this
     }
 }

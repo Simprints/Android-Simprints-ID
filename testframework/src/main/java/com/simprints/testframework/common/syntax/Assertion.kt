@@ -1,8 +1,5 @@
 package com.simprints.testframework.common.syntax
 
-import com.nhaarman.mockito_kotlin.atLeast
-import com.nhaarman.mockito_kotlin.atMost
-import com.nhaarman.mockito_kotlin.times
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
@@ -17,13 +14,13 @@ fun <T> verifyNever(mock: T, methodCall: T.() -> Any?) =
     verifyExactly(0, mock, methodCall)
 
 fun <T> verifyExactly(times: Int, mock: T, methodCall: T.() -> Any?) =
-    verify(::times, times, mock, methodCall)
+    verify(Mockito::times, times, mock, methodCall)
 
 fun <T> verifyAtLeast(times: Int, mock: T, methodCall: T.() -> Any?) =
-    verify(::atLeast, times, mock, methodCall)
+    verify(Mockito::atLeast, times, mock, methodCall)
 
 fun <T> verifyAtMost(times: Int, mock: T, methodCall: T.() -> Any?) =
-    verify(::atMost, times, mock, methodCall)
+    verify(Mockito::atMost, times, mock, methodCall)
 
 private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
     Mockito.verify(mock, mode(times)).methodCall()

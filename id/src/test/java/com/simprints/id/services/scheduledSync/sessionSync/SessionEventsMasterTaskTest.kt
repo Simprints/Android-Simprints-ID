@@ -2,8 +2,6 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -16,9 +14,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
-import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.*
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -29,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.AdditionalAnswers
 import org.mockito.Mockito
 import org.mockito.Mockito.spy
-import org.mockito.Mockito.times
 import org.robolectric.annotation.Config
 import java.io.IOException
 
@@ -80,7 +75,7 @@ class SessionEventsMasterTaskTest {
             val testObserver = this.execute().test()
         testObserver.awaitAndAssertSuccess()
 
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 
@@ -114,7 +109,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verify(analyticsManagerMock, times(1)).logThrowable(any())
+            verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 
@@ -129,7 +124,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 
