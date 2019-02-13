@@ -37,6 +37,6 @@ interface LoginContract {
 
         fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)
-        fun logMessageToAnalyticsWithUIPrompt(message: String)
+        fun logMessageForCrashReportWithUITrigger(message: String)
     }
 }

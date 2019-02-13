@@ -22,6 +22,6 @@ interface LongConsentContract {
 
         fun downloadLongConsent()
 
-        fun logMessageToAnalyticsWithUIPrompt(message: String)
+        fun logMessageForCrashReportWithUITrigger(message: String)
     }
 }

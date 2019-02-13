@@ -3,9 +3,9 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
@@ -18,7 +18,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     init {
         component.inject(this)
@@ -163,7 +163,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
         preferencesManager.language = stringValue
-        logMessageToAnalytics("Language set to ${preferencesManager.language}")
+        logMessageForCrashReport("Language set to ${preferencesManager.language}")
 
         listPreference.summary = if (index >= 0) {
             listPreference.entries[index]
@@ -179,7 +179,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             moduleIdHash.size > MAX_SELECTED_MODULES -> { handleTooManyModulesSelected(moduleIdHash) }
             else -> {
                 preferencesManager.selectedModules = moduleIdHash
-                logMessageToAnalytics("Modules set to ${preferencesManager.selectedModules}")
+                logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
             }
         }
         return true
@@ -201,7 +201,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                                             fingersHash: HashSet<String>): Boolean {
         if (selectionContainsDefaultFingers(fingersHash)) {
             preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
-            logMessageToAnalytics("Default fingers set to ${preferencesManager.fingerStatus}")
+            logMessageForCrashReport("Default fingers set to ${preferencesManager.fingerStatus}")
         } else {
             view.showToastForInvalidSelectionOfFingers()
             fingersHash.clear()
@@ -221,8 +221,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
 
-    private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.SETTINGS, LogTrigger.UI, message)
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logInfo(CrashReportTags.SETTINGS, CrashTrigger.UI, message)
     }
 
     companion object {

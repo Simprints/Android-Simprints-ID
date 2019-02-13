@@ -60,7 +60,7 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         longConsent_downloadProgressBar.visibility = View.INVISIBLE
         longConsent_downloadButton.setOnClickListener {
             viewPresenter.downloadLongConsent()
-            viewPresenter.logMessageToAnalyticsWithUIPrompt("Long consent download button clicked")
+            viewPresenter.logMessageForCrashReportWithUITrigger("Long consent download button clicked")
         }
     }
 

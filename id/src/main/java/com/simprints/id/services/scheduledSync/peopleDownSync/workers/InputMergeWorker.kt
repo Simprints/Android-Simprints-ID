@@ -6,7 +6,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -19,7 +19,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
 
     @Inject lateinit var saveCountsTask: SaveCountsTask
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     override fun doWork(): Result {
         inject()
@@ -33,7 +33,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
             Result.success(inputData)
         } catch (e: Throwable) {
             e.printStackTrace()
-            analyticsManager.logThrowable(e)
+            crashReportManager.logThrowable(e)
             Result.failure()
         }
         toastForDebugBuilds(result)

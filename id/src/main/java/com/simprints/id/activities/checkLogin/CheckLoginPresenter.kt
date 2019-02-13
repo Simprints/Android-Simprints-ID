@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -22,6 +23,7 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
@@ -45,7 +47,7 @@ abstract class CheckLoginPresenter(
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
                     e.printStackTrace()
-                    analyticsManager.logThrowable(e)
+                    crashReportManager.logThrowable(e)
                     view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }
             }

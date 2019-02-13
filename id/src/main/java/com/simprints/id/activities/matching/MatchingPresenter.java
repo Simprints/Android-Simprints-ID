@@ -5,10 +5,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
-import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.AnalyticsTags;
-import com.simprints.id.data.analytics.LogTrigger;
+
+import com.simprints.id.data.analytics.crashes.CrashReportManager;
+import com.simprints.id.data.analytics.crashes.CrashReportTags;
+import com.simprints.id.data.analytics.crashes.CrashTrigger;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
@@ -41,6 +41,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import io.reactivex.functions.BiConsumer;
 
 import static android.app.Activity.RESULT_OK;
@@ -61,7 +62,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @NonNull @Inject PreferencesManager preferencesManager;
     @NonNull @Inject LoginInfoManager loginInfoManager;
     @NonNull @Inject TimeHelper timeHelper;
-    @NonNull @Inject AnalyticsManager analyticsManager;
+    @NonNull @Inject
+    CrashReportManager crashReportManager;
     @NonNull @Inject DbManager dbManager;
     @NonNull @Inject SessionEventsManager sessionEventsManager;
     private Long startTimeVerification = 0L;
@@ -93,7 +95,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         // TODO : Use polymorphism
         switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
-                logMessageToAnalytics("Making identification");
+                logMessageForCrashReport("Making identification");
                 startTimeIdentification = timeHelper.now();
 
                 final Runnable onMatchStartRunnable = new Runnable() {
@@ -111,14 +113,14 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgressLoadingStart();
                 break;
             case VERIFY:
-                logMessageToAnalytics("Making verification");
+                logMessageForCrashReport("Making verification");
                 startTimeVerification = timeHelper.now();
 
                 matchingView.setVerificationProgress();
                 onVerifyStart();
                 break;
             default:
-                analyticsManager.logException(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                crashReportManager.logException(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -147,7 +149,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 preferencesManager.getMatchGroup(),
                 wrapCallback("loading people", newOnLoadPeopleCallback()));
         } catch (UninitializedDataManagerError error) {
-            analyticsManager.logException(error);
+            crashReportManager.logException(error);
             matchingView.launchAlert();
         }
     }
@@ -156,7 +158,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                logMessageToAnalytics(String.format(Locale.UK,
+                logMessageForCrashReport(String.format(Locale.UK,
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -187,7 +189,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                analyticsManager.logException(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                crashReportManager.logException(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -202,7 +204,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 guid,
                 wrapCallback("loading people", newOnLoadPersonCallback()));
         } catch (UninitializedDataManagerError error) {
-            analyticsManager.logException(error);
+            crashReportManager.logException(error);
             matchingView.launchAlert();
         }
     }
@@ -211,7 +213,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                logMessageToAnalytics("Successfully loaded candidate");
+                logMessageForCrashReport("Successfully loaded candidate");
 
                 int matcherType = preferencesManager.getMatcherType();
 
@@ -241,7 +243,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                analyticsManager.logException(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
+                crashReportManager.logException(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -288,7 +290,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
                             dbManager.saveIdentification(probe, candidates.size(), topCandidates);
                         } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logException(error);
+                            crashReportManager.logException(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -341,7 +343,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             dbManager.saveVerification(probe, verification, guidExistsResult);
                             sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
                         } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logException(error);
+                            crashReportManager.logException(error);
                             matchingView.launchAlert();
                             return;
                         }
@@ -371,7 +373,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         });
     }
 
-    private void logMessageToAnalytics(String message) {
-        analyticsManager.logInfo(AnalyticsTags.MATCHING, LogTrigger.UI, message);
+    private void logMessageForCrashReport(String message) {
+        crashReportManager.logInfo(CrashReportTags.MATCHING, CrashTrigger.UI, message);
     }
 }

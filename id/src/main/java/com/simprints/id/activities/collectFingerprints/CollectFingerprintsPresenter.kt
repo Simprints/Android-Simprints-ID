@@ -13,9 +13,9 @@ import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprin
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
@@ -44,7 +44,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -92,11 +92,11 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
-            logMessageToAnalytics("Scan button clicked")
+            logMessageForCrashReport("Scan button clicked")
             startCapturing()
         }
         view.scanButton.setOnLongClickListener {
-            logMessageToAnalytics("Scan button long clicked")
+            logMessageForCrashReport("Scan button long clicked")
             resetFingerState()
         }
     }
@@ -227,7 +227,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
-        logMessageToAnalytics("Confirm fingerprints clicked")
+        logMessageForCrashReport("Confirm fingerprints clicked")
         dismissConfirmDialogIfStillShowing()
 
         val fingerprints = activeFingers
@@ -293,7 +293,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleUnexpectedError(error: SimprintsError) {
-        analyticsManager.logException(error)
+        crashReportManager.logException(error)
         Timber.e(error)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
@@ -320,7 +320,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             callbackRestart = { handleRestart() })
             .create().also {
                 it.show()
-                logMessageToAnalytics("Confirm fingerprints dialog shown")
+                logMessageForCrashReport("Confirm fingerprints dialog shown")
             }
     }
 
@@ -332,7 +332,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
     private fun handleRestart() {
-        logMessageToAnalytics("Restart clicked")
+        logMessageForCrashReport("Restart clicked")
         fingerDisplayHelper.clearAndPopulateFingerArrays()
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
@@ -341,7 +341,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
-        logMessageToAnalytics("Missing finger text clicked")
+        logMessageForCrashReport("Missing finger text clicked")
         if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             lastCaptureStartedAt = timeHelper.now()
@@ -350,8 +350,8 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogTrigger.UI, message)
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logInfo(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message)
     }
 
     companion object {

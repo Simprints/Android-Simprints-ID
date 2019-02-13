@@ -1,6 +1,6 @@
-package com.simprints.id.data.analytics
+package com.simprints.id.data.analytics.crashes
 
-enum class AnalyticsTags {
+enum class CrashReportTags {
     LOGIN,
     SCANNER_SETUP,
     SYNC,
@@ -10,5 +10,6 @@ enum class AnalyticsTags {
     SETTINGS,
     LONG_CONSENT,
     ALERT,
-    REFUSAL
+    REFUSAL,
+    SAFE_EXCEPTION
 }

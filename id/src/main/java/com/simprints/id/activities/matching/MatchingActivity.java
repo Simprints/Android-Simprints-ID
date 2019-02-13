@@ -15,6 +15,7 @@ import com.simprints.id.R;
 import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.analytics.crashes.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.di.AppComponent;
 import com.simprints.id.domain.ALERT_TYPE;
@@ -44,6 +45,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
 
     @Inject PreferencesManager preferencesManager;
     @Inject AnalyticsManager analyticsManager;
+    @Inject CrashReportManager crashReportManager;
     @Inject TimeHelper timeHelper;
 
     @Override
@@ -66,7 +68,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            analyticsManager.logException(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
+            crashReportManager.logException(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
             launchAlert();
             finish();
             return;

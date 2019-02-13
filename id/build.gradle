@@ -3,7 +3,6 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
-apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: "realm-android"
 

@@ -1,8 +1,8 @@
 package com.simprints.id.activities.login
 
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
@@ -32,7 +32,7 @@ class LoginPresenter(val view: LoginContract.View,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -69,7 +69,7 @@ class LoginPresenter(val view: LoginContract.View,
                                suppliedUserId: String,
                                suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
 
-        logMessageToAnalyticsWithNetworkPrompt("Making authentication request")
+        logMessageForCrashReportWithNetworkTrigger("Making authentication request")
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
@@ -91,7 +91,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun handleSignInSuccess(suppliedProjectId: String,
                                     suppliedUserId: String) {
-        logMessageToAnalyticsWithNetworkPrompt("Sign in success")
+        logMessageForCrashReportWithNetworkTrigger("Sign in success")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
@@ -127,14 +127,14 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
-        logMessageToAnalyticsWithNetworkPrompt("Sign in error - $reason")
+        logMessageForCrashReportWithNetworkTrigger("Sign in error - $reason")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
     private fun logSignInError(e: Throwable) {
         when (e) {
             is IOException -> Timber.d("Attempted login offline")
-            else -> analyticsManager.logThrowable(e)
+            else -> crashReportManager.logThrowable(e)
         }
     }
 
@@ -153,19 +153,19 @@ class LoginPresenter(val view: LoginContract.View,
             val potentialProjectSecret = scannedJson.getString(PROJECT_SECRET_JSON_KEY)
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)
-            logMessageToAnalyticsWithUIPrompt("QR scanning successful")
+            logMessageForCrashReportWithUITrigger("QR scanning successful")
         } catch (e: JSONException) {
             view.showErrorForInvalidQRCode()
-            logMessageToAnalyticsWithUIPrompt("QR scanning unsuccessful")
+            logMessageForCrashReportWithUITrigger("QR scanning unsuccessful")
         }
     }
 
-    override fun logMessageToAnalyticsWithUIPrompt(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogTrigger.UI, message)
+    override fun logMessageForCrashReportWithUITrigger(message: String) {
+        crashReportManager.logInfo(CrashReportTags.LOGIN, CrashTrigger.UI, message)
     }
 
-    private fun logMessageToAnalyticsWithNetworkPrompt(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.LOGIN, LogTrigger.NETWORK, message)
+    private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
+        crashReportManager.logInfo(CrashReportTags.LOGIN, CrashTrigger.NETWORK, message)
     }
 
     companion object {

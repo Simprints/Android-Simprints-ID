@@ -2,8 +2,9 @@ package com.simprints.id.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
@@ -18,6 +19,7 @@ import io.reactivex.Completable
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                               val analyticsManager: AnalyticsManager,
+                              val crashReportManager: CrashReportManager,
                               private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
@@ -56,7 +58,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
-                logMessageToAnalytics("ScannerManager: Scanner initialized")
+                logMessageForCrashReport("ScannerManager: Scanner initialized")
                 it.onComplete()
             }
         }
@@ -67,7 +69,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.connect(WrapperScannerCallback({
-                logMessageToAnalytics("ScannerManager: Connected to Vero")
+                logMessageForCrashReport("ScannerManager: Connected to Vero")
                 preferencesManager.scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
                 result.onComplete()
@@ -91,7 +93,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
-                logMessageToAnalytics("ScannerManager: UN20 ready")
+                logMessageForCrashReport("ScannerManager: UN20 ready")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -116,7 +118,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
-                logMessageToAnalytics("ScannerManager: UN20 off")
+                logMessageForCrashReport("ScannerManager: UN20 off")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -132,7 +134,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             result.onError(NullScannerError())
         } else {
             scanner?.resetUI(WrapperScannerCallback({
-                logMessageToAnalytics("ScannerManager: UI reset")
+                logMessageForCrashReport("ScannerManager: UI reset")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
@@ -170,7 +172,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         }
     }
 
-    private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.SCANNER_SETUP, LogTrigger.SCANNER, message)
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logInfo(CrashReportTags.SCANNER_SETUP, CrashTrigger.SCANNER, message)
     }
 }

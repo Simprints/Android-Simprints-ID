@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -16,7 +16,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     override fun doWork(): Result {
         Timber.d("SessionEventsMasterWorker doWork()")
@@ -34,7 +34,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
             Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            analyticsManager.logThrowable(throwable)
+            crashReportManager.logThrowable(throwable)
             Result.failure()
         }
     }
