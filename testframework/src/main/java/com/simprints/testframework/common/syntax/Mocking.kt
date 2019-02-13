@@ -82,6 +82,11 @@ class InfixOngoingStubbing<T>(private val ongoingStubbing: OngoingStubbing<T>)
 }
 
 /**
+ * An explicit [Mockito.any] that allows null values
+ */
+fun <T> anyOrNull(): T? = Mockito.any<T>()
+
+/**
  * A complement to [Mockito.any] that appropriately ensures non-null values
  */
 fun <T> anyNotNull(): T {

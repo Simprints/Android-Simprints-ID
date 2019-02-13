@@ -20,6 +20,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
@@ -29,7 +30,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 import java.util.*
 import javax.inject.Inject
@@ -192,10 +192,10 @@ class DashboardCardsFactoryTest {
     }
 
     private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
-        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), any(), any())).thenReturn(Single.just(count))
+        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
-        whenever(localDbManager.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(nLocalPeople))
+        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
     }
 }

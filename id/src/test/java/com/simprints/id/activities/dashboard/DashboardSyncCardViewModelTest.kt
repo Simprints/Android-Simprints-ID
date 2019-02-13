@@ -29,10 +29,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testframework.common.livedata.testObserver
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.verifyExactly
-import com.simprints.testframework.common.syntax.verifyOnce
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.common.syntax.*
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
@@ -41,7 +38,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -253,7 +249,7 @@ class DashboardSyncCardViewModelTest {
 
     private fun mockCounters(peopleInDb: Int? = null, peopleToUpload: Int? = null, peopleToDownload: Int? = null) {
         peopleInDb?.let {
-            whenever(localDbManagerMock.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(peopleToUpload))
+            whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
         }
 
         peopleInDb?.let {
@@ -289,7 +285,7 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
-        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(any(), any(), any(), any()) }
+        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) }
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {

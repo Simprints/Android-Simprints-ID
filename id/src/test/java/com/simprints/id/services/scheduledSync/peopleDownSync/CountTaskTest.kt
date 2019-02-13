@@ -13,6 +13,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImp
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
@@ -21,7 +22,6 @@ import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -63,7 +63,7 @@ class CountTaskTest {
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
                                                              peopleInLocalDb: Int): TestObserver<Int> {
 
-        whenever(remotePeoplemanagerMock.getNumberOfPatients(anyNotNull(), any(), any())).thenReturn(Single.just(peopleToDownload))
+        whenever(remotePeoplemanagerMock.getNumberOfPatients(anyNotNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
         whenever(preferencesManagerMock.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
         whenever(preferencesManagerMock.moduleId).thenReturn("0")

@@ -20,6 +20,7 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.createActivity
@@ -30,7 +31,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.robolectric.Shadows.shadowOf
@@ -83,7 +83,7 @@ class LoginActivityTest {
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), any())).thenReturn(Completable.complete())
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), anyOrNull())).thenReturn(Completable.complete())
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
