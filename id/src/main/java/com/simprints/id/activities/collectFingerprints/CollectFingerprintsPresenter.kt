@@ -13,9 +13,9 @@ import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprin
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
-import com.simprints.id.data.analytics.crashes.CrashReportManager
-import com.simprints.id.data.analytics.crashes.CrashReportTags
-import com.simprints.id.data.analytics.crashes.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportTags
+import com.simprints.id.data.analytics.crashReport.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager

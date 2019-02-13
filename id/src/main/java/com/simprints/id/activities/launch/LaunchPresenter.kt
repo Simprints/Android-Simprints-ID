@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.ConsentEvent

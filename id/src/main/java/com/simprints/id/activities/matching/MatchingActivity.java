@@ -15,7 +15,7 @@ import com.simprints.id.R;
 import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.crashes.CrashReportManager;
+import com.simprints.id.data.analytics.crashReport.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.di.AppComponent;
 import com.simprints.id.domain.ALERT_TYPE;

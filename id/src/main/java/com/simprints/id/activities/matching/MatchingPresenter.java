@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import com.simprints.id.data.analytics.crashes.CrashReportManager;
-import com.simprints.id.data.analytics.crashes.CrashReportTags;
-import com.simprints.id.data.analytics.crashes.CrashTrigger;
+import com.simprints.id.data.analytics.crashReport.CrashReportManager;
+import com.simprints.id.data.analytics.crashReport.CrashReportTags;
+import com.simprints.id.data.analytics.crashReport.CrashTrigger;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;

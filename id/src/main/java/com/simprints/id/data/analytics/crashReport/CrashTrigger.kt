@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.crashes
+package com.simprints.id.data.analytics.crashReport
 
 enum class CrashTrigger {
     UI,
