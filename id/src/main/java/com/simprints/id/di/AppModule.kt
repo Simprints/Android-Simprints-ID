@@ -8,8 +8,8 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.crashes.CrashReportManager
-import com.simprints.id.data.analytics.crashes.CrashReportManagerImpl
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl

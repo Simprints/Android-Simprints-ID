@@ -1,13 +1,13 @@
-package com.simprints.id.data.analytics.crashes
+package com.simprints.id.data.analytics.crashReport
 
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.FINGERS_SELECTED
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.MODULE_IDS
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.PROJECT_ID
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.SESSION_ID
-import com.simprints.id.data.analytics.crashes.CrashlyticsKeysConstants.Companion.USER_ID
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.MODULE_IDS
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.PROJECT_ID
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.SESSION_ID
+import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -27,7 +27,7 @@ class CrashReportManagerImpl: CrashReportManager {
         Crashlytics.log(Log.ERROR, CrashReportTags.ALERT.name, alertType.name)
     }
 
-    private fun getLogMessage(crashPrompter: CrashTrigger, message: String) = "[${crashPrompter.name}] $message"
+    private fun getLogMessage(crashTrigger: CrashTrigger, message: String) = "[${crashTrigger.name}] $message"
 
     override fun logThrowable(throwable: Throwable) {
         if(throwable !is SimprintsException) {

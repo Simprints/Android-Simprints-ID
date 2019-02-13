@@ -6,9 +6,9 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.crashes.CrashReportManager
-import com.simprints.id.data.analytics.crashes.CrashReportTags
-import com.simprints.id.data.analytics.crashes.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportTags
+import com.simprints.id.data.analytics.crashReport.CrashTrigger
 import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope

@@ -12,7 +12,7 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.di.AppModuleForTests

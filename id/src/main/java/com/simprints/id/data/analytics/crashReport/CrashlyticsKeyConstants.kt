@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.crashes
 
-class CrashlyticsKeysConstants {
+class CrashlyticsKeyConstants {
     companion object {
         const val PROJECT_ID = "Project ID"
         const val USER_ID = "User ID"

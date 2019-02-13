@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.crashes
+package com.simprints.id.data.analytics.crashReport
 
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger

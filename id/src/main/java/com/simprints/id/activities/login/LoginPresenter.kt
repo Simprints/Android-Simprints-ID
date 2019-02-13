@@ -1,8 +1,8 @@
 package com.simprints.id.activities.login
 
-import com.simprints.id.data.analytics.crashes.CrashReportManager
-import com.simprints.id.data.analytics.crashes.CrashReportTags
-import com.simprints.id.data.analytics.crashes.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportTags
+import com.simprints.id.data.analytics.crashReport.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
