@@ -3,7 +3,6 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
-import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -27,6 +26,7 @@ import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testframework.common.retrofit.createMockBehaviorService
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.verifyOnce
 import com.simprints.testframework.common.syntax.whenever
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.getSharedPreferences
@@ -107,7 +107,7 @@ class ProjectAuthenticatorTest {
             .assertNoErrors()
             .assertComplete()
 
-        verify(peopleUpSyncMasterMock).resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+        verifyOnce(peopleUpSyncMasterMock) { resume(projectId/*, userId*/) } // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test

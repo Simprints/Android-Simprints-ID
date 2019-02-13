@@ -2,9 +2,6 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
@@ -15,14 +12,15 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.testframework.common.syntax.anyNotNull
 import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
 import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -59,8 +57,8 @@ class SessionEventsUploaderTaskTest {
             "",
             SessionEventsApiAdapterFactory().gson).api)
 
-        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).doReturn(Completable.complete())
-        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).doReturn(Completable.complete())
+        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
+        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).thenReturn(Completable.complete())
     }
 
     @Test

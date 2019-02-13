@@ -2,9 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockito_kotlin.mock
 import com.simprints.id.R
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
@@ -22,7 +20,9 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.mock
 import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Assert
