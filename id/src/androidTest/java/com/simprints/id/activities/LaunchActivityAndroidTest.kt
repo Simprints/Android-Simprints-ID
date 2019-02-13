@@ -54,8 +54,8 @@ class LaunchActivityAndroidTest {
     @Inject lateinit var dbManagerSpy: DbManager
     @Inject lateinit var simNetworkUtilsSpy: SimNetworkUtils
 
-    @Rule @JvmField var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
-    @Rule @JvmField val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
+    @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
     private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)

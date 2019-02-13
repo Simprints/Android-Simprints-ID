@@ -19,9 +19,7 @@ import timber.log.Timber
 @SmallTest
 class ApplicationTest {
 
-    @Rule
-    @JvmField
-    val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
+    @get:Rule val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)
 
     @Test
     fun rxJavaUndeliverableExceptionHappens_shouldBeHandled() {

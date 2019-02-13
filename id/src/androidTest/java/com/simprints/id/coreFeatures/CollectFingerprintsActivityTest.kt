@@ -43,7 +43,7 @@ class CollectFingerprintsActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Rule @JvmField val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
+    @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
     private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)

@@ -34,8 +34,8 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.LoginManagerTest
 import com.simprints.id.testtools.TestProjectRule
-import com.simprints.id.testtools.models.TestProject
-import com.simprints.id.testtools.remote.RemoteTestingManager
+import com.simprints.id.testtools.integration.models.TestProject
+import com.simprints.id.testtools.integration.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testframework.android.tryOnUiUntilTimeout
 import com.simprints.testframework.android.waitOnSystem
@@ -66,7 +66,7 @@ class DashboardActivityAndroidTest {
     @get:Rule val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    @Rule @JvmField val launchActivityRule = ActivityTestRule(DashboardActivity::class.java, false, false)
+    @get:Rule val launchActivityRule = ActivityTestRule(DashboardActivity::class.java, false, false)
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager

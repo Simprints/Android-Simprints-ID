@@ -3,9 +3,9 @@ package com.simprints.id.testtools
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.testtools.models.TestProject
-import com.simprints.id.testtools.models.TestProjectCreationParameters
-import com.simprints.id.testtools.remote.RemoteTestingManager
+import com.simprints.id.testtools.integration.models.TestProject
+import com.simprints.id.testtools.integration.models.TestProjectCreationParameters
+import com.simprints.id.testtools.integration.remote.RemoteTestingManager
 import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description

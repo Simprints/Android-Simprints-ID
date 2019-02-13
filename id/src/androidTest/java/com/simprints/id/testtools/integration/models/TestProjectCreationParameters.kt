@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.models
+package com.simprints.id.testtools.integration.models
 
 import java.util.*
 

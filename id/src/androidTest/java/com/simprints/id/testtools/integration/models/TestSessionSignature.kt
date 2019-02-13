@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.models
+package com.simprints.id.testtools.integration.models
 
 data class TestSessionSignature(val id: String,
                                 val startTime: String,

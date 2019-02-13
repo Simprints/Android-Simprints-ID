@@ -73,7 +73,7 @@ class AndroidTestConfig<T : Any>(
 
     companion object {
         private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY)
-        val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
-        val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
+        private val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
+        private val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
     }
 }

@@ -30,14 +30,10 @@ class AuthTestsNoWifi {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Rule
-    @JvmField
-    val loginTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @get:Rule val loginTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
-
     @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
-
     @Inject lateinit var remoteSessionsManagerSpy: RemoteSessionsManager
 
     private val module by lazy {

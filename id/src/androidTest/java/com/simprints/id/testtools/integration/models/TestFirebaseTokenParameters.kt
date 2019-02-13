@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.models
+package com.simprints.id.testtools.integration.models
 
 data class TestFirebaseTokenParameters(val projectId: String,
                                        val userId: String = "the_only_user",
