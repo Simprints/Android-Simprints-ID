@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventData.controllers.domain
 
 import android.os.Build
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.session.Device
@@ -30,7 +30,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val analyticsManager: AnalyticsManager) :
+                                    private val crashReportManager: CrashReportManager) :
+
     SessionEventsManager,
     SessionEventsLocalDbManager by sessionEventsLocalDbManager {
 
@@ -78,7 +79,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
         }.doOnError {
             Timber.e(it)
-            analyticsManager.logThrowable(it)
+            crashReportManager.logThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
@@ -95,7 +96,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
             Completable.complete()
         }.doOnError {
-            analyticsManager.logThrowable(it)
+            crashReportManager.logThrowable(it)
         }.onErrorComplete()
 
     /** @throws SessionNotFoundException */

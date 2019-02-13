@@ -1,21 +1,17 @@
 package com.simprints.id.data.analytics
 
 import android.os.Bundle
-import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.models.fb_Session
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
-import com.simprints.libsimprints.FingerIdentifier
 import io.fabric.sdk.android.Fabric
 import io.reactivex.Single
 import timber.log.Timber
@@ -37,69 +33,6 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
             } else {
                 it.onError(task.exception as Throwable)
             }
-        }
-    }
-
-    override fun logAlert(alertType: ALERT_TYPE) {
-        logAlert(
-            alertType.name,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            preferencesManager.moduleId,
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.deviceId)
-    }
-
-    private fun logAlert(alertName: String, apiKey: String, moduleId: String, userId: String,
-                         deviceId: String) {
-        Timber.d("AnalyticsManagerImpl.logAlert(alertName=$alertName, ...)")
-        logAlertToCrashlytics(alertName)
-        logAlertToFirebaseAnalytics(alertName, apiKey, moduleId, userId, deviceId)
-    }
-
-    private fun logAlertToCrashlytics(alertName: String) {
-        Timber.d("AnalyticsManagerImpl.logAlertToCrashlytics(alertName=$alertName)")
-            Crashlytics.log(Log.ERROR, AnalyticsTags.ALERT.name, alertName)
-    }
-
-    private fun logAlertToFirebaseAnalytics(alertName: String, apiKey: String, moduleId: String,
-                                            userId: String, deviceId: String) {
-        Timber.d("AnalyticsManagerImpl.logAlertToFirebaseAnalytics(alertName=$alertName, ...)")
-        val bundle = Bundle()
-        bundle.putString("alert_name", alertName)
-        bundle.putString("api_key", apiKey)
-        bundle.putString("module_id", moduleId)
-        bundle.putString("user_id", userId)
-        bundle.putString("device_id", deviceId)
-        firebaseAnalytics.logEvent("alert", bundle)
-    }
-
-    override fun logThrowable(throwable: Throwable) =
-        when (throwable) {
-            is SimprintsError -> logException(throwable)
-            is SimprintsException -> logSafeException(throwable)
-            else -> logUnexpectedThrowable(throwable)
-        }
-
-    private fun logUnexpectedThrowable(throwable: Throwable) {
-        logUnsafeException(throwable)
-    }
-
-    override fun logException(error: SimprintsError) {
-        logUnsafeException(error)
-    }
-
-    override fun logSafeException(exception: SimprintsException) {
-        Timber.d("AnalyticsManagerImpl.logSafeException(description=$exception)")
-        val bundle = Bundle()
-        bundle.putString("exception", exception.toString())
-        bundle.putString("description", exception.message)
-        firebaseAnalytics.logEvent("safe_exception", bundle)
-    }
-
-    private fun logUnsafeException(e: Throwable) {
-        Timber.e(e)
-        if (Fabric.isInitialized()) {
-            Crashlytics.logException(e)
         }
     }
 
@@ -205,40 +138,5 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
             bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
         }
         firebaseAnalytics.logEvent("activeSession", bundle)
-    }
-
-    override fun logInfo(analyticsTag: AnalyticsTags, logPrompter: LogTrigger, message: String) {
-        Crashlytics.log(Log.VERBOSE, analyticsTag.name, getLogMessage(logPrompter, message))
-    }
-
-    override fun logWarning(analyticsTag: AnalyticsTags, logPrompter: LogTrigger, message: String) {
-        Crashlytics.log(Log.WARN, analyticsTag.name, getLogMessage(logPrompter, message))
-    }
-
-    private fun getLogMessage(logPrompter: LogTrigger, message: String) = "[${logPrompter.name}] $message"
-
-    override fun setProjectIdCrashlyticsKey(projectId: String) {
-        Crashlytics.setString("Project ID", projectId)
-    }
-
-    override fun setUserIdCrashlyticsKey(userId: String) {
-        Crashlytics.setString("User ID", userId)
-        Crashlytics.setUserIdentifier(userId)
-    }
-
-    override fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?) {
-        Crashlytics.setString("Module IDs", moduleIds.toString())
-    }
-
-    override fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>) {
-        Crashlytics.setString("People down sync triggers", peopleDownSyncTriggers.toString())
-    }
-
-    override fun setSessionIdCrashlyticsKey(sessionId: String) {
-        Crashlytics.setString("Session ID", sessionId)
-    }
-
-    override fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>) {
-        Crashlytics.setString("Fingers selected", fingersSelected.toString())
     }
 }

@@ -69,11 +69,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog = SimProgressDialog(this)
         loginEditTextUserId.setText(preferences.userId)
         loginButtonScanQr.setOnClickListener {
-            viewPresenter.logMessageToAnalyticsWithUIPrompt("Scan QR button clicked")
+            viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
             viewPresenter.openScanQRApp()
         }
         loginButtonSignIn.setOnClickListener {
-            viewPresenter.logMessageToAnalyticsWithUIPrompt("Login button clicked")
+            viewPresenter.logMessageForCrashReportWithUITrigger("Login button clicked")
             handleSignInStart()
         }
     }

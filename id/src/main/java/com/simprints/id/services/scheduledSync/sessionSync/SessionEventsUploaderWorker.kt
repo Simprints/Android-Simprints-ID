@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -19,7 +19,7 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
@@ -39,7 +39,7 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
 
     override fun doWork(): Result {
         injectDependencies()
-        logMessageToAnalytics("SessionEventsUploaderWorker doWork()")
+        logMessageForCrashReport("SessionEventsUploaderWorker doWork()")
 
         return try {
             val task = SessionEventsUploaderTask(
@@ -51,13 +51,13 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
             )
 
             task.execute().blockingAwait()
-            logMessageToAnalytics("SessionEventsUploaderWorker done()")
+            logMessageForCrashReport("SessionEventsUploaderWorker done()")
 
             Result.success()
         } catch (throwable: Throwable) {
             logWarningToAnalytics("SessionEventsUploaderWorker error() $throwable")
             Timber.e(throwable)
-            analyticsManager.logThrowable(throwable)
+            crashReportManager.logThrowable(throwable)
             Result.failure()
         }
     }
@@ -71,9 +71,9 @@ class SessionEventsUploaderWorker(context: Context, params: WorkerParameters) : 
         }
     }
 
-    private fun logMessageToAnalytics(message: String) =
-        analyticsManager.logInfo(AnalyticsTags.SESSION, LogTrigger.NETWORK, message)
+    private fun logMessageForCrashReport(message: String) =
+        crashReportManager.logInfo(CrashReportTags.SESSION, CrashTrigger.NETWORK, message)
 
     private fun logWarningToAnalytics(message: String) =
-        analyticsManager.logWarning(AnalyticsTags.SESSION, LogTrigger.NETWORK, message)
+        crashReportManager.logWarning(CrashReportTags.SESSION, CrashTrigger.NETWORK, message)
 }

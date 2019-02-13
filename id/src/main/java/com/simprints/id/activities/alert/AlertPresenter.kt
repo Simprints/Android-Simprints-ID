@@ -1,7 +1,7 @@
 package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
@@ -14,7 +14,7 @@ class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
                      val alertType: ALERT_TYPE) : AlertContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -24,7 +24,7 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun start() {
-        analyticsManager.logAlert(alertType)
+        crashReportManager.logAlert(alertType)
         checkAlertTypeAndHandleButtons()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)

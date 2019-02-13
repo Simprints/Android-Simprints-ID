@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.DataManager
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.ConsentEvent
@@ -48,7 +48,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -168,7 +168,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
         view.doLaunchAlert(scannerManager.getAlertType(it))
-        analyticsManager.logThrowable(it)
+        crashReportManager.logThrowable(it)
     }
 
     private fun requestPermissionsForLocation(progress: Int): Completable {
@@ -227,7 +227,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         val generalConsent = try {
             JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            analyticsManager.logException(MalformedConsentTextError("Malformed General Consent Text Error", e))
+            crashReportManager.logException(MalformedConsentTextError("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
         return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
@@ -237,7 +237,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         val parentalConsent = try {
             JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            analyticsManager.logException(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
+            crashReportManager.logException(MalformedConsentTextError("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
         return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
@@ -315,13 +315,13 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun initOrUpdateAnalyticsKeys() {
-        analyticsManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
-        analyticsManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
-        analyticsManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-        analyticsManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
-        analyticsManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        crashReportManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+        crashReportManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        crashReportManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
         sessionEventsManager.getCurrentSession().subscribeBy {
-            it -> analyticsManager.setSessionIdCrashlyticsKey(it.id)
+            it -> crashReportManager.setSessionIdCrashlyticsKey(it.id)
         }
     }
 }

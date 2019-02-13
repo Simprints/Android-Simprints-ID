@@ -8,6 +8,8 @@ import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
@@ -133,6 +135,10 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
+    open fun provideCrashManager(): CrashReportManager = CrashReportManagerImpl()
+
+    @Provides
+    @Singleton
     open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
 
     @Provides
@@ -154,8 +160,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager):
-        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, analyticsManager)
+    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
+        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton
@@ -171,8 +177,11 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideScannerManager(preferencesManager: PreferencesManager, analyticsManager: AnalyticsManager, bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        ScannerManagerImpl(preferencesManager, analyticsManager, bluetoothComponentAdapter)
+    open fun provideScannerManager(preferencesManager: PreferencesManager,
+                                   analyticsManager: AnalyticsManager,
+                                   crashReportManager: CrashReportManager,
+                                   bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
+        ScannerManagerImpl(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter)
 
     @Provides
     @Singleton
@@ -195,8 +204,8 @@ open class AppModule(val app: Application) {
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         analyticsManager: AnalyticsManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
+                                         crashReportManager: CrashReportManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
 
 
     @Provides

@@ -7,15 +7,15 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
@@ -36,7 +36,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     private var previousStatus: Finger.Status = NOT_COLLECTED
     private var currentFingerStatus: Finger.Status
@@ -44,7 +44,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         set(value) { presenter.currentFinger().status = value }
 
     private val scannerButtonListener = ButtonListener {
-        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogTrigger.SCANNER_BUTTON, "Scanner button clicked")
+        crashReportManager.logInfo(CrashReportTags.FINGER_CAPTURE, CrashTrigger.SCANNER_BUTTON, "Scanner button clicked")
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
         else if (shouldEnableScanButton())
@@ -99,7 +99,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Timber.d("reconnect.onError()")
                 view.un20WakeupDialog.dismiss()
                 view.doLaunchAlert(scannerManager.getAlertType(it))
-                analyticsManager.logThrowable(it)
+                crashReportManager.logThrowable(it)
             })
     }
 
@@ -243,7 +243,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // TODO : change exceptions in libcommon
-            analyticsManager.logException(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
+            crashReportManager.logException(SimprintsError("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 
@@ -254,7 +254,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             currentFingerStatus = Finger.Status.BAD_SCAN
             presenter.currentFinger().numberOfBadScans += 1
         }
-        logMessageToAnalytics("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
+        logMessageForCrashReport("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
     }
 
     fun resetScannerUi() {
@@ -271,7 +271,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
     }
 
-    private fun logMessageToAnalytics(message: String) {
-        analyticsManager.logInfo(AnalyticsTags.FINGER_CAPTURE, LogTrigger.UI, message)
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logInfo(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message)
     }
 }

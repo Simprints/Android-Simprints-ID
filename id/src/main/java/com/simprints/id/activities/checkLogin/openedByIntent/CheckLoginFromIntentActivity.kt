@@ -9,7 +9,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
@@ -25,7 +25,7 @@ import javax.inject.Inject
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
 
     companion object {
@@ -61,7 +61,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun checkCallingAppIsFromKnownSource() {
         preferencesManager.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(preferencesManager.callingPackage)) {
-            analyticsManager.logSafeException(CallingAppFromUnknownSourceException())
+            crashReportManager.logThrowable(CallingAppFromUnknownSourceException())
         }
     }
 

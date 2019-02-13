@@ -3,9 +3,9 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.AnalyticsTags
-import com.simprints.id.data.analytics.LogTrigger
+import com.simprints.id.data.analytics.crashes.CrashReportManager
+import com.simprints.id.data.analytics.crashes.CrashReportTags
+import com.simprints.id.data.analytics.crashes.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class DashboardPresenter(private val view: DashboardContract.View,
                          val component: AppComponent) : DashboardContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
@@ -82,7 +82,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
         viewModel.viewModelState.onSyncActionClicked = {
-            analyticsManager.logInfo(AnalyticsTags.SYNC, LogTrigger.UI,"Dashboard card sync button clicked")
+            crashReportManager.logInfo(CrashReportTags.SYNC, CrashTrigger.UI,"Dashboard card sync button clicked")
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
@@ -130,10 +130,10 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun initOrUpdateAnalyticsKeys() {
-        analyticsManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
-        analyticsManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
-        analyticsManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-        analyticsManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
-        analyticsManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        crashReportManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+        crashReportManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+        crashReportManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
     }
 }
