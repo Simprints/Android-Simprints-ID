@@ -47,7 +47,6 @@ class SettingsAboutPresenterTest {
         verify(presenter, times(1)).loadSyncAndSearchConfigurationPreference(any())
     }
 
-
     @Test
     fun appVersionPreference_loadValue_preferenceShouldHaveValues() {
         val mockPreference = mock(Preference::class.java)

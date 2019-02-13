@@ -62,7 +62,7 @@ class SessionEventsManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Rule @JvmField val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @get:Rule val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager

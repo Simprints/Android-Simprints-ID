@@ -21,9 +21,7 @@ import java.util.concurrent.TimeUnit
 @SmallTest
 class SessionEventsSyncManagerImplITest {
 
-    @Rule
-    @JvmField
-    val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
     private var sessionEventsSyncManager = SessionEventsSyncManagerImpl()

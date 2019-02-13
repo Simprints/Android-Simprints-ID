@@ -52,7 +52,7 @@ class GuidSelectionServiceTest {
     @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
 
-    @Rule @JvmField val scanTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @get:Rule val scanTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
 
     @Before
     fun setUp() {

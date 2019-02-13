@@ -22,9 +22,9 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMast
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.TestProjectRule
-import com.simprints.id.testtools.adapters.toCalloutCredentials
-import com.simprints.id.testtools.models.TestProject
-import com.simprints.id.testtools.remote.RemoteTestingManager
+import com.simprints.id.testtools.integration.adapters.toCalloutCredentials
+import com.simprints.id.testtools.integration.models.TestProject
+import com.simprints.id.testtools.integration.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier
@@ -49,9 +49,7 @@ class SessionEventsUploaderTaskEndToEndTest {
     @get:Rule val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    @Rule
-    @JvmField
-    val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
