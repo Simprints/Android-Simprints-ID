@@ -1,18 +1,14 @@
 package com.simprints.id.data.analytics
 
 import android.os.Bundle
-import com.crashlytics.android.Crashlytics
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.models.fb_Session
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.safe.SimprintsException
-import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
-import io.fabric.sdk.android.Fabric
 import io.reactivex.Single
 import timber.log.Timber
 import kotlin.reflect.full.memberProperties
