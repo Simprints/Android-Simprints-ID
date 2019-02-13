@@ -13,11 +13,11 @@ import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
-import org.mockito.ArgumentMatchers.any
 import org.mockito.stubbing.Answer
 
 object RobolectricTestMocker {
@@ -89,7 +89,7 @@ object RobolectricTestMocker {
     }
 
     fun setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager): RobolectricTestMocker {
-        whenever { sessionEventsLocalDbManagerMock.loadSessions(any(), any()) } thenReturn Single.error(IllegalStateException())
+        whenever { sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull()) } thenReturn Single.error(IllegalStateException())
         whenever { sessionEventsLocalDbManagerMock.insertOrUpdateSessionEvents(anyNotNull()) } thenReturn Completable.complete()
         return this
     }

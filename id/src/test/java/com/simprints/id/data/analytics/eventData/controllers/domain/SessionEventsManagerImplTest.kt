@@ -21,7 +21,6 @@ import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
@@ -97,7 +96,7 @@ class SessionEventsManagerImplTest {
 
     @Test
     fun closeLastSessionsIfPending_shouldSwallowException() {
-        whenever(sessionEventsLocalDbManagerMock.loadSessions(any(), any())).thenReturn(Single.error(Throwable("error_reading_db")))
+        whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.error(Throwable("error_reading_db")))
 
         sessionsEventsManagerSpy.createSession().blockingGet()
 

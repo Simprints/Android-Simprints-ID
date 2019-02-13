@@ -4,10 +4,10 @@ import com.simprints.id.data.analytics.eventData.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
 import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.mockito.ArgumentMatchers.any
 
 fun mockSessionEventsManager(sessionsEventsManager: SessionEventsLocalDbManager,
                              sessionsInFakeDb: MutableList<SessionEvents>) {
@@ -30,7 +30,7 @@ fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager: Sessio
 fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
                                                     sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    whenever(sessionsEventsManager.deleteSessions(any(), any(), any(), any())).thenAnswer { args ->
+    whenever(sessionsEventsManager.deleteSessions(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenAnswer { args ->
         val sessionToDelete = findSessions(
             sessionsInFakeDb,
             args.arguments[0] as String?,
@@ -46,7 +46,7 @@ fun mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager: Sessi
 fun mockSessionEventsMgrLoadSessionsToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
                                                 sessionsInFakeDb: MutableList<SessionEvents>) {
 
-    whenever(sessionsEventsManager.loadSessions(any(), any())).thenAnswer { args ->
+    whenever(sessionsEventsManager.loadSessions(anyOrNull(), anyOrNull())).thenAnswer { args ->
         val sessions = findSessions(
             sessionsInFakeDb,
             args.arguments[0] as String?,

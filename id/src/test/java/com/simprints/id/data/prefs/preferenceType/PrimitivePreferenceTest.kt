@@ -2,10 +2,7 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.testframework.common.syntax.assertThrows
-import com.simprints.testframework.common.syntax.verifyOnlyInteraction
-import com.simprints.testframework.common.syntax.verifyOnlyInteractions
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.common.syntax.*
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -25,8 +22,8 @@ class PrimitivePreferenceTest {
 
     private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
         val editor = com.simprints.testframework.common.syntax.mock<ImprovedSharedPreferences.Editor>()
-        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
-        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
+        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
+        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
         return editor
     }
 

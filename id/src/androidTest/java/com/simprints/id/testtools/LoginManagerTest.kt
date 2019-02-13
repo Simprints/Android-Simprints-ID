@@ -36,7 +36,7 @@ class LoginManagerTest {
         }
         editor.commit()
 
-        whenever(secureDataManagerMock.getLocalDbKeyOrThrow(anyNotNull())).thenReturn(localDbKey)
+        whenever(secureDataManagerMock) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
         whenever(remoteDbManagerMock.getCurrentFirestoreToken()).thenReturn(Single.just(token))
 
         localDbManager.signInToLocal(secureDataManagerMock.getLocalDbKeyOrThrow(projectId))
