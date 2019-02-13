@@ -12,7 +12,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -28,6 +28,7 @@ import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
+import io.fabric.sdk.android.Fabric
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -62,13 +63,13 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
-    @Inject lateinit var analyticsManagerSpy: AnalyticsManager
+    @Inject lateinit var crashReportManagerSpy: CrashReportManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
     override var module by lazyVar {
         AppModuleForTests(app,
-            analyticsManagerRule = SpyRule,
+            crashReportManagerRule = MockRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule,
@@ -94,22 +95,22 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     @Test
-    fun unknownCallingAppSource_shouldLogEvent() {
+    fun unknownCallingAppSource_shouldLogEventAlongWithNoSessionsFoundException() {
         Robolectric.buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
-        verifyALogSafeExceptionWasThrown(1)
+        verifyALogSafeExceptionWasThrown(2)
     }
 
     @Test
-    fun knownCallingAppSource_shouldNotLogEvent() {
+    fun knownCallingAppSource_shouldNotLogEventApartFromNoSessionsFoundException() {
         val pm = app.packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
         Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
-        verifyALogSafeExceptionWasThrown(0)
+        verifyALogSafeExceptionWasThrown(1)
     }
 
     private fun verifyALogSafeExceptionWasThrown(times: Int) {
-        Mockito.verify(analyticsManagerSpy, Mockito.times(times)).logSafeException(anyNotNull())
+        Mockito.verify(crashReportManagerSpy, Mockito.times(times)).logThrowable(anyNotNull())
     }
 
     @Test

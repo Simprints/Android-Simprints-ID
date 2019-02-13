@@ -19,6 +19,7 @@ open class AppModuleForTests(app: Application,
                              override var dataManagerRule: DependencyRule = RealRule,
                              override var loginInfoManagerRule: DependencyRule = RealRule,
                              override var analyticsManagerRule: DependencyRule = RealRule,
+                             override var crashReportManagerRule: DependencyRule = RealRule,
                              override var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                              override var sessionEventsManagerRule: DependencyRule = RealRule,
                              override var sessionEventsLocalDbManagerRule: DependencyRule = MockRule, //Roboletric doesn't support Realm

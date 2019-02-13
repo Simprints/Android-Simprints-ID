@@ -14,6 +14,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -46,7 +47,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManagerMock: AnalyticsManager
+    @Inject lateinit var crashReportManagerMock: CrashReportManager
     @Mock lateinit var workParams: WorkerParameters
 
     private lateinit var subDownSyncWorker: SubDownSyncWorker
@@ -56,7 +57,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
 
     override var module: AppModuleForTests by lazyVar {
         object: AppModuleForTests(app) {
-            override fun provideAnalyticsManager(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager, firebaseAnalytics: FirebaseAnalytics): AnalyticsManager {
+            override fun provideCrashManager(): CrashReportManager {
                 return mock()
             }
 
@@ -107,7 +108,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         val result = subDownSyncWorker.doWork()
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
-        verify(analyticsManagerMock, times(1)).logThrowable(any())
+        verify(crashReportManagerMock, times(1)).logThrowable(any())
         assert(result is ListenableWorker.Result.Failure)
     }
 }

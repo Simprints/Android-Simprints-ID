@@ -3,6 +3,8 @@ package com.simprints.id.activities
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.FirebaseApp
+import com.nhaarman.mockito_kotlin.mock
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -11,14 +13,17 @@ import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.mockSettingsPreferencesManager
+import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboLaunchActivity
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
+import io.reactivex.Single
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
@@ -34,6 +39,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     override var preferencesModule by lazyVar {
         PreferencesModuleForAnyTests(
@@ -46,8 +52,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,
+            crashReportManagerRule = MockRule,
             scheduledPeopleSyncManagerRule = MockRule,
-            scheduledSessionsSyncManagerRule = MockRule)
+            scheduledSessionsSyncManagerRule = MockRule,
+            sessionEventsManagerRule = MockRule)
     }
 
     @Before
@@ -58,6 +66,7 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         super.setUp()
         testAppComponent.inject(this)
+        mockSessionEventsManagerForLaunchAct()
     }
 
     @Test
@@ -184,6 +193,10 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
                                                            parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
 
         mockSettingsPreferencesManager(settingsPreferencesManager, parentalConsentExists, generalConsentOptions, parentalConsentOptions, LANGUAGE, PROGRAM_NAME, ORGANIZATION_NAME)
+    }
+
+    private fun mockSessionEventsManagerForLaunchAct() {
+        whenever(sessionEventsManager.getCurrentSession()).thenReturn(Single.just(mock()))
     }
 
     companion object {

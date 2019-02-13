@@ -56,7 +56,8 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         AppModuleForTests(app,
             localDbManagerRule = MockRule,
             dbManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule)
+            sessionEventsLocalDbManagerRule = MockRule,
+            crashReportManagerRule = MockRule)
     }
 
     @Before
