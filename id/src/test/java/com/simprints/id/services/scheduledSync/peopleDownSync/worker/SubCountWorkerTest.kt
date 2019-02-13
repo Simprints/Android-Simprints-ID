@@ -12,7 +12,7 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.di.AppModuleForTests
@@ -43,7 +43,7 @@ class SubCountWorkerTest : DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     @Mock lateinit var workParams: WorkerParameters
 
@@ -56,7 +56,7 @@ class SubCountWorkerTest : DaggerForTests() {
         object : AppModuleForTests(
             app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule
+            crashReportManagerRule = DependencyRule.MockRule
         ) {
             override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask {
                 return countTaskMock
@@ -98,7 +98,7 @@ class SubCountWorkerTest : DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
         val workerResult = subCountWorker.doWork()
 
-        verify(analyticsManager, times(1)).logThrowable(any())
+        verify(crashReportManager, times(1)).logThrowable(any())
         assert(workerResult is ListenableWorker.Result.Success)
     }
 }

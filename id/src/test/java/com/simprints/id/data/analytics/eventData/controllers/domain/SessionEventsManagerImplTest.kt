@@ -6,7 +6,7 @@ import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.spy
 import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
@@ -40,9 +40,9 @@ class SessionEventsManagerImplTest {
     private val sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager = mock()
     private val preferencesManagerMock: PreferencesManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
-    private val analyticsManagerMock: AnalyticsManager = mock()
+    private val crashReportManagerMock: CrashReportManager = mock()
     private val sessionsEventsManagerSpy: SessionEventsManager =
-        spy(SessionEventsManagerImpl("deviceID", sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, analyticsManagerMock))
+        spy(SessionEventsManagerImpl("deviceID", sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
 
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
@@ -107,7 +107,7 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.createSession().blockingGet()
 
-        verify(analyticsManagerMock, times(1)).logThrowable(anyNotNull())
+        verify(crashReportManagerMock, times(1)).logThrowable(anyNotNull())
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
@@ -126,7 +126,7 @@ class SessionEventsManagerImplTest {
     fun updateSession_shouldSwallowException() {
         val tester = sessionsEventsManagerSpy.updateSession { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
-        verify(analyticsManagerMock, times(1)).logThrowable(anyNotNull())
+        verify(crashReportManagerMock, times(1)).logThrowable(anyNotNull())
     }
 
     @Test

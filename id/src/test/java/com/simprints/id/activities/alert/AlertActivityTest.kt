@@ -40,7 +40,7 @@ class AlertActivityTest : DaggerForTests() {
         AppModuleForTests(app,
             remoteDbManagerRule = MockRule,
             localDbManagerRule = MockRule,
-            analyticsManagerRule = MockRule,
+            crashReportManagerRule = MockRule,
             secureDataManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule)
     }

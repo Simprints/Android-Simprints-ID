@@ -5,6 +5,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashes.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
@@ -49,6 +50,7 @@ open class AppModuleForAnyTests(app: Application,
                                 open var randomGeneratorRule: DependencyRule = RealRule,
                                 open var keystoreManagerRule: DependencyRule = RealRule,
                                 open var analyticsManagerRule: DependencyRule = RealRule,
+                                open var crashReportManagerRule: DependencyRule = RealRule,
                                 open var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                                 open var sessionEventsManagerRule: DependencyRule = RealRule,
                                 open var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
@@ -119,14 +121,16 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
         scheduledSessionsSyncManagerRule.resolveDependency { super.provideScheduledSessionsSyncManager() }
 
+    override fun provideCrashManager(): CrashReportManager =
+        crashReportManagerRule.resolveDependency { super.provideCrashManager() }
+
     override fun provideSessionEventsManager(ctx: Context,
                                              sessionEventsSyncManager: SessionEventsSyncManager,
                                              sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                              preferencesManager: PreferencesManager,
                                              timeHelper: TimeHelper,
-                                             analyticsManager: AnalyticsManager): SessionEventsManager =
-
-        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager) }
+                                             crashReportManager: CrashReportManager): SessionEventsManager =
+        sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
                                                     secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
@@ -135,14 +139,15 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =
         simNetworkUtilsRule.resolveDependency { super.provideSimNetworkUtils(ctx) }
 
-    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager): LongConsentManager =
-        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, analyticsManager) }
+    override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
+        longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
 
     override fun provideScannerManager(preferencesManager: PreferencesManager,
                                        analyticsManager: AnalyticsManager,
+                                       crashReportManager: CrashReportManager,
                                        bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
 
-        scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, bluetoothComponentAdapter) }
+        scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter) }
 
     override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager =
         remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
