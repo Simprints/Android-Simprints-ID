@@ -1,4 +1,4 @@
-package com.simprints.id.activities
+package com.simprints.id.integration.sync
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
@@ -28,14 +28,14 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
+import com.simprints.id.integration.testtools.TestProjectRule
+import com.simprints.id.integration.testtools.models.TestProject
+import com.simprints.id.integration.testtools.remote.RemoteTestingManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.LoginManagerTest
-import com.simprints.id.testtools.TestProjectRule
-import com.simprints.id.testtools.integration.models.TestProject
-import com.simprints.id.testtools.integration.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testframework.android.tryOnUiUntilTimeout
 import com.simprints.testframework.android.waitOnSystem

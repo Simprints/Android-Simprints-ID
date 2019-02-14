@@ -1,4 +1,4 @@
-package com.simprints.id.service
+package com.simprints.id.services
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.eventData
+package com.simprints.id.integration.sessions
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -15,6 +15,7 @@ import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.data.analytics.eventData.*
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
