@@ -10,9 +10,9 @@ import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.TestProjectRule
+import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.testtools.integration.adapters.toCalloutCredentials
 import com.simprints.id.testtools.integration.models.TestProject
 import com.simprints.id.tools.RandomGenerator
@@ -35,14 +35,14 @@ class HappyWorkflowAllMainFeatures {
     @get:Rule val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    @get:Rule val enrolTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val enrolTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val identifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val identifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val verifyTestRule1 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val verifyTestRule2 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val verifyTestRule3 = ActivityUtils.checkLoginFromIntentActivityTestRule()
-    @get:Rule val verifyTestRule4 = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @get:Rule val enrolTestRule1 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val enrolTestRule2 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val identifyTestRule1 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val identifyTestRule2 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val verifyTestRule1 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val verifyTestRule2 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val verifyTestRule3 = checkLoginFromIntentActivityTestRule()
+    @get:Rule val verifyTestRule4 = checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator

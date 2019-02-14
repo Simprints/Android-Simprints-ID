@@ -9,28 +9,25 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.testtools.*
-import com.simprints.testframework.android.StringUtils.getResourceString
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
+import com.simprints.id.testtools.grantPermissions
+import com.simprints.id.testtools.launchActivityAndRunOnUiThread
 import com.simprints.libsimprints.*
-import com.simprints.testframework.android.log
-import com.simprints.testframework.android.tryOnSystemUntilTimeout
-import com.simprints.testframework.android.tryOnUiUntilTimeout
-import com.simprints.testframework.android.waitOnUi
-import org.hamcrest.Matchers.*
+import com.simprints.testframework.android.*
+import org.hamcrest.Matchers.not
 import org.junit.Assert.*
 
 fun launchActivityEnrol(testCalloutCredentials: TestCalloutCredentials,
                         enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchActivityEnrol")
-    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
+    launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
 
 fun launchActivityIdentify(testCalloutCredentials: TestCalloutCredentials,
                            identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchActivityIdentify")
-    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
+    launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_IDENTIFY_INTENT, identifyTestRule)
 }
 
@@ -38,7 +35,7 @@ fun launchActivityVerify(testCalloutCredentials: TestCalloutCredentials,
                          verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>,
                          guid: String?) {
     log("launchActivityVerify")
-    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
+    launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_VERIFY_INTENT, verifyTestRule,
         verifyGuidExtra = guid)
 }
@@ -67,7 +64,7 @@ fun setupActivityAndDecline() {
 fun setupActivity() {
     log("setupActivity")
     tryOnUiUntilTimeout(20000, 50) {
-        ActivityUtils.grantPermissions()
+        grantPermissions()
         onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
     }
