@@ -22,11 +22,10 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMas
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, AndroidInjectionModule::class])
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class])
 interface AppComponentForTests : AppComponent {
     fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)

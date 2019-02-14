@@ -17,11 +17,10 @@ import com.simprints.id.services.GuidSelectionServiceTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplITest
 import com.simprints.id.integration.sessions.SessionEventsUploaderTaskEndToEndTest
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class), (AndroidInjectionModule::class)])
+@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class)])
 interface AppComponentForAndroidTests : AppComponent {
     fun inject(happyWorkflowAllMainFeatures: HappyWorkflowAllMainFeatures)
     fun inject(secureDataManagerTest: SecureDataManagerTest)

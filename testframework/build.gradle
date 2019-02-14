@@ -1,8 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
-apply plugin: "realm-android"
+apply plugin: "kotlin-android-extensions"
 
 android {
     compileSdkVersion 28
@@ -34,64 +33,40 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    // Android
-    implementation 'androidx.multidex:multidex:2.0.1'
-
-    // Logging
-    implementation 'com.jakewharton.timber:timber:4.6.0'
-
-    // Testing base
-    implementation 'androidx.test:monitor:1.1.1'
-    implementation "androidx.test.ext:junit:1.1.0"
-    implementation "androidx.test:core:1.1.0"
-    implementation 'android.arch.core:core-testing:1.1.1'
-
-    // Espresso
-    implementation 'androidx.test.espresso:espresso-core:3.1.1'
-    implementation 'androidx.test.espresso:espresso-intents:3.1.1'
-    implementation('com.schibsted.spain:barista:2.5.0') {
+    implementation deps.androidx.multidex
+    implementation deps.timber.core
+    implementation deps.testing.androidx.monitor
+    implementation deps.testing.androidx.ext_junit
+    implementation deps.testing.androidx.core
+    implementation deps.testing.androidx.core_testing
+    implementation deps.testing.espresso.core
+    implementation deps.testing.espresso.intents
+    implementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
         exclude group: "org.jetbrains.kotlin"
         exclude group: "com.google.guava"
     }
 
-    // Dagger
-    implementation "com.google.dagger:dagger-android:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
-    implementation "com.google.dagger:dagger:$dagger_version"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
-    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    implementation deps.dagger.core
+    annotationProcessor deps.dagger.compiler
+    kapt deps.dagger.compiler
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
 
-    // Kotlin awesomeness
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation deps.testing.mockito.core
+    implementation deps.testing.mockito.inline
+    implementation deps.testing.mockito.kotlin
+    implementation deps.testing.mockito.android
+    implementation deps.testing.robolectric.core
+    implementation deps.testing.robolectric.multidex
+    implementation deps.testing.mockwebserver
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
+    implementation deps.testing.retrofit
+    implementation deps.retrofit.core
+    implementation deps.firebase.core
+    implementation deps.testing.work
 
-    // Mockito
-    implementation "org.mockito:mockito-core:$mockito_version"
-    implementation "org.mockito:mockito-inline:$mockito_version"
-    implementation "org.mockito:mockito-android:$mockito_version"
-    implementation 'com.nhaarman:mockito-kotlin:1.6.0'
-
-    // Robolectric
-    implementation "org.robolectric:robolectric:4.0.2"
-    implementation "org.robolectric:multidex:3.4.2"
-
-    // Mock server
-    implementation 'com.squareup.okhttp3:mockwebserver:3.10.0'
-
-    // Reactive
-    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
-    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
-
-    // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:retrofit-mock:$retrofit_version"
-
-    // Firebase
-    implementation "com.google.firebase:firebase-core:16.0.6"
-
-    // WorkManager
-    implementation "android.arch.work:work-testing:$work_version"
 }
