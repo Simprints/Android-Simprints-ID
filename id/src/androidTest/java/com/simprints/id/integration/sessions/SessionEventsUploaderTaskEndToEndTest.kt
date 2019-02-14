@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.sessionSync
+package com.simprints.id.integration.sessions
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -18,13 +18,14 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.integration.testtools.TestProjectRule
+import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
+import com.simprints.id.integration.testtools.models.TestProject
+import com.simprints.id.integration.testtools.remote.RemoteTestingManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTask
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.TestProjectRule
-import com.simprints.id.testtools.integration.adapters.toCalloutCredentials
-import com.simprints.id.testtools.integration.models.TestProject
-import com.simprints.id.testtools.integration.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier

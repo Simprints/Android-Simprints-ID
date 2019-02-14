@@ -1,7 +1,7 @@
-package com.simprints.id.testtools.integration.remote
+package com.simprints.id.integration.testtools.remote
 
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.testtools.integration.models.*
+import com.simprints.id.integration.testtools.models.*
 
 interface RemoteTestingManager {
 

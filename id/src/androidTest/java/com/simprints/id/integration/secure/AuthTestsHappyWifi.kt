@@ -1,4 +1,4 @@
-package com.simprints.id.secure
+package com.simprints.id.integration.secure
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -2,51 +2,15 @@ package com.simprints.id.testtools
 
 import android.content.Context
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.testtools.integration.exceptions.TestingSuiteError
+import com.simprints.id.integration.testtools.exceptions.TestingSuiteError
 import com.simprints.testframework.android.log
 import io.realm.Realm
 import io.realm.RealmConfiguration
-import java.io.File
 
 object StorageUtils {
 
     fun clearApplicationData(context: Context) {
         clearSharedPrefs(context)
-    }
-
-    private fun clearCache(context: Context) {
-        val cacheDirectory = context.cacheDir ?: return
-        val applicationDirectory = File(cacheDirectory.parent)
-        if (applicationDirectory.exists()) {
-            val fileNames = applicationDirectory.list() ?: return
-            fileNames
-                    .filter { it != "lib" }
-                    .forEach { deleteFile(File(applicationDirectory, it)) }
-        }
-    }
-
-    private fun deleteFile(file: File?): Boolean {
-        var deletedAll = true
-        if (file != null) {
-            if (file.isDirectory) {
-                val children = file.list()
-                for (child in children) {
-                    deletedAll = deleteFile(File(file, child)) && deletedAll
-                }
-            } else {
-                deletedAll = file.delete()
-            }
-        }
-        return deletedAll
-    }
-
-    fun deleteAllFiles(ctx: Context) {
-        val files = ctx.filesDir.listFiles()
-        files?.let {
-            for (file in it) {
-                file.delete()
-            }
-        }
     }
 
     private fun clearSharedPrefs(context: Context) {

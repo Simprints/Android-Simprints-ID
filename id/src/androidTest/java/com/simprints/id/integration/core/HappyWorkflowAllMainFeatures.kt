@@ -1,4 +1,4 @@
-package com.simprints.id.coreFeatures
+package com.simprints.id.integration.core
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -11,10 +11,10 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.TestProjectRule
+import com.simprints.id.integration.testtools.TestProjectRule
 import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
-import com.simprints.id.testtools.integration.adapters.toCalloutCredentials
-import com.simprints.id.testtools.integration.models.TestProject
+import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
+import com.simprints.id.integration.testtools.models.TestProject
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger

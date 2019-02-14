@@ -1,4 +1,4 @@
-package com.simprints.id.coreFeatures
+package com.simprints.id.integration.ui
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,13 +22,13 @@ import com.simprints.id.testSnippets.skipFinger
 import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.ScannerUtils.setupScannerForCollectingFingerprints
-import com.simprints.testframework.android.getCurrentActivity
 import com.simprints.id.testtools.launchCollectFingerprintsActivity
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testframework.android.getCurrentActivity
 import com.simprints.testframework.common.syntax.whenever
 import org.junit.Assert
 import org.junit.Before

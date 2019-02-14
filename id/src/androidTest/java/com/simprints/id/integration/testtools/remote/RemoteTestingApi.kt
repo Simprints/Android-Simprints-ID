@@ -1,7 +1,7 @@
-package com.simprints.id.testtools.integration.remote
+package com.simprints.id.integration.testtools.remote
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.testtools.integration.models.*
+import com.simprints.id.integration.testtools.models.*
 import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
