@@ -20,10 +20,10 @@ import com.simprints.id.testSnippets.collectFingerprintsPressScan
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testSnippets.skipFinger
 import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
-import com.simprints.id.testtools.ActivityUtils.getCurrentActivity
-import com.simprints.id.testtools.ActivityUtils.launchCollectFingerprintsActivity
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.ScannerUtils.setupScannerForCollectingFingerprints
+import com.simprints.testframework.android.getCurrentActivity
+import com.simprints.id.testtools.launchCollectFingerprintsActivity
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter

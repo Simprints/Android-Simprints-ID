@@ -8,7 +8,8 @@ import androidx.test.rule.ActivityTestRule
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.testtools.ActivityUtils
+import com.simprints.id.testtools.grantPermissions
+import com.simprints.id.testtools.launchActivityAndRunOnUiThread
 import com.simprints.libsimprints.Constants
 import com.simprints.testframework.android.log
 import com.simprints.testframework.android.tryOnUiUntilTimeout
@@ -16,7 +17,7 @@ import com.simprints.testframework.android.tryOnUiUntilTimeout
 fun launchAppFromIntentEnrol(testCalloutCredentials: TestCalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("launchAppFromIntentEnrol")
-    ActivityUtils.launchActivityAndRunOnUiThread(testCalloutCredentials,
+    launchActivityAndRunOnUiThread(testCalloutCredentials,
         Constants.SIMPRINTS_REGISTER_INTENT, enrolTestRule)
 }
 
@@ -56,7 +57,7 @@ fun pressSignIn() {
 fun ensureSignInSuccess() {
     log("ensureSignInSuccess")
     tryOnUiUntilTimeout(25000, 1000) {
-        ActivityUtils.grantPermissions()
+        grantPermissions()
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
     }

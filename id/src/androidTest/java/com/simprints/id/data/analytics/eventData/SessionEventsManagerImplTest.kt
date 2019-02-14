@@ -30,8 +30,8 @@ import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.testSnippets.*
-import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Person
@@ -62,7 +62,7 @@ class SessionEventsManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @get:Rule val simprintsActionTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @get:Rule val simprintsActionTestRule = checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager

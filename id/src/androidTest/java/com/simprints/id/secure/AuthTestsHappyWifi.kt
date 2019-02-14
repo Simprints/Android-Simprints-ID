@@ -3,9 +3,7 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import com.simprints.id.Application
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
@@ -18,6 +16,7 @@ import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
@@ -42,7 +41,7 @@ class AuthTestsHappyWifi {
 
     private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-    @get:Rule val loginTestRule = ActivityTestRule<CheckLoginFromIntentActivity>(CheckLoginFromIntentActivity::class.java, false, false)
+    @get:Rule val loginTestRule = checkLoginFromIntentActivityTestRule()
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator

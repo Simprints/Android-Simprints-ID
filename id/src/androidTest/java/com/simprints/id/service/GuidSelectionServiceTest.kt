@@ -18,8 +18,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.testSnippets.launchActivityEnrol
 import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
 import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testtools.ActivityUtils
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.SimHelper
 import com.simprints.testframework.android.tryOnUiUntilTimeout
@@ -52,7 +52,7 @@ class GuidSelectionServiceTest {
     @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
 
-    @get:Rule val scanTestRule = ActivityUtils.checkLoginFromIntentActivityTestRule()
+    @get:Rule val scanTestRule = checkLoginFromIntentActivityTestRule()
 
     @Before
     fun setUp() {
