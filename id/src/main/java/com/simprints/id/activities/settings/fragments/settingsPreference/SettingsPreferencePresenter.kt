@@ -3,9 +3,11 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
@@ -15,6 +17,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     init {
         component.inject(this)
@@ -85,12 +89,10 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
         loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
-        loadValueAndBindChangeListener(view.getSyncAndSearchConfigurationPreference())
-        loadValueAndBindChangeListener(view.getAppVersionPreference())
-        loadValueAndBindChangeListener(view.getScannerVersionPreference())
+        loadValueAndBindChangeListener(view.getPreferenceForAbout())
     }
 
-    private fun loadValueAndBindChangeListener(preference: Preference) {
+    internal fun loadValueAndBindChangeListener(preference: Preference) {
         when (preference.key) {
             view.getKeyForLanguagePreference() -> {
                 loadLanguagePreference(preference as ListPreference)
@@ -104,14 +106,11 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
             }
-            view.getKeyForSyncAndSearchConfigurationPreference() -> {
-                loadSyncAndSearchConfigurationPreference(preference)
-            }
-            view.getKeyForAppVersionPreference() -> {
-                loadAppVersionInPreference(preference)
-            }
-            view.getKeyForScannerVersionPreference() -> {
-                loadScannerVersionInPreference(preference)
+            view.getKeyForAboutPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    view.openSettingAboutActivity()
+                    true
+                }
             }
         }
     }
@@ -123,7 +122,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    private fun loadLanguagePreference(preference: ListPreference) {
+    internal fun loadLanguagePreference(preference: ListPreference) {
         preference.value = preferencesManager.language
         val index = preference.findIndexOfValue(preference.value)
         preference.summary = if (index >= 0) {
@@ -133,27 +132,12 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    private fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
+    internal fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
         preference.values = preferencesManager.selectedModules
     }
 
-    private fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
+    internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
-    }
-
-    private fun loadSyncAndSearchConfigurationPreference(preference: Preference) {
-        preference.summary = "${preferencesManager.syncGroup.lowerCaseCapitalized()} Sync" +
-            " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
-    }
-
-    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
-
-    private fun loadAppVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.appVersionName
-    }
-
-    private fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.hardwareVersionString
     }
 
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
