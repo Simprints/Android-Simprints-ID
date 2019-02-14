@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceActivity
 import android.view.MenuItem
@@ -11,6 +12,12 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 
 class SettingsActivity : AppCompatPreferenceActivity() {
+
+    companion object {
+        private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
+
+        private const val LOGOUT_RESULT_CODE = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,5 +47,16 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun isValidFragment(fragmentName: String): Boolean {
         return PreferenceFragment::class.java.name == fragmentName
             || SettingsPreferenceFragment::class.java.name == fragmentName
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
+            setResult(LOGOUT_RESULT_CODE)
+            finish()
+        }
+    }
+
+    fun openSettingAboutActivity() {
+        startActivityForResult(Intent(this, SettingsAboutActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
     }
 }

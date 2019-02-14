@@ -13,8 +13,8 @@ import com.simprints.id.data.analytics.crashReport.CrashTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
-import com.simprints.id.exceptions.unsafe.SimprintsError
-import com.simprints.id.exceptions.unsafe.UnexpectedScannerError
+import com.simprints.id.exceptions.unexpected.UnexpectedException
+import com.simprints.id.exceptions.unexpected.UnexpectedScannerError
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate

@@ -114,13 +114,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        dbManager.signOut()
-        syncSchedulerHelper.cancelDownSyncWorkers()
-        sessionEventManager.signOut()
-    }
-
-    override fun userDidWantToLogout() {
-        view.showConfirmationDialogForLogout()
+        view.startCheckLoginActivityAndFinish()
     }
 
     private fun userIsOffline() = try {

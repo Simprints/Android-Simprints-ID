@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
-import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeError
 
 
 class ImprovedSharedPreferencesEditorImpl(private val editor: SharedPreferences.Editor)

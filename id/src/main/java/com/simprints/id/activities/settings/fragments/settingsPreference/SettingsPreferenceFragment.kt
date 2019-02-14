@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 
 
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {
@@ -49,32 +50,20 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForDefaultFingers(): Preference =
         findPreference(getKeyForDefaultFingersPreference())
 
-    override fun getSyncAndSearchConfigurationPreference(): Preference =
-        findPreference(getKeyForSyncAndSearchConfigurationPreference())
-
-    override fun getAppVersionPreference(): Preference =
-        findPreference(getKeyForAppVersionPreference())
-
-    override fun getScannerVersionPreference(): Preference =
-        findPreference(getKeyForScannerVersionPreference())
-
     override fun getKeyForLanguagePreference(): String =
-        getString(R.string.select_language_preference)
+        getString(R.string.preference_select_language_key)
 
     override fun getKeyForSelectModulesPreference(): String =
-        getString(R.string.select_modules_preference)
+        getString(R.string.preference_select_modules_key)
 
     override fun getKeyForDefaultFingersPreference(): String =
-        getString(R.string.select_fingers_preference)
+        getString(R.string.preference_select_fingers_key)
 
-    override fun getKeyForSyncAndSearchConfigurationPreference(): String =
-        getString(R.string.sync_and_search_configuration_preference)
+    override fun getPreferenceForAbout(): Preference =
+        findPreference(getKeyForAboutPreference())
 
-    override fun getKeyForAppVersionPreference(): String =
-        getString(R.string.app_version_preference)
-
-    override fun getKeyForScannerVersionPreference(): String =
-        getString(R.string.scanner_version_preference)
+    override fun getKeyForAboutPreference(): String =
+        getString(R.string.preference_app_details_key)
 
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
         getPreferenceForSelectModules().isEnabled = enabled
@@ -90,5 +79,11 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun showToastForInvalidSelectionOfFingers() {
         Toast.makeText(activity, getString(R.string.settings_invalid_selection), Toast.LENGTH_LONG).show()
+    }
+
+    override fun openSettingAboutActivity() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).openSettingAboutActivity()
+        }
     }
 }

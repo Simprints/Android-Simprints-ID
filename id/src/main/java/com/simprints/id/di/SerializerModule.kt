@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Location
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter

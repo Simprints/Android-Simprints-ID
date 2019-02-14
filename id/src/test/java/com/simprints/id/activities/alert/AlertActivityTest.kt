@@ -20,6 +20,7 @@ import com.simprints.id.testUtils.extensions.showOnScreen
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.roboletric.createRoboAlertActivity
 import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
@@ -49,6 +50,7 @@ class AlertActivityTest : DaggerForTests() {
     override fun setUp() {
         app = (ApplicationProvider.getApplicationContext() as TestApplication)
         FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
         super.setUp()
         testAppComponent.inject(this)
 

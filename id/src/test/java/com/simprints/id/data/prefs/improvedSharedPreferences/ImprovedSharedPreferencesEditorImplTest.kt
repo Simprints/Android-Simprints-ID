@@ -5,7 +5,7 @@ import com.simprints.id.shared.assertThrows
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.verifyOnlyInteraction
 import com.simprints.id.shared.whenever
-import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeError
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 

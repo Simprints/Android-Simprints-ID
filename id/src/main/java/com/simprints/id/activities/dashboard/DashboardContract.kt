@@ -13,9 +13,9 @@ interface DashboardContract {
         fun launchAlertView(error: ALERT_TYPE)
         fun notifyCardViewChanged(position: Int)
         fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
-        fun showConfirmationDialogForLogout()
         fun showToastForUserOffline()
         fun showToastForRecordsUpToDate()
+        fun startCheckLoginActivityAndFinish()
     }
 
     interface Presenter : BasePresenter {
@@ -23,7 +23,6 @@ interface DashboardContract {
 
         fun userDidWantToRefreshCardsIfPossible()
         fun userDidWantToDownSync()
-        fun userDidWantToLogout()
         fun logout()
     }
 }

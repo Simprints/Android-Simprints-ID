@@ -8,9 +8,9 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.Device
 import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
+import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Person
@@ -75,7 +75,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                 block(it)
                 insertOrUpdateSessionEvents(it)
             } else {
-                throw AttemptedToModifyASessionAlreadyClosed()
+                throw AttemptedToModifyASessionAlreadyClosedException()
             }
         }.doOnError {
             Timber.e(it)

@@ -24,7 +24,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.exceptions.unsafe.MalformedConsentTextError
+import com.simprints.id.exceptions.unexpected.MalformedConsentTextError
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction

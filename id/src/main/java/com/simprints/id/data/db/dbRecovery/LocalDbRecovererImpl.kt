@@ -28,7 +28,7 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import java.util.*
 
-class LocalDbRecovererImpl(private val localDbManager: LocalDbManager,
+class LocalDbRecovererImpl(private val localDbManager: LocalDbManager, // STOPSHIP remove
                            private val firebaseManagerImpl: FirebaseManagerImpl,
                            private val projectId: String,
                            private val userId: String,
