@@ -9,12 +9,13 @@ import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.testSnippets.*
+import com.simprints.id.integration.testsnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.integration.testtools.TestProjectRule
 import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
 import com.simprints.id.integration.testtools.models.TestProject
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger

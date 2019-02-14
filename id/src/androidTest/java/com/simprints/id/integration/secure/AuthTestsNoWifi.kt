@@ -15,8 +15,9 @@ import com.simprints.id.commontesttools.state.replaceRemoteDbManagerApiClientsWi
 import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.testSnippets.*
+import com.simprints.id.integration.testsnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import org.junit.Before
 import org.junit.Rule

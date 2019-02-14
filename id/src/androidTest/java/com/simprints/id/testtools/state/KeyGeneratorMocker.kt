@@ -1,4 +1,4 @@
-package com.simprints.id.testSnippets
+package com.simprints.id.testtools.state
 
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testframework.common.syntax.whenever

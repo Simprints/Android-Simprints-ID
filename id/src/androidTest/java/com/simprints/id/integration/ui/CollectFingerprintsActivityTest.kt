@@ -16,10 +16,10 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.testSnippets.collectFingerprintsPressScan
-import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
-import com.simprints.id.testSnippets.skipFinger
-import com.simprints.id.testSnippets.waitForSplashScreenAppearsAndDisappears
+import com.simprints.id.integration.testsnippets.collectFingerprintsPressScan
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
+import com.simprints.id.integration.testsnippets.skipFinger
+import com.simprints.id.integration.testsnippets.waitForSplashScreenAppearsAndDisappears
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.id.testtools.launchCollectFingerprintsActivity
