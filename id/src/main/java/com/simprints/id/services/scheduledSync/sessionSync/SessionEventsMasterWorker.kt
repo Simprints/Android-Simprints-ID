@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject

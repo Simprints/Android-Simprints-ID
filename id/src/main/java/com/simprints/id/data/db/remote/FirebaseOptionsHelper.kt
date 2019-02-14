@@ -3,8 +3,8 @@ package com.simprints.id.data.db.remote
 import android.content.Context
 import com.google.firebase.FirebaseOptions
 import com.simprints.id.BuildConfig
-import com.simprints.id.exceptions.unsafe.GoogleServicesJsonInvalidError
-import com.simprints.id.exceptions.unsafe.GoogleServicesJsonNotFoundError
+import com.simprints.id.exceptions.unexpected.GoogleServicesJsonInvalidError
+import com.simprints.id.exceptions.unexpected.GoogleServicesJsonNotFoundError
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

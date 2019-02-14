@@ -3,8 +3,8 @@ package com.simprints.id.session.sessionParameters.readers
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
-import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterTypeError
+import com.simprints.id.exceptions.safe.callout.MissingCalloutParameterError
 import kotlin.reflect.KClass
 
 

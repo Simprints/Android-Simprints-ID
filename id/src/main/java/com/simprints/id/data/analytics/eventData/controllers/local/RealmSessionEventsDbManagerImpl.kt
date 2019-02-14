@@ -6,8 +6,8 @@ import com.simprints.id.data.analytics.eventData.models.local.RlSession
 import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
-import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.RealmUninitialisedError
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm

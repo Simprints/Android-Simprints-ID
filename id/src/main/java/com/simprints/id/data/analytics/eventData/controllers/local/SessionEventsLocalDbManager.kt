@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventData.controllers.local
 
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.reactivex.Completable
 import io.reactivex.Single
 

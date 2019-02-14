@@ -7,8 +7,8 @@ import android.os.Build.VERSION_CODES.M
 import android.security.KeyPairGeneratorSpec
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
-import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystoreError
+import com.simprints.id.exceptions.safe.callout.InvalidDecryptionData
+import com.simprints.id.exceptions.unexpected.MissingPrivateKeyInKeystoreError
 import com.simprints.id.secure.cryptography.AsymmetricEncrypter
 import com.simprints.id.secure.cryptography.AsymmetricEncrypterImpl
 import java.math.BigInteger

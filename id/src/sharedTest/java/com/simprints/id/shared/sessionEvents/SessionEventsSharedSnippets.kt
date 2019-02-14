@@ -4,7 +4,7 @@ import com.nhaarman.mockito_kotlin.anyOrNull
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.Device
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.shared.anyNotNull
 import com.simprints.id.shared.whenever
 import com.simprints.id.tools.TimeHelper
