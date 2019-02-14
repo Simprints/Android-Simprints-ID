@@ -1,4 +1,4 @@
-package com.simprints.id.testSnippets
+package com.simprints.id.integration.testsnippets
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click

@@ -15,11 +15,11 @@ import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelect
 import com.simprints.id.data.analytics.eventData.models.local.RlSession
 import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.testSnippets.launchActivityEnrol
-import com.simprints.id.testSnippets.setupLoginInfoToBeSignedIn
-import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.integration.testsnippets.launchActivityEnrol
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
+import com.simprints.id.testtools.state.LoginStateMocker
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.SimHelper
 import com.simprints.testframework.android.tryOnUiUntilTimeout
@@ -58,7 +58,7 @@ class GuidSelectionServiceTest {
     fun setUp() {
         AndroidTestConfig(this, module).fullSetupWith {
             setupRandomGeneratorToGenerateKey(DefaultTestConstants.DEFAULT_REALM_KEY, randomGeneratorMock)
-            setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
+            LoginStateMocker.setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
         }
     }
 

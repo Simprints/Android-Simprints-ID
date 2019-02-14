@@ -24,8 +24,9 @@ import com.simprints.id.integration.testtools.models.TestProject
 import com.simprints.id.integration.testtools.remote.RemoteTestingManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTask
-import com.simprints.id.testSnippets.*
+import com.simprints.id.integration.testsnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier

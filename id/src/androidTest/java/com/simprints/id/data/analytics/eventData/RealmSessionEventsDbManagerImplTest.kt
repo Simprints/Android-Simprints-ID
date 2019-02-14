@@ -19,7 +19,7 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseI
 import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.testSnippets.setupRandomGeneratorToGenerateKey
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper

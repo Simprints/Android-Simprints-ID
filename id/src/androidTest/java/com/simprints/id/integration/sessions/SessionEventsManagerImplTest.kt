@@ -30,9 +30,10 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.testSnippets.*
+import com.simprints.id.integration.testsnippets.*
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Person

@@ -35,7 +35,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSy
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.LoginManagerTest
+import com.simprints.id.testtools.state.LoginStateMocker
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testframework.android.tryOnUiUntilTimeout
 import com.simprints.testframework.android.waitOnSystem
@@ -236,7 +236,7 @@ class DashboardActivityAndroidTest {
 
     private fun mockBeingSignedIn() {
         val token = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
-        LoginManagerTest().setUpSignedInState(
+        LoginStateMocker.setupLoginStateFullyToBeSignedIn(
             app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
             secureDataManagerSpy,
             remoteDbManagerSpy,
