@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
@@ -15,7 +15,7 @@ class SessionEventsSyncMasterTask(
     private val sessionEventsManager: SessionEventsManager,
     private val timeHelper: TimeHelper,
     private val sessionApi: SessionsRemoteInterface,
-    private val analyticsManager: AnalyticsManager) {
+    private val crashReportManager: CrashReportManager) {
 
     companion object {
         var BATCH_SIZE = 20
@@ -38,7 +38,7 @@ class SessionEventsSyncMasterTask(
         this.concatMapCompletable {
             createUploadBatchTaskCompletable(it).doOnError { t ->
                 if (t !is NoSessionsFoundException) {
-                    analyticsManager.logThrowable(t)
+                    crashReportManager.logThrowable(t)
                 }
             }.onErrorComplete()
         }
