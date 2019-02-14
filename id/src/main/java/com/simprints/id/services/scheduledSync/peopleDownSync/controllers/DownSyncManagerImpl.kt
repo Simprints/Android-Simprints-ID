@@ -59,7 +59,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
     }
 
     override fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<DownSyncMasterWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(DownSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
@@ -69,7 +69,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
 
 
     override fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope) =
-        OneTimeWorkRequestBuilder<DownSyncMasterWorker>()
+        OneTimeWorkRequest.Builder(DownSyncMasterWorker::class.java)
             .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
