@@ -50,7 +50,7 @@ open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 6L
+        private const val SYNC_REPEAT_INTERVAL = 1L
         private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
 
         internal const val MASTER_WORKER_VERSION = 1L
