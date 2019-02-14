@@ -1,6 +1,6 @@
 package com.simprints.id.exceptions.safe.setup
 
-import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.safe.SafeException
 
 class BluetoothNotEnabledException(message: String = "BluetoothNotEnabledException") :
-    SimprintsException(message)
+    SafeException(message)

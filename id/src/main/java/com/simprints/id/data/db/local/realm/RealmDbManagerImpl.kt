@@ -13,7 +13,7 @@ import com.simprints.id.domain.Project
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
-import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.exceptions.unexpected.RealmUninitialisedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.BackpressureStrategy

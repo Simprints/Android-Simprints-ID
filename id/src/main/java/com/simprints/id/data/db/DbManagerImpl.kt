@@ -271,7 +271,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
         remote.saveSessionInRemote(session)
     }
 
-    override fun recoverLocalDb(group: Constants.GROUP): Completable {
+    override fun recoverLocalDb(group: Constants.GROUP): Completable { // STOPSHIP remove
         val firebaseManager = remote as FirebaseManagerImpl
         val realmManager = local as RealmDbManagerImpl
         return LocalDbRecovererImpl(

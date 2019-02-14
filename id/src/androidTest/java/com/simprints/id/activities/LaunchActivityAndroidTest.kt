@@ -21,6 +21,7 @@ import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.*
+import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY

@@ -1,8 +1,8 @@
 package com.simprints.id.data.analytics
 
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.SimprintsException
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import io.reactivex.Single
@@ -13,8 +13,8 @@ interface AnalyticsManager {
     val analyticsId: Single<String>
 
     fun logThrowable(throwable: Throwable)
-    fun logError(error: SimprintsError)
-    fun logSafeException(exception: SimprintsException)
+    fun logError(error: UnexpectedException)
+    fun logSafeException(exception: SafeException)
 
     fun logCallout(callout: Callout)
     fun logAlert(alertType: ALERT_TYPE)

@@ -8,8 +8,8 @@ import com.simprints.id.data.db.remote.models.fb_Session
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.SimprintsException
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
@@ -81,8 +81,8 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     override fun logThrowable(throwable: Throwable) =
         when (throwable) {
-            is SimprintsError -> logError(throwable)
-            is SimprintsException -> logSafeException(throwable)
+            is UnexpectedException -> logError(throwable)
+            is SafeException -> logSafeException(throwable)
             else -> logUnexpectedThrowable(throwable)
         }
 
@@ -90,11 +90,11 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         logUnsafeThrowable(throwable)
     }
 
-    override fun logError(error: SimprintsError) {
+    override fun logError(error: UnexpectedException) {
         logUnsafeThrowable(error)
     }
 
-    override fun logSafeException(exception: SimprintsException) {
+    override fun logSafeException(exception: SafeException) {
         Timber.d("AnalyticsManagerImpl.logSafeException(description=$exception)")
         val bundle = Bundle()
         bundle.putString("exception", exception.toString())

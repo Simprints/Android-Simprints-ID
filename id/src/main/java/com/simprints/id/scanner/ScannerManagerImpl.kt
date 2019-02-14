@@ -4,8 +4,13 @@ import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.setup.*
-import com.simprints.id.exceptions.unsafe.NullScannerError
+import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
+import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
+import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
+import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
+import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.id.exceptions.unexpected.NullScannerError
+import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
