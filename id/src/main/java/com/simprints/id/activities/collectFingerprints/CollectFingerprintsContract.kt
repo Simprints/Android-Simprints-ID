@@ -60,7 +60,7 @@ interface CollectFingerprintsContract {
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()
         fun handleTryAgainFromDifferentActivity()
-        fun handleUnexpectedError(error: UnexpectedException)
+        fun handleUnexpectedError(unexpectedException: UnexpectedException)
 
         // Scanning
         var isConfirmDialogShown: Boolean

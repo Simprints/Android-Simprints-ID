@@ -32,7 +32,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
                 sessionEventsManager,
                 timeHelper,
                 remoteSessionsManager.getSessionsApiClient().blockingGet(),
-                analyticsManager
+                crashReportManager
             )
             task.execute().blockingAwait()
             Result.success()

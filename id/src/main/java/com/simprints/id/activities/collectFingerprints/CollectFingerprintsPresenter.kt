@@ -292,9 +292,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.finishSuccessAndStartMatching(intent)
     }
 
-    override fun handleUnexpectedError(error: SimprintsError) {
-        crashReportManager.logException(error)
-        Timber.e(error)
+    override fun handleUnexpectedError(unexpectedException: UnexpectedException) {
+        crashReportManager.logException(unexpectedException)
+        Timber.e(unexpectedException)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 

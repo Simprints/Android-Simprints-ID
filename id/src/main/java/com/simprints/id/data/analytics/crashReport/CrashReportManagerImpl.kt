@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.libsimprints.FingerIdentifier
 
