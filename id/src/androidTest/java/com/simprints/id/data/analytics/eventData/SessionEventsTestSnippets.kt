@@ -34,6 +34,16 @@ fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
     }
 }
 
+fun verifyEventsWhenSimprintsIsLaunched(events: List<Event>) {
+    val expectedEvents = arrayListOf(
+        AuthorizationEvent::class.java,
+        ConnectivitySnapshotEvent::class.java,
+        CalloutEvent::class.java
+    ).map { it.canonicalName }
+
+    Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
+}
+
 fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
     val expectedEvents = arrayListOf(
         AuthorizationEvent::class.java,

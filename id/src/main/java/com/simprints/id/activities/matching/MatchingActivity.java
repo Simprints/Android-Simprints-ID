@@ -19,7 +19,7 @@ import com.simprints.id.data.analytics.crashReport.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.di.AppComponent;
 import com.simprints.id.domain.ALERT_TYPE;
-import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
+import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;

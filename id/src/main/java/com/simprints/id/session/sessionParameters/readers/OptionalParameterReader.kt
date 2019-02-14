@@ -1,6 +1,6 @@
 package com.simprints.id.session.sessionParameters.readers
 
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterTypeError
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutParameter
 

@@ -23,8 +23,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.FormatResult
 import com.simprints.id.tools.LanguageHelper
@@ -282,7 +282,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
-        handleUnexpectedError(SimprintsError(throwable))
+        handleUnexpectedError(UnexpectedException(throwable))
         view.cancelAndFinish()
     }
 

@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.work.*
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope

@@ -12,7 +12,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
+import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.tools.InternalConstants

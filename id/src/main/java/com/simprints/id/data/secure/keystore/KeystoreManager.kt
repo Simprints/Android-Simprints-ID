@@ -1,7 +1,7 @@
 package com.simprints.id.data.secure.keystore
 
-import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystoreError
-import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
+import com.simprints.id.exceptions.unexpected.MissingPrivateKeyInKeystoreError
+import com.simprints.id.exceptions.safe.callout.InvalidDecryptionData
 
 interface KeystoreManager {
 

@@ -15,7 +15,7 @@ import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -59,12 +59,22 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.createSession().doFinally {
             try {
                 extractSessionParametersOrThrow()
+                addCalloutAndConnectivityEventsInSession()
                 setLastUser()
             } catch (exception: InvalidCalloutError) {
                 view.openAlertActivityForError(exception.alertType)
                 setupFailed = true
             }
         }.subscribeBy(onError = { it.printStackTrace() })
+    }
+
+    private fun addCalloutAndConnectivityEventsInSession() {
+        sessionEventsManager.updateSessionInBackground {
+            it.events.apply {
+                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+            }
+        }
     }
 
     private fun setLastUser() {
@@ -77,7 +87,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun extractSessionParametersOrThrow() {
+    fun extractSessionParametersOrThrow() {
         val callout = view.parseCallout()
         analyticsManager.logCallout(callout)
         val sessionParameters = sessionParametersExtractor.extractFrom(callout)
@@ -132,10 +142,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.signedInUserId = preferencesManager.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
-        sessionEventsManager.updateSessionInBackground {
-            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        }
-
         view.openLaunchActivity()
     }
 
@@ -163,8 +169,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             it.analyticsId = gaId
             it.databaseInfo = DatabaseInfo(peopleDbCount, sessionDbCount)
             it.events.apply {
-                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
-                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
                 addAuthorizationEvent(it, AUTHORIZED)
             }
         }

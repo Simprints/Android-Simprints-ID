@@ -83,12 +83,12 @@
     <!-- Button Labels -->
     <string name="rescan_label">Re-scan</string>
     <string name="rescan_label_question">Re-scan?</string>
-    <string name="scan_label">SCAN</string>
-    <string name="cancel_button" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="scan_label">Scan</string>
+    <string name="cancel_button" tools:ignore="ButtonCase">Cancel</string>
     <string name="ok">OK</string>
-    <string name="scan">SCAN</string>
-    <string name="confirm">CONFIRM</string>
-    <string name="restart">RESTART</string>
+    <string name="scan">Scan</string>
+    <string name="confirm">Confirm</string>
+    <string name="restart">Restart</string>
     <!-- Content Descriptions -->
     <string name="finger_image_description" translatable="false">Hands with arrow pointing to a finger</string>
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
@@ -103,16 +103,16 @@
     <string name="coming_soon">Coming soon…</string>
     <string name="wait_for_current_sync_to_finish">Please wait for the current sync operation to finish</string>
     <!-- Finger Names -->
-    <string name="l_5_finger_name">LEFT FIFTH FINGER</string>
-    <string name="l_4_finger_name">LEFT FOURTH FINGER</string>
-    <string name="l_3_finger_name">LEFT THIRD FINGER</string>
-    <string name="l_2_finger_name">LEFT INDEX FINGER</string>
-    <string name="l_1_finger_name">LEFT THUMB</string>
-    <string name="r_1_finger_name">RIGHT THUMB</string>
-    <string name="r_2_finger_name">RIGHT INDEX FINGER</string>
-    <string name="r_3_finger_name">RIGHT THIRD FINGER</string>
-    <string name="r_4_finger_name">RIGHT FOURTH FINGER</string>
-    <string name="r_5_finger_name">RIGHT FIFTH FINGER</string>
+    <string name="l_5_finger_name">Left Fifth Finger</string>
+    <string name="l_4_finger_name">Left Fourth Finger</string>
+    <string name="l_3_finger_name">Left Third Finger</string>
+    <string name="l_2_finger_name">Left Index Finger</string>
+    <string name="l_1_finger_name">Left Thumb</string>
+    <string name="r_1_finger_name">Right Thumb</string>
+    <string name="r_2_finger_name">Right Index Finger</string>
+    <string name="r_3_finger_name">Right Third Finger</string>
+    <string name="r_4_finger_name">Right Fourth Finger</string>
+    <string name="r_5_finger_name">Right Fifth Finger</string>
     <!-- Content descriptions -->
     <string name="navbar_simprints_logo">Simprints logo</string>
 
@@ -145,12 +145,12 @@
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">BLUETOOTH ERROR</string>
-    <string name="configuration_error_title">CONFIGURATION ERROR</string>
-    <string name="disconnected_title">SCANNER NOT FOUND</string>
-    <string name="verify_guid_not_found_title">PERSON NOT FOUND</string>
-    <string name="error_occurred_title">ERROR OCCURRED</string>
-    <string name="low_battery_title">LOW BATTERY</string>
+    <string name="bluetooth_error_title">Bluetooth Error</string>
+    <string name="configuration_error_title">Configuration Error</string>
+    <string name="disconnected_title">Scanner not found</string>
+    <string name="verify_guid_not_found_title">Person not found</string>
+    <string name="error_occurred_title">Error occurred</string>
+    <string name="low_battery_title">Low battery</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <!-- Error Message Text -->
     <string name="invalid_apikey_message">A configuration error has occurred (invalid API key), please contact your system administrator</string>
@@ -195,9 +195,7 @@
     <string name="user_count">User Count:</string>
     <string name="module_count">Module Count:</string>
     <string name="project_count">Project Count:</string>
-    <string name="about_app_version">App Version</string>
     <string name="about_libsimprints_version">LibSimprints Version:</string>
-    <string name="about_scanner_version">Scanner Version</string>
     <!-- Button Labels -->
     <string name="recover_db" translatable="false">Recover DB</string>
     <!-- Recovery dialogs -->
@@ -397,26 +395,30 @@
     <!--Settings Activity-->
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_sett">Settings</string>
-    <string name="select_language_preference">select_language</string>
-    <string name="select_modules_preference">select_modules</string>
-    <string name="select_fingers_preference">select_fingers</string>
-    <string name="sync_and_search_configuration_preference">sync_and_search_configuration</string>
-    <string name="app_version_preference">app_version</string>
-    <string name="scanner_version_preference">scanner_version</string>
-    <string name="settings_language">Language</string>
-    <string name="settings_modules">Select modules</string>
-    <string name="settings_fingers">Select default fingers</string>
     <string name="settings_sync_launch">Sync upon launch</string>
     <string name="settings_background_sync">Background Sync</string>
     <string name="settings_general">GENERAL</string>
-    <string name="settings_about">ABOUT</string>
-    <string name="settings_sync_and_search_configuration">Sync &amp; Search Configuration</string>
+    <string name="settings_app_details">APP DETAILS</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_scanner_version">Scanner Version</string>
-    <string name="settings_modules_subtext">Choose the modules you would like to sync</string>
-    <string name="settings_fingers_subtext">Choose the fingers you would like to scan</string>
     <string name="settings_no_modules_toast">Invalid Selection. Please select at least one module.</string>
     <string name="settings_too_many_modules_toast">Invalid Selection. Please select no more than %1$d modules.</string>
     <string name="settings_invalid_selection">Invalid Selection</string>
+    <string name="setting_others">OTHERS</string>
+    <string name="settings_logout_subtext">You will need to be online to login again.</string>
+    <string name="title_activity_settings_about">About</string>
+
+    <!--Settings Preferences titles and summaries-->
+    <string name="preference_app_details_title">App Details</string>
+    <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
+    <string name="preference_logout_title">Log Out</string>
+    <string name="preference_select_language_title">Language</string>
+    <string name="preference_select_modules_title">Select modules</string>
+    <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="preference_app_version_title">App Version</string>
+    <string name="preference_scanner_version_title">Scanner Version</string>
+    <string name="preference_device_id_title">Device ID</string>
+    <string name="preference_summary_modules">Choose the modules you would like to sync</string>
+    <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
 
 </resources>

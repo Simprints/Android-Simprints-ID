@@ -56,7 +56,6 @@
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
     <string name="sync_data">সঙ্কি ডাটা</string>
-    <string name="syncing">সিঙ্ক করা হচ্ছে…</string>
     <string name="syncing_calculating">সিঙ্ক করা হচ্ছে… গণনাকারী</string>
     <string name="syncing_with_progress">সিঙ্ক করা হচ্ছে… %1$d/%2$d</string>
     <string name="not_signed_in">সাইন ইন করনেনি</string>
@@ -119,9 +118,9 @@
     <string name="user_count">ব্যবহারকারি সংখ্যা:</string>
     <string name="module_count">মডিউল সংখ্যা:</string>
     <string name="project_count">প্রকল্প সংখ্যা:</string>
-    <string name="about_app_version">অ্যাপ সংস্করণ:</string>
+    <string name="preference_app_version_title">অ্যাপ সংস্করণ:</string>
     <string name="about_libsimprints_version">LibSimprints সংস্করণ:</string>
-    <string name="about_scanner_version">স্ক্যানার সংস্করণ:</string>
+    <string name="preference_scanner_version_title">স্ক্যানার সংস্করণ:</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->

@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
@@ -124,13 +124,13 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet().map { it.id },
             sessionEventsManager,
             timeHelper,
             remoteSessionsManager.getSessionsApiClient().blockingGet())
 
-        return syncTask.execute().test()
+        return syncTask.execute(
+            testProject.id,
+            realmSessionEventsManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =

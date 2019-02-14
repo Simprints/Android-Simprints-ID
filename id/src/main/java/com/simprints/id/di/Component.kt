@@ -28,6 +28,7 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
@@ -42,7 +43,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
@@ -85,7 +85,6 @@ interface AppComponent {
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
-    fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(subCountWorker: SubCountWorker)
@@ -93,4 +92,5 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
+    fun inject(settingsAboutPresenter: SettingsAboutPresenter)
 }
