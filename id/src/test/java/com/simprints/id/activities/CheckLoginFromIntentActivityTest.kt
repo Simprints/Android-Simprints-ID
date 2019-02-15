@@ -6,35 +6,37 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
+import com.simprints.id.commontesttools.di.DependencyRule.*
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.testUtils.assertActivityStarted
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
+import com.simprints.id.testtools.state.setupFakeKeyStore
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.assertActivityStarted
+import com.simprints.testframework.unit.robolectric.createActivity
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.robolectric.Robolectric
+import org.robolectric.Robolectric.buildActivity
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import javax.inject.Inject
@@ -45,7 +47,7 @@ import javax.inject.Inject
 @Config(
     application = TestApplication::class,
     sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
-class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
+class CheckLoginFromIntentActivityTest {
 
     companion object {
         const val DEFAULT_ACTION = "com.simprints.id.REGISTER"
@@ -57,6 +59,8 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         const val DEFAULT_LEGACY_API_KEY = "96307ff9-873b-45e0-8ef0-b2efd5bef12d"
     }
 
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+
     private lateinit var sharedPrefs: SharedPreferences
 
     @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
@@ -66,36 +70,32 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             analyticsManagerRule = SpyRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule)
+            sessionEventsLocalDbManagerRule = MockRule,
+            keystoreManagerRule = ReplaceRule { setupFakeKeyStore() })
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
-        setupLocalAndRemoteManagersForApiTesting(
-            localDbManagerSpy = localDbManagerMock,
-            remoteDbManagerSpy = remoteDbManagerMock,
-            sessionEventsLocalDbManagerMock = sessionEventsLocalDbManagerMock)
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
 
-        sharedPrefs = getRoboSharedPreferences()
-        initLogInStateMock(sharedPrefs, remoteDbManagerMock)
+        sharedPrefs = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
+
+        RobolectricTestMocker
+            .setupLocalAndRemoteManagersForApiTesting(localDbManagerMock, remoteDbManagerMock, sessionEventsLocalDbManagerMock)
+            .initLogInStateMock(sharedPrefs, remoteDbManagerMock)
 
         dbManager.initialiseDb()
     }
 
     @Test
     fun unknownCallingAppSource_shouldLogEvent() {
-        Robolectric.buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
+        buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(1)
     }
 
@@ -104,7 +104,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         val pm = app.packageManager
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
-        Robolectric.buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
+        buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
         verifyALogSafeExceptionWasThrown(0)
     }
 
@@ -139,7 +139,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     @Test
     fun invalidParams_shouldAlertActComeUp() {
 
-        val controller = createRoboCheckLoginFromIntentViewActivity().start()
+        val controller = createRoboCheckLoginFromIntentViewActivity(null).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.visible()
 
@@ -253,6 +253,9 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
         controller.resume().visible()
         return activity
     }
+
+    private fun createRoboCheckLoginFromIntentViewActivity(intent: Intent?) =
+        createActivity<CheckLoginFromIntentActivity>(intent)
 
     private fun createACallingAppIntentWithLegacyApiKey(actionString: String = DEFAULT_ACTION,
                                                         legacyApiKey: String = DEFAULT_LEGACY_API_KEY,

@@ -1,9 +1,9 @@
 apply plugin: "com.android.application"
-apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: "com.google.firebase.firebase-crash"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 
 //Required to import Realm manually (no plugin)
@@ -20,6 +20,7 @@ android {
         versionCode 143
         versionName "2019.1.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     bundle {
@@ -72,7 +73,7 @@ android {
     testBuildType "debug"
 
     sourceSets {
-        String sharedTestDir = 'src/sharedTest/java'
+        String sharedTestDir = 'src/commontesttools/java'
         test {
             java.srcDir sharedTestDir
         }
@@ -208,6 +209,7 @@ dependencies {
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
+    testImplementation project(':testframework')
 
     // Android test
     androidTestImplementation deps.simprints.mockscanner
@@ -232,6 +234,11 @@ dependencies {
         exclude group: "com.google.guava"
     }
     kaptAndroidTest deps.dagger.compiler
+    androidTestImplementation(project(':testframework')) {
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+    }
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

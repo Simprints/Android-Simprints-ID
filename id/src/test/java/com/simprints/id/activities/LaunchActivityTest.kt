@@ -2,23 +2,21 @@ package com.simprints.id.activities
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
+import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.mockSettingsPreferencesManager
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboLaunchActivity
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.createActivity
 import junit.framework.TestCase.assertEquals
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
@@ -29,20 +27,22 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LaunchActivityTest : RxJavaTest, DaggerForTests() {
+class LaunchActivityTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
-    override var preferencesModule by lazyVar {
-        PreferencesModuleForAnyTests(
+    private val preferencesModule by lazy {
+        TestPreferencesModule(
             settingsPreferencesManagerRule = MockRule
         )
     }
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,
@@ -51,13 +51,8 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this, module, preferencesModule).fullSetup()
     }
 
     @Test
@@ -185,6 +180,8 @@ class LaunchActivityTest : RxJavaTest, DaggerForTests() {
 
         mockSettingsPreferencesManager(settingsPreferencesManager, parentalConsentExists, generalConsentOptions, parentalConsentOptions, LANGUAGE, PROGRAM_NAME, ORGANIZATION_NAME)
     }
+
+    private fun createRoboLaunchActivity() = createActivity<LaunchActivity>()
 
     companion object {
         private const val LANGUAGE = "en"

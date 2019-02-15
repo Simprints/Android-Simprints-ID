@@ -2,25 +2,20 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.sessionEvents.createFakeClosedSession
-import com.simprints.id.shared.sessionEvents.mockSessionEventsManager
-import com.simprints.id.shared.waitForCompletionAndAssertNoErrors
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.testframework.common.syntax.*
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -30,14 +25,12 @@ import org.junit.runner.RunWith
 import org.mockito.AdditionalAnswers
 import org.mockito.Mockito
 import org.mockito.Mockito.spy
-import org.mockito.Mockito.times
 import org.robolectric.annotation.Config
 import java.io.IOException
 
-
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
+class SessionEventsMasterTaskTest {
 
     private val projectId = "projectId"
 
@@ -48,7 +41,9 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
     @Before
-    override fun setUp() {
+    fun setUp() {
+        UnitTestConfig(this).rescheduleRxMainThread()
+
         sessionsInFakeDb.clear()
         mockSessionEventsManager(sessionsEventsManagerMock, sessionsInFakeDb)
     }
@@ -61,7 +56,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                 .createBatches()
                 .test()
 
-            testObserver.waitForCompletionAndAssertNoErrors()
+            testObserver.awaitAndAssertSuccess()
 
             with(testObserver.values()) {
                 assertThat(size).isEqualTo(2)
@@ -78,9 +73,9 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
             sessionsInFakeDb.addAll(createClosedSessions(BATCH_SIZE + 1))
 
             val testObserver = this.execute().test()
-            testObserver.waitForCompletionAndAssertNoErrors()
+        testObserver.awaitAndAssertSuccess()
 
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 
@@ -98,7 +93,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                 .executeUploaderTask()
                 .test()
 
-            testObserver.waitForCompletionAndAssertNoErrors()
+            testObserver.awaitAndAssertSuccess()
             assertThat(batchedUploaded).isEqualTo(2)
         }
     }
@@ -113,8 +108,8 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                     .executeUploaderTask()
                     .test()
 
-            testObserver.waitForCompletionAndAssertNoErrors()
-            verify(analyticsManagerMock, times(1)).logThrowable(any())
+            testObserver.awaitAndAssertSuccess()
+            verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 
@@ -128,8 +123,8 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                     .executeUploaderTask()
                     .test()
 
-            testObserver.waitForCompletionAndAssertNoErrors()
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            testObserver.awaitAndAssertSuccess()
+            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
         }
     }
 

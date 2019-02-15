@@ -1,1 +1,1 @@
-include ':id', ':libcommon', ':libsimprints', ':clientapi'
+include ':id', ':libcommon', ':libsimprints', ':clientapi', ':testframework'

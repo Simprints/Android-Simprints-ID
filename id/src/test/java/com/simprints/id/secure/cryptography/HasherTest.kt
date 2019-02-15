@@ -1,8 +1,8 @@
 package com.simprints.id.secure.cryptography
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.id.testtools.TestApplication
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

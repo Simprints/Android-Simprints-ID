@@ -1,14 +1,14 @@
 package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.testframework.common.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -21,7 +21,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class NonceManagerTest : RxJavaTest {
+class NonceManagerTest {
 
     private val validNonceJsonResponse = "{\"value\":\"nonce_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
@@ -33,6 +33,8 @@ class NonceManagerTest : RxJavaTest {
 
     @Test
     fun successfulResponse_shouldObtainANonce() {
+        UnitTestConfig(this).rescheduleRxMainThread()
+
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
         val testObserver = makeTestRequestNonce(apiClient.api)

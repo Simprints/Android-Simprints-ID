@@ -2,9 +2,9 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
@@ -12,17 +12,15 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.sessionEvents.createFakeClosedSession
-import com.simprints.id.shared.sessionEvents.createFakeOpenSession
-import com.simprints.id.shared.sessionEvents.createFakeOpenSessionButExpired
-import com.simprints.id.shared.waitForCompletionAndAssertNoErrors
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
@@ -41,7 +39,7 @@ import retrofit2.adapter.rxjava2.Result
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SessionEventsUploaderTaskTest : RxJavaTest {
+class SessionEventsUploaderTaskTest {
 
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
@@ -49,6 +47,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
 
     @Before
     fun setUp() {
+        UnitTestConfig(this).rescheduleRxMainThread()
+
         ShadowLog.stream = System.out
 
         sessionsRemoteInterfaceSpy = spy(SimApiClient(
@@ -57,8 +57,8 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
             "",
             SessionEventsApiAdapterFactory().gson).api)
 
-        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).doReturn(Completable.complete())
-        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).doReturn(Completable.complete())
+        whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
+        whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).thenReturn(Completable.complete())
     }
 
     @Test
@@ -72,7 +72,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
             val closingSessionsTask = Single.just(sessions)
                 .closeOpenSessionsAndUpdateUploadTime()
                 .test()
-            closingSessionsTask.waitForCompletionAndAssertNoErrors()
+            closingSessionsTask.awaitAndAssertSuccess()
 
             val outputSessions = closingSessionsTask.values().first()
             outputSessions.apply {
@@ -96,7 +96,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
             val filterTask = Single.just(sessions)
                 .filterClosedSessions()
                 .test()
-            filterTask.waitForCompletionAndAssertNoErrors()
+            filterTask.awaitAndAssertSuccess()
 
             val outputSessions = filterTask.values().first()
             outputSessions.apply {
@@ -118,7 +118,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
                 .uploadClosedSessionsOrThrowIfNoSessions("bWOFHInKA2YaQwrxZ7uJ")
                 .test()
 
-            uploadTask.waitForCompletionAndAssertNoErrors()
+            uploadTask.awaitAndAssertSuccess()
         }
     }
 
@@ -130,7 +130,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
                 .checkUploadSucceedAndRetryIfNecessary()
                 .test()
 
-            checkResponseTask.waitForCompletionAndAssertNoErrors()
+            checkResponseTask.awaitAndAssertSuccess()
         }
     }
 
@@ -173,7 +173,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
             val filterTask = Single.just(sessions)
                 .deleteSessionsFromDb()
                 .test()
-            filterTask.waitForCompletionAndAssertNoErrors()
+            filterTask.awaitAndAssertSuccess()
 
             verify(sessionsEventsManagerMock, times(sessions.size))
                 .deleteSessions(isNull() as String?, anyString(), anyBoolean(), isNull() as Long?)
