@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
@@ -43,7 +43,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
 
     private val sessionsRemoteInterfaceMock: SessionsRemoteInterface = mock()
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
-    private val analyticsManagerMock: AnalyticsManager = mock()
+    private val crashReportManagerMock: CrashReportManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
@@ -80,7 +80,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
             val testObserver = this.execute().test()
             testObserver.waitForCompletionAndAssertNoErrors()
 
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            verify(crashReportManagerMock, times(0)).logExceptionOrThrowable(any())
         }
     }
 
@@ -114,7 +114,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                     .test()
 
             testObserver.waitForCompletionAndAssertNoErrors()
-            verify(analyticsManagerMock, times(1)).logThrowable(any())
+            verify(crashReportManagerMock, times(1)).logExceptionOrThrowable(any())
         }
     }
 
@@ -129,7 +129,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
                     .test()
 
             testObserver.waitForCompletionAndAssertNoErrors()
-            verify(analyticsManagerMock, times(0)).logThrowable(any())
+            verify(crashReportManagerMock, times(0)).logExceptionOrThrowable(any())
         }
     }
 
@@ -146,7 +146,7 @@ class SessionEventsMasterTaskTest : RxJavaTest, DaggerForTests() {
             sessionsEventsManagerMock,
             timeHelper,
             sessionsRemoteInterfaceMock,
-            analyticsManagerMock
+            crashReportManagerMock
         )
 
     private fun createClosedSessions(nSessions: Int) =

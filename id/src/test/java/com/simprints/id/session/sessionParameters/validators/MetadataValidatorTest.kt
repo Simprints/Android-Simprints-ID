@@ -1,6 +1,7 @@
 package com.simprints.id.session.sessionParameters.validators
 
 import com.google.gson.Gson
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.shared.assertThrows
 import org.junit.Test
 
@@ -10,7 +11,7 @@ class MetadataValidatorTest {
     private val validMetadata: String = "{\"aKey\":\"watchOutForTheMissingQuote\"}"
     private val invalidMetadata: String = "{\"aKey\":\"watchOutForTheMissingQuote}"
 
-    private val invalidMetadataError = Error()
+    private val invalidMetadataError = SafeException("invalid metadata error")
 
     private val metadataValidator = MetadataValidator(invalidMetadataError, Gson())
 

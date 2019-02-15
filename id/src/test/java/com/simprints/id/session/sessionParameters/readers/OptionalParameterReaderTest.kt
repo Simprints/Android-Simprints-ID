@@ -1,5 +1,6 @@
 package com.simprints.id.session.sessionParameters.readers
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
@@ -23,7 +24,7 @@ class OptionalParameterReaderTest {
     private val emptyCallout = Callout(anyCalloutAction, CalloutParameters(setOf()))
     private val calloutWithStringParameter = Callout(anyCalloutAction, CalloutParameters(setOf(calloutParameter)))
 
-    private val invalidParameterTypeError = Error()
+    private val invalidParameterTypeError = SafeException("invalid parameter type error")
 
     private val optionalStringParameterReader = OptionalParameterReader(key, defaultStringValue,
         invalidParameterTypeError)
