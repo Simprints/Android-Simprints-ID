@@ -2,12 +2,9 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.EnrollmentEvent
-import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -269,20 +266,5 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     override fun saveSession(session: Session) {
         remote.saveSessionInRemote(session)
-    }
-
-    override fun recoverLocalDb(group: Constants.GROUP): Completable { // STOPSHIP remove
-        val firebaseManager = remote as FirebaseManagerImpl
-        val realmManager = local as RealmDbManagerImpl
-        return LocalDbRecovererImpl(
-            realmManager,
-            firebaseManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.deviceId,
-            preferencesManager.moduleId,
-            group)
-            .recoverDb()
-            .trace("recoverLocalDb")
     }
 }

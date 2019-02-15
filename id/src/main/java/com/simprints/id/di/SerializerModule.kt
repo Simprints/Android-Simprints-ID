@@ -55,29 +55,29 @@ class SerializerModule {
     //Action
     @Provides @Singleton @Named("ActionReader") fun provideActionReader(): Reader<CalloutAction> = ActionReader()
     @Provides @Singleton @Named("InvalidActionError") fun provideInvalidActionError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_INTENT_ACTION)
-    @Provides @Singleton @Named("ActionValidator") fun provideActionValidator(@Named("InvalidActionError") invalidActionError: Error): Validator<CalloutAction> = ValueValidator(CalloutAction.validValues, invalidActionError)
+    @Provides @Singleton @Named("ActionValidator") fun provideActionValidator(@Named("InvalidActionError") invalidActionError: SafeException): Validator<CalloutAction> = ValueValidator(CalloutAction.validValues, invalidActionError)
     @Provides @Singleton @Named("ActionExtractor") fun provideActionExtractor(@Named("ActionReader") actionReader: Reader<CalloutAction>, @Named("ActionValidator") actionValidator: Validator<CalloutAction>): Extractor<CalloutAction> = ParameterExtractor(actionReader, actionValidator)
 
     //ModuleId
     @Provides @Singleton @Named("InvalidModuleIdError") fun provideInvalidModuleIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_MODULE_ID)
     @Provides @Singleton @Named("MissingModuleIdError") fun provideMissingModuleIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.MISSING_MODULE_ID)
-    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(@Named("InvalidModuleIdError") invalidModuleIdError: Error): Validator<String> = ModuleIdValidator(invalidModuleIdError)
+    @Provides @Singleton @Named("ModuleIdValidator") fun provideModuleIdValidator(@Named("InvalidModuleIdError") invalidModuleIdError: SafeException): Validator<String> = ModuleIdValidator(invalidModuleIdError)
     @Provides @Singleton @Named("ModuleIdExtractor")fun provideModuleIdExtractor(@Named("ModuleIdReader") moduleIdReader: Reader<String>, @Named("ModuleIdValidator") moduleIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(moduleIdReader, moduleIdValidator)
-    @Provides @Singleton @Named("ModuleIdReader") fun provideModuleIdReader(@Named("MissingModuleIdError") missingModuleIdError: Error, @Named("InvalidModuleIdError") invalidModuleIdError: Error): Reader<String> =
+    @Provides @Singleton @Named("ModuleIdReader") fun provideModuleIdReader(@Named("MissingModuleIdError") missingModuleIdError: SafeException, @Named("InvalidModuleIdError") invalidModuleIdError: SafeException): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_MODULE_ID, String::class, missingModuleIdError, invalidModuleIdError)
 
     //APIKey
     @Provides @Singleton @Named("InvalidApiKeyError") fun provideInvalidApiKeyError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
-    @Provides @Singleton @Named("ApiKeyValidator") fun provideApiKeyValidator(@Named("InvalidApiKeyError") invalidApiKeyError: Error): Validator<String> = GuidValidator(invalidApiKeyError)
+    @Provides @Singleton @Named("ApiKeyValidator") fun provideApiKeyValidator(@Named("InvalidApiKeyError") invalidApiKeyError: SafeException): Validator<String> = GuidValidator(invalidApiKeyError)
     @Provides @Singleton @Named("ApiKeyExtractor") fun provideApiKeyExtractor(@Named("ApiKeyReader") apiKeyReader: Reader<String>, @Named("ApiKeyValidator") apiKeyValidator: Validator<String>): Extractor<String> = ParameterExtractor(apiKeyReader, apiKeyValidator)
-    @Provides @Singleton @Named("ApiKeyReader") fun provideApiKeyReader(@Named("InvalidApiKeyError") invalidApiKeyError: Error): Reader<String> =
+    @Provides @Singleton @Named("ApiKeyReader") fun provideApiKeyReader(@Named("InvalidApiKeyError") invalidApiKeyError: SafeException): Reader<String> =
         OptionalParameterReader(SIMPRINTS_API_KEY, "", invalidApiKeyError)
 
     //ProjectId
     @Provides @Singleton @Named("InvalidProjectIdError") fun provideInvalidProjectIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_API_KEY)
-    @Provides @Singleton @Named("ProjectIdValidator") fun provideProjectIdValidator(@Named("InvalidProjectIdError") invalidProjectIdError: Error): Validator<String> = NoOpValidator()
+    @Provides @Singleton @Named("ProjectIdValidator") fun provideProjectIdValidator(@Named("InvalidProjectIdError") invalidProjectIdError: SafeException): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("ProjectIdExtractor") fun provideProjectIdExtractor(@Named("ProjectIdReader") projectIdReader: Reader<String>, @Named("ProjectIdValidator") projectIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(projectIdReader, projectIdValidator)
-    @Provides @Singleton @Named("ProjectIdReader") fun provideProjectIdReader(@Named("InvalidProjectIdError") invalidProjectIdError: Error): Reader<String> =
+    @Provides @Singleton @Named("ProjectIdReader") fun provideProjectIdReader(@Named("InvalidProjectIdError") invalidProjectIdError: SafeException): Reader<String> =
         OptionalParameterReader(SIMPRINTS_PROJECT_ID, "", invalidProjectIdError)
 
     //UserId
@@ -85,41 +85,41 @@ class SerializerModule {
     @Provides @Singleton @Named("MissingUserIdError") fun provideMissingUserIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.MISSING_USER_ID)
     @Provides @Singleton @Named("UserIdValidator") fun provideUserIdValidator(): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("UserIdExtractor") fun provideUserIdExtractor(@Named("UserIdReader") userIdReader: Reader<String>, @Named("UserIdValidator") userIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(userIdReader, userIdValidator)
-    @Provides @Singleton @Named("UserIdReader") fun provideUserIdReader(@Named("MissingUserIdError") missingUserIdError: Error, @Named("InvalidUserIdError") invalidUserIdError: Error): Reader<String> =
+    @Provides @Singleton @Named("UserIdReader") fun provideUserIdReader(@Named("MissingUserIdError") missingUserIdError: SafeException, @Named("InvalidUserIdError") invalidUserIdError: SafeException): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_USER_ID, String::class, missingUserIdError, invalidUserIdError)
 
     //VerifyId
     @Provides @Singleton @Named("MissingVerifyIdError") fun provideMissingVerifyIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.MISSING_VERIFY_GUID)
     @Provides @Singleton @Named("InvalidVerifyIdError") fun provideInvalidVerifyIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_VERIFY_GUID)
-    @Provides @Singleton @Named("VerifyIdValidator") fun provideVerifyIdValidator(@Named("InvalidVerifyIdError") invalidVerifyIdError: Error): Validator<String> = GuidValidator(invalidVerifyIdError)
+    @Provides @Singleton @Named("VerifyIdValidator") fun provideVerifyIdValidator(@Named("InvalidVerifyIdError") invalidVerifyIdError: SafeException): Validator<String> = GuidValidator(invalidVerifyIdError)
     @Provides @Singleton @Named("VerifyIdExtractor") fun provideVerifyIdExtractor(@Named("VerifyIdReader") verifyIdReader: Reader<String>, @Named("VerifyIdValidator") verifyIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(verifyIdReader, verifyIdValidator)
-    @Provides @Singleton @Named("VerifyIdReader") fun provideVerifyIdReader(@Named("MissingVerifyIdError") missingVerifyIdError: Error, @Named("InvalidVerifyIdError") invalidVerifyIdError: Error): Reader<String> =
+    @Provides @Singleton @Named("VerifyIdReader") fun provideVerifyIdReader(@Named("MissingVerifyIdError") missingVerifyIdError: SafeException, @Named("InvalidVerifyIdError") invalidVerifyIdError: SafeException): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_VERIFY_GUID, String::class, missingVerifyIdError, invalidVerifyIdError)
 
     //UpdateId
     @Provides @Singleton @Named("MissingUpdateIdError") fun provideMissingUpdateIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.MISSING_UPDATE_GUID)
     @Provides @Singleton @Named("InvalidUpdateIdError") fun provideInvalidUpdateIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_UPDATE_GUID)
-    @Provides @Singleton @Named("UpdateIdValidator") fun provideUpdateIdValidator(@Named("InvalidUpdateIdError") invalidUpdateIdError: Error): Validator<String> = GuidValidator(invalidUpdateIdError)
+    @Provides @Singleton @Named("UpdateIdValidator") fun provideUpdateIdValidator(@Named("InvalidUpdateIdError") invalidUpdateIdError: SafeException): Validator<String> = GuidValidator(invalidUpdateIdError)
     @Provides @Singleton @Named("UpdateIdExtractor") fun provideUpdateIdExtractor(@Named("UpdateIdReader") updateIdReader: Reader<String> , @Named("UpdateIdValidator") updateIdValidator: Validator<String>): Extractor<String> = ParameterExtractor(updateIdReader, updateIdValidator)
-    @Provides @Singleton @Named("UpdateIdReader") fun provideUpdateIdReader(@Named("MissingUpdateIdError") missingUpdateIdError: Error, @Named("InvalidUpdateIdError") invalidUpdateIdError: Error): Reader<String> =
+    @Provides @Singleton @Named("UpdateIdReader") fun provideUpdateIdReader(@Named("MissingUpdateIdError") missingUpdateIdError: SafeException, @Named("InvalidUpdateIdError") invalidUpdateIdError: SafeException): Reader<String> =
         MandatoryParameterReader(SIMPRINTS_UPDATE_GUID, String::class, missingUpdateIdError, invalidUpdateIdError)
 
     //CallingPackage
     @Provides @Singleton @Named("InvalidCallingPackageError") fun provideInvalidCallingPackageError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_CALLING_PACKAGE)
-    @Provides @Singleton @Named("CallingPackageReader") fun provideCallingPackageReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: Error): Reader<String> = OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
+    @Provides @Singleton @Named("CallingPackageReader") fun provideCallingPackageReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: SafeException): Reader<String> = OptionalParameterReader(SIMPRINTS_CALLING_PACKAGE, "", invalidCallingPackageError)
     @Provides @Singleton @Named("CallingPackageValidator") fun provideCallingPackageValidator(): Validator<String> = NoOpValidator()
     @Provides @Singleton @Named("CallingPackageExtractor") fun provideCallingPackageExtractor(@Named("CallingPackageReader") callingPackageReader: Reader<String>, @Named("CallingPackageValidator") callingPackageValidator: Validator<String>): Extractor<String> = ParameterExtractor(callingPackageReader, callingPackageValidator)
 
     //MetadataReader
-    @Provides @Singleton @Named("MetadataReader") fun provideMetadataReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: Error): Reader<String> = OptionalParameterReader(SIMPRINTS_METADATA, "", invalidCallingPackageError)
+    @Provides @Singleton @Named("MetadataReader") fun provideMetadataReader(@Named("InvalidCallingPackageError") invalidCallingPackageError: SafeException): Reader<String> = OptionalParameterReader(SIMPRINTS_METADATA, "", invalidCallingPackageError)
     @Provides @Singleton @Named("InvalidMetadataError") fun provideInvalidMetadataError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_METADATA)
-    @Provides @Singleton @Named("MetadataValidator") fun provideMetadataValidator(@Named("InvalidMetadataError") invalidMetadataError: Error, gson: Gson): Validator<String> = MetadataValidator(invalidMetadataError, gson)
+    @Provides @Singleton @Named("MetadataValidator") fun provideMetadataValidator(@Named("InvalidMetadataError") invalidMetadataError: SafeException, gson: Gson): Validator<String> = MetadataValidator(invalidMetadataError, gson)
     @Provides @Singleton @Named("MetadataExtractor") fun provideMetadataExtractor(@Named("MetadataReader") metadataReader: Reader<String>, @Named("MetadataValidator") metadataValidator: Validator<String>): Extractor<String> = ParameterExtractor(metadataReader, metadataValidator)
 
     //ResultFormat
     @Provides @Singleton @Named("InvalidResultFormatError") fun provideInvalidResultFormatError(): SafeException = InvalidCalloutError(ALERT_TYPE.INVALID_RESULT_FORMAT)
-    @Provides @Singleton @Named("ResultFormatReader") fun provideResultFormatReader(@Named("InvalidResultFormatError") invalidResultFormatError: Error): Reader<String> = OptionalParameterReader(SIMPRINTS_RESULT_FORMAT, "", invalidResultFormatError)
-    @Provides @Singleton @Named("ResultFormatValidator") fun provideResultFormatValidator(@Named("InvalidResultFormatError") invalidResultFormatError: Error): Validator<String> {
+    @Provides @Singleton @Named("ResultFormatReader") fun provideResultFormatReader(@Named("InvalidResultFormatError") invalidResultFormatError: SafeException): Reader<String> = OptionalParameterReader(SIMPRINTS_RESULT_FORMAT, "", invalidResultFormatError)
+    @Provides @Singleton @Named("ResultFormatValidator") fun provideResultFormatValidator(@Named("InvalidResultFormatError") invalidResultFormatError: SafeException): Validator<String> {
         val validResultFormats = listOf(SIMPRINTS_ODK_RESULT_FORMAT_V01, "")
         return ValueValidator(validResultFormats, invalidResultFormatError)
     }
@@ -139,7 +139,7 @@ class SerializerModule {
     }
 
     @Provides @Singleton @Named("MissingApiKeyOrProjectIdError") fun provideMissingApiKeyOrProjectIdError(): SafeException = InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
-    @Provides @Singleton @Named("SessionParametersValidator") fun provideSessionParametersValidator(@Named("MissingApiKeyOrProjectIdError") missingApiKeyOrProjectIdError: Error): Set<Validator<SessionParameters>> = setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
+    @Provides @Singleton @Named("SessionParametersValidator") fun provideSessionParametersValidator(@Named("MissingApiKeyOrProjectIdError") missingApiKeyOrProjectIdError: SafeException): Set<Validator<SessionParameters>> = setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
 
     @Provides @Singleton fun provideSessionParametersExtractor(@Named("ActionExtractor") actionExtractor: Extractor<CalloutAction>,
                                                                @Named("ApiKeyExtractor") apiKeyExtractor: Extractor<String>,

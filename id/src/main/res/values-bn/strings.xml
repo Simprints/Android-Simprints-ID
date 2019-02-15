@@ -79,7 +79,7 @@
     <string name="please_wait">সনাক্তকরণ করার সময় অনুগ্রহ করে অপেক্ষা করুন</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID exception message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">Bluetooth ত্রুটি</string>
     <string name="configuration_error_title">কনফিগারেশন ত্রুটি</string>

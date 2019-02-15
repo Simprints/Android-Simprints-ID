@@ -4,6 +4,6 @@ import com.simprints.id.exceptions.safe.SafeException
 
 class TransientSyncFailureException(
     message: String = "TransientSyncFailureException",
-    cause: Throwable? = null
+    cause: Throwable
 )
     : SafeException(message, cause)

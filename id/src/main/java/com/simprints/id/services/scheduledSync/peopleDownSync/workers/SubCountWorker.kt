@@ -10,7 +10,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
 import com.simprints.id.data.analytics.crashReport.CrashTrigger
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -69,7 +69,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SubCountWorker>()
+        } else throw WorkerInjectionFailedException.forWorker<SubCountWorker>()
     }
 
     private fun logMessageForCrashReport(message: String) =

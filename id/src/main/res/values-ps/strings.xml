@@ -97,7 +97,7 @@
     <string name="tier4_matches_other">سره ورته دي %d</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID exception message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">په بلوتوت کې تیروتنه</string>
     <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
@@ -142,7 +142,7 @@
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
     <string name="recovering_db">د معلوماتو بیا لاسته راوړل.... لږ څه وخت نیسې</string>
-    <string name="error">تیروتنه</string>
+    <string name="exception">تیروتنه</string>
     <string name="error_recovery_message">د ریکوري شوي فایل په رالیږلو کې ستونزه</string>
     <string name="success_recovery_message">د دوباره لټون فایل په بریالیتوب سره اپلوډ شو</string>
     <string name="dismiss">راوتل</string>
