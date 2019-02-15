@@ -38,7 +38,7 @@ class SessionEventsSyncMasterTask(
         this.concatMapCompletable {
             createUploadBatchTaskCompletable(it).doOnError { t ->
                 if (t !is NoSessionsFoundException) {
-                    crashReportManager.logThrowable(t)
+                    crashReportManager.logExceptionOrThrowable(t)
                 }
             }.onErrorComplete()
         }

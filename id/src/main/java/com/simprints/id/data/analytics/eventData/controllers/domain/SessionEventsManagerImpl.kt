@@ -79,7 +79,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
         }.doOnError {
             Timber.e(it)
-            crashReportManager.logThrowable(it)
+            crashReportManager.logExceptionOrThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
@@ -96,7 +96,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
             Completable.complete()
         }.doOnError {
-            crashReportManager.logThrowable(it)
+            crashReportManager.logExceptionOrThrowable(it)
         }.onErrorComplete()
 
     /** @throws SessionNotFoundException */

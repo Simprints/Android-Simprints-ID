@@ -33,7 +33,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
             Result.success(inputData)
         } catch (e: Throwable) {
             e.printStackTrace()
-            crashReportManager.logThrowable(e)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.failure()
         }
         toastForDebugBuilds(result)

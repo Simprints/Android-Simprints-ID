@@ -47,7 +47,7 @@ abstract class CheckLoginPresenter(
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
                     e.printStackTrace()
-                    crashReportManager.logThrowable(e)
+                    crashReportManager.logExceptionOrThrowable(e)
                     view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
                 }
             }

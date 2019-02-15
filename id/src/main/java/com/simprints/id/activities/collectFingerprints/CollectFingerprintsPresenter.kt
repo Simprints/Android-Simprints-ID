@@ -200,7 +200,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             CalloutAction.UPDATE -> context.getString(R.string.update_title)
             CalloutAction.VERIFY -> context.getString(R.string.verify_title)
             else -> {
-                handleUnexpectedError(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
                 ""
             }
         }
@@ -283,7 +283,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
-        handleUnexpectedError(UnexpectedException(throwable))
+        handleException(UnexpectedException(throwable))
         view.cancelAndFinish()
     }
 
@@ -293,8 +293,8 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.finishSuccessAndStartMatching(intent)
     }
 
-    override fun handleUnexpectedError(simprintsException: SimprintsException) {
-        crashReportManager.logException(simprintsException)
+    override fun handleException(simprintsException: SimprintsException) {
+        crashReportManager.logExceptionOrThrowable(simprintsException)
         Timber.e(simprintsException)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }

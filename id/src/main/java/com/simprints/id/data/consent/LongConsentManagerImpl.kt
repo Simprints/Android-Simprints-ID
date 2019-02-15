@@ -50,7 +50,7 @@ class LongConsentManagerImpl(context: Context,
                 downloadTasks.add(
                     downloadLongConsentWithProgress(language)
                         .ignoreElements()
-                        .doOnError { crashReportManager.logThrowable(it) }
+                        .doOnError { crashReportManager.logExceptionOrThrowable(it) }
                         .onErrorComplete()
                 )
         }

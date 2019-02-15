@@ -65,7 +65,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                         RefusalEvent.Answer.fromRefusalReason(refusalReason),
                         refusalText))
             }.subscribeBy(onError = {
-                crashReportManager.logThrowable(it)
+                crashReportManager.logExceptionOrThrowable(it)
                 view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
             }, onComplete = {
                 view.setResultAndFinish(Activity.RESULT_CANCELED, reason)

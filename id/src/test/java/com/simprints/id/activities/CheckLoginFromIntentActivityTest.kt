@@ -108,7 +108,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     }
 
     private fun verifyALogSafeExceptionWasThrown(times: Int) {
-        Mockito.verify(crashReportManagerSpy, Mockito.times(times)).logThrowable(anyNotNull())
+        Mockito.verify(crashReportManagerSpy, Mockito.times(times)).logExceptionOrThrowable(anyNotNull())
     }
 
     @Test

@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.SimprintsException
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -29,20 +29,16 @@ class CrashReportManagerImpl: CrashReportManager {
 
     private fun getLogMessage(crashTrigger: CrashTrigger, message: String) = "[${crashTrigger.name}] $message"
 
-    override fun logThrowable(throwable: Throwable) {
-        if(throwable !is SimprintsException) {
-            logException(throwable)
+    override fun logExceptionOrThrowable(throwable: Throwable) {
+        if(throwable is UnexpectedException) {
+            Crashlytics.logException(throwable)
         } else {
             logSafeException(throwable)
         }
     }
 
-    override fun logException(throwable: Throwable) {
-        Crashlytics.logException(throwable)
-    }
-
-    private fun logSafeException(simprintsException: SimprintsException) {
-        Crashlytics.log(Log.ERROR, CrashReportTags.SAFE_EXCEPTION.name, "$simprintsException")
+    private fun logSafeException(throwable: Throwable) {
+        Crashlytics.log(Log.ERROR, CrashReportTags.SAFE_EXCEPTION.name, "$throwable")
     }
 
     override fun setProjectIdCrashlyticsKey(projectId: String) {
