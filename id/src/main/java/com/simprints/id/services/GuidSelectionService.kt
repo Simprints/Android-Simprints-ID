@@ -59,12 +59,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                         Timber.d(SessionEventsApiAdapterFactory().gson.toJson(sessionEventsManager.loadSessionById(sessionId).blockingGet()))
                         Timber.d("Added Guid Selection Event")
                     }, onError = { e ->
-                        crashReportManager.logThrowable(e)
+                        crashReportManager.logExceptionOrThrowable(e)
                     })
             }
             true
         } catch (t: Throwable) {
-            crashReportManager.logThrowable(t)
+            crashReportManager.logExceptionOrThrowable(t)
             false
         }
         analyticsManager.logGuidSelectionService(loginInfoManager.getSignedInProjectIdOrEmpty(),

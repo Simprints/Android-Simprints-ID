@@ -41,7 +41,7 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()
-            crashReportManager.logThrowable(e)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.failure()
         }
 

@@ -10,8 +10,7 @@ interface CrashReportManager {
     fun logWarning(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger, message: String)
 
     fun logAlert(alertType: ALERT_TYPE)
-    fun logException(throwable: Throwable)
-    fun logThrowable(throwable: Throwable)
+    fun logExceptionOrThrowable(throwable: Throwable)
 
     fun setProjectIdCrashlyticsKey(projectId: String)
     fun setUserIdCrashlyticsKey(userId: String)

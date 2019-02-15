@@ -98,7 +98,7 @@ class SubCountWorkerTest : DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
         val workerResult = subCountWorker.doWork()
 
-        verify(crashReportManager, times(1)).logThrowable(any())
+        verify(crashReportManager, times(1)).logExceptionOrThrowable(any())
         assert(workerResult is ListenableWorker.Result.Success)
     }
 }

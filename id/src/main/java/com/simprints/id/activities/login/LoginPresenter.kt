@@ -134,7 +134,7 @@ class LoginPresenter(val view: LoginContract.View,
     private fun logSignInError(e: Throwable) {
         when (e) {
             is IOException -> Timber.d("Attempted login offline")
-            else -> crashReportManager.logThrowable(e)
+            else -> crashReportManager.logExceptionOrThrowable(e)
         }
     }
 

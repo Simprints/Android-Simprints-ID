@@ -61,7 +61,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun checkCallingAppIsFromKnownSource() {
         preferencesManager.callingPackage = getCallingPackageName()
         if (app.packageManager.isCallingAppFromUnknownSource(preferencesManager.callingPackage)) {
-            crashReportManager.logThrowable(CallingAppFromUnknownSourceException())
+            crashReportManager.logExceptionOrThrowable(CallingAppFromUnknownSourceException())
         }
     }
 

@@ -49,7 +49,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         } catch (e: Throwable) {
             e.printStackTrace()
             logToAnalyticsAndToastForDebugBuilds(subSyncScope)
-            crashReportManager.logThrowable(e)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.success()
         }
     }

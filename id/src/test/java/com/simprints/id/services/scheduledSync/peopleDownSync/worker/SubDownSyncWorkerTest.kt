@@ -104,7 +104,7 @@ class SubDownSyncWorkerTest: DaggerForTests() {
         val result = subDownSyncWorker.doWork()
 
         verify(mockDownSyncTask, times(1)).execute(anyNotNull())
-        verify(crashReportManagerMock, times(1)).logThrowable(any())
+        verify(crashReportManagerMock, times(1)).logExceptionOrThrowable(any())
         assert(result is ListenableWorker.Result.Failure)
     }
 }

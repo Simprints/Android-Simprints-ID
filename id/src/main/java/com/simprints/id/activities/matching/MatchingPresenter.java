@@ -119,7 +119,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 onVerifyStart();
                 break;
             default:
-                crashReportManager.logException(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                crashReportManager.logExceptionOrThrowable(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -183,7 +183,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                crashReportManager.logException(new FailedToLoadPeopleException("Failed to load people during identification: " + data_error.details()));
+                crashReportManager.logExceptionOrThrowable(new FailedToLoadPeopleException("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -232,7 +232,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                crashReportManager.logException(UnexpectedDataException.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
+                crashReportManager.logExceptionOrThrowable(UnexpectedDataException.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };

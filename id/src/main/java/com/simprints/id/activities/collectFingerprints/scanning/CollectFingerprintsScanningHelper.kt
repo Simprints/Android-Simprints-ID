@@ -99,7 +99,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Timber.d("reconnect.onError()")
                 view.un20WakeupDialog.dismiss()
                 view.doLaunchAlert(scannerManager.getAlertType(it))
-                crashReportManager.logThrowable(it)
+                crashReportManager.logExceptionOrThrowable(it)
             })
     }
 
@@ -117,7 +117,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 handleNoFingerTemplateDetected()
             else -> {
                 cancelCaptureUI()
-                presenter.handleUnexpectedError(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
+                presenter.handleException(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
             }
         }
     }
@@ -146,7 +146,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             when (scanner_error) {
                 BUSY -> resetUIFromError()
                 INVALID_STATE -> reconnect()
-                else -> presenter.handleUnexpectedError(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsActivity"))
+                else -> presenter.handleException(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsActivity"))
             }
         }
     }
@@ -243,7 +243,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // TODO : change exceptions in libcommon
-            crashReportManager.logException(UnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
+            crashReportManager.logExceptionOrThrowable(UnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 

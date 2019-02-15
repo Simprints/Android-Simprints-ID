@@ -41,7 +41,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
             Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            crashReportManager.logThrowable(throwable)
+            crashReportManager.logExceptionOrThrowable(throwable)
             Result.failure()
         }
     }
