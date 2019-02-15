@@ -1,0 +1,170 @@
+def kotlin_version = "1.3.20"
+def kotlin = [
+    reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TOOD: remove it when we drop the legacy code around Firebase,
+    stdlib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+    anko   : "org.jetbrains.anko:anko:0.10.8"
+]
+
+def dagger_version = "2.21"
+def dagger = [
+    core    : "com.google.dagger:dagger:$dagger_version",
+    compiler: "com.google.dagger:dagger-compiler:$dagger_version"
+]
+
+def androidx_lifecycle_version = "2.1.0-alpha02"
+def androidx_room_version = "2.1.0-alpha04"
+def androidx = [
+    core     : "androidx.core:core-ktx:1.1.0-alpha04",
+    multidex : "androidx.multidex:multidex:2.0.1",
+    appcompat: "androidx.appcompat:appcompat:1.1.0-alpha02",
+    legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
+    room     : [
+        core    : "androidx.room:room-runtime:$androidx_room_version",
+        compiler: "androidx.room:room-compiler:$androidx_room_version"
+    ],
+    lifecycle: [
+        livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
+        compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
+        viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version"
+    ],
+    ui       : [
+        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-alpha3",
+        cardview        : "androidx.cardview:cardview:1.0.0",
+        fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
+        preference      : "androidx.preference:preference:1.1.0-alpha03"
+    ]
+]
+
+def support = [
+    material: "com.google.android.material:material:1.1.0-alpha03"
+]
+
+def work_version = "1.0.0-beta05"
+def arch_components = [
+    work: "android.arch.work:work-runtime-ktx:$work_version"
+]
+
+def playservices_version = "16.0.0"
+def playservices = [
+    location : "com.google.android.gms:play-services-location:$playservices_version",
+    places   : "com.google.android.gms:play-services-places:$playservices_version",
+    safetynet: "com.google.android.gms:play-services-safetynet:$playservices_version"
+]
+
+def firebase = [
+    database : "com.google.firebase:firebase-database:16.0.6",
+    firestore: "com.google.firebase:firebase-firestore:17.1.5",
+    core     : "com.google.firebase:firebase-core:16.0.7",
+    auth     : "com.google.firebase:firebase-auth:16.1.0",
+    config   : "com.google.firebase:firebase-config:16.3.0",
+    perf     : "com.google.firebase:firebase-perf:16.2.3",
+    storage  : "com.google.firebase:firebase-storage:16.0.5"
+]
+
+def crashlytics = [
+    core: "com.crashlytics.sdk.android:crashlytics:2.9.9@aar",
+    ndk : "com.crashlytics.sdk.android:crashlytics-ndk:2.0.5@aar"
+]
+
+def retrofit_version = "2.5.0"
+def okttp_version = "3.13.1"
+def retrofit = [
+    core         : "com.squareup.retrofit2:retrofit:$retrofit_version",
+    adapter      : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
+    convertergson: "com.squareup.retrofit2:converter-gson:$retrofit_version",
+    logging      : "com.squareup.okhttp3:logging-interceptor:$okttp_version",
+    okhttp       : "com.squareup.okhttp3:okhttp:$okttp_version",
+]
+
+def gson = [
+    core: "com.google.code.gson:gson:2.8.5"
+]
+
+def timber = [
+    core: "com.jakewharton.timber:timber:4.5.1"
+    //4.7.1 breaks realm:
+    // https://github.com/realm/realm-java/issues/6153
+    // https://github.com/JakeWharton/timber/issues/295
+]
+
+def rxjava2 = [
+    core       : "io.reactivex.rxjava2:rxjava:2.2.6",
+    android    : "io.reactivex.rxjava2:rxandroid:2.1.0",
+    kotlin     : "io.reactivex.rxjava2:rxkotlin:2.3.0",
+    permissions: "com.github.tbruyelle:rxpermissions:2.x.v0.9.3",
+    location   : "pl.charmas.android:android-reactive-location2:2.1@aar"
+]
+
+def simprints = [
+    libscanner  : "com.simprints:libscanner:2018.4.0",
+    libmatcher  : "com.simprints:libmatcher:1.3.2",
+    mockscanner : "com.simprints:mockscanner:2018.3.0",
+    libsimprints: "com.simprints:libsimprints:2018.2.0"
+]
+
+def mockito_version = "2.24.0"
+def espresso_version = "3.1.2-alpha01"
+def roboletric_version = "4.1"
+def testing = [
+    junit        : "junit:junit:4.13-beta-2",
+    robolectric  : [
+        core    : "org.robolectric:robolectric:$roboletric_version",
+        multidex: "org.robolectric:multidex:3.4.2"
+    ],
+    truth        : "com.google.truth:truth:0.42",
+    mockito      : [
+        core   : "org.mockito:mockito-core:$mockito_version",
+        inline : "org.mockito:mockito-inline:$mockito_version", //Required to mock final classes
+        android: "org.mockito:mockito-android:$mockito_version", //Required to use Mock in AndroidTests
+        kotlin : "com.nhaarman:mockito-kotlin:1.6.0",
+    ],
+    mockwebserver: "com.squareup.okhttp3:mockwebserver:3.10.0",
+    espresso     : [
+        core   : "androidx.test.espresso:espresso-core:$espresso_version",
+        intents: "androidx.test.espresso:espresso-intents:$espresso_version",
+        barista: "com.schibsted.spain:barista:2.7.1" //Used to grant permissions in AndroidTests
+    ],
+    dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
+    dagger_kotlin: "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
+    work         : "android.arch.work:work-testing:$work_version",
+    retrofit     : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
+
+    //https://developer.android.com/jetpack/androidx/releases/test
+    androidx     : [
+        monitor     : "androidx.test:monitor:1.1.2-alpha01",
+        ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
+        core        : "androidx.test:core:1.1.1-alpha01",
+        core_testing: "android.arch.core:core-testing:1.1.1",
+        runner      : "androidx.test:runner:1.1.2-alpha01",
+        rules       : "androidx.test:rules:1.1.2-alpha01",
+        room        : "androidx.room:room-testing:$androidx_room_version"
+    ]
+]
+
+//No using Realm plugin: https://github.com/realm/realm-java/issues/5982
+def realm_version = "4.3.4"
+def realm = [
+    annotations          : "io.realm:realm-annotations:$realm_version",
+    annotations_processor: "io.realm:realm-annotations-processor:$realm_version",
+    kotlin               : "io.realm:realm-android-kotlin-extensions:$realm_version",
+    android              : "io.realm:realm-android-library:$realm_version",
+    glassfish_annotation : "org.glassfish:javax.annotation:10.0-b28"
+]
+
+ext.deps = [
+    kotlin         : kotlin,
+    dagger         : dagger,
+    androidx       : androidx,
+    support        : support,
+    arch_components: arch_components,
+    playservices   : playservices,
+    firebase       : firebase,
+    crashlytics    : crashlytics,
+    retrofit       : retrofit,
+    gson           : gson,
+    timber         : timber,
+    rxjava2        : rxjava2,
+    simprints      : simprints,
+    testing        : testing,
+    realm          : realm
+]

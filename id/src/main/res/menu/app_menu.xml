@@ -4,8 +4,6 @@
         android:id="@+id/menuPrivacyNotice" />
     <item android:title="@string/menu_settings"
         android:id="@+id/menuSettings" />
-    <item android:title="@string/menu_log_out"
-        android:id="@+id/menuLogout" />
 
     <item android:title="Debug"
         android:visible="false"

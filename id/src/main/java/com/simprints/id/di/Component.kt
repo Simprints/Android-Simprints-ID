@@ -1,8 +1,6 @@
 package com.simprints.id.di
 
 import com.simprints.id.Application
-import com.simprints.id.activities.debug.DebugActivity
-import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
@@ -19,6 +17,8 @@ import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
+import com.simprints.id.activities.debug.DebugActivity
+import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.launch.LaunchPresenter
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
@@ -28,6 +28,7 @@ import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.activities.matching.MatchingPresenter
 import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.secure.ProjectAuthenticator
@@ -42,13 +43,11 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderWorker
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class), (AndroidInjectionModule::class)])
+@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class)])
 interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
@@ -85,7 +84,6 @@ interface AppComponent {
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
     fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
-    fun inject(sessionSyncUploaderWorker: SessionEventsUploaderWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(subCountWorker: SubCountWorker)
@@ -93,4 +91,5 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
+    fun inject(settingsAboutPresenter: SettingsAboutPresenter)
 }
