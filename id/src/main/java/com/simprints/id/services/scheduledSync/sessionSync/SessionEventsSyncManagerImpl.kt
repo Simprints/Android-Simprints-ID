@@ -4,9 +4,7 @@ import androidx.work.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = WorkManager::getInstance) : SessionEventsSyncManager {
-
-    private val workerManager = getWorkManager()
+open class SessionEventsSyncManagerImpl : SessionEventsSyncManager {
 
     override fun scheduleSessionsSync() {
         createAndEnqueueRequest()
@@ -52,7 +50,7 @@ open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = Work
         .build()
 
     companion object {
-        private const val SYNC_REPEAT_INTERVAL = 6L
+        private const val SYNC_REPEAT_INTERVAL = 1L
         private val SYNC_REPEAT_UNIT = TimeUnit.HOURS
 
         internal const val MASTER_WORKER_VERSION = 1L
@@ -60,7 +58,6 @@ open class SessionEventsSyncManagerImpl(getWorkManager: () -> WorkManager = Work
     }
 
     override fun cancelSyncWorkers() {
-        workerManager.cancelAllWorkByTag(MASTER_WORKER_TAG)
-        workerManager.cancelAllWorkByTag(SessionEventsSyncMasterTask.SESSIONS_TO_UPLOAD_TAG)
+        WorkManager.getInstance().cancelAllWorkByTag(MASTER_WORKER_TAG)
     }
 }

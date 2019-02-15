@@ -3,7 +3,6 @@ package com.simprints.id.activities.dashboard
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -35,11 +34,13 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
         private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
+
+        private const val LOGOUT_RESULT_CODE = 1
+
     }
 
     override lateinit var viewPresenter: DashboardContract.Presenter
     private lateinit var cardsViewAdapter: DashboardCardAdapter
-    private var confirmationLogoutDialog: AlertDialog.Builder? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,23 +114,19 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
             when (id) {
                 R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-                R.id.menuLogout -> viewPresenter.userDidWantToLogout()
                 R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }
             true
         }
     }
 
-    override fun showConfirmationDialogForLogout() {
-        confirmationLogoutDialog = AlertDialog.Builder(this)
-            .setTitle(R.string.confirmation_logout_title)
-            .setMessage(R.string.confirmation_logout_message)
-            .setPositiveButton(getString(R.string.logout)) { _, _ -> logout() }
-            .setNegativeButton(getString(R.string.confirmation_logout_cancel), null).apply { show() }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
+            viewPresenter.logout()
+        }
     }
 
-    private fun logout() {
-        viewPresenter.logout()
+    override fun startCheckLoginActivityAndFinish(){
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
     }
