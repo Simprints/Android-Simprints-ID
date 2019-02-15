@@ -2,25 +2,19 @@ package com.simprints.id.data.analytics.eventData.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.spy
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
+import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.sessionEvents.createFakeOpenSession
-import com.simprints.id.shared.sessionEvents.mockSessionEventsManager
-import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.testframework.common.syntax.*
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Assert.assertNotNull
@@ -28,7 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.Mockito.times
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
@@ -67,8 +60,8 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.signOut()
 
-        verify(sessionsEventsManagerSpy, times(1)).deleteSessions(null, null, null, null)
-        verify(sessionEventsSyncManagerMock, times(1)).cancelSyncWorkers()
+        verifyOnce(sessionsEventsManagerSpy) { deleteSessions(null, null, null, null) }
+        verifyOnce(sessionEventsSyncManagerMock) { cancelSyncWorkers() }
     }
 
     @Test
@@ -98,7 +91,7 @@ class SessionEventsManagerImplTest {
         assertThat(oldOpenSession?.isClosed()).isTrue()
         assertThat(oldOpenSession?.events?.filterIsInstance(ArtificialTerminationEvent::class.java)).hasSize(1)
 
-        verify(sessionEventsSyncManagerMock, times(1)).scheduleSessionsSync()
+        verifyOnce(sessionEventsSyncManagerMock) { scheduleSessionsSync() }
     }
 
     @Test
@@ -107,7 +100,7 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.createSession().blockingGet()
 
-        verify(analyticsManagerMock, times(1)).logThrowable(anyNotNull())
+        verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
@@ -126,7 +119,7 @@ class SessionEventsManagerImplTest {
     fun updateSession_shouldSwallowException() {
         val tester = sessionsEventsManagerSpy.updateSession { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
-        verify(analyticsManagerMock, times(1)).logThrowable(anyNotNull())
+        verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
     }
 
     @Test

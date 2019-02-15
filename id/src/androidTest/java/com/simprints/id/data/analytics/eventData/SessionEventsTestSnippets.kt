@@ -5,8 +5,8 @@ import com.simprints.id.data.analytics.eventData.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventData.models.local.*
-import com.simprints.id.shared.sessionEvents.createFakeClosedSession
-import com.simprints.id.shared.sessionEvents.createFakeSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
 import junit.framework.TestCase.*

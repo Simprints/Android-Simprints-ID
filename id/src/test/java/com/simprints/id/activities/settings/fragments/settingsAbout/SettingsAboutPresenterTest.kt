@@ -2,16 +2,16 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockito_kotlin.*
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
-import junit.framework.Assert.fail
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.verifyOnce
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.robolectric.annotation.Config
@@ -42,24 +42,23 @@ class SettingsAboutPresenterTest {
         val mockPreference = mock(Preference::class.java)
         whenever(viewMock.getKeyForSyncAndSearchConfigurationPreference()).thenReturn(PREFERENCE_KEY_FOR_SYNC_AND_SEARCH)
         whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_SYNC_AND_SEARCH)
-        doNothing().whenever(presenter).loadSyncAndSearchConfigurationPreference(any())
+        whenever(presenter) { loadSyncAndSearchConfigurationPreference(anyNotNull()) } thenDoNothing {}
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verify(presenter, times(1)).loadSyncAndSearchConfigurationPreference(any())
+        verifyOnce(presenter) { loadSyncAndSearchConfigurationPreference(anyNotNull()) }
     }
-
 
     @Test
     fun appVersionPreference_loadValue_preferenceShouldHaveValues() {
         val mockPreference = mock(Preference::class.java)
         whenever(viewMock.getKeyForAppVersionPreference()).thenReturn(PREFERENCE_KEY_FOR_APP_VERSION)
         whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_APP_VERSION)
-        doNothing().whenever(presenter).loadAppVersionInPreference(any())
+        whenever(presenter) { loadAppVersionInPreference(anyNotNull()) } thenDoNothing {}
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verify(presenter, times(1)).loadAppVersionInPreference(any())
+        verifyOnce(presenter) { loadAppVersionInPreference(anyNotNull()) }
     }
 
     @Test
@@ -68,11 +67,11 @@ class SettingsAboutPresenterTest {
         whenever(viewMock.getScannerVersionPreference()).thenReturn(mockPreference)
         whenever(viewMock.getKeyForScannerVersionPreference()).thenReturn(PREFERENCE_KEY_FOR_SCANNER_VERSION)
         whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_SCANNER_VERSION)
-        doNothing().whenever(presenter).loadScannerVersionInPreference(any())
+        whenever(presenter) { loadScannerVersionInPreference(anyNotNull()) } thenDoNothing {}
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verify(presenter, times(1)).loadScannerVersionInPreference(any())
+        verifyOnce(presenter) { loadScannerVersionInPreference(anyNotNull()) }
     }
 
     @Test
@@ -81,11 +80,11 @@ class SettingsAboutPresenterTest {
         whenever(viewMock.getDeviceIdPreference()).thenReturn(mockPreference)
         whenever(viewMock.getKeyForDeviceIdPreference()).thenReturn(PREFERENCE_KEY_FOR_DEVICE_ID)
         whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_DEVICE_ID)
-        doNothing().whenever(presenter).loadDeviceIdInPreference(any())
+        whenever(presenter) { loadDeviceIdInPreference(anyNotNull()) } thenDoNothing {}
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verify(presenter, times(1)).loadDeviceIdInPreference(any())
+        verifyOnce(presenter) { loadDeviceIdInPreference(anyNotNull()) }
     }
 
     @Test
@@ -97,7 +96,7 @@ class SettingsAboutPresenterTest {
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verify(mockPreference, times(1)).setOnPreferenceClickListener (any())
+        verifyOnce(mockPreference) { setOnPreferenceClickListener(anyNotNull()) }
     }
 
     @Test
@@ -107,16 +106,16 @@ class SettingsAboutPresenterTest {
         whenever(viewMock.getKeyForLogoutPreference()).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
         whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
         var actionForLogoutPreference: Preference.OnPreferenceClickListener? = null
-        Mockito.doAnswer {
+        whenever(mockPreference) { setOnPreferenceClickListener(anyNotNull()) } thenAnswer {
             actionForLogoutPreference = it.arguments.first() as Preference.OnPreferenceClickListener
             null
-        }.whenever(mockPreference).setOnPreferenceClickListener(any())
+        }
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
         actionForLogoutPreference?.let {
             it.onPreferenceClick(mockPreference)
-            verify(viewMock, times(1)).showConfirmationDialogForLogout()
+            verifyOnce(viewMock) { showConfirmationDialogForLogout() }
         } ?: fail("Action for logout preference not set.")
     }
 }

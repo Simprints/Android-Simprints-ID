@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.shared.*
+import com.simprints.testframework.common.syntax.*
 import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito.*
@@ -21,14 +21,14 @@ class PrimitivePreferenceTest {
     private var stringPref by PrimitivePreference(improvedPrefs, aKey, aString)
 
     private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
-        val editor = mock<ImprovedSharedPreferences.Editor>()
-        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
-        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
+        val editor = com.simprints.testframework.common.syntax.mock<ImprovedSharedPreferences.Editor>()
+        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
+        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
         return editor
     }
 
     private fun mockImprovedPrefs(editorToReturn: ImprovedSharedPreferences.Editor): ImprovedSharedPreferences {
-        val prefs = mock<ImprovedSharedPreferences>()
+        val prefs = com.simprints.testframework.common.syntax.mock<ImprovedSharedPreferences>()
         whenever(prefs.edit()).thenReturn(editorToReturn)
         whenever(prefs.getPrimitive(aKey, aString)).thenReturn(storedString)
         return prefs
@@ -74,8 +74,8 @@ class PrimitivePreferenceTest {
     fun testSetValuePutsPrimitiveAndAppliesChange() {
         stringPref = storedString
         verifyOnlyInteractions(improvedEditor,
-                { putPrimitive(aKey, storedString) },
-                { apply() })
+            { putPrimitive(aKey, storedString) },
+            { apply() })
     }
 
     @Suppress("UNUSED_VALUE", "UNUSED_VARIABLE")

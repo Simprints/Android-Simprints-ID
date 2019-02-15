@@ -1,0 +1,72 @@
+apply plugin: 'com.android.library'
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+apply plugin: "kotlin-android-extensions"
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        multiDexEnabled true
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation deps.androidx.multidex
+    implementation deps.timber.core
+    implementation deps.testing.androidx.monitor
+    implementation deps.testing.androidx.ext_junit
+    implementation deps.testing.androidx.core
+    implementation deps.testing.androidx.core_testing
+    implementation deps.testing.espresso.core
+    implementation deps.testing.espresso.intents
+    implementation(deps.testing.espresso.barista) {
+        exclude group: "com.android.support"
+        exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
+    }
+
+    implementation deps.dagger.core
+    annotationProcessor deps.dagger.compiler
+    kapt deps.dagger.compiler
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+
+    implementation deps.testing.mockito.core
+    implementation deps.testing.mockito.inline
+    implementation deps.testing.mockito.kotlin
+    implementation deps.testing.mockito.android
+    implementation deps.testing.robolectric.core
+    implementation deps.testing.robolectric.multidex
+    implementation deps.testing.mockwebserver
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
+    implementation deps.testing.retrofit
+    implementation deps.retrofit.core
+    implementation deps.firebase.core
+    implementation deps.testing.work
+
+}

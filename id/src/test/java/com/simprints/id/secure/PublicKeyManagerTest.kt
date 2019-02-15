@@ -1,14 +1,14 @@
 package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testframework.common.retrofit.givenNetworkFailurePercentIs
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
-import com.simprints.id.shared.givenNetworkFailurePercentIs
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.FakeResponseInterceptor
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.testframework.common.retrofit.FakeResponseInterceptor
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.TestApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
@@ -24,7 +24,7 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class PublicKeyManagerTest : RxJavaTest {
+class PublicKeyManagerTest {
 
     private val validPublicKeyJsonResponse = "{\"value\":\"public_key_from_server\"}"
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
@@ -36,6 +36,8 @@ class PublicKeyManagerTest : RxJavaTest {
 
     @Test
     fun successfulResponse_shouldObtainThePublicKey() {
+        UnitTestConfig(this).rescheduleRxMainThread()
+
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
 
         val testObserver = makeTestRequestPublicKey(apiClient.api)
@@ -84,6 +86,6 @@ class PublicKeyManagerTest : RxJavaTest {
         val mockRetrofit = MockRetrofit.Builder(retrofit)
             .networkBehavior(networkBehavior)
             .build()
-        return ApiServiceMock(mockRetrofit.create(SecureApiInterface::class.java))
+        return SecureApiServiceMock(mockRetrofit.create(SecureApiInterface::class.java))
     }
 }

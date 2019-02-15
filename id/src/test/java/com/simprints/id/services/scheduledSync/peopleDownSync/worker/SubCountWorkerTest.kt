@@ -6,28 +6,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.firebase.FirebaseApp
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.mock
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.mock
+import com.simprints.testframework.common.syntax.verifyOnce
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +32,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubCountWorkerTest : DaggerForTests() {
+class SubCountWorkerTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -52,25 +47,18 @@ class SubCountWorkerTest : DaggerForTests() {
     private lateinit var subCountWorker: SubCountWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
-    override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(
-            app,
+    private val module by lazy {
+        TestAppModule(app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule
-        ) {
-            override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask {
-                return countTaskMock
-            }
-        }
+            analyticsManagerRule = DependencyRule.SpyRule,
+            countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
+        )
     }
 
     @Before
-    override fun setUp() {
-        app = ApplicationProvider.getApplicationContext()
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
+
         MockitoAnnotations.initMocks(this)
         subCountWorker = SubCountWorker(context, workParams)
         whenever(workParams.inputData).thenReturn(
@@ -98,7 +86,7 @@ class SubCountWorkerTest : DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
         val workerResult = subCountWorker.doWork()
 
-        verify(analyticsManager, times(1)).logThrowable(any())
+        verifyOnce(analyticsManager) { logThrowable(anyNotNull()) }
         assert(workerResult is ListenableWorker.Result.Success)
     }
 }

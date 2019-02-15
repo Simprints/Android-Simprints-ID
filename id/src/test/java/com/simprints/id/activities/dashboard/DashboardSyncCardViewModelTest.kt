@@ -5,14 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.google.firebase.FirebaseApp
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
@@ -21,22 +20,18 @@ import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.liveData.testObserver
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.testframework.common.livedata.testObserver
+import com.simprints.testframework.common.syntax.*
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
@@ -49,7 +44,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
+class DashboardSyncCardViewModelTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -70,14 +67,14 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
     private val fakeSyncStateLiveData = MutableLiveData<SyncState>()
 
-    override var preferencesModule by lazyVar {
-        PreferencesModuleForAnyTests(
+    private val preferencesModule by lazy {
+        TestPreferencesModule(
             settingsPreferencesManagerRule = SpyRule
         )
     }
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             dbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             remoteProjectManagerRule = MockRule,
@@ -85,19 +82,16 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
             downSyncManagerRule = MockRule)
     }
 
-
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this, module, preferencesModule).fullSetup()
 
-        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
-        setUserLogInState(true, getRoboSharedPreferences())
+        val sharedPref = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
-        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        RobolectricTestMocker
+            .initLogInStateMock(sharedPref, remoteDbManagerMock)
+            .setUserLogInState(true, sharedPref)
+            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
     }
@@ -114,7 +108,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
         Truth.assert_().that(lastState?.peopleToUpload).isEqualTo(2)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(3)
-        verify(dbManagerMock, times(1)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyOnce(dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
     @Test
@@ -271,7 +265,7 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
         DashboardSyncCardViewModel(
             DashboardCardType.SYNC_DB,
             1,
-            testAppComponent,
+            app.component,
             downSyncDao,
             upSyncDao,
             fakeSyncStateLiveData)
@@ -291,15 +285,15 @@ class DashboardSyncCardViewModelTest : RxJavaTest, DaggerForTests() {
     }
 
     private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
-        verify(localDbManagerMock, times(requiredCallsToInitTotalCounter)).getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
+        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) }
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
-        verify(dbManagerMock, times(times)).calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())
+        verifyExactly(times, dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
 
     }
 
     private fun verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter: Int) {
-        verify(dbManagerMock, times(requiredCallToInitAndUpdateUpSyncCounter)).getPeopleCountFromLocalForSyncScope(anyNotNull())
+        verifyExactly(requiredCallToInitAndUpdateUpSyncCounter, dbManagerMock) { getPeopleCountFromLocalForSyncScope(anyNotNull()) }
     }
 }

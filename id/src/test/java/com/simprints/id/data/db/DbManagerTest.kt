@@ -2,9 +2,12 @@ package com.simprints.id.data.db
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.testframework.common.retrofit.createMockBehaviorService
+import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
@@ -14,32 +17,29 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.shared.DependencyRule.*
-import com.simprints.id.shared.PeopleGeneratorUtils
-import com.simprints.id.shared.createMockBehaviorService
-import com.simprints.id.shared.whenever
-import com.simprints.id.sync.SimApiMock
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.retrofit.mockServer.mockNotFoundResponse
-import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForDownloadPatient
-import com.simprints.id.testUtils.retrofit.mockServer.mockResponseForUploadPatient
-import com.simprints.id.testUtils.retrofit.mockServer.mockServerProblemResponse
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.setupLocalAndRemoteManagersForApiTesting
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.sync.PeopleApiServiceMock
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testframework.unit.mockserver.mockNotFoundResponse
+import com.simprints.testframework.unit.mockserver.mockSuccessfulResponse
+import com.simprints.testframework.unit.mockserver.mockServerProblemResponse
+import com.simprints.id.testtools.state.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.tools.json.JsonHelper
 import com.simprints.libcommon.Person
+import com.simprints.testframework.common.syntax.spy
+import com.simprints.testframework.common.syntax.whenever
 import io.reactivex.Single
+import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -47,7 +47,9 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DbManagerTest : RxJavaTest, DaggerForTests() {
+class DbManagerTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -59,10 +61,10 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
 
-    override var module by lazyVar {
-        AppModuleForTests(
+    private val module by lazy {
+        TestAppModule(
             app,
-            localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
+            localDbManagerRule = ReplaceRule { spy<LocalDbManager>() },
             remoteDbManagerRule = SpyRule,
             remotePeopleManagerRule = SpyRule,
             peopleUpSyncMasterRule = MockRule,
@@ -71,16 +73,13 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
 
         mockServer.start()
         apiClient = SimApiClient(PeopleRemoteInterface::class.java, PeopleRemoteInterface.baseUrl)
 
-        setupLocalAndRemoteManagersForApiTesting(mockServer, localDbManagerSpy, remoteDbManagerSpy, sessionEventsLocalDbManagerSpy)
+        setupLocalAndRemoteManagersForApiTesting(localDbManagerSpy, remoteDbManagerSpy, sessionEventsLocalDbManagerSpy, mockServer)
     }
 
     @Test
@@ -90,7 +89,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             createdAt = null
         })
 
-        mockServer.enqueue(mockResponseForUploadPatient())
+        mockServer.enqueue(mockSuccessfulResponse())
         mockServer.enqueue(mockResponseForDownloadPatient(fakePerson.copy().apply {
             updatedAt = Date(1)
             createdAt = Date(0)
@@ -169,7 +168,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             createdAt = null
         })
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val testObservable = dbManager.savePerson(fakePerson).test()
@@ -217,7 +216,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     fun loadingPersonMissingInLocalAndWithNoConnection_shouldTriggerDataError() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
+        val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val result = mutableListOf<Person>()
@@ -246,5 +245,12 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
     @Throws
     fun tearDown() {
         mockServer.shutdown()
+    }
+}
+
+fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse {
+    return MockResponse().let {
+        it.setResponseCode(200)
+        it.setBody(JsonHelper.toJson(patient))
     }
 }

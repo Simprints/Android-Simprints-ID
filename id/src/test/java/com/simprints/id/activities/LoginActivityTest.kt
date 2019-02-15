@@ -2,27 +2,28 @@ package com.simprints.id.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.pm.ApplicationInfo
+import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.simprints.id.R
+import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.roboletric.createRoboLoginActivity
-import com.simprints.id.testUtils.roboletric.injectHowToResolveScannerAppIntent
-import com.simprints.id.testUtils.roboletric.setupSessionEventsManagerToAvoidRealmCall
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.testframework.common.syntax.anyNotNull
+import com.simprints.testframework.common.syntax.anyOrNull
+import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testframework.unit.robolectric.createActivity
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert
@@ -30,7 +31,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.robolectric.Shadows.shadowOf
@@ -40,7 +40,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class LoginActivityTest : RxJavaTest, DaggerForTests() {
+class LoginActivityTest {
 
     companion object {
         const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -48,24 +48,21 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
         const val DEFAULT_USER_ID = "some_user_id"
     }
 
-    @Inject lateinit var dbManagerSpy: DbManager
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             localDbManagerRule = MockRule,
             dbManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule)
     }
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
-        dbManagerSpy.initialiseDb()
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
     }
@@ -86,7 +83,7 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), any())).thenReturn(Completable.complete())
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), anyOrNull())).thenReturn(Completable.complete())
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
@@ -218,5 +215,22 @@ class LoginActivityTest : RxJavaTest, DaggerForTests() {
                 DEFAULT_PROJECT_SECRET,
                 "",
                 "some_legacy_api_key")
+    }
+
+    private fun createRoboLoginActivity() = createRoboLoginActivity(null)
+    private fun createRoboLoginActivity(intent: Intent?) =
+        createActivity<LoginActivity>(intent)
+
+    private fun injectHowToResolveScannerAppIntent(): ResolveInfo {
+        // Pretend that ScannerQR app is installed
+        val info = ResolveInfo()
+        info.isDefault = true
+        val applicationInfo = ApplicationInfo()
+        applicationInfo.packageName = "com.google.zxing.client.android"
+        applicationInfo.className = "com.google.zxing.client.android.CaptureActivity"
+        info.activityInfo = ActivityInfo()
+        info.activityInfo.applicationInfo = applicationInfo
+        info.activityInfo.name = "Barcode Scanner"
+        return info
     }
 }
