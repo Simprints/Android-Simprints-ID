@@ -23,6 +23,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
+import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.callout.CalloutAction
@@ -292,9 +293,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.finishSuccessAndStartMatching(intent)
     }
 
-    override fun handleUnexpectedError(unexpectedException: UnexpectedException) {
-        crashReportManager.logException(unexpectedException)
-        Timber.e(unexpectedException)
+    override fun handleUnexpectedError(simprintsException: SimprintsException) {
+        crashReportManager.logException(simprintsException)
+        Timber.e(simprintsException)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 

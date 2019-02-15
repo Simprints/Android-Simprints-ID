@@ -12,7 +12,7 @@ import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
 import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
-import com.simprints.id.exceptions.unexpected.NullScannerError
+import com.simprints.id.exceptions.unexpected.NullScannerException
 import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
@@ -71,7 +71,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun connectToVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.connect(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: Connected to Vero")
@@ -95,7 +95,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun wakeUpVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: UN20 ready")
@@ -120,7 +120,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun shutdownVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: UN20 off")
@@ -136,7 +136,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     override fun resetVeroUI(): Completable = Completable.create { result ->
 
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.resetUI(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: UI reset")

@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.SaveCountsTask
@@ -66,6 +66,6 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<InputMergeWorker>()
+        } else throw WorkerInjectionFailedException.forWorker<InputMergeWorker>()
     }
 }

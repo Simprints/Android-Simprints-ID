@@ -10,8 +10,6 @@ import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEve
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.unexpected.UninitializedDataManagerError
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.RefusalForm
@@ -91,12 +89,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     private fun getRefusalForm(refusalText: String) = RefusalForm(reason.toString(), refusalText)
 
     private fun saveRefusalFormInDb(refusalForm: RefusalForm) {
-        try {
-            dbManager.saveRefusalForm(refusalForm)
-        } catch (error: UninitializedDataManagerError) {
-            crashReportManager.logException(error)
-            view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
-        }
+        dbManager.saveRefusalForm(refusalForm)
     }
 
     private fun logMessageForCrashReport(message: String) {

@@ -13,9 +13,9 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -30,8 +30,7 @@ import javax.inject.Inject
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
-    @Inject
-    lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""

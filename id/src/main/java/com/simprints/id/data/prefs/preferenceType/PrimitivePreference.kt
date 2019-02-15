@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 import isPrimitive
 import kotlin.reflect.KProperty
 
@@ -15,7 +15,7 @@ open class PrimitivePreference<T : Any>(private val prefs: ImprovedSharedPrefere
 
     init {
         if (!defValue.isPrimitive()) {
-            throw NonPrimitiveTypeError.forTypeOf(defValue)
+            throw NonPrimitiveTypeException.forTypeOf(defValue)
         }
     }
 

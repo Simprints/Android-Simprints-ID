@@ -5,7 +5,7 @@ import com.simprints.id.shared.assertThrows
 import com.simprints.id.shared.mock
 import com.simprints.id.shared.verifyOnlyInteraction
 import com.simprints.id.shared.whenever
-import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 
@@ -96,7 +96,7 @@ class ImprovedSharedPreferencesEditorImplTest {
 
     @Test
     fun testPutPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
-        assertThrows<NonPrimitiveTypeError> {
+        assertThrows<NonPrimitiveTypeException> {
             improvedEditor.putPrimitive(aKey, aClass)
         }
     }

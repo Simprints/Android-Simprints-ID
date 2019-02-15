@@ -102,7 +102,7 @@
     <string name="tier4_matches_other"> در مطابقت است %d</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID exception message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">خطا در بلوتوت</string>
     <string name="configuration_error_title">خطا در تنظیمات</string>
@@ -148,7 +148,7 @@
     <!-- Button Labels -->
     <!-- Recovery dialogs -->
     <string name="recovering_db">دوباره بدست آوردن دیتا .... لحظه را دربری میگیرد</string>
-    <string name="error">اشتباه</string>
+    <string name="exception">اشتباه</string>
     <string name="error_recovery_message">اشتباه در هنگام فرستادن فایل بازیابی شده</string>
     <string name="success_recovery_message">فایل بازیابی شده موفقانه اپلود گردید</string>
     <string name="dismiss">اخراج شدن</string>

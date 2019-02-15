@@ -1,6 +1,8 @@
 package com.simprints.id.session.sessionParameters.validators
 
-class ModuleIdValidator(private val errorWhenInvalid: Error) : Validator<String> {
+import com.simprints.id.exceptions.safe.SafeException
+
+class ModuleIdValidator(private val errorWhenInvalid: SafeException) : Validator<String> {
 
     override fun validate(value: String) {
 

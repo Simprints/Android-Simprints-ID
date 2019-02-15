@@ -9,7 +9,7 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
-import com.simprints.id.exceptions.unexpected.UnexpectedException
+import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.tools.TimeoutBar
 
 interface CollectFingerprintsContract {
@@ -60,7 +60,7 @@ interface CollectFingerprintsContract {
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()
         fun handleTryAgainFromDifferentActivity()
-        fun handleUnexpectedError(unexpectedException: UnexpectedException)
+        fun handleUnexpectedError(simprintsException: SimprintsException)
 
         // Scanning
         var isConfirmDialogShown: Boolean

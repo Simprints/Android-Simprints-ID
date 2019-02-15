@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,7 +51,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         if (context is Application) {
             context.component.inject(this)
         } else {
-            throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
+            throw WorkerInjectionFailedException.forWorker<SessionEventsMasterWorker>()
         }
     }
 }

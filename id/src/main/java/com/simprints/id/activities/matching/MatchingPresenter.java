@@ -18,10 +18,9 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.di.AppComponent;
-import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
-import com.simprints.id.exceptions.unexpected.UnexpectedDataError;
-import com.simprints.id.exceptions.unexpected.UninitializedDataManagerError;
+import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
+import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.TimeHelper;
@@ -143,15 +142,10 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onIdentifyStart() {
-        try {
-            dbManager.loadPeople(
-                candidates,
-                preferencesManager.getMatchGroup(),
-                wrapCallback("loading people", newOnLoadPeopleCallback()));
-        } catch (UninitializedDataManagerError error) {
-            crashReportManager.logException(error);
-            matchingView.launchAlert();
-        }
+        dbManager.loadPeople(
+            candidates,
+            preferencesManager.getMatchGroup(),
+            wrapCallback("loading people", newOnLoadPeopleCallback()));
     }
 
     private DataCallback newOnLoadPeopleCallback() {
@@ -189,7 +183,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                crashReportManager.logException(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                crashReportManager.logException(new FailedToLoadPeopleException("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -197,16 +191,11 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     private void onVerifyStart() {
         final String guid = preferencesManager.getPatientId();
-        try {
-            dbManager.loadPerson(
-                candidates,
-                loginInfoManager.getSignedInProjectIdOrEmpty(),
-                guid,
-                wrapCallback("loading people", newOnLoadPersonCallback()));
-        } catch (UninitializedDataManagerError error) {
-            crashReportManager.logException(error);
-            matchingView.launchAlert();
-        }
+        dbManager.loadPerson(
+            candidates,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            guid,
+            wrapCallback("loading people", newOnLoadPersonCallback()));
     }
 
     private DataCallback newOnLoadPersonCallback() {
@@ -243,7 +232,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                crashReportManager.logException(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
+                crashReportManager.logException(UnexpectedDataException.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -286,14 +275,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                                 scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        try {
-                            sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
-                            dbManager.saveIdentification(probe, candidates.size(), topCandidates);
-                        } catch (UninitializedDataManagerError error) {
-                            crashReportManager.logException(error);
-                            matchingView.launchAlert();
-                            return;
-                        }
+                        sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
+                        dbManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // signOut
                         int tier1Or2Matches = 0;
@@ -339,14 +322,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             resultCode = com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
-                        try {
-                            dbManager.saveVerification(probe, verification, guidExistsResult);
-                            sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
-                        } catch (UninitializedDataManagerError error) {
-                            crashReportManager.logException(error);
-                            matchingView.launchAlert();
-                            return;
-                        }
+                        dbManager.saveVerification(probe, verification, guidExistsResult);
+                        sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
 
                         // signOut
                         Intent resultData;

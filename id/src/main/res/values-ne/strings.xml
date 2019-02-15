@@ -96,7 +96,7 @@
     <string name="tier4_matches_zero">"%d मिल्ने व्यक्ति भेटिए "</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID exception message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">ब्लुटुथमा गल्ती देखियो  </string>
     <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
@@ -140,7 +140,7 @@
     <string name="preference_scanner_version_title">सिम्प्रिन्ट्स संस्करण</string>
     <!-- Recovery dialogs -->
     <string name="recovering_db">"डाटाबेस पुनःप्राप्त गर्दै… यसलाई केहि समय लग्नेछ "</string>
-    <string name="error">गल्ती भयो</string>
+    <string name="exception">गल्ती भयो</string>
     <string name="error_recovery_message">रिकभरी फाइल अपलोड गर्दा त्रुटि भयो</string>
     <string name="success_recovery_message">रिकभरी फाइल सफलतापूर्वक अपलोड गरियो</string>
     <string name="dismiss">खारेज गर्नुहोस्</string>

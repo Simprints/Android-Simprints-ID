@@ -12,7 +12,7 @@ import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -64,7 +64,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         if (context is Application) {
             context.component.inject(this)
         } else {
-            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+            throw WorkerInjectionFailedException.forWorker<PeopleUpSyncUploaderWorker>()
         }
     }
 

@@ -7,7 +7,7 @@ import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
-import com.simprints.id.exceptions.unexpected.RealmUninitialisedError
+import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
@@ -35,7 +35,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         initDbIfRequired().toSingle {
             realmConfig?.let {
                 Realm.getInstance(it)
-            } ?: throw RealmUninitialisedError("No valid realm Config")
+            } ?: throw RealmUninitialisedException("No valid realm Config")
         }
 
     private fun initDbIfRequired(): Completable {

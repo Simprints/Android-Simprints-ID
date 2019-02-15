@@ -14,7 +14,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unexpected.UnexpectedException
-import com.simprints.id.exceptions.unexpected.UnexpectedScannerError
+import com.simprints.id.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate
@@ -117,7 +117,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 handleNoFingerTemplateDetected()
             else -> {
                 cancelCaptureUI()
-                presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
+                presenter.handleUnexpectedError(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsScanningHelper"))
             }
         }
     }
@@ -146,7 +146,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             when (scanner_error) {
                 BUSY -> resetUIFromError()
                 INVALID_STATE -> reconnect()
-                else -> presenter.handleUnexpectedError(UnexpectedScannerError.forScannerError(scanner_error, "CollectFingerprintsActivity"))
+                else -> presenter.handleUnexpectedError(UnexpectedScannerException.forScannerError(scanner_error, "CollectFingerprintsActivity"))
             }
         }
     }
