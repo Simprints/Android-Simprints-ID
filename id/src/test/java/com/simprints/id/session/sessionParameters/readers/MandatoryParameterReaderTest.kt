@@ -1,5 +1,6 @@
 package com.simprints.id.session.sessionParameters.readers
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
@@ -22,8 +23,8 @@ class MandatoryParameterReaderTest {
     private val calloutWithStringParameter = Callout(anyCalloutAction, CalloutParameters(setOf(calloutParameter)))
 
 
-    private val missingParameterError = Error()
-    private val invalidParameterTypeError = Error()
+    private val missingParameterError = SafeException("missing parameter error")
+    private val invalidParameterTypeError = SafeException("invalid parameter type error")
 
     private val mandatoryStringParameterReader = MandatoryParameterReader(key, String::class,
         missingParameterError, invalidParameterTypeError)

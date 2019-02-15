@@ -1,5 +1,6 @@
 package com.simprints.id.session.sessionParameters.validators
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.shared.assertThrows
 import org.junit.Test
 
@@ -8,7 +9,7 @@ class ModuleIdValidatorTest {
     private val validModuleId = "this is a valid module\n\r!£$%^&*(){}{::@?><,./#';[]'}"
     private val invalidModuleId = "this is not a valid module |"
 
-    private val invalidModuleIdError = Error()
+    private val invalidModuleIdError = SafeException("invalid moduleid error")
     private val validator = ModuleIdValidator(invalidModuleIdError)
 
     @Test
