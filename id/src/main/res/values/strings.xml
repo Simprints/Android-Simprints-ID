@@ -409,7 +409,7 @@
     <string name="title_activity_settings_about">About</string>
 
     <!--Settings Preferences titles and summaries-->
-    <string name="preference_app_details_title">App Details</string>
+    <string name="preference_app_details_title">About</string>
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
