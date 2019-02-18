@@ -27,7 +27,8 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var secureApiInterfaceRule: DependencyRule = RealRule,
                                     override var scannerManagerRule: DependencyRule = RealRule,
                                     override var syncScopesBuilderRule: DependencyRule = RealRule,
-                                    override var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModuleForAnyTests(
+                                    override var syncSchedulerHelperRule: DependencyRule = RealRule,
+                                    override var locationProviderRule: DependencyRule = RealRule) : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
     remoteDbManagerRule = remoteDbManagerRule,
@@ -50,5 +51,6 @@ open class AppModuleForAndroidTests(app: Application,
     secureApiInterfaceRule = secureApiInterfaceRule,
     scannerManagerRule = scannerManagerRule,
     syncScopesBuilderRule = syncScopesBuilderRule,
-    syncSchedulerHelperRule = syncSchedulerHelperRule
+    syncSchedulerHelperRule = syncSchedulerHelperRule,
+    locationProviderRule = locationProviderRule
 )
