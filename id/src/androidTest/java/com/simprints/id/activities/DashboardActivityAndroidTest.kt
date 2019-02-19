@@ -63,6 +63,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
         private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
+        private const val UI_TIMEOUT = 20000
     }
 
     override lateinit var testProject: TestProject
@@ -150,11 +151,11 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
         downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 20) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_calculating)))
         }
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 20) {
             Espresso.onView(withId(R.id.dashboardCardSyncDescription))
                 .check(matches(withText(not(String.format(app.getString(R.string.dashboard_card_syncing), "")))))
         }
@@ -165,7 +166,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
             .check(matches(withText("${peopleInDb.size}")))
 
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 200) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
         }
 
@@ -190,7 +191,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
     private fun waitForDownSyncCountAndValidateUI() {
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 200) {
             onView(withId(R.id.dashboardCardSyncDownloadText))
                 .check(matches(Matchers.not(withText(""))))
         }
@@ -208,9 +209,17 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private fun peopleInDbForSyncScope(scope: SyncScope, toSync: Boolean): Int =
         peopleInDb.count {
             it.toSync == toSync &&
-            it.projectId == scope.projectId &&
-            if (scope.userId != null) {  it.userId == scope.userId } else { true } &&
-            if (!scope.moduleIds.isNullOrEmpty()) { scope.moduleIds?.contains(it.moduleId) ?: false } else { true }
+                it.projectId == scope.projectId &&
+                if (scope.userId != null) {
+                    it.userId == scope.userId
+                } else {
+                    true
+                } &&
+                if (!scope.moduleIds.isNullOrEmpty()) {
+                    scope.moduleIds?.contains(it.moduleId) ?: false
+                } else {
+                    true
+                }
         }
 
     private fun mockGlobalScope(): SyncScope {
