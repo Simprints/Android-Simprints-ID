@@ -60,10 +60,7 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.utils.AndroidResourcesHelper
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
-import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.id.tools.utils.SimNetworkUtilsImpl
+import com.simprints.id.tools.utils.*
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
@@ -260,4 +257,9 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideLocationProvider(ctx: Context): LocationProvider = LocationProviderImpl(ctx)
 }
+

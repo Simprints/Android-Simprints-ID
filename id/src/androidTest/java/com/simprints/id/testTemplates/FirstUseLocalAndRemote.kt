@@ -10,6 +10,7 @@ import com.simprints.id.testTools.models.TestProject
 import com.simprints.id.testTools.remote.RemoteTestingManager
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import timber.log.Timber
 
 /**
  * Interface for tests where an empty project should be created server side, as well as clearing
@@ -68,6 +69,7 @@ interface FirstUseLocalAndRemote : FirstUseLocal {
     override fun setUp() {
 
         testProject = RemoteTestingManager.create().createTestProject()
+        Timber.d("Testing project created: ${testProject.id}")
 
         val localDbKey = LocalDbKey(
             testProject.id,
@@ -83,6 +85,8 @@ interface FirstUseLocalAndRemote : FirstUseLocal {
 
     override fun tearDown() {
         RemoteTestingManager.create().deleteTestProject(testProject.id)
+        Timber.d("Test project deleted: ${testProject.id}")
+
         super.tearDown()
     }
 }

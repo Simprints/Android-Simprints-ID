@@ -34,6 +34,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.id.shared.DependencyRule.RealRule
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 
@@ -66,7 +67,8 @@ open class AppModuleForAnyTests(app: Application,
                                 open var countTaskRule: DependencyRule = RealRule,
                                 open var downSyncTaskRule: DependencyRule = RealRule,
                                 open var syncSchedulerHelperRule: DependencyRule = RealRule,
-                                open var downSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                                open var downSyncManagerRule: DependencyRule = RealRule,
+                                open val locationProviderRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -179,4 +181,6 @@ open class AppModuleForAnyTests(app: Application,
     override fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
         downSyncManagerRule.resolveDependency { super.provideDownSyncManager(syncScopesBuilder) }
 
+    override fun provideLocationProvider(ctx: Context): LocationProvider =
+        locationProviderRule.resolveDependency { super.provideLocationProvider(ctx) }
 }

@@ -115,7 +115,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
 
             doReturn(Single.just(createSuccessUploadResponse())).`when`(sessionsRemoteInterfaceSpy).uploadSessions(anyNotNull(), anyNotNull())
             val uploadTask = Single.just(sessions)
-                .uploadClosedSessionsOrThrowIfNoSessions("bWOFHInKA2YaQwrxZ7uJ")
+                .uploadClosedSessionsOrThrowIfNoSessions(DefaultTestConstants.DEFAULT_PROJECT_ID)
                 .test()
 
             uploadTask.waitForCompletionAndAssertNoErrors()
@@ -223,7 +223,7 @@ class SessionEventsUploaderTaskTest : RxJavaTest {
             .build()))
 
     private fun executeUpload(sessions: List<SessionEvents>): TestObserver<Void> {
-        return createTask().execute("bWOFHInKA2YaQwrxZ7uJ", sessions).test()
+        return createTask().execute(DefaultTestConstants.DEFAULT_PROJECT_ID, sessions).test()
     }
 
     private fun createTask() =
