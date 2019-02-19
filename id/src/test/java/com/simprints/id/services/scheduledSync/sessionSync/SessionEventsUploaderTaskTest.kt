@@ -38,6 +38,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 import retrofit2.Response
 import retrofit2.adapter.rxjava2.Result
+import com.simprints.id.shared.DefaultTestConstants
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
