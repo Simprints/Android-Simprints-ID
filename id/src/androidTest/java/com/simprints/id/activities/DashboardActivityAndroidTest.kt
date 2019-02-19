@@ -63,7 +63,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
         private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
-        private const val UI_TIMEOUT = 20000
+        private const val UI_TIMEOUT = 20000L
     }
 
     override lateinit var testProject: TestProject
