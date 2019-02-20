@@ -14,8 +14,6 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.mockSessionEventsManagerForId
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -79,8 +77,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
             scannerManagerRule = DependencyRule.SpyRule,
             simNetworkUtilsRule = DependencyRule.SpyRule,
-            syncSchedulerHelperRule = DependencyRule.MockRule,
-            sessionEventsManagerRule = DependencyRule.MockRule)
+            syncSchedulerHelperRule = DependencyRule.MockRule)
     }
 
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
@@ -88,7 +85,6 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var scannerManagerSpy: ScannerManager
-    @Inject lateinit var sessionEventsManagerMock: SessionEventsManager
 
     @Before
     override fun setUp() {
@@ -97,7 +93,6 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         testAppComponent.inject(this)
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        mockSessionEventsManagerForId(sessionEventsManagerMock)
 
         app.initDependencies()
 

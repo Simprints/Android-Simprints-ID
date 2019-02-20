@@ -323,8 +323,5 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
         crashReportManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
         crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
-        sessionEventsManager.getCurrentSession().subscribeBy {
-            it -> crashReportManager.setSessionIdCrashlyticsKey(it.id)
-        }
     }
 }
