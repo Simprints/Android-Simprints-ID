@@ -30,6 +30,7 @@ interface SettingsPreferencesManager {
     var programName: String
     var organizationName: String
 
+    var logoExists: Boolean
     var parentalConsentExists: Boolean
     var generalConsentOptionsJson: String
     var parentalConsentOptionsJson: String
