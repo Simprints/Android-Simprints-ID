@@ -14,13 +14,18 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.mockSessionEventsManagerForId
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.setup.*
+import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
+import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
+import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
+import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
@@ -74,7 +79,8 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
             scannerManagerRule = DependencyRule.SpyRule,
             simNetworkUtilsRule = DependencyRule.SpyRule,
-            syncSchedulerHelperRule = DependencyRule.MockRule)
+            syncSchedulerHelperRule = DependencyRule.MockRule,
+            sessionEventsManagerRule = DependencyRule.MockRule)
     }
 
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
@@ -82,6 +88,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var scannerManagerSpy: ScannerManager
+    @Inject lateinit var sessionEventsManagerMock: SessionEventsManager
 
     @Before
     override fun setUp() {
@@ -90,6 +97,7 @@ class LaunchActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocal {
         testAppComponent.inject(this)
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
+        mockSessionEventsManagerForId(sessionEventsManagerMock)
 
         app.initDependencies()
 
