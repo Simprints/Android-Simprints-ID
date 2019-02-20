@@ -7,7 +7,7 @@
     <string name="app_name" translatable="false">Simprints ID</string>
     <!-- Activity Titles -->
     <string name="title_activity_front" translatable="false">Simprints ID</string>
-    <string name="register_title">Enrollment</string>
+    <string name="register_title">Enrolment</string>
     <string name="identify_title">Identify</string>
     <string name="update_title">Update</string>
     <string name="verify_title">Verify</string>
