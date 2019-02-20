@@ -4,13 +4,13 @@ import androidx.test.InstrumentationRegistry
 import androidx.test.filters.LargeTest
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.mockSessionEventsManagerForId
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
 import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.shared.DependencyRule.*
+import com.simprints.id.shared.DependencyRule
+import com.simprints.id.shared.DependencyRule.MockRule
+import com.simprints.id.shared.DependencyRule.ReplaceRule
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocalAndRemote
 import com.simprints.id.testTools.ActivityUtils
@@ -50,13 +50,12 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var randomGeneratorMock: RandomGenerator
-    @Inject lateinit var sessionEventsManagerMock: SessionEventsManager
     private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
-            sessionEventsManagerRule = SpyRule,
+            sessionEventsManagerRule = DependencyRule.SpyRule,
             bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
     }
 
@@ -68,7 +67,6 @@ class HappyWorkflowAllMainFeatures : DaggerForAndroidTests(), FirstUseLocalAndRe
         testAppComponent.inject(this)
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        mockSessionEventsManagerForId(sessionEventsManagerMock)
 
         app.initDependencies()
 
