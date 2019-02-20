@@ -1,5 +1,6 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import android.annotation.SuppressLint
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent
@@ -60,6 +61,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 extractSessionParametersOrThrow()
                 addCalloutAndConnectivityEventsInSession()
                 setLastUser()
+                setSessionIdCrashlyticsKey()
             } catch (exception: InvalidCalloutError) {
                 view.openAlertActivityForError(exception.alertType)
                 setupFailed = true
@@ -188,6 +190,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun setSessionIdCrashlyticsKey() {
+        sessionEventsManager.getCurrentSession().subscribeBy {
+            crashReportManager.setSessionIdCrashlyticsKey(it.id)
         }
     }
 }
