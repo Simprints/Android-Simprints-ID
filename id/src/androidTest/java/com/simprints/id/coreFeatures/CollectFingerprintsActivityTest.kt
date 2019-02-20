@@ -8,8 +8,6 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.mockSessionEventsManagerForId
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
@@ -68,7 +66,7 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var sessionEventsManagerMock: SessionEventsManager
+
 
     @Before
     override fun setUp() {
@@ -77,7 +75,6 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
         testAppComponent.inject(this)
 
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        mockSessionEventsManagerForId(sessionEventsManagerMock)
 
         app.initDependencies()
 

@@ -1,9 +1,6 @@
 package com.simprints.id.data.analytics.eventData
 
 import com.google.common.truth.Truth
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.whenever
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
@@ -11,7 +8,6 @@ import com.simprints.id.data.analytics.eventData.models.local.*
 import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.tools.TimeHelper
-import io.reactivex.Single
 import io.realm.Realm
 import junit.framework.TestCase.*
 import java.util.*
@@ -171,8 +167,4 @@ fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
         assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
-}
-
-fun mockSessionEventsManagerForId(sessionEventsManager: SessionEventsManager) {
-    whenever(sessionEventsManager.getCurrentSession()).thenReturn(Single.just(mock()))
 }
