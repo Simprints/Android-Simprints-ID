@@ -2,11 +2,11 @@ package com.simprints.id.activities.launch
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -20,7 +20,6 @@ import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
