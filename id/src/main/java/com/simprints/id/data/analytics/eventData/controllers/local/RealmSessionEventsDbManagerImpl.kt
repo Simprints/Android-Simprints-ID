@@ -6,8 +6,9 @@ import com.simprints.id.data.analytics.eventData.models.local.RlSession
 import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unexpected.SessionNotFoundException
+import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.realm.Realm
@@ -123,7 +124,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     private fun generateDbKeyIfRequired(): LocalDbKey {
         try {
             secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
-        } catch (e: Exception) {
+        } catch (e: MissingLocalDatabaseKeyException) {
             secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME, null)
         }
         return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
