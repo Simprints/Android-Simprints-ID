@@ -13,7 +13,6 @@ import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.shared.DependencyRule
 import com.simprints.id.shared.DependencyRule.MockRule
 import com.simprints.id.shared.PreferencesModuleForAnyTests
 import com.simprints.id.shared.mockSettingsPreferencesManager

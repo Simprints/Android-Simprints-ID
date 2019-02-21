@@ -4,8 +4,6 @@ import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.TestApplication
 import junit.framework.Assert.fail
 import org.junit.Before
