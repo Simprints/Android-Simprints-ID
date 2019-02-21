@@ -57,7 +57,6 @@ class CollectFingerprintsActivityTest : DaggerForAndroidTests(), FirstUseLocal {
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = DependencyRule.MockRule,
-            sessionEventsManagerRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter })
     }
 
