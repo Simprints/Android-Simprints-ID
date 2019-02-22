@@ -55,7 +55,7 @@ private fun createIntent(testCalloutCredentials: TestCalloutCredentials, action:
 fun grantPermissions() {
     // Allow all first-app permissions and dismiss the dialog box
     log("ActivityUtils.grantPermissions(): granting permissions")
-    for (permission in permissions) PermissionGranter.allowPermissionsIfNeeded(permission)
+    permissions.forEach { PermissionGranter.allowPermissionsIfNeeded(it) }
 }
 
 fun launchCollectFingerprintsActivity(collectFingerprintsTestRule: ActivityTestRule<CollectFingerprintsActivity>) {

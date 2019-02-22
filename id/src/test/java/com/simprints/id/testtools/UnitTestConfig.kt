@@ -24,29 +24,28 @@ class UnitTestConfig<T : Any>(
         rescheduleRxMainThread()
             .setupFirebase()
             .setupWorkManager()
-            .initComponent()
-            .inject()
+            .initAndInjectComponent()
 
-    fun rescheduleRxMainThread() : UnitTestConfig<T> {
+    fun rescheduleRxMainThread() = also {
         com.simprints.testframework.unit.reactive.rescheduleRxMainThread()
-        return this
     }
 
-    fun setupFirebase(): UnitTestConfig<T> {
+    fun setupFirebase() = also {
         FirebaseApp.initializeApp(app)
-        return this
     }
 
-    fun setupWorkManager(): UnitTestConfig<T> {
+    fun setupWorkManager() = also {
         try {
             WorkManagerTestInitHelper.initializeTestWorkManager(app, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
-        return this
     }
 
-    fun initComponent(): UnitTestConfig<T> {
+    fun initAndInjectComponent() =
+        initComponent().inject()
+
+    private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForTests.builder()
             .appModule(appModule ?: TestAppModule(app))
@@ -54,11 +53,9 @@ class UnitTestConfig<T : Any>(
             .build()
 
         app.component = testAppComponent
-        return this
     }
 
-    fun inject(): UnitTestConfig<T> {
+    private fun inject() = also {
         injectClassFromComponent(testAppComponent, test)
-        return this
     }
 }
