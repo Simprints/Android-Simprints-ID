@@ -8,7 +8,7 @@ import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.id.exceptions.unexpected.UnexpectedException
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.libsimprints.FingerIdentifier
 
@@ -22,10 +22,10 @@ class CrashReportManagerImpl: CrashReportManager {
     private fun getLogMessage(crashTrigger: CrashTrigger, message: String) = "[${crashTrigger.name}] $message"
 
     override fun logExceptionOrThrowable(throwable: Throwable) {
-        if(throwable is UnexpectedException) {
-            Crashlytics.logException(throwable)
-        } else {
+        if(throwable is SafeException) {
             logSafeException(throwable)
+        } else {
+            Crashlytics.logException(throwable)
         }
     }
 
