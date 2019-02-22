@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import android.content.Context
-import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
@@ -54,7 +53,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
             Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            logWarningToAnalytics("PeopleUpSyncUploaderWorker - failure")
+            logMessageForCrashReport("PeopleUpSyncUploaderWorker - failure")
             crashReportManager.logExceptionOrThrowable(throwable)
             Result.failure()
         }
@@ -71,9 +70,6 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
     private fun logMessageForCrashReport(message: String) =
         crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.NETWORK, message = message)
-
-    private fun logWarningToAnalytics(message: String) =
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.NETWORK, Log.WARN, message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
