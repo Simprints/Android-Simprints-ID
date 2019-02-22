@@ -1,1 +1,1 @@
-include ':id', ':libcommon', ':libsimprints', ':testtools'
+include ':id', ':libcommon', ':libsimprints', ':testtools', ':fingerprints', ':faces', ':core'
