@@ -1,4 +1,4 @@
-package com.simprints.id.activities
+package com.simprints.id.activities.launch
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
@@ -12,7 +12,6 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule

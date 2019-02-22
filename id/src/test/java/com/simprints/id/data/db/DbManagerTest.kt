@@ -19,7 +19,7 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.sync.PeopleApiServiceMock
+import com.simprints.id.services.scheduledSync.PeopleApiServiceMock
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testframework.unit.mockserver.mockNotFoundResponse
 import com.simprints.testframework.unit.mockserver.mockSuccessfulResponse

@@ -1,10 +1,8 @@
-package com.simprints.id.sync
+package com.simprints.id.services.scheduledSync.peopleDownSync.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.TestApplication
 import org.junit.Assert
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.simprints.id.sync
+package com.simprints.id.services.scheduledSync
 
 import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.id.data.db.remote.models.fb_Person

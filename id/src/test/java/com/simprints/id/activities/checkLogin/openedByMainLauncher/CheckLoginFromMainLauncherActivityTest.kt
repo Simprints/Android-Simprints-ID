@@ -1,10 +1,9 @@
-package com.simprints.id.activities
+package com.simprints.id.activities.checkLogin.openedByMainLauncher
 
 import android.app.Activity
 import android.content.SharedPreferences
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
