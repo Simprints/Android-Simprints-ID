@@ -80,7 +80,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
         viewModel.viewModelState.onSyncActionClicked = {
-            crashReportManager.logInfo(CrashReportTags.SYNC, CrashTrigger.UI,"Dashboard card sync button clicked")
+            crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.UI, message = "Dashboard card sync button clicked")
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()

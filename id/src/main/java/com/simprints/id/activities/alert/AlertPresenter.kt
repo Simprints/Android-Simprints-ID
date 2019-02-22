@@ -2,6 +2,8 @@ package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashReport.CrashReportTags
+import com.simprints.id.data.analytics.crashReport.CrashTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
@@ -24,7 +26,7 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun start() {
-        crashReportManager.logAlert(alertType)
+        logToCrashReport()
         checkAlertTypeAndHandleButtons()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
@@ -77,5 +79,9 @@ class AlertPresenter(val view: AlertContract.View,
             view.hideLeftButton()
         }
         view.initRightButton(alertType)
+    }
+
+    private fun logToCrashReport() {
+        crashReportManager.logMessageForCrashReport(CrashReportTags.ALERT, CrashTrigger.UI, message = alertType.name)
     }
 }

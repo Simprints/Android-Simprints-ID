@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
 import com.simprints.id.data.analytics.crashReport.CrashReportManager;
 import com.simprints.id.data.analytics.crashReport.CrashReportTags;
@@ -351,6 +352,6 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void logMessageForCrashReport(String message) {
-        crashReportManager.logInfo(CrashReportTags.MATCHING, CrashTrigger.UI, message);
+        crashReportManager.logMessageForCrashReport(CrashReportTags.MATCHING, CrashTrigger.UI, Log.INFO, message);
     }
 }

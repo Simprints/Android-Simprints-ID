@@ -8,23 +8,15 @@ import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashReport.CrashlyticsKeyConstants.Companion.USER_ID
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.libsimprints.FingerIdentifier
 
 class CrashReportManagerImpl: CrashReportManager {
 
-    override fun logInfo(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger, message: String) {
-        Crashlytics.log(Log.VERBOSE, crashReportTag.name, getLogMessage(crashTrigger, message))
-    }
-
-    override fun logWarning(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger, message: String) {
-        Crashlytics.log(Log.WARN, crashReportTag.name, getLogMessage(crashTrigger, message))
-    }
-
-    override fun logAlert(alertType: ALERT_TYPE) {
-        Crashlytics.log(Log.ERROR, CrashReportTags.ALERT.name, alertType.name)
+    override fun logMessageForCrashReport(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger,
+                                          crashPriority: Int, message: String) {
+        Crashlytics.log(crashPriority, crashReportTag.name, getLogMessage(crashTrigger, message))
     }
 
     private fun getLogMessage(crashTrigger: CrashTrigger, message: String) = "[${crashTrigger.name}] $message"

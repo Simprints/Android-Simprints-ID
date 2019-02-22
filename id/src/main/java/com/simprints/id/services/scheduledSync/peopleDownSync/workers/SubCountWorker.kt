@@ -73,5 +73,5 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
     }
 
     private fun logMessageForCrashReport(message: String) =
-        crashReportManager.logInfo(CrashReportTags.SYNC, CrashTrigger.NETWORK, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.NETWORK, message = message)
 }

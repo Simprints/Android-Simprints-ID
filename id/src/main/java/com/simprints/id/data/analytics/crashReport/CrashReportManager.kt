@@ -1,15 +1,16 @@
 package com.simprints.id.data.analytics.crashReport
 
-import com.simprints.id.domain.ALERT_TYPE
+import android.util.Log
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.libsimprints.FingerIdentifier
 
 interface CrashReportManager {
 
-    fun logInfo(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger, message: String)
-    fun logWarning(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger, message: String)
+    fun logMessageForCrashReport(crashReportTag: CrashReportTags,
+                                 crashTrigger: CrashTrigger,
+                                 crashPriority: Int = Log.INFO,
+                                 message: String)
 
-    fun logAlert(alertType: ALERT_TYPE)
     fun logExceptionOrThrowable(throwable: Throwable)
 
     fun setProjectIdCrashlyticsKey(projectId: String)

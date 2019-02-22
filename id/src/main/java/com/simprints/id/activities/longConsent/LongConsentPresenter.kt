@@ -52,10 +52,10 @@ class LongConsentPresenter(val view: LongConsentContract.View,
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {
-        crashReportManager.logInfo(CrashReportTags.LONG_CONSENT, CrashTrigger.UI, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LONG_CONSENT, CrashTrigger.UI, message = message)
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        crashReportManager.logInfo(CrashReportTags.LONG_CONSENT, CrashTrigger.NETWORK, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LONG_CONSENT, CrashTrigger.NETWORK, message = message)
     }
 }
