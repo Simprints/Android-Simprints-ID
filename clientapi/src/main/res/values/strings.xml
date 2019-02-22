@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name" translatable="false">Client API</string>
+    <string name="title_activity_project_id_error" translatable="false">ProjectIdErrorActivity</string>
+
+    <!-- Error Screen Layout -->
+    <string name="main_error_graphic" translatable="false">Main Error Graphic</string>
+    <string name="hint_error_graphic" translatable="false">Hint Error Graphic</string>
+    <string name="failed_to_retrieve_message" translatable="false">Failed to retrieve message</string>
+
+    <!-- Error Screen Text -->
+    <string name="configuration_error_title">CONFIGURATION ERROR</string>
+    <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
+
+</resources>
