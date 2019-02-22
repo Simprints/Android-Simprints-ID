@@ -81,6 +81,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun start() {
         view.setLanguage(preferencesManager.language)
+        view.setLogoVisibility(preferencesManager.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
 

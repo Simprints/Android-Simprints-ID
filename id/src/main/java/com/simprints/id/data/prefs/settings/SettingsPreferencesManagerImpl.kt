@@ -95,6 +95,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val ORGANIZATION_NAME_KEY = "OrganizationName"
         const val ORGANIZATION_NAME_DEFAULT = "This organization"
 
+        const val LOGO_EXISTS_KEY = "LogoExists"
+        const val LOGO_EXISTS_DEFAULT = true
+
         const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
         const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
 
@@ -183,6 +186,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Name of the partner's organization
     override var organizationName: String
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, ORGANIZATION_NAME_KEY, ORGANIZATION_NAME_DEFAULT)
+
+    // Whether to show the Simprints logo at the top of the launch activity
+    override var logoExists: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
 
     // Whether the parental consent should be shown
     override var parentalConsentExists: Boolean
