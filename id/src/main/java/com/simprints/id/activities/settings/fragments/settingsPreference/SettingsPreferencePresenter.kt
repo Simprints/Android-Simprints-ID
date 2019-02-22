@@ -3,9 +3,9 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
 import com.simprints.id.data.analytics.crashReport.CrashTrigger
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -206,7 +206,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logInfo(CrashReportTags.SETTINGS, CrashTrigger.UI, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.SETTINGS, CrashTrigger.UI, message = message)
     }
 
     companion object {

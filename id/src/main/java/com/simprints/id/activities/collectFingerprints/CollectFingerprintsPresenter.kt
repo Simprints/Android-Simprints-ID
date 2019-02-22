@@ -352,7 +352,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logInfo(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message = message)
     }
 
     companion object {

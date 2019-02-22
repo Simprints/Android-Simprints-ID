@@ -93,6 +93,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logInfo(CrashReportTags.REFUSAL, CrashTrigger.UI, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.REFUSAL, CrashTrigger.UI, message = message)
     }
 }

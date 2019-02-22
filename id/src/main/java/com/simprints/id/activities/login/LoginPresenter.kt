@@ -161,11 +161,11 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {
-        crashReportManager.logInfo(CrashReportTags.LOGIN, CrashTrigger.UI, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashTrigger.UI, message = message)
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        crashReportManager.logInfo(CrashReportTags.LOGIN, CrashTrigger.NETWORK, message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashTrigger.NETWORK, message = message)
     }
 
     companion object {
