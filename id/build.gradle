@@ -204,7 +204,6 @@ dependencies {
     testImplementation deps.testing.androidx.runner
     testImplementation deps.testing.androidx.room
     testImplementation deps.testing.truth
-    testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.mockwebserver

@@ -54,10 +54,8 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
 
-    implementation deps.testing.mockito.core
     implementation deps.testing.mockito.inline
     implementation deps.testing.mockito.kotlin
-    implementation deps.testing.mockito.android
     implementation deps.testing.robolectric.core
     implementation deps.testing.robolectric.multidex
     implementation deps.testing.mockwebserver

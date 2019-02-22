@@ -23,22 +23,29 @@ class AndroidTestConfig<T : Any>(
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
+    private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY)
+    private val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
+    private val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
+
     fun fullSetup() =
-        initComponent()
-            .inject()
+        initAndInjectComponent()
             .initRealm()
             .clearData()
             .initDependencies()
 
     /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
      * Useful for setting up mocks before the Application is created */
-    fun fullSetupWith(block: () -> Unit): AndroidTestConfig<T> {
-        val config = initComponent().inject().initRealm().clearData()
-        block()
-        return config.initDependencies()
-    }
+    fun fullSetupWith(block: () -> Unit) =
+        initAndInjectComponent()
+            .initRealm()
+            .clearData()
+            .also { block() }
+            .initDependencies()
 
-    fun initComponent(): AndroidTestConfig<T> {
+    fun initAndInjectComponent() =
+        initComponent().inject()
+
+    private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForAndroidTests.builder()
             .appModule(appModule ?: TestAppModule(app))
@@ -46,34 +53,23 @@ class AndroidTestConfig<T : Any>(
             .build()
 
         app.component = testAppComponent
-        return this
     }
 
-    fun inject(): AndroidTestConfig<T> {
+    private fun inject() = also {
         injectClassFromComponent(testAppComponent, test)
-        return this
     }
 
-    fun initRealm(): AndroidTestConfig<T> {
+    fun initRealm() = also {
         Realm.init(app)
-        return this
     }
 
-    fun clearData(): AndroidTestConfig<T> {
+    fun clearData() = also {
         StorageUtils.clearApplicationData(app)
         StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
         StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
-        return this
     }
 
-    fun initDependencies(): AndroidTestConfig<T> {
+    fun initDependencies() = also {
         app.initDependencies()
-        return this
-    }
-
-    companion object {
-        private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY)
-        private val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
-        private val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
     }
 }
