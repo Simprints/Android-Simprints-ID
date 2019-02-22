@@ -12,11 +12,11 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.anyOrNull
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
 import org.junit.Before

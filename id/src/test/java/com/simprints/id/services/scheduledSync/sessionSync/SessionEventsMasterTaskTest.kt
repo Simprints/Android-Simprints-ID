@@ -14,8 +14,8 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.testframework.common.syntax.*
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

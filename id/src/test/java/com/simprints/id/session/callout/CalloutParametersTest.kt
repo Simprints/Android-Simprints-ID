@@ -3,8 +3,8 @@ package com.simprints.id.session.callout
 import android.content.Intent
 import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
 import com.simprints.id.session.callout.CalloutParameters.Companion.calloutParameters
-import com.simprints.testframework.common.android.mockIntent
-import com.simprints.testframework.common.syntax.assertThrows
+import com.simprints.testtools.common.android.mockIntent
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Assert.*
 import org.junit.Test
 

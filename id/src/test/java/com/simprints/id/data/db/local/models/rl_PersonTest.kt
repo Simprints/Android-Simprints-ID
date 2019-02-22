@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.local.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.commontesttools.PeopleGeneratorUtils

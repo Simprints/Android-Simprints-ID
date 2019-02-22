@@ -10,8 +10,8 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.libsimprints.Constants
-import com.simprints.testframework.android.log
-import com.simprints.testframework.android.runActivityOnUiThread
+import com.simprints.testtools.android.log
+import com.simprints.testtools.android.runActivityOnUiThread
 import java.util.*
 
 fun checkLoginFromIntentActivityTestRule() =

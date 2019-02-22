@@ -2,7 +2,7 @@ package com.simprints.id.session.sessionParameters.validators
 
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.testframework.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class ProjectIdOrApiKeyValidatorTest {

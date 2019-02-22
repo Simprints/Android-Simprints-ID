@@ -29,10 +29,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.json.JsonHelper
-import com.simprints.testframework.common.syntax.*
-import com.simprints.testframework.unit.mockserver.assertPathUrlParam
-import com.simprints.testframework.unit.mockserver.assertQueryUrlParam
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.mockserver.assertPathUrlParam
+import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse

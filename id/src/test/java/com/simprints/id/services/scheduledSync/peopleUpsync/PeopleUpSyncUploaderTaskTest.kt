@@ -8,7 +8,7 @@ import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
-import com.simprints.testframework.common.syntax.*
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single

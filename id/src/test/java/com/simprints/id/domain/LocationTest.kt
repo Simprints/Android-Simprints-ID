@@ -1,7 +1,7 @@
 package com.simprints.id.domain
 
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import android.location.Location as AndroidLocation

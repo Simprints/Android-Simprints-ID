@@ -37,9 +37,9 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.state.LoginStateMocker
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.testframework.android.tryOnUiUntilTimeout
-import com.simprints.testframework.android.waitOnSystem
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.android.tryOnUiUntilTimeout
+import com.simprints.testtools.android.waitOnSystem
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers

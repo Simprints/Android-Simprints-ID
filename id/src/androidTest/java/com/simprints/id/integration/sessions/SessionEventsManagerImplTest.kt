@@ -42,11 +42,11 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.android.tryOnSystemUntilTimeout
-import com.simprints.testframework.android.waitOnUi
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.android.tryOnSystemUntilTimeout
+import com.simprints.testtools.android.waitOnUi
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import com.simprints.testtools.common.syntax.whenever
 import io.realm.Sort
 import junit.framework.TestCase.*
 import org.json.JSONObject

@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
-import com.simprints.testframework.common.dagger.injectClassFromComponent
+import com.simprints.testtools.common.dagger.injectClassFromComponent
 
 class UnitTestConfig<T : Any>(
     private val test: T,
@@ -27,7 +27,7 @@ class UnitTestConfig<T : Any>(
             .initAndInjectComponent()
 
     fun rescheduleRxMainThread() = also {
-        com.simprints.testframework.unit.reactive.rescheduleRxMainThread()
+        com.simprints.testtools.unit.reactive.rescheduleRxMainThread()
     }
 
     fun setupFirebase() = also {

@@ -2,8 +2,8 @@ package com.simprints.id.session.sessionParameters.extractors
 
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

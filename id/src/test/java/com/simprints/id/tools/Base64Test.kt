@@ -3,7 +3,7 @@ package com.simprints.id.tools
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.io.BaseEncoding
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.testtools.TestApplication
 import org.junit.Assert
 import org.junit.Test

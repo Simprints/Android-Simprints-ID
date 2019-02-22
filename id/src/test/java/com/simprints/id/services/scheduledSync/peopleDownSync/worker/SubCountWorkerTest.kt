@@ -16,11 +16,11 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWo
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.verifyOnce
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
