@@ -1,8 +1,8 @@
 package com.simprints.id.testtools.state
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenever
 import org.mockito.Mockito
 import org.mockito.stubbing.Answer
 

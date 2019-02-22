@@ -22,7 +22,7 @@ import com.simprints.id.testtools.state.LoginStateMocker
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.SimHelper
-import com.simprints.testframework.android.tryOnUiUntilTimeout
+import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule

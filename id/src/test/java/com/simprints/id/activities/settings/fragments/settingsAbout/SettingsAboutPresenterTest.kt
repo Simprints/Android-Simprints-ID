@@ -3,11 +3,11 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.verifyOnce
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test

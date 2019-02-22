@@ -11,8 +11,8 @@ import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.testtools.grantPermissions
 import com.simprints.id.testtools.launchActivityAndRunOnUiThread
 import com.simprints.libsimprints.Constants
-import com.simprints.testframework.android.log
-import com.simprints.testframework.android.tryOnUiUntilTimeout
+import com.simprints.testtools.android.log
+import com.simprints.testtools.android.tryOnUiUntilTimeout
 
 fun launchAppFromIntentEnrol(testCalloutCredentials: TestCalloutCredentials,
                              enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {

@@ -6,10 +6,10 @@ import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.assertThrows
-import com.simprints.testframework.common.syntax.mock
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString

@@ -8,8 +8,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
 
 object LoginStateMocker {

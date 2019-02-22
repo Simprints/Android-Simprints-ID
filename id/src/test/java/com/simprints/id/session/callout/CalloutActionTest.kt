@@ -2,7 +2,7 @@ package com.simprints.id.session.callout
 
 import android.content.Intent
 import com.simprints.id.session.callout.CalloutAction.Companion.calloutAction
-import com.simprints.testframework.common.android.mockIntent
+import com.simprints.testtools.common.android.mockIntent
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

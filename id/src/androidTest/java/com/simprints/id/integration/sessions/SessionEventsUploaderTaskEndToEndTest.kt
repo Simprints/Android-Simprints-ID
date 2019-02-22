@@ -33,8 +33,8 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.common.syntax.awaitAndAssertSuccess
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver
 import org.junit.Before
 import org.junit.Rule

@@ -20,7 +20,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.android.log
+import com.simprints.testtools.android.log
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

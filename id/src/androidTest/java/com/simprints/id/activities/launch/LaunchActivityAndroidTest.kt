@@ -32,9 +32,9 @@ import com.simprints.libscanner.Scanner
 import com.simprints.libsimprints.Constants
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.android.waitOnUi
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.android.waitOnUi
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Before

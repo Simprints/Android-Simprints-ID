@@ -10,7 +10,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
@@ -18,8 +18,8 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
-import com.simprints.testframework.unit.robolectric.createActivity
-import com.simprints.testframework.unit.robolectric.showOnScreen
+import com.simprints.testtools.unit.robolectric.createActivity
+import com.simprints.testtools.unit.robolectric.showOnScreen
 import kotlinx.android.synthetic.main.activity_alert.*
 import org.junit.Assert.assertEquals
 import org.junit.Before

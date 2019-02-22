@@ -28,8 +28,8 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
-import com.simprints.testframework.android.getCurrentActivity
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.android.getCurrentActivity
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule

@@ -25,7 +25,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

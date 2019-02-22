@@ -209,7 +209,7 @@ dependencies {
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
-    testImplementation project(':testframework')
+    testImplementation project(':testtools')
 
     // Android test
     androidTestImplementation deps.simprints.mockscanner
@@ -234,7 +234,7 @@ dependencies {
         exclude group: "com.google.guava"
     }
     kaptAndroidTest deps.dagger.compiler
-    androidTestImplementation(project(':testframework')) {
+    androidTestImplementation(project(':testtools')) {
         exclude group: 'org.apache.maven'
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'

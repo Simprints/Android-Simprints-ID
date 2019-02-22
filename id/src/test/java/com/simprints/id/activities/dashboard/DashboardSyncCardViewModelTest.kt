@@ -28,10 +28,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
-import com.simprints.testframework.common.livedata.testObserver
-import com.simprints.testframework.common.syntax.*
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.testframework.unit.robolectric.getSharedPreferences
+import com.simprints.testtools.common.livedata.testObserver
+import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule

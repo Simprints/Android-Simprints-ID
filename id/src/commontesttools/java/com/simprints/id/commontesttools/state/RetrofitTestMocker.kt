@@ -5,8 +5,8 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.network.NetworkConstants
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.SecureApiInterface
-import com.simprints.testframework.common.retrofit.createMockBehaviorService
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.retrofit.createMockBehaviorService
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
 
 fun replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy: RemotePeopleManager, remoteSessionsManagerSpy: RemoteSessionsManager) {

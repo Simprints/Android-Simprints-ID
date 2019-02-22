@@ -11,7 +11,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
-import com.simprints.testframework.common.dagger.injectClassFromComponent
+import com.simprints.testtools.common.dagger.injectClassFromComponent
 import io.realm.Realm
 
 class AndroidTestConfig<T : Any>(

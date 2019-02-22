@@ -4,7 +4,7 @@ import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.testframework.common.syntax.mock
+import com.simprints.testtools.common.syntax.mock
 import org.junit.Assert
 import org.junit.Test
 

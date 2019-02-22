@@ -9,8 +9,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGeneratorImpl
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.assertThrows
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotSame
 import org.junit.Before

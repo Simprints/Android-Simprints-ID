@@ -13,7 +13,7 @@ import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.testtools.grantPermissions
 import com.simprints.id.testtools.launchActivityAndRunOnUiThread
 import com.simprints.libsimprints.*
-import com.simprints.testframework.android.*
+import com.simprints.testtools.android.*
 import org.hamcrest.Matchers.not
 import org.junit.Assert.*
 

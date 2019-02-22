@@ -17,10 +17,10 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID
 import com.simprints.id.testtools.state.RobolectricTestMocker.initLogInStateMock
 import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.testframework.unit.robolectric.assertActivityStarted
-import com.simprints.testframework.unit.robolectric.createActivity
-import com.simprints.testframework.unit.robolectric.getSharedPreferences
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.assertActivityStarted
+import com.simprints.testtools.unit.robolectric.createActivity
+import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

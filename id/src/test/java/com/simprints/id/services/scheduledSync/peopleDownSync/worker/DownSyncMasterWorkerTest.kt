@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -12,7 +12,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMa
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule

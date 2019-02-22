@@ -8,9 +8,9 @@ import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testframework.common.syntax.verifyOnce
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

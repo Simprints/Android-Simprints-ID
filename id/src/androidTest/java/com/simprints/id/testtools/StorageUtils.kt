@@ -3,7 +3,7 @@ package com.simprints.id.testtools
 import android.content.Context
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.integration.testtools.exceptions.TestingSuiteError
-import com.simprints.testframework.android.log
+import com.simprints.testtools.android.log
 import io.realm.Realm
 import io.realm.RealmConfiguration
 

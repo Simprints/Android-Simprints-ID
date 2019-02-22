@@ -18,11 +18,11 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
-import com.simprints.testframework.common.syntax.anyNotNull
-import com.simprints.testframework.common.syntax.anyOrNull
-import com.simprints.testframework.common.syntax.whenever
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.testframework.unit.robolectric.createActivity
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.createActivity
 import io.reactivex.Completable
 import kotlinx.android.synthetic.main.activity_login.*
 import org.junit.Assert

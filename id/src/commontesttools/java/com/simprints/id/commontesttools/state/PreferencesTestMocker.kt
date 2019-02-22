@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools.state
 
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.testframework.common.syntax.whenever
+import com.simprints.testtools.common.syntax.whenever
 
 
 fun mockSettingsPreferencesManager(settingsPreferencesManager: SettingsPreferencesManager,

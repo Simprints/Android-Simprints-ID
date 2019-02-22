@@ -5,8 +5,8 @@ import android.preference.MultiSelectListPreference
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testframework.common.syntax.*
-import com.simprints.testframework.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
