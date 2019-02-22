@@ -1,9 +1,9 @@
 package com.simprints.id.testtools.di
 
-import com.simprints.id.activities.CheckLoginFromIntentActivityTest
-import com.simprints.id.activities.CheckLoginFromMainLauncherActivityTest
-import com.simprints.id.activities.LaunchActivityTest
-import com.simprints.id.activities.LoginActivityTest
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
+import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
+import com.simprints.id.activities.launch.LaunchActivityTest
+import com.simprints.id.activities.login.LoginActivityTest
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest

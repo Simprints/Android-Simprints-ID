@@ -1,4 +1,4 @@
-package com.simprints.id.activities
+package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.app.Activity
 import android.content.Intent
@@ -6,8 +6,8 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity

@@ -2,7 +2,7 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
-import com.simprints.id.activities.CheckLoginFromIntentActivityTest
+import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
