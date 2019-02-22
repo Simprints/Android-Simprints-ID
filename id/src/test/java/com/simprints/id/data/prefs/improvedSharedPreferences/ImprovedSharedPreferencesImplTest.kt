@@ -3,10 +3,10 @@ package com.simprints.id.data.prefs.improvedSharedPreferences
 import android.content.SharedPreferences
 import com.simprints.id.exceptions.unsafe.MismatchedTypeError
 import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.shared.assertThrows
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.verifyOnlyInteraction
-import com.simprints.id.shared.whenever
+import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnlyInteraction
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
@@ -43,11 +43,11 @@ class ImprovedSharedPreferencesImplTest {
     private fun mockBasePrefsWithValues(int: Int, long: Long, float: Float, string: String,
                                         boolean: Boolean): SharedPreferences {
         val prefs = mock<SharedPreferences>()
-        whenever(prefs.getInt(anyString(), anyInt())).thenReturn(int)
-        whenever(prefs.getLong(anyString(), anyLong())).thenReturn(long)
-        whenever(prefs.getFloat(anyString(), anyFloat())).thenReturn(float)
-        whenever(prefs.getString(anyString(), anyString())).thenReturn(string)
-        whenever(prefs.getBoolean(anyString(), anyBoolean())).thenReturn(boolean)
+        whenever(prefs) { getInt(anyString(), anyInt()) } thenReturn int
+        whenever(prefs) { getLong(anyString(), anyLong()) } thenReturn long
+        whenever(prefs) { getFloat(anyString(), anyFloat()) } thenReturn float
+        whenever(prefs) { getString(anyString(), anyString()) } thenReturn string
+        whenever(prefs) { getBoolean(anyString(), anyBoolean()) } thenReturn boolean
         return prefs
     }
 
@@ -141,7 +141,7 @@ class ImprovedSharedPreferencesImplTest {
 
     @Test
     fun testGetPrimitiveWrapsExceptionsAsMismatchedTypeExceptions() {
-        whenever(basePrefs.getInt(anyString(), anyInt())).then { throw ClassCastException() }
+        whenever { basePrefs.getInt(anyString(), anyInt()) } thenThrow ClassCastException()
         assertThrows<MismatchedTypeError> {
             improvedPrefs.getPrimitive(aKey, anInt)
         }
