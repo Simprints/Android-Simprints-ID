@@ -7,13 +7,13 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
-import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.exceptions.unsafe.UnexpectedScannerError
+import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning

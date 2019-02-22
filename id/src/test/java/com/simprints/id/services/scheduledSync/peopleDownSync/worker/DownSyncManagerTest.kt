@@ -1,18 +1,14 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.Configuration
 import androidx.work.NetworkType
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import com.google.firebase.FirebaseApp
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.di.DaggerForTests
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.TestApplication
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -21,12 +17,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
-import timber.log.Timber
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DownSyncManagerTest: DaggerForTests() {
+class DownSyncManagerTest {
 
     @Mock lateinit var syncScope: SyncScope
 
@@ -34,16 +29,8 @@ class DownSyncManagerTest: DaggerForTests() {
 
     @Before
     @Throws(Exception::class)
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        try {
-            WorkManager.initialize(app, Configuration.Builder().build())
-        } catch (e: IllegalStateException) {
-            Timber.d("WorkManager already initialized")
-        }
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this).fullSetup()
         MockitoAnnotations.initMocks(this)
     }
 

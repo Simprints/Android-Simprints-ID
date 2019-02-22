@@ -1,48 +1,44 @@
 package com.simprints.id.data.prefs
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
-import com.nhaarman.mockito_kotlin.times
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.Constants
-import com.simprints.id.shared.DependencyRule.SpyRule
-import com.simprints.id.shared.PreferencesModuleForAnyTests
-import com.simprints.id.shared.assertThrows
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.TestApplication
 import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.verifyExactly
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.verify
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SettingsPreferencesManagerTest : DaggerForTests() {
+class SettingsPreferencesManagerTest {
 
     @Inject lateinit var remoteConfigSpy: FirebaseRemoteConfig
     @Inject lateinit var settingsPreferencesManager: SettingsPreferencesManager
 
-    override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
-        PreferencesModuleForAnyTests(remoteConfigRule = SpyRule)
+    private val preferencesModule by lazy {
+        TestPreferencesModule(remoteConfigRule = SpyRule)
     }
 
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    @Before
+    fun setup() {
+        UnitTestConfig(this, null, preferencesModule).fullSetup()
 
-        whenever(remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY)).thenReturn(true)
+        whenever { remoteConfigSpy.getBoolean(RemoteConfigWrapper.PROJECT_SPECIFIC_MODE_KEY) } thenReturn true
     }
 
     @Test
@@ -56,7 +52,7 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
         Assert.assertEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(2)).getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY)
+        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY) }
     }
 
     @Test
@@ -70,7 +66,7 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
         Assert.assertNotEquals(originalValue, newValue)
 
-        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY)
+        verifyOnce(remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.LANGUAGE_KEY) }
     }
 
     @Test
@@ -84,12 +80,12 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
         Assert.assertEquals(oldMatchGroup, newMatchGroup)
 
-        verify(remoteConfigSpy, times(2)).getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)
+        verifyExactly(2, remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) }
     }
 
     @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToUnrecognizedValue() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)).thenReturn("PROJECT")
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } thenReturn "PROJECT"
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
@@ -98,7 +94,7 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Test
     fun fetchingRemoteConfigEnum_revertsToDefaultIfSetToWrongType() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY)).thenReturn("1")
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.MATCH_GROUP_KEY) } thenReturn "1"
 
         val matchGroup = settingsPreferencesManager.matchGroup
 
@@ -116,12 +112,12 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
         Assert.assertEquals(NON_DEFAULT_FINGER_STATUS_TARGET, newFingerStatus)
 
-        verify(remoteConfigSpy, times(1)).getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)
+        verifyOnce(remoteConfigSpy) { getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) }
     }
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_worksForNonDefaultValue() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)).thenReturn(NON_DEFAULT_FINGER_STATUS_SERIALIZED)
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } thenReturn NON_DEFAULT_FINGER_STATUS_SERIALIZED
 
         val fingerStatus = settingsPreferencesManager.fingerStatus
 
@@ -130,7 +126,7 @@ class SettingsPreferencesManagerTest : DaggerForTests() {
 
     @Test
     fun fetchingOverridableRemoteConfigFingerIdMap_throwsIfMalformed() {
-        whenever(remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY)).thenReturn(MALFORMED_FINGER_STATUS_SERIALIZED)
+        whenever { remoteConfigSpy.getString(SettingsPreferencesManagerImpl.FINGER_STATUS_KEY) } thenReturn MALFORMED_FINGER_STATUS_SERIALIZED
 
         assertThrows<JsonSyntaxException> {
             settingsPreferencesManager.fingerStatus
