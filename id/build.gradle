@@ -8,6 +8,7 @@ apply plugin: 'kotlin-android-extensions'
 
 //Required to import Realm manually (no plugin)
 import io.realm.transformer.RealmTransformer
+
 android.registerTransform(new RealmTransformer())
 
 android {
@@ -59,7 +60,7 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release" ||
-            variant.buildType.name == "releaseWithLogfile") {
+                variant.buildType.name == "releaseWithLogfile") {
 
             buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
@@ -93,6 +94,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    dynamicFeatures = [":fingerprints", ":faces"]
+
+
 }
 
 def getDevProjectId() {
