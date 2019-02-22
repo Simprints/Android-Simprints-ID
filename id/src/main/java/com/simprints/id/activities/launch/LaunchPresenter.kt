@@ -318,10 +318,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun initOrUpdateAnalyticsKeys() {
-        crashReportManager.setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
-        crashReportManager.setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
-        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-        crashReportManager.setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
-        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        crashReportManager.apply {
+            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+            setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        }
     }
 }
