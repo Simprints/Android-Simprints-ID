@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
+    <string name="configuration_error_message">د (%1$s) په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+</resources>

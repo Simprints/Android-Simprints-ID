@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // LibSimprints
+    implementation deps.simprints.libsimprints
+
+    // Support
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.support.material
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+    implementation deps.gson.core
+    testImplementation deps.testing.junit
+    testImplementation deps.testing.mockito.core
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
+}
+
+repositories {
+    mavenCentral()
+}
