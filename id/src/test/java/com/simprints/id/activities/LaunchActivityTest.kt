@@ -46,7 +46,7 @@ class LaunchActivityTest {
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             dbManagerRule = MockRule,
-            scheduledPeopleSyncManagerRule = MockRule,
+            syncSchedulerHelperRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule)
     }
 

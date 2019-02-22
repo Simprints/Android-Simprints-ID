@@ -66,7 +66,7 @@ class ProjectAuthenticatorTest {
             remoteDbManagerRule = MockRule,
             remoteProjectManagerRule = MockRule,
             loginInfoManagerRule = MockRule,
-            scheduledPeopleSyncManagerRule = MockRule,
+            syncSchedulerHelperRule = MockRule,
             longConsentManagerRule = MockRule,
             peopleUpSyncMasterRule = MockRule,
             keystoreManagerRule = ReplaceRule { setupFakeKeyStore() }
