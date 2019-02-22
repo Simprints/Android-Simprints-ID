@@ -2,6 +2,7 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
@@ -115,7 +116,7 @@ class SessionEventsUploaderTaskTest {
 
             doReturn(Single.just(createSuccessUploadResponse())).`when`(sessionsRemoteInterfaceSpy).uploadSessions(anyNotNull(), anyNotNull())
             val uploadTask = Single.just(sessions)
-                .uploadClosedSessionsOrThrowIfNoSessions("bWOFHInKA2YaQwrxZ7uJ")
+                .uploadClosedSessionsOrThrowIfNoSessions(DefaultTestConstants.DEFAULT_PROJECT_ID)
                 .test()
 
             uploadTask.awaitAndAssertSuccess()
@@ -223,7 +224,7 @@ class SessionEventsUploaderTaskTest {
             .build()))
 
     private fun executeUpload(sessions: List<SessionEvents>): TestObserver<Void> {
-        return createTask().execute("bWOFHInKA2YaQwrxZ7uJ", sessions).test()
+        return createTask().execute(DefaultTestConstants.DEFAULT_PROJECT_ID, sessions).test()
     }
 
     private fun createTask() =
