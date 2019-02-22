@@ -164,6 +164,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             else -> {
                 preferencesManager.selectedModules = moduleIdHash
                 logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
+                setCrashlyticsKeyForModules()
             }
         }
         return true
@@ -186,6 +187,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         if (selectionContainsDefaultFingers(fingersHash)) {
             preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
             logMessageForCrashReport("Default fingers set to ${preferencesManager.fingerStatus}")
+            setCrashlyticsKeyForFingers()
         } else {
             view.showToastForInvalidSelectionOfFingers()
             fingersHash.clear()
@@ -207,6 +209,14 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(CrashReportTags.SETTINGS, CrashTrigger.UI, message = message)
+    }
+
+    private fun setCrashlyticsKeyForModules() {
+        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+    }
+
+    private fun setCrashlyticsKeyForFingers() {
+        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
     }
 
     companion object {
