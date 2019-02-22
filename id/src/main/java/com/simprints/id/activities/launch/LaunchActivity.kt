@@ -130,8 +130,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         super.onDestroy()
     }
 
-    override fun getLocationProvider(): ReactiveLocationProvider = ReactiveLocationProvider(this)
-
     override fun continueToNextActivity() {
         startActivityForResult(
             Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java),
