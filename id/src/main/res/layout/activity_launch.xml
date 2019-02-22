@@ -13,11 +13,12 @@
     <ImageView
         android:id="@+id/simprintsLogoWithTagLine"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="20dp"
         android:layout_weight="3"
         android:contentDescription="@string/launch_background_description"
-        android:src="@drawable/launch_background"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_simprints_logo_white_vertical"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@+id/tabHost"
         app:layout_constraintEnd_toEndOf="parent"
@@ -87,12 +88,11 @@
 
     <TabHost
         android:id="@+id/tabHost"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="20dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
 
@@ -121,9 +121,8 @@
                     <TextView
                         android:id="@+id/generalConsentTextView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:maxLines="12"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
                         android:paddingLeft="20dp"
                         android:paddingRight="20dp"
                         android:paddingTop="10dp"
@@ -142,9 +141,8 @@
                     <TextView
                         android:id="@+id/parentalConsentTextView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:maxLines="12"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal"
                         android:paddingLeft="20dp"
                         android:paddingTop="10dp"
                         android:paddingRight="20dp"

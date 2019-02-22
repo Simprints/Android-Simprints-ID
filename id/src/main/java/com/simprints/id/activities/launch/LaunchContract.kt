@@ -18,6 +18,7 @@ interface LaunchContract {
         fun setLanguage(language: String)
         fun initTextsInButtons()
         fun initConsentTabs()
+        fun setLogoVisibility(visible: Boolean)
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
