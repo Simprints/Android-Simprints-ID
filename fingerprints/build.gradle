@@ -1,12 +1,27 @@
 apply plugin: 'com.android.dynamic-feature'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
 
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 28
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
+    }
+
+    buildTypes {
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -18,7 +33,44 @@ buildscript {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url "https://maven.google.com" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://maven.fabric.io/public" }
+    maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+    maven {
+        url "http://178.62.61.39:8081/artifactory/libs-release-local"
+        credentials {
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation deps.dagger.core
+    kapt deps.dagger.compiler
+
+    implementation deps.timber.core
+    implementation deps.androidx.core
+    implementation deps.androidx.multidex
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.legacy
+    implementation deps.androidx.room.core
+    implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.livedata
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.androidx.ui.cardview
+    implementation deps.androidx.ui.preference
+    implementation deps.androidx.ui.fragment
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
+
 }

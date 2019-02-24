@@ -1,12 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.fingerprints">
 
     <dist:module
         dist:instant="false"
-        dist:onDemand="true"
+        dist:onDemand="false"
         dist:title="@string/title_fingerprint">
         <dist:fusing dist:include="true" />
     </dist:module>
+
+    <application tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name="com.simprints.fingerprints.activities.matching.MatchingActivity"
+            android:label="Matching"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
+    </application>
 </manifest>
 

@@ -6,7 +6,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.tools.extensions.handleResponse
 import io.reactivex.Single
 import retrofit2.HttpException

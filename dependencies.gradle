@@ -8,7 +8,7 @@ def kotlin = [
 def dagger_version = "2.21"
 def dagger = [
     core    : "com.google.dagger:dagger:$dagger_version",
-    compiler: "com.google.dagger:dagger-compiler:$dagger_version"
+    compiler: "com.google.dagger:dagger-compiler:$dagger_version",
 ]
 
 def androidx_lifecycle_version = "2.1.0-alpha02"

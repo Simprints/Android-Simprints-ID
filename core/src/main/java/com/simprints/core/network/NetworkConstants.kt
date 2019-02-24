@@ -1,6 +1,6 @@
-package com.simprints.id.network
+package com.simprints.core.network
 
-import com.simprints.id.BuildConfig
+import com.test.core.BuildConfig
 
 class NetworkConstants {
     companion object {
