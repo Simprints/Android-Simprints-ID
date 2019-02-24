@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.models
 
 import com.simprints.id.domain.Fingerprint
-import com.simprints.id.tools.json.SkipSerialisationField
+import com.simprints.core.tools.json.SkipSerialisationField
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.libcommon.Fingerprint as LibFingerprint

@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.common.retrofit.givenNetworkFailurePercentIs
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.secure.models.PublicKeyString
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import com.simprints.id.testtools.UnitTestConfig

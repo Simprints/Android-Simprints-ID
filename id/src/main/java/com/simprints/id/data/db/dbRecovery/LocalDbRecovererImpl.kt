@@ -12,8 +12,8 @@ import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Fingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.LocalDbRecoveryFailedException
-import com.simprints.id.tools.json.JsonHelper
-import com.simprints.id.tools.json.SkipSerialisationField
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.core.tools.json.SkipSerialisationField
 import com.simprints.libcommon.Utils.byteArrayToBase64
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Completable

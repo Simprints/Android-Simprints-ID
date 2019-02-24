@@ -1,7 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.BuildConfig
-import com.simprints.id.network.NetworkConstants
+import com.simprints.core.network.NetworkConstants
 import com.simprints.id.secure.models.*
 import io.reactivex.Single
 import retrofit2.Response

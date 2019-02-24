@@ -1,4 +1,4 @@
-package com.simprints.id.tools.json
+package com.simprints.core.tools.json
 
 import com.google.gson.Gson
 import com.google.gson.TypeAdapter
