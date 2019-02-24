@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Fingerprint
 import com.simprints.id.domain.Person
-import com.simprints.id.tools.json.PostGsonProcessable
-import com.simprints.id.tools.json.SkipSerialisationProperty
+import com.simprints.core.tools.json.PostGsonProcessable
+import com.simprints.core.tools.json.SkipSerialisationProperty
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 import kotlin.collections.ArrayList

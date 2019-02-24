@@ -1,7 +1,7 @@
 package com.simprints.id.integration.testtools.remote
 
 import com.google.gson.Gson
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory

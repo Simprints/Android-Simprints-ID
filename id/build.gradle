@@ -132,12 +132,13 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':libcommon')
-    implementation project(':libsimprints')
-    implementation project(':clientapi')
+    api project(':libcommon')
+    api project(':libsimprints')
+    api project(':clientapi')
+    api project(':core')
+    api deps.simprints.libscanner
+    api deps.simprints.libmatcher
 
-    implementation deps.simprints.libscanner
-    implementation deps.simprints.libmatcher
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
@@ -159,12 +160,12 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-    implementation deps.firebase.database
-    implementation deps.firebase.core
-    implementation deps.firebase.auth
-    implementation deps.firebase.config
-    implementation deps.firebase.perf
-    implementation deps.firebase.storage
+    api deps.firebase.database
+    api deps.firebase.core
+    api deps.firebase.auth
+    api deps.firebase.config
+    api deps.firebase.perf
+    api deps.firebase.storage
     implementation(deps.crashlytics.core) {
         transitive = true
     }
@@ -176,14 +177,13 @@ dependencies {
     implementation deps.retrofit.convertergson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
-    implementation deps.gson.core
+    api deps.gson.core
     implementation deps.timber.core
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
-    annotationProcessor deps.dagger.compiler
     kapt deps.dagger.compiler
 
     implementation deps.realm.annotations

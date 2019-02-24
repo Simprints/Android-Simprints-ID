@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
