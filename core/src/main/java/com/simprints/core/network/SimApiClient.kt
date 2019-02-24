@@ -1,7 +1,7 @@
-package com.simprints.id.network
+package com.simprints.core.network
 
 import com.google.gson.Gson
-import com.simprints.id.tools.json.JsonHelper
+import com.simprints.core.tools.json.JsonHelper
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

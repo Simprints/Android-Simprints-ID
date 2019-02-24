@@ -1,4 +1,4 @@
-package com.simprints.id.activities.matching;
+package com.simprints.fingerprints.activities.matching;
 
 import android.animation.ObjectAnimator;
 import android.content.Intent;
@@ -10,17 +10,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.simprints.fingerprints.di.FingerprintsComponent;
+import com.simprints.fingerprints.di.FingerprintsComponentBuilder;
 import com.simprints.id.Application;
 import com.simprints.id.R;
-import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.activities.IntentKeys;
+import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.prefs.PreferencesManager;
-import com.simprints.id.di.AppComponent;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
-import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 
 import javax.inject.Inject;
@@ -44,12 +44,11 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
 
     @Inject PreferencesManager preferencesManager;
     @Inject AnalyticsManager analyticsManager;
-    @Inject TimeHelper timeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppComponent component = ((Application) getApplication()).getComponent();
+        FingerprintsComponent component = FingerprintsComponentBuilder.getComponent((Application) getApplication());
         component.inject(this);
 
         LanguageHelper.setLanguage(this, preferencesManager.getLanguage());

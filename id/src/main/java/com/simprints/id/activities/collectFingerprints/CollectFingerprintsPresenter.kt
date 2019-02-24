@@ -12,7 +12,6 @@ import com.simprints.id.activities.collectFingerprints.confirmFingerprints.Confi
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
-import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
@@ -280,10 +279,15 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        val intent = Intent(context, MatchingActivity::class.java)
+        val fingerprintsModule = "com.simprints.id"
+        val matchingActivityClassName = "$fingerprintsModule.MatchingActivity"
+
+        val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
         view.finishSuccessAndStartMatching(intent)
     }
+
+
 
     override fun handleUnexpectedError(error: SimprintsError) {
         analyticsManager.logError(error)

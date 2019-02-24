@@ -29,7 +29,7 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.json.JsonHelper
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libcommon.Person

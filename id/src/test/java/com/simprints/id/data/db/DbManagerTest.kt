@@ -17,7 +17,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.PeopleApiServiceMock
 import com.simprints.id.testtools.UnitTestConfig
@@ -26,7 +26,7 @@ import com.simprints.testtools.unit.mockserver.mockSuccessfulResponse
 import com.simprints.testtools.unit.mockserver.mockServerProblemResponse
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.tools.json.JsonHelper
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.libcommon.Person
 import com.simprints.testtools.common.syntax.spy
 import com.simprints.testtools.common.syntax.whenever

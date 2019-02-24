@@ -60,7 +60,7 @@
 -keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
 
 -keep class com.simprints.id.session.callout.** { *; }
--keep class com.simprints.id.tools.json.** { *; }
+-keep class com.simprints.core.tools.json.** { *; }
 -keepclassmembers enum * { *; }
 
 # For Realm

@@ -1,4 +1,4 @@
-package com.simprints.id.activities.matching;
+package com.simprints.fingerprints.activities.matching;
 
 
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package com.simprints.id.activities.matching;
+package com.simprints.fingerprints.activities.matching;
 
 
 import android.annotation.SuppressLint;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
+
+import com.simprints.fingerprints.di.FingerprintsComponent;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
@@ -15,7 +17,6 @@ import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
-import com.simprints.id.di.AppComponent;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
@@ -69,7 +70,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     @SuppressLint("CheckResult")
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
-                      @NonNull AppComponent component,
+                      @NonNull FingerprintsComponent component,
                       Person probe) {
         component.inject(this);
         this.matchingView = matchingView;
