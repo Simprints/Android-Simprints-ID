@@ -2,9 +2,9 @@ package com.simprints.id.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException

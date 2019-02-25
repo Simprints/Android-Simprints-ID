@@ -5,9 +5,9 @@ import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager

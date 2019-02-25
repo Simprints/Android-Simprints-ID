@@ -13,11 +13,11 @@ import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprin
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE

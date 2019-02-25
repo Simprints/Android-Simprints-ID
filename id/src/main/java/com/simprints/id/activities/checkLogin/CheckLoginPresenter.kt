@@ -1,7 +1,7 @@
 package com.simprints.id.activities.checkLogin
 
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager

@@ -5,8 +5,8 @@ import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionRealmConfig
+import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
