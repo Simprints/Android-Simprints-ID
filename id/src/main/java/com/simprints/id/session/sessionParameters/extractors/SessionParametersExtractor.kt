@@ -1,6 +1,6 @@
 package com.simprints.id.session.sessionParameters.extractors
 
-import com.simprints.id.domain.request.IdRequest
+import com.simprints.id.domain.requests.IdRequest
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.sessionParameters.SessionParameters
 import com.simprints.libsimprints.Constants

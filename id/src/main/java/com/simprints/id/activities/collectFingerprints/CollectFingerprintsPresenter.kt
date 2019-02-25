@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
@@ -30,14 +31,11 @@ import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.tools.FormatResult
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
-import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Registration
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -279,9 +277,8 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun handleSavePersonSuccess() {
         preferencesManager.lastEnrolDate = Date()
-        val registrationResult = Registration(preferencesManager.patientId)
-        val result = Intent(Constants.SIMPRINTS_REGISTER_INTENT)
-        FormatResult.put(result, registrationResult, preferencesManager.resultFormat)
+        val result = Intent()
+        result.putExtra(EnrollResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
         view.finishSuccessEnrol(result)
     }
 

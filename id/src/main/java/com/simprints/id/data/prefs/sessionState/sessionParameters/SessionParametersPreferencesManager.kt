@@ -9,6 +9,7 @@ interface SessionParametersPreferencesManager {
     var projectId: String
     var moduleId: String
     var userId: String
+    @Deprecated("we are dropping UPDATE, so it should be set only during enrol")
     var patientId: String
     var callingPackage: String
     var metadata: String
