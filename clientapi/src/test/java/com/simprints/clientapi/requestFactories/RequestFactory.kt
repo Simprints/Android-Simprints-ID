@@ -3,7 +3,7 @@ package com.simprints.clientapi.requestFactories
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
 import org.mockito.Mockito
 
 abstract class RequestFactory {
@@ -27,7 +27,7 @@ abstract class RequestFactory {
 
     abstract fun getMockExtractor(withLegacyApiKey: Boolean = false): ClientRequestExtractor
 
-    abstract fun getValidSimprintsRequest(): SimprintsIdRequest
+    abstract fun getValidSimprintsRequest(): ClientApiBaseRequest
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor,
                                      withLegacyApiKey: Boolean) {
