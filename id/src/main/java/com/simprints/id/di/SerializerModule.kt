@@ -9,10 +9,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownS
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameter
 import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.id.session.sessionParameters.extractors.ActionDependentExtractor
-import com.simprints.id.session.sessionParameters.extractors.Extractor
-import com.simprints.id.session.sessionParameters.extractors.ParameterExtractor
-import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
+import com.simprints.id.session.sessionParameters.extractors.*
 import com.simprints.id.session.sessionParameters.readers.*
 import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersLister
 import com.simprints.id.session.sessionParameters.readers.unexpectedParameters.ExpectedParametersListerImpl
@@ -140,17 +137,5 @@ class SerializerModule {
     @Provides @Singleton @Named("MissingApiKeyOrProjectIdError") fun provideMissingApiKeyOrProjectIdError(): Error = InvalidCalloutError(ALERT_TYPE.MISSING_PROJECT_ID_OR_API_KEY)
     @Provides @Singleton @Named("SessionParametersValidator") fun provideSessionParametersValidator(@Named("MissingApiKeyOrProjectIdError") missingApiKeyOrProjectIdError: Error): Set<Validator<SessionParameters>> = setOf(ProjectIdOrApiKeyValidator(missingApiKeyOrProjectIdError))
 
-    @Provides @Singleton fun provideSessionParametersExtractor(@Named("ActionExtractor") actionExtractor: Extractor<CalloutAction>,
-                                                               @Named("ApiKeyExtractor") apiKeyExtractor: Extractor<String>,
-                                                               @Named("ProjectIdExtractor") projectIdExtractor: Extractor<String>,
-                                                               @Named("ModuleIdExtractor") moduleIdExtractor: Extractor<String>,
-                                                               @Named("UserIdExtractor") userIdExtractor: Extractor<String>,
-                                                               @Named("PatientIdExtractor") patientIdExtractor: Extractor<String>,
-                                                               @Named("CallingPackageExtractor") callingPackageExtractor: Extractor<String>,
-                                                               @Named("MetadataExtractor") metadataExtractor: Extractor<String>,
-                                                               @Named("ResultFormatExtractor") resultFormatExtractor: Extractor<String>,
-                                                               @Named("SessionParametersValidator") sessionParametersValidator: Set<Validator<SessionParameters>>): SessionParametersExtractor =
-    SessionParametersExtractor(actionExtractor, apiKeyExtractor, projectIdExtractor, moduleIdExtractor,
-        userIdExtractor, patientIdExtractor, callingPackageExtractor, metadataExtractor,
-        resultFormatExtractor, sessionParametersValidator)
+    @Provides @Singleton fun provideSessionParametersExtractor(): SessionParametersExtractor = SessionParametersExtractorImpl()
 }
