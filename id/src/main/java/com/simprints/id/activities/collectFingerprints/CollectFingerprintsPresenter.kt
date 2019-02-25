@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
@@ -278,7 +278,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun handleSavePersonSuccess() {
         preferencesManager.lastEnrolDate = Date()
         val result = Intent()
-        result.putExtra(EnrollResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
+        result.putExtra(ClientApiEnrollResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
         view.finishSuccessEnrol(result)
     }
 
