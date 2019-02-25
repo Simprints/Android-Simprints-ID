@@ -14,7 +14,7 @@ import com.simprints.libsimprints.FingerIdentifier
 
 class CrashReportManagerImpl: CrashReportManager {
 
-    override fun logMessageForCrashReport(crashReportTag: CrashReportTags, crashReportTrigger: CrashReportTrigger,
+    override fun logMessageForCrashReport(crashReportTag: CrashReportTag, crashReportTrigger: CrashReportTrigger,
                                           crashPriority: Int, message: String) {
         Crashlytics.log(crashPriority, crashReportTag.name, getLogMessage(crashReportTrigger, message))
     }
@@ -30,7 +30,7 @@ class CrashReportManagerImpl: CrashReportManager {
     }
 
     private fun logSafeException(throwable: Throwable) {
-        Crashlytics.log(Log.ERROR, CrashReportTags.SAFE_EXCEPTION.name, "$throwable")
+        Crashlytics.log(Log.ERROR, CrashReportTag.SAFE_EXCEPTION.name, "$throwable")
     }
 
     override fun setProjectIdCrashlyticsKey(projectId: String) {

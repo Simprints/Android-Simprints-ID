@@ -3,7 +3,7 @@ package com.simprints.id.scanner
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
@@ -178,6 +178,6 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SCANNER_SETUP, CrashReportTrigger.SCANNER, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SCANNER_SETUP, CrashReportTrigger.SCANNER, message = message)
     }
 }
