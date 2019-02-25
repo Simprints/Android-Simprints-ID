@@ -62,10 +62,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeResponse(response: SimprintsIdResponse) = when (response) {
-        is EnrollResponse -> presenter.handleEnrollResponse(response)
-        is IdentificationResponse -> presenter.handleIdentifyResponse(response)
-        is VerifyResponse -> presenter.handleVerifyResponse(response)
-        is RefusalFormResponse -> presenter.handleRefusalResponse(response)
+        is ClientApiEnrollResponse -> presenter.handleEnrollResponse(response)
+        is ClientApiIdentifyResponse -> presenter.handleIdentifyResponse(response)
+        is ClientApiVerifyResponse -> presenter.handleVerifyResponse(response)
+        is ClientApiRefusalFormResponse -> presenter.handleRefusalResponse(response)
         else -> presenter.handleResponseError()
     }
 
