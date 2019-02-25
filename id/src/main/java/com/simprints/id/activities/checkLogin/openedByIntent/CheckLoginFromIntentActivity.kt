@@ -12,13 +12,14 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.request.IdRequest
 import com.simprints.id.exceptions.safe.CallingAppFromUnknownSourceException
-import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.tools.extensions.parseClientApiRequest
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -55,8 +56,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter.start()
     }
 
-    override fun parseCallout(): Callout =
-        intent.toCallout()
+    override fun parseIdRequest(): IdRequest =
+        intent.parseClientApiRequest()
+
+    override fun getCheckCallingApp() = getCallingPackageName()
 
     override fun checkCallingAppIsFromKnownSource() {
         preferencesManager.callingPackage = getCallingPackageName()

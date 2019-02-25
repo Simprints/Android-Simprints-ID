@@ -3,6 +3,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.checkLogin.CheckLoginContract
+import com.simprints.id.domain.request.IdRequest
 import com.simprints.id.session.callout.Callout
 
 interface CheckLoginFromIntentContract {
@@ -11,8 +12,9 @@ interface CheckLoginFromIntentContract {
         fun openLoginActivity(legacyApiKey: String)
         fun openLaunchActivity()
 
+        fun getCheckCallingApp(): String
         fun checkCallingAppIsFromKnownSource()
-        fun parseCallout(): Callout
+        fun parseIdRequest(): IdRequest
         fun finishCheckLoginFromIntentActivity()
     }
 

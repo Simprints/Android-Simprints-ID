@@ -2,11 +2,10 @@ package com.simprints.id.domain.request
 
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
 
-class IdEnrolRequest(projectId: String,
-                     userId: String,
-                     moduleId: String,
-                     metadata: String) :
-    IdBaseRequest(projectId, userId, moduleId, metadata) {
+class IdEnrolRequest(override val projectId: String,
+                     override val userId: String,
+                     override val moduleId: String,
+                     override val metadata: String) : IdRequest {
 
     constructor(clientApiEnrolRequest: ClientApiEnrollRequest) : this(
         projectId = clientApiEnrolRequest.projectId,
@@ -17,4 +16,4 @@ class IdEnrolRequest(projectId: String,
 }
 
 fun ClientApiEnrollRequest.toIdDomainEnrolRequest() = IdEnrolRequest(this)
-fun IdBaseRequest.isEnrolRequest() = this is IdEnrolRequest
+fun IdRequest.isEnrolRequest() = this is IdEnrolRequest
