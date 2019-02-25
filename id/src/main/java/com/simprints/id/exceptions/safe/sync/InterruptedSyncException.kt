@@ -1,7 +1,7 @@
 package com.simprints.id.exceptions.safe.sync
 
-import com.simprints.id.exceptions.safe.SimprintsException
+import com.simprints.id.exceptions.safe.SafeException
 
 
 class InterruptedSyncException(message: String = "InterruptedSyncException")
-    : SimprintsException(message)
+    : SafeException(message)

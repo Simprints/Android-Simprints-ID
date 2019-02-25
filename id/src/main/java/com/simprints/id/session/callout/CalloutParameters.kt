@@ -1,7 +1,7 @@
 package com.simprints.id.session.callout
 
 import android.content.Intent
-import com.simprints.id.exceptions.unsafe.MissingCalloutParameterError
+import com.simprints.id.exceptions.safe.callout.MissingCalloutParameterError
 
 
 class CalloutParameters(parameters: Set<CalloutParameter>): Iterable<CalloutParameter> {

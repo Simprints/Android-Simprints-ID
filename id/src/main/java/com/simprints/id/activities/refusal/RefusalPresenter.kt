@@ -2,14 +2,14 @@ package com.simprints.id.activities.refusal
 
 import android.app.Activity
 import com.simprints.id.R
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.RefusalForm
@@ -20,7 +20,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                        component: AppComponent) : RefusalContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var timeHelper: TimeHelper
 
@@ -39,16 +39,23 @@ class RefusalPresenter(private val view: RefusalContract.View,
         view.enableSubmitButton()
         view.enableRefusalText()
         when (optionIdentifier) {
-            R.id.rbScannerNotWorking ->
+            R.id.rbScannerNotWorking -> {
                 reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING
-            R.id.rbRefused ->
+                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.SCANNER_NOT_WORKING} Clicked")
+            }
+            R.id.rbRefused -> {
                 reason = REFUSAL_FORM_REASON.REFUSED
-            R.id.rb_other ->
+                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.REFUSED} Clicked")
+            }
+            R.id.rb_other -> {
                 reason = REFUSAL_FORM_REASON.OTHER
+                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.OTHER} Clicked")
+            }
         }
     }
 
     override fun handleSubmitButtonClick(refusalText: String) {
+        logMessageForCrashReport("Submit button clicked")
         saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
@@ -58,7 +65,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                         RefusalEvent.Answer.fromRefusalReason(refusalReason),
                         refusalText))
             }.subscribeBy(onError = {
-                analyticsManager.logThrowable(it)
+                crashReportManager.logExceptionOrThrowable(it)
                 view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
             }, onComplete = {
                 view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
@@ -67,6 +74,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleScanFingerprintsClick() {
+        logMessageForCrashReport("Scan fingerprints button clicked")
         view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
     }
 
@@ -81,11 +89,10 @@ class RefusalPresenter(private val view: RefusalContract.View,
     private fun getRefusalForm(refusalText: String) = RefusalForm(reason.toString(), refusalText)
 
     private fun saveRefusalFormInDb(refusalForm: RefusalForm) {
-        try {
-            dbManager.saveRefusalForm(refusalForm)
-        } catch (error: UninitializedDataManagerError) {
-            analyticsManager.logError(error)
-            view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
-        }
+        dbManager.saveRefusalForm(refusalForm)
+    }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
     }
 }

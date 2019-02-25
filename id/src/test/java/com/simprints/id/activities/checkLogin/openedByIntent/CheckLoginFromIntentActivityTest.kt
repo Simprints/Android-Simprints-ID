@@ -11,10 +11,11 @@ import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
-import com.simprints.id.commontesttools.di.DependencyRule.*
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -66,13 +67,13 @@ class CheckLoginFromIntentActivityTest {
     @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
-    @Inject lateinit var analyticsManagerSpy: AnalyticsManager
+    @Inject lateinit var crashReportManagerMock: CrashReportManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
         TestAppModule(app,
-            analyticsManagerRule = SpyRule,
+            crashReportManagerRule = MockRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule,
@@ -96,7 +97,7 @@ class CheckLoginFromIntentActivityTest {
     @Test
     fun unknownCallingAppSource_shouldLogEvent() {
         buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
-        verifyALogSafeExceptionWasThrown(1)
+        verifyExceptionWasThrownAlongWithNoSessionException(2)
     }
 
     @Test
@@ -105,11 +106,11 @@ class CheckLoginFromIntentActivityTest {
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
         buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
-        verifyALogSafeExceptionWasThrown(0)
+        verifyExceptionWasThrownAlongWithNoSessionException(1)
     }
 
-    private fun verifyALogSafeExceptionWasThrown(times: Int) {
-        Mockito.verify(analyticsManagerSpy, Mockito.times(times)).logSafeException(anyNotNull())
+    private fun verifyExceptionWasThrownAlongWithNoSessionException(times: Int) {
+        Mockito.verify(crashReportManagerMock, Mockito.times(times)).logExceptionOrThrowable(anyNotNull())
     }
 
     @Test
