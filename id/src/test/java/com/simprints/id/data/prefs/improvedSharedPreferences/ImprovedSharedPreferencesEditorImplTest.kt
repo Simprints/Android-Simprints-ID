@@ -1,11 +1,11 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
 import android.content.SharedPreferences
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnlyInteraction
 import com.simprints.testtools.common.syntax.whenever
-import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
 import org.junit.Test
 import org.mockito.ArgumentMatchers.*
 
@@ -96,7 +96,7 @@ class ImprovedSharedPreferencesEditorImplTest {
 
     @Test
     fun testPutPrimitiveThrowsExceptionWhenValueIsUnsupportedType() {
-        assertThrows<NonPrimitiveTypeError> {
+        assertThrows<NonPrimitiveTypeException> {
             improvedEditor.putPrimitive(aKey, aClass)
         }
     }

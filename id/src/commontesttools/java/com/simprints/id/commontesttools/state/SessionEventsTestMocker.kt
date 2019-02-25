@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.state
 
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.whenever

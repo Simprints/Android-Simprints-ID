@@ -4,7 +4,7 @@ import com.simprints.id.integration.sync.DashboardActivityAndroidTest
 import com.simprints.id.activities.launch.LaunchActivityAndroidTest
 import com.simprints.id.integration.ui.CollectFingerprintsActivityTest
 import com.simprints.id.integration.core.HappyWorkflowAllMainFeatures
-import com.simprints.id.data.analytics.eventData.RealmSessionEventsDbManagerImplTest
+import com.simprints.id.data.analytics.eventdata.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.integration.sessions.SessionEventsManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
 import com.simprints.id.di.AppComponent

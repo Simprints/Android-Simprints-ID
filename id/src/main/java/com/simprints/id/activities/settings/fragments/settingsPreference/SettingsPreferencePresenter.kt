@@ -3,6 +3,9 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -19,6 +22,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     init {
         component.inject(this)
@@ -143,6 +147,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     private fun handleLanguagePreferenceChanged(listPreference: ListPreference, stringValue: String): Boolean {
         val index = listPreference.findIndexOfValue(stringValue)
         preferencesManager.language = stringValue
+        logMessageForCrashReport("Language set to ${preferencesManager.language}")
 
         listPreference.summary = if (index >= 0) {
             listPreference.entries[index]
@@ -154,9 +159,13 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
         when {
-            moduleIdHash.size == 0 -> handleNoModulesSelected(moduleIdHash)
-            moduleIdHash.size > MAX_SELECTED_MODULES -> handleTooManyModulesSelected(moduleIdHash)
-            else -> preferencesManager.selectedModules = moduleIdHash
+            moduleIdHash.size == 0 -> { handleNoModulesSelected(moduleIdHash) }
+            moduleIdHash.size > MAX_SELECTED_MODULES -> { handleTooManyModulesSelected(moduleIdHash) }
+            else -> {
+                preferencesManager.selectedModules = moduleIdHash
+                logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
+                setCrashlyticsKeyForModules()
+            }
         }
         return true
     }
@@ -177,6 +186,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                                             fingersHash: HashSet<String>): Boolean {
         if (selectionContainsDefaultFingers(fingersHash)) {
             preferencesManager.fingerStatus = getMapFromFingersHash(fingersHash)
+            logMessageForCrashReport("Default fingers set to ${preferencesManager.fingerStatus}")
+            setCrashlyticsKeyForFingers()
         } else {
             view.showToastForInvalidSelectionOfFingers()
             fingersHash.clear()
@@ -195,6 +206,18 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         mutableMapOf<FingerIdentifier, Boolean>().apply {
             fingersHash.map { FingerIdentifier.valueOf(it) }.forEach { this[it] = true }
         }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
+    }
+
+    private fun setCrashlyticsKeyForModules() {
+        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+    }
+
+    private fun setCrashlyticsKeyForFingers() {
+        crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+    }
 
     companion object {
         const val MAX_SELECTED_MODULES = 6

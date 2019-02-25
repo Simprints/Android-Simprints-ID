@@ -1,9 +1,11 @@
 package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.AlertScreenEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
@@ -14,7 +16,7 @@ class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
                      val alertType: ALERT_TYPE) : AlertContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -24,7 +26,7 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun start() {
-        analyticsManager.logAlert(alertType)
+        logToCrashReport()
         checkAlertTypeAndHandleButtons()
         val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
@@ -77,5 +79,9 @@ class AlertPresenter(val view: AlertContract.View,
             view.hideLeftButton()
         }
         view.initRightButton(alertType)
+    }
+
+    private fun logToCrashReport() {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
     }
 }

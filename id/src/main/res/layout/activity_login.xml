@@ -79,7 +79,6 @@
             android:layout_height="55dp"
             android:layout_marginTop="10dp"
             android:drawableEnd="@drawable/ic_barcode"
-            android:drawableRight="@drawable/ic_barcode"
             android:text="@string/scan_qr" />
 
         <Button

@@ -4,10 +4,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.TestApplication
@@ -36,7 +36,7 @@ class SessionEventsMasterTaskTest {
 
     private val sessionsRemoteInterfaceMock: SessionsRemoteInterface = mock()
     private val sessionsEventsManagerMock: SessionEventsManager = mock()
-    private val analyticsManagerMock: AnalyticsManager = mock()
+    private val crashReportManagerMock: CrashReportManager = mock()
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
@@ -75,7 +75,7 @@ class SessionEventsMasterTaskTest {
             val testObserver = this.execute().test()
         testObserver.awaitAndAssertSuccess()
 
-            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 
@@ -109,7 +109,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 
@@ -124,7 +124,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 
@@ -141,7 +141,7 @@ class SessionEventsMasterTaskTest {
             sessionsEventsManagerMock,
             timeHelper,
             sessionsRemoteInterfaceMock,
-            analyticsManagerMock
+            crashReportManagerMock
         )
 
     private fun createClosedSessions(nSessions: Int) =

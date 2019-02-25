@@ -8,12 +8,12 @@ import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.GuidSelectionEvent
-import com.simprints.id.data.analytics.eventData.models.local.RlSession
-import com.simprints.id.data.analytics.eventData.models.local.toDomainSession
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
+import com.simprints.id.data.analytics.eventdata.models.local.RlSession
+import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.integration.testsnippets.launchActivityEnrol
 import com.simprints.id.testtools.AndroidTestConfig
@@ -40,7 +40,7 @@ class GuidSelectionServiceTest {
         TestAppModule(app,
             randomGeneratorRule = DependencyRule.MockRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
-            analyticsManagerRule = DependencyRule.MockRule,
+            crashReportManagerRule = DependencyRule.MockRule,
             loginInfoManagerRule = DependencyRule.SpyRule)
     }
 

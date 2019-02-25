@@ -13,16 +13,19 @@ import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprin
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.activities.matching.MatchingActivity
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.SimprintsException
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.FormatResult
 import com.simprints.id.tools.LanguageHelper
@@ -42,7 +45,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -90,9 +93,13 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun initScanButtonListeners() {
         view.scanButton.setOnClickListener {
+            logMessageForCrashReport("Scan button clicked")
             startCapturing()
         }
-        view.scanButton.setOnLongClickListener { resetFingerState() }
+        view.scanButton.setOnLongClickListener {
+            logMessageForCrashReport("Scan button long clicked")
+            resetFingerState()
+        }
     }
 
     private fun resetFingerState(): Boolean {
@@ -193,7 +200,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             CalloutAction.UPDATE -> context.getString(R.string.update_title)
             CalloutAction.VERIFY -> context.getString(R.string.verify_title)
             else -> {
-                handleUnexpectedError(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
                 ""
             }
         }
@@ -221,6 +228,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
+        logMessageForCrashReport("Confirm fingerprints clicked")
         dismissConfirmDialogIfStillShowing()
 
         val fingerprints = activeFingers
@@ -275,7 +283,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
-        handleUnexpectedError(SimprintsError(throwable))
+        handleException(UnexpectedException(throwable))
         view.cancelAndFinish()
     }
 
@@ -285,9 +293,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.finishSuccessAndStartMatching(intent)
     }
 
-    override fun handleUnexpectedError(error: SimprintsError) {
-        analyticsManager.logError(error)
-        Timber.e(error)
+    override fun handleException(simprintsException: SimprintsException) {
+        crashReportManager.logExceptionOrThrowable(simprintsException)
+        Timber.e(simprintsException)
         view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
     }
 
@@ -311,7 +319,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         confirmDialog = ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
             callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
-            .create().also { it.show() }
+            .create().also {
+                it.show()
+                logMessageForCrashReport("Confirm fingerprints dialog shown")
+            }
     }
 
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
@@ -322,6 +333,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
     private fun handleRestart() {
+        logMessageForCrashReport("Restart clicked")
         fingerDisplayHelper.clearAndPopulateFingerArrays()
         fingerDisplayHelper.handleFingersChanged()
         fingerDisplayHelper.resetFingerIndexToBeginning()
@@ -330,12 +342,17 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleMissingFingerClick() {
+        logMessageForCrashReport("Missing finger text clicked")
         if (!currentFinger().isCollecting) {
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             lastCaptureStartedAt = timeHelper.now()
             addCaptureEventInSession(currentFinger())
             resolveFingerTerminalConditionTriggered()
         }
+    }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
     }
 
     companion object {
