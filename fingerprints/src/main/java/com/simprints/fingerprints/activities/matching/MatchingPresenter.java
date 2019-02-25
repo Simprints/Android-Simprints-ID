@@ -5,8 +5,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
 
+import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
 import com.simprints.fingerprints.di.FingerprintsComponent;
 import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
@@ -17,12 +17,14 @@ import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.domain.responses.IdIdentificationResponse;
+import com.simprints.id.domain.responses.IdVerifyResponse;
+import com.simprints.id.domain.responses.TierResponse;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.session.callout.CalloutAction;
-import com.simprints.id.tools.FormatResult;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libcommon.Person;
 import com.simprints.libmatcher.EVENT;
@@ -40,6 +42,7 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import io.reactivex.functions.BiConsumer;
 import timber.log.Timber;
 
@@ -310,9 +313,10 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             }
                         }
 
-                        Intent resultData;
-                        resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFY_INTENT);
-                        FormatResult.put(resultData, topCandidates, preferencesManager, sessionId);
+                        Intent resultData = new Intent();
+                        resultData.putExtra(
+                            SimprintsIdResponse.BUNDLE_KEY,
+                            new IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -345,9 +349,14 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         }
 
                         // signOut
-                        Intent resultData;
-                        resultData = new Intent(com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_INTENT);
-                        FormatResult.put(resultData, verification, preferencesManager.getResultFormat());
+                        Intent resultData = new Intent();
+                        resultData.putExtra(
+                            SimprintsIdResponse.BUNDLE_KEY,
+                            new IdVerifyResponse(
+                                verification.getGuid(),
+                                (int) verification.getConfidence(),
+                                TierResponse.valueOf(verification.getTier().name())).toDomainClientApiVerify());
+
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;

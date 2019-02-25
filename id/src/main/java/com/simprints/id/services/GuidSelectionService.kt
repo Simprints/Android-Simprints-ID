@@ -9,10 +9,13 @@ import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.requests.IdConfirmIdentifyRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.libsimprints.Constants.*
+import com.simprints.id.tools.extensions.parseClientApiRequest
+import com.simprints.libsimprints.Constants.SIMPRINTS_PROJECT_ID
+import com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -34,19 +37,18 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent)
+            onHandleNonNullIntent(intent.parseClientApiRequest() as IdConfirmIdentifyRequest)
         } else {
             analyticsManager.logGuidSelectionService("", "", "", false)
         }
     }
 
-    private fun onHandleNonNullIntent(intent: Intent) {
-        val apiKey = intent.parseApiKey()
-        val projectId = intent.parseProjectId()
-        val sessionId = intent.parseSessionId()
-        val selectedGuid = intent.parseSelectedGuid()
+    private fun onHandleNonNullIntent(intent: IdConfirmIdentifyRequest) {
+        val projectId = intent.projectId
+        val sessionId = intent.sessionId
+        val selectedGuid = intent.selectedGuid
         val callbackSent = try {
-            checkCalloutParameters(projectId, apiKey, sessionId, selectedGuid)
+            checkCalloutParameters(projectId, sessionId, selectedGuid)
             dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
             sessionId?.let {
                 sessionEventsManager
@@ -69,20 +71,8 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
             sessionId ?: "", selectedGuid, callbackSent)
     }
 
-    private fun Intent.parseApiKey(): String? =
-        this.getStringExtra(SIMPRINTS_API_KEY)
-
-    private fun Intent.parseProjectId(): String? =
-        this.getStringExtra(SIMPRINTS_PROJECT_ID)
-
-    private fun Intent.parseSessionId(): String? =
-        this.getStringExtra(SIMPRINTS_SESSION_ID)
-
-    private fun Intent.parseSelectedGuid(): String =
-        this.getStringExtra(SIMPRINTS_SELECTED_GUID) ?: "null"
-
-    private fun checkCalloutParameters(projectId: String?, apiKey: String?, sessionId: String?, selectedGuid: String) {
-        checkProjectIdOrApiKey(projectId, apiKey)
+    private fun checkCalloutParameters(projectId: String?, sessionId: String?, selectedGuid: String) {
+        checkProjectIdOrApiKey(projectId)
         checkSessionId(sessionId)
         checkSelectedGuid(selectedGuid)
     }
@@ -93,10 +83,9 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         }
     }
 
-    private fun checkProjectIdOrApiKey(projectId: String?, apiKey: String?) =
+    private fun checkProjectIdOrApiKey(projectId: String?) =
         when {
             projectId != null -> checkProjectId(projectId)
-            apiKey != null -> checkApiKey(apiKey)
             else -> throw InvalidCalloutParameterError.forParameter(SIMPRINTS_PROJECT_ID)
         }
 

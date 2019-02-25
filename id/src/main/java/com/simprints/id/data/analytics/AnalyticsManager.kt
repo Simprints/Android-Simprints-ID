@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics
 
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.request.IdRequest
+import com.simprints.id.domain.requests.IdRequest
 import com.simprints.id.exceptions.safe.SimprintsException
 import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
