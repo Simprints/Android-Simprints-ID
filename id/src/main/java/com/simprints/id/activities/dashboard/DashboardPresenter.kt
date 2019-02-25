@@ -4,7 +4,7 @@ import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
@@ -80,7 +80,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
         viewModel.viewModelState.onSyncActionClicked = {
-            crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
+            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()

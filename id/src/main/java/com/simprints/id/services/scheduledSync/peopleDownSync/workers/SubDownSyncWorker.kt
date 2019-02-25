@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -68,5 +68,5 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
     }
 
     private fun logMessageForCrashReport(message: String) =
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashReportTrigger.NETWORK, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
 }

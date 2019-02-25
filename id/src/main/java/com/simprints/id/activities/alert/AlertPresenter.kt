@@ -2,7 +2,7 @@ package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
@@ -82,6 +82,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.ALERT, CrashReportTrigger.UI, message = alertType.name)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
     }
 }

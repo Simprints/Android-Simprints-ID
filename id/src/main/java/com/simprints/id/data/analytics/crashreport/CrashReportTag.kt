@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.crashreport
 
-enum class CrashReportTags {
+enum class CrashReportTag {
     LOGIN,
     SCANNER_SETUP,
     SYNC,

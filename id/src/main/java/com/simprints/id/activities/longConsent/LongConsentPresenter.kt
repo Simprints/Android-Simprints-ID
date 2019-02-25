@@ -1,7 +1,7 @@
 package com.simprints.id.activities.longConsent
 
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -52,10 +52,10 @@ class LongConsentPresenter(val view: LongConsentContract.View,
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.LONG_CONSENT, CrashReportTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.LONG_CONSENT, CrashReportTrigger.UI, message = message)
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.LONG_CONSENT, CrashReportTrigger.NETWORK, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.LONG_CONSENT, CrashReportTrigger.NETWORK, message = message)
     }
 }
