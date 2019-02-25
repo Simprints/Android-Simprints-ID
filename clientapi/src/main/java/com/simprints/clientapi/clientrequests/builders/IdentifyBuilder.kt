@@ -2,8 +2,8 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.simprintsrequests.requests.IdentifyRequest
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiIdentifyRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
 import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprintsIdRequest
 
@@ -11,7 +11,7 @@ import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacySimprints
 class IdentifyBuilder(val extractor: IdentifyExtractor, validator: IdentifyValidator) :
     ClientRequestBuilder(extractor, validator) {
 
-    override fun buildSimprintsRequest(): SimprintsIdRequest = IdentifyRequest(
+    override fun buildSimprintsRequest(): ClientApiBaseRequest = ClientApiIdentifyRequest(
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),
