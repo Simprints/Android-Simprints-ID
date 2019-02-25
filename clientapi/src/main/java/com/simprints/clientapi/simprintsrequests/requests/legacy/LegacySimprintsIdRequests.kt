@@ -1,10 +1,10 @@
 package com.simprints.clientapi.simprintsrequests.requests.legacy
 
 import com.simprints.clientapi.simprintsrequests.ApiVersion
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
 
 
-interface LegacySimprintsIdRequest : SimprintsIdRequest {
+interface LegacySimprintsIdRequest : ClientApiBaseRequest {
 
     val legacyApiKey: String
 

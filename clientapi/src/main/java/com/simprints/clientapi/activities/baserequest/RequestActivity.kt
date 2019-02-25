@@ -9,8 +9,8 @@ import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
 import com.simprints.clientapi.routers.SimprintsRequestRouter.routeSimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsConfirmationRequest
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsIdRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmationRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
 import com.simprints.clientapi.simprintsrequests.responses.*
 import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse.Companion.BUNDLE_NAME
 import com.simprints.libsimprints.Constants
@@ -30,10 +30,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentifyExtractor: ConfirmIdentifyExtractor
         get() = ConfirmIdentifyExtractor(intent)
 
-    override fun sendSimprintsRequest(request: SimprintsIdRequest) {
+    override fun sendSimprintsRequest(request: ClientApiBaseRequest) {
         routeSimprintsIdRequest(this, request)
 
-        if (request is SimprintsConfirmationRequest)
+        if (request is ClientApiConfirmationRequest)
             finishAffinity()
     }
 

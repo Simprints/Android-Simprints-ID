@@ -1,6 +1,6 @@
 package com.simprints.clientapi.simprintsrequests.requests.legacy
 
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsActionRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiActionRequest
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -12,7 +12,7 @@ data class LegacyVerifyRequest(
     override val userId: String,
     override val metadata: String,
     val verifyGuid: String
-) : LegacySimprintsIdRequest, SimprintsActionRequest {
+) : LegacySimprintsIdRequest, ClientApiActionRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME

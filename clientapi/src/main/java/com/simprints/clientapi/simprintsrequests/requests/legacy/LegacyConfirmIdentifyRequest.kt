@@ -1,6 +1,6 @@
 package com.simprints.clientapi.simprintsrequests.requests.legacy
 
-import com.simprints.clientapi.simprintsrequests.requests.SimprintsConfirmationRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmationRequest
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -10,7 +10,7 @@ data class LegacyConfirmIdentifyRequest(
     override val legacyApiKey: String,
     val sessionId: String,
     val selectedGuid: String
-) : LegacySimprintsIdRequest, SimprintsConfirmationRequest {
+) : LegacySimprintsIdRequest, ClientApiConfirmationRequest {
 
     @IgnoredOnParcel
     override val requestName: String = REQUEST_NAME
