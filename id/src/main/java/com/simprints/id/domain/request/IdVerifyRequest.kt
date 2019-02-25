@@ -17,3 +17,6 @@ class IdVerifyRequest(projectId: String,
         verifyGuid = clientApiVerifyRequest.verifyGuid
     )
 }
+
+fun ClientApiVerifyRequest.toIdDomainIdVerifyRequest() = IdVerifyRequest(this)
+fun IdBaseRequest.isVerifyRequest() = this is IdVerifyRequest
