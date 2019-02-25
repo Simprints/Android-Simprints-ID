@@ -32,7 +32,8 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         }
     }
 
-    override fun logCallout(callout: Callout) {
+    override fun logCallout(idRequest: IdRequest) {
+        val callout = Callout(idRequest)
         Timber.d("AnalyticsManagerImpl.logCallout(callout=$callout)")
         with(callout) {
             val bundle = Bundle()

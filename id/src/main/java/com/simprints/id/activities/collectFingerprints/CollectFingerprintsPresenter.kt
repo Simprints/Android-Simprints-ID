@@ -292,7 +292,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun goToMatching(person: Person) {
         val fingerprintsModule = "com.simprints.id"
-        val matchingActivityClassName = "$fingerprintsModule.MatchingActivity"
+        val matchingActivityClassName = "com.simprints.fingerprints.activities.matching.MatchingActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)

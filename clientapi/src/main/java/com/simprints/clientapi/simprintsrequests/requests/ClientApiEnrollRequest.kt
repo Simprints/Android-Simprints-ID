@@ -15,7 +15,7 @@ data class ClientApiEnrollRequest(
     override val requestName: String = REQUEST_NAME
 
     companion object {
-        private const val REQUEST_NAME = "enrollmentRequest"
+        const val REQUEST_NAME = "enrollmentRequest"
     }
 
 }

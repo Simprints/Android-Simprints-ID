@@ -2,12 +2,11 @@ package com.simprints.id.domain.request
 
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
 
-class IdVerifyRequest(projectId: String,
-                     userId: String,
-                     moduleId: String,
-                     metadata: String,
-                     val verifyGuid: String):
-    IdBaseRequest(projectId, userId, moduleId, metadata) {
+class IdVerifyRequest(override val projectId: String,
+                      override val userId: String,
+                      override val moduleId: String,
+                      override val metadata: String,
+                      val verifyGuid: String) : IdRequest {
 
     constructor(clientApiVerifyRequest: ClientApiVerifyRequest) : this(
         projectId = clientApiVerifyRequest.projectId,
@@ -19,4 +18,4 @@ class IdVerifyRequest(projectId: String,
 }
 
 fun ClientApiVerifyRequest.toIdDomainIdVerifyRequest() = IdVerifyRequest(this)
-fun IdBaseRequest.isVerifyRequest() = this is IdVerifyRequest
+fun IdRequest.isVerifyRequest() = this is IdVerifyRequest

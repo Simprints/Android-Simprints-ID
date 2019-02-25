@@ -15,7 +15,7 @@ data class ClientApiIdentifyRequest(
     override val requestName: String = REQUEST_NAME
 
     companion object {
-        private const val REQUEST_NAME = "identifyRequest"
+        const val REQUEST_NAME = "identifyRequest"
     }
 
 }
