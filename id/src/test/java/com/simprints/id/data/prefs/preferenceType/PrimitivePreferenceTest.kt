@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 import com.simprints.testtools.common.syntax.*
 import org.junit.Assert
 import org.junit.Test

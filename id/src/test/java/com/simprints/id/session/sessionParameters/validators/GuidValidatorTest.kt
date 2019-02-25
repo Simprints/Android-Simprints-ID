@@ -1,5 +1,6 @@
 package com.simprints.id.session.sessionParameters.validators
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
