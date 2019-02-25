@@ -1,11 +1,11 @@
 package com.simprints.id.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.AlertScreenEvent
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE

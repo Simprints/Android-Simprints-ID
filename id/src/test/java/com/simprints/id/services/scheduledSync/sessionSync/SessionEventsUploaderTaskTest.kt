@@ -6,10 +6,10 @@ import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
+import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.network.SimApiClient

@@ -2,15 +2,15 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventData.models.domain.events.CallbackEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.CalloutEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent

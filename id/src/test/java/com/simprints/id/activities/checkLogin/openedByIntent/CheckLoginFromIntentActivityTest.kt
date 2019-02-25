@@ -14,8 +14,8 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager

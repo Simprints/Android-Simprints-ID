@@ -7,9 +7,9 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTags
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*

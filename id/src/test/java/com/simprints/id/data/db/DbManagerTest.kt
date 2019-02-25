@@ -8,7 +8,7 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.*
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
