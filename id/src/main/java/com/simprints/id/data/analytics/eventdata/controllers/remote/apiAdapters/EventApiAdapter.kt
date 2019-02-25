@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
+package com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters
 
 import com.google.gson.*
 import com.simprints.id.tools.extensions.removeIfExists
