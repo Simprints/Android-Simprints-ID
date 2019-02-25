@@ -3,10 +3,7 @@ package com.simprints.clientapi.activities.libsimprints
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Verification
+import com.simprints.libsimprints.*
 
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
@@ -32,6 +29,11 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun returnVerification(verification: Verification) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_VERIFICATION, verification)
+        sendOkResult(it)
+    }
+
+    override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
+        it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
         sendOkResult(it)
     }
 
