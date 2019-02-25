@@ -7,8 +7,9 @@ import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
 import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
-import com.simprints.libsimprints.Constants.*
-import com.simprints.libsimprints.Identification
+import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.IdentificationResponse
+import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
@@ -35,17 +36,16 @@ class OdkActivity : RequestActivity(), OdkContract.View {
             setResult(resultCode, data).also { finish() }
         else
             when (requestCode) {
-                REGISTER_REQUEST_CODE -> presenter.processRegistration(
-                    data.getParcelableExtra(SIMPRINTS_REGISTRATION)
+                REGISTER_REQUEST_CODE -> presenter.handleEnrollResponse(
+                    data.getParcelableExtra(EnrollResponse.BUNDLE_KEY)
                 )
-                IDENTIFY_REQUEST_CODE -> presenter.processIdentification(
-                    data.getParcelableArrayListExtra<Identification>(SIMPRINTS_IDENTIFICATIONS),
-                    data.getStringExtra(SIMPRINTS_SESSION_ID)
+                IDENTIFY_REQUEST_CODE -> presenter.handleIdentifyResponse(
+                    data.getParcelableExtra(IdentificationResponse.BUNDLE_KEY)
                 )
-                VERIFY_REQUEST_CODE -> presenter.processVerification(
-                    data.getParcelableExtra(SIMPRINTS_VERIFICATION)
+                VERIFY_REQUEST_CODE -> presenter.handleVerifyResponse(
+                    data.getParcelableExtra(VerifyResponse.BUNDLE_KEY)
                 )
-                else -> presenter.processReturnError()
+                else -> presenter.handleResponseError()
             }
     }
 
@@ -54,7 +54,10 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String) =
+    override fun returnIdentification(idList: String,
+                                      confidenceList: String,
+                                      tierList: String,
+                                      sessionId: String) =
         Intent().let {
             it.putExtra(ODK_GUIDS_KEY, idList)
             it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
@@ -63,17 +66,11 @@ class OdkActivity : RequestActivity(), OdkContract.View {
             sendOkResult(it)
         }
 
-    override fun returnVerification(id: String, confidence: String, tier: String) =
-        Intent().let {
-            it.putExtra(ODK_GUIDS_KEY, id)
-            it.putExtra(ODK_CONFIDENCES_KEY, confidence)
-            it.putExtra(ODK_TIERS_KEY, tier)
-            sendOkResult(it)
-        }
-
-    private fun sendOkResult(intent: Intent) {
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+    override fun returnVerification(id: String, confidence: String, tier: String) = Intent().let {
+        it.putExtra(ODK_GUIDS_KEY, id)
+        it.putExtra(ODK_CONFIDENCES_KEY, confidence)
+        it.putExtra(ODK_TIERS_KEY, tier)
+        sendOkResult(it)
     }
 
 }
