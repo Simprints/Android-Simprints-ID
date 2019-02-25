@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
 
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventData.models.domain.events.OneToManyMatchEvent.MatchPoolType
@@ -14,8 +14,8 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.id.shared.sessionEvents.*
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.commontesttools.sessionEvents.*
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Test

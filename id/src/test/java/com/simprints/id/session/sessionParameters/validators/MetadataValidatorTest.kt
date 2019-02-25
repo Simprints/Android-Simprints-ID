@@ -1,8 +1,7 @@
 package com.simprints.id.session.sessionParameters.validators
 
 import com.google.gson.Gson
-import com.simprints.id.exceptions.safe.SafeException
-import com.simprints.id.shared.assertThrows
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class MetadataValidatorTest {

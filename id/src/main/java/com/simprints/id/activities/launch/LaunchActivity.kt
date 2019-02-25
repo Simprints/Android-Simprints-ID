@@ -62,6 +62,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
     }
 
+    override fun setLogoVisibility(visible: Boolean) {
+        simprintsLogoWithTagLine.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
         loadingInfoTextView.visibility = View.VISIBLE
         launchProgressBar.progress = progress
