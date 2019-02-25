@@ -15,6 +15,8 @@ interface OdkContract {
 
         fun returnVerification(id: String, confidence: String, tier: String)
 
+        fun returnRefusalForm(reason: String, extra: String)
+
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter

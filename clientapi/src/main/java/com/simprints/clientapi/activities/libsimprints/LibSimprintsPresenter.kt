@@ -1,38 +1,16 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
-import com.simprints.clientapi.simprintsrequests.responses.IdentificationResponse
-import com.simprints.clientapi.simprintsrequests.responses.RefusalFormResponse
-import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiRefusalFormResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
+import com.simprints.libsimprints.*
 import com.simprints.libsimprints.Constants.*
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
 
 
 class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: String?)
     : RequestPresenter(view), LibSimprintsContract.Presenter {
-
-    override fun handleEnrollResponse(enroll: EnrollResponse) =
-        view.returnRegistration(Registration(enroll.guid))
-
-    override fun handleIdentifyResponse(identify: IdentificationResponse) =
-        view.returnIdentification(ArrayList(identify.identifications.map {
-            Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
-        }), identify.sessionId)
-
-    override fun handleVerifyResponse(verify: VerifyResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun handleResponseError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun start() = when (action) {
         SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
@@ -42,6 +20,22 @@ class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: Str
         else -> view.returnIntentActionErrorToClient()
     }
 
+    override fun handleEnrollResponse(enroll: ClientApiEnrollResponse) =
+        view.returnRegistration(Registration(enroll.guid))
+
+    override fun handleIdentifyResponse(identify: ClientApiIdentifyResponse) =
+        view.returnIdentification(ArrayList(identify.identifications.map {
+            Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
+        }), identify.sessionId)
+
+    override fun handleVerifyResponse(verify: ClientApiVerifyResponse) = view.returnVerification(
+        Verification(verify.confidence, Tier.valueOf(verify.tier.name), verify.guid)
+    )
+
+    override fun handleRefusalResponse(refusalForm: ClientApiRefusalFormResponse) =
+        view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
+
+    override fun handleResponseError() = view.returnIntentActionErrorToClient()
 
 }
 
