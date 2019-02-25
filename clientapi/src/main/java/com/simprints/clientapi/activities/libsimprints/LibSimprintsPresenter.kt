@@ -6,18 +6,21 @@ import com.simprints.clientapi.simprintsrequests.responses.IdentificationRespons
 import com.simprints.clientapi.simprintsrequests.responses.RefusalFormResponse
 import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
 import com.simprints.libsimprints.Constants.*
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Tier
 
 
 class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: String?)
     : RequestPresenter(view), LibSimprintsContract.Presenter {
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun handleEnrollResponse(enroll: EnrollResponse) =
+        view.returnRegistration(Registration(enroll.guid))
 
-    override fun handleIdentifyResponse(identify: IdentificationResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun handleIdentifyResponse(identify: IdentificationResponse) =
+        view.returnIdentification(ArrayList(identify.identifications.map {
+            Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
+        }), identify.sessionId)
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

@@ -13,10 +13,10 @@ data class ClientApiVerifyRequest(
 ) : ClientApiBaseRequest, ClientApiActionRequest {
 
     @IgnoredOnParcel
-    override val requestName: String = REQUEST_NAME
+    override val bundleKey: String = BUNDLE_KEY
 
     companion object {
-        const val REQUEST_NAME = "ClientApiVerifyRequest"
+        const val BUNDLE_KEY = "ClientApiVerifyRequest"
     }
 
 }

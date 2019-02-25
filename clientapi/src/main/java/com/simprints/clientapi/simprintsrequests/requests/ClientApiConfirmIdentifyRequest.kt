@@ -12,10 +12,10 @@ data class ClientApiConfirmIdentifyRequest(
 ) : ClientApiBaseRequest, ClientApiConfirmationRequest {
 
     @IgnoredOnParcel
-    override val requestName: String = REQUEST_NAME
+    override val bundleKey: String = BUNDLE_KEY
 
     companion object {
-        private const val REQUEST_NAME = "confirmIdentifyRequest"
+        private const val BUNDLE_KEY = "confirmIdentifyRequest"
     }
 
 }

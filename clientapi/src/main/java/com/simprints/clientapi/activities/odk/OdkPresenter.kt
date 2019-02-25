@@ -8,9 +8,6 @@ import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
 import com.simprints.clientapi.simprintsrequests.responses.IdentificationResponse
 import com.simprints.clientapi.simprintsrequests.responses.RefusalFormResponse
 import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Verification
 
 
 class OdkPresenter(val view: OdkContract.View,
@@ -32,43 +29,26 @@ class OdkPresenter(val view: OdkContract.View,
         else -> view.returnIntentActionErrorToClient()
     }
 
-    override fun processRegistration(registration: Registration) =
-        view.returnRegistration(registration.guid)
+    override fun handleEnrollResponse(enroll: EnrollResponse) = view.returnRegistration(enroll.guid)
 
-    override fun processIdentification(identifications: ArrayList<Identification>,
-                                       sessionId: String) = view.returnIdentification(
-        identifications.getIdsString(),
-        identifications.getConfidencesString(),
-        identifications.getTiersString(),
-        sessionId
+    override fun handleIdentifyResponse(identify: IdentificationResponse) = view.returnIdentification(
+        identify.identifications.getIdsString(),
+        identify.identifications.getConfidencesString(),
+        identify.identifications.getTiersString(),
+        identify.sessionId
     )
 
-    override fun processVerification(verification: Verification) = view.returnVerification(
-        verification.guid,
-        verification.confidence.toString(),
-        verification.tier.toString()
+    override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
+        verify.guid,
+        verify.confidence.toString(),
+        verify.tier.toString()
     )
 
-    override fun processReturnError() = view.returnIntentActionErrorToClient()
-
-    override fun handleEnrollResponse(enroll: EnrollResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun handleIdentifyResponse(identify: IdentificationResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun handleVerifyResponse(verify: VerifyResponse) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun handleResponseError() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun handleResponseError() = view.returnIntentActionErrorToClient()
 
 }
