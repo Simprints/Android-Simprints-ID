@@ -3,7 +3,6 @@ package com.simprints.clientapi.clientrequests.builders
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_VERIFY_GUID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
-import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 import org.junit.Assert
 
 
@@ -13,14 +12,6 @@ class VerifyBuilderTest : ActionRequestBuilderTest(VerifyRequestFactory) {
         super.buildSimprintsRequest_shouldSucceed()
         mockFactory.getBuilder(mockFactory.getMockExtractor()).build().let {
             it as ClientApiVerifyRequest
-            Assert.assertEquals(it.verifyGuid, MOCK_VERIFY_GUID)
-        }
-    }
-
-    override fun buildLegacySimprintsRequest_shouldSucceed() {
-        super.buildLegacySimprintsRequest_shouldSucceed()
-        mockFactory.getBuilder(mockFactory.getMockExtractor(true)).build().let {
-            it as LegacyVerifyRequest
             Assert.assertEquals(it.verifyGuid, MOCK_VERIFY_GUID)
         }
     }

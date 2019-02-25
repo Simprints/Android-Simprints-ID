@@ -28,4 +28,5 @@ class ErrorPresenterTest {
         ErrorPresenter(view, TEST_ERROR_MESSAGE).apply { start(); handleCloseClick() }
         Mockito.verify(view, Mockito.times(1)).closeActivity()
     }
+
 }

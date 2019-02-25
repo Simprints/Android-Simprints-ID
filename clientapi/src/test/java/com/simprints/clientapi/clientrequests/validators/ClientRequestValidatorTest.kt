@@ -19,7 +19,6 @@ abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactor
     open fun validateClientRequest_shouldFailOnProjectId() {
         val extractor = mockFactory.getMockExtractor()
         Mockito.`when`(extractor.getProjectId()).thenReturn("")
-        Mockito.`when`(extractor.getLegacyApiKey()).thenReturn("")
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
