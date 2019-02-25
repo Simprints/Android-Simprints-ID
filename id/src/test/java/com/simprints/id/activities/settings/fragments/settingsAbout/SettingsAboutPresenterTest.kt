@@ -2,8 +2,7 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.testUtils.roboletric.TestApplication
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce

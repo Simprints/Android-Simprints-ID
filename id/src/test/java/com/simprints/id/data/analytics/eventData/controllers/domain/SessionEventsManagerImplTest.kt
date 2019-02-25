@@ -4,11 +4,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.spy
-import com.nhaarman.mockito_kotlin.verify
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
@@ -104,7 +102,7 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.createSession().blockingGet()
 
-        verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
@@ -123,7 +121,7 @@ class SessionEventsManagerImplTest {
     fun updateSession_shouldSwallowException() {
         val tester = sessionsEventsManagerSpy.updateSession { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
-        verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
     @Test

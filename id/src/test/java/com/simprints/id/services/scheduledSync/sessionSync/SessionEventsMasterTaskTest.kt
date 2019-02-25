@@ -75,7 +75,7 @@ class SessionEventsMasterTaskTest {
             val testObserver = this.execute().test()
         testObserver.awaitAndAssertSuccess()
 
-            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 
@@ -109,7 +109,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 
@@ -124,7 +124,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyNever(analyticsManagerMock) { logThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         }
     }
 

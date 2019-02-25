@@ -13,7 +13,7 @@ import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -66,13 +66,13 @@ class CheckLoginFromIntentActivityTest {
     @Inject lateinit var sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
-    @Inject lateinit var analyticsManagerSpy: AnalyticsManager
+    @Inject lateinit var crashReportManagerSpy: CrashReportManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
         TestAppModule(app,
-            analyticsManagerRule = SpyRule,
+            crashReportManagerRule = SpyRule,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule,
@@ -109,7 +109,7 @@ class CheckLoginFromIntentActivityTest {
     }
 
     private fun verifyALogSafeExceptionWasThrown(times: Int) {
-        Mockito.verify(analyticsManagerSpy, Mockito.times(times)).logSafeException(anyNotNull())
+        Mockito.verify(crashReportManagerSpy, Mockito.times(times)).logExceptionOrThrowable(anyNotNull())
     }
 
     @Test
