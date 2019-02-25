@@ -73,7 +73,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), view.parseCallout()))
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), Callout(view.parseIdRequest())))
             }
         }
     }
@@ -89,9 +89,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     fun extractSessionParametersOrThrow() {
-        val callout = view.parseCallout()
-        analyticsManager.logCallout(callout)
-        val sessionParameters = sessionParametersExtractor.extractFrom(callout)
+        val idRequest = view.parseIdRequest()
+        analyticsManager.logCallout(idRequest)
+        val sessionParameters = sessionParametersExtractor.extractFrom(idRequest, view.getCheckCallingApp(), "")
         possibleLegacyApiKey = sessionParameters.apiKey
         preferencesManager.sessionParameters = sessionParameters
         analyticsManager.logUserProperties()
