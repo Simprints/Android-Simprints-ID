@@ -15,3 +15,6 @@ class IdIdentifyRequest(projectId: String,
         metadata = clientApiVerifyRequest.metadata
     )
 }
+
+fun ClientApiIdentifyRequest.toIdDomainIdIdentifyRequest() = IdIdentifyRequest(this)
+fun IdBaseRequest.isIdentifyRequest() = this is IdIdentifyRequest
