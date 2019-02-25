@@ -11,16 +11,10 @@ import com.simprints.clientapi.exceptions.InvalidUserIdException
 abstract class ClientRequestValidator(private val extractor: ClientRequestExtractor) {
 
     open fun validateClientRequest() {
-        validateProjectIdOrLegacyApiKey()
+        validateProjectId()
         validateUserId()
         validateModuleId()
         validateMetadata()
-    }
-
-    protected open fun validateProjectIdOrLegacyApiKey() = try {
-        validateProjectId()
-    } catch (ex: InvalidProjectIdException) {
-        validateLegacyApiKey()
     }
 
     protected open fun validateProjectId() {
@@ -38,12 +32,6 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
             throw InvalidModuleIdException("Missing Module ID")
         else if (extractor.getModuleId().contains("|"))
             throw InvalidModuleIdException("Illegal Module ID")
-    }
-
-    // TODO: remove legacy
-    protected open fun validateLegacyApiKey() {
-        if (extractor.getLegacyApiKey().isBlank())
-            throw InvalidProjectIdException("Missing Project ID or Legacy API Key")
     }
 
     protected open fun validateMetadata() {
