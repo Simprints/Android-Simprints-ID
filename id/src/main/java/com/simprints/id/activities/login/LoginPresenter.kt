@@ -2,7 +2,7 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
@@ -161,11 +161,11 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashReportTrigger.UI, message = message)
     }
 
     private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashTrigger.NETWORK, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.LOGIN, CrashReportTrigger.NETWORK, message = message)
     }
 
     companion object {

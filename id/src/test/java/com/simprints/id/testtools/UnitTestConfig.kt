@@ -10,6 +10,7 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.dagger.injectClassFromComponent
+import io.fabric.sdk.android.Fabric
 
 class UnitTestConfig<T : Any>(
     private val test: T,
@@ -24,6 +25,7 @@ class UnitTestConfig<T : Any>(
         rescheduleRxMainThread()
             .setupFirebase()
             .setupWorkManager()
+            .setupCrashlytics()
             .initAndInjectComponent()
 
     fun rescheduleRxMainThread() = also {
@@ -40,6 +42,10 @@ class UnitTestConfig<T : Any>(
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
+    }
+
+    fun setupCrashlytics() = also {
+        Fabric.with(app)
     }
 
     fun initAndInjectComponent() =

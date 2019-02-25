@@ -8,7 +8,7 @@ import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -68,5 +68,5 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
     }
 
     private fun logMessageForCrashReport(message: String) =
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.NETWORK, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashReportTrigger.NETWORK, message = message)
 }

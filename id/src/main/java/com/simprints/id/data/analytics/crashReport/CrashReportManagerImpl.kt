@@ -14,12 +14,12 @@ import com.simprints.libsimprints.FingerIdentifier
 
 class CrashReportManagerImpl: CrashReportManager {
 
-    override fun logMessageForCrashReport(crashReportTag: CrashReportTags, crashTrigger: CrashTrigger,
+    override fun logMessageForCrashReport(crashReportTag: CrashReportTags, crashReportTrigger: CrashReportTrigger,
                                           crashPriority: Int, message: String) {
-        Crashlytics.log(crashPriority, crashReportTag.name, getLogMessage(crashTrigger, message))
+        Crashlytics.log(crashPriority, crashReportTag.name, getLogMessage(crashReportTrigger, message))
     }
 
-    private fun getLogMessage(crashTrigger: CrashTrigger, message: String) = "[${crashTrigger.name}] $message"
+    private fun getLogMessage(crashReportTrigger: CrashReportTrigger, message: String) = "[${crashReportTrigger.name}] $message"
 
     override fun logExceptionOrThrowable(throwable: Throwable) {
         if(throwable is SafeException) {
