@@ -1,15 +1,8 @@
 package com.simprints.clientapi.activities.odk
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.routers.SimprintsRequestRouter.IDENTIFY_REQUEST_CODE
-import com.simprints.clientapi.routers.SimprintsRequestRouter.REGISTER_REQUEST_CODE
-import com.simprints.clientapi.routers.SimprintsRequestRouter.VERIFY_REQUEST_CODE
-import com.simprints.clientapi.simprintsrequests.responses.EnrollResponse
-import com.simprints.clientapi.simprintsrequests.responses.IdentificationResponse
-import com.simprints.clientapi.simprintsrequests.responses.VerifyResponse
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
@@ -20,6 +13,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
         private const val ODK_TIERS_KEY = "odk-tiers"
         private const val ODK_SESSION_ID = "odk-session-id"
+        private const val ODK_REFUSAL_REASON = "odk-refusal-reason"
+        private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
     }
 
     override lateinit var presenter: OdkContract.Presenter
@@ -27,26 +22,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenter = OdkPresenter(this, intent.action).apply { start() }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode != Activity.RESULT_OK || data == null)
-            setResult(resultCode, data).also { finish() }
-        else
-            when (requestCode) {
-                REGISTER_REQUEST_CODE -> presenter.handleEnrollResponse(
-                    data.getParcelableExtra(EnrollResponse.BUNDLE_KEY)
-                )
-                IDENTIFY_REQUEST_CODE -> presenter.handleIdentifyResponse(
-                    data.getParcelableExtra(IdentificationResponse.BUNDLE_KEY)
-                )
-                VERIFY_REQUEST_CODE -> presenter.handleVerifyResponse(
-                    data.getParcelableExtra(VerifyResponse.BUNDLE_KEY)
-                )
-                else -> presenter.handleResponseError()
-            }
     }
 
     override fun returnRegistration(registrationId: String) = Intent().let {
@@ -57,19 +32,24 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnIdentification(idList: String,
                                       confidenceList: String,
                                       tierList: String,
-                                      sessionId: String) =
-        Intent().let {
-            it.putExtra(ODK_GUIDS_KEY, idList)
-            it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
-            it.putExtra(ODK_TIERS_KEY, tierList)
-            it.putExtra(ODK_SESSION_ID, sessionId)
-            sendOkResult(it)
-        }
+                                      sessionId: String) = Intent().let {
+        it.putExtra(ODK_GUIDS_KEY, idList)
+        it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
+        it.putExtra(ODK_TIERS_KEY, tierList)
+        it.putExtra(ODK_SESSION_ID, sessionId)
+        sendOkResult(it)
+    }
 
     override fun returnVerification(id: String, confidence: String, tier: String) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
+        sendOkResult(it)
+    }
+
+    override fun returnRefusalForm(reason: String, extra: String) = Intent().let {
+        it.putExtra(ODK_REFUSAL_REASON, reason)
+        it.putExtra(ODK_REFUSAL_EXTRA, extra)
         sendOkResult(it)
     }
 
