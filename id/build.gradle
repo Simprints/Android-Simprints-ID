@@ -1,8 +1,8 @@
 apply plugin: "com.android.application"
-apply plugin: "kotlin-kapt"
 apply plugin: "io.fabric"
 apply plugin: 'com.google.firebase.firebase-perf'
 apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 
 //Required to import Realm manually (no plugin)
@@ -16,9 +16,11 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         multiDexEnabled true
-        versionCode 144
-        versionName "2019.1.0-dev0"
+        vectorDrawables.useSupportLibrary = true
+        versionCode 145
+        versionName "2019.1.0-dev1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     bundle {
@@ -71,7 +73,7 @@ android {
     testBuildType "debug"
 
     sourceSets {
-        String sharedTestDir = 'src/sharedTest/java'
+        String sharedTestDir = 'src/commontesttools/java'
         test {
             java.srcDir sharedTestDir
         }
@@ -128,6 +130,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':libcommon')
     implementation project(':libsimprints')
+
     implementation deps.simprints.libscanner
     implementation deps.simprints.libmatcher
     implementation deps.dagger.core
@@ -200,12 +203,12 @@ dependencies {
     testImplementation deps.testing.androidx.runner
     testImplementation deps.testing.androidx.room
     testImplementation deps.testing.truth
-    testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
+    testImplementation project(':testtools')
 
     // Android test
     androidTestImplementation deps.simprints.mockscanner
@@ -230,6 +233,11 @@ dependencies {
         exclude group: "com.google.guava"
     }
     kaptAndroidTest deps.dagger.compiler
+    androidTestImplementation(project(':testtools')) {
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+    }
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

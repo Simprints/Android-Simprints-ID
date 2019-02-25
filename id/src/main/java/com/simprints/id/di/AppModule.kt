@@ -238,7 +238,7 @@ open class AppModule(val app: Application) {
                               syncStatusDatabase: SyncStatusDatabase): CountTask = CountTaskImpl(dbManager)
 
     @Provides
-    open fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
+    fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
