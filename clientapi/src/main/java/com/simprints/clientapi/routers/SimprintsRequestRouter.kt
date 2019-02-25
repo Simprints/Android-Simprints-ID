@@ -27,20 +27,20 @@ object SimprintsRequestRouter {
     private const val LEGACY_VERIFY = "com.simprints.legacy.VERIFY"
     private const val LEGACY_SELECT_GUID_INTENT = "com.simprints.legacy.CONFIRM_IDENTITY"
 
-    fun routeSimprintsIdRequest(act: Activity, request: SimprintsIdRequest) {
+    fun routeSimprintsIdRequest(act: Activity, request: ClientApiBaseRequest) {
         when (request) {
-            is SimprintsActionRequest -> routeSimprintsActionRequest(act, request)
-            is SimprintsConfirmationRequest -> routeSimprintsConfirmationRequest(act, request)
+            is ClientApiActionRequest -> routeSimprintsActionRequest(act, request)
+            is ClientApiConfirmationRequest -> routeSimprintsConfirmationRequest(act, request)
             else -> throw InvalidClientRequestException("Invalid Request")
         }
     }
 
     private fun routeSimprintsActionRequest(act: Activity,
-                                            request: SimprintsActionRequest) = when (request) {
+                                            request: ClientApiActionRequest) = when (request) {
         // Regular Requests
-        is EnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
-        is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
-        is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
+        is ClientApiEnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
+        is ClientApiVerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
+        is ClientApiIdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
 
         // Legacy Requests
         is LegacyEnrollRequest -> act.route(request, LEGACY_REGISTER, REGISTER_REQUEST_CODE)
@@ -52,9 +52,9 @@ object SimprintsRequestRouter {
     }
 
     private fun routeSimprintsConfirmationRequest(act: Activity,
-                                                  request: SimprintsConfirmationRequest) = when (request) {
+                                                  request: ClientApiConfirmationRequest) = when (request) {
         // Regular Requests
-        is ConfirmIdentifyRequest -> act.startService(request.toIntent(SELECT_GUID_INTENT))
+        is ClientApiConfirmIdentifyRequest -> act.startService(request.toIntent(SELECT_GUID_INTENT))
 
         // Legacy Requests
         is LegacyConfirmIdentifyRequest -> act.startService(request.toIntent(LEGACY_SELECT_GUID_INTENT))
@@ -63,7 +63,7 @@ object SimprintsRequestRouter {
         else -> throw InvalidClientRequestException("Invalid Confirmation Request")
     }
 
-    private fun Activity.route(intent: SimprintsIdRequest, route: String, code: Int) =
+    private fun Activity.route(intent: ClientApiBaseRequest, route: String, code: Int) =
         this.startActivityForResult(intent.toIntent(route), code)
 
 }

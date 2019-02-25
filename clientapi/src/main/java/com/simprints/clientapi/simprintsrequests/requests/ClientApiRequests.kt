@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.simprints.clientapi.simprintsrequests.ApiVersion
 import kotlinx.android.parcel.IgnoredOnParcel
 
-interface SimprintsIdRequest : Parcelable {
+interface ClientApiBaseRequest : Parcelable {
 
     @IgnoredOnParcel
     val requestName: String
@@ -13,7 +13,7 @@ interface SimprintsIdRequest : Parcelable {
 
 }
 
-interface SimprintsActionRequest {
+interface ClientApiActionRequest {
 
     val userId: String
     val moduleId: String
@@ -21,5 +21,5 @@ interface SimprintsActionRequest {
 
 }
 
-interface SimprintsConfirmationRequest
+interface ClientApiConfirmationRequest
 
