@@ -1,12 +1,12 @@
-package com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters
+package com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.simprints.id.data.analytics.eventData.models.domain.events.*
-import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.domain.session.Device
-import com.simprints.id.data.analytics.eventData.models.domain.session.Location
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 
 
 class SessionEventsApiAdapterFactory {
