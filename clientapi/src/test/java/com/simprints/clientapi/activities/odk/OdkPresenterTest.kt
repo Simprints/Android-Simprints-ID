@@ -7,18 +7,7 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERI
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_LEGACY_API_KEY
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_METADATA
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_MODULE_ID
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SELECTED_GUID
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_USER_ID
-import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_VERIFY_GUID
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyConfirmIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyEnrollRequest
-import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyIdentifyRequest
-import com.simprints.clientapi.simprintsrequests.requests.legacy.LegacyVerifyRequest
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
@@ -50,20 +39,6 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun startPresenterForLegacyRegister_ShouldRequestLegacyRegister() {
-        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor(withLegacyApiKey = true)
-        `when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
-
-        OdkPresenter(view, ACTION_REGISTER).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyEnrollRequest(
-            legacyApiKey = MOCK_LEGACY_API_KEY,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA
-        ))
-    }
-
-    @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         `when`(view.identifyExtractor).thenReturn(identifyExtractor)
@@ -74,20 +49,6 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun startPresenterForLegacyIdentify_ShouldRequestLegacyIdentify() {
-        val identifyExtractor = IdentifyRequestFactory.getMockExtractor(withLegacyApiKey = true)
-        `when`(view.identifyExtractor).thenReturn(identifyExtractor)
-
-        OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyIdentifyRequest(
-            legacyApiKey = MOCK_LEGACY_API_KEY,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA
-        ))
-    }
-
-    @Test
     fun startPresenterForVerify_ShouldRequestVerify() {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         `when`(view.verifyExtractor).thenReturn(verifyExractor)
@@ -95,21 +56,6 @@ class OdkPresenterTest {
         OdkPresenter(view, ACTION_VERIFY).apply { start() }
         Mockito.verify(view, times(1)).sendSimprintsRequest(
             VerifyRequestFactory.getValidSimprintsRequest())
-    }
-
-    @Test
-    fun startPresenterForLegacyVerify_ShouldRequestLegacyVerify() {
-        val verifyExractor = VerifyRequestFactory.getMockExtractor(withLegacyApiKey = true)
-        `when`(view.verifyExtractor).thenReturn(verifyExractor)
-
-        OdkPresenter(view, ACTION_VERIFY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyVerifyRequest(
-            legacyApiKey = MOCK_LEGACY_API_KEY,
-            moduleId = MOCK_MODULE_ID,
-            userId = MOCK_USER_ID,
-            metadata = MOCK_METADATA,
-            verifyGuid = MOCK_VERIFY_GUID
-        ))
     }
 
     @Test
@@ -167,19 +113,6 @@ class OdkPresenterTest {
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
         Mockito.verify(view, times(1)).sendSimprintsRequest(
             ConfirmIdentifyFactory.getValidSimprintsRequest())
-    }
-
-    @Test
-    fun startPresenterForLegacyConfirmIdentify_ShouldRequestLegacyConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor(withLegacyApiKey = true)
-        `when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
-
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(LegacyConfirmIdentifyRequest(
-            legacyApiKey = MOCK_LEGACY_API_KEY,
-            sessionId = MOCK_SESSION_ID,
-            selectedGuid = MOCK_SELECTED_GUID
-        ))
     }
 
 }

@@ -9,7 +9,7 @@ class ConfirmIdentifyValidator(val extractor: ConfirmIdentifyExtractor)
     : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {
-        validateProjectIdOrLegacyApiKey()
+        validateProjectId()
         validateSessionId(extractor.getSessionId())
         validateSelectedGuid(extractor.getSelectedGuid())
     }

@@ -4,8 +4,8 @@ import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmIdentifyRequest
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
@@ -24,9 +24,9 @@ object ConfirmIdentifyFactory : RequestFactory() {
     override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder =
         ConfirmIdentifyBuilder(extractor as ConfirmIdentifyExtractor, getValidator(extractor))
 
-    override fun getMockExtractor(withLegacyApiKey: Boolean): ConfirmIdentifyExtractor {
+    override fun getMockExtractor(): ConfirmIdentifyExtractor {
         val mockConfirmIdentifyExtractor = mock(ConfirmIdentifyExtractor::class.java)
-        setMockDefaultExtractor(mockConfirmIdentifyExtractor, withLegacyApiKey)
+        setMockDefaultExtractor(mockConfirmIdentifyExtractor)
         `when`(mockConfirmIdentifyExtractor.getSessionId()).thenReturn(MOCK_SESSION_ID)
         `when`(mockConfirmIdentifyExtractor.getSelectedGuid()).thenReturn(MOCK_SELECTED_GUID)
         return mockConfirmIdentifyExtractor
