@@ -46,10 +46,14 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.gson.core
+
+    // Unit Tests
     testImplementation deps.testing.junit
     testImplementation deps.testing.mockito.core
     testImplementation deps.testing.robolectric.core
     testImplementation deps.testing.robolectric.multidex
+
+    // Android Tests
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
