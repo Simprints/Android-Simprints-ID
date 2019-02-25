@@ -1,24 +1,24 @@
 package com.simprints.id.tools.extensions
 
 import android.content.Intent
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiIdentifyRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
-import com.simprints.id.domain.request.IdRequest
-import com.simprints.id.domain.request.toIdDomainEnrolRequest
-import com.simprints.id.domain.request.toIdDomainIdIdentifyRequest
-import com.simprints.id.domain.request.toIdDomainIdVerifyRequest
+import com.simprints.id.domain.requests.*
 
-fun Intent.parseClientApiRequest(): IdRequest =
+fun Intent.parseClientApiRequest(): IdBaseRequest =
     this.extras?.let {
         try {
             when (it.keySet().first()) {
-                ClientApiEnrollRequest.REQUEST_NAME ->
-                    it.getParcelable<ClientApiEnrollRequest>(ClientApiEnrollRequest.REQUEST_NAME)?.toIdDomainEnrolRequest()
-                ClientApiIdentifyRequest.REQUEST_NAME ->
-                    it.getParcelable<ClientApiIdentifyRequest>(ClientApiIdentifyRequest.REQUEST_NAME)?.toIdDomainIdIdentifyRequest()
-                ClientApiVerifyRequest.REQUEST_NAME ->
-                    it.getParcelable<ClientApiVerifyRequest>(ClientApiVerifyRequest.REQUEST_NAME)?.toIdDomainIdVerifyRequest()
+                ClientApiEnrollRequest.BUNDLE_KEY ->
+                    it.getParcelable<ClientApiEnrollRequest>(ClientApiEnrollRequest.BUNDLE_KEY)?.toDomainIdEnrolRequest()
+                ClientApiIdentifyRequest.BUNDLE_KEY ->
+                    it.getParcelable<ClientApiIdentifyRequest>(ClientApiIdentifyRequest.BUNDLE_KEY)?.toDomainIdIdentifyRequest()
+                ClientApiVerifyRequest.BUNDLE_KEY ->
+                    it.getParcelable<ClientApiVerifyRequest>(ClientApiVerifyRequest.BUNDLE_KEY)?.toDomainIdVerifyRequest()
+                ClientApiConfirmIdentifyRequest.BUNDLE_KEY ->
+                    it.getParcelable<ClientApiConfirmIdentifyRequest>(ClientApiConfirmIdentifyRequest.BUNDLE_KEY)?.toDomainIdConfirmIdentifyRequest()
                 else -> null
             }
         } catch (t: Throwable) {

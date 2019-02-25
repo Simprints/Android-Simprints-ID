@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.remote.enums;
 
-
+@Deprecated
 public enum REFUSAL_FORM_REASON {
     SCANNER_NOT_WORKING("scanner_not_working"),
     REFUSED("refused"),

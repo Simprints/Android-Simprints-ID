@@ -15,7 +15,7 @@ data class ClientApiConfirmIdentifyRequest(
     override val bundleKey: String = BUNDLE_KEY
 
     companion object {
-        private const val BUNDLE_KEY = "confirmIdentifyRequest"
+        const val BUNDLE_KEY = "confirmIdentifyRequest"
     }
 
 }
