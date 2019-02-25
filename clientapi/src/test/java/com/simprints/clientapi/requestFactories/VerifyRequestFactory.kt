@@ -25,9 +25,9 @@ object VerifyRequestFactory : RequestFactory() {
     override fun getValidator(extractor: ClientRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyExtractor)
 
-    override fun getMockExtractor(withLegacyApiKey: Boolean): VerifyExtractor {
+    override fun getMockExtractor(): VerifyExtractor {
         val mockVerifyExtractor = Mockito.mock(VerifyExtractor::class.java)
-        setMockDefaultExtractor(mockVerifyExtractor, withLegacyApiKey)
+        setMockDefaultExtractor(mockVerifyExtractor)
         Mockito.`when`(mockVerifyExtractor.getVerifyGuid()).thenReturn(RequestFactory.MOCK_VERIFY_GUID)
         return mockVerifyExtractor
     }

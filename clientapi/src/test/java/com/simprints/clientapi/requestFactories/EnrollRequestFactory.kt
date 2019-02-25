@@ -4,8 +4,8 @@ import com.simprints.clientapi.clientrequests.builders.EnrollBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
 import org.mockito.Mockito
 
 object EnrollRequestFactory : RequestFactory() {
@@ -23,9 +23,9 @@ object EnrollRequestFactory : RequestFactory() {
     override fun getValidator(extractor: ClientRequestExtractor): EnrollValidator =
         EnrollValidator(extractor as EnrollExtractor)
 
-    override fun getMockExtractor(withLegacyApiKey: Boolean): EnrollExtractor {
+    override fun getMockExtractor(): EnrollExtractor {
         val mockEnrollmentExtractor = Mockito.mock(EnrollExtractor::class.java)
-        setMockDefaultExtractor(mockEnrollmentExtractor, withLegacyApiKey)
+        setMockDefaultExtractor(mockEnrollmentExtractor)
         return mockEnrollmentExtractor
     }
 
