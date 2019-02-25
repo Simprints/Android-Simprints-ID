@@ -6,6 +6,6 @@ import com.simprints.libsimprints.Constants
 
 
 fun ClientApiBaseRequest.toIntent(action: String): Intent = Intent(action).apply {
-    putExtra(this@toIntent.requestName, this@toIntent)
+    putExtra(this@toIntent.bundleKey, this@toIntent)
     setPackage(Constants.SIMPRINTS_PACKAGE_NAME)
 }

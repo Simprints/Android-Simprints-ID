@@ -40,31 +40,24 @@ dependencies {
     implementation 'com.simprints:libsimprints:2018.2.0'
 
     // Support
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.support.material
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+    implementation deps.gson.core
 
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.0.1'
+    // Unit Tests
+    testImplementation deps.testing.junit
+    testImplementation deps.testing.mockito.core
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
 
-    // Network - Gson
-    implementation 'com.google.code.gson:gson:2.8.2'
-
-    // Anko
-    implementation "org.jetbrains.anko:anko:0.10.8"
-
-    // Unit Testing
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.robolectric:robolectric:4.1'
-    testImplementation "org.mockito:mockito-core:2.19.0"
-
-    // Android Testing
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.1'
-
+    // Android Tests
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
 }
 
 repositories {

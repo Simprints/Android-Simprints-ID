@@ -7,7 +7,7 @@ import kotlinx.android.parcel.IgnoredOnParcel
 interface ClientApiBaseRequest : Parcelable {
 
     @IgnoredOnParcel
-    val requestName: String
+    val bundleKey: String
     val projectId: String
     val apiVersion: ApiVersion get() = ApiVersion.V2
 
