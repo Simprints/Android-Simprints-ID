@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.simprints.id.data.analytics.crashReport.CrashReportManager;
 import com.simprints.id.data.analytics.crashReport.CrashReportTags;
-import com.simprints.id.data.analytics.crashReport.CrashTrigger;
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger;
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
@@ -352,6 +352,6 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void logMessageForCrashReport(String message) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.MATCHING, CrashTrigger.UI, Log.INFO, message);
+        crashReportManager.logMessageForCrashReport(CrashReportTags.MATCHING, CrashReportTrigger.UI, Log.INFO, message);
     }
 }

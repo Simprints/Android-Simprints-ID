@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -69,7 +69,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     }
 
     private fun logMessageForCrashReport(message: String) =
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashTrigger.NETWORK, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.SYNC, CrashReportTrigger.NETWORK, message = message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80

@@ -9,7 +9,7 @@ import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContra
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.Finger.Status.*
@@ -44,7 +44,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         set(value) { presenter.currentFinger().status = value }
 
     private val scannerButtonListener = ButtonListener {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashTrigger.SCANNER_BUTTON, message = "Scanner button clicked")
+        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashReportTrigger.SCANNER_BUTTON, message = "Scanner button clicked")
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
         else if (shouldEnableScanButton())
@@ -272,6 +272,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
     }
 }

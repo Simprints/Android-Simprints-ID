@@ -7,7 +7,7 @@ import com.simprints.libsimprints.FingerIdentifier
 interface CrashReportManager {
 
     fun logMessageForCrashReport(crashReportTag: CrashReportTags,
-                                 crashTrigger: CrashTrigger,
+                                 crashReportTrigger: CrashReportTrigger,
                                  crashPriority: Int = Log.INFO,
                                  message: String)
 

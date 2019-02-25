@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.crashReport
 
-enum class CrashTrigger {
+enum class CrashReportTrigger {
     UI,
     NETWORK,
     SCANNER,

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
@@ -178,6 +178,6 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.SCANNER_SETUP, CrashTrigger.SCANNER, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.SCANNER_SETUP, CrashReportTrigger.SCANNER, message = message)
     }
 }

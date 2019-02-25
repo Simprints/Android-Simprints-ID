@@ -40,7 +40,7 @@ class GuidSelectionServiceTest {
         TestAppModule(app,
             randomGeneratorRule = DependencyRule.MockRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
-            analyticsManagerRule = DependencyRule.MockRule,
+            crashReportManagerRule = DependencyRule.MockRule,
             loginInfoManagerRule = DependencyRule.SpyRule)
     }
 

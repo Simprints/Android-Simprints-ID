@@ -15,7 +15,7 @@ import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerpri
 import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
@@ -352,7 +352,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
     }
 
     companion object {

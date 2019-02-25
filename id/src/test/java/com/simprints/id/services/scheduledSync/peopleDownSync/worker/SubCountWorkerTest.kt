@@ -9,8 +9,6 @@ import androidx.work.workDataOf
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -52,11 +50,9 @@ class SubCountWorkerTest {
     private val module by lazy {
         TestAppModule(app,
             localDbManagerRule = DependencyRule.MockRule,
-            crashReportManagerRule = DependencyRule.MockRule
-        ) {
-            override fun provideCountTask(dbManager: DbManager,
-                                          syncStatusDatabase: SyncStatusDatabase): CountTask = countTaskMock
-        }
+            crashReportManagerRule = DependencyRule.MockRule,
+            countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
+        )
     }
 
     @Before

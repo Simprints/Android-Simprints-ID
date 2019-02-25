@@ -4,7 +4,7 @@ import android.app.Activity
 import com.simprints.id.R
 import com.simprints.id.data.analytics.crashReport.CrashReportManager
 import com.simprints.id.data.analytics.crashReport.CrashReportTags
-import com.simprints.id.data.analytics.crashReport.CrashTrigger
+import com.simprints.id.data.analytics.crashReport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
@@ -93,6 +93,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTags.REFUSAL, CrashTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(CrashReportTags.REFUSAL, CrashReportTrigger.UI, message = message)
     }
 }
