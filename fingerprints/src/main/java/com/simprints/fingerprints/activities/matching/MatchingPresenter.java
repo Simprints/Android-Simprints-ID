@@ -1,34 +1,31 @@
 package com.simprints.fingerprints.activities.matching;
 
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
 import com.simprints.fingerprints.di.FingerprintsComponent;
-import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
+import com.simprints.id.data.analytics.crashreport.CrashReportManager;
+import com.simprints.id.data.analytics.crashreport.CrashReportTag;
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger;
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager;
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
-import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
-import com.simprints.id.domain.responses.IdIdentificationResponse;
-import com.simprints.id.domain.responses.IdVerifyResponse;
-import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
-import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
-import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
+import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
+import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.TimeHelper;
-import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -36,6 +33,7 @@ import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -81,13 +79,13 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         sessionEventsManager
             .getCurrentSession()
             .subscribe(new BiConsumer<SessionEvents, Throwable>() {
-            @Override
-            public void accept(SessionEvents sessionEvents, Throwable throwable) {
-                if (sessionEvents != null && throwable == null) {
-                    sessionId = sessionEvents.getId();
+                @Override
+                public void accept(SessionEvents sessionEvents, Throwable throwable) {
+                    if (sessionEvents != null && throwable == null) {
+                        sessionId = sessionEvents.getId();
+                    }
                 }
-            }
-        });
+            });
     }
 
     @Override
@@ -174,11 +172,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 }
 
                 // Start lengthy operation in a background thread
-                //StopShip: Move libcommon models in libmatcher
-                new Thread(() -> {
-//                    LibMatcher matcher = new LibMatcher(probe, candidates,
-//                        matcher_type, scores, MatchingPresenter.this, 1);
-//                    matcher.start();
+                new Thread(new Runnable() {
+                    public void run() {
+//                        LibMatcher matcher = new LibMatcher(probe, candidates,
+//                            matcher_type, scores, MatchingPresenter.this, 1);
+//                        matcher.start();
+                    }
                 }).start();
             }
 
@@ -262,7 +261,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             idx[i] = i;
                         }
 
-                        Arrays.sort(idx, (i1, i2) -> Float.compare(scores.get(i2), scores.get(i1)));
+                        Arrays.sort(idx, new Comparator<Integer>() {
+                            @Override
+                            public int compare(final Integer i1, final Integer i2) {
+                                return Float.compare(scores.get(i2), scores.get(i1));
+                            }
+                        });
 
                         for (int i = 0; i < Math.min(nbOfResults, candidates.size()); i++) {
                             Person candidate = candidates.get(idx[i]);
@@ -293,10 +297,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             }
                         }
 
-                        Intent resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
+                        Intent resultData;
+                        resultData = new Intent();
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -323,14 +325,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
 
                         // signOut
-                        Intent resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new IdVerifyResponse(
-                                verification.getGuidVerified(),
-                                (int) verification.getConfidence(),
-                                Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());
-
+                        Intent resultData;
+                        resultData = new Intent();
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;

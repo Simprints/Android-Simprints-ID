@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Location
+import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor

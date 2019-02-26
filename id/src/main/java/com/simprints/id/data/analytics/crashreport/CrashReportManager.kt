@@ -1,8 +1,8 @@
 package com.simprints.id.data.analytics.crashreport
 
 import android.util.Log
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.libsimprints.FingerIdentifier
 
 interface CrashReportManager {
 

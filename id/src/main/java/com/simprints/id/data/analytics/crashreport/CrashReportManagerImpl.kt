@@ -2,6 +2,7 @@ package com.simprints.id.data.analytics.crashreport
 
 import android.util.Log
 import com.crashlytics.android.Crashlytics
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
@@ -10,7 +11,6 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
 import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.libsimprints.FingerIdentifier
 
 class CrashReportManagerImpl: CrashReportManager {
 
