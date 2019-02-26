@@ -2,7 +2,6 @@ package com.simprints.id.domain;
 
 import com.simprints.id.R;
 import com.simprints.id.tools.InternalConstants;
-import com.simprints.libsimprints.Constants;
 
 import static android.app.Activity.RESULT_CANCELED;
 

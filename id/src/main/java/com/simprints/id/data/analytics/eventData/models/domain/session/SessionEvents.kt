@@ -7,7 +7,7 @@ import java.util.*
 
 open class SessionEvents(var projectId: String,
                          var appVersionName: String,
-                         var libVersionName: String,
+                         var libVersionName: String = "",
                          var language: String,
                          var device: Device,
                          var startTime: Long = 0,

@@ -2,7 +2,7 @@ package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 
@@ -20,8 +20,8 @@ interface SettingsPreferencesManager {
     var timeoutS: Int
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
-    var syncGroup: Constants.GROUP
-    var matchGroup: Constants.GROUP
+    var syncGroup: GROUP
+    var matchGroup: GROUP
     var vibrateMode: Boolean
     var matchingEndWaitTimeSeconds: Int
     /** @throws JsonSyntaxException */

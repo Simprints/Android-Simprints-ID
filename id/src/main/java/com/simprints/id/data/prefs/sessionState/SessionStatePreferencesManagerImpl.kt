@@ -45,9 +45,6 @@ class SessionStatePreferencesManagerImpl(private val context: Context,
     override val appVersionName: String
         get() = context.packageVersionName
 
-    override val libVersionName: String
-        get() = com.simprints.libsimprints.BuildConfig.VERSION_NAME
-
     // Unique identifier of the current session
     override var sessionId: String
         by PrimitivePreference(prefs, SESSION_ID_KEY, SESSION_ID_DEFAULT)
@@ -63,5 +60,4 @@ class SessionStatePreferencesManagerImpl(private val context: Context,
         resetSessionParameters()
         initializeSessionTimestamps(msSinceBootOnSessionStart)
     }
-
 }

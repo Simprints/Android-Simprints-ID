@@ -6,7 +6,7 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.IdFingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert
@@ -42,7 +42,7 @@ class rl_PersonTest {
     @Test
     fun buildRlPersonWithFingerprint() {
         val fb_Person = fb_Person(
-            Person("giud", arrayListOf(Fingerprint(
+            Person("giud", arrayListOf(IdFingerprint(
                 FingerIdentifier.LEFT_3RD_FINGER,
                 PeopleGeneratorUtils.getRandomFingerprint().template!!))),
 

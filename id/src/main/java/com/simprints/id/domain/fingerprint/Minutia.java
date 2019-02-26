@@ -1,4 +1,4 @@
-package com.simprints.libcommon;
+package com.simprints.id.domain.fingerprint;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -9,7 +9,6 @@ data class fb_Session(
     val deviceModel: String = "",
     val deviceId: String = "",
     val appVersionName: String = "",
-    val libVersionName: String = "",
 
     val calloutAction: String = "",
     val projectId: String = "",

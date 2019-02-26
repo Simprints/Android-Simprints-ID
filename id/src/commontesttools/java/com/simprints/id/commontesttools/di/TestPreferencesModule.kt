@@ -21,7 +21,7 @@ class TestPreferencesModule(var remoteConfigRule: DependencyRule = RealRule,
     override fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
                                                    remoteConfigWrapper: RemoteConfigWrapper,
                                                    fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                                   groupSerializer: Serializer<Constants.GROUP>,
+                                                   groupSerializer: Serializer<GROUP>,
                                                    languagesStringArraySerializer: Serializer<Array<String>>,
                                                    moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                                    peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =

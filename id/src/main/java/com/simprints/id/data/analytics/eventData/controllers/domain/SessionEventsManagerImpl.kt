@@ -8,15 +8,15 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.Device
 import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.identification.IdentificationResult
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.domain.matching.IdentificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.fingerprint.Utils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -60,7 +60,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         SessionEvents(
             projectId,
             preferencesManager.appVersionName,
-            preferencesManager.libVersionName,
+            /* preferencesManager.libVersionName */ "", //StopShip: do we need libVersionName?
             preferencesManager.language,
             Device(
                 Build.VERSION.SDK_INT.toString(),

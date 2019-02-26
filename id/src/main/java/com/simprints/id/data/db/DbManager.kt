@@ -6,10 +6,10 @@ import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
-import com.simprints.id.domain.identification.IdentificationResult
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.matching.IdentificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -40,7 +40,7 @@ interface DbManager {
     fun loadPerson(destinationList: MutableList<LibPerson>, projectId: String, guid: String, callback: DataCallback)
     fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult>
 
-    fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<LibPerson>, group: GROUP, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 
@@ -55,8 +55,6 @@ interface DbManager {
     fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
 
     fun saveSession(session: Session)
-
-    fun recoverLocalDb(group: Constants.GROUP): Completable
 
     fun saveVerification(probe: LibPerson, match: VerificationResult?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 

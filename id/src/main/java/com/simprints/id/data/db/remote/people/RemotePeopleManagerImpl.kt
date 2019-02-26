@@ -5,7 +5,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.exceptions.safe.data.db.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.core.network.SimApiClient
@@ -32,9 +32,9 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                 }
         }
 
-    override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: List<IdPerson>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(IdPerson::toFirebasePerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }

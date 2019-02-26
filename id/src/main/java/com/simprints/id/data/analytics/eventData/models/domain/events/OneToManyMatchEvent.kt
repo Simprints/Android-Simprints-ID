@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventData.models.domain.events
 
 import com.simprints.id.data.analytics.eventData.models.domain.EventType
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 
 class OneToManyMatchEvent(val relativeStartTime: Long,
                           val relativeEndTime: Long,
@@ -16,11 +16,11 @@ class OneToManyMatchEvent(val relativeStartTime: Long,
         PROJECT;
 
         companion object {
-            fun fromConstantGroup(constantGroup: Constants.GROUP): MatchPoolType {
+            fun fromConstantGroup(constantGroup: GROUP): MatchPoolType {
                 return when (constantGroup) {
-                    Constants.GROUP.GLOBAL -> PROJECT
-                    Constants.GROUP.USER -> USER
-                    Constants.GROUP.MODULE -> MODULE
+                    GROUP.GLOBAL -> PROJECT
+                    GROUP.USER -> USER
+                    GROUP.MODULE -> MODULE
                 }
             }
         }

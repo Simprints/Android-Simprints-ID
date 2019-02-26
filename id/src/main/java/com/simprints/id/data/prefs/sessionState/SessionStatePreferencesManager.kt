@@ -17,8 +17,5 @@ interface SessionStatePreferencesManager
     var location: Location
     val deviceId: String
     val appVersionName: String
-    val libVersionName: String
-
     fun initializeSessionState(sessionId: String, msSinceBootOnSessionStart: Long)
-
 }

@@ -1,8 +1,9 @@
 package com.simprints.id.session.callout
 
 import android.content.Intent
-import com.simprints.libsimprints.Constants
+import com.simprints.id.domain.Constants
 
+@Deprecated("Use IdRequests")
 enum class CalloutAction(private val action: String) {
 
     REGISTER(Constants.SIMPRINTS_REGISTER_INTENT),
@@ -13,6 +14,12 @@ enum class CalloutAction(private val action: String) {
     INVALID("Invalid");
 
     companion object {
+
+        const val SIMPRINTS_REGISTER_INTENT = "com.simprints.id.REGISTER"
+        const val SIMPRINTS_IDENTIFY_INTENT = "com.simprints.id.IDENTIFY"
+        const val SIMPRINTS_UPDATE_INTENT = "com.simprints.id.UPDATE"
+        const val SIMPRINTS_VERIFY_INTENT = "com.simprints.id.VERIFY"
+        const val SIMPRINTS_SELECT_GUID_INTENT = "com.simprints.id.CONFIRM_IDENTITY"
 
         val validValues = values()
             .filterNot { it == MISSING || it == INVALID }

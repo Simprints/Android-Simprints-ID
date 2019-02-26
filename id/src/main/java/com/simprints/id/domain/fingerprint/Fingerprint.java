@@ -1,10 +1,9 @@
-package com.simprints.libcommon;
+package com.simprints.id.domain.fingerprint;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-
-import com.simprints.libsimprints.FingerIdentifier;
+import com.simprints.id.FingerIdentifier;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -166,7 +165,7 @@ public class Fingerprint implements Parcelable {
      * @return A random valid {@link Fingerprint} with specified {@link FingerIdentifier}
      */
     public static Fingerprint generateRandomFingerprint(@NonNull FingerIdentifier fingerId,
-                                                        byte qualityScore) {
+                                                          byte qualityScore) {
         byte nbMinutiae = (byte) RANDOM_GENERATOR.nextInt(128);
         int length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE;
 

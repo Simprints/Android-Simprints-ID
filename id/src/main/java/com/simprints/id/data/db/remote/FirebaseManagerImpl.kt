@@ -14,8 +14,8 @@ import com.simprints.id.data.db.remote.models.fb_RefusalForm
 import com.simprints.id.data.db.remote.models.fb_VfEvent
 import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.identification.IdentificationResult
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.matching.IdentificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.exceptions.unsafe.DbAlreadyInitialisedError
 import com.simprints.id.exceptions.unsafe.RemoteDbNotSignedInError

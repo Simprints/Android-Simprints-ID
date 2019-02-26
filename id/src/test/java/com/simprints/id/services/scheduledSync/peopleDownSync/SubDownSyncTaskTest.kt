@@ -18,7 +18,7 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -215,7 +215,7 @@ class SubDownSyncTaskTest {
             lastPatientId = lastPatientId,
             lastPatientUpdatedAt = lastPatientUpdateAt))
 
-        val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
+        val argForInsertOrUpdateInLocalDb = argumentCaptor<List<IdPerson>>()
         whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).thenReturn(Completable.complete())
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
@@ -230,7 +230,7 @@ class SubDownSyncTaskTest {
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
-    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<fb_Person>) {
+    private fun verifyLastPatientSaveIsTheRightOne(saved: List<IdPerson>, inResponse: List<fb_Person>) {
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
     }
@@ -289,7 +289,7 @@ class SubDownSyncTaskTest {
 
     private fun mockSuccessfulResponseWithIncorrectModels(patients: List<fb_Person>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
-        val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
+        val badFbPersonJson = fbPersonJson.replace("idFingerprints", "fungerprints")
         return MockResponse().let {
             it.setResponseCode(200)
             it.setBody(badFbPersonJson)
