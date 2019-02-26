@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -26,7 +27,6 @@ import com.simprints.id.domain.Location
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libsimprints.FingerIdentifier
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named

@@ -6,8 +6,8 @@ import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
-import com.simprints.libcommon.Fingerprint
-import com.simprints.libcommon.Person
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test
@@ -22,14 +22,14 @@ class rl_PersonTest {
     @Test
     fun buildRlPersonWithoutFingerprint() {
         val fb_Person = fb_Person(
-            Person("guid"),
+            Person("guidFound"),
             "projectId",
             "userId",
             "moduleId")
 
         val rlPerson = rl_Person(fb_Person)
 
-        Assert.assertEquals(rlPerson.patientId, "guid")
+        Assert.assertEquals(rlPerson.patientId, "guidFound")
         Assert.assertEquals(rlPerson.userId, "userId")
         Assert.assertNull(rlPerson.createdAt)
         Assert.assertNull(rlPerson.updatedAt)

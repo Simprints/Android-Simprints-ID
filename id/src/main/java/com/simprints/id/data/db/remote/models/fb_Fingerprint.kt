@@ -1,17 +1,17 @@
 package com.simprints.id.data.db.remote.models
 
-import com.simprints.id.domain.Fingerprint
 import com.simprints.core.tools.json.SkipSerialisationField
-import com.simprints.libcommon.Utils
-import com.simprints.libsimprints.FingerIdentifier
-import com.simprints.libcommon.Fingerprint as LibFingerprint
+import com.simprints.id.FingerIdentifier
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.domain.fingerprint.Fingerprint as LibFingerprint
 
 data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
                           val template: String,
                           val quality: Int) {
 
     constructor (fingerprint: LibFingerprint) : this (
-        fingerId = fingerprint.fingerId,
+        fingerId = FingerIdentifier.valueOf(fingerprint.fingerId.name),
         template = Utils.byteArrayToBase64(fingerprint.templateBytes),
         quality = fingerprint.qualityScore)
 }

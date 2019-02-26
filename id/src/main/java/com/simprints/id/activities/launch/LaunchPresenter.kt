@@ -32,7 +32,7 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.libcommon.Person
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libscanner.ButtonListener
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -130,7 +130,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
             }.doOnError {
                 it.printStackTrace()
-                // For any error, we show the missing guid screen.
+                // For any error, we show the missing guidFound screen.
                 saveNotFoundVerificationAndShowAlert(Person(guid), startCandidateSearchTime)
             }.ignoreElement()
         }

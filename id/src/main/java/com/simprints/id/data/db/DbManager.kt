@@ -8,15 +8,15 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Project
+import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.session.Session
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 interface DbManager {
 
@@ -50,7 +50,7 @@ interface DbManager {
 
     fun updateIdentification(projectId: String, selectedGuid: String, sessionId: String)
 
-    fun saveRefusalForm(refusalForm: RefusalForm)
+    fun saveRefusalForm(refusalForm: IdRefusalForm)
 
     fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
 
@@ -58,5 +58,5 @@ interface DbManager {
 
     fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
-    fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>)
+    fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<IdentificationResult>)
 }

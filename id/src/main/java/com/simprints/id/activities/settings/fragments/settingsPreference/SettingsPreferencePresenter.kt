@@ -11,7 +11,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
 

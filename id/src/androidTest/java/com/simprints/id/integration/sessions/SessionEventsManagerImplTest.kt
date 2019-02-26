@@ -36,8 +36,8 @@ import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libcommon.Person
-import com.simprints.libcommon.Utils
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.fingerprint.Utils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger

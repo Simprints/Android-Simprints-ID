@@ -1,6 +1,6 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -74,7 +74,7 @@ object PeopleGeneratorUtils {
 
 
     fun getRandomFingerprint(): Fingerprint {
-        val commonFingerprint = com.simprints.libcommon.Fingerprint.generateRandomFingerprint()
+        val commonFingerprint = Fingerprint.generateRandomFingerprint()
         return Fingerprint(commonFingerprint.fingerId.ordinal, commonFingerprint.templateBytes, 50)
     }
 

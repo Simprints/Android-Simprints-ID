@@ -15,7 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.realm.Sort
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 /** @throws NotSignedInException */
 interface LocalDbManager {
