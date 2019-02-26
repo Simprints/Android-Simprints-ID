@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.fingerprint.IdFingerprint
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
@@ -12,8 +12,8 @@ object PeopleGeneratorUtils {
 
     fun getRandomPeople(nPeople: Int,
                         subSyncScope: SubSyncScope,
-                        toSync: List<Boolean>): MutableList<Person> =
-        mutableListOf<Person>().also { fakePeople ->
+                        toSync: List<Boolean>): MutableList<IdPerson> =
+        mutableListOf<IdPerson>().also { fakePeople ->
             repeat(nPeople) {
                 fakePeople.add(
                     getRandomPerson(
@@ -28,8 +28,8 @@ object PeopleGeneratorUtils {
 
     fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
                         syncScope: SyncScope,
-                        toSync: List<Boolean>): MutableList<Person> =
-        mutableListOf<Person>().also { fakePeople ->
+                        toSync: List<Boolean>): MutableList<IdPerson> =
+        mutableListOf<IdPerson>().also { fakePeople ->
             syncScope.toSubSyncScopes().forEach { subScope ->
                 fakePeople.addAll(getRandomPeople(numberOfPeopleForEachSubScope, subScope, toSync))
             }
@@ -39,9 +39,9 @@ object PeopleGeneratorUtils {
                         projectId: String = UUID.randomUUID().toString(),
                         userId: String = UUID.randomUUID().toString(),
                         moduleId: String = UUID.randomUUID().toString(),
-                        toSync: Boolean = false): ArrayList<Person> {
+                        toSync: Boolean = false): ArrayList<IdPerson> {
 
-        return arrayListOf<Person>().also { list ->
+        return arrayListOf<IdPerson>().also { list ->
             repeat(numberOfPeople) {
                 list.add(getRandomPerson(
                     UUID.randomUUID().toString(),
@@ -60,8 +60,8 @@ object PeopleGeneratorUtils {
                         toSync: Boolean = false,
                         createdAt: Date = getRandomTime(),
                         updateAt: Date = getRandomTime(),
-                        fingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
-        Person(
+                        idFingerprints: Array<IdFingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): IdPerson =
+        IdPerson(
             patientId = patientId,
             projectId = projectId,
             userId = userId,
@@ -69,13 +69,13 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
-            fingerprints = fingerprints.toList()
+            idFingerprints = idFingerprints.toList()
         )
 
 
-    fun getRandomFingerprint(): Fingerprint {
-        val commonFingerprint = Fingerprint.generateRandomFingerprint()
-        return Fingerprint(commonFingerprint.fingerId.ordinal, commonFingerprint.templateBytes, 50)
+    fun getRandomFingerprint(): IdFingerprint {
+        val commonFingerprint = IdFingerprint.generateRandomFingerprint()
+        return IdFingerprint(commonFingerprint.fingerId.ordinal, commonFingerprint.templateBytes, 50)
     }
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {

@@ -25,16 +25,10 @@ open class RequestLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_front)
 
         initSimprintsIdVersionTextView(preferencesManager.appVersionName)
-        initLibSimprintsVersionTextView(preferencesManager.libVersionName)
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {
         val simprintsIdVersionString = String.format(getString(R.string.front_simprintsId_version), simprintsIdVersion)
         simprintsIdVersionTextView.text = simprintsIdVersionString
-    }
-
-    private fun initLibSimprintsVersionTextView(libSimprintsVersion: String) {
-        val libSimprintsVersionString = String.format(getString(R.string.front_libSimprints_version), libSimprintsVersion)
-        libSimprintsVersionTextView.text = libSimprintsVersionString
     }
 }

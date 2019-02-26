@@ -2,7 +2,7 @@ package com.simprints.id.data.db.remote.models
 
 import com.google.firebase.database.ServerValue
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.fingerprint.Person
 import java.util.*
 

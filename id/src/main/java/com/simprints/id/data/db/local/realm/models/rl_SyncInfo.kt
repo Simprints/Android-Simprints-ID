@@ -22,7 +22,7 @@ open class rl_SyncInfo : RealmObject {
 
     constructor()
 
-    constructor(syncGroup: Constants.GROUP, lastPerson: rl_Person, moduleId: String?) {
+    constructor(syncGroup: GROUP, lastPerson: rl_Person, moduleId: String?) {
         syncGroupId = syncGroup.ordinal
         lastKnownPatientUpdatedAt = lastPerson.updatedAt ?: Date(0)
         lastKnownPatientId = lastPerson.patientId

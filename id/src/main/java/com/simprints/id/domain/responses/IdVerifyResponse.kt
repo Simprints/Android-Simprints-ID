@@ -2,7 +2,7 @@ package com.simprints.id.domain.responses
 
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
-import com.simprints.id.domain.identification.Tier
+import com.simprints.id.domain.matching.Tier
 
 data class IdVerifyResponse(val guid: String, val confidence: Int, val tier: Tier): IdResponse {
 

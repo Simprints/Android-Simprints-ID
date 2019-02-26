@@ -5,7 +5,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -39,7 +39,7 @@ open class RealmTestsBase {
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
         fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
-    protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
+    protected fun saveFakePeople(realm: Realm, people: List<IdPerson>): List<IdPerson> =
         people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
 
     protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {

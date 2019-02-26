@@ -7,10 +7,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
-import com.simprints.id.domain.Constants
-import com.simprints.id.domain.Person
-import com.simprints.id.domain.Project
-import com.simprints.id.domain.toLibPerson
+import com.simprints.id.domain.*
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
@@ -58,10 +55,10 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
         insertOrUpdatePeopleInLocal(listOf(person.toDomainPerson()))
 
-    override fun insertOrUpdatePeopleInLocal(people: List<Person>): Completable =
+    override fun insertOrUpdatePeopleInLocal(people: List<IdPerson>): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
-                it.insertOrUpdate(people.map(Person::toRealmPerson))
+                it.insertOrUpdate(people.map(IdPerson::toRealmPerson))
             }
         }
             .ignoreElement()
@@ -76,7 +73,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 .toInt()
         }
 
-    override fun loadPersonFromLocal(personId: String): Single<Person> =
+    override fun loadPersonFromLocal(personId: String): Single<IdPerson> =
         useRealmInstance { realm ->
             realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId)
                 .findFirst()
@@ -88,7 +85,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                      userId: String?,
                                      moduleId: String?,
                                      toSync: Boolean?,
-                                     sortBy: Map<String, Sort>?): Single<List<Person>> =
+                                     sortBy: Map<String, Sort>?): Single<List<IdPerson>> =
         useRealmInstance { realm ->
             realm
                 .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
@@ -101,8 +98,8 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?,
-                                       sortBy: Map<String, Sort>?): Flowable<Person> =
-        Flowable.create<Person>({ emitter ->
+                                       sortBy: Map<String, Sort>?): Flowable<IdPerson> =
+        Flowable.create<IdPerson>({ emitter ->
             try {
                 useRealmInstance { realm ->
                     realm
@@ -196,12 +193,12 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
         )
 
-    override fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: Constants.GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
-            Constants.GROUP.GLOBAL -> loadPeopleFromLocal()
-            Constants.GROUP.USER -> loadPeopleFromLocal(userId = userId)
-            Constants.GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
-        }.blockingGet().map(Person::toLibPerson)
+            GROUP.GLOBAL -> loadPeopleFromLocal()
+            GROUP.USER -> loadPeopleFromLocal(userId = userId)
+            GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
+        }.blockingGet().map(IdPerson::toLibPerson)
         destinationList.addAll(result)
         callback?.onSuccess(false)
     }

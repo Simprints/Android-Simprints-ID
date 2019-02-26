@@ -1,6 +1,7 @@
-package com.simprints.libcommon;
+package com.simprints.id.domain.fingerprint;
 
-import com.simprints.libsimprints.FingerIdentifier;
+
+import com.simprints.id.FingerIdentifier;
 
 import java.util.Arrays;
 
