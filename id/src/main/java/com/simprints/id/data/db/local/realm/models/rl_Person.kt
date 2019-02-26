@@ -1,11 +1,10 @@
 package com.simprints.id.data.db.local.realm.models
 
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.models.toDomainFingerprint
-import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.tools.extensions.toRealmList
-import com.simprints.libsimprints.FingerIdentifier
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -13,8 +12,8 @@ import io.realm.annotations.Required
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
-import com.simprints.libcommon.Fingerprint as LibFingerprint
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Fingerprint as LibFingerprint
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 open class rl_Person(
     @PrimaryKey

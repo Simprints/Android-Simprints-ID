@@ -17,7 +17,7 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import com.simprints.libcommon.Fingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.libscanner.ButtonListener
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.SCANNER_ERROR.*

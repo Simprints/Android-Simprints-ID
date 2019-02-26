@@ -8,8 +8,8 @@ import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.libcommon.Fingerprint
-import com.simprints.libcommon.Person
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test

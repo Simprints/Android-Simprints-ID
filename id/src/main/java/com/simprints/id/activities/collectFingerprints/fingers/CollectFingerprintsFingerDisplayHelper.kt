@@ -4,14 +4,14 @@ import android.app.Activity
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
 import com.simprints.id.tools.extensions.isFingerNotCollectable
-import com.simprints.libcommon.FingerConfig
-import com.simprints.libcommon.ScanConfig
-import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.id.domain.fingerprint.FingerConfig
+import com.simprints.id.domain.fingerprint.ScanConfig
 import javax.inject.Inject
 
 

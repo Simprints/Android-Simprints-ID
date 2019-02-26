@@ -1,16 +1,16 @@
 package com.simprints.id.data.db.remote.models
 
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.domain.Fingerprint
-import com.simprints.id.domain.Person
 import com.simprints.core.tools.json.PostGsonProcessable
 import com.simprints.core.tools.json.SkipSerialisationProperty
-import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.domain.Person
+import com.simprints.id.domain.fingerprint.Fingerprint
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 data class fb_Person(@SerializedName("id") var patientId: String,
                      var projectId: String,

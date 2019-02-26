@@ -3,12 +3,12 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.Constants
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.libsimprints.FingerIdentifier
 import javax.inject.Inject
 
 

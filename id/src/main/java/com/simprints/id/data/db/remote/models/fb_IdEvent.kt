@@ -2,8 +2,8 @@ package com.simprints.id.data.db.remote.models
 
 import com.google.firebase.database.ServerValue
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.libcommon.Person
-import com.simprints.libsimprints.Identification
+import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.fingerprint.Person
 import java.util.*
 
 class fb_IdEvent (
@@ -20,7 +20,7 @@ class fb_IdEvent (
                 userId: String,
                 moduleId: String,
                 matchSize: Int,
-                identifications: List<Identification>,
+                identifications: List<IdentificationResult>,
                 sessionId: String) : this (
 
         ProbePerson = fb_Person(probe, projectId, userId, moduleId),
