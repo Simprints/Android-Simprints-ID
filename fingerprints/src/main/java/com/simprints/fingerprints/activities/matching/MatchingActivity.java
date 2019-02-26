@@ -20,9 +20,10 @@ import com.simprints.id.data.analytics.AnalyticsManager;
 import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.ALERT_TYPE;
+import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
-import com.simprints.id.domain.fingerprint.Person;
+import com.simprints.id.tools.TimeHelper;
 
 import javax.inject.Inject;
 
@@ -73,6 +74,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
             finish();
             return;
         }
+
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
         viewPresenter = new MatchingPresenter(this, component, probe);
     }
@@ -86,8 +88,8 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void setIdentificationProgress(int progress) {
         ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), progress)
-                .setDuration(progress * 10)
-                .start();
+            .setDuration(progress * 10)
+            .start();
     }
 
     @Override

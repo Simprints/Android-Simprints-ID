@@ -6,10 +6,7 @@ import com.simprints.id.data.db.remote.adapters.toFirebaseSession
 import com.simprints.id.data.db.remote.models.fb_Session
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.requests.IdRequest
-import com.simprints.id.exceptions.safe.SimprintsException
-import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore

@@ -13,10 +13,6 @@ import com.simprints.id.activities.collectFingerprints.confirmFingerprints.Confi
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.FingerprintCaptureEvent
-import com.simprints.id.activities.matching.MatchingActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -32,8 +28,9 @@ import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.fingerprint.Utils
 import com.simprints.id.domain.responses.IdEnrolResponse
 import com.simprints.id.domain.responses.toDomainClientApiEnrol
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.SimprintsException
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
+import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
@@ -289,8 +286,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        val fingerprintsModule = "com.simprints.id"
-        val matchingActivityClassName = "com.simprints.idFingerprints.activities.matching.MatchingActivity"
+        val fingerprintsModule = "com.simprints.id" //STOPSHIP
+        val matchingActivityClassName = "com.simprints.fingerprints.activities.matching.MatchingActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
