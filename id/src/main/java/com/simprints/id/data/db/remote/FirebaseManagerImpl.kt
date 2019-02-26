@@ -14,11 +14,11 @@ import com.simprints.id.data.db.remote.models.fb_RefusalForm
 import com.simprints.id.data.db.remote.models.fb_VfEvent
 import com.simprints.id.data.db.remote.tools.Routes
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.exceptions.unexpected.DbAlreadyInitialisedException
-import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.refusal_form.IdRefusalForm
+import com.simprints.id.exceptions.unexpected.DbAlreadyInitialisedException
+import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
