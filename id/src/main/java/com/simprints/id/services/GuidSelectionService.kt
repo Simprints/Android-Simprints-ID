@@ -100,6 +100,6 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     @Suppress("UNUSED_PARAMETER")
     private fun checkSelectedGuid(selectedGuid: String) {
-        // For now, any selected guid is valid
+        // For now, any selected guidFound is valid
     }
 }

@@ -2,15 +2,15 @@ package com.simprints.id.data.db.remote
 
 import com.google.firebase.FirebaseApp
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
+import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.session.Session
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 interface RemoteDbManager {
 
@@ -28,12 +28,12 @@ interface RemoteDbManager {
     // Data transfer
     // Firebase
 
-    fun saveIdentificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<Identification>, sessionId: String)
+    fun saveIdentificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<IdentificationResult>, sessionId: String)
     fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String)
 
-    fun saveVerificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: Verification?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
+    fun saveVerificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: VerificationResult?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT)
 
-    fun saveRefusalFormInRemote(refusalForm: RefusalForm, projectId: String, userId: String, sessionId: String)
+    fun saveRefusalFormInRemote(refusalForm: IdRefusalForm, projectId: String, userId: String, sessionId: String)
 
     fun saveSessionInRemote(session: Session)
 

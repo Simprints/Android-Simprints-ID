@@ -133,8 +133,6 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':libcommon')
-    api project(':libsimprints')
     api project(':clientapi')
     api project(':core')
     api deps.simprints.libscanner

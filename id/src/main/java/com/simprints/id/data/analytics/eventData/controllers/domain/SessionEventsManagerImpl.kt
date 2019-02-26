@@ -8,15 +8,15 @@ import com.simprints.id.data.analytics.eventData.models.domain.session.Device
 import com.simprints.id.data.analytics.eventData.models.domain.session.Location
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.identification.VerificationResult
 import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libcommon.Person
-import com.simprints.libcommon.Utils
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Verification
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.fingerprint.Utils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -108,23 +108,23 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             insertOrUpdateSessionEvents(it)
         }
 
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?) {
+    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: VerificationResult?) {
         updateSessionInBackground { session ->
             session.events.add(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
                 preferencesManager.patientId,
-                match?.let { MatchEntry(it.guid, match.confidence) }))
+                match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
         }
     }
 
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int) {
+    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<IdentificationResult>, matchSize: Int) {
         updateSessionInBackground { session ->
             session.events.add(OneToManyMatchEvent(
                 session.timeRelativeToStartTime(startTimeIdentification),
                 session.nowRelativeToStartTime(timeHelper),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchEntry(it.guid, it.confidence) }.toList().toTypedArray()))
+                matches.map { MatchEntry(it.guidFound, it.confidence.toFloat()) }.toList().toTypedArray()))
         }
     }
 

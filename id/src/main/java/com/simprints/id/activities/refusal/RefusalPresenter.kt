@@ -9,10 +9,10 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libsimprints.RefusalForm
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
@@ -78,9 +78,9 @@ class RefusalPresenter(private val view: RefusalContract.View,
         view.enableSubmitButton()
     }
 
-    private fun getRefusalForm(refusalText: String) = RefusalForm(reason.toString(), refusalText)
+    private fun getRefusalForm(refusalText: String) = IdRefusalForm(reason.toString(), refusalText)
 
-    private fun saveRefusalFormInDb(refusalForm: RefusalForm) {
+    private fun saveRefusalFormInDb(refusalForm: IdRefusalForm) {
         try {
             dbManager.saveRefusalForm(refusalForm)
         } catch (error: UninitializedDataManagerError) {

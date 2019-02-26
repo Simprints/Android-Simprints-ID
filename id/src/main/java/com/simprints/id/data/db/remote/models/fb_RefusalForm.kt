@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.models
 
 import com.google.firebase.database.ServerValue
-import com.simprints.libsimprints.RefusalForm
+import com.simprints.id.domain.refusal_form.IdRefusalForm
 
 class fb_RefusalForm(
     var reason: String,
@@ -11,7 +11,7 @@ class fb_RefusalForm(
     var sessionId: String,
     var serverTimestamp: Map<String, String>) {
 
-    constructor(refusalForm: RefusalForm,
+    constructor(refusalForm: IdRefusalForm,
                 projectId: String,
                 userId: String,
                 sessionId: String): this (

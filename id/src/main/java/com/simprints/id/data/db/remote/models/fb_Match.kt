@@ -1,12 +1,13 @@
 package com.simprints.id.data.db.remote.models
 
-import com.simprints.libsimprints.Identification
+import com.simprints.id.domain.identification.IdentificationResult
 
+@Deprecated("Remove it with RTDB")
 class fb_Match (
     var personGuid: String,
     var score: Float = 0.toFloat()) {
 
-    constructor(id: Identification): this(
-        personGuid = id.guid,
-        score = id.confidence)
+    constructor(id: IdentificationResult): this(
+        personGuid = id.guidFound,
+        score = id.confidence.toFloat())
 }

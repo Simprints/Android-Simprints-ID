@@ -28,9 +28,9 @@ import com.simprints.id.exceptions.unsafe.SimprintsError
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libcommon.Fingerprint
-import com.simprints.libcommon.Person
-import com.simprints.libcommon.Utils
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.fingerprint.Utils
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*

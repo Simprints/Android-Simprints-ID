@@ -9,12 +9,12 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.domain.Constants
-import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.LocalDbRecoveryFailedException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.core.tools.json.SkipSerialisationField
-import com.simprints.libcommon.Utils.byteArrayToBase64
+import com.simprints.id.domain.fingerprint.Utils.byteArrayToBase64
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Completable
 import io.reactivex.CompletableEmitter

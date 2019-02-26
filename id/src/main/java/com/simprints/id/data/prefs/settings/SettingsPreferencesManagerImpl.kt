@@ -1,6 +1,8 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
@@ -14,9 +16,7 @@ import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libsimprints.FingerIdentifier
 
 
 open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
