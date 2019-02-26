@@ -17,9 +17,9 @@ import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
-import com.simprints.id.domain.identification.IdentificationResult;
-import com.simprints.id.domain.identification.Tier;
-import com.simprints.id.domain.identification.VerificationResult;
+import com.simprints.id.domain.matching.IdentificationResult;
+import com.simprints.id.domain.matching.Tier;
+import com.simprints.id.domain.matching.VerificationResult;
 import com.simprints.id.domain.responses.IdIdentificationResponse;
 import com.simprints.id.domain.responses.IdVerifyResponse;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
@@ -46,7 +46,8 @@ import io.reactivex.functions.BiConsumer;
 
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
-import static com.simprints.id.domain.identification.Tier.computeTier;
+import static com.simprints.id.domain.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
+import static com.simprints.id.domain.matching.Tier.computeTier;
 
 public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
@@ -173,12 +174,11 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 }
 
                 // Start lengthy operation in a background thread
-                new Thread(new Runnable() {
-                    public void run() {
-                        LibMatcher matcher = new LibMatcher(probe, candidates,
-                            matcher_type, scores, MatchingPresenter.this, 1);
-                        matcher.start();
-                    }
+                //StopShip: Move libcommon models in libmatcher
+                new Thread(() -> {
+//                    LibMatcher matcher = new LibMatcher(probe, candidates,
+//                        matcher_type, scores, MatchingPresenter.this, 1);
+//                    matcher.start();
                 }).start();
             }
 
@@ -223,9 +223,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 // Start lengthy operation in a background thread
                 new Thread(new Runnable() {
                     public void run() {
-                        LibMatcher matcher = new LibMatcher(probe, candidates,
-                            matcher_type, scores, MatchingPresenter.this, 1);
-                        matcher.start();
+//                        LibMatcher matcher = new LibMatcher(probe, candidates,
+//                            matcher_type, scores, MatchingPresenter.this, 1);
+//                        matcher.start();
                     }
                 }).start();
 
@@ -316,7 +316,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         } else {
                             verification = null;
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_UNKNOWN;
-                            resultCode = com.simprints.libsimprints.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
+                            resultCode = SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
                         dbManager.saveVerification(probe, verification, guidExistsResult);

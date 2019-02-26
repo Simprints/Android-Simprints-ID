@@ -65,7 +65,7 @@ class CountTaskTest {
 
         whenever(remotePeoplemanagerMock.getNumberOfPatients(anyNotNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
-        whenever(preferencesManagerMock.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
+        whenever(preferencesManagerMock.syncGroup).thenReturn(GROUP.GLOBAL)
         whenever(preferencesManagerMock.moduleId).thenReturn("0")
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")

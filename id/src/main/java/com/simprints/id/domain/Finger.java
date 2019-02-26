@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import com.simprints.id.FingerIdentifier;
 import com.simprints.id.R;
 import com.simprints.id.domain.fingerprint.Fingerprint;
+import com.simprints.id.domain.fingerprint.IdFingerprint;
 
 import androidx.annotation.NonNull;
 
@@ -58,7 +59,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
         isActive = in.readInt() == 1;
         status = Status.values()[in.readInt()];
         if (in.readInt() == 1) {
-            template = in.readParcelable(Fingerprint.class.getClassLoader());
+            template = in.readParcelable(IdFingerprint.class.getClassLoader());
         } else {
             template = null;
         }

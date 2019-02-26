@@ -27,15 +27,16 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unexpected.UnexpectedException
-import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.domain.responses.IdEnrolResponse
+import com.simprints.id.domain.responses.toDomainClientApiEnrol
+import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterError
+import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.session.callout.CalloutAction
+import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -289,7 +290,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun goToMatching(person: Person) {
         val fingerprintsModule = "com.simprints.id"
-        val matchingActivityClassName = "com.simprints.fingerprints.activities.matching.MatchingActivity"
+        val matchingActivityClassName = "com.simprints.idFingerprints.activities.matching.MatchingActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)

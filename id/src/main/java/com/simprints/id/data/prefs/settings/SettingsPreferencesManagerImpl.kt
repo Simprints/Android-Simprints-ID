@@ -11,7 +11,7 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigCompl
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
@@ -22,7 +22,7 @@ import com.simprints.id.tools.serializers.Serializer
 open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                          groupSerializer: Serializer<Constants.GROUP>,
+                                          groupSerializer: Serializer<GROUP>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
@@ -64,10 +64,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val SELECTED_MODULES_DEFAULT = setOf<String>()
 
         const val SYNC_GROUP_KEY = "SyncGroup"
-        val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
+        val SYNC_GROUP_DEFAULT = GROUP.USER
 
         const val MATCH_GROUP_KEY = "MatchGroup"
-        val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
+        val MATCH_GROUP_DEFAULT = GROUP.USER
 
         const val VIBRATE_KEY = "VibrateOn"
         const val VIBRATE_DEFAULT = true
@@ -160,11 +160,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
 
     // Sync group. Default is user
-    override var syncGroup: Constants.GROUP
+    override var syncGroup: GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
-    override var matchGroup: Constants.GROUP
+    override var matchGroup: GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // Is the vibrate on

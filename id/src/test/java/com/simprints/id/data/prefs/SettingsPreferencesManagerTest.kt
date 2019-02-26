@@ -74,7 +74,7 @@ class SettingsPreferencesManagerTest {
         val oldMatchGroup = settingsPreferencesManager.matchGroup
         Assert.assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, oldMatchGroup)
 
-        settingsPreferencesManager.matchGroup = Constants.GROUP.MODULE
+        settingsPreferencesManager.matchGroup = GROUP.MODULE
 
         val newMatchGroup = settingsPreferencesManager.matchGroup
 

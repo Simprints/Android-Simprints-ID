@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.remote.models
 
-import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.matching.IdentificationResult
 
 @Deprecated("Remove it with RTDB")
 class fb_Match (

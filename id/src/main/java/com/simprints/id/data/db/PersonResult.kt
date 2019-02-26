@@ -1,5 +1,5 @@
 package com.simprints.id.data.db
 
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.IdPerson
 
-class PersonFetchResult(val person: Person, val fetchedOnline: Boolean)
+class PersonFetchResult(val person: IdPerson, val fetchedOnline: Boolean)

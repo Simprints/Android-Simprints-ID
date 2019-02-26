@@ -1,4 +1,4 @@
-package com.simprints.libcommon;
+package com.simprints.id.domain.fingerprint;
 
 @SuppressWarnings("unused")
 public enum FingerConfig

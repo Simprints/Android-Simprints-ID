@@ -24,7 +24,7 @@ class ComplexPreferenceTest {
         private val defaultFingerId = FingerIdentifier.LEFT_3RD_FINGER
         private const val serializedDefaultFingerId = "left_3rd_finger"
 
-        private val defaultGroupEnum = Constants.GROUP.USER
+        private val defaultGroupEnum = GROUP.USER
         private val serializedDefaultGroupEnum = defaultGroupEnum.name
 
         private val storedFingerId = FingerIdentifier.LEFT_4TH_FINGER
@@ -40,19 +40,19 @@ class ComplexPreferenceTest {
         improvedPrefs,
         aKey,
         defaultGroupEnum,
-        EnumSerializer(Constants.GROUP::class.java))
+        EnumSerializer(GROUP::class.java))
 
     private var enumFromNameInSharedPrefs by ComplexPreference(
         improvedPrefs,
         bKey,
         defaultGroupEnum,
-        EnumSerializer(Constants.GROUP::class.java))
+        EnumSerializer(GROUP::class.java))
 
     private var enumFromWrongIndexInSharedPrefs by ComplexPreference(
         improvedPrefs,
         cKey,
         defaultGroupEnum,
-        EnumSerializer(Constants.GROUP::class.java))
+        EnumSerializer(GROUP::class.java))
 
     private fun mockFingerIdentifierSerializer(): Serializer<FingerIdentifier> {
         val serializer = mock<Serializer<FingerIdentifier>>()
@@ -79,7 +79,7 @@ class ComplexPreferenceTest {
                 MismatchedTypeException("Expecting String, integer stored",
                 Throwable("Expecting String, integer stored")))
 
-        whenever(prefs.getPrimitive(bKey, serializedDefaultGroupEnum)).thenReturn(Constants.GROUP.MODULE.name)
+        whenever(prefs.getPrimitive(bKey, serializedDefaultGroupEnum)).thenReturn(GROUP.MODULE.name)
 
         whenever(prefs.getPrimitive(cKey, -1)).thenReturn(5)
         whenever(prefs.getPrimitive(cKey, serializedDefaultGroupEnum))
@@ -94,7 +94,7 @@ class ComplexPreferenceTest {
     @Test
     fun testDeserializeEnumWithIndexInSharedPrefs() {
         //SharedPref: 2
-        assertEquals(enumFromIndexInSharedPrefs, Constants.GROUP.MODULE)
+        assertEquals(enumFromIndexInSharedPrefs, GROUP.MODULE)
     }
 
     @Test
@@ -106,7 +106,7 @@ class ComplexPreferenceTest {
     @Test
     fun testDeserializeEnumWithNameInSharedPrefs() {
         //SharedPref: "MODULE"
-        assertEquals(enumFromNameInSharedPrefs, Constants.GROUP.MODULE)
+        assertEquals(enumFromNameInSharedPrefs, GROUP.MODULE)
     }
 
     @Suppress("UNUSED_VARIABLE")
