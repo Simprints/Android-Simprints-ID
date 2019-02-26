@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var remotePeopleManager: RemotePeopleManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
     val projectId by lazy {
@@ -33,8 +35,8 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
     }*/
 
     override fun doWork(): Result {
-        Timber.d("PeopleUpSyncUploaderWorker doWork()")
         injectDependencies()
+        logMessageForCrashReport("PeopleUpSyncUploaderWorker - running")
 
         val task = PeopleUpSyncUploaderTask(
             loginInfoManager, localDbManager, remotePeopleManager,
@@ -44,13 +46,15 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
         return try {
             task.execute()
+            logMessageForCrashReport("PeopleUpSyncUploaderWorker - success")
             Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
             Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            analyticsManager.logThrowable(throwable)
+            logMessageForCrashReport("PeopleUpSyncUploaderWorker - failure")
+            crashReportManager.logExceptionOrThrowable(throwable)
             Result.failure()
         }
     }
@@ -60,9 +64,12 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         if (context is Application) {
             context.component.inject(this)
         } else {
-            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
+            throw WorkerInjectionFailedException.forWorker<PeopleUpSyncUploaderWorker>()
         }
     }
+
+    private fun logMessageForCrashReport(message: String) =
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80

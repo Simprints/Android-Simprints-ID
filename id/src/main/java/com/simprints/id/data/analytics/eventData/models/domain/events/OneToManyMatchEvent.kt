@@ -1,6 +1,7 @@
-package com.simprints.id.data.analytics.eventData.models.domain.events
+package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventData.models.domain.EventType
+import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import com.simprints.id.domain.Constants
 import com.simprints.id.domain.GROUP
 
 class OneToManyMatchEvent(val relativeStartTime: Long,

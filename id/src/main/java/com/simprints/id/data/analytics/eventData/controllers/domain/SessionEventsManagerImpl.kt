@@ -1,20 +1,20 @@
-package com.simprints.id.data.analytics.eventData.controllers.domain
+package com.simprints.id.data.analytics.eventdata.controllers.domain
 
 import android.os.Build
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.*
-import com.simprints.id.data.analytics.eventData.models.domain.session.Device
-import com.simprints.id.data.analytics.eventData.models.domain.session.Location
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.fingerprint.Utils
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
-import com.simprints.id.exceptions.safe.session.AttemptedToModifyASessionAlreadyClosed
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.safe.session.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
@@ -30,7 +30,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
                                     private val timeHelper: TimeHelper,
-                                    private val analyticsManager: AnalyticsManager) :
+                                    private val crashReportManager: CrashReportManager) :
+
     SessionEventsManager,
     SessionEventsLocalDbManager by sessionEventsLocalDbManager {
 
@@ -74,11 +75,11 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                 block(it)
                 insertOrUpdateSessionEvents(it)
             } else {
-                throw AttemptedToModifyASessionAlreadyClosed()
+                throw AttemptedToModifyASessionAlreadyClosedException()
             }
         }.doOnError {
             Timber.e(it)
-            analyticsManager.logThrowable(it)
+            crashReportManager.logExceptionOrThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
@@ -95,7 +96,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
             Completable.complete()
         }.doOnError {
-            analyticsManager.logThrowable(it)
+            crashReportManager.logExceptionOrThrowable(it)
         }.onErrorComplete()
 
     /** @throws SessionNotFoundException */

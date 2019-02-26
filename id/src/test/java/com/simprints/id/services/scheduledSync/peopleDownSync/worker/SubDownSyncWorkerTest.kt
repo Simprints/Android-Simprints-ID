@@ -8,7 +8,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -37,7 +37,7 @@ class SubDownSyncWorkerTest {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManagerMock: AnalyticsManager
+    @Inject lateinit var crashReportManagerMock: CrashReportManager
     @Mock lateinit var workParams: WorkerParameters
 
     private lateinit var subDownSyncWorker: SubDownSyncWorker
@@ -47,7 +47,7 @@ class SubDownSyncWorkerTest {
 
     private val module by lazy {
         TestAppModule(app,
-            analyticsManagerRule = DependencyRule.MockRule,
+            crashReportManagerRule = DependencyRule.MockRule,
             localDbManagerRule = DependencyRule.MockRule,
             downSyncTaskRule = DependencyRule.ReplaceRule { mockDownSyncTask }
         )
@@ -83,7 +83,7 @@ class SubDownSyncWorkerTest {
         val result = subDownSyncWorker.doWork()
 
         verifyOnce(mockDownSyncTask) { execute(anyNotNull()) }
-        verifyOnce(analyticsManagerMock) { logThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         assert(result is ListenableWorker.Result.Failure)
     }
 }

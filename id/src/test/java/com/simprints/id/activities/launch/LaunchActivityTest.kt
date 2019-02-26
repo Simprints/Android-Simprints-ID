@@ -44,6 +44,7 @@ class LaunchActivityTest {
         TestAppModule(app,
             localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
+            crashReportManagerRule = MockRule,
             dbManagerRule = MockRule,
             syncSchedulerHelperRule = MockRule,
             scheduledSessionsSyncManagerRule = MockRule)

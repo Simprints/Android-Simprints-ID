@@ -8,7 +8,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -38,7 +38,7 @@ class SubCountWorkerTest {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     @Mock lateinit var workParams: WorkerParameters
 
@@ -50,7 +50,7 @@ class SubCountWorkerTest {
     private val module by lazy {
         TestAppModule(app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule,
+            crashReportManagerRule = DependencyRule.MockRule,
             countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
         )
     }
@@ -86,7 +86,7 @@ class SubCountWorkerTest {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
         val workerResult = subCountWorker.doWork()
 
-        verifyOnce(analyticsManager) { logThrowable(anyNotNull()) }
+        verifyOnce(crashReportManager) { logExceptionOrThrowable(anyNotNull()) }
         assert(workerResult is ListenableWorker.Result.Success)
     }
 }

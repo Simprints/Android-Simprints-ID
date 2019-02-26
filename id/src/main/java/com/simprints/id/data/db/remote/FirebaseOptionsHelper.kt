@@ -3,8 +3,8 @@ package com.simprints.id.data.db.remote
 import android.content.Context
 import com.google.firebase.FirebaseOptions
 import com.simprints.id.BuildConfig
-import com.simprints.id.exceptions.unsafe.GoogleServicesJsonInvalidError
-import com.simprints.id.exceptions.unsafe.GoogleServicesJsonNotFoundError
+import com.simprints.id.exceptions.unexpected.GoogleServicesJsonInvalidException
+import com.simprints.id.exceptions.unexpected.GoogleServicesJsonNotFoundException
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -29,7 +29,7 @@ class FirebaseOptionsHelper(private val context: Context) {
     private fun getJsonFromGoogleServicesFile(jsonName: String): JSONObject {
         val id = context.resources.getIdentifier(jsonName, rawResourcesName, context.packageName)
         if (isResourceIdMissing(id)) {
-            throw GoogleServicesJsonNotFoundError.forFile(jsonName)
+            throw GoogleServicesJsonNotFoundException.forFile(jsonName)
         }
         val text = context.resources.openRawResource(id).bufferedReader().use { it.readText() }
         return JSONObject(text)
@@ -50,7 +50,7 @@ class FirebaseOptionsHelper(private val context: Context) {
                 .iterateOnObjects()
                 .single { it.hasPackageName(context.packageName) }
         } catch (e: Throwable) {
-            throw GoogleServicesJsonInvalidError()
+            throw GoogleServicesJsonInvalidException()
         }
 
     private fun JSONArray.iterateOnObjects(): List<JSONObject> =
@@ -119,7 +119,7 @@ class FirebaseOptionsHelper(private val context: Context) {
         try {
             this.operation()
         } catch (e: JSONException) {
-            throw GoogleServicesJsonInvalidError()
+            throw GoogleServicesJsonInvalidException()
         }
 
     companion object {

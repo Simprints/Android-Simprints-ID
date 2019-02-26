@@ -1,9 +1,9 @@
-package com.simprints.id.data.analytics.eventData.models.local
+package com.simprints.id.data.analytics.eventdata.models.local
 
-import com.simprints.id.data.analytics.eventData.models.domain.EventType
-import com.simprints.id.data.analytics.eventData.models.domain.EventType.*
-import com.simprints.id.data.analytics.eventData.models.domain.events.*
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import com.simprints.id.data.analytics.eventdata.models.domain.EventType.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 

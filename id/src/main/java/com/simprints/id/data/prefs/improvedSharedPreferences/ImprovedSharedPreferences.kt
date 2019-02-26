@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.improvedSharedPreferences
 
-import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
-import com.simprints.id.exceptions.unsafe.MismatchedTypeError
+import com.simprints.id.exceptions.unexpected.MismatchedTypeException
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 
 /**
  * Extension of the SharedPreferences interface of the Android framework.
@@ -15,8 +15,8 @@ interface ImprovedSharedPreferences {
      *
      * Return the value if it exists, or the provided default value if it does not.
      *
-     * @throws [NonPrimitiveTypeError] if T is not a primitive type.
-     * @throws [MismatchedTypeError] if an exception occurred during retrieval due to the
+     * @throws [NonPrimitiveTypeException] if T is not a primitive type.
+     * @throws [MismatchedTypeException] if an exception occurred during retrieval due to the
      * stored value type being different from the requested type.
      */
     fun <T : Any> getPrimitive(key: String, defaultValue: T): T
@@ -48,7 +48,7 @@ interface ImprovedSharedPreferences {
          * Return a reference to the same [ImprovedSharedPreferences.Editor] object, so you can
          * chain put calls together.
          *
-         * Throw a [NonPrimitiveTypeError] if T is not a primitive type.
+         * Throw a [NonPrimitiveTypeException] if T is not a primitive type.
          */
         fun <T : Any> putPrimitive(key: String, value: T): ImprovedSharedPreferences.Editor
 
