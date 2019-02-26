@@ -1,7 +1,7 @@
-package com.simprints.id.data.analytics.eventData.controllers.remote
+package com.simprints.id.data.analytics.eventdata.controllers.remote
 
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.core.network.NetworkConstants
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.Body

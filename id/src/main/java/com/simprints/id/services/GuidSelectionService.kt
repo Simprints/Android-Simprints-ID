@@ -4,8 +4,9 @@ import android.app.IntentService
 import android.content.Intent
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -55,12 +57,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                         Timber.d(SessionEventsApiAdapterFactory().gson.toJson(sessionEventsManager.loadSessionById(sessionId).blockingGet()))
                         Timber.d("Added Guid Selection Event")
                     }, onError = { e ->
-                        analyticsManager.logThrowable(e)
+                        crashReportManager.logExceptionOrThrowable(e)
                     })
             }
             true
         } catch (t: Throwable) {
-            analyticsManager.logThrowable(t)
+            crashReportManager.logExceptionOrThrowable(t)
             false
         }
         analyticsManager.logGuidSelectionService(loginInfoManager.getSignedInProjectIdOrEmpty(),

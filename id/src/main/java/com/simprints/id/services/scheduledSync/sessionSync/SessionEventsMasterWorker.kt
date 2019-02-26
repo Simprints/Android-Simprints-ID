@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
@@ -32,7 +32,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
                 sessionEventsManager,
                 timeHelper,
                 remoteSessionsManager.getSessionsApiClient().blockingGet(),
-                analyticsManager
+                crashReportManager
             )
             task.execute().blockingAwait()
             Result.success()
@@ -41,7 +41,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
             Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
-            analyticsManager.logThrowable(throwable)
+            crashReportManager.logExceptionOrThrowable(throwable)
             Result.failure()
         }
     }
@@ -51,7 +51,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         if (context is Application) {
             context.component.inject(this)
         } else {
-            throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
+            throw WorkerInjectionFailedException.forWorker<SessionEventsMasterWorker>()
         }
     }
 }

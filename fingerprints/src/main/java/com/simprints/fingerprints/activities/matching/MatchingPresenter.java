@@ -1,34 +1,31 @@
 package com.simprints.fingerprints.activities.matching;
 
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
 import com.simprints.fingerprints.di.FingerprintsComponent;
-import com.simprints.id.data.analytics.AnalyticsManager;
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager;
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents;
+import com.simprints.id.data.analytics.crashreport.CrashReportManager;
+import com.simprints.id.data.analytics.crashreport.CrashReportTag;
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger;
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager;
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
-import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
-import com.simprints.id.domain.responses.IdIdentificationResponse;
-import com.simprints.id.domain.responses.IdVerifyResponse;
-import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
-import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
-import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
-import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
+import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
+import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
+import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.TimeHelper;
-import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
@@ -36,6 +33,7 @@ import com.simprints.libmatcher.sourceafis.MatcherEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,7 +41,6 @@ import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import io.reactivex.functions.BiConsumer;
-import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
@@ -64,7 +61,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @NonNull @Inject PreferencesManager preferencesManager;
     @NonNull @Inject LoginInfoManager loginInfoManager;
     @NonNull @Inject TimeHelper timeHelper;
-    @NonNull @Inject AnalyticsManager analyticsManager;
+    @NonNull @Inject
+    CrashReportManager crashReportManager;
     @NonNull @Inject DbManager dbManager;
     @NonNull @Inject SessionEventsManager sessionEventsManager;
     private Long startTimeVerification = 0L;
@@ -81,13 +79,13 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         sessionEventsManager
             .getCurrentSession()
             .subscribe(new BiConsumer<SessionEvents, Throwable>() {
-            @Override
-            public void accept(SessionEvents sessionEvents, Throwable throwable) {
-                if (sessionEvents != null && throwable == null) {
-                    sessionId = sessionEvents.getId();
+                @Override
+                public void accept(SessionEvents sessionEvents, Throwable throwable) {
+                    if (sessionEvents != null && throwable == null) {
+                        sessionId = sessionEvents.getId();
+                    }
                 }
-            }
-        });
+            });
     }
 
     @Override
@@ -96,6 +94,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         // TODO : Use polymorphism
         switch (preferencesManager.getCalloutAction()) {
             case IDENTIFY:
+                logMessageForCrashReport("Making identification");
                 startTimeIdentification = timeHelper.now();
 
                 final Runnable onMatchStartRunnable = new Runnable() {
@@ -113,13 +112,14 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgressLoadingStart();
                 break;
             case VERIFY:
+                logMessageForCrashReport("Making verification");
                 startTimeVerification = timeHelper.now();
 
                 matchingView.setVerificationProgress();
                 onVerifyStart();
                 break;
             default:
-                analyticsManager.logError(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
+                crashReportManager.logExceptionOrThrowable(new InvalidMatchingCalloutError("Invalid action in MatchingActivity"));
                 matchingView.launchAlert();
         }
     }
@@ -142,22 +142,17 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onIdentifyStart() {
-        try {
-            dbManager.loadPeople(
-                candidates,
-                preferencesManager.getMatchGroup(),
-                wrapCallback("loading people", newOnLoadPeopleCallback()));
-        } catch (UninitializedDataManagerError error) {
-            analyticsManager.logError(error);
-            matchingView.launchAlert();
-        }
+        dbManager.loadPeople(
+            candidates,
+            preferencesManager.getMatchGroup(),
+            wrapCallback("loading people", newOnLoadPeopleCallback()));
     }
 
     private DataCallback newOnLoadPeopleCallback() {
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Timber.d( String.format(Locale.UK,
+                logMessageForCrashReport(String.format(Locale.UK,
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
@@ -177,17 +172,18 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 }
 
                 // Start lengthy operation in a background thread
-                //StopShip: Move libcommon models in libmatcher
-                new Thread(() -> {
-//                    LibMatcher matcher = new LibMatcher(probe, candidates,
-//                        matcher_type, scores, MatchingPresenter.this, 1);
-//                    matcher.start();
+                new Thread(new Runnable() {
+                    public void run() {
+//                        LibMatcher matcher = new LibMatcher(probe, candidates,
+//                            matcher_type, scores, MatchingPresenter.this, 1);
+//                        matcher.start();
+                    }
                 }).start();
             }
 
             @Override
             public void onFailure(DATA_ERROR data_error) {
-                analyticsManager.logError(new FailedToLoadPeopleError("Failed to load people during identification: " + data_error.details()));
+                crashReportManager.logExceptionOrThrowable(new FailedToLoadPeopleException("Failed to load people during identification: " + data_error.details()));
                 matchingView.launchAlert();
             }
         };
@@ -195,23 +191,18 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     private void onVerifyStart() {
         final String guid = preferencesManager.getPatientId();
-        try {
-            dbManager.loadPerson(
-                candidates,
-                loginInfoManager.getSignedInProjectIdOrEmpty(),
-                guid,
-                wrapCallback("loading people", newOnLoadPersonCallback()));
-        } catch (UninitializedDataManagerError error) {
-            analyticsManager.logError(error);
-            matchingView.launchAlert();
-        }
+        dbManager.loadPerson(
+            candidates,
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            guid,
+            wrapCallback("loading people", newOnLoadPersonCallback()));
     }
 
     private DataCallback newOnLoadPersonCallback() {
         return new DataCallback() {
             @Override
             public void onSuccess(boolean isDataFromRemote) {
-                Timber.d( "Successfully loaded candidate");
+                logMessageForCrashReport("Successfully loaded candidate");
 
                 int matcherType = preferencesManager.getMatcherType();
 
@@ -241,7 +232,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
             @Override
             public void onFailure(DATA_ERROR dataError) {
-                analyticsManager.logError(UnexpectedDataError.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
+                crashReportManager.logExceptionOrThrowable(UnexpectedDataException.forDataError(dataError, "MatchingActivity.onVerifyStart()"));
                 matchingView.launchAlert();
             }
         };
@@ -270,7 +261,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             idx[i] = i;
                         }
 
-                        Arrays.sort(idx, (i1, i2) -> Float.compare(scores.get(i2), scores.get(i1)));
+                        Arrays.sort(idx, new Comparator<Integer>() {
+                            @Override
+                            public int compare(final Integer i1, final Integer i2) {
+                                return Float.compare(scores.get(i2), scores.get(i1));
+                            }
+                        });
 
                         for (int i = 0; i < Math.min(nbOfResults, candidates.size()); i++) {
                             Person candidate = candidates.get(idx[i]);
@@ -279,14 +275,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                                 scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
-                        try {
-                            sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
-                            dbManager.saveIdentification(probe, candidates.size(), topCandidates);
-                        } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logError(error);
-                            matchingView.launchAlert();
-                            return;
-                        }
+                        sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
+                        dbManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // signOut
                         int tier1Or2Matches = 0;
@@ -307,10 +297,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             }
                         }
 
-                        Intent resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
+                        Intent resultData;
+                        resultData = new Intent();
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -333,24 +321,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             resultCode = SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
-                        try {
-                            dbManager.saveVerification(probe, verification, guidExistsResult);
-                            sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
-                        } catch (UninitializedDataManagerError error) {
-                            analyticsManager.logError(error);
-                            matchingView.launchAlert();
-                            return;
-                        }
+                        dbManager.saveVerification(probe, verification, guidExistsResult);
+                        sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
 
                         // signOut
-                        Intent resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new IdVerifyResponse(
-                                verification.getGuidVerified(),
-                                (int) verification.getConfidence(),
-                                Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());
-
+                        Intent resultData;
+                        resultData = new Intent();
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;
@@ -370,5 +346,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 matchingView.setIdentificationProgress(progress.getProgress());
             }
         });
+    }
+
+    private void logMessageForCrashReport(String message) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.MATCHING, CrashReportTrigger.UI, Log.INFO, message);
     }
 }

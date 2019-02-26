@@ -61,6 +61,7 @@ class CollectFingerprintsActivityTest {
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var scannerManager: ScannerManager
 
+
     @Before
     fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()

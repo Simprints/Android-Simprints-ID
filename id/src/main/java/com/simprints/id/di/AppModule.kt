@@ -3,15 +3,18 @@ package com.simprints.id.di
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.Application
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManagerImpl
-import com.simprints.id.data.analytics.eventData.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManagerImpl
+import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
@@ -37,7 +40,6 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.core.network.SimApiClient
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
@@ -130,6 +132,10 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
+    open fun provideCrashManager(): CrashReportManager = CrashReportManagerImpl()
+
+    @Provides
+    @Singleton
     open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
 
     @Provides
@@ -151,8 +157,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, analyticsManager: AnalyticsManager):
-        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, analyticsManager)
+    open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
+        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton
@@ -168,8 +174,11 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideScannerManager(preferencesManager: PreferencesManager, analyticsManager: AnalyticsManager, bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        ScannerManagerImpl(preferencesManager, analyticsManager, bluetoothComponentAdapter)
+    open fun provideScannerManager(preferencesManager: PreferencesManager,
+                                   analyticsManager: AnalyticsManager,
+                                   crashReportManager: CrashReportManager,
+                                   bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
+        ScannerManagerImpl(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter)
 
     @Provides
     @Singleton
@@ -192,8 +201,8 @@ open class AppModule(val app: Application) {
                                          sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
-                                         analyticsManager: AnalyticsManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
+                                         crashReportManager: CrashReportManager): SessionEventsManager =
+        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
 
 
     @Provides

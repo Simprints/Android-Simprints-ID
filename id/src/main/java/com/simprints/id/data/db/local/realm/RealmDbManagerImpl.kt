@@ -10,7 +10,7 @@ import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
 import com.simprints.id.domain.*
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
-import com.simprints.id.exceptions.unsafe.RealmUninitialisedError
+import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.BackpressureStrategy
@@ -155,7 +155,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     private fun getRealmConfig(): Single<RealmConfiguration> =
         realmConfig
             ?.let { Single.just(it) }
-            ?: throw RealmUninitialisedError("No valid realm Config")
+            ?: throw RealmUninitialisedException("No valid realm Config")
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
         Single.just(PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)

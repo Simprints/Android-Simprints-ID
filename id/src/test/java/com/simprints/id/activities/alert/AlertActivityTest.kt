@@ -13,7 +13,7 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -41,7 +41,7 @@ class AlertActivityTest {
         TestAppModule(app,
             remoteDbManagerRule = MockRule,
             localDbManagerRule = MockRule,
-            analyticsManagerRule = MockRule,
+            crashReportManagerRule = MockRule,
             secureDataManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule)
     }

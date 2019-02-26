@@ -17,11 +17,13 @@ import com.simprints.id.R;
 import com.simprints.id.activities.IntentKeys;
 import com.simprints.id.activities.alert.AlertActivity;
 import com.simprints.id.data.analytics.AnalyticsManager;
+import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.ALERT_TYPE;
-import com.simprints.id.exceptions.unsafe.NoIntentExtrasError;
-import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.domain.fingerprint.Person;
+import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError;
+import com.simprints.id.tools.LanguageHelper;
+import com.simprints.id.tools.TimeHelper;
 
 import javax.inject.Inject;
 
@@ -44,6 +46,8 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
 
     @Inject PreferencesManager preferencesManager;
     @Inject AnalyticsManager analyticsManager;
+    @Inject CrashReportManager crashReportManager;
+    @Inject TimeHelper timeHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +69,12 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         // Create the Presenter, and pass it all the information and handles it needs
         final Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            analyticsManager.logError(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
+            crashReportManager.logExceptionOrThrowable(new NoIntentExtrasError("Null extras passed to MatchingActivity"));
             launchAlert();
             finish();
             return;
         }
+
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
         viewPresenter = new MatchingPresenter(this, component, probe);
     }
@@ -83,8 +88,8 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
     @Override
     public void setIdentificationProgress(int progress) {
         ObjectAnimator.ofInt(progressBar, "progress", progressBar.getProgress(), progress)
-                .setDuration(progress * 10)
-                .start();
+            .setDuration(progress * 10)
+            .start();
     }
 
     @Override
