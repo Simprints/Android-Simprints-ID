@@ -4,10 +4,9 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-
+import com.simprints.id.FingerIdentifier;
 import com.simprints.id.R;
-import com.simprints.libcommon.Fingerprint;
-import com.simprints.libsimprints.FingerIdentifier;
+import com.simprints.id.domain.fingerprint.Fingerprint;
 
 import androidx.annotation.NonNull;
 
@@ -25,6 +24,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
             return new Finger[size];
         }
     };
+
     private FingerIdentifier id;
     private boolean isActive;
     private Status status;

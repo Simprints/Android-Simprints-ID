@@ -6,6 +6,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
 import com.simprints.id.Application
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
@@ -23,7 +24,6 @@ import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before

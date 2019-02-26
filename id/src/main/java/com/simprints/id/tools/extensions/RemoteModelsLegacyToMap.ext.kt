@@ -36,7 +36,7 @@ fun fb_VfEvent.toMap(): Map<String, Any> {
     result["ProbePerson"] = ProbePerson.toMap()
     result["userId"] = userId
     result["date"] = date
-    result["guid"] = guid
+    result["guidFound"] = guid
     result["guidExistsResult"] = guidExistsResult
     result["confidence"] = confidence
     result["serverDate"] = serverDate

@@ -1,8 +1,10 @@
 package com.simprints.id.domain
 
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.toLibFingerprintOrNull
 import java.util.*
-import com.simprints.libcommon.Fingerprint as LibFingerprint
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Fingerprint as LibFingerprint
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 data class Person (
     val patientId: String,

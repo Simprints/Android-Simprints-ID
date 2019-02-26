@@ -22,8 +22,8 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
 
     fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
-    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?)
-    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int)
+    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: VerificationResult?)
+    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<IdentificationResult>, matchSize: Int)
     fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
     fun addLocationToSession(latitude: Double, longitude: Double)

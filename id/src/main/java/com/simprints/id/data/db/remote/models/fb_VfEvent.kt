@@ -3,8 +3,8 @@ package com.simprints.id.data.db.remote.models
 import com.google.firebase.database.ServerValue
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.libcommon.Person
-import com.simprints.libsimprints.Verification
+import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.fingerprint.Person
 
 class fb_VfEvent(
     var ProbePerson: fb_Person,
@@ -21,9 +21,9 @@ class fb_VfEvent(
                 userId: String,
                 moduleId: String,
                 guid: String,
-                verification: Verification?,
+                verification: VerificationResult?,
                 sessionId: String,
-                guidExistsResult: VERIFY_GUID_EXISTS_RESULT): this(
+                guidExistsResult: VERIFY_GUID_EXISTS_RESULT) : this(
         ProbePerson = fb_Person(probe, projectId, userId, moduleId),
         userId = userId,
         guid = guid,
@@ -31,5 +31,5 @@ class fb_VfEvent(
         sessionId = sessionId,
         serverDate = ServerValue.TIMESTAMP,
         guidExistsResult = guidExistsResult.toString(),
-        confidence = verification?.confidence ?: 0.toFloat())
+        confidence = verification?.let { it.confidence.toFloat() } ?: 0.toFloat())
 }

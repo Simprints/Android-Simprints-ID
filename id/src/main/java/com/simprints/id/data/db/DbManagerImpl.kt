@@ -17,6 +17,9 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
+import com.simprints.id.domain.identification.IdentificationResult
+import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -24,16 +27,13 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.session.Session
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 open class DbManagerImpl(override val local: LocalDbManager,
                          override val remote: RemoteDbManager,
@@ -221,7 +221,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             }.sum()
         )
 
-    override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<Identification>) {
+    override fun saveIdentification(probe: LibPerson, matchSize: Int, matches: List<IdentificationResult>) {
         preferencesManager.lastIdentificationDate = Date()
         remote.saveIdentificationInRemote(
             probe,
@@ -242,7 +242,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             sessionId)
     }
 
-    override fun saveVerification(probe: LibPerson, match: Verification?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
+    override fun saveVerification(probe: LibPerson, match: VerificationResult?, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
         preferencesManager.lastVerificationDate = Date()
         remote.saveVerificationInRemote(
             probe,
@@ -256,7 +256,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             guidExistsResult)
     }
 
-    override fun saveRefusalForm(refusalForm: RefusalForm) {
+    override fun saveRefusalForm(refusalForm: IdRefusalForm) {
         remote.saveRefusalFormInRemote(
             refusalForm,
             loginInfoManager.getSignedInProjectIdOrEmpty(),

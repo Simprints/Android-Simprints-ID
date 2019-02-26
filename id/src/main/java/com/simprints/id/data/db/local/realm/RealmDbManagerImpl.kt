@@ -25,7 +25,7 @@ import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
 import timber.log.Timber
-import com.simprints.libcommon.Person as LibPerson
+import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 //TODO: investigate potential concurrency issues using .use
 open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {

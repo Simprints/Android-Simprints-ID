@@ -17,26 +17,25 @@ import com.simprints.id.data.db.DbManager;
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
+import com.simprints.id.domain.identification.IdentificationResult;
+import com.simprints.id.domain.identification.Tier;
+import com.simprints.id.domain.identification.VerificationResult;
 import com.simprints.id.domain.responses.IdIdentificationResponse;
 import com.simprints.id.domain.responses.IdVerifyResponse;
-import com.simprints.id.domain.responses.TierResponse;
 import com.simprints.id.exceptions.unsafe.FailedToLoadPeopleError;
 import com.simprints.id.exceptions.unsafe.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unsafe.UnexpectedDataError;
 import com.simprints.id.exceptions.unsafe.UninitializedDataManagerError;
 import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.TimeHelper;
-import com.simprints.libcommon.Person;
+import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
 import com.simprints.libmatcher.Progress;
 import com.simprints.libmatcher.sourceafis.MatcherEventListener;
-import com.simprints.libsimprints.Identification;
-import com.simprints.libsimprints.Verification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -47,7 +46,7 @@ import io.reactivex.functions.BiConsumer;
 
 import static android.app.Activity.RESULT_OK;
 import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
-import static com.simprints.id.tools.TierHelper.computeTier;
+import static com.simprints.id.domain.identification.Tier.computeTier;
 
 public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
@@ -255,7 +254,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         matchingView.setIdentificationProgressReturningStart();
                         int nbOfResults = preferencesManager.getReturnIdCount();
 
-                        ArrayList<Identification> topCandidates = new ArrayList<>();
+                        ArrayList<IdentificationResult> topCandidates = new ArrayList<>();
 
                         // Sort the indices of the person by decreasing score
                         final Integer[] idx = new Integer[candidates.size()];
@@ -263,17 +262,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                             idx[i] = i;
                         }
 
-                        Arrays.sort(idx, new Comparator<Integer>() {
-                            @Override
-                            public int compare(final Integer i1, final Integer i2) {
-                                return Float.compare(scores.get(i2), scores.get(i1));
-                            }
-                        });
+                        Arrays.sort(idx, (i1, i2) -> Float.compare(scores.get(i2), scores.get(i1)));
 
                         for (int i = 0; i < Math.min(nbOfResults, candidates.size()); i++) {
                             Person candidate = candidates.get(idx[i]);
 
-                            topCandidates.add(new Identification(candidate.getGuid(),
+                            topCandidates.add(new IdentificationResult(candidate.getGuid(),
                                 scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
@@ -284,7 +278,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         int tier1Or2Matches = 0;
                         int tier3Matches = 0;
                         int tier4Matches = 0;
-                        for (Identification identification : topCandidates) {
+                        for (IdentificationResult identification : topCandidates) {
                             switch (identification.getTier()) {
                                 case TIER_1:
                                 case TIER_2:
@@ -310,13 +304,13 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         break;
                     }
                     case VERIFY: {
-                        final Verification verification;
+                        final VerificationResult verification;
                         VERIFY_GUID_EXISTS_RESULT guidExistsResult;
                         int resultCode;
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new Verification(score, computeTier(score), preferencesManager.getPatientId());
+                            verification = new VerificationResult(preferencesManager.getPatientId(), score, computeTier(score));
                             guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
@@ -333,9 +327,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         resultData.putExtra(
                             SimprintsIdResponse.BUNDLE_KEY,
                             new IdVerifyResponse(
-                                verification.getGuid(),
+                                verification.getGuidVerified(),
                                 (int) verification.getConfidence(),
-                                TierResponse.valueOf(verification.getTier().name())).toDomainClientApiVerify());
+                                Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());
 
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();

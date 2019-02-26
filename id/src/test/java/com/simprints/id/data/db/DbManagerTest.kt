@@ -27,7 +27,7 @@ import com.simprints.testtools.unit.mockserver.mockServerProblemResponse
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupLocalAndRemoteManagersForApiTesting
 import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.libcommon.Person
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.testtools.common.syntax.spy
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
