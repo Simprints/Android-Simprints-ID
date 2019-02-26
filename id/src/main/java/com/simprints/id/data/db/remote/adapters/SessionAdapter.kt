@@ -11,7 +11,6 @@ fun Session.toFirebaseSession(): fb_Session =
             deviceModel,
             deviceId,
             appVersionName,
-            libVersionName,
             calloutAction,
             projectId,
             moduleId,

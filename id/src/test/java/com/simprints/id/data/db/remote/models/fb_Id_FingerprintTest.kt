@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.IdFingerprint
 import com.simprints.libsimprints.FingerIdentifier
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -16,10 +16,10 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 
-class fb_FingerprintTest {
+class fb_Id_FingerprintTest {
     @Test
     fun serialiseFbFingerprint_skipUnwantedFields() {
-        val fingerprint = fb_Fingerprint(Fingerprint.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB))
+        val fingerprint = fb_Fingerprint(IdFingerprint.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB))
         val jsonString = JsonHelper.toJson(fingerprint)
         val json = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 

@@ -7,7 +7,7 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun configureVisibilityOfSelectModulePreference() {
         val isModuleListNonEmpty = preferencesManager.moduleIdOptions.isNotEmpty()
-        val isModuleSync = preferencesManager.syncGroup == Constants.GROUP.MODULE
+        val isModuleSync = preferencesManager.syncGroup == GROUP.MODULE
 
         view.setSelectModulePreferenceEnabled(isModuleSync and isModuleListNonEmpty) // TODO : log in analytics if XOR these conditions is true
     }

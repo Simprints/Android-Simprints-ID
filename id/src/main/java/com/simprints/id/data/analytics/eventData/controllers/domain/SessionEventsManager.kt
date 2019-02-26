@@ -4,8 +4,8 @@ import com.simprints.id.data.analytics.eventData.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventData.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventData.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
-import com.simprints.id.domain.identification.IdentificationResult
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.matching.IdentificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.fingerprint.Person
 import io.reactivex.Completable
 import io.reactivex.Single

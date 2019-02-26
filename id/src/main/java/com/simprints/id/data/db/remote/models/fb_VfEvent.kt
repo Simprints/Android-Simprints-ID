@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote.models
 import com.google.firebase.database.ServerValue
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.fingerprint.Person
 
 class fb_VfEvent(

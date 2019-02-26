@@ -1,12 +1,11 @@
 package com.simprints.id.domain
 
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.IdFingerprint
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.fingerprint.toLibFingerprintOrNull
 import java.util.*
-import com.simprints.id.domain.fingerprint.Fingerprint as LibFingerprint
-import com.simprints.id.domain.fingerprint.Person as LibPerson
 
-data class Person (
+data class IdPerson (
     val patientId: String,
     val projectId: String,
     val userId: String,
@@ -14,12 +13,12 @@ data class Person (
     val createdAt: Date?,
     val updatedAt: Date?,
     val toSync: Boolean, // TODO: stop leaking data layer concerns into domain layer
-    val fingerprints: List<Fingerprint>
+    val idFingerprints: List<IdFingerprint>
 )
 
 // TODO: move this adapter out of domain code. The domain layer should not be aware of outer layers
-fun Person.toLibPerson(): LibPerson =
-    LibPerson(
+fun IdPerson.toLibPerson(): Person =
+    Person(
         patientId,
-        fingerprints.mapNotNull(Fingerprint::toLibFingerprintOrNull)
+        idFingerprints.mapNotNull(IdFingerprint::toLibFingerprintOrNull)
     )

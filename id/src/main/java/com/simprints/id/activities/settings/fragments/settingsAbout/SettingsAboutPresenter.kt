@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import javax.inject.Inject
 
@@ -63,7 +63,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
             " - ${preferencesManager.matchGroup.lowerCaseCapitalized()} Search"
     }
 
-    private fun Constants.GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
+    private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
     internal fun loadAppVersionInPreference(preference: Preference) {
         preference.summary = preferencesManager.appVersionName

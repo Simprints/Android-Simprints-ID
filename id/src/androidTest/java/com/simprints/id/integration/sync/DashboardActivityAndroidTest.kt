@@ -27,7 +27,7 @@ import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.Constants
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.integration.testtools.TestProjectRule
 import com.simprints.id.integration.testtools.models.TestProject
 import com.simprints.id.integration.testtools.remote.RemoteTestingManager
@@ -94,8 +94,8 @@ class DashboardActivityAndroidTest {
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
-    private var peopleInDb = mutableListOf<Person>()
-    private var peopleOnServer = mutableListOf<Person>()
+    private var peopleInDb = mutableListOf<IdPerson>()
+    private var peopleOnServer = mutableListOf<IdPerson>()
 
     @Before
     fun setUp() {
@@ -207,18 +207,18 @@ class DashboardActivityAndroidTest {
         }
 
     private fun mockGlobalScope(): SyncScope {
-        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.GLOBAL)
+        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.GLOBAL)
         return syncScope
     }
 
     private fun mockUserScope(): SyncScope {
-        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.USER)
+        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.USER)
         return syncScope
     }
 
     private fun mockModuleScope(): SyncScope {
         whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(modules)
-        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.MODULE)
+        whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.MODULE)
         return syncScope
     }
 

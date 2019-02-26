@@ -2,12 +2,9 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventData.models.domain.events.EnrollmentEvent
-import com.simprints.id.data.db.dbRecovery.LocalDbRecovererImpl
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
 import com.simprints.id.data.db.remote.models.fb_Person
@@ -17,11 +14,11 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.Constants
-import com.simprints.id.domain.Person
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.IdPerson
 import com.simprints.id.domain.Project
-import com.simprints.id.domain.identification.IdentificationResult
-import com.simprints.id.domain.identification.VerificationResult
+import com.simprints.id.domain.matching.IdentificationResult
+import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.domain.toLibPerson
 import com.simprints.id.secure.models.Tokens
@@ -181,14 +178,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
             }
 
 
-    override fun loadPeople(destinationList: MutableList<LibPerson>, group: Constants.GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<LibPerson>, group: GROUP, callback: DataCallback?) {
         val people = when (group) {
-            Constants.GROUP.GLOBAL -> local.loadPeopleFromLocal()
-            Constants.GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            Constants.GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
+            GROUP.GLOBAL -> local.loadPeopleFromLocal()
+            GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
+            GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
         }
             .blockingGet()
-            .map(Person::toLibPerson)
+            .map(IdPerson::toLibPerson)
         destinationList.addAll(people)
         callback?.onSuccess(false)
     }
@@ -269,20 +266,5 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     override fun saveSession(session: Session) {
         remote.saveSessionInRemote(session)
-    }
-
-    override fun recoverLocalDb(group: Constants.GROUP): Completable {
-        val firebaseManager = remote as FirebaseManagerImpl
-        val realmManager = local as RealmDbManagerImpl
-        return LocalDbRecovererImpl(
-            realmManager,
-            firebaseManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.deviceId,
-            preferencesManager.moduleId,
-            group)
-            .recoverDb()
-            .trace("recoverLocalDb")
     }
 }

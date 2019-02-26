@@ -1,10 +1,9 @@
-package com.simprints.libcommon;
+package com.simprints.id.domain.fingerprint;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-
-import com.simprints.libsimprints.FingerIdentifier;
+import com.simprints.id.FingerIdentifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -197,5 +196,4 @@ public class Person implements Parcelable {
             dest.writeParcelable(fp, flags);
         }
     }
-
 }

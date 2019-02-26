@@ -3,7 +3,6 @@ package com.simprints.id.session.sessionParameters.extractors
 import com.simprints.id.domain.requests.IdRequest
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.libsimprints.Constants
 
 class SessionParametersExtractorImpl: SessionParametersExtractor {
 
@@ -15,7 +14,7 @@ class SessionParametersExtractorImpl: SessionParametersExtractor {
         val metadata = idRequest.metadata
 
         //STOPSHIP: Remove me
-        return SessionParameters(action, "", projectId, moduleId, userId, "", callingPackage, metadata, Constants.SIMPRINTS_ODK_RESULT_FORMAT_V01)
+        return SessionParameters(action, "", projectId, moduleId, userId, "", callingPackage, metadata, "")
     }
 }
 
