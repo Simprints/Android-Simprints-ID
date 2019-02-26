@@ -10,7 +10,12 @@ import io.realm.transformer.RealmTransformer
 
 android.registerTransform(new RealmTransformer())
 
+androidExtensions {
+    experimental = true
+}
+
 android {
+
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
