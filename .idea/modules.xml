@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moduleinterfaces/moduleinterfaces.iml" filepath="$PROJECT_DIR$/moduleinterfaces/moduleinterfaces.iml" />
       <module fileurl="file://$PROJECT_DIR$/testtools/testtools.iml" filepath="$PROJECT_DIR$/testtools/testtools.iml" />
     </modules>
   </component>

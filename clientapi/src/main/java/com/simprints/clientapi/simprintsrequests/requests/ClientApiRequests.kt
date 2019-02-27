@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.simprints.clientapi.simprintsrequests.ApiVersion
 import kotlinx.android.parcel.IgnoredOnParcel
 
+
 interface ClientApiBaseRequest : Parcelable {
 
     @IgnoredOnParcel
