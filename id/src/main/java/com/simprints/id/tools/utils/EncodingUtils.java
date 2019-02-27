@@ -1,11 +1,11 @@
-package com.simprints.id.domain.fingerprint;
+package com.simprints.id.tools.utils;
 
 
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
-public class Utils {
+public class EncodingUtils {
 
     public static @NonNull
     String byteArrayToBase64(@NonNull byte[] bytes)

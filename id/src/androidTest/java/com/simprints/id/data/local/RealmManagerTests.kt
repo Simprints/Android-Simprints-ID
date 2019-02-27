@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.local.realm.models.toDomainPerson
 import io.realm.Realm
 import org.junit.Assert.assertEquals
@@ -97,8 +97,8 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
 
-        assertEquals(realm.where(rl_Person::class.java).count(), 1)
-        assertTrue(realm.where(rl_Person::class.java).findFirst()!!.deepEquals(fakePerson))
+        assertEquals(realm.where(DbPerson::class.java).count(), 1)
+        assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
     }
 
     @Test
@@ -107,8 +107,8 @@ class RealmManagerTests : RealmTestsBase() {
         realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
         realmManager.insertOrUpdatePersonInLocal(fakePerson).blockingAwait()
 
-        assertEquals(realm.where(rl_Person::class.java).count(), 1)
-        assertTrue(realm.where(rl_Person::class.java).findFirst()!!.deepEquals(fakePerson))
+        assertEquals(realm.where(DbPerson::class.java).count(), 1)
+        assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
     }
 
     @Test

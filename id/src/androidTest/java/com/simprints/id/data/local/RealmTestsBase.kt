@@ -3,8 +3,7 @@ package com.simprints.id.data.local
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.domain.IdPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import io.realm.Realm
@@ -34,15 +33,15 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
+    protected fun getFakePerson(): DbPerson = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
 
-    protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
+    protected fun saveFakePerson(realm: Realm, fakePerson: DbPerson): DbPerson =
         fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
     protected fun saveFakePeople(realm: Realm, people: List<IdPerson>): List<IdPerson> =
         people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
 
-    protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {
+    protected fun DbPerson.deepEquals(other: DbPerson): Boolean = when {
         this.patientId != other.patientId -> false
         this.projectId != other.projectId -> false
         this.userId != other.userId -> false
