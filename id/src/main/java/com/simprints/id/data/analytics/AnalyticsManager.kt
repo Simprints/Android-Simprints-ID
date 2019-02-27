@@ -1,7 +1,6 @@
 package com.simprints.id.data.analytics
 
 import com.simprints.id.domain.requests.IdRequest
-import com.simprints.id.session.Session
 import io.reactivex.Single
 
 
@@ -15,5 +14,4 @@ interface AnalyticsManager {
     fun logGuidSelectionService(projectId: String, sessionId: String, selectedGuid: String, callbackSent: Boolean)
     fun logConnectionStateChange(connected: Boolean)
     fun logAuthStateChange(authenticated: Boolean)
-    fun logSession(session: Session)
 }

@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
@@ -19,6 +19,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.Finger
@@ -44,6 +45,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View)
     : CollectFingerprintsContract.Presenter {
 
+    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
@@ -250,7 +252,12 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
-        val person = Person(preferencesManager.patientId, fingerprints)
+        val person = Person(
+            UUID.randomUUID().toString(),
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            loginInfoManager.getSignedInUserIdOrEmpty(),
+            preferencesManager.moduleId,
+            fingerprints)
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
         if (isRegisteringElseIsMatching()) {
@@ -273,7 +280,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun handleSavePersonSuccess() {
         preferencesManager.lastEnrolDate = Date()
         val result = Intent()
-        result.putExtra(ClientApiEnrollResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
+        result.putExtra(SimprintsIdResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
         view.finishSuccessEnrol(result)
     }
 
