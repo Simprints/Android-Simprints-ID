@@ -9,11 +9,11 @@ import com.simprints.id.FingerIdentifier.*
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.Finger
-import com.simprints.id.domain.fingerprint.FingerConfig.OPTIONAL
-import com.simprints.id.domain.fingerprint.FingerConfig.REQUIRED
-import com.simprints.id.domain.fingerprint.ScanConfig
-import com.simprints.id.domain.fingerprint.ScanConfigFingerEntry
+import com.simprints.id.activities.collectFingerprints.models.Finger
+import com.simprints.id.activities.collectFingerprints.models.FingerConfig.OPTIONAL
+import com.simprints.id.activities.collectFingerprints.models.FingerConfig.REQUIRED
+import com.simprints.id.activities.collectFingerprints.models.ScanConfig
+import com.simprints.id.activities.collectFingerprints.models.ScanConfigFingerEntry
 import com.simprints.id.tools.extensions.isFingerNotCollectable
 import javax.inject.Inject
 

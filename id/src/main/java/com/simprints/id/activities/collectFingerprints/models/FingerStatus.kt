@@ -1,4 +1,4 @@
-package com.simprints.id.domain
+package com.simprints.id.activities.collectFingerprints.models
 
 import android.graphics.Color
 import com.simprints.id.R

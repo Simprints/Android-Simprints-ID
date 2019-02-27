@@ -2,8 +2,7 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import com.simprints.id.data.analytics.eventdata.models.domain.EventType
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.Finger
-import com.simprints.id.domain.FingerStatus
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus
 
 class FingerprintCaptureEvent(val relativeStartTime: Long,
                               val relativeEndTime: Long,

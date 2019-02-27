@@ -8,9 +8,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simprints.id.R;
-import com.simprints.id.domain.Finger;
-import com.simprints.id.domain.FingerRes;
-import com.simprints.id.domain.FingerStatus;
+import com.simprints.id.activities.collectFingerprints.models.Finger;
+import com.simprints.id.activities.collectFingerprints.models.FingerRes;
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

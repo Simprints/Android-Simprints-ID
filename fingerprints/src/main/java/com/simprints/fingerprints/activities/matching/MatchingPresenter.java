@@ -46,7 +46,7 @@ import androidx.annotation.NonNull;
 import io.reactivex.functions.BiConsumer;
 
 import static android.app.Activity.RESULT_OK;
-import static com.simprints.id.data.db.remote.tools.Utils.wrapCallback;
+import static com.simprints.id.tools.DataCallbackUtils.wrapCallback;
 import static com.simprints.id.domain.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
 import static com.simprints.id.domain.matching.Tier.computeTier;
 
