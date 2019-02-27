@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
-import com.simprints.id.domain.FingerStatus
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus
 
 
 class CollectFingerprintsIndicatorsHelper(private val context: Context,

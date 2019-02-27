@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -151,7 +151,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground { session ->
             session.events.add(PersonCreationEvent(
                 session.nowRelativeToStartTime(timeHelper),
-                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
+                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
     }
