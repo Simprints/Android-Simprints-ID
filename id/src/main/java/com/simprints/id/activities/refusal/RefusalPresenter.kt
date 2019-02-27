@@ -55,7 +55,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
-        saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
                 it.events.add(RefusalEvent(
@@ -86,11 +85,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     private fun getRefusalForm(refusalText: String) = IdRefusalForm(reason.toString(), refusalText)
-
-    private fun saveRefusalFormInDb(refusalForm: RefusalForm) {
-        dbManager.saveRefusalForm(refusalForm)
-    }
-
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(CrashReportTag.REFUSAL, CrashReportTrigger.UI, message = message)
     }

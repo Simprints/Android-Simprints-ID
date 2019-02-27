@@ -45,30 +45,11 @@ class Fingerprint(val fingerId: FingerIdentifier,
 
         template.put(isoTemplateBytes)
         template.order(ByteOrder.BIG_ENDIAN)
-        try {
-            // Checks the format identifier
-            if (this.template.getInt(FORMAT_ID) != ISO_FORMAT_ID) {
-                throw IllegalArgumentException("Invalid template: not an ISO template")
-            }
 
-            // Checks the ISO version
-            if (this.template.getInt(VERSION) != ISO_2005_VERSION) {
-                throw IllegalArgumentException("Invalid template: only ISO 2005 is supported")
-            }
-
-            // Checks the length of the record
-            if (this.template.getInt(RECORD_LENGTH) != isoTemplateBytes.size) {
-                throw IllegalArgumentException("Invalid template: invalid length")
-            }
-
-            // Checks the number of fingers
-            if (this.template.get(NB_FINGERPRINTS).toInt() != 1) {
-                throw IllegalArgumentException("Invalid template: only single fingerprint template ares supported")
-            }
-        } catch (ex: IndexOutOfBoundsException) {
-            throw IllegalArgumentException("Invalid template: Processing byte[] failed")
-        }
-
+        require(this.template.getInt(FORMAT_ID) == ISO_FORMAT_ID) { "Invalid template: not an ISO template" }
+        require(this.template.getInt(VERSION) == ISO_2005_VERSION) { "Invalid template: only ISO 2005 is supported" }
+        require(this.template.getInt(RECORD_LENGTH) == isoTemplateBytes.size) { "Invalid template: invalid length" }
+        require(this.template.get(NB_FINGERPRINTS)== 1.toByte()) { "Invalid template: only single fingerprint template ares supported" }
     }
 
     companion object : Parceler<Fingerprint> {

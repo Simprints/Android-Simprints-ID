@@ -4,13 +4,11 @@ import com.google.gson.annotations.SerializedName
 import com.simprints.core.tools.json.PostGsonProcessable
 import com.simprints.core.tools.json.SkipSerialisationProperty
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.domain.IdPerson
 import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 data class fb_Person(@SerializedName("id") var patientId: String,
                      var projectId: String,
@@ -19,35 +17,6 @@ data class fb_Person(@SerializedName("id") var patientId: String,
                      var createdAt: Date?,
                      var updatedAt: Date?,
                      var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>>) : PostGsonProcessable {
-
-    constructor (person: LibPerson,
-                 projectId: String,
-                 userId: String,
-                 moduleId: String) : this(
-        patientId = person.guid,
-        projectId = projectId,
-        userId = userId,
-        moduleId = moduleId,
-        updatedAt = null,
-        createdAt = null,
-        fingerprints = HashMap(
-            person.fingerprints
-                .map { fb_Fingerprint(it) }
-                .groupBy { it.fingerId }
-                .mapValues { ArrayList(it.value) }))
-
-    constructor (realmPerson: rl_Person) : this(
-        patientId = realmPerson.patientId,
-        projectId = realmPerson.projectId,
-        userId = realmPerson.userId,
-        moduleId = realmPerson.moduleId,
-        updatedAt = realmPerson.updatedAt,
-        createdAt = realmPerson.createdAt,
-        fingerprints = HashMap(
-            realmPerson.libPerson.fingerprints
-                .map { fb_Fingerprint(it) }
-                .groupBy { it.fingerId }
-                .mapValues { ArrayList(it.value) }))
 
     @SkipSerialisationProperty
     val fingerprintsAsList
@@ -59,7 +28,7 @@ data class fb_Person(@SerializedName("id") var patientId: String,
     }
 }
 
-fun IdPerson.toFirebasePerson(): fb_Person =
+fun Person.toFirebasePerson(): fb_Person =
     fb_Person(
         patientId = patientId,
         projectId = projectId,
@@ -73,8 +42,8 @@ fun IdPerson.toFirebasePerson(): fb_Person =
             .mapValues { ArrayList(it.value) })
     )
 
-fun fb_Person.toDomainPerson(): IdPerson =
-    IdPerson(
+fun fb_Person.toDomainPerson(): Person =
+    Person(
         patientId = patientId,
         projectId = projectId,
         userId = userId,

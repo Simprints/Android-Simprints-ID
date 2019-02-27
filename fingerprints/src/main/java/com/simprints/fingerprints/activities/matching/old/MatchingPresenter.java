@@ -7,7 +7,6 @@ import android.os.HandlerThread;
 import android.util.Log;
 
 import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
-import com.simprints.fingerprints.activities.matching.MatchingContract;
 import com.simprints.fingerprints.di.FingerprintsComponent;
 import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.analytics.crashreport.CrashReportTag;
@@ -17,7 +16,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
-import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT;
 import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.fingerprint.Person;
@@ -276,12 +274,11 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         for (int i = 0; i < Math.min(nbOfResults, candidates.size()); i++) {
                             Person candidate = candidates.get(idx[i]);
 
-                            topCandidates.add(new IdentificationResult(candidate.getGuid(),
+                            topCandidates.add(new IdentificationResult(candidate.getPatientId(),
                                 scores.get(idx[i]).intValue(), computeTier(scores.get(idx[i]))));
                         }
 
                         sessionEventsManager.addOneToManyEventInBackground(startTimeIdentification, topCandidates, candidates.size());
-                        dbManager.saveIdentification(probe, candidates.size(), topCandidates);
 
                         // signOut
                         int tier1Or2Matches = 0;
@@ -315,22 +312,18 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                     }
                     case VERIFY: {
                         final VerificationResult verification;
-                        VERIFY_GUID_EXISTS_RESULT guidExistsResult;
                         int resultCode;
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
                             verification = new VerificationResult(preferencesManager.getPatientId(), score, computeTier(score));
-                            guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_FOUND;
                             resultCode = RESULT_OK;
                         } else {
                             verification = null;
-                            guidExistsResult = VERIFY_GUID_EXISTS_RESULT.GUID_NOT_FOUND_UNKNOWN;
                             resultCode = SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
                         }
 
-                        dbManager.saveVerification(probe, verification, guidExistsResult);
-                        sessionEventsManager.addOneToOneMatchEventInBackground(probe.getGuid(), startTimeVerification, verification);
+                        sessionEventsManager.addOneToOneMatchEventInBackground(probe.getPatientId(), startTimeVerification, verification);
 
                         // signOut
                         Intent resultData;
