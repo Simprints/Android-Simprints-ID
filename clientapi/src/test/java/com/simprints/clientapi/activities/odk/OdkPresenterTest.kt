@@ -8,10 +8,12 @@ import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
-import com.simprints.libsimprints.Verification
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse.Identification
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier.TIER_1
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier.TIER_5
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -68,17 +70,18 @@ class OdkPresenterTest {
     fun processRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER).processRegistration(Registration(registerId))
+        OdkPresenter(view, ACTION_REGISTER).handleEnrollResponse(ClientApiEnrollResponse(registerId))
         Mockito.verify(view, times(1)).returnRegistration(registerId)
     }
 
     @Test
     fun processIdentification_ShouldReturnValidOdkIdentification() {
-        val id1 = Identification(UUID.randomUUID().toString(), 100, Tier.TIER_1)
-        val id2 = Identification(UUID.randomUUID().toString(), 15, Tier.TIER_5)
+        val id1 = Identification(UUID.randomUUID().toString(), 100, TIER_1)
+        val id2 = Identification(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY).processIdentification(arrayListOf(id1, id2), sessionId)
+        OdkPresenter(view, ACTION_IDENTIFY).handleIdentifyResponse(
+            ClientApiIdentifyResponse(arrayListOf(id1, id2), sessionId))
         Mockito.verify(view, times(1)).returnIdentification(
             idList = "${id1.guid} ${id2.guid}",
             confidenceList = "${id1.confidence} ${id2.confidence}",
@@ -89,9 +92,9 @@ class OdkPresenterTest {
 
     @Test
     fun processVerification_ShouldReturnValidOdkVerification() {
-        val verification = Verification(100, Tier.TIER_1, UUID.randomUUID().toString())
+        val verification = ClientApiVerifyResponse(UUID.randomUUID().toString(), 100, TIER_1)
 
-        OdkPresenter(view, ACTION_IDENTIFY).processVerification(verification)
+        OdkPresenter(view, ACTION_IDENTIFY).handleVerifyResponse(verification)
         Mockito.verify(view, times(1)).returnVerification(
             id = verification.guid,
             confidence = verification.confidence.toString(),
@@ -101,7 +104,7 @@ class OdkPresenterTest {
 
     @Test
     fun processReturnError_ShouldCallActionError() {
-        OdkPresenter(view, "").processReturnError()
+        OdkPresenter(view, "").handleResponseError()
         Mockito.verify(view, times(1)).returnIntentActionErrorToClient()
     }
 
