@@ -11,7 +11,7 @@ import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
 import java.util.*
 
-open class rl_Person(
+open class DbPerson(
     @PrimaryKey
     var patientId: String = "",
 
@@ -31,7 +31,7 @@ open class rl_Person(
     var toSync: Boolean = false,
 
     @Required
-    var fingerprints: RealmList<rl_Fingerprint> = RealmList()
+    var fingerprints: RealmList<DbFingerprint> = RealmList()
 ) : RealmObject() {
 
     companion object {
@@ -54,7 +54,7 @@ open class rl_Person(
 
 }
 
-fun rl_Person.toDomainPerson(): Person =
+fun DbPerson.toDomainPerson(): Person =
     Person(
         patientId = patientId,
         projectId = projectId,
@@ -63,11 +63,11 @@ fun rl_Person.toDomainPerson(): Person =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        fingerprints = fingerprints.map(rl_Fingerprint::toDomainFingerprint)
+        fingerprints = fingerprints.map(DbFingerprint::toDomainFingerprint)
     )
 
-fun Person.toRealmPerson(): rl_Person =
-    rl_Person(
+fun Person.toRealmPerson(): DbPerson =
+    DbPerson(
         patientId = patientId,
         projectId = projectId,
         userId = userId,
