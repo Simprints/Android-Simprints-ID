@@ -69,7 +69,7 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
-            idFingerprints = idFingerprints.toList()
+            fingerprints = idFingerprints.toList()
         )
 
 

@@ -12,7 +12,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Finger
-import com.simprints.id.domain.Finger.Status.*
+import com.simprints.id.domain.FingerStatus
+import com.simprints.id.domain.FingerStatus.*
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.exceptions.unexpected.UnexpectedScannerException
@@ -38,8 +39,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
-    private var previousStatus: Finger.Status = NOT_COLLECTED
-    private var currentFingerStatus: Finger.Status
+    private var previousStatus: FingerStatus = NOT_COLLECTED
+    private var currentFingerStatus: FingerStatus
         get() = presenter.currentFinger().status
         set(value) { presenter.currentFinger().status = value }
 
@@ -249,9 +250,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) {
         if (quality >= preferencesManager.qualityThreshold) {
-            currentFingerStatus = Finger.Status.GOOD_SCAN
+            currentFingerStatus = FingerStatus.GOOD_SCAN
         } else {
-            currentFingerStatus = Finger.Status.BAD_SCAN
+            currentFingerStatus = FingerStatus.BAD_SCAN
             presenter.currentFinger().numberOfBadScans += 1
         }
         logMessageForCrashReport("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
@@ -266,7 +267,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
-        currentFingerStatus = Finger.Status.FINGER_SKIPPED
+        currentFingerStatus = FingerStatus.FINGER_SKIPPED
         presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
         presenter.refreshDisplay()
     }

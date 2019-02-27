@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.local.realm.models
 
-import com.simprints.id.domain.fingerprint.IdFingerprint
+import com.simprints.id.FingerIdentifier
+import com.simprints.id.domain.fingerprint.Fingerprint
 import io.realm.RealmObject
-import com.simprints.id.domain.fingerprint.IdFingerprint as LibFingerprint
 
 open class rl_Fingerprint (
     var fingerId: Int = 0,
@@ -10,16 +10,15 @@ open class rl_Fingerprint (
     var qualityScore: Int = 0
 ): RealmObject()
 
-fun rl_Fingerprint.toDomainFingerprint(): IdFingerprint =
-    IdFingerprint(
-        fingerId = fingerId,
-        qualityScore = qualityScore,
-        template = template
+fun rl_Fingerprint.toDomainFingerprint(): Fingerprint =
+    Fingerprint(
+        fingerId = FingerIdentifier.values()[fingerId],
+        isoTemplateBytes = template ?: throw IllegalArgumentException("Unexpected null fingerprint template")
     )
 
-fun IdFingerprint.toRealmFingerprint(): rl_Fingerprint =
+fun Fingerprint.toRealmFingerprint(): rl_Fingerprint =
     rl_Fingerprint(
-        fingerId = fingerId,
+        fingerId = fingerId.ordinal,
         qualityScore = qualityScore,
-        template = template
+        template = templateBytes
     )

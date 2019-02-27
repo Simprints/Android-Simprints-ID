@@ -3,9 +3,7 @@ package com.simprints.id.data.db.remote.models
 import com.simprints.core.tools.json.SkipSerialisationField
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.IdFingerprint
 import com.simprints.id.domain.fingerprint.Utils
-import com.simprints.id.domain.fingerprint.IdFingerprint as LibFingerprint
 
 data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
                           val template: String,
@@ -17,16 +15,15 @@ data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier
         quality = fingerprint.qualityScore)
 }
 
-fun IdFingerprint.toFirebaseFingerprint(): fb_Fingerprint =
+fun Fingerprint.toFirebaseFingerprint(): fb_Fingerprint =
     fb_Fingerprint(
-        fingerId = FingerIdentifier.values()[fingerId],
-        template = Utils.byteArrayToBase64(template!!), // TODO: get rid of double bang
+        fingerId = fingerId,
+        template = Utils.byteArrayToBase64(templateBytes), // TODO: get rid of double bang
         quality = qualityScore
     )
 
-fun fb_Fingerprint.toDomainFingerprint(): IdFingerprint =
-    IdFingerprint(
-        fingerId = fingerId.ordinal,
-        template = Utils.base64ToBytes(template),
-        qualityScore = quality
+fun fb_Fingerprint.toDomainFingerprint(): Fingerprint =
+    Fingerprint(
+        fingerId = fingerId,
+        isoTemplateBytes = Utils.base64ToBytes(template)
     )

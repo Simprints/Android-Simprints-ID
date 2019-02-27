@@ -289,7 +289,7 @@ class SubDownSyncTaskTest {
 
     private fun mockSuccessfulResponseWithIncorrectModels(patients: List<fb_Person>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
-        val badFbPersonJson = fbPersonJson.replace("idFingerprints", "fungerprints")
+        val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
         return MockResponse().let {
             it.setResponseCode(200)
             it.setBody(badFbPersonJson)
