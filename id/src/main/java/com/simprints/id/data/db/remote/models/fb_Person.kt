@@ -6,7 +6,7 @@ import com.simprints.core.tools.json.SkipSerialisationProperty
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.IdPerson
-import com.simprints.id.domain.fingerprint.IdFingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -67,8 +67,8 @@ fun IdPerson.toFirebasePerson(): fb_Person =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = HashMap(idFingerprints
-            .map(IdFingerprint::toFirebaseFingerprint)
+        fingerprints = HashMap(fingerprints
+            .map(Fingerprint::toFirebaseFingerprint)
             .groupBy { it.fingerId }
             .mapValues { ArrayList(it.value) })
     )
@@ -81,7 +81,7 @@ fun fb_Person.toDomainPerson(): IdPerson =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        idFingerprints = fingerprints.flatMap { (_, fingerFingerprints) ->
+        fingerprints = fingerprints.flatMap { (_, fingerFingerprints) ->
             fingerFingerprints.map(fb_Fingerprint::toDomainFingerprint)
         },
         toSync = false

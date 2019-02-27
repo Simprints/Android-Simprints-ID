@@ -8,9 +8,8 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 @Parcelize
-data class Fingerprint(
-    val fingerId: FingerIdentifier,
-    private val template: @RawValue ByteBuffer) : Parcelable {
+class Fingerprint(val fingerId: FingerIdentifier,
+                  private val template: @RawValue ByteBuffer) : Parcelable {
 
     /**
      * @return A newly allocated byte array containing the ISO 2005 template of
