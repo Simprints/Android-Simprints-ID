@@ -230,17 +230,14 @@ class CollectFingerprintsPresenter(private val context: Context,
         logMessageForCrashReport("Confirm fingerprints clicked")
         dismissConfirmDialogIfStillShowing()
 
-        val fingerprints = activeFingers
-            .filter { fingerHasSatisfiedTerminalCondition(it) }
-            .filter { !it.isFingerSkipped }
-            .filter { it.template != null }
-            .map { Fingerprint(it.id, it.template.templateBytes) }
+        val fingers = activeFingers
+            .filter { fingerHasSatisfiedTerminalCondition(it) && !it.isFingerSkipped && it.template != null }
 
-        if (fingerprints.isEmpty()) {
+        if (fingers.isEmpty()) {
             Toast.makeText(context, R.string.no_fingers_scanned, Toast.LENGTH_LONG).show()
             handleRestart()
         } else {
-            proceedToFinish(fingerprints)
+            proceedToFinish(fingers.mapNotNull { it.template })
         }
     }
 

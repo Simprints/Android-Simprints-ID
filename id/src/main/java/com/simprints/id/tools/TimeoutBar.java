@@ -6,7 +6,7 @@ import android.os.CountDownTimer;
 import android.widget.ProgressBar;
 
 import com.simprints.id.R;
-import com.simprints.id.domain.Finger;
+import com.simprints.id.domain.FingerStatus;
 
 import androidx.core.content.ContextCompat;
 
@@ -56,7 +56,7 @@ public class TimeoutBar {
         progressBar.setProgress(0);
     }
 
-    public void setProgressBar(Finger.Status status) {
+    public void setProgressBar(FingerStatus status) {
         progressBar.setProgress(0);
         Drawable drawable;
 
