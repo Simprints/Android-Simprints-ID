@@ -11,14 +11,13 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.Finger
-import com.simprints.id.domain.FingerStatus
-import com.simprints.id.domain.FingerStatus.*
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus.*
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.tools.TimeoutBar
+import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.libscanner.ButtonListener

@@ -22,11 +22,11 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.Finger
-import com.simprints.id.domain.FingerRes
+import com.simprints.id.activities.collectFingerprints.models.Finger
+import com.simprints.id.activities.collectFingerprints.models.FingerRes
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.domain.responses.IdEnrolResponse
 import com.simprints.id.domain.responses.toDomainClientApiEnrol
 import com.simprints.id.exceptions.SimprintsException
@@ -313,7 +313,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 preferencesManager.qualityThreshold,
                 FingerprintCaptureEvent.Result.fromFingerStatus(finger.status),
                 finger.template?.let {
-                    FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
+                    FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
                 }
             ))
         }

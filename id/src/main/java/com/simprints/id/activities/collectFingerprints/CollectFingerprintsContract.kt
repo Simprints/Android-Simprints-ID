@@ -8,9 +8,9 @@ import android.widget.ProgressBar
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.Finger
+import com.simprints.id.activities.collectFingerprints.models.Finger
 import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.tools.TimeoutBar
+import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 
 interface CollectFingerprintsContract {
 

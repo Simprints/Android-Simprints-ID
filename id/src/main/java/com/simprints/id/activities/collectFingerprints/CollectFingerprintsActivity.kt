@@ -17,7 +17,7 @@ import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.id.tools.TimeoutBar
+import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 

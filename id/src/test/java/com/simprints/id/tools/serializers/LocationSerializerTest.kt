@@ -1,6 +1,5 @@
 package com.simprints.id.tools.serializers
 
-import com.simprints.id.domain.Location
 import org.junit.Assert
 import org.junit.Test
 
