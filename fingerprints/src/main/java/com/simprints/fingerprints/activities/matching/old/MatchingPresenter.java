@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.activities.matching;
+package com.simprints.fingerprints.activities.matching.old;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
+import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
+import com.simprints.fingerprints.activities.matching.MatchingContract;
 import com.simprints.fingerprints.di.FingerprintsComponent;
 import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.analytics.crashreport.CrashReportTag;
@@ -20,7 +22,10 @@ import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
+import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
+import com.simprints.id.domain.responses.IdIdentificationResponse;
+import com.simprints.id.domain.responses.IdVerifyResponse;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
 import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
@@ -70,7 +75,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     private String sessionId = "";
 
     @SuppressLint("CheckResult")
-    MatchingPresenter(@NonNull MatchingContract.View matchingView,
+    public MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull FingerprintsComponent component,
                       Person probe) {
         component.inject(this);
@@ -299,6 +304,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         Intent resultData;
                         resultData = new Intent();
+                        resultData.putExtra(
+                            SimprintsIdResponse.BUNDLE_KEY,
+                            new IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -327,6 +335,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         // signOut
                         Intent resultData;
                         resultData = new Intent();
+                        resultData.putExtra(
+                            SimprintsIdResponse.BUNDLE_KEY,
+                            new IdVerifyResponse(
+                                verification.getGuidVerified(),
+                                (int) verification.getConfidence(),
+                                Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
                         break;
