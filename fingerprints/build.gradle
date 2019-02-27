@@ -10,7 +10,9 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
-        versionName "1.0"
+        versionName "2019.1.0-dev0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -18,6 +20,8 @@ android {
             initWith release
         }
     }
+
+    testBuildType "debug"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -72,5 +76,15 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
+
+    testImplementation project(':testtools')
+    testImplementation(deps.testing.junit) {
+        exclude group: "com.android.support"
+    }
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.androidx.runner
+    kaptTest deps.dagger.compiler
 
 }
