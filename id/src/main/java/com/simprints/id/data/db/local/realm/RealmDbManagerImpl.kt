@@ -5,8 +5,6 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
-import com.simprints.id.data.db.local.realm.models.adapters.toProject
-import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
@@ -76,7 +74,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
     override fun loadPersonFromLocal(personId: String): Single<Person> =
         useRealmInstance { realm ->
-            realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId)
+            realm.where(DbPerson::class.java).equalTo(PATIENT_ID_FIELD, personId)
                 .findFirst()
                 ?.toDomainPerson()
                 ?: throw IllegalStateException()
@@ -91,7 +89,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
             realm
                 .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
                 .findAll()
-                .map(rl_Person::toDomainPerson)
+                .map(DbPerson::toDomainPerson)
         }
 
     // TODO: improve this terrible usage of RxJava
@@ -120,9 +118,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     override fun loadProjectFromLocal(projectId: String): Single<Project> =
         useRealmInstance { realm ->
             realm
-                .where(rl_Project::class.java).equalTo(rl_Project.PROJECT_ID_FIELD, projectId)
+                .where(DbProject::class.java).equalTo(DbProject.PROJECT_ID_FIELD, projectId)
                 .findFirst()
-                ?.let { realm.copyFromRealm(it).toProject() }
+                ?.let { realm.copyFromRealm(it).toDomainProject() }
                 ?: throw NoSuchStoredProjectException()
         }
 
@@ -177,8 +175,8 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                           userId: String? = null,
                                           moduleId: String? = null,
                                           toSync: Boolean? = null,
-                                          sortBy: Map<String, Sort>? = null): RealmQuery<rl_Person> =
-        where(rl_Person::class.java)
+                                          sortBy: Map<String, Sort>? = null): RealmQuery<DbPerson> =
+        where(DbPerson::class.java)
             .apply {
                 patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
                 userId?.let { this.equalTo(USER_ID_FIELD, it) }
@@ -187,7 +185,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 sortBy?.let { this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
             }
 
-    private fun Realm.buildQueryForPerson(subSyncScope: SubSyncScope): RealmQuery<rl_Person> =
+    private fun Realm.buildQueryForPerson(subSyncScope: SubSyncScope): RealmQuery<DbPerson> =
         buildQueryForPerson(
             userId = subSyncScope.userId,
             moduleId = subSyncScope.moduleId
@@ -208,10 +206,10 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     /**
      *  @Deprecated: do not use it. Use Room DownSyncStatus
      */
-    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo> =
+    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo> =
         useRealmInstance { realm ->
             realm
-                .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+                .where(DbSyncInfo::class.java).equalTo(DbSyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
                 ?: throw NoSuchRlSessionInfoException()
@@ -222,7 +220,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
      */
     override fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable = Completable.fromAction {
         useRealmInstance { realm ->
-            realm.where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+            realm.where(DbSyncInfo::class.java).equalTo(DbSyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findAll().deleteAllFromRealm()
         }
     }

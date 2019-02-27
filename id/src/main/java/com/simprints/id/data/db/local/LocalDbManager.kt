@@ -2,7 +2,7 @@ package com.simprints.id.data.db.local
 
 import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
+import com.simprints.id.data.db.local.realm.models.DbSyncInfo
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
@@ -55,6 +55,6 @@ interface LocalDbManager {
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?)
 
     //@Deprecated: do not use it. Use Room SyncStatus
-    fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo>
+    fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo>
     fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable
 }
