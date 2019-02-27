@@ -4,9 +4,10 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.domain.IdPerson
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.tools.extensions.handleResponse
@@ -19,7 +20,7 @@ import java.io.IOException
 
 open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager) : RemotePeopleManager {
 
-    override fun downloadPerson(patientId: String, projectId: String): Single<fb_Person> =
+    override fun downloadPerson(patientId: String, projectId: String): Single<Person> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
             peopleRemoteInterface.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
@@ -30,11 +31,12 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                         else -> throw it
                     }
                 }
+                .map(fb_Person::toDomainPerson)
         }
 
-    override fun uploadPeople(projectId: String, patientsToUpload: List<IdPerson>): Completable =
+    override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(IdPerson::toFirebasePerson)))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
         }

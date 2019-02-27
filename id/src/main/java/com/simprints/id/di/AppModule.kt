@@ -5,8 +5,6 @@ import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.Application
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -146,14 +144,6 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): SecureDataManager =
         SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
-
-    @Provides
-    @Singleton
-    open fun provideDataManager(preferencesManager: PreferencesManager,
-                                loginInfoManager: LoginInfoManager,
-                                analyticsManager: AnalyticsManager,
-                                remoteDbManager: RemoteDbManager): DataManager =
-        DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager)
 
     @Provides
     @Singleton

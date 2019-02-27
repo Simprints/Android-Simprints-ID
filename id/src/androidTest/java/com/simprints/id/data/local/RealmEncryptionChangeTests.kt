@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.DbPerson
 import io.realm.Realm
 import org.junit.After
 import org.junit.Assert
@@ -56,7 +56,7 @@ class RealmEncryptionChangeTests : RealmTestsBase() {
 
         RealmDbManagerImpl(testContext).signInToLocal(LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName))
         Realm.getInstance(config).use {
-            val newPerson = it.where(rl_Person::class.java).findFirst()
+            val newPerson = it.where(DbPerson::class.java).findFirst()
             Assert.assertNotNull(newPerson)
             Assert.assertTrue(newPerson!!.deepEquals(fakePerson))
         }
