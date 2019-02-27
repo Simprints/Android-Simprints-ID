@@ -22,7 +22,7 @@ open class DbSyncInfo : RealmObject {
 
     constructor()
 
-    constructor(syncGroup: GROUP, lastPerson: rl_Person, moduleId: String?) {
+    constructor(syncGroup: GROUP, lastPerson: DbPerson, moduleId: String?) {
         syncGroupId = syncGroup.ordinal
         lastKnownPatientUpdatedAt = lastPerson.updatedAt ?: Date(0)
         lastKnownPatientId = lastPerson.patientId
