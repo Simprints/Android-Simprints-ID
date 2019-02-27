@@ -1,4 +1,4 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.id.activities.collectFingerprints.models
 
 
 import com.simprints.id.FingerIdentifier

@@ -1,4 +1,4 @@
-package com.simprints.id.tools;
+package com.simprints.id.activities.collectFingerprints.views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -6,7 +6,7 @@ import android.os.CountDownTimer;
 import android.widget.ProgressBar;
 
 import com.simprints.id.R;
-import com.simprints.id.domain.FingerStatus;
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus;
 
 import androidx.core.content.ContextCompat;
 

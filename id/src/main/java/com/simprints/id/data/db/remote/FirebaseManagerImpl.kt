@@ -5,7 +5,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.Application
-import com.simprints.id.data.db.remote.tools.Utils
 import com.simprints.id.exceptions.unexpected.DbAlreadyInitialisedException
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
@@ -40,8 +39,6 @@ open class FirebaseManagerImpl(
         val legacyFirebaseAppName = getLegacyAppName()
         val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
-
-        Utils.forceSync(legacyFirebaseApp)
     }
 
     private fun initialiseFirestoreFirebaseProject() {

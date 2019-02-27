@@ -204,7 +204,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    preferencesManager.location = com.simprints.id.domain.Location.fromAndroidLocation(it)
                     sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }

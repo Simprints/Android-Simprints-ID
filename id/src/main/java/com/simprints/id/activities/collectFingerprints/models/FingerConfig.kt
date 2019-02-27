@@ -1,4 +1,4 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.id.activities.collectFingerprints.models
 
 enum class FingerConfig {
     DO_NOT_COLLECT,
