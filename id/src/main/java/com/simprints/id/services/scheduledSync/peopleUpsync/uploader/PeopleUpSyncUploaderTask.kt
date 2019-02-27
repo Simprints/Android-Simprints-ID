@@ -6,7 +6,7 @@ import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.IdPerson
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import io.reactivex.Flowable
@@ -53,11 +53,11 @@ class PeopleUpSyncUploaderTask (
         return peopleToSyncCount > 0
     }
 
-    private fun getPeopleToSyncInBatches(): Flowable<List<IdPerson>> =
+    private fun getPeopleToSyncInBatches(): Flowable<List<Person>> =
         localDbManager.loadPeopleFromLocalRx(/*userId = userId, */toSync = true)
             .buffer(batchSize)
 
-    private fun upSyncBatch(people: List<IdPerson>) {
+    private fun upSyncBatch(people: List<Person>) {
         uploadPeople(people)
         Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
@@ -65,7 +65,7 @@ class PeopleUpSyncUploaderTask (
         updateLastUpSyncTime()
     }
 
-    private fun uploadPeople(people: List<IdPerson>) =
+    private fun uploadPeople(people: List<Person>) =
         try {
             remotePeopleManager
                 .uploadPeople(projectId, people)
@@ -82,7 +82,7 @@ class PeopleUpSyncUploaderTask (
             }
         }
 
-    private fun markPeopleAsSynced(people: List<IdPerson>) {
+    private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
         localDbManager
             .insertOrUpdatePeopleInLocal(updatedPeople)
