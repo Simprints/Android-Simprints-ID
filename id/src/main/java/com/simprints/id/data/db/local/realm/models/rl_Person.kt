@@ -5,7 +5,6 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toDomainFingerprint
 import com.simprints.id.domain.IdPerson
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.IdFingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList
@@ -81,7 +80,7 @@ fun rl_Person.toDomainPerson(): IdPerson =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        idFingerprints = fingerprints.map(rl_Fingerprint::toDomainFingerprint)
+        fingerprints = fingerprints.map(rl_Fingerprint::toDomainFingerprint)
     )
 
 fun IdPerson.toRealmPerson(): rl_Person =
@@ -93,5 +92,5 @@ fun IdPerson.toRealmPerson(): rl_Person =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        fingerprints = idFingerprints.map(IdFingerprint::toRealmFingerprint).toRealmList()
+        fingerprints = fingerprints.map(Fingerprint::toRealmFingerprint).toRealmList()
     )
