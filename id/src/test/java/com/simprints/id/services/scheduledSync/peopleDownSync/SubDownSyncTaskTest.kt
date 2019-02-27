@@ -8,14 +8,12 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.local.realm.models.DbSyncInfo
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.domain.IdPerson
@@ -175,7 +173,7 @@ class SubDownSyncTaskTest {
         mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
         whenever(localDbMock.getRlSyncInfo(subScope)).thenReturn(Single.just(
-            rl_SyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
+            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
         whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
