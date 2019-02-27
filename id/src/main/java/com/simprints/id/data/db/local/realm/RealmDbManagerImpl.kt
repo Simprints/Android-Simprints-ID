@@ -7,7 +7,9 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.db.local.realm.models.adapters.toProject
 import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
-import com.simprints.id.domain.*
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.Project
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
@@ -22,7 +24,6 @@ import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
 import timber.log.Timber
-import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 //TODO: investigate potential concurrency issues using .use
 open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
@@ -52,13 +53,13 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
         PeopleRealmEncryptionMigration(localDbKey, appContext)
     }
 
-    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
-        insertOrUpdatePeopleInLocal(listOf(person.toDomainPerson()))
+    override fun insertOrUpdatePersonInLocal(person: Person): Completable =
+        insertOrUpdatePeopleInLocal(listOf(person))
 
-    override fun insertOrUpdatePeopleInLocal(people: List<IdPerson>): Completable =
+    override fun insertOrUpdatePeopleInLocal(people: List<Person>): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
-                it.insertOrUpdate(people.map(IdPerson::toRealmPerson))
+                it.insertOrUpdate(people.map(Person::toRealmPerson))
             }
         }
             .ignoreElement()
@@ -73,7 +74,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 .toInt()
         }
 
-    override fun loadPersonFromLocal(personId: String): Single<IdPerson> =
+    override fun loadPersonFromLocal(personId: String): Single<Person> =
         useRealmInstance { realm ->
             realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId)
                 .findFirst()
@@ -85,7 +86,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                      userId: String?,
                                      moduleId: String?,
                                      toSync: Boolean?,
-                                     sortBy: Map<String, Sort>?): Single<List<IdPerson>> =
+                                     sortBy: Map<String, Sort>?): Single<List<Person>> =
         useRealmInstance { realm ->
             realm
                 .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
@@ -98,8 +99,8 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?,
-                                       sortBy: Map<String, Sort>?): Flowable<IdPerson> =
-        Flowable.create<IdPerson>({ emitter ->
+                                       sortBy: Map<String, Sort>?): Flowable<Person> =
+        Flowable.create<Person>({ emitter ->
             try {
                 useRealmInstance { realm ->
                     realm
@@ -193,12 +194,13 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
         )
 
-    override fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
             GROUP.GLOBAL -> loadPeopleFromLocal()
             GROUP.USER -> loadPeopleFromLocal(userId = userId)
             GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
-        }.blockingGet().map(IdPerson::toLibPerson)
+        }.blockingGet()
+
         destinationList.addAll(result)
         callback?.onSuccess(false)
     }

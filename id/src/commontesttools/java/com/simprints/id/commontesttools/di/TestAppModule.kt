@@ -3,7 +3,6 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager

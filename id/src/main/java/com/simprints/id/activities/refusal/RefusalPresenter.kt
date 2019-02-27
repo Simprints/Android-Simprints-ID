@@ -10,7 +10,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEve
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
@@ -56,7 +55,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
-        saveRefusalFormInDb(getRefusalForm(refusalText))
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
                 it.events.add(RefusalEvent(
@@ -84,12 +82,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleChangesInRefusalText(refusalText: String) {
         view.enableSubmitButton()
-    }
-
-    private fun getRefusalForm(refusalText: String) = IdRefusalForm(reason.toString(), refusalText)
-
-    private fun saveRefusalFormInDb(refusalForm: IdRefusalForm) {
-            dbManager.saveRefusalForm(refusalForm)
     }
 
     private fun logMessageForCrashReport(message: String) {
