@@ -1,15 +1,17 @@
 package com.simprints.id.domain.fingerprint
 
+import android.os.Parcel
 import android.os.Parcelable
 import com.simprints.id.FingerIdentifier
+import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.RawValue
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+
 @Parcelize
 class Fingerprint(val fingerId: FingerIdentifier,
-                  private val template: @RawValue ByteBuffer) : Parcelable {
+                  private val template: ByteBuffer) : Parcelable {
 
     /**
      * @return A newly allocated byte array containing the ISO 2005 template of
@@ -41,6 +43,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
     constructor(fingerId: FingerIdentifier, isoTemplateBytes: ByteArray) :
         this(fingerId, ByteBuffer.allocateDirect(isoTemplateBytes.size)) {
 
+        template.put(isoTemplateBytes)
         template.order(ByteOrder.BIG_ENDIAN)
         try {
             // Checks the format identifier
@@ -68,7 +71,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
 
     }
 
-    companion object {
+    companion object : Parceler<Fingerprint> {
 
         private val ISO_FORMAT_ID = Integer.parseInt("464D5200", 16)     // 'F' 'M' 'R' 00hex
         private val ISO_2005_VERSION = Integer.parseInt("20323000", 16)  // ' ' '2' '0' 00hex
@@ -77,5 +80,21 @@ class Fingerprint(val fingerId: FingerIdentifier,
         private const val RECORD_LENGTH = 8          // INT
         private const val NB_FINGERPRINTS = 22       // BYTE
         private const val FIRST_QUALITY = 26         // BYTE
+
+        override fun Fingerprint.write(parcel: Parcel, flags: Int) {
+            parcel.writeInt(fingerId.ordinal)
+            val bytes = this.templateBytes
+            parcel.writeInt(bytes.size)
+            parcel.writeByteArray(bytes)
+        }
+
+        override fun create(parcel: Parcel): Fingerprint {
+            val fingerId = FingerIdentifier.values()[parcel.readInt()]
+            val temp = ByteArray(parcel.readInt())
+            parcel.readByteArray(temp)
+            val template = ByteBuffer.allocateDirect(temp.size)
+            template.put(temp)
+            return Fingerprint(fingerId, template)
+        }
     }
 }

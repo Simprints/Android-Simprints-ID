@@ -9,14 +9,14 @@ class ScanConfig {
         FingerIdentifier.values().associate { Pair(it, ScanConfigFingerEntry()) }
 
     operator fun get(id: FingerIdentifier): FingerConfig =
-        fingerConfigs[id]?.let { it.config }
+        fingerConfigs[id]?.config
             ?: throw IllegalArgumentException("No FingerConfig associated to id")
 
     fun getPriority(id: FingerIdentifier): Int =
-        fingerConfigs[id]?.let { it.priority }
+        fingerConfigs[id]?.priority
             ?: throw IllegalArgumentException("No priority associated to id")
 
     fun getOrder(id: FingerIdentifier): Int =
-        fingerConfigs[id]?.let { it.order }
+        fingerConfigs[id]?.order
             ?: throw IllegalArgumentException("No priority associated to id")
 }
