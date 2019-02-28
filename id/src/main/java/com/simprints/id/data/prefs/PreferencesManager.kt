@@ -4,7 +4,6 @@ import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 
 interface PreferencesManager :
-    SessionStatePreferencesManager,
     SettingsPreferencesManager,
     RecentEventsPreferencesManager {
 

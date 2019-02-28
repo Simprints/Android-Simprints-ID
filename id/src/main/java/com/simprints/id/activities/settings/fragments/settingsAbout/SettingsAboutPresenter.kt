@@ -4,6 +4,7 @@ import android.preference.Preference
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -18,6 +19,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var sessionEventManager: SessionEventsManager
+    @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
 
     init {
         component.inject(this)
@@ -70,11 +72,11 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     }
 
     internal fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = "" /*preferencesManager.hardwareVersionString*/ //STOPSHIP: save in sharedprefs what is in scannermanager
+        preference.summary = recentEventsManager.lastMacAddress
     }
 
     internal fun loadDeviceIdInPreference(preference: Preference) {
-        preference.summary = "" /* preferencesManager.deviceId */ //STOPSHIP: save in sharedprefs what is in scannermanager
+        preference.summary = recentEventsManager.lastScannerId
     }
 
     private fun handleLogoutPreferenceClicked() {
