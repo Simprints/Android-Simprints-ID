@@ -8,12 +8,6 @@ import kotlinx.android.parcel.Parcelize
 data class ClientApiIdentifyResponse(val identifications: List<Identification>,
                                      val sessionId: String) : SimprintsIdResponse {
 
-    companion object {
-        const val BUNDLE_KEY = "identificationResponse"
-    }
-
-    override val bundleKey: String get() = BUNDLE_KEY
-
     @Parcelize
     data class Identification(val guid: String, val confidence: Int, val tier: ClientApiTier) : Parcelable
 

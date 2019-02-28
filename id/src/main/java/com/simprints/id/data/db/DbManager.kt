@@ -33,7 +33,7 @@ interface DbManager {
     fun loadPerson(destinationList: MutableList<Person>, projectId: String, guid: String, callback: DataCallback)
     fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult>
 
-    fun loadPeople(destinationList: MutableList<Person>, group: GROUP, callback: DataCallback?)
+    fun loadPeople(destinationList: MutableList<Person>, group: GROUP, moduleId: String, callback: DataCallback?)
 
     fun loadProject(projectId: String): Single<Project>
 

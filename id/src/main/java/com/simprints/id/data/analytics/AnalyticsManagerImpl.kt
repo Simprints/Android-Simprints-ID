@@ -3,14 +3,11 @@ package com.simprints.id.data.analytics
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.requests.IdRequest
-import com.simprints.id.session.callout.Callout
+import com.simprints.id.domain.requests.AppRequest
 import io.reactivex.Single
 import timber.log.Timber
 
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
-                           private val preferencesManager: PreferencesManager,
                            private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsManager {
 
     override val analyticsId: Single<String> = Single.create<String> {
@@ -28,29 +25,21 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         }
     }
 
-    override fun logCallout(idRequest: IdRequest) {
-        val callout = Callout(idRequest)
-        Timber.d("AnalyticsManagerImpl.logCallout(callout=$callout)")
-        with(callout) {
+    override fun logCallout(appRequest: AppRequest) {
+        Timber.d("AnalyticsManagerImpl.logCallout(appRequest=$appRequest)")
+        with(appRequest) {
             val bundle = Bundle()
-            bundle.putString("action", action.toString())
-            for (calloutParameter in parameters) {
-                bundle.putString(calloutParameter.key, calloutParameter.value.toString())
-            }
+            bundle.putString("action", AppRequest.action(appRequest).toString())
+            bundle.putString("projectId", appRequest.projectId)
+            bundle.putString("userId", appRequest.userId)
+            bundle.putString("moduleID", appRequest.moduleId)
             firebaseAnalytics.logEvent("callout", bundle)
         }
     }
 
-    override fun logUserProperties() {
-        logUserProperties(
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            preferencesManager.moduleId,
-            preferencesManager.deviceId)
-    }
 
-    private fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String) {
-        Timber.d("AnalyticsManagerImpl.logUserProperties(userId=$userId, apiKey=$projectId, projectId=$projectId, moduleId=$moduleId, deviceIde=$deviceId)")
+    override fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String) {
+        Timber.d("AnalyticsManagerImpl.logUserProperties(userId=$userId, apiKey=$projectId, projectId=$projectId, moduleId=$moduleId")
         firebaseAnalytics.setUserId(userId)
         firebaseAnalytics.setUserProperty("api_key", projectId)
         firebaseAnalytics.setUserProperty("project_id", projectId)
@@ -58,20 +47,14 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.setUserProperty("device_id", deviceId)
     }
 
-    override fun logScannerProperties() {
-        logScannerProperties(
-            preferencesManager.macAddress,
-            preferencesManager.scannerId)
-    }
-
-    private fun logScannerProperties(macAddress: String, scannerId: String) {
-        Timber.d("AnalyticsManagerImpl.logScannerProperties(macAddress=$macAddress, scannerId=$scannerId)")
+    override fun logScannerProperties(macAddress: String, scannerId: String) {
+        Timber.d("AnalyticsManagerImpl.logScannerProperties(macAddress=$macAddress, lastScannerId=$scannerId)")
         firebaseAnalytics.setUserProperty("mac_address", macAddress)
         firebaseAnalytics.setUserProperty("scanner_id", scannerId)
     }
 
-    override fun logGuidSelectionService(projectId: String, sessionId: String, selectedGuid: String, callbackSent: Boolean) {
-        logGuidSelectionService(projectId, sessionId, selectedGuid, callbackSent, preferencesManager.deviceId)
+    override fun logGuidSelectionService(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean) {
+        logGuidSelectionService(projectId, sessionId, selectedGuid, callbackSent, deviceId)
     }
 
     private fun logGuidSelectionService(apiKey: String, sessionId: String,
@@ -86,12 +69,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.logEvent("guid_selection_service", bundle)
     }
 
-    override fun logConnectionStateChange(connected: Boolean) {
+    override fun logConnectionStateChange(connected: Boolean, deviceId: String, sessionId: String) {
         logConnectionStateChange(
             connected,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
-            preferencesManager.deviceId,
-            preferencesManager.sessionId)
+            deviceId,
+            sessionId)
     }
 
     private fun logConnectionStateChange(connected: Boolean, apiKey: String,
@@ -105,12 +88,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.logEvent("connection_state_change", bundle)
     }
 
-    override fun logAuthStateChange(authenticated: Boolean) {
+    override fun logAuthStateChange(authenticated: Boolean, deviceId: String, sessionId: String) {
         logAuthStateChange(
             authenticated,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
-            preferencesManager.deviceId,
-            preferencesManager.sessionId)
+            deviceId,
+            sessionId)
     }
 
     private fun logAuthStateChange(authenticated: Boolean, apiKey: String, androidId: String, sessionId: String) {
