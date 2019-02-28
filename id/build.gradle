@@ -18,8 +18,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 147
-        versionName "2019.1.0-dev3"
+        versionCode 148
+        versionName "2019.1.0-rc0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
