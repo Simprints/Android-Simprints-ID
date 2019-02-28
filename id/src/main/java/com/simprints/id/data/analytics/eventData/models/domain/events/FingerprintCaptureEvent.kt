@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import com.simprints.id.data.analytics.eventdata.models.domain.EventType
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.Finger
+import com.simprints.id.activities.collectFingerprints.models.FingerStatus
 
 class FingerprintCaptureEvent(val relativeStartTime: Long,
                               val relativeEndTime: Long,
@@ -21,12 +21,12 @@ class FingerprintCaptureEvent(val relativeStartTime: Long,
         FAILURE_TO_ACQUIRE;
 
         companion object {
-            fun fromFingerStatus(fingerStatus: Finger.Status): Result {
+            fun fromFingerStatus(fingerStatus: FingerStatus): Result {
                 return when (fingerStatus) {
-                    Finger.Status.GOOD_SCAN, Finger.Status.RESCAN_GOOD_SCAN -> GOOD_SCAN
-                    Finger.Status.BAD_SCAN -> BAD_QUALITY
-                    Finger.Status.NO_FINGER_DETECTED -> NO_FINGER_DETECTED
-                    Finger.Status.FINGER_SKIPPED -> SKIPPED
+                    FingerStatus.GOOD_SCAN, FingerStatus.RESCAN_GOOD_SCAN -> GOOD_SCAN
+                    FingerStatus.BAD_SCAN -> BAD_QUALITY
+                    FingerStatus.NO_FINGER_DETECTED -> NO_FINGER_DETECTED
+                    FingerStatus.FINGER_SKIPPED -> SKIPPED
                     else -> FAILURE_TO_ACQUIRE
                 }
             }

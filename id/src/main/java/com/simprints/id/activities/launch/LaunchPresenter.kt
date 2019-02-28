@@ -6,9 +6,9 @@ import android.app.Activity
 import android.content.Intent
 import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
@@ -29,10 +29,8 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libscanner.ButtonListener
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -44,7 +42,6 @@ import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
@@ -131,7 +128,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             }.doOnError {
                 it.printStackTrace()
                 // For any error, we show the missing guidFound screen.
-                saveNotFoundVerificationAndShowAlert(Person(guid), startCandidateSearchTime)
+                saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
             }.ignoreElement()
         }
     }
@@ -146,15 +143,15 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
     }
 
-    private fun saveNotFoundVerificationAndShowAlert(probe: Person, startCandidateSearchTime: Long) {
+    private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
-            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
+            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
         } else {
             // We're offline but might find the person if we sync
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
-            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
+            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }
 
@@ -207,7 +204,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    preferencesManager.location = com.simprints.id.domain.Location.fromAndroidLocation(it)
                     sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }
@@ -292,7 +288,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         preferencesManager.msSinceBootOnSessionEnd = timeHelper.now()
-        dataManager.saveSession()
         view.setResultAndFinish(resultCode, resultData)
     }
 

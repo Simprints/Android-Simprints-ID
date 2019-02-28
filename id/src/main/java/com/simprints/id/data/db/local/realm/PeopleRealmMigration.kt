@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.local.realm
 
-import com.simprints.id.data.db.local.realm.models.rl_Fingerprint
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.rl_Project
-import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
+import com.simprints.id.data.db.local.realm.models.DbFingerprint
+import com.simprints.id.data.db.local.realm.models.DbPerson
+import com.simprints.id.data.db.local.realm.models.DbProject
+import com.simprints.id.data.db.local.realm.models.DbSyncInfo
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
@@ -11,18 +11,19 @@ import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
-    @RealmModule(classes = [rl_Fingerprint::class, rl_Person::class, rl_Project::class, rl_SyncInfo::class])
+    //StopShip: classes were renamed. Write Migration.
+    @RealmModule(classes = [DbFingerprint::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
     class PeopleModule
 
     companion object {
         const val REALM_SCHEMA_VERSION: Long = 5
 
-        const val PERSON_TABLE: String = "rl_Person"
+        const val PERSON_TABLE: String = "DbPerson"
         const val USER_TABLE: String = "rl_User"
-        const val FINGERPRINT_TABLE: String = "rl_Fingerprint"
+        const val FINGERPRINT_TABLE: String = "DbFingerprint"
         const val API_KEY_TABLE: String = "rl_ApiKey"
-        const val SYNC_INFO_TABLE: String = "rl_SyncInfo"
-        const val PROJECT_TABLE: String = "rl_Project"
+        const val SYNC_INFO_TABLE: String = "DbSyncInfo"
+        const val PROJECT_TABLE: String = "DbProject"
 
         const val MODULE_FIELD: String = "moduleId"
         const val UPDATE_FIELD: String = "updatedAt"

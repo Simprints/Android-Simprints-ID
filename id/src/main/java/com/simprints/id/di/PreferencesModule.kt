@@ -23,7 +23,6 @@ import com.simprints.id.data.prefs.sessionState.sessionTimestamps.SessionTimesta
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.Location
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.serializers.Serializer
@@ -75,16 +74,14 @@ open class PreferencesModule {
                                               prefs: ImprovedSharedPreferences,
                                               scannerAttributesPreferencesManager: ScannerAttributesPreferencesManager,
                                               sessionParametersPreferencesManager: SessionParametersPreferencesManager,
-                                              sessionTimestampsPreferencesManager: SessionTimestampsPreferencesManager,
-                                              @Named("LocationSerializer") locationSerializer: Serializer<Location>): SessionStatePreferencesManager =
+                                              sessionTimestampsPreferencesManager: SessionTimestampsPreferencesManager): SessionStatePreferencesManager =
 
         SessionStatePreferencesManagerImpl(
             ctx,
             prefs,
             scannerAttributesPreferencesManager,
             sessionParametersPreferencesManager,
-            sessionTimestampsPreferencesManager,
-            locationSerializer)
+            sessionTimestampsPreferencesManager)
 
     @Provides
     @Singleton

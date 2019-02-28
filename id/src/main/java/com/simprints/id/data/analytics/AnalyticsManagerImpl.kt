@@ -2,17 +2,12 @@ package com.simprints.id.data.analytics
 
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.simprints.id.data.db.remote.adapters.toFirebaseSession
-import com.simprints.id.data.db.remote.models.fb_Session
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.requests.IdRequest
-import com.simprints.id.session.Session
 import com.simprints.id.session.callout.Callout
-import com.simprints.id.tools.extensions.fromLowerCamelToLowerUnderscore
 import io.reactivex.Single
 import timber.log.Timber
-import kotlin.reflect.full.memberProperties
 
 class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
                            private val preferencesManager: PreferencesManager,
@@ -126,15 +121,5 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         bundle.putString("session_id", sessionId)
         bundle.putBoolean("authenticated", authenticated)
         firebaseAnalytics.logEvent("auth_state_change", bundle)
-    }
-
-    override fun logSession(session: Session) {
-        Timber.d("AnalyticsManagerImpl.logSession(activeSession=$session)")
-        val fbSession = session.toFirebaseSession()
-        val bundle = Bundle()
-        for (property in fb_Session::class.memberProperties) {
-            bundle.putString(property.name.fromLowerCamelToLowerUnderscore(), property.get(fbSession).toString())
-        }
-        firebaseAnalytics.logEvent("activeSession", bundle)
     }
 }

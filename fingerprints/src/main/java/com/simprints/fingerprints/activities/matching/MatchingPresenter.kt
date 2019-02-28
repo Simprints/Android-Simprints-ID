@@ -13,9 +13,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.GROUP.*
-import com.simprints.id.domain.IdPerson
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.toLibPerson
 import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
 import com.simprints.id.session.callout.CalloutAction.IDENTIFY
@@ -82,8 +80,6 @@ class MatchingPresenter(
             GLOBAL -> localDbManager.loadPeopleFromLocal()
             USER -> localDbManager.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
             MODULE -> localDbManager.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
-        }.map {
-            it.map(IdPerson::toLibPerson)
         }
 
     private fun handleLoadPeopleSuccess(candidates: List<Person>) {

@@ -5,13 +5,16 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
+import com.simprints.id.FingerIdentifier.*
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.FingerPageAdapter
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.Finger
+import com.simprints.id.activities.collectFingerprints.models.Finger
+import com.simprints.id.activities.collectFingerprints.models.FingerConfig.OPTIONAL
+import com.simprints.id.activities.collectFingerprints.models.FingerConfig.REQUIRED
+import com.simprints.id.activities.collectFingerprints.models.ScanConfig
+import com.simprints.id.activities.collectFingerprints.models.ScanConfigFingerEntry
 import com.simprints.id.tools.extensions.isFingerNotCollectable
-import com.simprints.id.domain.fingerprint.FingerConfig
-import com.simprints.id.domain.fingerprint.ScanConfig
 import javax.inject.Inject
 
 
@@ -153,16 +156,18 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 
         private val defaultScanConfig = ScanConfig().apply {
-            set(FingerIdentifier.LEFT_THUMB, FingerConfig.REQUIRED, 0, 0)
-            set(FingerIdentifier.LEFT_INDEX_FINGER, FingerConfig.REQUIRED, 1, 1)
-            set(FingerIdentifier.LEFT_3RD_FINGER, FingerConfig.OPTIONAL, 4, 2)
-            set(FingerIdentifier.LEFT_4TH_FINGER, FingerConfig.OPTIONAL, 6, 3)
-            set(FingerIdentifier.LEFT_5TH_FINGER, FingerConfig.OPTIONAL, 8, 4)
-            set(FingerIdentifier.RIGHT_THUMB, FingerConfig.OPTIONAL, 2, 5)
-            set(FingerIdentifier.RIGHT_INDEX_FINGER, FingerConfig.OPTIONAL, 3, 6)
-            set(FingerIdentifier.RIGHT_3RD_FINGER, FingerConfig.OPTIONAL, 5, 7)
-            set(FingerIdentifier.RIGHT_4TH_FINGER, FingerConfig.OPTIONAL, 7, 8)
-            set(FingerIdentifier.RIGHT_5TH_FINGER, FingerConfig.OPTIONAL, 9, 9)
+            with(fingerConfigs) {
+                plus(Pair(LEFT_THUMB, ScanConfigFingerEntry(REQUIRED, 0, 0)))
+                plus(Pair(LEFT_INDEX_FINGER, ScanConfigFingerEntry(REQUIRED, 1, 1)))
+                plus(Pair(LEFT_3RD_FINGER, ScanConfigFingerEntry(OPTIONAL, 4, 2)))
+                plus(Pair(LEFT_4TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 6, 3)))
+                plus(Pair(LEFT_5TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 8, 4)))
+                plus(Pair(RIGHT_THUMB, ScanConfigFingerEntry(OPTIONAL, 2, 5)))
+                plus(Pair(RIGHT_INDEX_FINGER, ScanConfigFingerEntry(OPTIONAL, 3, 6)))
+                plus(Pair(RIGHT_3RD_FINGER, ScanConfigFingerEntry(OPTIONAL, 5, 7)))
+                plus(Pair(RIGHT_4TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 7, 8)))
+                plus(Pair(RIGHT_5TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 9, 9)))
+            }
         }
     }
 }
