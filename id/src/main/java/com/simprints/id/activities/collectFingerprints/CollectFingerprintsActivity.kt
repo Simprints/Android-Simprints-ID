@@ -16,7 +16,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
 import com.simprints.id.tools.extensions.launchAlert
@@ -36,7 +36,7 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var appRequest: AppRequest
+    private lateinit var appRequest: Request
 
     private var rightToLeft: Boolean = false
 
@@ -46,8 +46,8 @@ class CollectFingerprintsActivity :
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        appRequest = this.intent.extras?.getParcelable(AppRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
 
         configureRightToLeft()
 

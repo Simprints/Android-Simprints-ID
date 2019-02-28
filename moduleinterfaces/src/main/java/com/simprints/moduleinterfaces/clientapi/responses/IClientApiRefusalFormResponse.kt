@@ -1,7 +1,7 @@
 package com.simprints.moduleinterfaces.clientapi.responses
 
 
-interface ClientRefusalFormResponse : ClientResponse {
+interface IClientApiRefusalFormResponse : IClientApiResponse {
 
     val reason: String
     val extra: String

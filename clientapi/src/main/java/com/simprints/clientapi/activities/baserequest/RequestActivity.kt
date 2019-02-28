@@ -17,8 +17,8 @@ import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResp
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiRefusalFormResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.moduleinterfaces.clientapi.responses.ClientResponse
-import com.simprints.moduleinterfaces.clientapi.responses.ClientResponse.Companion.BUNDLE_KEY
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
@@ -67,7 +67,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun routeResponse(response: ClientResponse) = when (response) {
+    private fun routeResponse(response: IClientApiResponse) = when (response) {
         is ClientApiEnrollResponse -> presenter.handleEnrollResponse(response)
         is ClientApiIdentifyResponse -> presenter.handleIdentifyResponse(response)
         is ClientApiVerifyResponse -> presenter.handleVerifyResponse(response)

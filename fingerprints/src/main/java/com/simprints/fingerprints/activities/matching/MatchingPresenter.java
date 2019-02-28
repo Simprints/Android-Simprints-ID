@@ -23,8 +23,8 @@ import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
 import com.simprints.id.domain.requests.AppRequest;
 import com.simprints.id.domain.requests.AppVerifyRequest;
-import com.simprints.id.domain.responses.AppIdentificationResponse;
-import com.simprints.id.domain.responses.AppVerifyResponse;
+import com.simprints.id.domain.responses.IdentificationResponse;
+import com.simprints.id.domain.responses.VerifyResponse;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
 import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
@@ -302,7 +302,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         resultData = new Intent();
                         resultData.putExtra(
                             SimprintsIdResponse.BUNDLE_KEY,
-                            new AppIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
+                            new IdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -329,7 +329,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         resultData = new Intent();
                         resultData.putExtra(
                             SimprintsIdResponse.BUNDLE_KEY,
-                            new AppVerifyResponse(
+                            new VerifyResponse(
                                 verification.getGuidVerified(),
                                 verification.getConfidence(),
                                 Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());

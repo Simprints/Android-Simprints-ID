@@ -11,10 +11,10 @@ import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
-import com.simprints.moduleinterfaces.clientapi.responses.ClientIdentifyResponse
-import com.simprints.moduleinterfaces.clientapi.responses.ClientResponseTier
-import com.simprints.moduleinterfaces.clientapi.responses.ClientResponseTier.TIER_1
-import com.simprints.moduleinterfaces.clientapi.responses.ClientResponseTier.TIER_5
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier.TIER_1
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier.TIER_5
 import kotlinx.android.parcel.Parcelize
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -127,6 +127,6 @@ class OdkPresenterTest {
 data class Identification(
     override val guid: String,
     override val confidence: Int,
-    override val tier: ClientResponseTier
-) : ClientIdentifyResponse.Identification
+    override val tier: IClientApiResponseTier
+) : IClientApiIdentifyResponse.Identification
 
