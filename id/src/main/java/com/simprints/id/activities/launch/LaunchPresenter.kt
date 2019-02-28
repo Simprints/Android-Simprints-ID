@@ -230,7 +230,7 @@ class LaunchPresenter(private val view: LaunchContract.View, private val appRequ
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, AppRequest.action(appRequest), preferencesManager.programName, preferencesManager.organizationName)
+        return generalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -240,7 +240,7 @@ class LaunchPresenter(private val view: LaunchContract.View, private val appRequ
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, AppRequest.action(appRequest), preferencesManager.programName, preferencesManager.organizationName)
+        return parentalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     override fun handleOnBackPressed() {

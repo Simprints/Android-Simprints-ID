@@ -48,7 +48,7 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
     }
 
     override fun logScannerProperties(macAddress: String, scannerId: String) {
-        Timber.d("AnalyticsManagerImpl.logScannerProperties(macAddress=$macAddress, scannerId=$scannerId)")
+        Timber.d("AnalyticsManagerImpl.logScannerProperties(macAddress=$macAddress, lastScannerId=$scannerId)")
         firebaseAnalytics.setUserProperty("mac_address", macAddress)
         firebaseAnalytics.setUserProperty("scanner_id", scannerId)
     }

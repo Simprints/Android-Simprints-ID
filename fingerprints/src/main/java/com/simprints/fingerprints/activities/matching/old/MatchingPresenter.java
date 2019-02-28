@@ -12,7 +12,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.analytics.crashreport.CrashReportTag;
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger;
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager;
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents;
 import com.simprints.id.data.db.DATA_ERROR;
 import com.simprints.id.data.db.DataCallback;
 import com.simprints.id.data.db.DbManager;
@@ -22,12 +21,13 @@ import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
 import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
+import com.simprints.id.domain.requests.AppRequest;
+import com.simprints.id.domain.requests.AppVerifyRequest;
 import com.simprints.id.domain.responses.AppIdentificationResponse;
 import com.simprints.id.domain.responses.AppVerifyResponse;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
 import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
-import com.simprints.id.session.callout.CalloutAction;
 import com.simprints.id.tools.TimeHelper;
 import com.simprints.libmatcher.EVENT;
 import com.simprints.libmatcher.LibMatcher;
@@ -43,17 +43,17 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
-import io.reactivex.functions.BiConsumer;
 
 import static android.app.Activity.RESULT_OK;
-import static com.simprints.id.tools.DataCallbackUtils.wrapCallback;
 import static com.simprints.id.domain.Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE;
 import static com.simprints.id.domain.matching.Tier.computeTier;
+import static com.simprints.id.tools.DataCallbackUtils.wrapCallback;
 
 public class MatchingPresenter implements MatchingContract.Presenter, MatcherEventListener {
 
     @NonNull
     private final MatchingContract.View matchingView;
+    private final AppRequest appRequest;
 
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
@@ -75,27 +75,26 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @SuppressLint("CheckResult")
     public MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull FingerprintsComponent component,
-                      Person probe) {
+                      Person probe,
+                      AppRequest appRequest) {
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
+        this.appRequest = appRequest;
+
         sessionEventsManager
             .getCurrentSession()
-            .subscribe(new BiConsumer<SessionEvents, Throwable>() {
-                @Override
-                public void accept(SessionEvents sessionEvents, Throwable throwable) {
-                    if (sessionEvents != null && throwable == null) {
-                        sessionId = sessionEvents.getId();
-                    }
+            .subscribe((sessionEvents, throwable) -> {
+                if (sessionEvents != null && throwable == null) {
+                    sessionId = sessionEvents.getId();
                 }
             });
     }
 
     @Override
     public void start() {
-        preferencesManager.setMsSinceBootOnMatchStart(timeHelper.now());
         // TODO : Use polymorphism
-        switch (preferencesManager.getCalloutAction()) {
+        switch (AppRequest.Companion.action(appRequest)) {
             case IDENTIFY:
                 logMessageForCrashReport("Making identification");
                 startTimeIdentification = timeHelper.now();
@@ -148,6 +147,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
         dbManager.loadPeople(
             candidates,
             preferencesManager.getMatchGroup(),
+            appRequest.getModuleId(),
             wrapCallback("loading people", newOnLoadPeopleCallback()));
     }
 
@@ -193,7 +193,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onVerifyStart() {
-        final String guid = preferencesManager.getPatientId();
+        final String guid = ((AppVerifyRequest) appRequest).getVerifyGuid();
         dbManager.loadPerson(
             candidates,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
@@ -249,8 +249,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 break;
             }
             case MATCH_COMPLETED: {
-                CalloutAction callout = preferencesManager.getCalloutAction();
-                switch (callout) {
+                switch (AppRequest.Companion.action(appRequest)) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
@@ -316,7 +315,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new VerificationResult(preferencesManager.getPatientId(), score, computeTier(score));
+                            verification = new VerificationResult(((AppVerifyRequest) appRequest).getVerifyGuid(), score, computeTier(score));
                             resultCode = RESULT_OK;
                         } else {
                             verification = null;

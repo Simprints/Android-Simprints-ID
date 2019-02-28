@@ -46,7 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
-        sessionEventsManager.createSession().doFinally {
+        sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
             try {
                 extractSessionParametersOrThrow()
                 addCalloutAndConnectivityEventsInSession()
@@ -63,7 +63,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), Callout(view.parseAppRequest())))
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), appRequest))
             }
         }
     }
@@ -80,7 +80,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun extractSessionParametersOrThrow() {
         analyticsManager.logCallout(appRequest)
-        analyticsManager.logUserProperties()
+        analyticsManager.logUserProperties(appRequest.userId, appRequest.projectId, appRequest.moduleId, view.getDeviceUniqueId())
     }
 
     override fun handleNotSignedInUser() {

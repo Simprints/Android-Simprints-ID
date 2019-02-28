@@ -16,9 +16,7 @@ import com.simprints.id.domain.responses.AppResponse
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
-import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.extensions.parseClientApiRequest
+import com.simprints.id.tools.extensions.*
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -54,6 +52,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         super.onResume()
         viewPresenter.start()
     }
+
+    override fun getAppVersionNameFromPackageManager() = packageVersionName
+    override fun getDeviceUniqueId() = deviceId
 
     override fun parseAppRequest() =
         intent.parseClientApiRequest() as AppRequest
