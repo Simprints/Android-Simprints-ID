@@ -1,7 +1,7 @@
 package com.simprints.moduleinterfaces.app.requests
 
 
-interface ClientVerifyRequest : ClientRequest {
+interface AppVerifyRequest : AppRequest {
 
     val verifyGuid: String
 

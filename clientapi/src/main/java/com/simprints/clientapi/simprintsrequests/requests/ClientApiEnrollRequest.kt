@@ -1,7 +1,9 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
-import kotlinx.android.parcel.IgnoredOnParcel
+import com.simprints.moduleinterfaces.app.requests.AppEnrollRequest
+import com.simprints.moduleinterfaces.app.requests.AppRequest
 import kotlinx.android.parcel.Parcelize
+
 
 @Parcelize
 data class ClientApiEnrollRequest(
@@ -9,13 +11,18 @@ data class ClientApiEnrollRequest(
     override val moduleId: String,
     override val userId: String,
     override val metadata: String
-) : ClientApiBaseRequest, ClientApiActionRequest {
+) : ClientApiAppRequest {
 
-    @IgnoredOnParcel
-    override val bundleKey: String = BUNDLE_KEY
-
-    companion object {
-        const val BUNDLE_KEY = "enrollmentRequest"
-    }
+    override fun convertToAppRequest(): AppRequest = AppEnrollRequest(
+        this.projectId, this.userId, this.moduleId, this.metadata
+    )
 
 }
+
+@Parcelize
+private data class AppEnrollRequest(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String
+) : AppEnrollRequest
