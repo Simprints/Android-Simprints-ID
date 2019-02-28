@@ -79,7 +79,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             scanner?.connect(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: Connected to Vero")
                 scannerId = scanner?.scannerId ?: ""
-                analyticsManager.logScannerProperties()
+                analyticsManager.logScannerProperties(macAddress ?: "", scannerId?: "")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
