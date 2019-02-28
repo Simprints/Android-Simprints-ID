@@ -1,14 +1,10 @@
 package com.simprints.clientapi.simprintsrequests.responses
 
-import android.os.Parcelable
+import com.simprints.moduleinterfaces.clientapi.responses.ClientIdentifyResponse
+import com.simprints.moduleinterfaces.clientapi.responses.ClientIdentifyResponse.Identification
 import kotlinx.android.parcel.Parcelize
 
 
 @Parcelize
-data class ClientApiIdentifyResponse(val identifications: List<Identification>,
-                                     val sessionId: String) : SimprintsIdResponse {
-
-    @Parcelize
-    data class Identification(val guid: String, val confidence: Int, val tier: ClientApiTier) : Parcelable
-
-}
+data class ClientApiIdentifyResponse(override val identifications: List<Identification>,
+                                     override val sessionId: String) : ClientIdentifyResponse

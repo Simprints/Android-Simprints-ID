@@ -1,7 +1,6 @@
 package com.simprints.id.domain.responses
 
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier
 import com.simprints.id.domain.matching.IdentificationResult
 
 data class IdIdentificationResponse(val identifications: List<IdentificationResult>,

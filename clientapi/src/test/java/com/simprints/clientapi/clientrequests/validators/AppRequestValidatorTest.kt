@@ -8,7 +8,7 @@ import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
 
-abstract class ClientRequestValidatorTest(private val mockFactory: RequestFactory) {
+abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) {
 
     @Test
     open fun validateClientRequest_shouldNotFail() {

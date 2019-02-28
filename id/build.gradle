@@ -136,7 +136,6 @@ dependencies {
     api project(':core')
     api deps.simprints.libscanner
     api deps.simprints.libmatcher
-
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
@@ -183,7 +182,6 @@ dependencies {
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     kapt deps.dagger.compiler
-
     implementation deps.realm.annotations
     implementation(deps.realm.kotlin) {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
@@ -191,7 +189,6 @@ dependencies {
     implementation deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
-
     // Test
     testImplementation deps.simprints.mockscanner
     testImplementation deps.testing.retrofit
@@ -212,7 +209,6 @@ dependencies {
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
     testImplementation project(':testtools')
-
     // Android test
     androidTestImplementation deps.simprints.mockscanner
     androidTestImplementation deps.testing.mockito.core
