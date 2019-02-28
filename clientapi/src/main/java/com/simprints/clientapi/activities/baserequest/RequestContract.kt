@@ -5,7 +5,8 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppConfirmation
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiRefusalFormResponse
@@ -26,7 +27,9 @@ interface RequestContract {
 
         val confirmIdentifyExtractor: ConfirmIdentifyExtractor
 
-        fun sendSimprintsRequest(request: ClientApiBaseRequest)
+        fun sendSimprintsRequest(request: ClientApiAppRequest)
+
+        fun sendSimprintsConfirmationAndFinish(request: ClientApiAppConfirmation)
 
         fun handleClientRequestError(exception: Exception)
 

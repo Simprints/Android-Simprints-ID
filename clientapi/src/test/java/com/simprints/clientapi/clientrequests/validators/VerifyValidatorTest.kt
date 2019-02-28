@@ -6,7 +6,7 @@ import org.junit.Assert
 import org.junit.Test
 import org.mockito.Mockito
 
-class VerifyValidatorTest : ClientRequestValidatorTest(VerifyRequestFactory) {
+class VerifyValidatorTest : AppRequestValidatorTest(VerifyRequestFactory) {
 
     @Test
     fun validateClientRequest_shouldFailOnVerifyGuid() {

@@ -1,7 +1,9 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
-import kotlinx.android.parcel.IgnoredOnParcel
+import com.simprints.moduleinterfaces.app.requests.AppRequest
+import com.simprints.moduleinterfaces.app.requests.AppVerifyRequest
 import kotlinx.android.parcel.Parcelize
+
 
 @Parcelize
 data class ClientApiVerifyRequest(
@@ -10,13 +12,19 @@ data class ClientApiVerifyRequest(
     override val userId: String,
     override val metadata: String,
     val verifyGuid: String
-) : ClientApiBaseRequest, ClientApiActionRequest {
+) : ClientApiAppRequest {
 
-    @IgnoredOnParcel
-    override val bundleKey: String = BUNDLE_KEY
-
-    companion object {
-        const val BUNDLE_KEY = "ClientApiVerifyRequest"
-    }
+    override fun convertToAppRequest(): AppRequest = AppVerifyRequest(
+        this.projectId, this.userId, this.moduleId, this.metadata, this.verifyGuid
+    )
 
 }
+
+@Parcelize
+private data class AppVerifyRequest(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val verifyGuid: String
+) : AppVerifyRequest

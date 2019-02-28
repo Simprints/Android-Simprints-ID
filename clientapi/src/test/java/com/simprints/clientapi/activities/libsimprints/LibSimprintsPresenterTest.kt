@@ -54,8 +54,8 @@ class LibSimprintsPresenterTest {
         Mockito.`when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
-            ConfirmIdentifyFactory.getValidSimprintsRequest())
+        Mockito.verify(view, Mockito.times(1))
+            .sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest())
     }
 
     @Test
