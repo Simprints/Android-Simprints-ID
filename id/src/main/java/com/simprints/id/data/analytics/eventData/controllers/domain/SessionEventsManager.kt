@@ -14,7 +14,7 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
 
     fun signOut()
 
-    fun createSession(): Single<SessionEvents>
+    fun createSession(appVersionName: String): Single<SessionEvents>
     fun getCurrentSession(): Single<SessionEvents>
 
     fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable

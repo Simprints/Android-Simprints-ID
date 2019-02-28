@@ -12,6 +12,8 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.collectFingerprints.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.id.activities.collectFingerprints.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.id.activities.collectFingerprints.indicators.CollectFingerprintsIndicatorsHelper
+import com.simprints.id.activities.collectFingerprints.models.Finger
+import com.simprints.id.activities.collectFingerprints.models.FingerRes
 import com.simprints.id.activities.collectFingerprints.scanning.CollectFingerprintsScanningHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
@@ -22,19 +24,18 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.activities.collectFingerprints.models.Finger
-import com.simprints.id.activities.collectFingerprints.models.FingerRes
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.tools.utils.EncodingUtils
-import com.simprints.id.domain.responses.IdEnrolResponse
+import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.AppRequestAction
+import com.simprints.id.domain.responses.AppEnrolResponse
 import com.simprints.id.domain.responses.toDomainClientApiEnrol
 import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unexpected.UnexpectedException
-import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -42,7 +43,8 @@ import javax.inject.Inject
 import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
-                                   private val view: CollectFingerprintsContract.View)
+                                   private val view: CollectFingerprintsContract.View,
+                                   private val appRequest: AppRequest)
     : CollectFingerprintsContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -70,7 +72,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun start() {
-        preferencesManager.msSinceBootOnMainStart = timeHelper.now()
         LanguageHelper.setLanguage(context, preferencesManager.language)
 
         initFingerDisplayHelper(view)
@@ -195,11 +196,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (preferencesManager.calloutAction) {
-            CalloutAction.REGISTER -> context.getString(R.string.register_title)
-            CalloutAction.IDENTIFY -> context.getString(R.string.identify_title)
-            CalloutAction.UPDATE -> context.getString(R.string.update_title)
-            CalloutAction.VERIFY -> context.getString(R.string.verify_title)
+        when (AppRequest.action(appRequest)) {
+            AppRequestAction.ENROL -> context.getString(R.string.register_title)
+            AppRequestAction.IDENTIFY -> context.getString(R.string.identify_title)
+            AppRequestAction.VERIFY -> context.getString(R.string.verify_title)
             else -> {
                 handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
                 ""
@@ -256,7 +256,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             UUID.randomUUID().toString(),
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             loginInfoManager.getSignedInUserIdOrEmpty(),
-            preferencesManager.moduleId,
+            appRequest.moduleId,
             fingerprints)
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
@@ -267,20 +267,21 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun isRegisteringElseIsMatching() =
-        preferencesManager.calloutAction === CalloutAction.REGISTER || preferencesManager.calloutAction === CalloutAction.UPDATE
+    private fun isRegisteringElseIsMatching() = AppRequest.action(appRequest) == AppRequestAction.ENROL
 
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)
             .subscribeBy(
-                onComplete = { handleSavePersonSuccess() },
+                onComplete = { handleSavePersonSuccess(person.patientId) },
                 onError = { handleSavePersonFailure(it) })
     }
 
-    private fun handleSavePersonSuccess() {
+    //STOPSHIP
+    //We shouldn't be using any client API models in ID past the interface layer.
+    private fun handleSavePersonSuccess(guidCreated: String) {
         preferencesManager.lastEnrolDate = Date()
         val result = Intent()
-        result.putExtra(SimprintsIdResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
+        result.putExtra(SimprintsIdResponse.BUNDLE_KEY, AppEnrolResponse(guidCreated).toDomainClientApiEnrol())
         view.finishSuccessEnrol(result)
     }
 
