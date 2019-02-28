@@ -2,9 +2,9 @@ package com.simprints.id.domain.requests
 
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmIdentifyRequest
 
-data class IdConfirmIdentifyRequest(override val projectId: String,
-                                    val sessionId: String,
-                                    val selectedGuid: String): IdBaseRequest {
+data class AppConfirmIdentifyRequest(override val projectId: String,
+                                     val sessionId: String,
+                                     val selectedGuid: String) : AppBaseRequest {
 
     constructor(clientApiConfirmIdentifyRequest: ClientApiConfirmIdentifyRequest) : this(
         projectId = clientApiConfirmIdentifyRequest.projectId,
@@ -12,5 +12,6 @@ data class IdConfirmIdentifyRequest(override val projectId: String,
         selectedGuid = clientApiConfirmIdentifyRequest.selectedGuid
     )
 }
+
 fun ClientApiConfirmIdentifyRequest.toDomainIdConfirmIdentifyRequest() =
-    IdConfirmIdentifyRequest(projectId, sessionId, selectedGuid)
+    AppConfirmIdentifyRequest(projectId, sessionId, selectedGuid)

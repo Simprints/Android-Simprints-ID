@@ -8,9 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.requests.AppRequest
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
@@ -34,27 +34,23 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var secureApiInterface: SecureApiInterface
 
-    private var possibleLegacyProjectId: String? = null
     val app by lazy {
         application as Application
     }
 
     private lateinit var progressDialog: SimProgressDialog
+    private lateinit var appRequest: AppRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        appRequest = this.intent.extras?.getParcelable(AppRequest.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
 
         val component = (application as Application).component
         component.inject(this)
 
         initUI()
-
-        intent.getStringExtra(IntentKeys.loginActivityLegacyProjectIdKey)?.let {
-            if (it.isNotEmpty()) {
-                possibleLegacyProjectId = it
-            }
-        }
 
         val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
             component,
@@ -67,7 +63,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     private fun initUI() {
         progressDialog = SimProgressDialog(this)
-        loginEditTextUserId.setText(preferences.userId)
+        loginEditTextUserId.setText(appRequest.userId)
         loginButtonScanQr.setOnClickListener {
             viewPresenter.logMessageForCrashReportWithUITrigger("Scan QR button clicked")
             viewPresenter.openScanQRApp()
@@ -93,7 +89,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         val userId = loginEditTextUserId.text.toString()
         val projectId = loginEditTextProjectId.text.toString()
         val projectSecret = loginEditTextProjectSecret.text.toString()
-        viewPresenter.signIn(userId, projectId, projectSecret, preferences.projectId, possibleLegacyProjectId)
+        viewPresenter.signIn(userId, projectId, projectSecret, appRequest.projectId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
