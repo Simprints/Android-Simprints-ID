@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
@@ -29,7 +28,8 @@ import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.requests.RequestAction
 import com.simprints.id.domain.responses.EnrolResponse
-import com.simprints.id.domain.responses.toDomainClientApiEnrol
+import com.simprints.id.domain.responses.Response
+import com.simprints.id.domain.responses.toClientApiEnrolResponse
 import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unexpected.UnexpectedException
@@ -278,11 +278,11 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     //STOPSHIP
     //We shouldn't be using any client API models in ID past the interface layer.
-    private fun handleSavePersonSuccess() {
-//        preferencesManager.lastEnrolDate = Date()
-//        val result = Intent()
-//        result.putExtra(ClientApiEnrollResponse.BUNDLE_KEY, IdEnrolResponse(preferencesManager.patientId).toDomainClientApiEnrol())
-//        view.finishSuccessEnrol(result)
+    private fun handleSavePersonSuccess(guidCreated: String) {
+        preferencesManager.lastEnrolDate = Date()
+        val result = Intent()
+        result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated).toClientApiEnrolResponse())
+        view.finishSuccessEnrol(result)
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
