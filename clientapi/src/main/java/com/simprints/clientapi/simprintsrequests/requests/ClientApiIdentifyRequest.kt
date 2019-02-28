@@ -1,7 +1,7 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
-import com.simprints.moduleinterfaces.app.requests.AppIdentifyRequest
-import com.simprints.moduleinterfaces.app.requests.AppRequest
+import com.simprints.moduleinterfaces.app.requests.IAppIdentifyRequest
+import com.simprints.moduleinterfaces.app.requests.IAppRequest
 import kotlinx.android.parcel.Parcelize
 
 
@@ -13,7 +13,7 @@ data class ClientApiIdentifyRequest(
     override val metadata: String
 ) : ClientApiAppRequest {
 
-    override fun convertToAppRequest(): AppRequest = AppIdentifyRequest(
+    override fun convertToAppRequest(): IAppRequest = AppIdentifyRequest(
         this.projectId, this.userId, this.moduleId, this.metadata
     )
 
@@ -26,4 +26,4 @@ private data class AppIdentifyRequest(
     override val userId: String,
     override val moduleId: String,
     override val metadata: String
-) : AppIdentifyRequest
+) : IAppIdentifyRequest

@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics
 import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.Request
 import io.reactivex.Single
 import timber.log.Timber
 
@@ -25,11 +25,11 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         }
     }
 
-    override fun logCallout(appRequest: AppRequest) {
+    override fun logCallout(appRequest: Request) {
         Timber.d("AnalyticsManagerImpl.logCallout(appRequest=$appRequest)")
         with(appRequest) {
             val bundle = Bundle()
-            bundle.putString("action", AppRequest.action(appRequest).toString())
+            bundle.putString("action", Request.action(appRequest).toString())
             bundle.putString("projectId", appRequest.projectId)
             bundle.putString("userId", appRequest.userId)
             bundle.putString("moduleID", appRequest.moduleId)

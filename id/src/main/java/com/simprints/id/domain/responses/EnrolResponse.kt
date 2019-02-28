@@ -4,6 +4,6 @@ import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollRespon
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class AppEnrolResponse(val guid: String): AppResponse
+data class EnrolResponse(val guid: String): Response
 
-fun AppEnrolResponse.toDomainClientApiEnrol() = ClientApiEnrollResponse(guid)
+fun EnrolResponse.toDomainClientApiEnrol() = ClientApiEnrollResponse(guid)

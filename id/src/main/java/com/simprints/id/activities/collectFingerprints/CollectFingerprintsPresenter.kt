@@ -26,9 +26,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.AppRequest
-import com.simprints.id.domain.requests.AppRequestAction
-import com.simprints.id.domain.responses.AppEnrolResponse
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.RequestAction
+import com.simprints.id.domain.responses.EnrolResponse
 import com.simprints.id.domain.responses.toDomainClientApiEnrol
 import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
@@ -44,7 +44,7 @@ import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
-                                   private val appRequest: AppRequest)
+                                   private val appRequest: Request)
     : CollectFingerprintsContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -196,10 +196,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (AppRequest.action(appRequest)) {
-            AppRequestAction.ENROL -> context.getString(R.string.register_title)
-            AppRequestAction.IDENTIFY -> context.getString(R.string.identify_title)
-            AppRequestAction.VERIFY -> context.getString(R.string.verify_title)
+        when (Request.action(appRequest)) {
+            RequestAction.ENROL -> context.getString(R.string.register_title)
+            RequestAction.IDENTIFY -> context.getString(R.string.identify_title)
+            RequestAction.VERIFY -> context.getString(R.string.verify_title)
             else -> {
                 handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
                 ""
@@ -267,7 +267,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun isRegisteringElseIsMatching() = AppRequest.action(appRequest) == AppRequestAction.ENROL
+    private fun isRegisteringElseIsMatching() = Request.action(appRequest) == RequestAction.ENROL
 
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)

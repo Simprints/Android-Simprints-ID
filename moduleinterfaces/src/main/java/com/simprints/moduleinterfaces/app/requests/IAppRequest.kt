@@ -3,7 +3,7 @@ package com.simprints.moduleinterfaces.app.requests
 import android.os.Parcelable
 
 
-interface AppRequest : Parcelable {
+interface IAppRequest : Parcelable {
 
     companion object {
         const val BUNDLE_KEY = "clientRequestBundleKey"
