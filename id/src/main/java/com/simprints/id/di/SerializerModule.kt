@@ -4,9 +4,6 @@ import com.google.gson.Gson
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
-import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractorImpl
 import com.simprints.id.tools.serializers.*
 import dagger.Module
 import dagger.Provides
@@ -20,7 +17,6 @@ class SerializerModule {
 
     @Provides @Singleton @Named("BooleanSerializer") fun provideBooleanSerializer(): Serializer<Boolean> = BooleanSerializer()
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
-    @Provides @Singleton @Named("CalloutActionSerializer") fun provideCalloutActionSerializer(): Serializer<CalloutAction> = EnumSerializer(CalloutAction::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<GROUP> = EnumSerializer(GROUP::class.java)
     @Provides @Singleton @Named("PeopleDownSyncTriggerSerializer") fun providePeopleDownSyncTriggerSerializer(): Serializer<PeopleDownSyncTrigger> = EnumSerializer(PeopleDownSyncTrigger::class.java)
     @Provides @Singleton fun provideGson(): Gson = Gson()
@@ -35,6 +31,4 @@ class SerializerModule {
 
     @Provides @Singleton @Named("LanguagesStringArraySerializer") fun provideLanguagesStringArraySerializer(): Serializer<Array<String>> = LanguagesStringArraySerializer()
     @Provides @Singleton @Named("ModuleIdOptionsStringSetSerializer") fun provideModuleIdOptionsStringSetSerializer(): Serializer<Set<String>> = ModuleIdOptionsStringSetSerializer()
-
-    @Provides @Singleton fun provideSessionParametersExtractor(): SessionParametersExtractor = SessionParametersExtractorImpl()
 }

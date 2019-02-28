@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
@@ -27,7 +26,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
-    @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     init {

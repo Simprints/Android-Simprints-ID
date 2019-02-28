@@ -14,13 +14,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.responses.AppResponse
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.id.tools.utils.StringsUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -34,26 +32,18 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
-    private var possibleLegacyApiKey: String = ""
     private var setupFailed: Boolean = false
 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    private val appRequest = view.parseAppRequest()
 
     init {
         component.inject(this)
-        initSession()
     }
 
-    private fun initSession() {
-        preferencesManager.initializeSessionState(newSessionId(), timeHelper.now())
-    }
-
-    private fun newSessionId(): String {
-        return StringsUtils.randomUUID()
-    }
-
+    @SuppressLint("CheckResult")
     override fun setup() {
         view.checkCallingAppIsFromKnownSource()
         sessionEventsManager.createSession().doFinally {
@@ -73,13 +63,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), Callout(view.parseIdRequest())))
+                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), Callout(view.parseAppRequest())))
             }
         }
     }
 
     private fun setLastUser() {
-        preferencesManager.lastUserUsed = preferencesManager.userId
+        preferencesManager.lastUserUsed = appRequest.userId
     }
 
     override fun start() {
@@ -88,12 +78,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    fun extractSessionParametersOrThrow() {
-        val idRequest = view.parseIdRequest()
-        analyticsManager.logCallout(idRequest)
-        val sessionParameters = sessionParametersExtractor.extractFrom(idRequest, view.getCheckCallingApp(), "")
-        possibleLegacyApiKey = sessionParameters.apiKey
-        preferencesManager.sessionParameters = sessionParameters
+    private fun extractSessionParametersOrThrow() {
+        analyticsManager.logCallout(appRequest)
         analyticsManager.logUserProperties()
     }
 
@@ -104,7 +90,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
         if (!loginAlreadyTried.get()) {
             loginAlreadyTried.set(true)
-            view.openLoginActivity(possibleLegacyApiKey)
+            view.openLoginActivity(appRequest)
         } else {
             view.finishCheckLoginFromIntentActivity()
         }
@@ -113,16 +99,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     /** @throws DifferentProjectIdSignedInException */
     override fun isProjectIdStoredAndMatches(): Boolean =
         loginInfoManager.getSignedInProjectIdOrEmpty().isNotEmpty() &&
-            matchIntentAndStoredProjectIdsOrThrow(loginInfoManager.getSignedInProjectIdOrEmpty())
-
-    private fun matchIntentAndStoredProjectIdsOrThrow(storedProjectId: String): Boolean =
-        if (possibleLegacyApiKey.isEmpty()) {
-            matchProjectIdsOrThrow(storedProjectId, preferencesManager.projectId)
-        } else {
-            val hashedLegacyApiKey = Hasher().hash(possibleLegacyApiKey)
-            val storedProjectIdFromLegacyOrEmpty = loginInfoManager.getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey)
-            matchProjectIdsOrThrow(storedProjectId, storedProjectIdFromLegacyOrEmpty)
-        }
+            matchProjectIdsOrThrow(loginInfoManager.getSignedInProjectIdOrEmpty(), appRequest.projectId)
 
     private fun matchProjectIdsOrThrow(storedProjectId: String, intentProjectId: String): Boolean =
         storedProjectId == intentProjectId ||
@@ -140,12 +117,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     override fun handleSignedInUser() {
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User */
-        loginInfoManager.signedInUserId = preferencesManager.userId
+        loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
-        view.openLaunchActivity()
+        view.openLaunchActivity(appRequest)
     }
 
+    @SuppressLint("CheckResult")
     private fun addInfoIntoSessionEventsAfterUserSignIn() {
         try {
             Singles.zip(
@@ -186,9 +164,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ))
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, returnCallout: Callout) {
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: AppResponse) {
         sessionEventsManager.updateSessionInBackground {
-            it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
+            it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), appResponse)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)
         }
     }

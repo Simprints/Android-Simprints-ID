@@ -3,9 +3,9 @@ package com.simprints.id.domain.consent
 import android.content.Context
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.R
-import com.simprints.id.session.callout.CalloutAction
-import com.simprints.id.session.callout.CalloutAction.IDENTIFY
-import com.simprints.id.session.callout.CalloutAction.VERIFY
+import com.simprints.id.domain.requests.AppIdentifyRequest
+import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.AppVerifyRequest
 
 
 data class ParentalConsent(
@@ -19,9 +19,9 @@ data class ParentalConsent(
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, calloutAction: CalloutAction, programName: String, organisationName: String) = StringBuilder().apply {
-        when (calloutAction) {
-            IDENTIFY, VERIFY -> {
+    fun assembleText(context: Context, appRequest: AppRequest, programName: String, organisationName: String) = StringBuilder().apply {
+        when (appRequest) {
+            is AppIdentifyRequest, is AppVerifyRequest -> {
                 if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
             }
             else -> {
