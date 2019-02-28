@@ -4,25 +4,11 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.Application
-import com.simprints.id.data.db.remote.adapters.toFirebaseSession
-import com.simprints.id.data.db.remote.enums.VERIFY_GUID_EXISTS_RESULT
-import com.simprints.id.data.db.remote.models.fb_IdEvent
-import com.simprints.id.data.db.remote.models.fb_IdEventUpdate
-import com.simprints.id.data.db.remote.models.fb_RefusalForm
-import com.simprints.id.data.db.remote.models.fb_VfEvent
-import com.simprints.id.data.db.remote.tools.Routes
-import com.simprints.id.data.db.remote.tools.Utils
-import com.simprints.id.domain.matching.IdentificationResult
-import com.simprints.id.domain.matching.VerificationResult
-import com.simprints.id.domain.refusal_form.IdRefusalForm
 import com.simprints.id.exceptions.unexpected.DbAlreadyInitialisedException
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.secure.models.Tokens
-import com.simprints.id.session.Session
-import com.simprints.id.tools.extensions.toMap
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -53,8 +39,6 @@ open class FirebaseManagerImpl(
         val legacyFirebaseAppName = getLegacyAppName()
         val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
         legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
-
-        Utils.forceSync(legacyFirebaseApp)
     }
 
     private fun initialiseFirestoreFirebaseProject() {
@@ -130,30 +114,6 @@ open class FirebaseManagerImpl(
         }
     }
 
-    // Data transfer
-    // Firebase
-    override fun saveIdentificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, matchSize: Int, matches: List<IdentificationResult>, sessionId: String) {
-        Routes.idEventRef(legacyFirebaseApp, projectId).push().setValue(fb_IdEvent(probe, projectId, userId, moduleId, matchSize, matches, sessionId).toMap())
-    }
-
-    override fun updateIdentificationInRemote(projectId: String, selectedGuid: String, deviceId: String, sessionId: String) {
-        Routes.idUpdateRef(projectId).push().setValue(fb_IdEventUpdate(projectId, selectedGuid, deviceId, sessionId))
-    }
-
-    override fun saveVerificationInRemote(probe: LibPerson, projectId: String, userId: String, androidId: String, moduleId: String, patientId: String, match: VerificationResult?, sessionId: String, guidExistsResult: VERIFY_GUID_EXISTS_RESULT) {
-        Routes.vfEventRef(legacyFirebaseApp, projectId).push().setValue(fb_VfEvent(probe, projectId, userId, moduleId, patientId, match, sessionId, guidExistsResult).toMap())
-    }
-
-    override fun saveRefusalFormInRemote(refusalForm: IdRefusalForm, projectId: String, userId: String, sessionId: String) {
-        Routes.refusalRef(legacyFirebaseApp).push().setValue(fb_RefusalForm(refusalForm, projectId, userId, sessionId))
-    }
-
-    override fun saveSessionInRemote(session: Session) {
-        Routes.sessionRef(legacyFirebaseApp).push().setValue(session.toFirebaseSession())
-    }
-
-    fun getFirebaseStorageInstance() = FirebaseStorage.getInstance(legacyFirebaseApp)
-
     override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
@@ -179,7 +139,6 @@ open class FirebaseManagerImpl(
         fun getLegacyAppName(): String =
             FirebaseApp.DEFAULT_APP_NAME
 
-        fun getFirestoreAppName(): String =
-            "firestore"
+        fun getFirestoreAppName(): String = "firestore"
     }
 }

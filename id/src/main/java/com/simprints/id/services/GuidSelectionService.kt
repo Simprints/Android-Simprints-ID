@@ -47,8 +47,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val selectedGuid = intent.selectedGuid
         val callbackSent = try {
             checkProjectId(projectId)
-            dbManager.updateIdentification(loginInfoManager.getSignedInProjectIdOrEmpty(), selectedGuid, sessionId ?: "")
-            sessionId?.let {
+            sessionId.let {
                 sessionEventsManager
                     .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
                     .subscribeOn(Schedulers.io())
