@@ -6,11 +6,11 @@ import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
 
 abstract class ClientRequestBuilder(private val validator: ClientRequestValidator) {
 
-    protected abstract fun buildSimprintsRequest(): ClientApiBaseRequest
+    protected abstract fun buildAppRequest(): ClientApiBaseRequest
 
     fun build(): ClientApiBaseRequest {
         validator.validateClientRequest()
-        return buildSimprintsRequest()
+        return buildAppRequest()
     }
 
 }

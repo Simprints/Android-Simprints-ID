@@ -8,7 +8,7 @@ import org.junit.Test
 import org.mockito.Mockito
 
 
-class ConfirmIdentifyValidatorTest : ClientRequestValidatorTest(ConfirmIdentifyFactory) {
+class ConfirmIdentifyValidatorTest : AppRequestValidatorTest(ConfirmIdentifyFactory) {
 
     override fun validateClientRequest_shouldFailOnModuleId() {}
 
