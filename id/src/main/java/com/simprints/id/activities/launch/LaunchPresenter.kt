@@ -24,8 +24,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.domain.requests.AppRequest
-import com.simprints.id.domain.requests.AppVerifyRequest
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -41,7 +41,7 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class LaunchPresenter(private val view: LaunchContract.View, private val appRequest: AppRequest) : LaunchContract.Presenter {
+class LaunchPresenter(private val view: LaunchContract.View, private val appRequest: Request) : LaunchContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -119,7 +119,7 @@ class LaunchPresenter(private val view: LaunchContract.View, private val appRequ
             .andThen(tryToFetchGuid())
 
     private fun tryToFetchGuid(): Completable {
-        return if (appRequest is AppVerifyRequest) {
+        return if (appRequest is VerifyRequest) {
             val guid = appRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
             dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess { personFetchResult ->

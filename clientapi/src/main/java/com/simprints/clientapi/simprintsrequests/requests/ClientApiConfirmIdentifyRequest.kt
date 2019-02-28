@@ -1,7 +1,7 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
-import com.simprints.moduleinterfaces.app.confirmations.AppConfirmation
-import com.simprints.moduleinterfaces.app.confirmations.AppIdentifyConfirmation
+import com.simprints.moduleinterfaces.app.confirmations.IAppConfirmation
+import com.simprints.moduleinterfaces.app.confirmations.IAppIdentifyConfirmation
 import kotlinx.android.parcel.Parcelize
 
 
@@ -12,7 +12,7 @@ data class ClientApiConfirmIdentifyRequest(
     override val selectedGuid: String
 ) : ClientApiAppConfirmation {
 
-    override fun convertToAppRequest(): AppConfirmation = AppIdentifyConfirmation(
+    override fun convertToAppRequest(): IAppConfirmation = AppIdentifyConfirmation(
         this.projectId, this.sessionId, this.selectedGuid
     )
 
@@ -23,4 +23,4 @@ private data class AppIdentifyConfirmation(
     override val projectId: String,
     override val sessionId: String,
     override val selectedGuid: String
-) : AppIdentifyConfirmation
+) : IAppIdentifyConfirmation

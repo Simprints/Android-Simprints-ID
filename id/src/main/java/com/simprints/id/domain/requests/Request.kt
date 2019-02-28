@@ -2,25 +2,25 @@ package com.simprints.id.domain.requests
 
 import android.os.Parcelable
 
-interface AppBaseRequest {
+interface BaseRequest {
     val projectId: String
 }
 
-interface AppRequestParamAction {
+interface RequestParamAction {
     val userId: String
     val moduleId: String
     val metadata: String
 }
 
-interface AppRequest : AppBaseRequest, AppRequestParamAction, Parcelable {
+interface Request : BaseRequest, RequestParamAction, Parcelable {
     companion object {
         const val BUNDLE_KEY = "ApiRequest"
 
-        fun action(appRequest: AppRequest) =
+        fun action(appRequest: Request) =
             when (appRequest) {
-                is AppEnrolRequest -> AppRequestAction.ENROL
-                is AppVerifyRequest -> AppRequestAction.VERIFY
-                is AppIdentifyRequest -> AppRequestAction.IDENTIFY
+                is EnrolRequest -> RequestAction.ENROL
+                is VerifyRequest -> RequestAction.VERIFY
+                is IdentifyRequest -> RequestAction.IDENTIFY
                 else -> throw IllegalArgumentException("Invalid appRequest")
             }
     }

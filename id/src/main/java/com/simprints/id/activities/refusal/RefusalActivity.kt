@@ -12,7 +12,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.responses.AppRefusalFormResponse
+import com.simprints.id.domain.responses.RefusalFormResponse
 import com.simprints.id.domain.responses.toDomainClientApiRefusalResponse
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_refusal.*
@@ -94,7 +94,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     }
 
     private fun getIntentForResultData(reason: REFUSAL_FORM_REASON?, text: String) =
-        Intent().putExtra(SimprintsIdResponse.BUNDLE_KEY, AppRefusalFormResponse(reason.toString(), text).toDomainClientApiRefusalResponse())
+        Intent().putExtra(SimprintsIdResponse.BUNDLE_KEY, RefusalFormResponse(reason.toString(), text).toDomainClientApiRefusalResponse())
 
     private fun getRefusalText() = refusalText.text.toString()
 }

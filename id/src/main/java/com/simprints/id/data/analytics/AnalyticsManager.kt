@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics
 
-import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.Request
 import io.reactivex.Single
 
 
@@ -8,7 +8,7 @@ interface AnalyticsManager {
 
     val analyticsId: Single<String>
 
-    fun logCallout(idRequest: AppRequest)
+    fun logCallout(idRequest: Request)
 
     fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String)
     fun logGuidSelectionService(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean)

@@ -10,7 +10,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
@@ -39,13 +39,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     private lateinit var progressDialog: SimProgressDialog
-    private lateinit var appRequest: AppRequest
+    private lateinit var appRequest: Request
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        appRequest = this.intent.extras?.getParcelable(AppRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
 
         val component = (application as Application).component
         component.inject(this)
