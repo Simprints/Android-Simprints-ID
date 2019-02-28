@@ -9,6 +9,9 @@ import com.simprints.id.domain.responses.AppResponse
 interface CheckLoginFromIntentContract {
 
     interface View : BaseView<Presenter>, CheckLoginContract.View {
+        fun getAppVersionNameFromPackageManager(): String
+        fun getDeviceUniqueId(): String
+
         fun openLoginActivity(appRequest: AppRequest)
         fun openLaunchActivity(appRequest: AppRequest)
 

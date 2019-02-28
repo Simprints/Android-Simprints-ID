@@ -9,13 +9,13 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,8 +46,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             it[0]
         }
 
-    override fun createSession(): Single<SessionEvents> =
-        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
+    override fun createSession(appVersionName: String): Single<SessionEvents> =
+        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName).let {
             Timber.d("Created session: ${it.id}")
             sessionEventsSyncManager.scheduleSessionsSync()
 

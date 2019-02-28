@@ -192,7 +192,7 @@ fun validateScannerConnectionEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo(EventType.REFUSAL.toString())
     assertThat(json.get("relativeStartTime").asLong)
     with(json.get("scannerInfo").asJsonObject) {
-        assertThat(get("scannerId").asString).isNotEmpty()
+        assertThat(get("lastScannerId").asString).isNotEmpty()
         assertThat(get("macAddress").asString).isNotEmpty()
         assertThat(get("hardwareVersion").asString).isNotEmpty()
     }
@@ -232,7 +232,7 @@ fun validateDatabaseInfoApiModel(json: JsonObject) {
 fun validateDeviceApiModel(json: JsonObject) {
     assertThat(json.get("androidSdkVersion").asString).isNotEmpty()
     assertThat(json.get("deviceModel").asString).isNotEmpty()
-    assertThat(json.get("deviceId").asString).isNotEmpty()
+    assertThat(json.get("deviceUniqueId").asString).isNotEmpty()
     assertThat(json.size()).isEqualTo(3)
 }
 

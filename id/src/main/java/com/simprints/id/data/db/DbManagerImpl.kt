@@ -158,7 +158,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
                     }
             }
 
-
     override fun loadPeople(destinationList: MutableList<Person>,
                             group: GROUP,
                             moduleId: String, //STOPSHIP: terrible API: if we use or not module id depends on group
