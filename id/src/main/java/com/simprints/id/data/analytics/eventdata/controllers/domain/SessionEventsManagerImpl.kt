@@ -57,10 +57,10 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                 .toSingle { it }
         }
 
-    private fun createSessionWithAvailableInfo(projectId: String): SessionEvents =
+    private fun createSessionWithAvailableInfo(projectId: String, appVersionName: String): SessionEvents =
         SessionEvents(
             projectId,
-            preferencesManager.appVersionName,
+            appVersionName,
             /* preferencesManager.libVersionName */ "", //StopShip: do we need libVersionName?
             preferencesManager.language,
             Device(
@@ -114,7 +114,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             session.events.add(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
-                preferencesManager.patientId,
+                patientId,
                 match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
         }
     }

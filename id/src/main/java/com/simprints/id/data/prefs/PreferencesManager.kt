@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs
 
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 
 interface PreferencesManager :

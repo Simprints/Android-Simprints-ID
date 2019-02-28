@@ -6,6 +6,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.extensions.packageVersionName
 import kotlinx.android.synthetic.main.activity_front.*
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ open class RequestLoginActivity : AppCompatActivity() {
         LanguageHelper.setLanguage(this, preferencesManager.language)
         setContentView(R.layout.activity_front)
 
-        initSimprintsIdVersionTextView(preferencesManager.appVersionName)
+        initSimprintsIdVersionTextView(packageVersionName)
     }
 
     private fun initSimprintsIdVersionTextView(simprintsIdVersion: String) {

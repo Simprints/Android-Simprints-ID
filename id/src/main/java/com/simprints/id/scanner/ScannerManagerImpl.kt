@@ -28,6 +28,9 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                               private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
+    override var macAddress: String? = null
+    override var scannerId: String? = null
+    override var hardwareVersion: String? = null
 
     @SuppressLint("CheckResult")
     override fun start(): Completable =
@@ -57,10 +60,9 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
             else -> {
                 val macAddress = pairedScanners[0]
-                preferencesManager.macAddress = macAddress
+                this.macAddress = macAddress
 
                 scanner = Scanner(macAddress, bluetoothAdapter)
-
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
                 logMessageForCrashReport("ScannerManager: Scanner initialized")
@@ -69,13 +71,14 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         }
     }
 
+
     override fun connectToVero(): Completable = Completable.create { result ->
         if (scanner == null) {
             result.onError(NullScannerException())
         } else {
             scanner?.connect(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: Connected to Vero")
-                preferencesManager.scannerId = scanner?.scannerId ?: ""
+                scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
                 result.onComplete()
             }, { scannerError ->
@@ -99,7 +102,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: UN20 ready")
-                preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
+                hardwareVersion = scanner?.ucVersion?.toString() ?: "unknown"
 
                 result.onComplete()
             }, { scannerError ->
@@ -124,7 +127,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
                 logMessageForCrashReport("ScannerManager: UN20 off")
-                preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
+                hardwareVersion = scanner?.ucVersion?.toString() ?: "unknown"
 
                 result.onComplete()
             }, {

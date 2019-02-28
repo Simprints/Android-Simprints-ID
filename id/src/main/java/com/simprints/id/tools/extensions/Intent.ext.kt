@@ -7,7 +7,7 @@ import com.simprints.clientapi.simprintsrequests.requests.ClientApiIdentifyReque
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
 import com.simprints.id.domain.requests.*
 
-fun Intent.parseClientApiRequest(): IdBaseRequest =
+fun Intent.parseClientApiRequest(): AppBaseRequest =
     this.extras?.let {
         try {
             when (it.keySet().first()) {
