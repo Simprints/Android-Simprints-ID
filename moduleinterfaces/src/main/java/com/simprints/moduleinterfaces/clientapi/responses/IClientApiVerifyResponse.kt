@@ -1,10 +1,10 @@
 package com.simprints.moduleinterfaces.clientapi.responses
 
 
-interface ClientVerifyResponse : ClientResponse {
+interface IClientApiVerifyResponse : IClientApiResponse {
 
     val guid: String
     val confidence: Int
-    val tier: ClientResponseTier
+    val tier: IClientApiResponseTier
 
 }
