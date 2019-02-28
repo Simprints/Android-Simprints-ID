@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse;
 import com.simprints.fingerprints.di.FingerprintsComponent;
 import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.analytics.crashreport.CrashReportTag;
@@ -19,12 +18,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
-import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
-import com.simprints.id.domain.requests.AppRequest;
-import com.simprints.id.domain.requests.AppVerifyRequest;
-import com.simprints.id.domain.responses.IdentificationResponse;
-import com.simprints.id.domain.responses.VerifyResponse;
+import com.simprints.id.domain.requests.Request;
+import com.simprints.id.domain.requests.VerifyRequest;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
 import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
@@ -53,7 +49,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
     @NonNull
     private final MatchingContract.View matchingView;
-    private final AppRequest appRequest;
+    private final Request appRequest;
 
     private Person probe;
     private List<Person> candidates = new ArrayList<>();
@@ -76,7 +72,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     MatchingPresenter(@NonNull MatchingContract.View matchingView,
                       @NonNull FingerprintsComponent component,
                       Person probe,
-                      AppRequest appRequest) {
+                      Request appRequest) {
         component.inject(this);
         this.matchingView = matchingView;
         this.probe = probe;
@@ -94,7 +90,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @Override
     public void start() {
         // TODO : Use polymorphism
-        switch (AppRequest.Companion.action(appRequest)) {
+        switch (Request.Companion.action(appRequest)) {
             case IDENTIFY:
                 logMessageForCrashReport("Making identification");
                 startTimeIdentification = timeHelper.now();
@@ -193,7 +189,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     }
 
     private void onVerifyStart() {
-        final String guid = ((AppVerifyRequest) appRequest).getVerifyGuid();
+        final String guid = ((VerifyRequest) appRequest).getVerifyGuid();
         dbManager.loadPerson(
             candidates,
             loginInfoManager.getSignedInProjectIdOrEmpty(),
@@ -249,7 +245,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                 break;
             }
             case MATCH_COMPLETED: {
-                switch (AppRequest.Companion.action(appRequest)) {
+                switch (Request.Companion.action(appRequest)) {
                     case IDENTIFY: {
                         onMatchStartHandlerThread.quit();
                         matchingView.setIdentificationProgressReturningStart();
@@ -300,9 +296,9 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         Intent resultData;
                         resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new IdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
+//                        resultData.putExtra(
+//                            Response.BUNDLE_KEY,
+//                            new IdentificationResponse(topCandidates, sessionId).toClientApiIdentifyResponse());
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -315,7 +311,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
 
                         if (candidates.size() > 0 && scores.size() > 0) {
                             int score = scores.get(0).intValue();
-                            verification = new VerificationResult(((AppVerifyRequest) appRequest).getVerifyGuid(), score, computeTier(score));
+                            verification = new VerificationResult(((VerifyRequest) appRequest).getVerifyGuid(), score, computeTier(score));
                             resultCode = RESULT_OK;
                         } else {
                             verification = null;
@@ -327,12 +323,12 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         // signOut
                         Intent resultData;
                         resultData = new Intent();
-                        resultData.putExtra(
-                            SimprintsIdResponse.BUNDLE_KEY,
-                            new VerifyResponse(
-                                verification.getGuidVerified(),
-                                verification.getConfidence(),
-                                Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());
+//                        resultData.putExtra(
+//                            VerifyResponse.BUNDLE_KEY,
+//                            new VerifyResponse(
+//                                verification.getGuidVerified(),
+//                                verification.getConfidence(),
+//                                Tier.valueOf(verification.getTier().name())).toClientApiVerifyResponse());
 
                         matchingView.doSetResult(resultCode, resultData);
                         matchingView.doFinish();
