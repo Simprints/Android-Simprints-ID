@@ -22,8 +22,8 @@ import com.simprints.id.domain.fingerprint.Person;
 import com.simprints.id.domain.matching.IdentificationResult;
 import com.simprints.id.domain.matching.Tier;
 import com.simprints.id.domain.matching.VerificationResult;
-import com.simprints.id.domain.responses.IdIdentificationResponse;
-import com.simprints.id.domain.responses.IdVerifyResponse;
+import com.simprints.id.domain.responses.AppIdentificationResponse;
+import com.simprints.id.domain.responses.AppVerifyResponse;
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError;
 import com.simprints.id.exceptions.unexpected.FailedToLoadPeopleException;
 import com.simprints.id.exceptions.unexpected.UnexpectedDataException;
@@ -303,7 +303,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         resultData = new Intent();
                         resultData.putExtra(
                             SimprintsIdResponse.BUNDLE_KEY,
-                            new IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
+                            new AppIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification());
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
                             tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
@@ -330,7 +330,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         resultData = new Intent();
                         resultData.putExtra(
                             SimprintsIdResponse.BUNDLE_KEY,
-                            new IdVerifyResponse(
+                            new AppVerifyResponse(
                                 verification.getGuidVerified(),
                                 (int) verification.getConfidence(),
                                 Tier.valueOf(verification.getTier().name())).toDomainClientApiVerify());

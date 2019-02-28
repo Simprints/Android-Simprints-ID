@@ -1,12 +1,14 @@
 package com.simprints.id.domain.requests
 
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
+import kotlinx.android.parcel.Parcelize
 
-data class IdVerifyRequest(override val projectId: String,
+@Parcelize
+data class AppVerifyRequest(override val projectId: String,
                            override val userId: String,
                            override val moduleId: String,
                            override val metadata: String,
-                           val verifyGuid: String) : IdRequest {
+                           val verifyGuid: String) : AppRequest {
 
     constructor(clientApiVerifyRequest: ClientApiVerifyRequest) : this(
         projectId = clientApiVerifyRequest.projectId,
@@ -17,5 +19,5 @@ data class IdVerifyRequest(override val projectId: String,
     )
 }
 
-fun ClientApiVerifyRequest.toDomainIdVerifyRequest() = IdVerifyRequest(this)
-fun IdRequest.isVerifyRequest() = this is IdVerifyRequest
+fun ClientApiVerifyRequest.toDomainIdVerifyRequest() = AppVerifyRequest(this)
+fun AppRequest.isVerifyRequest() = this is AppVerifyRequest

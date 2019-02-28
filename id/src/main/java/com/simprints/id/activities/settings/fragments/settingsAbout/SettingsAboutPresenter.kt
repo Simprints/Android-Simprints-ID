@@ -66,15 +66,15 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     private fun GROUP.lowerCaseCapitalized() = toString().toLowerCase().capitalize()
 
     internal fun loadAppVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.appVersionName
+        preference.summary = view.packageVersionName
     }
 
     internal fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = preferencesManager.hardwareVersionString
+        preference.summary = "" /*preferencesManager.hardwareVersionString*/ //STOPSHIP: save in sharedprefs what is in scannermanager
     }
 
     internal fun loadDeviceIdInPreference(preference: Preference) {
-        preference.summary = preferencesManager.deviceId
+        preference.summary = "" /* preferencesManager.deviceId */ //STOPSHIP: save in sharedprefs what is in scannermanager
     }
 
     private fun handleLogoutPreferenceClicked() {

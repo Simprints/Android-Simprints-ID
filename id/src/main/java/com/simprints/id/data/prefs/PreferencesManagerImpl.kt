@@ -3,17 +3,14 @@ package com.simprints.id.data.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 
 
-class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
-                             settings: SettingsPreferencesManager,
+class PreferencesManagerImpl(settings: SettingsPreferencesManager,
                              lastEvents: RecentEventsPreferencesManager,
                              context: Context)
     : PreferencesManager,
-    SessionStatePreferencesManager by sessionState,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {
     companion object {

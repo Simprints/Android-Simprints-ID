@@ -1,11 +1,13 @@
 package com.simprints.id.domain.requests
 
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
+import kotlinx.android.parcel.Parcelize
 
-data class IdEnrolRequest(override val projectId: String,
+@Parcelize
+data class AppEnrolRequest(override val projectId: String,
                           override val userId: String,
                           override val moduleId: String,
-                          override val metadata: String) : IdRequest {
+                          override val metadata: String) : AppRequest {
 
     constructor(clientApiEnrolRequest: ClientApiEnrollRequest) : this(
         projectId = clientApiEnrolRequest.projectId,
@@ -15,5 +17,5 @@ data class IdEnrolRequest(override val projectId: String,
     )
 }
 
-fun ClientApiEnrollRequest.toDomainIdEnrolRequest() = IdEnrolRequest(this)
-fun IdRequest.isEnrolRequest() = this is IdEnrolRequest
+fun ClientApiEnrollRequest.toDomainIdEnrolRequest() = AppEnrolRequest(this)
+fun AppRequest.isEnrolRequest() = this is AppEnrolRequest
