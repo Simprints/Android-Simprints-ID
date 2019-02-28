@@ -5,9 +5,9 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
-import com.simprints.id.data.db.local.realm.models.adapters.toProject
-import com.simprints.id.data.db.local.realm.models.adapters.toRealmProject
-import com.simprints.id.domain.*
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.Project
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
@@ -22,7 +22,6 @@ import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import io.realm.Sort
 import timber.log.Timber
-import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 //TODO: investigate potential concurrency issues using .use
 open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
@@ -52,13 +51,13 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
         PeopleRealmEncryptionMigration(localDbKey, appContext)
     }
 
-    override fun insertOrUpdatePersonInLocal(person: rl_Person): Completable =
-        insertOrUpdatePeopleInLocal(listOf(person.toDomainPerson()))
+    override fun insertOrUpdatePersonInLocal(person: Person): Completable =
+        insertOrUpdatePeopleInLocal(listOf(person))
 
-    override fun insertOrUpdatePeopleInLocal(people: List<IdPerson>): Completable =
+    override fun insertOrUpdatePeopleInLocal(people: List<Person>): Completable =
         useRealmInstance { realm ->
             realm.executeTransaction {
-                it.insertOrUpdate(people.map(IdPerson::toRealmPerson))
+                it.insertOrUpdate(people.map(Person::toRealmPerson))
             }
         }
             .ignoreElement()
@@ -73,9 +72,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 .toInt()
         }
 
-    override fun loadPersonFromLocal(personId: String): Single<IdPerson> =
+    override fun loadPersonFromLocal(personId: String): Single<Person> =
         useRealmInstance { realm ->
-            realm.where(rl_Person::class.java).equalTo(PATIENT_ID_FIELD, personId)
+            realm.where(DbPerson::class.java).equalTo(PATIENT_ID_FIELD, personId)
                 .findFirst()
                 ?.toDomainPerson()
                 ?: throw IllegalStateException()
@@ -85,12 +84,12 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                      userId: String?,
                                      moduleId: String?,
                                      toSync: Boolean?,
-                                     sortBy: Map<String, Sort>?): Single<List<IdPerson>> =
+                                     sortBy: Map<String, Sort>?): Single<List<Person>> =
         useRealmInstance { realm ->
             realm
                 .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
                 .findAll()
-                .map(rl_Person::toDomainPerson)
+                .map(DbPerson::toDomainPerson)
         }
 
     // TODO: improve this terrible usage of RxJava
@@ -98,8 +97,8 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?,
-                                       sortBy: Map<String, Sort>?): Flowable<IdPerson> =
-        Flowable.create<IdPerson>({ emitter ->
+                                       sortBy: Map<String, Sort>?): Flowable<Person> =
+        Flowable.create<Person>({ emitter ->
             try {
                 useRealmInstance { realm ->
                     realm
@@ -119,9 +118,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     override fun loadProjectFromLocal(projectId: String): Single<Project> =
         useRealmInstance { realm ->
             realm
-                .where(rl_Project::class.java).equalTo(rl_Project.PROJECT_ID_FIELD, projectId)
+                .where(DbProject::class.java).equalTo(DbProject.PROJECT_ID_FIELD, projectId)
                 .findFirst()
-                ?.let { realm.copyFromRealm(it).toProject() }
+                ?.let { realm.copyFromRealm(it).toDomainProject() }
                 ?: throw NoSuchStoredProjectException()
         }
 
@@ -176,8 +175,8 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                                           userId: String? = null,
                                           moduleId: String? = null,
                                           toSync: Boolean? = null,
-                                          sortBy: Map<String, Sort>? = null): RealmQuery<rl_Person> =
-        where(rl_Person::class.java)
+                                          sortBy: Map<String, Sort>? = null): RealmQuery<DbPerson> =
+        where(DbPerson::class.java)
             .apply {
                 patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
                 userId?.let { this.equalTo(USER_ID_FIELD, it) }
@@ -186,19 +185,20 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
                 sortBy?.let { this.sort(sortBy.keys.toTypedArray(), sortBy.values.toTypedArray()) }
             }
 
-    private fun Realm.buildQueryForPerson(subSyncScope: SubSyncScope): RealmQuery<rl_Person> =
+    private fun Realm.buildQueryForPerson(subSyncScope: SubSyncScope): RealmQuery<DbPerson> =
         buildQueryForPerson(
             userId = subSyncScope.userId,
             moduleId = subSyncScope.moduleId
 
         )
 
-    override fun loadPeopleFromLocal(destinationList: MutableList<LibPerson>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
+    override fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
         val result = when (group) {
             GROUP.GLOBAL -> loadPeopleFromLocal()
             GROUP.USER -> loadPeopleFromLocal(userId = userId)
             GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
-        }.blockingGet().map(IdPerson::toLibPerson)
+        }.blockingGet()
+
         destinationList.addAll(result)
         callback?.onSuccess(false)
     }
@@ -206,10 +206,10 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     /**
      *  @Deprecated: do not use it. Use Room DownSyncStatus
      */
-    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<rl_SyncInfo> =
+    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo> =
         useRealmInstance { realm ->
             realm
-                .where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+                .where(DbSyncInfo::class.java).equalTo(DbSyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
                 ?: throw NoSuchRlSessionInfoException()
@@ -220,7 +220,7 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
      */
     override fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable = Completable.fromAction {
         useRealmInstance { realm ->
-            realm.where(rl_SyncInfo::class.java).equalTo(rl_SyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
+            realm.where(DbSyncInfo::class.java).equalTo(DbSyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findAll().deleteAllFromRealm()
         }
     }

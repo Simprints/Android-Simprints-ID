@@ -10,7 +10,12 @@ import io.realm.transformer.RealmTransformer
 
 android.registerTransform(new RealmTransformer())
 
+androidExtensions {
+    experimental = true
+}
+
 android {
+
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
@@ -132,7 +137,6 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':clientapi')
     api project(':core')
     api deps.simprints.libscanner
     api deps.simprints.libmatcher
@@ -237,6 +241,7 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
     }
+    compile project(path: ':moduleinterfaces')
 }
 
 def copyGoogleServicesJsonTask(variantName, gcpProject) {

@@ -9,13 +9,13 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.fingerprint.Utils
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -46,8 +46,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             it[0]
         }
 
-    override fun createSession(): Single<SessionEvents> =
-        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
+    override fun createSession(appVersionName: String): Single<SessionEvents> =
+        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName).let {
             Timber.d("Created session: ${it.id}")
             sessionEventsSyncManager.scheduleSessionsSync()
 
@@ -56,10 +56,10 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                 .toSingle { it }
         }
 
-    private fun createSessionWithAvailableInfo(projectId: String): SessionEvents =
+    private fun createSessionWithAvailableInfo(projectId: String, appVersionName: String): SessionEvents =
         SessionEvents(
             projectId,
-            preferencesManager.appVersionName,
+            appVersionName,
             /* preferencesManager.libVersionName */ "", //StopShip: do we need libVersionName?
             preferencesManager.language,
             Device(
@@ -113,7 +113,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             session.events.add(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
-                preferencesManager.patientId,
+                patientId,
                 match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
         }
     }
@@ -150,7 +150,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground { session ->
             session.events.add(PersonCreationEvent(
                 session.nowRelativeToStartTime(timeHelper),
-                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
+                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
     }

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.local.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.id.data.db.local.realm.models.rl_Person
+import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
@@ -27,7 +27,7 @@ class rl_PersonTest {
             "userId",
             "moduleId")
 
-        val rlPerson = rl_Person(fb_Person)
+        val rlPerson = DbPerson(fb_Person)
 
         Assert.assertEquals(rlPerson.patientId, "guidFound")
         Assert.assertEquals(rlPerson.userId, "userId")
@@ -50,7 +50,7 @@ class rl_PersonTest {
             "userId",
             "moduleId")
 
-        val rlPerson = rl_Person(fb_Person)
+        val rlPerson = DbPerson(fb_Person)
 
         Assert.assertEquals(rlPerson.patientId, "giud")
         Assert.assertEquals(rlPerson.userId, "userId")
@@ -73,7 +73,7 @@ class rl_PersonTest {
         fb_Person.updatedAt = Date(0)
         fb_Person.createdAt = Date(1)
 
-        val rlPerson = rl_Person(fb_Person)
+        val rlPerson = DbPerson(fb_Person)
 
         Assert.assertEquals(rlPerson.patientId, "giud")
         Assert.assertEquals(rlPerson.userId, "userId")

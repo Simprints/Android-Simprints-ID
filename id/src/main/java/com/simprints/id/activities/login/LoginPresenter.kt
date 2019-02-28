@@ -1,5 +1,6 @@
 package com.simprints.id.activities.login
 
+import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -65,6 +66,7 @@ class LoginPresenter(val view: LoginContract.View,
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
 
+    @SuppressLint("CheckResult")
     private fun doAuthenticate(suppliedProjectId: String,
                                suppliedUserId: String,
                                suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {

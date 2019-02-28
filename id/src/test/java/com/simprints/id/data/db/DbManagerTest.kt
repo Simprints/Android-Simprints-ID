@@ -10,11 +10,9 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.DependencyRule.*
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.rl_Person
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
-import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.core.network.SimApiClient
@@ -105,7 +103,7 @@ class DbManagerTest {
         // savePerson makes an async task in the OnComplete, we need to wait it finishes.
         Thread.sleep(1000)
 
-        val argument = argumentCaptor<rl_Person>()
+        val argument = argumentCaptor<DbPerson>()
         verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
 
         // First time we save the person in the local dbManager, it doesn't have times and it needs to be sync
@@ -153,7 +151,7 @@ class DbManagerTest {
 
         testObservable.awaitTerminalEvent()
 
-        val argument = argumentCaptor<rl_Person>()
+        val argument = argumentCaptor<DbPerson>()
         verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
 
         Assert.assertNull(argument.firstValue.createdAt)
@@ -176,7 +174,7 @@ class DbManagerTest {
         testObservable.awaitTerminalEvent()
         testObservable.assertNoErrors()
 
-        val argument = argumentCaptor<rl_Person>()
+        val argument = argumentCaptor<DbPerson>()
         verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
 
         Assert.assertNull(argument.firstValue.createdAt)

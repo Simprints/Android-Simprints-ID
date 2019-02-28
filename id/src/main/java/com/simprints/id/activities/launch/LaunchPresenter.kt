@@ -6,9 +6,9 @@ import android.app.Activity
 import android.content.Intent
 import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
@@ -24,15 +24,14 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libscanner.ButtonListener
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -42,9 +41,8 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
+class LaunchPresenter(private val view: LaunchContract.View, private val appRequest: Request) : LaunchContract.Presenter {
 
-    @Inject lateinit var dataManager: DataManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
@@ -107,7 +105,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(preferencesManager.hardwareVersionString)
+        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion ?: "")
     }
 
     private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
@@ -121,18 +119,18 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             .andThen(tryToFetchGuid())
 
     private fun tryToFetchGuid(): Completable {
-        return if (preferencesManager.calloutAction != CalloutAction.VERIFY) {
-            Completable.complete()
-        } else {
-            val guid = preferencesManager.patientId
+        return if (appRequest is VerifyRequest) {
+            val guid = appRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
             dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess { personFetchResult ->
                 handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
             }.doOnError {
                 it.printStackTrace()
                 // For any error, we show the missing guidFound screen.
-                saveNotFoundVerificationAndShowAlert(Person(guid), startCandidateSearchTime)
+                saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
             }.ignoreElement()
+        } else {
+            Completable.complete()
         }
     }
 
@@ -146,15 +144,15 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
     }
 
-    private fun saveNotFoundVerificationAndShowAlert(probe: Person, startCandidateSearchTime: Long) {
+    private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
-            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
+            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
         } else {
             // We're offline but might find the person if we sync
             view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
-            saveEventForCandidateReadInBackgroundNotFound(probe.guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
+            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }
 
@@ -207,14 +205,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    preferencesManager.location = com.simprints.id.domain.Location.fromAndroidLocation(it)
                     sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }
     }
 
     private fun handleSetupFinished() {
-        preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
         view.doVibrateIfNecessary(preferencesManager.vibrateMode)
@@ -234,7 +230,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+        return generalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -244,7 +240,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, preferencesManager.calloutAction, preferencesManager.programName, preferencesManager.organizationName)
+        return parentalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     override fun handleOnBackPressed() {
@@ -291,8 +287,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
-        preferencesManager.msSinceBootOnSessionEnd = timeHelper.now()
-        dataManager.saveSession()
         view.setResultAndFinish(resultCode, resultData)
     }
 
@@ -313,9 +307,9 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
     private fun addBluetoothConnectivityEvent() {
         sessionEventsManager.addEventForScannerConnectivityInBackground(
             ScannerConnectionEvent.ScannerInfo(
-                preferencesManager.scannerId,
-                preferencesManager.macAddress,
-                preferencesManager.hardwareVersionString))
+                scannerManager.scannerId ?: "",
+                scannerManager.macAddress?: "",
+                scannerManager.hardwareVersion ?: ""))
     }
 
     private fun initOrUpdateAnalyticsKeys() {

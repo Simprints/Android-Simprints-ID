@@ -21,6 +21,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager;
 import com.simprints.id.data.prefs.PreferencesManager;
 import com.simprints.id.domain.ALERT_TYPE;
 import com.simprints.id.domain.fingerprint.Person;
+import com.simprints.id.domain.requests.AppRequest;
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError;
 import com.simprints.id.tools.LanguageHelper;
 import com.simprints.id.tools.TimeHelper;
@@ -55,6 +56,8 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         FingerprintsComponent component = FingerprintsComponentBuilder.getComponent((Application) getApplication());
         component.inject(this);
 
+        AppRequest appRequest = getIntent().getParcelableExtra(AppRequest.BUNDLE_KEY);
+
         LanguageHelper.setLanguage(this, preferencesManager.getLanguage());
         setContentView(R.layout.activity_matching);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -76,7 +79,7 @@ public class MatchingActivity extends AppCompatActivity implements MatchingContr
         }
 
         Person probe = extras.getParcelable(IntentKeys.matchingActivityProbePersonKey);
-        viewPresenter = new MatchingPresenter(this, component, probe);
+        viewPresenter = new MatchingPresenter(this, component, probe, appRequest);
     }
 
     @Override

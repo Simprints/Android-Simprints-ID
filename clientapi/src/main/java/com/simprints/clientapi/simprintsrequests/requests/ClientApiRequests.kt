@@ -1,8 +1,8 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
 import android.os.Parcelable
-import com.simprints.moduleinterfaces.app.confirmations.AppConfirmation
-import com.simprints.moduleinterfaces.app.requests.AppRequest
+import com.simprints.moduleinterfaces.app.confirmations.IAppConfirmation
+import com.simprints.moduleinterfaces.app.requests.IAppRequest
 
 
 interface ClientApiBaseRequest : Parcelable {
@@ -17,7 +17,7 @@ interface ClientApiAppRequest : ClientApiBaseRequest, Parcelable {
     val moduleId: String
     val metadata: String
 
-    fun convertToAppRequest(): AppRequest
+    fun convertToAppRequest(): IAppRequest
 
 }
 
@@ -26,7 +26,7 @@ interface ClientApiAppConfirmation : ClientApiBaseRequest, Parcelable {
     val sessionId: String
     val selectedGuid: String
 
-    fun convertToAppRequest(): AppConfirmation
+    fun convertToAppRequest(): IAppConfirmation
 
 }
 
