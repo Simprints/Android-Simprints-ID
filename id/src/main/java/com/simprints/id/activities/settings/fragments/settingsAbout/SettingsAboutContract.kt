@@ -9,6 +9,8 @@ interface SettingsAboutContract {
 
     interface  View: BaseView<Presenter> {
 
+        var packageVersionName: String
+
         fun getAppVersionPreference(): Preference
 
         fun getScannerVersionPreference(): Preference

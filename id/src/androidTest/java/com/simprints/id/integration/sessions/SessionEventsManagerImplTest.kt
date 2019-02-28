@@ -27,7 +27,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.analytics.eventdata.models.local.RlSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.integration.testsnippets.*
@@ -37,7 +36,7 @@ import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.fingerprint.Utils
+import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
@@ -313,7 +312,7 @@ class SessionEventsManagerImplTest {
 
         Truth.assertThat(usefulTemplatesFromEvents)
             .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
-                Utils.byteArrayToBase64(it.templateBytes)
+                EncodingUtils.byteArrayToBase64(it.templateBytes)
             })
 
         val skippedFingerCaptureEvent = eventsInMostRecentSession

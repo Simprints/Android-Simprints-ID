@@ -3,7 +3,7 @@ package com.simprints.id.activities.collectFingerprints;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
-import com.simprints.id.domain.Finger;
+import com.simprints.id.activities.collectFingerprints.models.Finger;
 
 import java.util.List;
 
