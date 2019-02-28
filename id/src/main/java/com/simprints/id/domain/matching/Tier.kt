@@ -1,5 +1,7 @@
 package com.simprints.id.domain.matching
 
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+
 enum class Tier {
     TIER_1,
     TIER_2,
@@ -24,3 +26,11 @@ enum class Tier {
     }
 }
 
+fun Tier.toClientApiIClientApiResponseTier(): IClientApiResponseTier =
+    when(this) {
+        Tier.TIER_1 -> IClientApiResponseTier.TIER_1
+        Tier.TIER_2 -> IClientApiResponseTier.TIER_2
+        Tier.TIER_3 -> IClientApiResponseTier.TIER_3
+        Tier.TIER_4 -> IClientApiResponseTier.TIER_4
+        Tier.TIER_5 -> IClientApiResponseTier.TIER_5
+    }
