@@ -1,26 +1,32 @@
 package com.simprints.clientapi.simprintsrequests.requests
 
 import android.os.Parcelable
-import com.simprints.clientapi.simprintsrequests.ApiVersion
-import kotlinx.android.parcel.IgnoredOnParcel
+import com.simprints.moduleinterfaces.app.confirmations.AppConfirmation
+import com.simprints.moduleinterfaces.app.requests.AppRequest
 
 
 interface ClientApiBaseRequest : Parcelable {
 
-    @IgnoredOnParcel
-    val bundleKey: String
     val projectId: String
-    val apiVersion: ApiVersion get() = ApiVersion.V2
 
 }
 
-interface ClientApiActionRequest {
+interface ClientApiAppRequest : ClientApiBaseRequest, Parcelable {
 
     val userId: String
     val moduleId: String
     val metadata: String
 
+    fun convertToAppRequest(): AppRequest
+
 }
 
-interface ClientApiConfirmationRequest
+interface ClientApiAppConfirmation : ClientApiBaseRequest, Parcelable {
+
+    val sessionId: String
+    val selectedGuid: String
+
+    fun convertToAppRequest(): AppConfirmation
+
+}
 
