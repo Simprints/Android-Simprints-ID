@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.local.realm.models
 
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainFingerprint
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
@@ -44,7 +44,7 @@ open class DbPerson(
         const val CREATE_TIME_FIELD = "createdAt"
     }
 
-    constructor(person: fb_Person, toSync: Boolean = person.updatedAt == null || person.createdAt == null):
+    constructor(person: ApiPerson, toSync: Boolean = person.updatedAt == null || person.createdAt == null):
      this(person.patientId, person.projectId, person.userId, person.moduleId, person.createdAt, person.updatedAt, toSync,
          person.fingerprintsAsList
              .map { it.toDomainFingerprint().toRealmFingerprint() }

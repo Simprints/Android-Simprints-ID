@@ -13,7 +13,7 @@ import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.domain.IdPerson
@@ -73,7 +73,7 @@ class SubDownSyncTaskTest {
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
 
-        whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
+        whenever(remoteDbManagerSpy.getCurrentToken()).thenReturn(Single.just(""))
         mockServer.start()
         setupApi()
         whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
@@ -228,7 +228,7 @@ class SubDownSyncTaskTest {
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
-    private fun verifyLastPatientSaveIsTheRightOne(saved: List<IdPerson>, inResponse: List<fb_Person>) {
+    private fun verifyLastPatientSaveIsTheRightOne(saved: List<IdPerson>, inResponse: List<ApiPerson>) {
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
     }
@@ -277,7 +277,7 @@ class SubDownSyncTaskTest {
         whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
     }
 
-    private fun mockSuccessfulResponseForDownloadPatients(patients: List<fb_Person>): MockResponse? {
+    private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {
             it.setResponseCode(200)
@@ -285,7 +285,7 @@ class SubDownSyncTaskTest {
         }
     }
 
-    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<fb_Person>): MockResponse? {
+    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
         return MockResponse().let {
