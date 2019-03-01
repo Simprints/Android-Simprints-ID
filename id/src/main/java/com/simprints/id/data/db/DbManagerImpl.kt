@@ -21,6 +21,7 @@ import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
@@ -120,31 +121,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
         it.onComplete()
     }
 
-    override fun loadPerson(destinationList: MutableList<Person>,
-                            projectId: String,
-                            guid: String,
-                            callback: DataCallback) {
-
-        local.loadPersonFromLocal(guid).subscribeBy(
-            onSuccess = { person ->
-                destinationList.add(person)
-                callback.onSuccess(false)
-            },
-            onError = {
-                remotePeopleManager.downloadPerson(guid, projectId).subscribeBy(
-                    onSuccess = { person ->
-                        destinationList.add(person)
-                        callback.onSuccess(true)
-                    },
-                    onError = {
-                        callback.onFailure(DATA_ERROR.NOT_FOUND)
-                    }
-                )
-            })
-    }
-
-    override fun loadPerson(projectId: String,
-                            guid: String): Single<PersonFetchResult> =
+    override fun loadPerson(guid: String): Single<PersonFetchResult> =
         local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
             .onErrorResumeNext {
                 remotePeopleManager
@@ -154,20 +131,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
                     }
             }
 
-    override fun loadPeople(destinationList: MutableList<Person>,
-                            group: GROUP,
-                            moduleId: String, //STOPSHIP: terrible API: if we use or not module id depends on group
-                            callback: DataCallback?) {
-        val people = when (group) {
+    override fun loadPeople(group: GROUP): Single<List<Person>> =
+        when (group) {
             GROUP.GLOBAL -> local.loadPeopleFromLocal()
             GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = moduleId)
+            GROUP.MODULE -> Single.concat(preferencesManager.selectedModules.map { moduleId ->
+                local.loadPeopleFromLocal(moduleId = moduleId)
+            }).reduce { a, b -> a + b }.toSingle(emptyList())
         }
-        .blockingGet()
-
-        destinationList.addAll(people)
-        callback?.onSuccess(false)
-    }
 
     override fun loadProject(projectId: String): Single<Project> =
         local.loadProjectFromLocal(projectId)
