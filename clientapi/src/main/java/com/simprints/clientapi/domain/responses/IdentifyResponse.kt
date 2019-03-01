@@ -1,4 +1,4 @@
-package com.simprints.clientapi.models.domain.responses
+package com.simprints.clientapi.domain.responses
 
 import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse
 import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier

@@ -1,11 +1,10 @@
-package com.simprints.clientapi.models.domain.requests
+package com.simprints.clientapi.domain.requests
 
-import android.os.Parcelable
-import com.simprints.clientapi.models.domain.ClientBase
+import com.simprints.clientapi.domain.ClientBase
 import com.simprints.moduleinterfaces.app.requests.IAppRequest
 
 
-interface BaseRequest : ClientBase, Parcelable {
+interface BaseRequest : ClientBase {
 
     val userId: String
     val moduleId: String

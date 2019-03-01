@@ -5,12 +5,12 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.models.domain.confirmations.BaseConfirmation
-import com.simprints.clientapi.models.domain.requests.BaseRequest
-import com.simprints.clientapi.models.domain.responses.EnrollResponse
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse
-import com.simprints.clientapi.models.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.models.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 
 
 interface RequestContract {

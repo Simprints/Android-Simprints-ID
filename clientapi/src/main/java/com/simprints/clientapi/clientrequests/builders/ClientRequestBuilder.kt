@@ -1,7 +1,7 @@
 package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
-import com.simprints.clientapi.models.domain.ClientBase
+import com.simprints.clientapi.domain.ClientBase
 
 
 abstract class ClientRequestBuilder(private val validator: ClientRequestValidator) {

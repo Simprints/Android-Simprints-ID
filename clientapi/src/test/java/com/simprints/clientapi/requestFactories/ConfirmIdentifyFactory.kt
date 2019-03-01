@@ -4,8 +4,8 @@ import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
-import com.simprints.clientapi.models.domain.confirmations.BaseConfirmation
-import com.simprints.clientapi.models.domain.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 

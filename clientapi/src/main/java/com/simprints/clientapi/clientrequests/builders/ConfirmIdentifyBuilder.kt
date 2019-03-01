@@ -2,8 +2,8 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
-import com.simprints.clientapi.models.domain.ClientBase
-import com.simprints.clientapi.models.domain.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.ClientBase
+import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
 
 
 class ConfirmIdentifyBuilder(val extractor: ConfirmIdentifyExtractor,

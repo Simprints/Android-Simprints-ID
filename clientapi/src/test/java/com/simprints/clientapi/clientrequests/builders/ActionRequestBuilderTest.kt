@@ -1,7 +1,7 @@
 package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.models.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.BaseRequest
 import org.junit.Assert
 import org.junit.Test
 

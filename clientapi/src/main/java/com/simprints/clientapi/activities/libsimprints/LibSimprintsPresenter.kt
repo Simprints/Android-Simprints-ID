@@ -1,10 +1,10 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.models.domain.responses.EnrollResponse
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse
-import com.simprints.clientapi.models.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.models.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.libsimprints.*
 import com.simprints.libsimprints.Constants.*
 
