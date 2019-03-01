@@ -41,7 +41,7 @@ object RobolectricTestMocker {
             sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)
         }
         whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
-        whenever { remoteDbManagerMock.getCurrentFirestoreToken() } thenReturn Single.just("")
+        whenever { remoteDbManagerMock.getCurrentToken() } thenReturn Single.just("")
         whenever { remoteDbManagerMock.signInToRemoteDb(anyNotNull()) } thenReturn Completable.complete()
         return this
     }
@@ -84,7 +84,7 @@ object RobolectricTestMocker {
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 
-        whenever { remoteDbManagerSpy.getCurrentFirestoreToken() } thenReturn Single.just("someToken")
+        whenever { remoteDbManagerSpy.getCurrentToken() } thenReturn Single.just("someToken")
         return this
     }
 

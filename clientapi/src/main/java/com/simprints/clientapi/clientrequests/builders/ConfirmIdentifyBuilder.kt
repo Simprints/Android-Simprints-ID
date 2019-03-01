@@ -10,7 +10,7 @@ class ConfirmIdentifyBuilder(val extractor: ConfirmIdentifyExtractor,
                              validator: ConfirmIdentifyValidator) :
     ClientRequestBuilder(validator) {
 
-    override fun buildSimprintsRequest(): ClientApiBaseRequest = ClientApiConfirmIdentifyRequest(
+    override fun buildAppRequest(): ClientApiBaseRequest = ClientApiConfirmIdentifyRequest(
         projectId = extractor.getProjectId(),
         sessionId = extractor.getSessionId(),
         selectedGuid = extractor.getSelectedGuid()

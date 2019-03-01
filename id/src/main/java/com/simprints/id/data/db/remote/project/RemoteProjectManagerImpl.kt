@@ -30,7 +30,7 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         }
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
-        remoteDbManager.getCurrentFirestoreToken()
+        remoteDbManager.getCurrentToken()
             .flatMap {
                 Single.just(buildProjectApi(it))
             }

@@ -12,7 +12,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.core.network.SimApiClient
@@ -82,7 +82,7 @@ class DbManagerTest {
 
     @Test
     fun savingPerson_shouldSaveThenScheduleUpSync() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
+        val fakePerson = ApiPerson(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -140,7 +140,7 @@ class DbManagerTest {
 
     @Test
     fun savingPerson_serverProblemStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
+        val fakePerson = ApiPerson(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -161,7 +161,7 @@ class DbManagerTest {
 
     @Test
     fun savingPerson_noConnectionStillSavesPerson() {
-        val fakePerson = fb_Person(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
+        val fakePerson = ApiPerson(PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
         })
@@ -246,7 +246,7 @@ class DbManagerTest {
     }
 }
 
-fun mockResponseForDownloadPatient(patient: fb_Person): MockResponse {
+fun mockResponseForDownloadPatient(patient: ApiPerson): MockResponse {
     return MockResponse().let {
         it.setResponseCode(200)
         it.setBody(JsonHelper.toJson(patient))

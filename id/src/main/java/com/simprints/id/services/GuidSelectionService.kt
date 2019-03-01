@@ -10,8 +10,9 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.requests.IdConfirmIdentifyRequest
+import com.simprints.id.domain.requests.IdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseClientApiRequest
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -35,13 +36,11 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent.parseClientApiRequest() as IdConfirmIdentifyRequest)
-        } else {
-            analyticsManager.logGuidSelectionService("", "", "", false)
+            onHandleNonNullIntent(intent.parseClientApiRequest() as IdentityConfirmationRequest)
         }
     }
 
-    private fun onHandleNonNullIntent(intent: IdConfirmIdentifyRequest) {
+    private fun onHandleNonNullIntent(intent: IdentityConfirmationRequest) {
         val projectId = intent.projectId
         val sessionId = intent.sessionId
         val selectedGuid = intent.selectedGuid
@@ -64,8 +63,12 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
             crashReportManager.logExceptionOrThrowable(t)
             false
         }
-        analyticsManager.logGuidSelectionService(loginInfoManager.getSignedInProjectIdOrEmpty(),
-            sessionId, selectedGuid, callbackSent)
+        analyticsManager.logGuidSelectionService(
+            loginInfoManager.getSignedInProjectIdOrEmpty(),
+            sessionId,
+            baseContext.deviceId,
+            selectedGuid,
+            callbackSent)
     }
 
     private fun checkProjectId(projectId: String) {

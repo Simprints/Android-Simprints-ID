@@ -10,7 +10,7 @@ import io.reactivex.Single
 open class RemoteSessionsManagerImpl(private val remoteDbManager: RemoteDbManager) : RemoteSessionsManager {
 
     override fun getSessionsApiClient(): Single<SessionsRemoteInterface> =
-        remoteDbManager.getCurrentFirestoreToken().flatMap {
+        remoteDbManager.getCurrentToken().flatMap {
             Single.just(buildSessionsApi(it))
         }
 

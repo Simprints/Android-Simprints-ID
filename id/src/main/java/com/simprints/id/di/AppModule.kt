@@ -82,7 +82,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideRemoteDbManager(ctx: Context): RemoteDbManager = FirebaseManagerImpl(ctx)
+    open fun provideRemoteDbManager(): RemoteDbManager = FirebaseManagerImpl()
 
     @Provides
     @Singleton
@@ -126,7 +126,7 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideAnalyticsManager(loginInfoManager: LoginInfoManager,
                                      preferencesManager: PreferencesManager,
-                                     firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, preferencesManager, firebaseAnalytics)
+                                     firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
 
     @Provides
     @Singleton

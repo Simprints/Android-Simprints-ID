@@ -37,7 +37,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
                          private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
     override fun initialiseDb() {
-        remote.initialiseRemoteDb()
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         if (projectId.isNotEmpty()) {
             try {
@@ -49,7 +48,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
     }
 
     override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
-        remote.signInToRemoteDb(tokens)
+        remote.signInToRemoteDb(tokens.legacyToken)
             .andThen(signInToLocal(projectId))
             .andThen(refreshProjectInfoWithServer(projectId))
             .flatMapCompletable(storeCredentials(userId))
@@ -94,9 +93,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
         syncStatusDatabase.upSyncDao.deleteAll()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
-
-    override fun isDbInitialised(): Boolean =
-        remote.isRemoteDbInitialized()
 
     override fun savePerson(person: Person): Completable =
         local.insertOrUpdatePersonInLocal(person.apply { toSync = true })
@@ -158,12 +154,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
                     }
             }
 
-
-    override fun loadPeople(destinationList: MutableList<Person>, group: GROUP, callback: DataCallback?) {
+    override fun loadPeople(destinationList: MutableList<Person>,
+                            group: GROUP,
+                            moduleId: String, //STOPSHIP: terrible API: if we use or not module id depends on group
+                            callback: DataCallback?) {
         val people = when (group) {
             GROUP.GLOBAL -> local.loadPeopleFromLocal()
             GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
+            GROUP.MODULE -> local.loadPeopleFromLocal(moduleId = moduleId)
         }
         .blockingGet()
 
