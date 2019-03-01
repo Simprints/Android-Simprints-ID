@@ -5,7 +5,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -88,20 +88,20 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                 }
         }
 
-    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<fb_Person> =
+    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiPerson> =
         flatMapObservable { jsonReader ->
-            Observable.create<fb_Person> { emitter ->
+            Observable.create<ApiPerson> { emitter ->
                 while (jsonReader.hasNext()) {
-                    emitter.onNext(JsonHelper.gson.fromJson<fb_Person>(jsonReader, fb_Person::class.java))
+                    emitter.onNext(JsonHelper.gson.fromJson<ApiPerson>(jsonReader, ApiPerson::class.java))
                 }
                 emitter.onComplete()
             }
         }
 
-    private fun Observable<fb_Person>.splitIntoBatches(): Observable<List<fb_Person>> =
+    private fun Observable<ApiPerson>.splitIntoBatches(): Observable<List<ApiPerson>> =
         buffer(BATCH_SIZE_FOR_DOWNLOADING)
 
-    private fun Observable<List<fb_Person>>.saveBatchAndUpdateDownSyncStatus(): Completable =
+    private fun Observable<List<ApiPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
             Completable.create { emitter ->
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
