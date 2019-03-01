@@ -1,11 +1,11 @@
 package com.simprints.clientapi.models.domain.responses
 
-import com.simprints.clientapi.models.appinterface.responses.AppRefusalFormResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiRefusalFormResponse
 
 
 data class RefusalFormResponse(val reason: String,
                                val extra: String) {
 
-    constructor(request: AppRefusalFormResponse) : this(request.reason, request.extra)
+    constructor(request: IClientApiRefusalFormResponse) : this(request.reason, request.extra)
 
 }

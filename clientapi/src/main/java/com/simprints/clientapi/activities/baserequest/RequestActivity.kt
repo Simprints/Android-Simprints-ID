@@ -7,18 +7,17 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.models.appinterface.responses.AppEnrollResponse
-import com.simprints.clientapi.models.appinterface.responses.AppIdentifyResponse
-import com.simprints.clientapi.models.appinterface.responses.AppRefusalFormResponse
-import com.simprints.clientapi.models.appinterface.responses.AppVerifyResponse
 import com.simprints.clientapi.models.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.models.domain.requests.BaseRequest
+import com.simprints.clientapi.models.domain.responses.EnrollResponse
+import com.simprints.clientapi.models.domain.responses.IdentifyResponse
+import com.simprints.clientapi.models.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.models.domain.responses.VerifyResponse
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
-import com.simprints.clientapi.models.domain.requests.BaseRequest
-import com.simprints.clientapi.models.domain.responses.*
 import com.simprints.libsimprints.Constants
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
+import com.simprints.moduleinterfaces.clientapi.responses.*
 import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
 
 
@@ -69,10 +68,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeResponse(response: IClientApiResponse) = when (response) {
-        is AppEnrollResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
-        is AppIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
-        is AppVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
-        is AppRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
+        is IClientApiEnrollResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
+        is IClientApiIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
+        is IClientApiVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
+        is IClientApiRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
         else -> presenter.handleResponseError()
     }
 
