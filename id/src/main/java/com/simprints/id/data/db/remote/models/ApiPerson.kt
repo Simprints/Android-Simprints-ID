@@ -10,13 +10,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-data class fb_Person(@SerializedName("id") var patientId: String,
+data class ApiPerson(@SerializedName("id") var patientId: String,
                      var projectId: String,
                      var userId: String,
                      var moduleId: String,
                      var createdAt: Date?,
                      var updatedAt: Date?,
-                     var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>>) : PostGsonProcessable {
+                     var fingerprints: HashMap<FingerIdentifier, ArrayList<ApiFingerprint>>) : PostGsonProcessable {
 
     @SkipSerialisationProperty
     val fingerprintsAsList
@@ -28,8 +28,8 @@ data class fb_Person(@SerializedName("id") var patientId: String,
     }
 }
 
-fun Person.toFirebasePerson(): fb_Person =
-    fb_Person(
+fun Person.toFirebasePerson(): ApiPerson =
+    ApiPerson(
         patientId = patientId,
         projectId = projectId,
         userId = userId,
@@ -42,7 +42,7 @@ fun Person.toFirebasePerson(): fb_Person =
             .mapValues { ArrayList(it.value) })
     )
 
-fun fb_Person.toDomainPerson(): Person =
+fun ApiPerson.toDomainPerson(): Person =
     Person(
         patientId = patientId,
         projectId = projectId,
@@ -51,7 +51,7 @@ fun fb_Person.toDomainPerson(): Person =
         createdAt = createdAt,
         updatedAt = updatedAt,
         fingerprints = fingerprints.flatMap { (_, fingerFingerprints) ->
-            fingerFingerprints.map(fb_Fingerprint::toDomainFingerprint)
+            fingerFingerprints.map(ApiFingerprint::toDomainFingerprint)
         },
         toSync = false
     )
