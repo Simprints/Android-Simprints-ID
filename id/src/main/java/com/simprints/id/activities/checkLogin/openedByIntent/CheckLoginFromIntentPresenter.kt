@@ -131,8 +131,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 fetchPeopleCountInLocalDatabase(),
                 fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
                 return@zip Triple(gaId, peopleDbCount, sessionDbCount)
-            }.flatMapCompletable { gaIdAndDbCounts ->
-                populateSessionWithAnalyticsIdAndDbInfo(gaIdAndDbCounts.first, gaIdAndDbCounts.second, gaIdAndDbCounts.third)
+            }.flatMapCompletable { (gaId, peopleDbCount, sessionDbCount) ->
+                populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount, sessionDbCount)
             }.subscribeBy(onError = { it.printStackTrace() })
         } catch (e: Exception) {
             e.printStackTrace()
