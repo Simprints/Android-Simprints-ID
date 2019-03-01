@@ -9,7 +9,7 @@ import com.simprints.clientapi.simprintsrequests.requests.ClientApiIdentifyReque
 class IdentifyBuilder(val extractor: IdentifyExtractor, validator: IdentifyValidator) :
     ClientRequestBuilder(validator) {
 
-    override fun buildSimprintsRequest(): ClientApiBaseRequest = ClientApiIdentifyRequest(
+    override fun buildAppRequest(): ClientApiBaseRequest = ClientApiIdentifyRequest(
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),

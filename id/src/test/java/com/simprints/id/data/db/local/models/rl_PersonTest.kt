@@ -3,7 +3,7 @@ package com.simprints.id.data.db.local.models
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.data.db.local.realm.models.DbPerson
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.domain.fingerprint.IdFingerprint
@@ -21,7 +21,7 @@ class rl_PersonTest {
 
     @Test
     fun buildRlPersonWithoutFingerprint() {
-        val fb_Person = fb_Person(
+        val fb_Person = ApiPerson(
             Person("guidFound"),
             "projectId",
             "userId",
@@ -41,7 +41,7 @@ class rl_PersonTest {
 
     @Test
     fun buildRlPersonWithFingerprint() {
-        val fb_Person = fb_Person(
+        val fb_Person = ApiPerson(
             Person("giud", arrayListOf(IdFingerprint(
                 FingerIdentifier.LEFT_3RD_FINGER,
                 PeopleGeneratorUtils.getRandomFingerprint().template!!))),
@@ -64,7 +64,7 @@ class rl_PersonTest {
 
     @Test
     fun buildRlPersonFromACompleteFbPerson() {
-        val fb_Person = fb_Person(
+        val fb_Person = ApiPerson(
             Person("giud"),
             "projectId",
             "userId",

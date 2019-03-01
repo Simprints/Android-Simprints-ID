@@ -10,10 +10,12 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse.Identification
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier.TIER_1
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiTier.TIER_5
 import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier.TIER_1
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier.TIER_5
+import kotlinx.android.parcel.Parcelize
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -114,8 +116,17 @@ class OdkPresenterTest {
         `when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
 
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
-        Mockito.verify(view, times(1)).sendSimprintsRequest(
+        Mockito.verify(view, times(1)).sendSimprintsConfirmationAndFinish(
             ConfirmIdentifyFactory.getValidSimprintsRequest())
     }
 
+
 }
+
+@Parcelize
+data class Identification(
+    override val guid: String,
+    override val confidence: Int,
+    override val tier: IClientApiResponseTier
+) : IClientApiIdentifyResponse.IIdentificationResult
+
