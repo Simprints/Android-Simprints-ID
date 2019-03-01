@@ -117,43 +117,24 @@ class MatchingPresenter(
 
     private fun handleIdentificationResult(candidates: List<Person>, scores: List<Float>) {
         view.setIdentificationProgressReturningStart()
-        val nbOfResults = preferencesManager.returnIdCount
 
-        val topCandidates = ArrayList<IdentificationResult>()
-
-        // Sort the indices of the person by decreasing score
-        val idx = candidates.indices.toList().toTypedArray()
-
-        Arrays.sort<Int>(idx) { i1, i2 -> java.lang.Float.compare(scores[i2], scores[i1]) }
-
-        for (i in 0 until Math.min(nbOfResults, candidates.size)) {
-            val candidate = candidates[idx[i]]
-
-            topCandidates.add(IdentificationResult(candidate.patientId,
-                scores[idx[i]].toInt(), computeTier(scores[idx[i]])))
-        }
+        val topCandidates = candidates
+            .zip(scores)
+            .sortedByDescending { (_, score) -> score }
+            .take(preferencesManager.returnIdCount)
+            .map { (candidate, score) ->
+                IdentificationResult(candidate.patientId, score.toInt(), computeTier(score))
+            }
 
         sessionEventsManager.addOneToManyEventInBackground(matchStartTime, topCandidates, candidates.size)
 
-        var tier1Or2Matches = 0
-        var tier3Matches = 0
-        var tier4Matches = 0
-        for ((_, _, tier) in topCandidates) {
-            when (tier) {
-                Tier.TIER_1, Tier.TIER_2 -> tier1Or2Matches++
-                Tier.TIER_3 -> tier3Matches++
-                Tier.TIER_4 -> tier4Matches++
-                Tier.TIER_5 -> Unit
-            }
-        }
+        val tier1Or2Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_1 || tier == Tier.TIER_2 }
+        val tier3Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_3 }
+        val tier4Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_4 }
 
-        val resultData = Intent().putExtra(
-            SimprintsIdResponse.BUNDLE_KEY,
-            IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification())
+        val resultData = Intent().putExtra(SimprintsIdResponse.BUNDLE_KEY, IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification())
         view.doSetResult(RESULT_OK, resultData)
-        view.setIdentificationProgressFinished(topCandidates.size,
-            tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
-
+        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
     }
 
     private fun handleStartVerify() {
