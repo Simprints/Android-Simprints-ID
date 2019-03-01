@@ -7,13 +7,18 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
+import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
+import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
-import com.simprints.clientapi.routers.SimprintsRequestRouter.routeSimprintsIdRequest
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmationRequest
-import com.simprints.clientapi.simprintsrequests.responses.*
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse.Companion.BUNDLE_KEY
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppConfirmation
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiRefusalFormResponse
+import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
 import com.simprints.libsimprints.Constants
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
@@ -30,11 +35,12 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val confirmIdentifyExtractor: ConfirmIdentifyExtractor
         get() = ConfirmIdentifyExtractor(intent)
 
-    override fun sendSimprintsRequest(request: ClientApiBaseRequest) {
-        routeSimprintsIdRequest(this, request)
+    override fun sendSimprintsRequest(request: ClientApiAppRequest) =
+        routeSimprintsRequest(this, request)
 
-        if (request is ClientApiConfirmationRequest)
-            finishAffinity()
+    override fun sendSimprintsConfirmationAndFinish(request: ClientApiAppConfirmation) {
+        routeSimprintsConfirmation(this, request)
+        finishAffinity()
     }
 
     override fun handleClientRequestError(exception: Exception) {
@@ -61,7 +67,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun routeResponse(response: SimprintsIdResponse) = when (response) {
+    private fun routeResponse(response: IClientApiResponse) = when (response) {
         is ClientApiEnrollResponse -> presenter.handleEnrollResponse(response)
         is ClientApiIdentifyResponse -> presenter.handleIdentifyResponse(response)
         is ClientApiVerifyResponse -> presenter.handleVerifyResponse(response)

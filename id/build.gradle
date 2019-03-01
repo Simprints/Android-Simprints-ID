@@ -58,6 +58,7 @@ android {
             ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
+            applicationIdSuffix '.debug'
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
     }
@@ -66,13 +67,9 @@ android {
         if (variant.buildType.name == "release" ||
                 variant.buildType.name == "releaseWithLogfile") {
 
-            buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
-            buildConfigField("String", "END_POINT", "\"prod\"")
         } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
-            buildConfigField("String", "END_POINT", "\"dev\"")
         }
     }
 
@@ -103,14 +100,6 @@ android {
 
 }
 
-def getDevProjectId() {
-    if (project.hasProperty("development_gcp_project")) {
-        return development_gcp_project
-    } else {
-        return "simprints-dev"
-    }
-}
-
 buildscript {
     repositories {
         jcenter()
@@ -137,11 +126,12 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':clientapi')
-    api project(':core')
+    implementation project(':core')
+    implementation project(':clientapi')
+    implementation project(':moduleinterfaces')
+
     api deps.simprints.libscanner
     api deps.simprints.libmatcher
-
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
@@ -188,7 +178,6 @@ dependencies {
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     kapt deps.dagger.compiler
-
     implementation deps.realm.annotations
     implementation(deps.realm.kotlin) {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
@@ -196,7 +185,6 @@ dependencies {
     implementation deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
-
     // Test
     testImplementation deps.simprints.mockscanner
     testImplementation deps.testing.retrofit
@@ -217,7 +205,6 @@ dependencies {
     testImplementation deps.testing.work
     kaptTest deps.dagger.compiler
     testImplementation project(':testtools')
-
     // Android test
     androidTestImplementation deps.simprints.mockscanner
     androidTestImplementation deps.testing.mockito.core
@@ -247,20 +234,6 @@ dependencies {
         exclude group: 'org.robolectric'
     }
 }
-
-def copyGoogleServicesJsonTask(variantName, gcpProject) {
-    return tasks.create("copyGoogleServicesJson${variantName.capitalize()}", Copy) {
-        def jsonName = "${gcpProject}-google-services.json".replaceAll("-", "_")
-        from "${project.rootDir}/id/src/${variantName}/res/raw/${jsonName}"
-        into "${project.rootDir}/id/src/${variantName}/"
-        rename { filename -> "google-services.json" }
-    }
-}
-
-copyGoogleServicesJsonTask("debug", getDevProjectId())
-copyGoogleServicesJsonTask("release", "simprints-152315")
-copyGoogleServicesJsonTask("releaseWithLogfile", "simprints-152315")
-copyGoogleServicesJsonTask("endToEndTesting", "simprints-testing")
 
 crashlytics {
     enableNdk true

@@ -6,20 +6,17 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.requests.IdRequest
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.responses.Response
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
-import com.simprints.id.session.callout.Callout.Companion.toCallout
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
-import com.simprints.id.tools.extensions.launchAlert
-import com.simprints.id.tools.extensions.parseClientApiRequest
+import com.simprints.id.tools.extensions.*
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -56,14 +53,16 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter.start()
     }
 
-    override fun parseIdRequest() =
-        intent.parseClientApiRequest() as IdRequest
+    override fun getAppVersionNameFromPackageManager() = packageVersionName
+    override fun getDeviceUniqueId() = deviceId
+
+    override fun parseRequest() =
+        intent.parseClientApiRequest() as Request
 
     override fun getCheckCallingApp() = getCallingPackageName()
 
     override fun checkCallingAppIsFromKnownSource() {
-        preferencesManager.callingPackage = getCallingPackageName()
-        if (app.packageManager.isCallingAppFromUnknownSource(preferencesManager.callingPackage)) {
+        if (app.packageManager.isCallingAppFromUnknownSource(callingPackage)) {
             crashReportManager.logExceptionOrThrowable(CallingAppFromUnknownSourceException())
         }
     }
@@ -76,9 +75,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         launchAlert(alertType)
     }
 
-    override fun openLoginActivity(legacyApiKey: String) {
+    override fun openLoginActivity(appRequest: Request) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, legacyApiKey)
+        loginIntent.putExtra(Request.BUNDLE_KEY, appRequest)
         startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
     }
 
@@ -86,8 +85,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         finish()
     }
 
-    override fun openLaunchActivity() {
+    override fun openLaunchActivity(appRequest: Request) {
         val nextIntent = Intent(this, LaunchActivity::class.java)
+        nextIntent.putExtra(Request.BUNDLE_KEY, appRequest)
         startActivityForResult(nextIntent, LAUNCH_ACTIVITY_REQUEST_CODE)
     }
 
@@ -100,9 +100,11 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
-            viewPresenter.handleActivityResult(requestCode, resultCode, data.toCallout())
-            setResult(resultCode, data)
-            finish()
+            data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
+                viewPresenter.handleActivityResult(requestCode, resultCode, it)
+                setResult(resultCode, data)
+                finish()
+            }
         }
     }
 }

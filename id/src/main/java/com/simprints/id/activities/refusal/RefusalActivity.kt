@@ -7,13 +7,13 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.clientapi.simprintsrequests.responses.SimprintsIdResponse
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.responses.IdRefusalFormResponse
-import com.simprints.id.domain.responses.toDomainClientApiRefusalResponse
+import com.simprints.id.domain.responses.RefusalFormResponse
+import com.simprints.id.domain.responses.Response
+import com.simprints.id.domain.responses.toClientApiIRefusalFormResponse
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
@@ -94,7 +94,9 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     }
 
     private fun getIntentForResultData(reason: REFUSAL_FORM_REASON?, text: String) =
-        Intent().putExtra(SimprintsIdResponse.BUNDLE_KEY, IdRefusalFormResponse(reason.toString(), text).toDomainClientApiRefusalResponse())
+        Intent().putExtra(
+            Response.BUNDLE_KEY,
+            RefusalFormResponse(reason.toString(), text).toClientApiIRefusalFormResponse())
 
     private fun getRefusalText() = refusalText.text.toString()
 }

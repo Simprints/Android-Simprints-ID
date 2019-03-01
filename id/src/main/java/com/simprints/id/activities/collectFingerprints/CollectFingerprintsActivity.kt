@@ -4,23 +4,23 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.id.R
+import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
-
 import kotlinx.android.synthetic.main.content_main.*
 
 class CollectFingerprintsActivity :
@@ -36,16 +36,22 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
+    private lateinit var appRequest: Request
 
     private var rightToLeft: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
+
         configureRightToLeft()
 
-        viewPresenter = CollectFingerprintsPresenter(this, this)
+        viewPresenter = CollectFingerprintsPresenter(this, this, appRequest)
         initBar()
         initViewFields()
         viewPresenter.start()

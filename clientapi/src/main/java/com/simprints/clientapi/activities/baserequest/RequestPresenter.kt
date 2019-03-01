@@ -5,6 +5,9 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.exceptions.InvalidClientRequestException
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppConfirmation
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView)
@@ -28,7 +31,11 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView)
 
     override fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
-        view.sendSimprintsRequest(request)
+        when (request) {
+            is ClientApiAppRequest -> view.sendSimprintsRequest(request)
+            is ClientApiAppConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
+            else -> throw InvalidClientRequestException()
+        }
     } catch (exception: Exception) {
         view.handleClientRequestError(exception)
     }
