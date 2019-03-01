@@ -1,5 +1,5 @@
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.artifactory'
+//apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
@@ -45,7 +45,6 @@ allprojects {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':libsimprints')
-    implementation "androidx.appcompat:appcompat:1.0.0"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    testImplementation "junit:junit:$junit_version"
+    implementation deps.androidx.appcompat
+    testImplementation deps.testing.junit
 }

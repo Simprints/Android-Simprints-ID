@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.common.truth.Truth
 import com.google.firebase.FirebaseApp
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.times
@@ -15,9 +14,9 @@ import com.nhaarman.mockito_kotlin.whenever
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -30,7 +29,6 @@ import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import io.reactivex.Single
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +39,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubCountWorkerTest: DaggerForTests() {
+class SubCountWorkerTest : DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -55,9 +53,11 @@ class SubCountWorkerTest: DaggerForTests() {
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     override var module: AppModuleForTests by lazyVar {
-        object : AppModuleForTests(app,
+        object : AppModuleForTests(
+            app,
             localDbManagerRule = DependencyRule.MockRule,
-            analyticsManagerRule = DependencyRule.SpyRule) {
+            analyticsManagerRule = DependencyRule.SpyRule
+        ) {
             override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask {
                 return countTaskMock
             }
@@ -73,7 +73,13 @@ class SubCountWorkerTest: DaggerForTests() {
         testAppComponent.inject(this)
         MockitoAnnotations.initMocks(this)
         subCountWorker = SubCountWorker(context, workParams)
-        whenever(workParams.inputData).thenReturn(workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(subSyncScope)))
+        whenever(workParams.inputData).thenReturn(
+            workDataOf(
+                SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(
+                    subSyncScope
+                )
+            )
+        )
     }
 
     @Test
@@ -81,8 +87,10 @@ class SubCountWorkerTest: DaggerForTests() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(5))
         val workerResult = subCountWorker.doWork()
 
-        Truth.assertThat(subCountWorker.outputData.getInt(subSyncScope.uniqueKey, 0)).isEqualTo(5)
-        assertEquals(ListenableWorker.Result.SUCCESS, workerResult)
+        assert(
+            workerResult is ListenableWorker.Result.Success &&
+                workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5
+        )
     }
 
     @Test
@@ -91,6 +99,6 @@ class SubCountWorkerTest: DaggerForTests() {
         val workerResult = subCountWorker.doWork()
 
         verify(analyticsManager, times(1)).logThrowable(any())
-        assertEquals(ListenableWorker.Result.SUCCESS, workerResult)
+        assert(workerResult is ListenableWorker.Result.Success)
     }
 }

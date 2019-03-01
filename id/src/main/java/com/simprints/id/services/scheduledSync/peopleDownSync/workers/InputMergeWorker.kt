@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.exceptions.unsafe.SimprintsError
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.SaveCountsTask
@@ -28,23 +28,16 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         // Move from {"subScopeUniqueKey": count} -> {subScope: count}
         val inputForTask = prepareInputForTask()
 
-        return try {
+        val result = try {
             saveCountsTask.execute(inputForTask)
-            outputData = inputData
-            Result.SUCCESS
+            Result.success(inputData)
         } catch (e: Throwable) {
             e.printStackTrace()
             analyticsManager.logThrowable(e)
-            Result.FAILURE
-        }.also {
-            if (BuildConfig.DEBUG) {
-                applicationContext.runOnUiThread {
-                    val message = "WM - InputMergeWorker: $it $inputData"
-                    Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
-                    Timber.d(message)
-                }
-            }
+            Result.failure()
         }
+        toastForDebugBuilds(result)
+        return result
     }
 
     private fun prepareInputForTask(): Map<SubSyncScope, Int> {
@@ -52,17 +45,27 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         val scope = syncScopeBuilder.buildSyncScope()
         scope?.toSubSyncScopes()?.forEach {
             val counter = inputData.getIntArray(it.uniqueKey)?.get(0)
-            counter?.let{ counterForSubSync ->
+            counter?.let { counterForSubSync ->
                 inputForTask[it] = counterForSubSync
             }
         }
         return inputForTask
     }
 
+    private fun toastForDebugBuilds(result: Result) {
+        if (BuildConfig.DEBUG) {
+            applicationContext.runOnUiThread {
+                val message = "WM - InputMergeWorker: $result $inputData"
+                Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
+                Timber.d(message)
+            }
+        }
+    }
+
     private fun inject() {
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw SimprintsError("Cannot get app component in Worker")
+        } else throw WorkerInjectionFailedError.forWorker<InputMergeWorker>()
     }
 }

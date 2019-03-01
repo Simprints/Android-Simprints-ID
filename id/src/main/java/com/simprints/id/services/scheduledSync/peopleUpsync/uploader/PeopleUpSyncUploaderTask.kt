@@ -2,13 +2,13 @@ package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import com.google.firebase.FirebaseNetworkException
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.local.room.UpSyncDao
+import com.simprints.id.data.db.local.room.UpSyncStatus
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.data.db.local.room.UpSyncDao
-import com.simprints.id.data.db.local.room.UpSyncStatus
 import io.reactivex.Flowable
 import timber.log.Timber
 import java.io.IOException
@@ -18,7 +18,7 @@ import java.io.IOException
 class PeopleUpSyncUploaderTask (
     private val loginInfoManager: LoginInfoManager,
     private val localDbManager: LocalDbManager,
-    private val remoteDbManager: RemoteDbManager,
+    private val remotePeopleManager: RemotePeopleManager,
     private val projectId: String,
     /*private val userId: String,*/
     private val batchSize: Int,
@@ -67,7 +67,7 @@ class PeopleUpSyncUploaderTask (
 
     private fun uploadPeople(people: List<Person>) =
         try {
-            remoteDbManager
+            remotePeopleManager
                 .uploadPeople(projectId, people)
                 .blockingAwait()
         } catch (exception: IOException) {

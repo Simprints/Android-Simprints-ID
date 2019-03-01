@@ -37,12 +37,10 @@ open class RealmTestsBase {
     protected fun getFakePerson(): rl_Person = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: rl_Person): rl_Person =
-        fakePerson.also { realm.executeTransaction { it.insertOrUpdate(fakePerson) } }
+        fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
     protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
-        people.also { realm.executeTransaction { it.insertOrUpdate(people.map { it.toRealmPerson() }) } }
-
-//    protected fun deleteAll(realm: Realm) = realm.executeTransaction { it.deleteAll() }
+        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
 
     protected fun rl_Person.deepEquals(other: rl_Person): Boolean = when {
         this.patientId != other.patientId -> false
@@ -54,17 +52,6 @@ open class RealmTestsBase {
         this.updatedAt != other.updatedAt -> false
         else -> true
     }
-
-//    protected fun saveFakeSyncInfo(realm: Realm,
-//                                   userId: String = "",
-//                                   moduleId: String = ""): rl_SyncInfo = when {
-//        userId.isNotEmpty() -> rl_SyncInfo(USER, PeopleGeneratorUtils.getRandomPerson(toSync = false), null)
-//        moduleId.isNotEmpty() -> rl_SyncInfo(MODULE, PeopleGeneratorUtils.getRandomPerson(toSync = false), moduleId)
-//        else -> rl_SyncInfo(GLOBAL, PeopleGeneratorUtils.getRandomPerson(toSync = false), null)
-//    }.also { info -> realm.executeTransaction { it.insertOrUpdate(info) } }
-//
-//    protected fun rl_SyncInfo.deepEquals(other: rl_SyncInfo): Boolean =
-//        syncGroupId == other.syncGroupId && lastSyncTime == other.lastSyncTime
 
     protected fun deleteRealmFiles(realmConfig: RealmConfiguration) {
         Realm.deleteRealm(realmConfig)

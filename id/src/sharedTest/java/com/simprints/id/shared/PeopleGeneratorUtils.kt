@@ -50,7 +50,7 @@ object PeopleGeneratorUtils {
                     moduleId,
                     toSync))
             }
-        }.also { it.sortBy { it.updatedAt } }
+        }.also { people -> people.sortBy { it.updatedAt } }
     }
 
     fun getRandomPerson(patientId: String = UUID.randomUUID().toString(),

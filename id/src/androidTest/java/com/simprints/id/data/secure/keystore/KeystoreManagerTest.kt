@@ -3,7 +3,7 @@ package com.simprints.id.data.secure.keystore
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
-import junit.framework.Assert
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +23,6 @@ class KeystoreManagerTest {
         val keystoreManager = KeystoreManagerImpl(InstrumentationRegistry.getInstrumentation().targetContext)
         val encrypt = keystoreManager.encryptString(originalString)
         val decrypt = keystoreManager.decryptString(encrypt)
-        Assert.assertEquals(originalString, decrypt)
+        assertEquals(originalString, decrypt)
     }
 }

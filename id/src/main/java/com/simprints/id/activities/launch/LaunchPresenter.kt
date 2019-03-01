@@ -8,7 +8,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.data.DataManager
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -31,6 +30,7 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.libcommon.Person
 import com.simprints.libscanner.ButtonListener
@@ -44,25 +44,20 @@ import javax.inject.Inject
 
 class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Presenter {
 
-    @Inject
-    lateinit var dataManager: DataManager
-    @Inject
-    lateinit var dbManager: DbManager
-
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var simNetworkUtils: SimNetworkUtils
-
+    @Inject lateinit var dataManager: DataManager
+    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var locationProvider: LocationProvider
 
+    private var startConsentEventTime: Long = 0
     private val activity = view as Activity
-
     private var permissionsAlreadyRequested = false
 
     // True iff the app is waiting for the user to confirm consent
@@ -78,8 +73,6 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         }
     }
 
-    private var startConsentEventTime: Long = 0
-
     init {
         val component = (activity.application as Application).component
         component.inject(this)
@@ -88,6 +81,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
 
     override fun start() {
         view.setLanguage(preferencesManager.language)
+        view.setLogoVisibility(preferencesManager.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
 
@@ -99,6 +93,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         startSetup()
     }
 
+    @SuppressLint("CheckResult")
     private fun startSetup() {
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
@@ -200,12 +195,12 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
             }
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission", "CheckResult")
     private fun collectLocationIfPermitted(permissions: List<Permission>) {
         if (!permissionsAlreadyRequested &&
             permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
             val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-            view.getLocationProvider()
+            locationProvider
                 .getUpdatedLocation(req)
                 .firstOrError()
                 .observeOn(AndroidSchedulers.mainThread())

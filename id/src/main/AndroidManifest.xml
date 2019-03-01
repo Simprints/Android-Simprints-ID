@@ -94,7 +94,7 @@
             android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.about.DebugActivity"
+            android:name=".activities.debug.DebugActivity"
             android:label="@string/about_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
@@ -104,6 +104,13 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
+        <activity
+            android:name=".activities.settings.SettingsAboutActivity"
+            android:label="@string/title_activity_settings_about"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
+
         <activity
             android:name=".activities.refusal.RefusalActivity"
             android:label="@string/refusal_label"

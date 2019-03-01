@@ -176,7 +176,7 @@ public class Finger implements Parcelable, Comparable<Finger>{
 
     public enum Status {
         NOT_COLLECTED(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
-                R.string.scan_label, R.color.simprints_scan_button_gray, R.string.empty, android.R.color.white,
+                R.string.scan_label, R.color.simprints_grey, R.string.empty, android.R.color.white,
                 R.string.please_scan),
         COLLECTING(R.drawable.ic_blank_selected, R.drawable.ic_blank_deselected,
                 R.string.cancel_button, R.color.simprints_blue,

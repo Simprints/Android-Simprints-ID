@@ -6,10 +6,11 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remotePeopleManager: RemotePeopleManager
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
@@ -36,21 +37,21 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         injectDependencies()
 
         val task = PeopleUpSyncUploaderTask(
-            loginInfoManager, localDbManager, remoteDbManager,
+            loginInfoManager, localDbManager, remotePeopleManager,
             projectId, /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
             newSyncStatusDatabase.upSyncDao
         )
 
         return try {
             task.execute()
-            Result.SUCCESS
+            Result.success()
         } catch (exception: TransientSyncFailureException) {
             Timber.e(exception)
-            Result.RETRY
+            Result.retry()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -58,6 +59,8 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
+        } else {
+            throw WorkerInjectionFailedError.forWorker<PeopleUpSyncUploaderWorker>()
         }
     }
 

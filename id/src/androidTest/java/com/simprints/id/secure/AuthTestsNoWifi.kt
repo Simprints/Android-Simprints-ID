@@ -6,18 +6,18 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.AndroidJUnit4
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.shared.DependencyRule.*
 import com.simprints.id.shared.replaceRemoteDbManagerApiClientsWithFailingClients
 import com.simprints.id.shared.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.shared.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
 import io.realm.Realm
@@ -41,12 +41,16 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
 
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
-    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
+
+    @Inject lateinit var remoteSessionsManagerSpy: RemoteSessionsManager
 
     override var module by lazyVar {
         AppModuleForAndroidTests(app,
             randomGeneratorRule = MockRule,
             remoteDbManagerRule = SpyRule,
+            remotePeopleManagerRule = SpyRule,
+            remoteSessionsManagerRule =  SpyRule,
             secureApiInterfaceRule = ReplaceRule { replaceSecureApiClientWithFailingClientProvider() })
     }
 
@@ -56,7 +60,7 @@ class AuthTestsNoWifi : FirstUseLocal, DaggerForAndroidTests() {
         super<DaggerForAndroidTests>.setUp()
         testAppComponent.inject(this)
         setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
-        replaceRemoteDbManagerApiClientsWithFailingClients(remoteDbManagerSpy)
+        replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy, remoteSessionsManagerSpy)
 
         Realm.init(InstrumentationRegistry.getInstrumentation().targetContext)
         peopleRealmConfiguration = FirstUseLocal.defaultPeopleRealmConfiguration

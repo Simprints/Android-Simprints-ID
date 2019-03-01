@@ -1,8 +1,6 @@
-package com.simprints.id.activities.about
+package com.simprints.id.activities.debug
 
 import androidx.lifecycle.MutableLiveData
-import com.simprints.id.activities.BasePresenter
-import com.simprints.id.activities.BaseView
 
 
 interface DebugContract {

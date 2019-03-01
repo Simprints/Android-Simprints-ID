@@ -1,6 +1,5 @@
 package com.simprints.id.data.db.remote.models
 
-import com.google.firebase.firestore.ServerTimestamp
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.domain.Fingerprint
@@ -17,8 +16,8 @@ data class fb_Person(@SerializedName("id") var patientId: String,
                      var projectId: String,
                      var userId: String,
                      var moduleId: String,
-                     @ServerTimestamp var createdAt: Date?,
-                     @ServerTimestamp var updatedAt: Date?,
+                     var createdAt: Date?,
+                     var updatedAt: Date?,
                      var fingerprints: HashMap<FingerIdentifier, ArrayList<fb_Fingerprint>>) : PostGsonProcessable {
 
     constructor (person: LibPerson,

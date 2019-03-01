@@ -23,7 +23,6 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        component: AppComponent,
                                        isDownSyncRunning: Boolean) {
 
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
@@ -41,8 +40,6 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     val dateFormat: DateFormat by lazy {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
-
-    private var lastIsDownSyncRunning: Boolean = isDownSyncRunning
 
     init {
         component.inject(this)
@@ -120,8 +117,8 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }.subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
-        syncScopeBuilder.buildSyncScope()?.let {
-            dbManager.getPeopleCountFromLocalForSyncScope(it)
+        syncScope?.let { syncScope ->
+            dbManager.getPeopleCountFromLocalForSyncScope(syncScope)
                 .flatMapCompletable {
                     viewModel.updateState(peopleInDb = it, emitState = true)
                     Completable.complete()

@@ -17,6 +17,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -40,6 +41,7 @@ import com.simprints.id.testTools.tryOnUiUntilTimeout
 import com.simprints.id.testTools.waitOnSystem
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.delegates.lazyVar
+import io.reactivex.Completable
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import org.hamcrest.CoreMatchers.not
@@ -56,9 +58,12 @@ import javax.inject.Inject
 class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRemote {
 
     companion object {
-        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 300 //300 * 3 = 900
+        private val modules = setOf("module1", "module2", "module3")
+        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 200 //200 * 3 (#modules) = 600
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
+        private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
         private const val SIGNED_ID_USER = "some_user"
+        private const val UI_TIMEOUT = 20000L
     }
 
     override lateinit var testProject: TestProject
@@ -69,6 +74,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
@@ -145,11 +151,11 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
         downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 20) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_calculating)))
         }
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 20) {
             Espresso.onView(withId(R.id.dashboardCardSyncDescription))
                 .check(matches(withText(not(String.format(app.getString(R.string.dashboard_card_syncing), "")))))
         }
@@ -160,7 +166,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
             .check(matches(withText("${peopleInDb.size}")))
 
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 200) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
         }
 
@@ -185,7 +191,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
     private fun waitForDownSyncCountAndValidateUI() {
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, 200) {
             onView(withId(R.id.dashboardCardSyncDownloadText))
                 .check(matches(Matchers.not(withText(""))))
         }
@@ -203,9 +209,17 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     private fun peopleInDbForSyncScope(scope: SyncScope, toSync: Boolean): Int =
         peopleInDb.count {
             it.toSync == toSync &&
-            it.projectId == scope.projectId &&
-            if (scope.userId != null) {  it.userId == scope.userId } else { true } &&
-            if (!scope.moduleIds.isNullOrEmpty()) { scope.moduleIds?.contains(it.moduleId) ?: false } else { true }
+                it.projectId == scope.projectId &&
+                if (scope.userId != null) {
+                    it.userId == scope.userId
+                } else {
+                    true
+                } &&
+                if (!scope.moduleIds.isNullOrEmpty()) {
+                    scope.moduleIds?.contains(it.moduleId) ?: false
+                } else {
+                    true
+                }
         }
 
     private fun mockGlobalScope(): SyncScope {
@@ -219,7 +233,7 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
     }
 
     private fun mockModuleScope(): SyncScope {
-        whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(setOf("module1", "module2", "module3"))
+        whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(modules)
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(Constants.GROUP.MODULE)
         return syncScope
     }
@@ -227,7 +241,11 @@ class DashboardActivityAndroidTest : DaggerForAndroidTests(), FirstUseLocalAndRe
 
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
-        remoteDbManagerSpy.uploadPeople(testProject.id, peopleOnServer).blockingAwait()
+        val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it)
+        }
+        Completable.merge(requests).blockingAwait()
+
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
     }

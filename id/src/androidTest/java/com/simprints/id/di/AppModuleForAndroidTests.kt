@@ -8,6 +8,9 @@ import com.simprints.id.shared.DependencyRule.RealRule
 open class AppModuleForAndroidTests(app: Application,
                                     override var localDbManagerRule: DependencyRule = RealRule,
                                     override var remoteDbManagerRule: DependencyRule = RealRule,
+                                    override var remotePeopleManagerRule: DependencyRule = RealRule,
+                                    override var remoteProjectManagerRule: DependencyRule = RealRule,
+                                    override var remoteSessionsManagerRule: DependencyRule = RealRule,
                                     override var dbManagerRule: DependencyRule = RealRule,
                                     override var secureDataManagerRule: DependencyRule = RealRule,
                                     override var dataManagerRule: DependencyRule = RealRule,
@@ -24,10 +27,14 @@ open class AppModuleForAndroidTests(app: Application,
                                     override var secureApiInterfaceRule: DependencyRule = RealRule,
                                     override var scannerManagerRule: DependencyRule = RealRule,
                                     override var syncScopesBuilderRule: DependencyRule = RealRule,
-                                    override var syncSchedulerHelperRule: DependencyRule = RealRule) : AppModuleForAnyTests(
+                                    override var syncSchedulerHelperRule: DependencyRule = RealRule,
+                                    override var locationProviderRule: DependencyRule = RealRule) : AppModuleForAnyTests(
     app,
     localDbManagerRule = localDbManagerRule,
     remoteDbManagerRule = remoteDbManagerRule,
+    remotePeopleManagerRule = remotePeopleManagerRule,
+    remoteProjectManagerRule =  remoteProjectManagerRule,
+    remoteSessionsManagerRule = remoteSessionsManagerRule,
     dbManagerRule = dbManagerRule,
     secureDataManagerRule = secureDataManagerRule,
     dataManagerRule = dataManagerRule,
@@ -44,5 +51,6 @@ open class AppModuleForAndroidTests(app: Application,
     secureApiInterfaceRule = secureApiInterfaceRule,
     scannerManagerRule = scannerManagerRule,
     syncScopesBuilderRule = syncScopesBuilderRule,
-    syncSchedulerHelperRule = syncSchedulerHelperRule
+    syncSchedulerHelperRule = syncSchedulerHelperRule,
+    locationProviderRule = locationProviderRule
 )

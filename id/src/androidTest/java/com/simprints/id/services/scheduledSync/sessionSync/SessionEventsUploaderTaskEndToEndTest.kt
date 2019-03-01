@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
-import androidx.test.runner.AndroidJUnit4
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.Application
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
@@ -11,6 +11,7 @@ import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventData.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.di.AppModuleForAndroidTests
 import com.simprints.id.di.DaggerForAndroidTests
@@ -59,6 +60,7 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var randomGeneratorMock: RandomGenerator
 
@@ -122,13 +124,13 @@ class SessionEventsUploaderTaskEndToEndTest : DaggerForAndroidTests(), FirstUseL
 
     private fun executeUpload(): TestObserver<Void> {
         val syncTask = SessionEventsUploaderTask(
-            testProject.id,
-            realmSessionEventsManager.loadSessions().blockingGet().map { it.id },
             sessionEventsManager,
             timeHelper,
-            remoteDbManager.getSessionsApiClient().blockingGet())
+            remoteSessionsManager.getSessionsApiClient().blockingGet())
 
-        return syncTask.execute().test()
+        return syncTask.execute(
+            testProject.id,
+            realmSessionEventsManager.loadSessions().blockingGet()).test()
     }
 
     private fun createClosedSessions(nSessions: Int) =

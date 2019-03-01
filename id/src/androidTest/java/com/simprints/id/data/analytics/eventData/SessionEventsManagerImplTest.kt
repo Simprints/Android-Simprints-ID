@@ -1,9 +1,12 @@
 package com.simprints.id.data.analytics.eventData
 
+import android.location.Location
 import androidx.test.InstrumentationRegistry
 import androidx.test.filters.SmallTest
 import androidx.test.runner.AndroidJUnit4
 import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
@@ -31,20 +34,23 @@ import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.testSnippets.*
 import com.simprints.id.testTemplates.FirstUseLocal
 import com.simprints.id.testTools.ActivityUtils
+import com.simprints.id.testTools.tryOnSystemUntilTimeout
 import com.simprints.id.testTools.waitOnUi
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.libcommon.Person
 import com.simprints.libcommon.Utils
 import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import io.reactivex.Single
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
-import junit.framework.Assert.*
+import junit.framework.TestCase.*
 import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
@@ -71,6 +77,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var locationProviderMock: LocationProvider
 
     override var preferencesModule: PreferencesModuleForAnyTests by lazyVar {
         PreferencesModuleForAnyTests(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -81,9 +88,11 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
             app,
             localDbManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule,
+            remoteSessionsManagerRule = DependencyRule.SpyRule,
             sessionEventsManagerRule = DependencyRule.SpyRule,
             scheduledSessionsSyncManagerRule = DependencyRule.MockRule,
             randomGeneratorRule = DependencyRule.MockRule,
+            locationProviderRule = DependencyRule.MockRule,
             bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
         )
     }
@@ -121,6 +130,15 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,
             FingerIdentifier.LEFT_INDEX_FINGER to true))
+
+        mockLocation()
+    }
+
+    private fun mockLocation() {
+        val targetLocation = Location("")
+        targetLocation.latitude = 0.0
+        targetLocation.longitude = 0.0
+        whenever(locationProviderMock.getUpdatedLocation(any())).thenReturn(Single.just(targetLocation).toObservable())
     }
 
     @After
@@ -204,6 +222,7 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
         Thread.sleep(100)
 
         assertNotNull(mostRecentSessionInDb.location)
+        assertThat(mostRecentSessionInDb.location?.longitude).isEqualTo(0.0)
     }
 
     @Test
@@ -230,6 +249,18 @@ class SessionEventsManagerImplTest : DaggerForAndroidTests(), FirstUseLocal {
 
         realmForDataEvent.refresh()
         verifyEventsAfterEnrolment(mostRecentSessionInDb.events, realmForDataEvent)
+    }
+
+    @Test
+    fun launchSimprints_shouldGenerateTheRightEvents() {
+        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+
+        // Launch
+        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+
+        tryOnSystemUntilTimeout(5000, 200) {
+            verifyEventsWhenSimprintsIsLaunched(mostRecentSessionInDb.events)
+        }
     }
 
     @Test

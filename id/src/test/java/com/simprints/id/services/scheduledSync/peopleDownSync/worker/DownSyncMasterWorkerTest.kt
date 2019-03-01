@@ -8,18 +8,16 @@ import androidx.work.*
 import com.google.firebase.FirebaseApp
 import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.di.DaggerForTests
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
 import com.simprints.id.shared.whenever
 import com.simprints.id.testUtils.roboletric.TestApplication
 import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
@@ -39,7 +37,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
 
     @Inject lateinit var context: Context
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     @Mock lateinit var workParams: WorkerParameters
     private lateinit var downSyncMasterWorker: DownSyncMasterWorker
@@ -52,9 +49,9 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
     private val numberOfEnqueuedSyncCountWorkers = 3
     private val numberOfBlockedDownSyncWorkers = 3
     private val numberOfBlockedInputMergerWorkers = 1
-    private val uniqueNameForChainWorkers = "${ConstantsWorkManager.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
-    private val workerKeyForSubDownSyncScope = "${ConstantsWorkManager.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
-    private val workerKeyForSubCountScope = "${ConstantsWorkManager.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
+    private val workerKeyForSubDownSyncScope = "${WorkManagerConstants.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val workerKeyForSubCountScope = "${WorkManagerConstants.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
 
     @Before
     override fun setUp() {
@@ -88,9 +85,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
     }
 
     @Test
-    @Ignore
-    // When it executes with all other tests, it fails to SQL connections execturd in the wrong threads.
-    // Probably Robolectric doesn't cope well with Room and SQL.
     fun doWorkTest_shouldCreateCountAndDownSyncWorkersAndSucceed() {
 
         val result = downSyncMasterWorker.doWork()
@@ -102,12 +96,10 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
             workInfo.size)
         assertEquals(numberOfEnqueuedSyncCountWorkers, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 
     @Test
-    @Ignore
-    // Passes in isolation similar to the test above
     fun doWorkTest_shouldReturnSuccessImmediatelyWithEmptySubSyncScopeList() {
         val noModuleSyncScope = SyncScope(projectId, null, setOf())
         whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(noModuleSyncScope)))
@@ -120,6 +112,6 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
         assertEquals(0, workInfo.size)
         assertEquals(null, seq[WorkInfo.State.ENQUEUED]?.size)
         assertEquals(null, seq[WorkInfo.State.BLOCKED]?.size)
-        assertEquals(ListenableWorker.Result.SUCCESS, result)
+        assert(result is ListenableWorker.Result.Success)
     }
 }

@@ -7,45 +7,37 @@ import com.simprints.id.data.analytics.eventData.models.domain.events.Artificial
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
+import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import timber.log.Timber
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
-class SessionEventsUploaderTask(private val projectId: String,
-                                private val sessionsIds: List<String>,
-                                private val sessionEventsManager: SessionEventsManager,
+class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsManager,
                                 private val timeHelper: TimeHelper,
                                 private val sessionApiClient: SessionsRemoteInterface) {
 
     companion object {
-        const val DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR = 31L
+        val SERVER_ERROR_CODES_NOT_WORTH_TO_RETRY = arrayListOf(400, 401, 403, 404)
+        const val NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS = 3L
     }
 
     /**
      * @throws NoSessionsFoundException
      * @throws SessionUploadFailureException
+     * @throws SessionUploadFailureRetryException
      */
-    fun execute(): Completable =
-        Single.just(sessionsIds)
-            .loadSessionsFromDb()
+    fun execute(projectId: String,
+                sessions: List<SessionEvents>): Completable =
+        Single.just(sessions)
             .closeOpenSessionsAndUpdateUploadTime()
             .filterClosedSessions()
-            .uploadClosedSessionsOrThrowIfNoSessions()
-            .checkUploadSucceed()
+            .uploadClosedSessionsOrThrowIfNoSessions(projectId)
             .deleteSessionsFromDb()
 
-    private fun Single<List<String>>.loadSessionsFromDb(): Single<List<SessionEvents>> =
-        this.map {
-            Timber.d("SessionEventsUploaderTask loadSessionsFromDb()")
-            it.map { session -> sessionEventsManager.loadSessionById(session).blockingGet() }
-        }
-
     @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
+    internal fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
         this.flatMap { sessions ->
             Timber.d("SessionEventsUploaderTask closeOpenSessionsAndUpdateUploadTime()")
 
@@ -57,24 +49,6 @@ class SessionEventsUploaderTask(private val projectId: String,
             Single.just(sessions)
         }
 
-    @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.filterClosedSessions(): Single<List<SessionEvents>> =
-        this.flatMap { sessions ->
-            Timber.d("SessionEventsUploaderTask filterClosedSessions()")
-
-            Single.just(sessions.filter { it.isClosed() })
-        }
-
-    @SuppressLint("CheckResult")
-    private fun Single<List<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(): Single<Result<Void?>> =
-        this.flatMap { sessions ->
-            if (sessions.isEmpty())
-                throw NoSessionsFoundException()
-
-            sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
-            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
-        }
-
     private fun forceSessionToCloseIfOpenAndNotInProgress(session: SessionEvents, timeHelper: TimeHelper) {
         Timber.d("SessionEventsUploaderTask forceSessionToCloseIfOpenAndNotInProgress()")
 
@@ -84,43 +58,58 @@ class SessionEventsUploaderTask(private val projectId: String,
         }
     }
 
-    private fun Single<out Result<Void?>>.checkUploadSucceed(): Completable =
+    @SuppressLint("CheckResult")
+    internal fun Single<List<SessionEvents>>.filterClosedSessions(): Single<List<SessionEvents>> =
+        this.flatMap { sessions ->
+            Timber.d("SessionEventsUploaderTask filterClosedSessions()")
+
+            Single.just(sessions.filter { it.isClosed() })
+        }
+
+    @SuppressLint("CheckResult")
+    internal fun Single<List<SessionEvents>>.uploadClosedSessionsOrThrowIfNoSessions(projectId: String): Single<List<SessionEvents>> =
+        this.flatMap { sessions ->
+            sessions.forEach { Timber.d("SessionEventsUploaderTask uploadClosedSessionsOrThrowIfNoSessions: ${it.id}") }
+
+            if (sessions.isEmpty())
+                throw NoSessionsFoundException()
+
+            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
+                .checkUploadSucceedAndRetryIfNecessary()
+                .andThen(Single.just(sessions))
+        }
+
+    internal fun Single<out Result<Void?>>.checkUploadSucceedAndRetryIfNecessary(): Completable =
         flatMapCompletable { result ->
-            Timber.d("SessionEventsUploaderTask checkUploadSucceed()")
-
+            Timber.d("SessionEventsUploaderTask checkUploadSucceedAndRetryIfNecessary()")
+            val response = result.response()
             when {
-                result.response()?.code() == 201 -> Completable.complete()
-                result.response() == null -> Completable.error(IOException(result.error()))
-                else -> Completable.error(SessionUploadFailureException())
+                response == null ->
+                    continueWithRetryException(result.error() ?: Throwable("Sessions upload response is null"))
+                isResponseASuccess(response.code()) ->
+                    continueWithSuccess()
+                isResponseAnErrorThatIsWorthToRetry(response.code()) ->
+                    continueWithRetryException(Throwable("Sessions upload response code: ${response.code()}"))
+                else ->
+                    continueWithNoRetryException()
             }
+        }.retry { counter, t ->
+            counter < NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS && t !is SessionUploadFailureException
         }
 
-    private fun deleteSessions() {
-        sessionsIds.forEach {
-            sessionEventsManager.deleteSessions(sessionId = it, openSession = false).blockingGet()
-        }
-    }
+    private fun isResponseAnErrorThatIsWorthToRetry(code: Int) = !SERVER_ERROR_CODES_NOT_WORTH_TO_RETRY.contains(code)
+    private fun isResponseASuccess(code: Int) = code == 201
 
-    //To avoid db building up in case of errors, we delete session older 1 month.
-    //So we have 1 month to fix any integration issues that comes up on the cloud.
-    private fun deleteSessionsAfterAServerError() {
-        sessionsIds.forEach {
-            sessionEventsManager.deleteSessions(
-                sessionId = it,
-                openSession = false,
-                startedBefore = timeHelper.nowMinus(DAYS_TO_KEEP_SESSIONS_IN_CASE_OF_ERROR, TimeUnit.DAYS)
-            ).blockingGet()
-        }
-    }
+    private fun continueWithSuccess() = Completable.complete()
+    private fun continueWithRetryException(error: Throwable) = Completable.error(SessionUploadFailureRetryException(error))
+    private fun continueWithNoRetryException() = Completable.error(SessionUploadFailureException())
 
-    private fun Completable.deleteSessionsFromDb(): Completable =
-        this.doOnError {
-            Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
-
-            if (it is SessionUploadFailureException) {
-                deleteSessionsAfterAServerError()
+    internal fun Single<List<SessionEvents>>.deleteSessionsFromDb(): Completable =
+        this.flatMapCompletable { sessions ->
+            Completable.fromCallable {
+                sessions.forEach { session ->
+                    sessionEventsManager.deleteSessions(sessionId = session.id, openSession = false).blockingGet()
+                }
             }
-        }.doOnComplete {
-            deleteSessions()
         }
 }

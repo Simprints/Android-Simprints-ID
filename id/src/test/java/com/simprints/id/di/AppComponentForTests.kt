@@ -7,6 +7,7 @@ import com.simprints.id.activities.LoginActivityTest
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsAboutFragmentTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
@@ -17,11 +18,10 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMas
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(AppModule::class, PreferencesModule::class, SerializerModule::class, AndroidInjectionModule::class))
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class])
 interface AppComponentForTests : AppComponent {
     fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
@@ -39,4 +39,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(subCountWorkerTest: SubCountWorkerTest)
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
+    fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
 }

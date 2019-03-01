@@ -6,13 +6,12 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -30,7 +29,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var sessionEventManager: SessionEventsManager
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
@@ -112,13 +110,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun logout() {
-        dbManager.signOut()
-        syncSchedulerHelper.cancelDownSyncWorkers()
-        sessionEventManager.signOut()
-    }
-
-    override fun userDidWantToLogout() {
-        view.showConfirmationDialogForLogout()
+        view.startCheckLoginActivityAndFinish()
     }
 
     private fun userIsOffline() = try {
