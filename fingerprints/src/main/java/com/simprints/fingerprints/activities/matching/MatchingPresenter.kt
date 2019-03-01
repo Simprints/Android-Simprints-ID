@@ -12,18 +12,25 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.Tier.Companion.computeTier
-import com.simprints.id.domain.requests.RequestAction
+import com.simprints.id.domain.matching.VerificationResult
+import com.simprints.id.domain.requests.IdentifyRequest
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.VerifyRequest
+import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libmatcher.EVENT
 import com.simprints.libmatcher.LibMatcher
+import com.simprints.libmatcher.LibMatcher.MATCHER_TYPE.*
 import com.simprints.libmatcher.Progress
 import com.simprints.libmatcher.sourceafis.MatcherEventListener
+import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +43,8 @@ import javax.inject.Inject
 class MatchingPresenter(
     component: FingerprintsComponent,
     private val view: MatchingContract.View,
-    private val probe: Person
+    private val probe: Person,
+    private val appRequest: Request
 ) : MatchingContract.Presenter {
 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -56,24 +64,32 @@ class MatchingPresenter(
     @SuppressLint("CheckResult")
     override fun start() {
         sessionEventsManager.getCurrentSession().subscribeBy { sessionId = it.id }
-        preferencesManager.msSinceBootOnMatchStart = timeHelper.now()
         matchStartTime = timeHelper.now()
 
-        when (preferencesManager.calloutAction) {
-            RequestAction.IDENTIFY -> handleStartIdentify()
-            RequestAction.VERIFY -> handleStartVerify()
+        when (appRequest) {
+            is IdentifyRequest -> handleStartIdentify(appRequest)
+            is VerifyRequest -> handleStartVerify(appRequest)
             else -> handleUnexpectedCallout()
         }
     }
 
-    private fun handleStartIdentify() {
+    private fun handleStartIdentify(identifyRequest: IdentifyRequest) {
         matchTask = dbManager.loadPeople(preferencesManager.matchGroup)
             .doOnSuccess { handleLoadPeopleSuccess(it) }
-            .runIdentification(getIdentifyMatcherType())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .runMatch(getMatcherType(identifyRequest), view::setIdentificationProgress)
+            .setMatchingSchedulers()
             .subscribeBy {
                 handleIdentificationResult(it.candidates, it.scores)
+            }
+    }
+
+    private fun handleStartVerify(verifyRequest: VerifyRequest) {
+        matchTask = dbManager.loadPerson(verifyRequest.verifyGuid).map { listOf(it.person) }
+            .doOnSuccess { handleLoadPersonSuccess(it) }
+            .runMatch(getMatcherType(verifyRequest))
+            .setMatchingSchedulers()
+            .subscribeBy {
+                handleVerificationResult(it.candidates, it.scores)
             }
     }
 
@@ -83,28 +99,51 @@ class MatchingPresenter(
         view.setIdentificationProgressMatchingStart(candidates.size)
     }
 
-    private fun getIdentifyMatcherType() =
-        when (preferencesManager.matcherType) {
-            0 -> LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
-            1 -> LibMatcher.MATCHER_TYPE.SOURCEAFIS_IDENTIFY
-            else -> LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
+    private fun handleLoadPersonSuccess(candidates: List<Person>) {
+        logMessageForCrashReport(String.format(Locale.UK,
+            "Successfully loaded %d candidates", candidates.size))
+    }
+
+    private fun getMatcherType(appRequest: Request) =
+        when (appRequest) {
+            is IdentifyRequest -> when (preferencesManager.matcherType) {
+                0 -> SIMAFIS_IDENTIFY
+                1 -> SOURCEAFIS_IDENTIFY
+                else -> SIMAFIS_IDENTIFY
+            }
+            is VerifyRequest -> when (preferencesManager.matcherType) {
+                0 -> SIMAFIS_VERIFY
+                1 -> SOURCEAFIS_VERIFY
+                else -> SIMAFIS_VERIFY
+            }
+            else -> throw UnsupportedOperationException()
         }
 
-    private fun Single<out List<Person>>.runIdentification(matcherType: LibMatcher.MATCHER_TYPE): Single<MatchResult> =
+    private fun Single<out List<Person>>.runMatch(
+        matcherType: LibMatcher.MATCHER_TYPE,
+        onMatchProgressDo: (progress: Int) -> Unit = {}
+    ): Single<MatchResult> =
         flatMap { candidates ->
-            Single.create<MatchResult> {
+            Single.create<MatchResult> { emitter ->
                 val scores = mutableListOf<Float>()
-
-                LibMatcher(probe, candidates, matcherType, scores, matchCallback(it, candidates, scores), 1).start()
+                val callback = matchCallback(emitter, candidates, scores, onMatchProgressDo)
+                val libProbe = probe.toLibCommonPerson()
+                val libCandidates = candidates.map { it.toLibCommonPerson() }
+                LibMatcher(libProbe, libCandidates, matcherType, scores, callback, 1).start()
             }
         }
 
-    private fun matchCallback(emitter: SingleEmitter<MatchResult>, candidates: List<Person>, scores: List<Float>) =
+    private fun matchCallback(
+        emitter: SingleEmitter<MatchResult>,
+        candidates: List<Person>,
+        scores: List<Float>,
+        onProgressDo: (progress: Int) -> Unit = {}
+    ) =
         object : MatcherEventListener {
 
             override fun onMatcherProgress(progress: Progress?) {
                 progress?.progress?.let {
-                    (view as Activity).runOnUiThread { view.setIdentificationProgress(it) }
+                    (view as Activity).runOnUiThread { onProgressDo(it) }
                 }
             }
 
@@ -132,13 +171,25 @@ class MatchingPresenter(
         val tier3Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_3 }
         val tier4Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_4 }
 
-        val resultData = Intent().putExtra(SimprintsIdResponse.BUNDLE_KEY, IdIdentificationResponse(topCandidates, sessionId).toDomainClientApiIdentification())
+
+        val resultData = Intent().putExtra(Response.BUNDLE_KEY,
+            IdentificationResponse(topCandidates, sessionId).toClientApiIdentifyResponse())
         view.doSetResult(RESULT_OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
     }
 
-    private fun handleStartVerify() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun handleVerificationResult(candidates: List<Person>, scores: List<Float>) {
+
+        val candidate = candidates.first()
+        val score = scores.first()
+
+        val verificationResult = VerificationResult(candidate.patientId, score.toInt(), computeTier(score))
+
+        sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
+        val resultData = Intent().putExtra(Response.BUNDLE_KEY,
+            VerifyResponse(candidate.patientId, score.toInt(), computeTier(score)).toClientApiVerifyResponse())
+        view.doSetResult(RESULT_OK, resultData)
+        view.doFinish()
     }
 
     private fun handleUnexpectedCallout() {
@@ -155,4 +206,14 @@ class MatchingPresenter(
     }
 
     class MatchResult(val candidates: List<Person>, val scores: List<Float>)
+
+    private fun <T> Single<T>.setMatchingSchedulers() =
+        subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+
+    private fun Person.toLibCommonPerson() =
+        com.simprints.libcommon.Person(patientId, fingerprints.map { it.toLibCommonFingerprint() }) // STOPSHIP
+
+    private fun Fingerprint.toLibCommonFingerprint() =
+        com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP
 }

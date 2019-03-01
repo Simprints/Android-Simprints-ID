@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.fingerprints.activities.matching.old.MatchingPresenter
 import com.simprints.fingerprints.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.R
@@ -19,6 +18,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
@@ -51,7 +51,12 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         }
 
         val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
-        viewPresenter = MatchingPresenter(this, component, probe)
+            ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP
+
+        val appRequest: Request = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP
+
+        viewPresenter = MatchingPresenter(component, this, probe, appRequest)
     }
 
     override fun onResume() {
