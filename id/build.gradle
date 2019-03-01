@@ -66,13 +66,9 @@ android {
         if (variant.buildType.name == "release" ||
                 variant.buildType.name == "releaseWithLogfile") {
 
-            buildConfigField("String", "GCP_PROJECT", "\"simprints-152315\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
-            buildConfigField("String", "END_POINT", "\"prod\"")
         } else if (variant.buildType.name == "debug") {
-            buildConfigField("String", "GCP_PROJECT", "\"${getDevProjectId()}\"")
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
-            buildConfigField("String", "END_POINT", "\"dev\"")
         }
     }
 
@@ -103,14 +99,6 @@ android {
 
 }
 
-def getDevProjectId() {
-    if (project.hasProperty("development_gcp_project")) {
-        return development_gcp_project
-    } else {
-        return "simprints-dev"
-    }
-}
-
 buildscript {
     repositories {
         jcenter()
@@ -137,7 +125,10 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    api project(':core')
+    implementation project(':core')
+    implementation project(':clientapi')
+    implementation project(':moduleinterfaces')
+
     api deps.simprints.libscanner
     api deps.simprints.libmatcher
     implementation deps.dagger.core
@@ -241,22 +232,7 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
     }
-    compile project(path: ':moduleinterfaces')
 }
-
-def copyGoogleServicesJsonTask(variantName, gcpProject) {
-    return tasks.create("copyGoogleServicesJson${variantName.capitalize()}", Copy) {
-        def jsonName = "${gcpProject}-google-services.json".replaceAll("-", "_")
-        from "${project.rootDir}/id/src/${variantName}/res/raw/${jsonName}"
-        into "${project.rootDir}/id/src/${variantName}/"
-        rename { filename -> "google-services.json" }
-    }
-}
-
-copyGoogleServicesJsonTask("debug", getDevProjectId())
-copyGoogleServicesJsonTask("release", "simprints-152315")
-copyGoogleServicesJsonTask("releaseWithLogfile", "simprints-152315")
-copyGoogleServicesJsonTask("endToEndTesting", "simprints-testing")
 
 crashlytics {
     enableNdk true

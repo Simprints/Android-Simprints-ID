@@ -28,7 +28,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
@@ -39,7 +39,7 @@
         </activity>
 
         <activity
-            android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:name="com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
