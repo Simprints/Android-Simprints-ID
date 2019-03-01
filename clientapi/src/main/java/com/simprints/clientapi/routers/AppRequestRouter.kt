@@ -3,7 +3,12 @@ package com.simprints.clientapi.routers
 import android.app.Activity
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
-import com.simprints.clientapi.simprintsrequests.requests.*
+import com.simprints.clientapi.models.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.models.domain.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.models.domain.requests.BaseRequest
+import com.simprints.clientapi.models.domain.requests.EnrollRequest
+import com.simprints.clientapi.models.domain.requests.IdentifyRequest
+import com.simprints.clientapi.models.domain.requests.VerifyRequest
 
 
 object AppRequestRouter {
@@ -18,21 +23,21 @@ object AppRequestRouter {
     private const val SELECT_GUID_INTENT = "com.simprints.clientapp.CONFIRM_IDENTITY"
 
     fun routeSimprintsRequest(act: Activity,
-                              request: ClientApiAppRequest) = when (request) {
+                              request: BaseRequest) = when (request) {
         // Regular Requests
-        is ClientApiEnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
-        is ClientApiVerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
-        is ClientApiIdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
+        is EnrollRequest -> act.route(request, REGISTER, REGISTER_REQUEST_CODE)
+        is VerifyRequest -> act.route(request, VERIFY, VERIFY_REQUEST_CODE)
+        is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
 
         // Handle Error
         else -> throw InvalidClientRequestException("Invalid Action Request")
     }
 
     fun routeSimprintsConfirmation(act: Activity,
-                                   request: ClientApiAppConfirmation) {
+                                   request: BaseConfirmation) {
         when (request) {
             // Regular Requests
-            is ClientApiConfirmIdentifyRequest ->
+            is IdentifyConfirmation ->
                 act.startService(request.convertToAppRequest().toIntent(SELECT_GUID_INTENT))
 
             // Handle Error
@@ -40,7 +45,7 @@ object AppRequestRouter {
         }
     }
 
-    private fun Activity.route(request: ClientApiAppRequest, route: String, code: Int) =
+    private fun Activity.route(request: BaseRequest, route: String, code: Int) =
         this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)
 
 }

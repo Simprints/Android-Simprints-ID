@@ -1,18 +1,18 @@
-package com.simprints.clientapi.simprintsrequests.requests
+package com.simprints.clientapi.models.domain.requests
 
+import com.simprints.clientapi.models.appinterface.requests.AppVerifyRequest
 import com.simprints.moduleinterfaces.app.requests.IAppRequest
-import com.simprints.moduleinterfaces.app.requests.IAppVerifyRequest
 import kotlinx.android.parcel.Parcelize
 
 
 @Parcelize
-data class ClientApiVerifyRequest(
+data class VerifyRequest(
     override val projectId: String,
     override val moduleId: String,
     override val userId: String,
     override val metadata: String,
     val verifyGuid: String
-) : ClientApiAppRequest {
+) : BaseRequest {
 
     override fun convertToAppRequest(): IAppRequest = AppVerifyRequest(
         this.projectId, this.userId, this.moduleId, this.metadata, this.verifyGuid
@@ -20,11 +20,3 @@ data class ClientApiVerifyRequest(
 
 }
 
-@Parcelize
-private data class AppVerifyRequest(
-    override val projectId: String,
-    override val userId: String,
-    override val moduleId: String,
-    override val metadata: String,
-    override val verifyGuid: String
-) : IAppVerifyRequest

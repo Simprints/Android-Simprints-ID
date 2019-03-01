@@ -1,4 +1,4 @@
-package com.simprints.clientapi.simprintsrequests
+package com.simprints.clientapi.models.domain
 
 enum class ApiVersion {
 

@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiConfirmIdentifyRequest
+import com.simprints.clientapi.models.domain.confirmations.IdentifyConfirmation
 import org.junit.Assert
 
 
@@ -12,7 +12,7 @@ class ConfirmIdentifyBuilderTest : SimprintsRequestBuilderTest(ConfirmIdentifyFa
         super.buildSimprintsRequest_shouldSucceed()
 
         mockFactory.getBuilder(mockFactory.getMockExtractor()).build().let {
-            it as ClientApiConfirmIdentifyRequest
+            it as IdentifyConfirmation
             Assert.assertEquals(it.sessionId, RequestFactory.MOCK_SESSION_ID)
             Assert.assertEquals(it.selectedGuid, RequestFactory.MOCK_SELECTED_GUID)
         }
