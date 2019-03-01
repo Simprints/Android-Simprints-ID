@@ -4,10 +4,10 @@ import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-import com.simprints.clientapi.models.domain.responses.EnrollResponse
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse
-import com.simprints.clientapi.models.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.models.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 
 
 class OdkPresenter(val view: OdkContract.View,

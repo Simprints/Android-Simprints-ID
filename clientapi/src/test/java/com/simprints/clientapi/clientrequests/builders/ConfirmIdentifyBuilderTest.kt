@@ -2,7 +2,7 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.models.domain.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
 import org.junit.Assert
 
 

@@ -4,8 +4,8 @@ import com.simprints.clientapi.clientrequests.builders.EnrollBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.models.domain.requests.BaseRequest
-import com.simprints.clientapi.models.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.EnrollRequest
 import org.mockito.Mockito
 
 object EnrollRequestFactory : RequestFactory() {

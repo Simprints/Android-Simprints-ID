@@ -3,7 +3,7 @@ package com.simprints.clientapi.requestFactories
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
-import com.simprints.clientapi.models.domain.ClientBase
+import com.simprints.clientapi.domain.ClientBase
 import org.mockito.Mockito
 
 abstract class RequestFactory {

@@ -4,10 +4,10 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
-import com.simprints.clientapi.models.domain.responses.EnrollResponse
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse.Identification
-import com.simprints.clientapi.models.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse.Identification
+import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory

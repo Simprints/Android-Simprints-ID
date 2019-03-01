@@ -1,6 +1,6 @@
 package com.simprints.clientapi.extensions
 
-import com.simprints.clientapi.models.domain.responses.IdentifyResponse.Identification
+import com.simprints.clientapi.domain.responses.IdentifyResponse.Identification
 
 
 fun List<Identification>.getIdsString(): String {

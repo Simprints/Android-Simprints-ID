@@ -4,8 +4,8 @@ import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.models.domain.requests.BaseRequest
-import com.simprints.clientapi.models.domain.requests.IdentifyRequest
+import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.IdentifyRequest
 import org.mockito.Mockito
 
 

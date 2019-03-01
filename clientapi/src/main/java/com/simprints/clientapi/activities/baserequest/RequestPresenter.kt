@@ -6,8 +6,8 @@ import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
-import com.simprints.clientapi.models.domain.confirmations.BaseConfirmation
-import com.simprints.clientapi.models.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.BaseRequest
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView)

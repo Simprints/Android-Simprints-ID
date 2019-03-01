@@ -2,8 +2,8 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.models.domain.ClientBase
-import com.simprints.clientapi.models.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.ClientBase
+import com.simprints.clientapi.domain.requests.EnrollRequest
 
 
 class EnrollBuilder(private val extractor: EnrollExtractor, validator: EnrollValidator)
