@@ -100,8 +100,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
-            data?.let {
-                viewPresenter.handleActivityResult(requestCode, resultCode, data.extras.getParcelable<Response>(Response.BUNDLE_KEY))
+            data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
+                viewPresenter.handleActivityResult(requestCode, resultCode, it)
                 setResult(resultCode, data)
                 finish()
             }

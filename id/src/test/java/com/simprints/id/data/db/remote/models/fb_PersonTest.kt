@@ -3,8 +3,6 @@ package com.simprints.id.data.db.remote.models
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.id.data.db.local.realm.models.toRealmFingerprint
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
@@ -30,7 +28,7 @@ class fb_PersonTest {
             fingerprints.add(PeopleGeneratorUtils.getRandomFingerprint().toRealmFingerprint().also { it.fingerId = FingerIdentifier.LEFT_THUMB.ordinal })
         }
 
-        val fbPerson = fb_Person(rlPerson)
+        val fbPerson = ApiPerson(rlPerson)
 
         Assert.assertEquals(fbPerson.patientId, rlPerson.patientId)
         Assert.assertEquals(fbPerson.userId, rlPerson.userId)
@@ -50,7 +48,7 @@ class fb_PersonTest {
                 it.add(IdFingerprint.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB))
             })
 
-        val fbPerson = fb_Person(person, "projectId", "userId", "moduleId")
+        val fbPerson = ApiPerson(person, "projectId", "userId", "moduleId")
 
         Assert.assertEquals(fbPerson.patientId, person.guid)
         Assert.assertEquals(fbPerson.userId, "userId")
@@ -64,7 +62,7 @@ class fb_PersonTest {
 
     @Test
     fun deserialiseFbPerson() {
-        val person = JsonHelper.gson.fromJson(fbPersonJson, fb_Person::class.java)
+        val person = JsonHelper.gson.fromJson(fbPersonJson, ApiPerson::class.java)
         Assert.assertEquals(person.patientId, "aeed3784-a399-445a-9dcd-0a373184709c")
         Assert.assertEquals(person.projectId, "test10MProject")
         Assert.assertEquals(person.moduleId, "module2")

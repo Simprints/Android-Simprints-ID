@@ -3,7 +3,7 @@ package com.simprints.id.data.db.remote.people
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -31,7 +31,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                         else -> throw it
                     }
                 }
-                .map(fb_Person::toDomainPerson)
+                .map(ApiPerson::toDomainPerson)
         }
 
     override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
@@ -50,7 +50,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
         }
 
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
-        remoteDbManager.getCurrentFirestoreToken()
+        remoteDbManager.getCurrentToken()
             .flatMap {
                 Single.just(buildPeopleApi(it))
             }

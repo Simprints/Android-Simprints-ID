@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.remote.network
 
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.core.network.NetworkConstants
 import io.reactivex.Single
@@ -26,12 +26,12 @@ interface PeopleRemoteInterface {
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, List<fb_Person>>): Single<Result<Void?>>
+                     @Body patientsJson: HashMap<String, List<ApiPerson>>): Single<Result<Void?>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String): Single<Response<fb_Person>>
+        @Path("projectId") projectId: String): Single<Response<ApiPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(

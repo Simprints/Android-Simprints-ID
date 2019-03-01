@@ -128,5 +128,5 @@ data class Identification(
     override val guid: String,
     override val confidence: Int,
     override val tier: IClientApiResponseTier
-) : IClientApiIdentifyResponse.Identification
+) : IClientApiIdentifyResponse.IIdentificationResult
 
