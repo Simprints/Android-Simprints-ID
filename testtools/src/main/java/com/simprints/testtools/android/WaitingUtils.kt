@@ -43,3 +43,9 @@ private fun changeUiTimeoutPolicyIfNeeded(timeout: Long) {
     if (currentTimeoutMillis <= timeout)
         setMasterPolicyTimeout(timeout * 2, TimeUnit.MILLISECONDS)
 }
+
+object WaitingUtils{
+    const val UI_TIMEOUT = 20000L
+    const val UI_POLLING_INTERVAL_SHORT = 50L
+    const val UI_POLLING_INTERVAL_LONG = 200L
+}
