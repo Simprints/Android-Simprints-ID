@@ -1,11 +1,22 @@
 package com.simprints.id.domain.responses
 
 import com.simprints.id.domain.matching.Tier
+import com.simprints.id.domain.matching.toClientApiIClientApiResponseTier
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiVerifyResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class VerifyResponse(val guid: String, val confidence: Int, val tier: Tier): Response {
+data class VerifyResponse(val guid: String,
+                          val confidence: Int,
+                          val tier: Tier): Response
 
-    //StopShip: it should be an ext, but it's used by MatchAct in Java!
-    fun toDomainClientApiVerify() = ClientApiVerifyResponse(guid, confidence, ClientApiTier.valueOf(tier.name))
-}
+fun VerifyResponse.toClientApiVerifyResponse(): IClientApiVerifyResponse =
+    ClientApiVerifyResponse(guid, confidence, tier.toClientApiIClientApiResponseTier())
+
+@Parcelize
+private class ClientApiVerifyResponse(override val guid: String,
+                                      override val confidence: Int,
+                                      override val tier: IClientApiResponseTier): IClientApiVerifyResponse
+
+

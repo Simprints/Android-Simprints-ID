@@ -5,13 +5,12 @@ import android.os.Parcelable
 
 interface IClientApiIdentifyResponse : IClientApiResponse {
 
-    val identifications: List<Identification>
+    val identifications: List<IIdentificationResult>
     val sessionId: String
 
-    interface Identification : Parcelable {
+    interface IIdentificationResult : Parcelable {
         val guid: String
         val confidence: Int
         val tier: IClientApiResponseTier
     }
-
 }

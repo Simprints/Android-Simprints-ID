@@ -25,8 +25,6 @@ interface DbManager {
     fun signIn(projectId: String, userId: String, tokens: Tokens): Completable
     fun signOut()
 
-    fun isDbInitialised(): Boolean
-
     // Data transfer
     fun savePerson(person: Person): Completable
 

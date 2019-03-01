@@ -1,15 +1,17 @@
 package com.simprints.id.domain.responses
 
-import com.simprints.id.domain.refusal_form.IdRefusalForm
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiRefusalFormResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class RefusalFormResponse(val reason: String, val extra: String): Response {
+data class RefusalFormResponse(val reason: String, val extra: String): Response
 
-    constructor(refusalForm: IdRefusalForm): this(
-        reason = refusalForm.reason ?: "",
-        extra = refusalForm.extra ?: ""
-    )
-}
+fun RefusalFormResponse.toClientApiIRefusalFormResponse(): IClientApiRefusalFormResponse =
+    ClientApiRefusalFormResponse(reason, extra)
 
-fun RefusalFormResponse.toDomainClientApiRefusalResponse() = ClientApiRefusalFormResponse(reason, extra)
+@Parcelize
+private class ClientApiRefusalFormResponse(
+    override val reason: String,
+    override val extra: String): IClientApiRefusalFormResponse
+
+
