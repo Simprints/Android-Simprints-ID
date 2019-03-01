@@ -5,7 +5,7 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.tools.utils.EncodingUtils
 
-data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
+data class ApiFingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
                           val template: String,
                           val quality: Int) {
 
@@ -15,14 +15,14 @@ data class fb_Fingerprint(@SkipSerialisationField var fingerId: FingerIdentifier
         quality = fingerprint.qualityScore)
 }
 
-fun Fingerprint.toFirebaseFingerprint(): fb_Fingerprint =
-    fb_Fingerprint(
+fun Fingerprint.toFirebaseFingerprint(): ApiFingerprint =
+    ApiFingerprint(
         fingerId = fingerId,
         template = EncodingUtils.byteArrayToBase64(templateBytes), // TODO: get rid of double bang
         quality = qualityScore
     )
 
-fun fb_Fingerprint.toDomainFingerprint(): Fingerprint =
+fun ApiFingerprint.toDomainFingerprint(): Fingerprint =
     Fingerprint(
         fingerId = fingerId,
         isoTemplateBytes = EncodingUtils.base64ToBytes(template)

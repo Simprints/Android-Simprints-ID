@@ -19,7 +19,7 @@ import org.robolectric.annotation.Config
 class fb_Id_FingerprintTest {
     @Test
     fun serialiseFbFingerprint_skipUnwantedFields() {
-        val fingerprint = fb_Fingerprint(IdFingerprint.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB))
+        val fingerprint = ApiFingerprint(IdFingerprint.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB))
         val jsonString = JsonHelper.toJson(fingerprint)
         val json = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
