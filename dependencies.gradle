@@ -53,7 +53,6 @@ def playservices = [
 
 def firebase = [
     database : "com.google.firebase:firebase-database:16.0.6",
-    firestore: "com.google.firebase:firebase-firestore:17.1.5",
     core     : "com.google.firebase:firebase-core:16.0.7",
     auth     : "com.google.firebase:firebase-auth:16.1.0",
     config   : "com.google.firebase:firebase-config:16.3.0",
