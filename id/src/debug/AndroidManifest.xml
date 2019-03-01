@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.simprints.id">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <application
+        android:name=".Application"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <activity
+            android:name=".activities.launch.LaunchActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="standard"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:label="@string/title_activity_front"
+            android:launchMode="standard"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="com.simprints.clientapp.REGISTER" />
+                <action android:name="com.simprints.clientapp.IDENTIFY" />
+                <action android:name="com.simprints.clientapp.VERIFY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.legacy.REGISTER" />
+                <action android:name="com.simprints.legacy.IDENTIFY" />
+                <action android:name="com.simprints.legacy.VERIFY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.alert.AlertActivity"
+            android:label="@string/alert_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.collectFingerprints.CollectFingerprintsActivity"
+            android:label="Main"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.login.LoginActivity"
+            android:label="@string/login_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.requestLogin.RequestLoginActivity"
+            android:label="@string/requestLogin_title"
+            android:launchMode="singleTop"
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.debug.DebugActivity"
+            android:label="@string/about_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
+        <activity
+            android:name=".activities.settings.SettingsAboutActivity"
+            android:label="@string/title_activity_settings_about"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
+
+        <activity
+            android:name=".activities.refusal.RefusalActivity"
+            android:label="@string/refusal_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.dashboard.DashboardActivity"
+            android:label="@string/dashboard_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.longConsent.LongConsentActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.collectFingerprints.SplashScreenActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+
+        <service
+            android:name=".services.GuidSelectionService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".activities.collectFingerprints.CollectFingerprintsActivity" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="${firebase_analytics_collection_enabled}" />
+        <meta-data
+            android:name="firebase_performance_logcat_enabled"
+            android:value="${firebase_performance_logcat_enabled}" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+    </application>
+
+</manifest>

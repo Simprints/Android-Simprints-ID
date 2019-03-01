@@ -10,7 +10,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.requests.AppConfirmIdentifyRequest
+import com.simprints.id.domain.requests.IdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseClientApiRequest
@@ -36,11 +36,11 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent.parseClientApiRequest() as AppConfirmIdentifyRequest)
+            onHandleNonNullIntent(intent.parseClientApiRequest() as IdentityConfirmationRequest)
         }
     }
 
-    private fun onHandleNonNullIntent(intent: AppConfirmIdentifyRequest) {
+    private fun onHandleNonNullIntent(intent: IdentityConfirmationRequest) {
         val projectId = intent.projectId
         val sessionId = intent.sessionId
         val selectedGuid = intent.selectedGuid

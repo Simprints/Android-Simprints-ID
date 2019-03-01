@@ -12,7 +12,7 @@ import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivi
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.requests.AppRequest
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
@@ -28,15 +28,15 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
-    private lateinit var appRequest: AppRequest
+    private lateinit var appRequest: Request
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        appRequest = this.intent.extras?.getParcelable(AppRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
@@ -141,7 +141,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun continueToNextActivity() {
         startActivityForResult(
-            Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java).also { it.putExtra(AppRequest.BUNDLE_KEY, appRequest) },
+            Intent(this@LaunchActivity, CollectFingerprintsActivity::class.java).also { it.putExtra(Request.BUNDLE_KEY, appRequest) },
             COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
     }
 

@@ -4,14 +4,14 @@ import com.simprints.clientapi.clientrequests.builders.IdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
+import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
 import com.simprints.clientapi.simprintsrequests.requests.ClientApiIdentifyRequest
 import org.mockito.Mockito
 
 
 object IdentifyRequestFactory : RequestFactory() {
 
-    override fun getValidSimprintsRequest(): ClientApiBaseRequest = ClientApiIdentifyRequest(
+    override fun getValidSimprintsRequest(): ClientApiAppRequest = ClientApiIdentifyRequest(
         projectId = MOCK_PROJECT_ID,
         moduleId = MOCK_MODULE_ID,
         userId = MOCK_USER_ID,
