@@ -2,13 +2,10 @@ package com.simprints.id.data.db.remote
 
 import android.content.Context
 import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.Application
-import com.simprints.id.exceptions.unexpected.DbAlreadyInitialisedException
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.secure.cryptography.Hasher
-import com.simprints.id.secure.models.Tokens
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -17,52 +14,27 @@ import timber.log.Timber
 import com.simprints.id.domain.fingerprint.Person as LibPerson
 
 open class FirebaseManagerImpl(
-    private val appContext: Context,
-    private val firebaseOptionsHelper: FirebaseOptionsHelper = FirebaseOptionsHelper(appContext)
+    private val appContext: Context
 ) : RemoteDbManager {
 
-    private var isInitialised = false
-
     // FirebaseApp
-    private lateinit var legacyFirebaseApp: FirebaseApp
-    private lateinit var firestoreFirebaseApp: FirebaseApp
-
-    // Lifecycle
-    override fun initialiseRemoteDb() {
-        if (isInitialised) throw DbAlreadyInitialisedException()
-        initialiseLegacyFirebaseProject()
-        initialiseFirestoreFirebaseProject()
-        isInitialised = true
+    private val legacyFirebaseApp: FirebaseApp by lazy {
+        initialiseFirebaseApp()
     }
 
-    private fun initialiseLegacyFirebaseProject() {
-        val legacyFirebaseAppName = getLegacyAppName()
-        val legacyFirebaseOptions = firebaseOptionsHelper.getLegacyFirebaseOptions()
-        legacyFirebaseApp = initialiseFirebaseApp(legacyFirebaseAppName, legacyFirebaseOptions)
-    }
-
-    private fun initialiseFirestoreFirebaseProject() {
-        val firestoreFirebaseAppName = getFirestoreAppName()
-        val firestoreFirebaseOptions = firebaseOptionsHelper.getFirestoreFirebaseOptions()
-        firestoreFirebaseApp = initialiseFirebaseApp(firestoreFirebaseAppName, firestoreFirebaseOptions)
-    }
-
-    private fun initialiseFirebaseApp(appName: String, firebaseOptions: FirebaseOptions): FirebaseApp =
+    private fun initialiseFirebaseApp(): FirebaseApp =
         try {
-            Timber.d("Trying to initialise Firebase app: $appName")
-            FirebaseApp.initializeApp(appContext, firebaseOptions, appName)
+            Timber.d("Trying to initialise Firebase app")
+            FirebaseApp.initializeApp(appContext)
         } catch (stateException: IllegalStateException) {
-            Timber.d("Firebase app: $appName already initialized")
-            FirebaseApp.getInstance(appName)
-        }
+            Timber.d("Firebase app: already initialized")
+            FirebaseApp.getInstance()
+        } ?: throw Throwable("test") //StopShp
 
     private fun getFirebaseAuth(firebaseApp: FirebaseApp): FirebaseAuth =
         FirebaseAuth.getInstance(firebaseApp)
 
-    override fun signInToRemoteDb(tokens: Tokens): Completable =
-        Completable.mergeArray(
-            signInToDb(legacyFirebaseApp, tokens.legacyToken),
-            signInToDb(firestoreFirebaseApp, tokens.firestoreToken))
+    override fun signInToRemoteDb(token: String): Completable = signInToDb(legacyFirebaseApp, token)
 
     private fun signInToDb(firebaseApp: FirebaseApp, token: String): Completable =
         Completable.create {
@@ -79,23 +51,9 @@ open class FirebaseManagerImpl(
 
     override fun signOutOfRemoteDb() {
         getFirebaseAuth(legacyFirebaseApp).signOut()
-        getFirebaseAuth(firestoreFirebaseApp).signOut()
     }
 
-    override fun isRemoteDbInitialized(): Boolean = isInitialised
-
-    override fun isSignedIn(projectId: String, userId: String): Boolean =
-        isFirestoreSignedInUserAsExpected(projectId, userId) &&
-            isLegacySignedInUserAsExpected(projectId)
-
-    private fun isFirestoreSignedInUserAsExpected(projectId: String, userId: String): Boolean {
-        val firestoreUser = getFirebaseAuth(firestoreFirebaseApp).currentUser ?: return false
-
-        //return firestoreUser.uid == "$projectId.$userId"
-        /** Hack to support multiple users:
-        Loosey condition to make the check not user specific */
-        return firestoreUser.uid.contains(projectId)
-    }
+    override fun isSignedIn(projectId: String, userId: String): Boolean = isLegacySignedInUserAsExpected(projectId)
 
     private fun isLegacySignedInUserAsExpected(projectId: String): Boolean {
         val firebaseUser = getFirebaseAuth(legacyFirebaseApp).currentUser ?: return false
@@ -114,7 +72,7 @@ open class FirebaseManagerImpl(
         }
     }
 
-    override fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
+    private fun getFirebaseLegacyApp(): FirebaseApp = legacyFirebaseApp
 
     override fun getCurrentFirestoreToken(): Single<String> = Single.create {
         getFirebaseLegacyApp().getToken(false).trace("getCurrentFirestoreToken")
