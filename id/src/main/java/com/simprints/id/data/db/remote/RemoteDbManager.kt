@@ -13,5 +13,5 @@ interface RemoteDbManager {
     /** @throws DifferentProjectIdSignedInException */
     fun isSignedIn(projectId: String, userId: String): Boolean
 
-    fun getCurrentFirestoreToken(): Single<String>
+    fun getCurrentToken(): Single<String>
 }
