@@ -1,16 +1,14 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.DOWNSYNC_MASTER_WORKER_TAG_PERIODIC
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SUBDOWNSYNC_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.ConstantsWorkManager.Companion.SYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.DOWNSYNC_MASTER_WORKER_TAG_PERIODIC
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SUBDOWNSYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_INTERVAL
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_UNIT
@@ -61,7 +59,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
     }
 
     override fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest =
-        PeriodicWorkRequestBuilder<DownSyncMasterWorker>(SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+        PeriodicWorkRequest.Builder(DownSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)
@@ -71,7 +69,7 @@ class DownSyncManagerImpl(private val syncScopesBuilder: SyncScopesBuilder) : Do
 
 
     override fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope) =
-        OneTimeWorkRequestBuilder<DownSyncMasterWorker>()
+        OneTimeWorkRequest.Builder(DownSyncMasterWorker::class.java)
             .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(DOWNSYNC_MASTER_WORKER_TAG_ONE_TIME)

@@ -1,10 +1,9 @@
-package com.simprints.id.activities.about
+package com.simprints.id.activities.debug
 
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.coroutines.GlobalScope
@@ -15,7 +14,6 @@ class DebugViewModel(component: AppComponent) : DebugContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
 
     override val stateLiveData: MutableLiveData<DebugActivity.State> = MutableLiveData()
 

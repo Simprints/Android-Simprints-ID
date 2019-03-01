@@ -9,9 +9,7 @@ import com.simprints.id.shared.sessionEvents.createFakeClosedSession
 import com.simprints.id.shared.sessionEvents.createFakeSession
 import com.simprints.id.tools.TimeHelper
 import io.realm.Realm
-import junit.framework.Assert
-import junit.framework.Assert.assertNotSame
-import org.junit.Assert.*
+import junit.framework.TestCase.*
 import java.util.*
 
 fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
@@ -34,6 +32,16 @@ fun verifyEventsForFailedSignedIdFollowedBySucceedSignIn(events: List<Event>) {
             assertTrue(it.userInfo.projectId.isNotEmpty())
         }
     }
+}
+
+fun verifyEventsWhenSimprintsIsLaunched(events: List<Event>) {
+    val expectedEvents = arrayListOf(
+        AuthorizationEvent::class.java,
+        ConnectivitySnapshotEvent::class.java,
+        CalloutEvent::class.java
+    ).map { it.canonicalName }
+
+    Truth.assertThat(events.map { it.javaClass.canonicalName }).containsExactlyElementsIn(expectedEvents)
 }
 
 fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
@@ -127,42 +135,36 @@ fun createAndSaveOpenFakeSession(timeHelper: TimeHelper,
                                  id: String = UUID.randomUUID().toString() + "open") =
     createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
 
-fun createAndSaveExpiredOpenFakeSession(timeHelper: TimeHelper,
-                                        realmSessionEventsManager: SessionEventsLocalDbManager,
-                                        projectId: String,
-                                        id: String = UUID.randomUUID().toString() + "open_expired_session") =
-    createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(SessionEvents.GRACE_PERIOD + 1000)).also { saveSessionInDb(it, realmSessionEventsManager) }.id
-
 fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEventsLocalDbManager) {
     realmSessionEventsManager.insertOrUpdateSessionEvents(session).blockingAwait()
 }
 
 fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlSession::class.java).findAll().size)
+        assertEquals(count, where(RlSession::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
+        assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlEvent::class.java).findAll().size)
+        assertEquals(count, where(RlEvent::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlDevice::class.java).findAll().size)
+        assertEquals(count, where(RlDevice::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        Assert.assertEquals(count, where(RlLocation::class.java).findAll().size)
+        assertEquals(count, where(RlLocation::class.java).findAll().size)
     }
 }

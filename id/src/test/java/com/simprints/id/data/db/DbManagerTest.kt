@@ -13,6 +13,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.di.AppModuleForTests
 import com.simprints.id.di.DaggerForTests
 import com.simprints.id.network.SimApiClient
@@ -53,6 +54,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
     @Inject lateinit var localDbManagerSpy: LocalDbManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
     @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
@@ -62,8 +64,9 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
             app,
             localDbManagerRule = ReplaceRule { spy(LocalDbManager::class.java) },
             remoteDbManagerRule = SpyRule,
-            sessionEventsLocalDbManagerRule = MockRule,
-            peopleUpSyncMasterRule = MockRule
+            remotePeopleManagerRule = SpyRule,
+            peopleUpSyncMasterRule = MockRule,
+            sessionEventsLocalDbManagerRule = MockRule
         )
     }
 
@@ -135,7 +138,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         dbManager.loadPerson(result, person.projectId, person.patientId, callback = callback)
 
         Assert.assertFalse(futureResultIsNotEmpty.get())
-        verify(remoteDbManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
+        verify(remotePeopleManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
     }
 
     @Test
@@ -167,7 +170,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         })
 
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val testObservable = dbManager.savePerson(fakePerson).test()
 
@@ -207,7 +210,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
         Assert.assertFalse(futurePersonExists.get())
         Assert.assertTrue(futureDataErrorExistsAndIsPersonNotFound.get())
-        verify(remoteDbManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
+        verify(remotePeopleManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
     }
 
     @Test
@@ -215,7 +218,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
         val poorNetworkClientMock: PeopleRemoteInterface = SimApiMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remoteDbManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
 
         val result = mutableListOf<Person>()
 
@@ -236,7 +239,7 @@ class DbManagerTest : RxJavaTest, DaggerForTests() {
 
         Assert.assertFalse(futurePersonExists.get())
         Assert.assertTrue(futureDataErrorExistsAndIsPersonNotFound.get())
-        verify(remoteDbManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
+        verify(remotePeopleManagerSpy, times(1)).downloadPerson(person.patientId, person.projectId)
     }
 
     @After

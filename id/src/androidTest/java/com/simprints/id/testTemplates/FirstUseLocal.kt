@@ -63,7 +63,7 @@ import io.realm.RealmConfiguration
 interface FirstUseLocal {
 
     companion object {
-        val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DEFAULT_REALM_KEY)
+        private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DEFAULT_REALM_KEY)
         val defaultSessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
         val defaultPeopleRealmConfiguration = PeopleRealmConfig.get(DEFAULT_LOCAL_DB_KEY.projectId, DEFAULT_LOCAL_DB_KEY.value, DEFAULT_LOCAL_DB_KEY.projectId)
     }

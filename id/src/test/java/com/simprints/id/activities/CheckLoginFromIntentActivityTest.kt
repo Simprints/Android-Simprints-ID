@@ -26,6 +26,7 @@ import com.simprints.id.shared.anyNotNull
 import com.simprints.id.testUtils.assertActivityStarted
 import com.simprints.id.testUtils.base.RxJavaTest
 import com.simprints.id.testUtils.roboletric.*
+import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
 import com.simprints.id.tools.delegates.lazyVar
 import org.junit.Assert
 import org.junit.Assert.*
@@ -78,6 +79,7 @@ class CheckLoginFromIntentActivityTest : RxJavaTest, DaggerForTests() {
     override fun setUp() {
         app = (ApplicationProvider.getApplicationContext() as TestApplication)
         FirebaseApp.initializeApp(app)
+        initWorkManagerIfRequired(app)
         super.setUp()
         testAppComponent.inject(this)
         setupLocalAndRemoteManagersForApiTesting(

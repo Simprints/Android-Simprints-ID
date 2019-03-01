@@ -36,7 +36,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
     override fun bind(viewModel: ViewModel) {
         val cardViewModel = viewModel as? DashboardSyncCardViewModel
         cardViewModel?.let {
-            it.stateLiveData.observe(this, Observer<DashboardSyncCardViewModelState> { state ->
+            it.viewModelStateLiveData.observe(this, Observer<DashboardSyncCardViewModelState> { state ->
                 rootView.context.runOnUiThread {
                     with(state) {
                         setTotalPeopleInDbCounter(peopleInDb)

@@ -6,7 +6,11 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,6 +19,8 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
 
     override fun doWork(): Result {
         Timber.d("SessionEventsMasterWorker doWork()")
@@ -23,14 +29,20 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         return try {
             val task = SessionEventsSyncMasterTask(
                 loginInfoManager.getSignedInProjectIdOrEmpty(),
-                sessionEventsManager
+                sessionEventsManager,
+                timeHelper,
+                remoteSessionsManager.getSessionsApiClient().blockingGet(),
+                analyticsManager
             )
             task.execute().blockingAwait()
-            Result.SUCCESS
+            Result.success()
+        } catch (e: NoSessionsFoundException) {
+            Timber.d("No sessions found")
+            Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             analyticsManager.logThrowable(throwable)
-            Result.FAILURE
+            Result.failure()
         }
     }
 
@@ -38,6 +50,8 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
+        } else {
+            throw WorkerInjectionFailedError.forWorker<SessionEventsMasterWorker>()
         }
     }
 }

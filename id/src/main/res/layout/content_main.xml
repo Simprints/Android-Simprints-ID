@@ -9,12 +9,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/simprints_main_bg"
+        android:background="@color/simprints_off_white"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity"
-        tools:showIn="@layout/activity_main">
+        tools:showIn="@layout/activity_collect_fingerprints">
 
         <View
             android:layout_width="match_parent"

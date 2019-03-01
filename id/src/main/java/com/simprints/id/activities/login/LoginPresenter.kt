@@ -26,7 +26,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class LoginPresenter(val view: LoginContract.View,
-                     private val component: AppComponent,
+                     component: AppComponent,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -93,7 +93,7 @@ class LoginPresenter(val view: LoginContract.View,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
 
-        sessionEventsManager.updateSessionInBackground({
+        sessionEventsManager.updateSessionInBackground {
             if (result == AUTHENTICATED) {
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
@@ -103,7 +103,7 @@ class LoginPresenter(val view: LoginContract.View,
                 it.timeRelativeToStartTime(timeHelper.now()),
                 UserInfo(suppliedProjectId, suppliedUserId),
                 result))
-        })
+        }
     }
 
     private fun handleSignInError(e: Throwable,

@@ -21,7 +21,7 @@ class ConfirmFingerprintsDialog(private val context: Context,
         StringBuilder().also {
             scannedFingers.forEach { (fingerName, scanThresholdPassed) ->
                 it.append(if (scanThresholdPassed) "✓ " else "× ")
-                it.append(fingerName + "\n")
+                it.append(fingerName.toUpperCase() + "\n")
             }
         }.toString()
 }

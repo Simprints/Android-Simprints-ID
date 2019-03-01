@@ -18,8 +18,15 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
+import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -36,7 +43,6 @@ import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -52,10 +58,7 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.utils.AndroidResourcesHelper
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
-import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.id.tools.utils.SimNetworkUtilsImpl
+import com.simprints.id.tools.utils.*
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
@@ -101,10 +104,12 @@ open class AppModule(val app: Application) {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
+                              remotePeopleManager: RemotePeopleManager,
+                              remoteProjectManager: RemoteProjectManager,
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, timeHelper, peopleUpSyncMaster, database)
+        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton
@@ -190,6 +195,7 @@ open class AppModule(val app: Application) {
                                          analyticsManager: AnalyticsManager): SessionEventsManager =
         SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, analyticsManager)
 
+
     @Provides
     @Singleton
     open fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
@@ -227,7 +233,24 @@ open class AppModule(val app: Application) {
 
     @Provides
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                 remoteDbManager: RemoteDbManager,
+                                 remotePeopleManager: RemotePeopleManager,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remoteDbManager, timeHelper, syncStatusDatabase.downSyncDao)
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase.downSyncDao)
+
+    @Provides
+    @Singleton
+    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager = RemoteProjectManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
+
+    @Provides
+    @Singleton
+    open fun provideLocationProvider(ctx: Context): LocationProvider = LocationProviderImpl(ctx)
 }
+

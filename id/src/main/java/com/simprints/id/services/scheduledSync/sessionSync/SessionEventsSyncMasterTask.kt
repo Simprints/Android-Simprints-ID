@@ -1,8 +1,11 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
-import androidx.work.*
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventData.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
+import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -10,52 +13,36 @@ import io.reactivex.Single
 class SessionEventsSyncMasterTask(
     private val projectId: String,
     private val sessionEventsManager: SessionEventsManager,
-    private val getWorkManager: () -> WorkManager = WorkManager::getInstance) {
+    private val timeHelper: TimeHelper,
+    private val sessionApi: SessionsRemoteInterface,
+    private val analyticsManager: AnalyticsManager) {
 
     companion object {
         var BATCH_SIZE = 20
-        const val SESSIONS_TO_UPLOAD_TAG = "SESSIONS_TO_UPLOAD_TAG"
-        const val SESSIONS_IDS_KEY = "SESSIONS_IDS_KEY"
-        const val PROJECT_ID_KEY: String = "PROJECT_ID_KEY"
     }
 
     fun execute(): Completable =
-        sessionEventsManager.loadSessions(projectId)
-            .cancelPreviousUploadTasks()
+        loadSessionsToUpload()
             .createBatches()
-            .registerOneTimeUploader()
+            .executeUploaderTask()
 
-    private fun Single<ArrayList<SessionEvents>>.cancelPreviousUploadTasks(): Single<List<SessionEvents>> =
-        this.map {
-            getWorkManager().cancelAllWorkByTag(SESSIONS_TO_UPLOAD_TAG)
-            it
-        }
+    private fun loadSessionsToUpload() =
+        sessionEventsManager.loadSessions(projectId).map { it.toList() }
 
-    private fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
+    internal fun Single<List<SessionEvents>>.createBatches(): Observable<List<SessionEvents>> =
         this.flattenAsObservable { it }
             .buffer(BATCH_SIZE)
 
-    private fun Observable<List<SessionEvents>>.registerOneTimeUploader(): Completable =
-        this.flatMapCompletable { sessions ->
-            Completable.fromAction {
-                getWorkManager().enqueue(buildWorkRequest(sessions.map { it.id }.toTypedArray()))
-            }
+
+    internal fun Observable<List<SessionEvents>>.executeUploaderTask(): Completable =
+        this.concatMapCompletable {
+            createUploadBatchTaskCompletable(it).doOnError { t ->
+                if (t !is NoSessionsFoundException) {
+                    analyticsManager.logThrowable(t)
+                }
+            }.onErrorComplete()
         }
 
-    private fun buildWorkRequest(sessionsIds: Array<String>): OneTimeWorkRequest =
-        OneTimeWorkRequestBuilder<SessionEventsUploaderWorker>()
-            .setConstraints(buildConstraints())
-            .setInputData(buildWorkData(sessionsIds))
-            .addTag(SESSIONS_TO_UPLOAD_TAG)
-            .build()
-
-    private fun buildConstraints() =
-        Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-    private fun buildWorkData(sessionsIds: Array<String>) =
-        workDataOf(
-            SESSIONS_IDS_KEY to sessionsIds,
-            PROJECT_ID_KEY to projectId)
+    internal fun createUploadBatchTaskCompletable(sessions: List<SessionEvents>): Completable =
+        SessionEventsUploaderTask(sessionEventsManager, timeHelper, sessionApi).execute(projectId, sessions)
 }

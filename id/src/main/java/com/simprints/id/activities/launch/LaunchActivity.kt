@@ -2,11 +2,11 @@ package com.simprints.id.activities.launch
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -20,7 +20,6 @@ import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
@@ -61,6 +60,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun initTextsInButtons() {
         consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
         consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
+    }
+
+    override fun setLogoVisibility(visible: Boolean) {
+        simprintsLogoWithTagLine.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
@@ -129,8 +132,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         viewPresenter.handleOnDestroy()
         super.onDestroy()
     }
-
-    override fun getLocationProvider(): ReactiveLocationProvider = ReactiveLocationProvider(this)
 
     override fun continueToNextActivity() {
         startActivityForResult(

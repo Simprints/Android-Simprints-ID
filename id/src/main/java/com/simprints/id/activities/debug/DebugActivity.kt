@@ -1,4 +1,4 @@
-package com.simprints.id.activities.about
+package com.simprints.id.activities.debug
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -7,14 +7,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.activities.debug.LocalDbRecycleViewAdapter
-import com.simprints.id.activities.debug.LocalDbViewModel
-import com.simprints.id.activities.debug.RoomDownStatusRecycleViewAdapter
-import com.simprints.id.activities.debug.RoomDownStatusViewModel
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.SyncStatusDatabase
+import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers

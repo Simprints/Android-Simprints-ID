@@ -37,7 +37,7 @@ open class SyncScopesBuilderImpl(val loginInfoManager: LoginInfoManager,
         return SyncScope(projectId, possibleUserId, possibleModuleIds)
     }
 
-    inline fun <reified T> fromJson(json: String): T? = try {
+    private inline fun <reified T> fromJson(json: String): T? = try {
         gson.fromJson(json, T::class.java)
     } catch (t: Throwable) {
         t.printStackTrace()
