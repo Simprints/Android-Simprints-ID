@@ -84,7 +84,7 @@ class MatchingPresenter(
     }
 
     private fun handleStartVerify(verifyRequest: VerifyRequest) {
-        matchTask = dbManager.loadPerson(verifyRequest.verifyGuid).map { listOf(it.person) }
+        matchTask = dbManager.loadPerson(appRequest.projectId, verifyRequest.verifyGuid).map { listOf(it.person) }
             .doOnSuccess { handleLoadPersonSuccess(it) }
             .runMatch(getMatcherType(verifyRequest))
             .setMatchingSchedulers()
@@ -93,13 +93,6 @@ class MatchingPresenter(
             }
     }
 
-        when (group) {
-            GLOBAL -> localDbManager.loadPeopleFromLocal()
-            USER -> localDbManager.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            MODULE -> localDbManager.loadPeopleFromLocal(moduleId = preferencesManager.moduleId)
-        }
-
-    private fun getPeopleFromGroup(group: GROUP): Single<List<Person>> =
     private fun handleLoadPeopleSuccess(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
