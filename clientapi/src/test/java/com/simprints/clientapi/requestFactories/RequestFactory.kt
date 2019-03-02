@@ -3,7 +3,7 @@ package com.simprints.clientapi.requestFactories
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
+import com.simprints.clientapi.domain.ClientBase
 import org.mockito.Mockito
 
 abstract class RequestFactory {
@@ -18,14 +18,13 @@ abstract class RequestFactory {
         const val MOCK_SELECTED_GUID = "5390ef82-9c1f-40a9-b833-2e97ab369208"
     }
 
-
     abstract fun getValidator(extractor: ClientRequestExtractor): ClientRequestValidator
 
     abstract fun getBuilder(extractor: ClientRequestExtractor): ClientRequestBuilder
 
     abstract fun getMockExtractor(): ClientRequestExtractor
 
-    abstract fun getValidSimprintsRequest(): ClientApiBaseRequest
+    abstract fun getValidSimprintsRequest(): ClientBase
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor) {
         Mockito.`when`(mockExtractor.getProjectId()).thenReturn(MOCK_PROJECT_ID)
