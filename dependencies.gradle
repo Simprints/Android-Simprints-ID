@@ -95,9 +95,10 @@ def rxjava2 = [
 ]
 
 def simprints = [
-    libscanner : "com.simprints:libscanner:2018.4.0",
-    libmatcher : "com.simprints:libmatcher:1.3.2",
-    mockscanner: "com.simprints:mockscanner:2018.3.0"
+    libscanner  : "com.simprints:libscanner:2018.4.0",
+    libmatcher  : "com.simprints:libmatcher:1.3.2",
+    mockscanner : "com.simprints:mockscanner:2018.3.0",
+    libsimprints: "com.simprints:libsimprints:2018.2.0"
 ]
 
 def mockito_version = "2.22.0"
