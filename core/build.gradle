@@ -27,6 +27,16 @@ android {
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+
+    libraryVariants.all { variant ->
+        if (variant.buildType.name == "release" ||
+            variant.buildType.name == "releaseWithLogfile") {
+            buildConfigField("String", "END_POINT", "\"prod\"")
+        } else if (variant.buildType.name == "debug") {
+            buildConfigField("String", "END_POINT", "\"dev\"")
+        }
     }
 }
 
@@ -48,6 +58,7 @@ dependencies {
     implementation deps.retrofit.okhttp
 
 }
+
 repositories {
     mavenCentral()
 }

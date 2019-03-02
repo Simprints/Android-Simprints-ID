@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprints.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
-import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -24,6 +23,8 @@ import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
+import com.simprints.fingerprints.R
+import com.simprints.id.R as appR //STOPSHIP: remove me
 
 class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
@@ -76,35 +77,35 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     }
 
     override fun setIdentificationProgressLoadingStart() {
-        tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+        tv_matchingProgressStatus1.setText(appR.string.loading_candidates)
         setIdentificationProgress(25)
     }
 
     override fun setIdentificationProgressMatchingStart(matchSize: Int) {
-        tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, matchSize, matchSize)
-        tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
+        tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, appR.string.loaded_candidates_quantity_key, matchSize, matchSize)
+        tv_matchingProgressStatus2.setText(appR.string.matching_fingerprints)
         setIdentificationProgress(50)
     }
 
     override fun setIdentificationProgressReturningStart() {
-        tv_matchingProgressStatus2.setText(R.string.returning_results)
+        tv_matchingProgressStatus2.setText(appR.string.returning_results)
         setIdentificationProgress(90)
     }
 
     override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) {
-        tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, returnSize, returnSize)
+        tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, appR.string.returned_results_quantity_key, returnSize, returnSize)
 
         if (tier1Or2Matches > 0) {
             tv_matchingResultStatus1.visibility = View.VISIBLE
-            tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
+            tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, appR.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
         }
         if (tier3Matches > 0) {
             tv_matchingResultStatus2.visibility = View.VISIBLE
-            tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
+            tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, appR.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
         }
         if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
             tv_matchingResultStatus3.visibility = View.VISIBLE
-            tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
+            tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, appR.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
         }
         setIdentificationProgress(100)
 

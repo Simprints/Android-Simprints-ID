@@ -28,7 +28,7 @@ interface DbManager {
     // Data transfer
     fun savePerson(person: Person): Completable
 
-    fun loadPerson(guid: String): Single<PersonFetchResult>
+    fun loadPerson(projectId:String, guid: String): Single<PersonFetchResult>
 
     fun loadPeople(group: GROUP): Single<List<Person>>
 
