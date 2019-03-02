@@ -4,13 +4,13 @@ import com.simprints.clientapi.clientrequests.builders.EnrollBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiEnrollRequest
+import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.EnrollRequest
 import org.mockito.Mockito
 
 object EnrollRequestFactory : RequestFactory() {
 
-    override fun getValidSimprintsRequest(): ClientApiAppRequest = ClientApiEnrollRequest(
+    override fun getValidSimprintsRequest(): BaseRequest = EnrollRequest(
         projectId = MOCK_PROJECT_ID,
         moduleId = MOCK_MODULE_ID,
         userId = MOCK_USER_ID,

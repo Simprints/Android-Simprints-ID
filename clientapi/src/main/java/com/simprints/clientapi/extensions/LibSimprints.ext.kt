@@ -1,16 +1,16 @@
 package com.simprints.clientapi.extensions
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse.IIdentificationResult
+import com.simprints.clientapi.domain.responses.IdentifyResponse.Identification
 
 
-fun List<IIdentificationResult>.getIdsString(): String {
+fun List<Identification>.getIdsString(): String {
     return this.joinToString(separator = "", transform = { "${it.guid} " }).trimEnd()
 }
 
-fun List<IIdentificationResult>.getConfidencesString(): String {
+fun List<Identification>.getConfidencesString(): String {
     return this.joinToString(separator = "", transform = { "${it.confidence} " }).trimEnd()
 }
 
-fun List<IIdentificationResult>.getTiersString(): String {
+fun List<Identification>.getTiersString(): String {
     return this.joinToString(separator = "", transform = { "${it.tier} " }).trimEnd()
 }
