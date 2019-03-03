@@ -78,9 +78,13 @@ class MatchingPresenter(
             .doOnSuccess { handleLoadPeopleSuccess(it) }
             .runMatch(getMatcherType(identifyRequest), view::setIdentificationProgress)
             .setMatchingSchedulers()
-            .subscribeBy {
-                handleIdentificationResult(it.candidates, it.scores)
-            }
+            .subscribeBy (
+                onSuccess = {
+                    handleIdentificationResult(it.candidates, it.scores) },
+                onError = {
+                    it.printStackTrace()
+                }
+            )
     }
 
     private fun handleStartVerify(verifyRequest: VerifyRequest) {
@@ -88,9 +92,12 @@ class MatchingPresenter(
             .doOnSuccess { handleLoadPersonSuccess(it) }
             .runMatch(getMatcherType(verifyRequest))
             .setMatchingSchedulers()
-            .subscribeBy {
-                handleVerificationResult(it.candidates, it.scores)
-            }
+            .subscribeBy (
+                onSuccess = { handleVerificationResult(it.candidates, it.scores) },
+                onError = {
+                    it.printStackTrace()
+                }
+            )
     }
 
     private fun handleLoadPeopleSuccess(candidates: List<Person>) {
@@ -173,7 +180,7 @@ class MatchingPresenter(
 
 
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            IdentifyResponse(topCandidates, sessionId))
+            IdentifyResponse(topCandidates, "")) //STOPSHIP: sessions are broken.
         view.doSetResult(RESULT_OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
     }
