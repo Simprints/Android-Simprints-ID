@@ -12,11 +12,12 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.Response
+import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -101,8 +102,15 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
 
             data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
-                viewPresenter.handleActivityResult(requestCode, resultCode, it)
-                setResult(resultCode, data)
+               val response =  when(it) {
+                   is EnrolResponse -> it.toClientApiEnrolResponse()
+                   is VerifyResponse -> it.toClientApiVerifyResponse()
+                   is IdentifyResponse -> it.toClientApiIdentifyResponse()
+                   else -> null
+               } ?: throw Throwable("Invalid response") //StopShip
+
+                viewPresenter.handleActivityResult(requestCode, resultCode, response)
+                setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
                 finish()
             }
         }

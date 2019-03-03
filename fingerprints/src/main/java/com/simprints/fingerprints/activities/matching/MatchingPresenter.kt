@@ -173,7 +173,7 @@ class MatchingPresenter(
 
 
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            IdentificationResponse(topCandidates, sessionId).toClientApiIdentifyResponse())
+            IdentifyResponse(topCandidates, sessionId))
         view.doSetResult(RESULT_OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
     }
@@ -187,7 +187,7 @@ class MatchingPresenter(
 
         sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            VerifyResponse(candidate.patientId, score.toInt(), computeTier(score)).toClientApiVerifyResponse())
+            VerifyResponse(candidate.patientId, score.toInt(), computeTier(score)))
         view.doSetResult(RESULT_OK, resultData)
         view.doFinish()
     }
