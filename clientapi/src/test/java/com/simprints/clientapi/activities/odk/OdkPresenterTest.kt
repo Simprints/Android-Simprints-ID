@@ -67,7 +67,7 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun processRegistration_ShouldReturnValidOdkRegistration() {
+    fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
         OdkPresenter(view, ACTION_REGISTER).handleEnrollResponse(EnrollResponse(registerId))
@@ -75,7 +75,7 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun processIdentification_ShouldReturnValidOdkIdentification() {
+    fun handleIdentification_ShouldReturnValidOdkIdentification() {
         val id1 = Identification(UUID.randomUUID().toString(), 100, TIER_1)
         val id2 = Identification(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
@@ -91,7 +91,7 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun processVerification_ShouldReturnValidOdkVerification() {
+    fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(UUID.randomUUID().toString(), 100, TIER_1)
 
         OdkPresenter(view, ACTION_IDENTIFY).handleVerifyResponse(verification)
@@ -103,7 +103,7 @@ class OdkPresenterTest {
     }
 
     @Test
-    fun processReturnError_ShouldCallActionError() {
+    fun handleResponseError_ShouldCallActionError() {
         OdkPresenter(view, "").handleResponseError()
         Mockito.verify(view, times(1)).returnIntentActionErrorToClient()
     }
