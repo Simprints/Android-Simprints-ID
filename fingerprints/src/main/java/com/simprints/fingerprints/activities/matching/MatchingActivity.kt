@@ -9,29 +9,35 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.fingerprints.R
 import com.simprints.fingerprints.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
-import com.simprints.fingerprints.R
-import com.simprints.id.R as appR //STOPSHIP: remove me
+import com.simprints.id.R as appR
 
 class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override lateinit var viewPresenter: MatchingContract.Presenter
 
+    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +48,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         setContentView(R.layout.activity_matching)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        // Create the Presenter, and pass it all the information and handles it needs
         val extras = intent.extras
         if (extras == null) {
             crashReportManager.logExceptionOrThrowable(NoIntentExtrasError("Null extras passed to MatchingActivity"))
@@ -57,7 +62,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val appRequest: Request = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP
 
-        viewPresenter = MatchingPresenter(component, this, probe, appRequest)
+        viewPresenter = MatchingPresenter(this, probe, appRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
     }
 
     override fun onResume() {
@@ -66,44 +71,39 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     }
 
     @SuppressLint("ObjectAnimatorBinding")
-    override fun setIdentificationProgress(progress: Int) {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setIdentificationProgress(progress: Int) =
+        runOnUiThread {
             ObjectAnimator.ofInt(pb_identification, "progress", pb_identification.progress, progress)
                 .setDuration((progress * 10).toLong())
                 .start()
         }
-    }
 
-    override fun setVerificationProgress() {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setVerificationProgress() =
+        runOnUiThread {
             setIdentificationProgress(100)
         }
-    }
 
-    override fun setIdentificationProgressLoadingStart() {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setIdentificationProgressLoadingStart() =
+        runOnUiThread {
             tv_matchingProgressStatus1.setText(appR.string.loading_candidates)
             setIdentificationProgress(25)
         }
-    }
 
-    override fun setIdentificationProgressMatchingStart(matchSize: Int) {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setIdentificationProgressMatchingStart(matchSize: Int) =
+        runOnUiThread {
             tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, appR.string.loaded_candidates_quantity_key, matchSize, matchSize)
             tv_matchingProgressStatus2.setText(appR.string.matching_fingerprints)
             setIdentificationProgress(50)
         }
-    }
 
-    override fun setIdentificationProgressReturningStart() {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setIdentificationProgressReturningStart() =
+        runOnUiThread {
             tv_matchingProgressStatus2.setText(appR.string.returning_results)
             setIdentificationProgress(90)
         }
-    }
 
-    override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) {
-        runOnUiThread { //STOPSHIP: call from the presenter in the main thread
+    override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
+        runOnUiThread {
             tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, appR.string.returned_results_quantity_key, returnSize, returnSize)
 
             if (tier1Or2Matches > 0) {
@@ -123,7 +123,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
             val handler = Handler()
             handler.postDelayed({ finish() }, matchingEndWaitTimeMillis.toLong())
         }
-    }
 
     override fun launchAlert() {
         val intent = Intent(this, AlertActivity::class.java)
