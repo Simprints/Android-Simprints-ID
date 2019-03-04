@@ -1,7 +1,7 @@
 package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.requestFactories.RequestFactory
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
+import com.simprints.clientapi.domain.requests.BaseRequest
 import org.junit.Assert
 import org.junit.Test
 
@@ -13,7 +13,7 @@ abstract class ActionRequestBuilderTest(mockFactory: RequestFactory)
     override fun buildSimprintsRequest_shouldSucceed() {
         super.buildSimprintsRequest_shouldSucceed()
         val request = mockFactory.getBuilder(mockFactory.getMockExtractor()).build()
-            as ClientApiAppRequest
+            as BaseRequest
 
         Assert.assertEquals(request.moduleId, RequestFactory.MOCK_MODULE_ID)
         Assert.assertEquals(request.userId, RequestFactory.MOCK_USER_ID)

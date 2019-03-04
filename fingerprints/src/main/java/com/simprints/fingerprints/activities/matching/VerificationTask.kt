@@ -28,7 +28,7 @@ internal class VerificationTask(view: MatchingContract.View,
     : MatchTask(view, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper) {
 
     override fun loadCandidates(appRequest: Request): Single<List<Person>> =
-        dbManager.loadPerson((appRequest as VerifyRequest).verifyGuid).map { listOf(it.person) }
+        dbManager.loadPerson(appRequest.projectId, (appRequest as VerifyRequest).verifyGuid).map { listOf(it.person) }
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,

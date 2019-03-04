@@ -10,9 +10,8 @@ import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.IdentificationResponse
+import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
-import com.simprints.id.domain.responses.toClientApiIdentifyResponse
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libmatcher.LibMatcher
 import io.reactivex.Single
@@ -65,11 +64,11 @@ internal class IdentificationTask(view: MatchingContract.View,
 
 
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            IdentificationResponse(topCandidates, getCurrentSessionId()).toClientApiIdentifyResponse())
+            IdentifyResponse(topCandidates, getCurrentSessionId()))
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
     }
 
-    private fun getCurrentSessionId() =
-        sessionEventsManager.getCurrentSession().map { it.id }.blockingGet()
+    private fun getCurrentSessionId() = ""
+        // sessionEventsManager.getCurrentSession().map { it.id }.blockingGet() STOPSHIP
 }

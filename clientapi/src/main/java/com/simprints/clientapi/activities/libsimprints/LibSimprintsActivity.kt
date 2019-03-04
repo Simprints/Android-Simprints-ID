@@ -27,8 +27,8 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
-    override fun returnVerification(verification: Verification) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_VERIFICATION, verification)
+    override fun returnVerification(confidence: Int, tier: Tier, guid: String) = Intent().let {
+        it.putExtra(Constants.SIMPRINTS_VERIFICATION, Verification(confidence, tier, guid))
         sendOkResult(it)
     }
 

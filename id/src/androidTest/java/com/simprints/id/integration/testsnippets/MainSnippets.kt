@@ -14,6 +14,9 @@ import com.simprints.id.testtools.grantPermissions
 import com.simprints.id.testtools.launchActivityAndRunOnUiThread
 import com.simprints.libsimprints.*
 import com.simprints.testtools.android.*
+import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_LONG
+import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_SHORT
+import com.simprints.testtools.android.WaitingUtils.UI_TIMEOUT
 import org.hamcrest.Matchers.not
 import org.junit.Assert.*
 
@@ -63,7 +66,7 @@ fun setupActivityAndDecline() {
 
 fun setupActivity() {
     log("setupActivity")
-    tryOnUiUntilTimeout(20000, 50) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
         grantPermissions()
         onView(withId(R.id.generalConsentTextView))
             .check(matches(isDisplayed()))
@@ -72,7 +75,7 @@ fun setupActivity() {
 
 private fun setupActivityContinue() {
     log("setupActivityContinue")
-    tryOnUiUntilTimeout(15000, 500) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.consentAcceptButton))
             .check(matches(isDisplayed()))
             .perform(click())
@@ -81,7 +84,7 @@ private fun setupActivityContinue() {
 
 fun setupActivityDecline() {
     log("setupActivityContinue")
-    tryOnUiUntilTimeout(12000, 500) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.consentDeclineButton))
             .check(matches(isDisplayed()))
             .perform(click())
@@ -90,7 +93,7 @@ fun setupActivityDecline() {
 
 fun collectFingerprintsPressScan() {
     log("collectFingerprintsPressScan")
-    tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.scan_button))
             .check(matches(not(withText(R.string.cancel_button))))
             .perform(click())
@@ -100,7 +103,7 @@ fun collectFingerprintsPressScan() {
 
 fun skipFinger() {
     log("skipFinger")
-    tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.missingFingerText))
             .check(matches(isDisplayed()))
             .perform(click())
@@ -109,12 +112,12 @@ fun skipFinger() {
 
 fun waitForSplashScreenAppearsAndDisappears() {
     log("checkSplashScreen")
-    tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.splashGetReady))
             .check(matches(isDisplayed()))
     }
 
-    tryOnUiUntilTimeout(10000, 200) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         onView(withId(R.id.splashGetReady))
             .check(doesNotExist())
     }
@@ -123,7 +126,7 @@ fun waitForSplashScreenAppearsAndDisappears() {
 }
 
 fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
-    tryOnUiUntilTimeout(1000, 50) {
+    tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
         onView(withText(getResourceString(R.string.confirm_fingers_dialog_title)))
             .inRoot(isDialog())
             .check(matches(isDisplayed()))
@@ -137,7 +140,7 @@ fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "�
 
 fun collectFingerprintsEnrolmentCheckFinished(enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("collectFingerprintsEnrolmentCheckFinished")
-    tryOnSystemUntilTimeout(5000, 500) {
+    tryOnSystemUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         assertTrue(enrolTestRule.activity.isDestroyed)
     }
 }
@@ -153,7 +156,7 @@ fun enrolmentReturnedResult(enrolTestRule: ActivityTestRule<CheckLoginFromIntent
 
 fun matchingActivityIdentificationCheckFinished(identifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityIdentificationCheckFinished")
-    tryOnSystemUntilTimeout(20000, 500) {
+    tryOnSystemUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         assertTrue(identifyTestRule.activity.isDestroyed)
     }
 }
@@ -187,7 +190,7 @@ fun twoReturnedIdentificationsOneMatchOneNotMatch(identifyTestRule: ActivityTest
 
 fun matchingActivityVerificationCheckFinished(verifyTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
     log("matchingActivityVerificationCheckFinished")
-    tryOnSystemUntilTimeout(5000, 500) {
+    tryOnSystemUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
         assertTrue(verifyTestRule.activity.isDestroyed)
     }
 }

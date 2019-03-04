@@ -41,6 +41,8 @@ import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockFinger
 import com.simprints.mockscanner.MockScannerManager
+import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_LONG
+import com.simprints.testtools.android.WaitingUtils.UI_TIMEOUT
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -227,7 +229,7 @@ class SessionEventsManagerImplTest {
         // Launch
         launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
 
-        tryOnSystemUntilTimeout(5000, 200) {
+        tryOnSystemUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
             verifyEventsWhenSimprintsIsLaunched(mostRecentSessionInDb.events)
         }
     }

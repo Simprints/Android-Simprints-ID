@@ -281,7 +281,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun handleSavePersonSuccess(guidCreated: String) {
         preferencesManager.lastEnrolDate = Date()
         val result = Intent()
-        result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated).toClientApiEnrolResponse())
+        result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated))
         view.finishSuccessEnrol(result)
     }
 
@@ -296,6 +296,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
+        intent.putExtra(Request.BUNDLE_KEY, appRequest)
         view.finishSuccessAndStartMatching(intent)
     }
 

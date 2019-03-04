@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 145
-        versionName "2019.1.0-dev1"
+        versionCode 151
+        versionName "2019.1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -58,7 +58,6 @@ android {
             ext.enableCrashlytics = false
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             versionNameSuffix "-dev"
-            applicationIdSuffix '.debug'
             manifestPlaceholders = [firebase_performance_logcat_enabled: true, firebase_analytics_collection_enabled: true]
         }
     }
@@ -66,7 +65,6 @@ android {
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release" ||
                 variant.buildType.name == "releaseWithLogfile") {
-
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
@@ -128,10 +126,11 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':core')
     implementation project(':clientapi')
-    implementation project(':moduleinterfaces')
-
+    api project(':moduleinterfaces')
     api deps.simprints.libscanner
-    api deps.simprints.libmatcher
+
+    implementation deps.simprints.libscanner
+    implementation deps.simprints.libmatcher
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko

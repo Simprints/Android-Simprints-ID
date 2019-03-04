@@ -37,6 +37,9 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.state.LoginStateMocker
 import com.simprints.id.tools.RandomGenerator
+import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_LONG
+import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_SHORT
+import com.simprints.testtools.android.WaitingUtils.UI_TIMEOUT
 import com.simprints.testtools.android.tryOnUiUntilTimeout
 import com.simprints.testtools.android.waitOnSystem
 import com.simprints.testtools.common.syntax.whenever
@@ -143,11 +146,11 @@ class DashboardActivityAndroidTest {
 
         downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_calculating)))
         }
 
-        tryOnUiUntilTimeout(10000, 20) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
             onView(withId(R.id.dashboardCardSyncDescription))
                 .check(matches(withText(not(String.format(app.getString(R.string.dashboard_card_syncing), "")))))
         }
@@ -158,7 +161,7 @@ class DashboardActivityAndroidTest {
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
             .check(matches(withText("${peopleInDb.size}")))
 
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
         }
 
@@ -183,7 +186,7 @@ class DashboardActivityAndroidTest {
     }
 
     private fun waitForDownSyncCountAndValidateUI() {
-        tryOnUiUntilTimeout(10000, 200) {
+        tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
             onView(withId(R.id.dashboardCardSyncDownloadText))
                 .check(matches(Matchers.not(withText(""))))
         }
