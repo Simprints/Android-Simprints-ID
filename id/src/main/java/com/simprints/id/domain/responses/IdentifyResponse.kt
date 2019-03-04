@@ -6,10 +6,10 @@ import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResp
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class IdentificationResponse(val identifications: List<IdentificationResult>,
-                                  val sessionId: String): Response
+data class IdentifyResponse(val identifications: List<IdentificationResult>,
+                            val sessionId: String): Response
 
-fun IdentificationResponse.toClientApiIdentifyResponse(): IClientApiIdentifyResponse = ClientApiIdentifyResponse(
+fun IdentifyResponse.toClientApiIdentifyResponse(): IClientApiIdentifyResponse = ClientApiIdentifyResponse(
     this.identifications.map { it.toClientApiIdentificationResult() },
     sessionId
 )

@@ -4,7 +4,7 @@ import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.checkLogin.CheckLoginContract
 import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.Response
+import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
 
 interface CheckLoginFromIntentContract {
 
@@ -23,6 +23,6 @@ interface CheckLoginFromIntentContract {
 
     interface Presenter : BasePresenter {
         fun setup()
-        fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: Response)
+        fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: IClientApiResponse)
     }
 }

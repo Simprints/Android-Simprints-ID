@@ -35,8 +35,10 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
     // LibSimprints
-    implementation deps.simprints.libsimprints
+    implementation 'com.simprints:libsimprints:2018.2.0'
+
     // Support
     implementation deps.androidx.appcompat
     implementation deps.androidx.ui.constraintlayout
@@ -44,11 +46,13 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.gson.core
+
     // Unit Tests
     testImplementation deps.testing.junit
     testImplementation deps.testing.mockito.core
     testImplementation deps.testing.robolectric.core
     testImplementation deps.testing.robolectric.multidex
+
     // Android Tests
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules

@@ -2,14 +2,14 @@ package com.simprints.clientapi.clientrequests.builders
 
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiBaseRequest
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiVerifyRequest
+import com.simprints.clientapi.domain.ClientBase
+import com.simprints.clientapi.domain.requests.VerifyRequest
 
 
 class VerifyBuilder(private val extractor: VerifyExtractor, validator: VerifyValidator)
     : ClientRequestBuilder(validator) {
 
-    override fun buildAppRequest(): ClientApiBaseRequest = ClientApiVerifyRequest(
+    override fun buildAppRequest(): ClientBase = VerifyRequest(
         projectId = extractor.getProjectId(),
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),

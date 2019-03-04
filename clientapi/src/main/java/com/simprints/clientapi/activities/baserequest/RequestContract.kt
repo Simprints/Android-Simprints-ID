@@ -5,12 +5,12 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppRequest
-import com.simprints.clientapi.simprintsrequests.requests.ClientApiAppConfirmation
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiEnrollResponse
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiIdentifyResponse
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiRefusalFormResponse
-import com.simprints.clientapi.simprintsrequests.responses.ClientApiVerifyResponse
+import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
 
 
 interface RequestContract {
@@ -27,9 +27,9 @@ interface RequestContract {
 
         val confirmIdentifyExtractor: ConfirmIdentifyExtractor
 
-        fun sendSimprintsRequest(request: ClientApiAppRequest)
+        fun sendSimprintsRequest(request: BaseRequest)
 
-        fun sendSimprintsConfirmationAndFinish(request: ClientApiAppConfirmation)
+        fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation)
 
         fun handleClientRequestError(exception: Exception)
 
@@ -47,13 +47,13 @@ interface RequestContract {
 
         fun processConfirmIdentifyRequest()
 
-        fun handleEnrollResponse(enroll: ClientApiEnrollResponse)
+        fun handleEnrollResponse(enroll: EnrollResponse)
 
-        fun handleIdentifyResponse(identify: ClientApiIdentifyResponse)
+        fun handleIdentifyResponse(identify: IdentifyResponse)
 
-        fun handleVerifyResponse(verify: ClientApiVerifyResponse)
+        fun handleVerifyResponse(verify: VerifyResponse)
 
-        fun handleRefusalResponse(refusalForm: ClientApiRefusalFormResponse)
+        fun handleRefusalResponse(refusalForm: RefusalFormResponse)
 
         fun handleResponseError()
 

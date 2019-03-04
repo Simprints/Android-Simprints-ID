@@ -1,26 +1,27 @@
-package com.simprints.clientapi.simprintsrequests.requests
+package com.simprints.clientapi.domain.confirmations
 
 import com.simprints.moduleinterfaces.app.confirmations.IAppConfirmation
 import com.simprints.moduleinterfaces.app.confirmations.IAppIdentifyConfirmation
 import kotlinx.android.parcel.Parcelize
 
 
-@Parcelize
-data class ClientApiConfirmIdentifyRequest(
+data class IdentifyConfirmation(
     override val projectId: String,
     override val sessionId: String,
     override val selectedGuid: String
-) : ClientApiAppConfirmation {
+) : BaseConfirmation {
 
     override fun convertToAppRequest(): IAppConfirmation = AppIdentifyConfirmation(
         this.projectId, this.sessionId, this.selectedGuid
     )
 
+    @Parcelize
+    data class AppIdentifyConfirmation(
+        override val projectId: String,
+        override val sessionId: String,
+        override val selectedGuid: String
+    ) : IAppIdentifyConfirmation
+
 }
 
-@Parcelize
-private data class AppIdentifyConfirmation(
-    override val projectId: String,
-    override val sessionId: String,
-    override val selectedGuid: String
-) : IAppIdentifyConfirmation
+
