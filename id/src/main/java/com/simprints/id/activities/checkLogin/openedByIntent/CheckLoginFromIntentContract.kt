@@ -23,6 +23,6 @@ interface CheckLoginFromIntentContract {
 
     interface Presenter : BasePresenter {
         fun setup()
-        fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: IClientApiResponse)
+        fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: IClientApiResponse?)
     }
 }

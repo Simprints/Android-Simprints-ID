@@ -1,8 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.models.domain
 
 enum class EventType {
-    CALLOUT,
-    CALLBACK,
+    REQUEST_ENROL,
+    REQUEST_IDENTIFY,
+    REQUEST_VERIFY,
+    RESPONSE_ENROL,
+    RESPONSE_IDENTIFY,
+    RESPONSE_VERIFY,
     ARTIFICIAL_TERMINATION,
     AUTHENTICATION,
     CONSENT,

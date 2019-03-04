@@ -99,20 +99,21 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         // in a error screen.
         // If the activity doesn't finish, then we check again the SignedInState in onResume.
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
-            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
+            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
 
-            data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
-               val response =  when(it) {
-                   is EnrolResponse -> it.toClientApiEnrolResponse()
-                   is VerifyResponse -> it.toClientApiVerifyResponse()
-                   is IdentifyResponse -> it.toClientApiIdentifyResponse()
-                   else -> null
-               } ?: throw Throwable("Invalid response") //StopShip
-
-                viewPresenter.handleActivityResult(requestCode, resultCode, response)
-                setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
-                finish()
+            val response = data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
+                when (it) {
+                    is EnrolResponse -> it.toClientApiEnrolResponse()
+                    is VerifyResponse -> it.toClientApiVerifyResponse()
+                    is IdentifyResponse -> it.toClientApiIdentifyResponse()
+                    is RefusalFormResponse -> it.toClientApiRefusalFormResponse()
+                    else -> null
+                }
             }
+
+            viewPresenter.handleActivityResult(requestCode, resultCode, response)
+            setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
+            finish()
         }
     }
 }
