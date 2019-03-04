@@ -73,20 +73,18 @@ class MatchingPresenter(
     private fun MatchTask.matchCallback(
         emitter: SingleEmitter<MatchResult>,
         candidates: List<Person>,
-        scores: List<Float>
-    ) =
-        object : MatcherEventListener {
+        scores: List<Float>) = object : MatcherEventListener {
 
-            override fun onMatcherProgress(progress: Progress?) {
-                progress?.progress?.let { onMatchProgressDo(it) }
-            }
-
-            override fun onMatcherEvent(event: EVENT?) =
-                when (event) {
-                    EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
-                    else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP
-                }
+        override fun onMatcherProgress(progress: Progress?) {
+            progress?.progress?.let { onMatchProgressDo(it) }
         }
+
+        override fun onMatcherEvent(event: EVENT?) =
+            when (event) {
+                EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
+                else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP
+            }
+    }
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
