@@ -1,7 +1,6 @@
 package com.simprints.fingerprints.activities.matching
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprints.di.FingerprintsComponent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -25,26 +24,19 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 
 class MatchingPresenter(
-    component: FingerprintsComponent,
     private val view: MatchingContract.View,
     private val probe: Person,
-    private val appRequest: Request
+    private val appRequest: Request,
+    private val dbManager: DbManager,
+    private val preferencesManager: PreferencesManager,
+    private val sessionEventsManager: SessionEventsManager,
+    private val crashReportManager: CrashReportManager,
+    private val timeHelper: TimeHelper
 ) : MatchingContract.Presenter {
 
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var timeHelper: TimeHelper
-
     private lateinit var matchTaskDisposable: Disposable
-
-    init {
-        component.inject(this)
-    }
 
     @SuppressLint("CheckResult")
     override fun start() {
@@ -63,9 +55,9 @@ class MatchingPresenter(
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }
             .flatMap { matchTask.runMatch(it, probe) }
             .setMatchingSchedulers()
-            .subscribeBy {
-                matchTask.handleMatchResult(it.candidates, it.scores)
-            }
+            .subscribeBy(
+                onSuccess = { matchTask.handleMatchResult(it.candidates, it.scores) },
+                onError = { it.printStackTrace() })
     }
 
     private fun MatchTask.runMatch(candidates: List<Person>, probe: Person): Single<MatchResult> =
