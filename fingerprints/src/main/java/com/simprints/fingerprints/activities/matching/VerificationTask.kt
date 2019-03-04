@@ -2,7 +2,10 @@ package com.simprints.fingerprints.activities.matching
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -19,13 +22,14 @@ import com.simprints.libmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 
-internal class VerificationTask(view: MatchingContract.View,
-                                dbManager: DbManager,
-                                preferencesManager: PreferencesManager,
-                                sessionEventsManager: SessionEventsManager,
-                                crashReportManager: CrashReportManager,
-                                timeHelper: TimeHelper)
-    : MatchTask(view, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper) {
+internal class VerificationTask(private val view: MatchingContract.View,
+                                private val dbManager: DbManager,
+                                private val preferencesManager: PreferencesManager,
+                                private val sessionEventsManager: SessionEventsManager,
+                                private val crashReportManager: CrashReportManager,
+                                timeHelper: TimeHelper) : MatchTask {
+
+    override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(appRequest: Request): Single<List<Person>> =
         dbManager.loadPerson(appRequest.projectId, (appRequest as VerifyRequest).verifyGuid).map { listOf(it.person) }
@@ -42,7 +46,9 @@ internal class VerificationTask(view: MatchingContract.View,
             else -> LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
         }
 
-    override fun onMatchProgressDo(progress: Int) {}
+    override fun onMatchProgressDo(progress: Int) {
+        view.setVerificationProgress()
+    }
 
     override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
         val candidate = candidates.first()
@@ -55,5 +61,9 @@ internal class VerificationTask(view: MatchingContract.View,
             VerifyResponse(candidate.patientId, score.toInt(), Tier.computeTier(score)).toClientApiVerifyResponse())
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
+    }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.MATCHING, CrashReportTrigger.UI, Log.INFO, message)
     }
 }

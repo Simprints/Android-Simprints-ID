@@ -2,7 +2,10 @@ package com.simprints.fingerprints.activities.matching
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -17,13 +20,14 @@ import com.simprints.libmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 
-internal class IdentificationTask(view: MatchingContract.View,
-                                  dbManager: DbManager,
-                                  preferencesManager: PreferencesManager,
-                                  sessionEventsManager: SessionEventsManager,
-                                  crashReportManager: CrashReportManager,
-                                  timeHelper: TimeHelper)
-    : MatchTask(view, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper) {
+internal class IdentificationTask(private val view: MatchingContract.View,
+                                  private val dbManager: DbManager,
+                                  private val preferencesManager: PreferencesManager,
+                                  private val sessionEventsManager: SessionEventsManager,
+                                  private val crashReportManager: CrashReportManager,
+                                  timeHelper: TimeHelper) : MatchTask {
+
+    override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(appRequest: Request): Single<List<Person>> =
         dbManager.loadPeople(preferencesManager.matchGroup)
@@ -62,7 +66,6 @@ internal class IdentificationTask(view: MatchingContract.View,
         val tier3Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_3 }
         val tier4Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_4 }
 
-
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
             IdentifyResponse(topCandidates, getCurrentSessionId()))
         view.doSetResult(Activity.RESULT_OK, resultData)
@@ -70,5 +73,9 @@ internal class IdentificationTask(view: MatchingContract.View,
     }
 
     private fun getCurrentSessionId() = ""
-        // sessionEventsManager.getCurrentSession().map { it.id }.blockingGet() STOPSHIP
+    // sessionEventsManager.getCurrentSession().map { it.id }.blockingGet() STOPSHIP
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.MATCHING, CrashReportTrigger.UI, Log.INFO, message)
+    }
 }
