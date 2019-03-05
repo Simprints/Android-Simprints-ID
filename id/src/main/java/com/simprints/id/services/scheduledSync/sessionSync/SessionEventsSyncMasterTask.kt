@@ -9,6 +9,7 @@ import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import timber.log.Timber
 
 class SessionEventsSyncMasterTask(
     private val projectId: String,
@@ -38,6 +39,7 @@ class SessionEventsSyncMasterTask(
         this.concatMapCompletable {
             createUploadBatchTaskCompletable(it).doOnError { t ->
                 if (t !is NoSessionsFoundException) {
+                    Timber.e(t)
                     crashReportManager.logExceptionOrThrowable(t)
                 }
             }.onErrorComplete()
