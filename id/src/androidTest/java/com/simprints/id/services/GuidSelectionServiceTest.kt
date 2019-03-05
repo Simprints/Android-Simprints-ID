@@ -12,7 +12,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
-import com.simprints.id.data.analytics.eventdata.models.local.RlSession
+import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.integration.testsnippets.launchActivityEnrol
@@ -76,7 +76,7 @@ class GuidSelectionServiceTest {
 
         tryOnUiUntilTimeout(10000, 500) {
             realmForDataEvent.refresh()
-            session = realmForDataEvent.where(RlSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
+            session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
             val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).first()
             Assert.assertNotNull(potentialGuidSelectionEvent)
             Assert.assertEquals(potentialGuidSelectionEvent.selectedId, "some_guid_confirmed")

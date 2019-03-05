@@ -3,22 +3,23 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.requests.EnrolRequest
+import com.simprints.id.domain.requests.IdentifyRequest
+import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.VerifyRequest
+import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -49,7 +50,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
             try {
                 extractSessionParametersOrThrow()
-                addCalloutAndConnectivityEventsInSession()
+                addCalloutAndConnectivityEventsInSession(appRequest)
                 setLastUser()
                 setSessionIdCrashlyticsKey()
             } catch (exception: InvalidCalloutError) {
@@ -59,14 +60,36 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }.subscribeBy(onError = { it.printStackTrace() })
     }
 
-    private fun addCalloutAndConnectivityEventsInSession() {
+    private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(CalloutEvent(it.nowRelativeToStartTime(timeHelper), appRequest))
+                add(buildRequestEvent(it.nowRelativeToStartTime(timeHelper), appRequest))
             }
         }
     }
+
+    private fun buildRequestEvent(relativeStarTime: Long, request: Request): Event =
+        when (request) {
+            is EnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
+            is VerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
+            is IdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
+            else -> throw Throwable("unrecognised request") //StopShip
+        }
+
+
+    private fun buildResponseEvent(relativeStarTime: Long, response: Response?): Event =
+        if (response == null) {
+            NoResponseEvent(relativeStarTime)
+        } else {
+            when (response) {
+                is EnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
+                is VerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
+                is IdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
+                is RefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
+                else -> throw Throwable("unrecognised request") //StopShip
+            }
+        }
 
     private fun setLastUser() {
         preferencesManager.lastUserUsed = appRequest.userId
@@ -153,7 +176,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
-        session.events.add(AuthorizationEvent(
+        session.addEvent(AuthorizationEvent(
             session.nowRelativeToStartTime(timeHelper),
             result,
             if (result == AUTHORIZED) {
@@ -164,9 +187,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ))
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: IClientApiResponse?) {
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: Response?) {
         sessionEventsManager.updateSessionInBackground {
-            //it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), appResponse)) //STOPSHIP: Fix me
+            it.addEvent(buildResponseEvent(it.nowRelativeToStartTime(timeHelper), response)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)
         }
     }
