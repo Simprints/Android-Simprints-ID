@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.eventdata.models.local
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 
-fun RlEvent.toDomainEvent(): Event? = when (getType()) {
+fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.ARTIFICIAL_TERMINATION -> JsonHelper.gson.fromJson(jsonEvent, ArtificialTerminationEvent::class.java)
     EventType.REFUSAL -> JsonHelper.gson.fromJson(jsonEvent, RefusalEvent::class.java)
     EventType.CONSENT -> JsonHelper.gson.fromJson(jsonEvent, ConsentEvent::class.java)
@@ -14,6 +14,8 @@ fun RlEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.ENROL_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, EnrolResponseEvent::class.java)
     EventType.VERIFY_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, VerifyResponseEvent::class.java)
     EventType.IDENTIFY_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, IdentifyResponseEvent::class.java)
+    EventType.REFUSAL_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, RefusalFormResponseEvent::class.java)
+    EventType.NO_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, NoResponseEvent::class.java)
     EventType.ENROLLMENT -> JsonHelper.gson.fromJson(jsonEvent, EnrollmentEvent::class.java)
     EventType.ALERT_SCREEN -> JsonHelper.gson.fromJson(jsonEvent, AlertScreenEvent::class.java)
     EventType.CANDIDATE_READ -> JsonHelper.gson.fromJson(jsonEvent, CandidateReadEvent::class.java)

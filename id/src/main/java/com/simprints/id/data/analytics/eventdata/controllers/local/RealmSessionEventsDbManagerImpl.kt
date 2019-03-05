@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventdata.controllers.local
 
 import android.content.Context
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.analytics.eventdata.models.local.RlSession
+import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
@@ -57,7 +57,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         getRealmInstance().flatMapCompletable {
             it.use { realm ->
                 realm.executeTransaction { realmInTrans ->
-                    realmInTrans.insertOrUpdate(RlSession(sessionEvents))
+                    realmInTrans.insertOrUpdate(DbSession(sessionEvents))
                 }
                 Completable.complete()
             }
@@ -65,7 +65,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
 
     override fun loadSessions(projectId: String?, openSession: Boolean?): Single<ArrayList<SessionEvents>> =
         useRealmInstance {
-            val query = it.where(RlSession::class.java).apply {
+            val query = it.where(DbSession::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
                 addQueryParamForOpenSession(openSession, this)
 
@@ -77,7 +77,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
     /** @throws SessionNotFoundException */
     override fun loadSessionById(sessionId: String): Single<SessionEvents> =
         useRealmInstance {
-            val query = it.where(RlSession::class.java).apply {
+            val query = it.where(DbSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
             query.findFirst()?.toDomainSession() ?: throw SessionNotFoundException()
@@ -85,7 +85,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
 
     override fun getSessionCount(projectId: String?): Single<Int> =
         useRealmInstance {
-            it.where(RlSession::class.java).apply {
+            it.where(DbSession::class.java).apply {
                 addQueryParamForProjectId(projectId, this)
             }.count().toInt()
         }
@@ -97,7 +97,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         getRealmInstance().flatMapCompletable { realm ->
             realm.use {
                 it.executeTransaction { realmInTrans ->
-                    val sessions = realmInTrans.where(RlSession::class.java).apply {
+                    val sessions = realmInTrans.where(DbSession::class.java).apply {
                         addQueryParamForProjectId(projectId, this)
                         addQueryParamForOpenSession(openSession, this)
                         addQueryParamForSessionId(sessionId, this)
@@ -114,7 +114,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             }
         }
 
-    private fun deleteSessionInfo(session: RlSession) {
+    private fun deleteSessionInfo(session: DbSession) {
         session.databaseInfo?.deleteFromRealm()
         session.device?.deleteFromRealm()
         session.location?.deleteFromRealm()
@@ -134,25 +134,25 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
             .also { realmConfig = it })
 
-    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<RlSession>) {
+    private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbSession>) {
         projectId?.let {
             query.equalTo(RealmSessionEventsDbManagerImpl.PROJECT_ID, projectId)
         }
     }
 
-    private fun addQueryParamForSessionId(sessionId: String?, query: RealmQuery<RlSession>) {
+    private fun addQueryParamForSessionId(sessionId: String?, query: RealmQuery<DbSession>) {
         sessionId?.let {
             query.equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
         }
     }
 
-    private fun addQueryParamForStartTime(startedBefore: Long?, query: RealmQuery<RlSession>) {
+    private fun addQueryParamForStartTime(startedBefore: Long?, query: RealmQuery<DbSession>) {
         startedBefore?.let {
             query.greaterThan(RealmSessionEventsDbManagerImpl.START_TIME, startedBefore).not()
         }
     }
 
-    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<RlSession>) {
+    private fun addQueryParamForOpenSession(openSession: Boolean?, query: RealmQuery<DbSession>) {
         openSession?.let {
             if (it) {
                 query.equalTo(RealmSessionEventsDbManagerImpl.END_TIME, 0L)

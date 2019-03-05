@@ -1,17 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolResponseEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyResponseEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.VerifyResponseEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 
 class ApiCallbackEvent(val relativeStartTime: Long,
                        val result: ApiCallout) : ApiEvent(ApiEventType.CALLBACK) {
 
-    class ApiCallout {
-        constructor(response: EnrolResponseEvent) //StopShip: implement transformation from Response to Callback
-        constructor(response: IdentifyResponseEvent)
-        constructor(response: VerifyResponseEvent)
-    }
+    constructor(noResponseEvent: NoResponseEvent) :
+        this(noResponseEvent.relativeStartTime, ApiCallout())
 
     constructor(enrolResponseEvent: EnrolResponseEvent) :
         this(enrolResponseEvent.relativeStartTime, ApiCallout(enrolResponseEvent))
@@ -22,6 +17,8 @@ class ApiCallbackEvent(val relativeStartTime: Long,
     constructor(verifyResponseEvent: VerifyResponseEvent) :
         this(verifyResponseEvent.relativeStartTime, ApiCallout(verifyResponseEvent))
 
+    constructor(refusalFormResponseEvent: RefusalFormResponseEvent) :
+        this(refusalFormResponseEvent.relativeStartTime, ApiCallout(refusalFormResponseEvent))
 }
 
 
