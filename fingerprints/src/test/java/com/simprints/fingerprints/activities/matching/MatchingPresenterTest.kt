@@ -48,6 +48,7 @@ class MatchingPresenterTest {
     private val matchTaskFinishedFlag = LinkedBlockingQueue<Unit>()
 
     private val viewMock = mock<MatchingContract.View>().apply {
+        whenever(this) { makeToastMatchFailed() } then { matchTaskFinishedFlag.put(Unit) }
         whenever(this) { doFinish() } then { matchTaskFinishedFlag.put(Unit) }
         whenever(this) {
             setIdentificationProgressFinished(anyInt(), anyInt(), anyInt(), anyInt(), anyInt())
@@ -154,6 +155,32 @@ class MatchingPresenterTest {
 
         verifyOnce(viewMock) { setVerificationProgress() }
         verifyOnce(viewMock) { doFinish() }
+    }
+
+    @Test
+    fun identifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+        setupDbManagerLoadCandidates()
+        setupPrefs()
+
+        val presenter = createPresenter(identifyRequest, probe, mockErrorLibMatcher)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+
+        verifyOnce(viewMock) { makeToastMatchFailed() }
+        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+    }
+
+    @Test
+    fun verifyRequest_matchFailsToComplete_showsToastAndLogsError() {
+        setupDbManagerLoadCandidate()
+        setupPrefs()
+
+        val presenter = createPresenter(verifyRequest, probe, mockErrorLibMatcher)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+
+        verifyOnce(viewMock) { makeToastMatchFailed() }
+        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
     private fun createPresenter(request: Request, probe: Person, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
