@@ -24,7 +24,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Artificial
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.PersonCreationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.analytics.eventdata.models.local.RlSession
+import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -100,7 +100,7 @@ class SessionEventsManagerImplTest {
         get() {
             realmForDataEvent.refresh()
             return realmForDataEvent
-                .where(RlSession::class.java)
+                .where(DbSession::class.java)
                 .findAll()
                 .sort("startTime", Sort.DESCENDING).first()!!.toDomainSession()
         }

@@ -12,8 +12,8 @@ import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
+import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
@@ -102,7 +102,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     /** @throws SessionNotFoundException */
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
-            it.events.add(GuidSelectionEvent(
+            it.addEvent(GuidSelectionEvent(
                 it.nowRelativeToStartTime(timeHelper),
                 selectedGuid
             ))
@@ -111,7 +111,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: VerificationResult?) {
         updateSessionInBackground { session ->
-            session.events.add(OneToOneMatchEvent(
+            session.addEvent(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.nowRelativeToStartTime(timeHelper),
                 patientId,
@@ -121,7 +121,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<IdentificationResult>, matchSize: Int) {
         updateSessionInBackground { session ->
-            session.events.add(OneToManyMatchEvent(
+            session.addEvent(OneToManyMatchEvent(
                 session.timeRelativeToStartTime(startTimeIdentification),
                 session.nowRelativeToStartTime(timeHelper),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
@@ -132,7 +132,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
         updateSessionInBackground {
             if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
-                it.events.add(ScannerConnectionEvent(
+                it.addEvent(ScannerConnectionEvent(
                     it.nowRelativeToStartTime(timeHelper),
                     scannerInfo
                 ))
@@ -149,7 +149,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     override fun addPersonCreationEventInBackground(person: Person) {
         updateSessionInBackground { session ->
-            session.events.add(PersonCreationEvent(
+            session.addEvent(PersonCreationEvent(
                 session.nowRelativeToStartTime(timeHelper),
                 extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
@@ -161,7 +161,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                                                       localResult: CandidateReadEvent.LocalResult,
                                                       remoteResult: CandidateReadEvent.RemoteResult?) {
         updateSessionInBackground {
-            it.events.add(CandidateReadEvent(
+            it.addEvent(CandidateReadEvent(
                 it.timeRelativeToStartTime(startCandidateSearchTime),
                 it.nowRelativeToStartTime(timeHelper),
                 guid,

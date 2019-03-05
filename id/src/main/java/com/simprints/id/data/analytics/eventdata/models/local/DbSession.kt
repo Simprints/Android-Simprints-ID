@@ -7,7 +7,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class RlSession : RealmObject {
+open class DbSession : RealmObject {
 
     @PrimaryKey
     lateinit var id: String
@@ -16,13 +16,13 @@ open class RlSession : RealmObject {
     lateinit var language: String
     lateinit var projectId: String
     var startTime: Long = 0L
-    lateinit var realmEvents: RealmList<RlEvent>
+    lateinit var realmEvents: RealmList<DbEvent>
 
     var relativeEndTime: Long = 0L
     var relativeUploadTime: Long = 0L
-    var device: RlDevice? = null
-    var databaseInfo: RlDatabaseInfo? = null
-    var location: RlLocation? = null
+    var device: DbDevice? = null
+    var databaseInfo: DbDatabaseInfo? = null
+    var location: DbLocation? = null
     var analyticsId: String? = null
 
     constructor()
@@ -38,14 +38,14 @@ open class RlSession : RealmObject {
         setEvents(sessionEvents.events)
         this.relativeEndTime = sessionEvents.relativeEndTime
         this.relativeUploadTime = sessionEvents.relativeUploadTime
-        this.device = RlDevice(sessionEvents.device)
+        this.device = DbDevice(sessionEvents.device)
 
         sessionEvents.databaseInfo?.let {
-            this.databaseInfo = RlDatabaseInfo(it)
+            this.databaseInfo = DbDatabaseInfo(it)
         }
 
         sessionEvents.location?.let {
-            this.location = RlLocation(it)
+            this.location = DbLocation(it)
         }
 
         this.analyticsId = sessionEvents.analyticsId
@@ -53,11 +53,11 @@ open class RlSession : RealmObject {
 
     private fun setEvents(events: ArrayList<Event>) = realmEvents.apply {
         clear()
-        addAll(events.map { RlEvent(it) })
+        addAll(events.map { DbEvent(it) })
     }
 }
 
-fun RlSession.toDomainSession(): SessionEvents {
+fun DbSession.toDomainSession(): SessionEvents {
     val session = SessionEvents(id = id,
         projectId = projectId,
         appVersionName = appVersionName,

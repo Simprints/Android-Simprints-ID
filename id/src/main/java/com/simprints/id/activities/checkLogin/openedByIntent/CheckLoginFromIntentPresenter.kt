@@ -15,12 +15,11 @@ import com.simprints.id.domain.requests.EnrolRequest
 import com.simprints.id.domain.requests.IdentifyRequest
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.requests.VerifyRequest
-import com.simprints.id.domain.responses.Response
+import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -70,12 +69,26 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun buildRequestEvent(relativeStarTime: Long, appRequest: Request): Event =
-        when (appRequest) {
-            is EnrolRequest -> EnrolRequestEvent(relativeStarTime, appRequest)
-            is VerifyRequest -> VerifyRequestEvent(relativeStarTime, appRequest)
-            is IdentifyRequest -> IdentifyRequestEvent(relativeStarTime, appRequest)
+    private fun buildRequestEvent(relativeStarTime: Long, request: Request): Event =
+        when (request) {
+            is EnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
+            is VerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
+            is IdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
             else -> throw Throwable("unrecognised request") //StopShip
+        }
+
+
+    private fun buildResponseEvent(relativeStarTime: Long, response: Response?): Event =
+        if (response == null) {
+            NoResponseEvent(relativeStarTime)
+        } else {
+            when (response) {
+                is EnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
+                is VerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
+                is IdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
+                is RefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
+                else -> throw Throwable("unrecognised request") //StopShip
+            }
         }
 
     private fun setLastUser() {
@@ -163,7 +176,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
-        session.events.add(AuthorizationEvent(
+        session.addEvent(AuthorizationEvent(
             session.nowRelativeToStartTime(timeHelper),
             result,
             if (result == AUTHORIZED) {
@@ -174,9 +187,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ))
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, appResponse: Response?) {
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: Response?) {
         sessionEventsManager.updateSessionInBackground {
-            //it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), appResponse)) //STOPSHIP: Fix me
+            it.addEvent(buildResponseEvent(it.nowRelativeToStartTime(timeHelper), response)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)
         }
     }

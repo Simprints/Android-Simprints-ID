@@ -4,7 +4,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class RlLocation : RealmObject {
+open class DbLocation : RealmObject {
 
     @PrimaryKey
     lateinit var id: String
@@ -19,5 +19,5 @@ open class RlLocation : RealmObject {
     }
 }
 
-fun RlLocation.toDomainLocation(): Location = Location(latitude, longitude, id)
+fun DbLocation.toDomainLocation(): Location = Location(latitude, longitude, id)
 

@@ -1,8 +1,11 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.session
 
+import com.google.gson.GsonBuilder
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 import java.util.*
 
 open class SessionEvents(var projectId: String,
@@ -32,7 +35,7 @@ open class SessionEvents(var projectId: String,
 
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
         if (isOpen()) {
-            events.add(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
+            addEvent(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
         }
     }
 
@@ -47,4 +50,12 @@ open class SessionEvents(var projectId: String,
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
+
+
+    fun addEvent(event: Event) {
+        if(BuildConfig.DEBUG) {
+            Timber.d("Add event: ${GsonBuilder().create().toJson(event)}")
+        }
+        events.add(event)
+    }
 }
