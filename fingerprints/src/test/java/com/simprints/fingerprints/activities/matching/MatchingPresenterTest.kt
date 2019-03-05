@@ -63,32 +63,36 @@ class MatchingPresenterTest {
     }
 
     private val mockIdentificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
-                                               LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, candidates, _, scores, callback, _ ->
-        mock<LibMatcher>().apply {
-            whenever(this) { start() } then {
-                IDENTIFY_PROGRESS_RANGE.forEach { callback.onMatcherProgress(Progress(it)) }
-                repeat(candidates.size) { scores.add(Random.nextFloat() * 100f) }
-                callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
+                                               LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
+        { _, candidates, _, scores, callback, _ ->
+            mock<LibMatcher>().apply {
+                whenever(this) { start() } then {
+                    IDENTIFY_PROGRESS_RANGE.forEach { callback.onMatcherProgress(Progress(it)) }
+                    repeat(candidates.size) { scores.add(Random.nextFloat() * 100f) }
+                    callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
+                }
             }
         }
-    }
 
     private val mockVerificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
-                                             LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, _, _, scores, callback, _ ->
-        mock<LibMatcher>().apply {
-            whenever(this) { start() } then {
-                scores.add(Random.nextFloat())
-                callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
+                                             LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
+        { _, _, _, scores, callback, _ ->
+            mock<LibMatcher>().apply {
+                whenever(this) { start() } then {
+                    callback.onMatcherProgress(Progress(0))
+                    scores.add(Random.nextFloat())
+                    callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
+                }
             }
         }
-    }
 
     private val mockErrorLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
-                                      LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, _, _, _, callback, _ ->
-        mock<LibMatcher>().apply {
-            whenever(this) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
+                                      LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
+        { _, _, _, _, callback, _ ->
+            mock<LibMatcher>().apply {
+                whenever(this) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
+            }
         }
-    }
 
     @Test
     fun identificationRequest_startedAndAwaited_finishesWithCorrectResult() {
@@ -135,8 +139,21 @@ class MatchingPresenterTest {
         assertThat(progressIntCaptor.allValues)
             .containsExactlyElementsIn(IDENTIFY_PROGRESS_RANGE)
             .inOrder()
-        verifyOnce(viewMock) { setIdentificationProgressFinished(eq(NUMBER_OF_ID_RETURNS), anyInt(), anyInt(), anyInt(), anyInt()) }
         verifyOnce(viewMock) { setIdentificationProgressReturningStart() }
+        verifyOnce(viewMock) { setIdentificationProgressFinished(eq(NUMBER_OF_ID_RETURNS), anyInt(), anyInt(), anyInt(), anyInt()) }
+    }
+
+    @Test
+    fun verificationRequest_startedAndAwaited_updatesViewCorrectly() {
+        setupDbManagerLoadCandidate()
+        setupPrefs()
+
+        val presenter = createPresenter(verifyRequest, probe, mockVerificationLibMatcher)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+
+        verifyOnce(viewMock) { setVerificationProgress() }
+        verifyOnce(viewMock) { doFinish() }
     }
 
     private fun createPresenter(request: Request, probe: Person, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
