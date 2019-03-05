@@ -164,7 +164,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ))
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: IClientApiResponse) {
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: IClientApiResponse?) {
         sessionEventsManager.updateSessionInBackground {
             //it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), appResponse)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)

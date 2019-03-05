@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import com.simprints.id.data.analytics.eventdata.models.domain.EventType
-import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
+import com.simprints.id.domain.refusal_form.RefusalFormReason
 
 class RefusalEvent(val relativeStartTime: Long,
                    val relativeEndTime: Long,
@@ -14,11 +14,11 @@ class RefusalEvent(val relativeStartTime: Long,
         OTHER;
 
         companion object {
-            fun fromRefusalReason(reasonForm: REFUSAL_FORM_REASON): Answer {
+            fun fromRefusalReason(reasonForm: RefusalFormReason): Answer {
                 return when (reasonForm) {
-                    REFUSAL_FORM_REASON.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
-                    REFUSAL_FORM_REASON.REFUSED -> BENEFICIARY_REFUSED
-                    REFUSAL_FORM_REASON.OTHER -> OTHER
+                    RefusalFormReason.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
+                    RefusalFormReason.REFUSED -> BENEFICIARY_REFUSED
+                    RefusalFormReason.OTHER -> OTHER
                 }
             }
         }
