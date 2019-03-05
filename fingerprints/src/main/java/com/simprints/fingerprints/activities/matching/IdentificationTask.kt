@@ -17,6 +17,7 @@ import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libmatcher.LibMatcher
+import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
@@ -30,7 +31,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(appRequest: Request): Single<List<Person>> =
-        dbManager.loadPeople(preferencesManager.matchGroup)
+        Completable.fromAction { view.setIdentificationProgressLoadingStart() }
+            .andThen(dbManager.loadPeople(preferencesManager.matchGroup))
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,

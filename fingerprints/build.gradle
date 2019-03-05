@@ -97,5 +97,6 @@ dependencies {
     kaptTest deps.dagger.compiler
     testImplementation deps.testing.robolectric.core
     testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.truth
 
 }
