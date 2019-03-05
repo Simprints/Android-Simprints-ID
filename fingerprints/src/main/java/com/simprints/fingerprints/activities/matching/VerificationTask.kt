@@ -58,7 +58,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
 
         sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
         val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            VerifyResponse(candidate.patientId, score.toInt(), Tier.computeTier(score)).toClientApiVerifyResponse())
+            VerifyResponse(candidate.patientId, score.toInt(), Tier.computeTier(score)))
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
     }

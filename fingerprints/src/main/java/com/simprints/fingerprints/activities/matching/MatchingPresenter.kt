@@ -59,7 +59,10 @@ class MatchingPresenter(
             .setMatchingSchedulers()
             .subscribeBy(
                 onSuccess = { matchTask.handleMatchResult(it.candidates, it.scores) },
-                onError = { it.printStackTrace() })
+                onError = {
+                    crashReportManager.logExceptionOrThrowable(it)
+                    view.makeToastMatchFailed()
+                })
     }
 
     private fun MatchTask.runMatch(candidates: List<Person>, probe: Person): Single<MatchResult> =
@@ -84,17 +87,17 @@ class MatchingPresenter(
         override fun onMatcherEvent(event: EVENT?) =
             when (event) {
                 EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
-                else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP
+                else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
             }
     }
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
     private fun Person.toLibCommonPerson() =
-        com.simprints.libcommon.Person(patientId, fingerprints.map { it.toLibCommonFingerprint() }) // STOPSHIP
+        com.simprints.libcommon.Person(patientId, fingerprints.map { it.toLibCommonFingerprint() }) // STOPSHIP : Change LibMatcher interface
 
     private fun Fingerprint.toLibCommonFingerprint() =
-        com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP
+        com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(InvalidMatchingCalloutError("Invalid action in MatchingActivity"))
