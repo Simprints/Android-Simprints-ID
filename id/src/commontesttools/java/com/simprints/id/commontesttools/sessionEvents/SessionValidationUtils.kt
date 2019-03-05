@@ -52,7 +52,7 @@ fun validateAuthorizationEventApiModel(json: JsonObject) {
 
 fun validateCallbackEventApiModel(json: JsonObject) {
 
-    assertThat(json.get("type").asString).isEqualTo(EventType.CALLBACK.toString())
+    assertThat(json.get("type").asString).isEqualTo(EventType.RESPONSE.toString())
     assertThat(json.get("relativeStartTime").asLong)
     assert(json.has("result"))
     assertThat(json.size()).isEqualTo(3)
@@ -60,7 +60,7 @@ fun validateCallbackEventApiModel(json: JsonObject) {
 
 fun validateCalloutEventApiModel(json: JsonObject) {
 
-    assertThat(json.get("type").asString).isEqualTo(EventType.CALLOUT.toString())
+    assertThat(json.get("type").asString).isEqualTo(EventType.REQUEST.toString())
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("parameters").asJsonObject)
     assertThat(json.size()).isEqualTo(3)
@@ -205,8 +205,8 @@ fun validateEvent(json: JsonObject) {
     when (EventType.valueOf(type)) {
         EventType.REFUSAL -> validateRefusalEventApiModel(json)
         EventType.CONSENT -> validateConsentEventApiModel(json)
-        EventType.CALLOUT -> validateCalloutEventApiModel(json)
-        EventType.CALLBACK -> validateCallbackEventApiModel(json)
+        EventType.REQUEST -> validateCalloutEventApiModel(json)
+        EventType.RESPONSE -> validateCallbackEventApiModel(json)
         EventType.ENROLLMENT -> validateEnrolmentEventApiModel(json)
         EventType.ALERT_SCREEN -> validateAlertScreenEventApiModel(json)
         EventType.CANDIDATE_READ -> validateCandidateReadEventApiModel(json)

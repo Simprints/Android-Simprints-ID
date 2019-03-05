@@ -8,8 +8,10 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.remote.enums.REFUSAL_FORM_REASON
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.refusal_form.RefusalFormAnswer
+import com.simprints.id.domain.refusal_form.RefusalFormReason
+import com.simprints.id.domain.refusal_form.RefusalFormReason.*
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
@@ -23,7 +25,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    private var reason: REFUSAL_FORM_REASON? = null
+    private var reason: RefusalFormReason = OTHER
     private var refusalStartTime: Long = 0
 
     init {
@@ -39,16 +41,16 @@ class RefusalPresenter(private val view: RefusalContract.View,
         view.enableRefusalText()
         when (optionIdentifier) {
             R.id.rbScannerNotWorking -> {
-                reason = REFUSAL_FORM_REASON.SCANNER_NOT_WORKING
-                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.SCANNER_NOT_WORKING} Clicked")
+                reason = SCANNER_NOT_WORKING
+                logMessageForCrashReport("Radio option $SCANNER_NOT_WORKING Clicked")
             }
             R.id.rbRefused -> {
-                reason = REFUSAL_FORM_REASON.REFUSED
-                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.REFUSED} Clicked")
+                reason = REFUSED
+                logMessageForCrashReport("Radio option $REFUSED Clicked")
             }
             R.id.rb_other -> {
-                reason = REFUSAL_FORM_REASON.OTHER
-                logMessageForCrashReport("Radio option ${REFUSAL_FORM_REASON.OTHER} Clicked")
+                reason = OTHER
+                logMessageForCrashReport("Radio option $OTHER Clicked")
             }
         }
     }
@@ -64,16 +66,16 @@ class RefusalPresenter(private val view: RefusalContract.View,
                         refusalText))
             }.subscribeBy(onError = {
                 crashReportManager.logExceptionOrThrowable(it)
-                view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
+                view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalFormAnswer(reason, refusalText))
             }, onComplete = {
-                view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
+                view.setResultAndFinish(Activity.RESULT_OK, RefusalFormAnswer(reason, refusalText))
             })
-        } ?: view.setResultAndFinish(Activity.RESULT_CANCELED, reason)
+        }
     }
 
     override fun handleScanFingerprintsClick() {
         logMessageForCrashReport("Scan fingerprints button clicked")
-        view.setResultAndFinish(InternalConstants.RESULT_TRY_AGAIN, null)
+        view.setResultAndFinish(Activity.RESULT_OK, RefusalFormAnswer(reason))
     }
 
     override fun handleLayoutChange() {
