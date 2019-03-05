@@ -2,8 +2,10 @@ package com.simprints.fingerprints.activities.matching
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.eq
 import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_USER_ID
@@ -25,9 +27,7 @@ import com.simprints.libmatcher.EVENT
 import com.simprints.libmatcher.LibMatcher
 import com.simprints.libmatcher.Progress
 import com.simprints.libmatcher.sourceafis.MatcherEventListener
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.RxSchedulerRule
 import io.reactivex.Single
 import org.junit.Assert
@@ -66,10 +66,27 @@ class MatchingPresenterTest {
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, candidates, _, scores, callback, _ ->
         mock<LibMatcher>().apply {
             whenever(this) { start() } then {
-                (0..100).forEach { callback.onMatcherProgress(Progress(it)) }
+                IDENTIFY_PROGRESS_RANGE.forEach { callback.onMatcherProgress(Progress(it)) }
                 repeat(candidates.size) { scores.add(Random.nextFloat() * 100f) }
                 callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
             }
+        }
+    }
+
+    private val mockVerificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+                                             LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, _, _, scores, callback, _ ->
+        mock<LibMatcher>().apply {
+            whenever(this) { start() } then {
+                scores.add(Random.nextFloat())
+                callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
+            }
+        }
+    }
+
+    private val mockErrorLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+                                      LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, _, _, _, callback, _ ->
+        mock<LibMatcher>().apply {
+            whenever(this) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
         }
     }
 
@@ -79,7 +96,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(identifyRequest, probe)
+        val presenter = createPresenter(identifyRequest, probe, mockIdentificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -94,7 +111,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(verifyRequest, probe)
+        val presenter = createPresenter(verifyRequest, probe, mockVerificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -102,9 +119,30 @@ class MatchingPresenterTest {
         Assert.assertEquals(VERIFY_GUID, verifyResponse.guid)
     }
 
-    private fun createPresenter(request: Request, probe: Person) =
+    @Test
+    fun identificationRequest_startedAndAwaited_updatesViewCorrectly() {
+        setupDbManagerLoadCandidates()
+        setupPrefs()
+
+        val presenter = createPresenter(identifyRequest, probe, mockIdentificationLibMatcher)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+
+        verifyOnce(viewMock) { setIdentificationProgressLoadingStart() }
+        verifyOnce(viewMock) { setIdentificationProgressMatchingStart(eq(CANDIDATE_POOL)) }
+        val progressIntCaptor = argumentCaptor<Int>()
+        verifyExactly(IDENTIFY_PROGRESS_RANGE.count(), viewMock) { setIdentificationProgress(progressIntCaptor.capture()) }
+        assertThat(progressIntCaptor.allValues)
+            .containsExactlyElementsIn(IDENTIFY_PROGRESS_RANGE)
+            .inOrder()
+        verifyOnce(viewMock) { setIdentificationProgressFinished(eq(NUMBER_OF_ID_RETURNS), anyInt(), anyInt(), anyInt(), anyInt()) }
+        verifyOnce(viewMock) { setIdentificationProgressReturningStart() }
+    }
+
+    private fun createPresenter(request: Request, probe: Person, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+                                                                                  LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, probe, request, dbManagerMock, preferencesManagerMock,
-            sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockIdentificationLibMatcher)
+            sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockLibMatcher)
 
     private fun setupDbManagerLoadCandidates() {
         val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID).toList()
@@ -134,6 +172,7 @@ class MatchingPresenterTest {
 
         private const val NUMBER_OF_ID_RETURNS = 10
         private const val CANDIDATE_POOL = 50
+        private val IDENTIFY_PROGRESS_RANGE = 0..100
 
         private const val VERIFY_GUID = "33eda6d0-22bb-475e-b439-3464433e5a87"
 
