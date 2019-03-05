@@ -57,10 +57,10 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         }
 
         val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
-            ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP
+            ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP : Custom error
 
         val appRequest: Request = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP
+            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
         viewPresenter = MatchingPresenter(this, probe, appRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
     }
@@ -130,8 +130,8 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
     }
 
-    override fun makeToastMatchNotRunning(text: String) {
-        Toast.makeText(this@MatchingActivity, text, Toast.LENGTH_LONG).show()
+    override fun makeToastMatchFailed() {
+        Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show() // STOPSHIP : proper toast message
     }
 
     override fun doSetResult(resultCode: Int, resultData: Intent) {

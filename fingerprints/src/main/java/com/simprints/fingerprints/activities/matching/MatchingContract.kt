@@ -25,7 +25,7 @@ interface MatchingContract {
 
         fun launchAlert()
 
-        fun makeToastMatchNotRunning(text: String)
+        fun makeToastMatchFailed()
 
         fun doSetResult(resultCode: Int, resultData: Intent)
 
