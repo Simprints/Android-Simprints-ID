@@ -11,12 +11,15 @@ import com.simprints.fingerprints.testtools.PeopleGeneratorUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.IdentifyRequest
 import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
+import com.simprints.id.domain.responses.VerifyResponse
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libmatcher.EVENT
 import com.simprints.libmatcher.LibMatcher
@@ -59,18 +62,6 @@ class MatchingPresenterTest {
         whenever(this) { now() } thenReturn System.currentTimeMillis()
     }
 
-    private val probe = PeopleGeneratorUtils.getRandomPerson(
-        projectId = DEFAULT_PROJECT_ID,
-        userId = DEFAULT_USER_ID,
-        moduleId = DEFAULT_USER_ID
-    )
-
-    private val request = IdentifyRequest(
-        DEFAULT_PROJECT_ID,
-        DEFAULT_USER_ID,
-        DEFAULT_MODULE_ID,
-        "")
-
     private val mockIdentificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = { _, candidates, _, scores, callback, _ ->
         mock<LibMatcher>().apply {
@@ -83,15 +74,13 @@ class MatchingPresenterTest {
     }
 
     @Test
-    fun identificationRequest_started_finishesWithCorrectResult() {
+    fun identificationRequest_startedAndAwaited_finishesWithCorrectResult() {
         setupDbManagerLoadCandidates()
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(request, probe)
-
+        val presenter = createPresenter(identifyRequest, probe)
         presenter.start()
-
         matchTaskFinishedFlag.take()
 
         val identifyResponse = result.firstValue.getParcelableExtra<IdentifyResponse>(Response.BUNDLE_KEY)!!
@@ -99,16 +88,34 @@ class MatchingPresenterTest {
         Assert.assertEquals(NUMBER_OF_ID_RETURNS, identifications.size)
     }
 
+    @Test
+    fun verificationRequest_startedAndAwaited_finishesWithCorrectResult() {
+        setupDbManagerLoadCandidate()
+        setupPrefs()
+        val result = captureMatchingResult()
+
+        val presenter = createPresenter(verifyRequest, probe)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+
+        val verifyResponse = result.firstValue.getParcelableExtra<VerifyResponse>(Response.BUNDLE_KEY)!!
+        Assert.assertEquals(VERIFY_GUID, verifyResponse.guid)
+    }
+
     private fun createPresenter(request: Request, probe: Person) =
         MatchingPresenter(viewMock, probe, request, dbManagerMock, preferencesManagerMock,
             sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockIdentificationLibMatcher)
 
-    private fun setupDbManagerLoadCandidates(includeProbe: Boolean = false) {
-        var candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID).toTypedArray()
+    private fun setupDbManagerLoadCandidates() {
+        val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID).toList()
 
-        if (includeProbe) candidates = arrayOf(probe, *candidates)
+        whenever(dbManagerMock) { loadPeople(anyNotNull()) } thenReturn Single.just(candidates)
+    }
 
-        whenever(dbManagerMock) { loadPeople(anyNotNull()) } thenReturn Single.just(candidates.toList())
+    private fun setupDbManagerLoadCandidate(verifyGuid: String = VERIFY_GUID) {
+        val candidate = PeopleGeneratorUtils.getRandomPerson(verifyGuid, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
+
+        whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(PersonFetchResult(candidate, false))
     }
 
     private fun setupPrefs(numberIdReturns: Int = NUMBER_OF_ID_RETURNS,
@@ -124,7 +131,29 @@ class MatchingPresenterTest {
     }
 
     companion object {
+
         private const val NUMBER_OF_ID_RETURNS = 10
         private const val CANDIDATE_POOL = 50
+
+        private const val VERIFY_GUID = "33eda6d0-22bb-475e-b439-3464433e5a87"
+
+        private val probe = PeopleGeneratorUtils.getRandomPerson(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            moduleId = DEFAULT_USER_ID
+        )
+
+        private val identifyRequest = IdentifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            "")
+
+        private val verifyRequest = VerifyRequest(
+            DEFAULT_PROJECT_ID,
+            DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID,
+            "",
+            VERIFY_GUID)
     }
 }
