@@ -59,7 +59,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
         logMessageForCrashReport("Submit button clicked")
         reason?.let { refusalReason ->
             sessionEventsManager.updateSession {
-                it.events.add(RefusalEvent(
+                it.addEvent(RefusalEvent(
                         it.timeRelativeToStartTime(refusalStartTime),
                         it.nowRelativeToStartTime(timeHelper),
                         RefusalEvent.Answer.fromRefusalReason(refusalReason),

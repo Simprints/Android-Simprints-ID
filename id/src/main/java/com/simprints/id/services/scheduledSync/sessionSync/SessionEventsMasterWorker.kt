@@ -40,6 +40,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
             Timber.d("No sessions found")
             Result.success()
         } catch (throwable: Throwable) {
+            Timber.d("Sessions upload failed")
             Timber.e(throwable)
             crashReportManager.logExceptionOrThrowable(throwable)
             Result.failure()

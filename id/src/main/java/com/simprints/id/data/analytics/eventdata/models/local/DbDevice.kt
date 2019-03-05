@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class RlDevice : RealmObject {
+open class DbDevice : RealmObject {
 
     @PrimaryKey
     lateinit var id: String
@@ -23,4 +23,4 @@ open class RlDevice : RealmObject {
     }
 }
 
-fun RlDevice.toDomainDevice(): Device = Device(androidSdkVersion, deviceModel, deviceId, id)
+fun DbDevice.toDomainDevice(): Device = Device(androidSdkVersion, deviceModel, deviceId, id)

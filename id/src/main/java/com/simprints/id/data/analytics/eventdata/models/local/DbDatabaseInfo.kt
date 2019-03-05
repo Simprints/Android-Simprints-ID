@@ -4,7 +4,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseI
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
-open class RlDatabaseInfo : RealmObject {
+open class DbDatabaseInfo : RealmObject {
 
     @PrimaryKey
     lateinit var id: String
@@ -21,4 +21,4 @@ open class RlDatabaseInfo : RealmObject {
     }
 }
 
-fun RlDatabaseInfo.toDomainDatabaseInfo(): DatabaseInfo = DatabaseInfo(recordCount, sessionCount, id)
+fun DbDatabaseInfo.toDomainDatabaseInfo(): DatabaseInfo = DatabaseInfo(recordCount, sessionCount, id)
