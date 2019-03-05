@@ -3,6 +3,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 apply plugin: "kotlin-kapt"
 
+androidExtensions {
+    experimental = true
+}
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -65,6 +69,8 @@ dependencies {
     kapt deps.dagger.compiler
 
     implementation deps.timber.core
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
     implementation deps.androidx.core
     implementation deps.androidx.multidex
     implementation deps.androidx.appcompat
@@ -89,5 +95,7 @@ dependencies {
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
     kaptTest deps.dagger.compiler
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.mockito.kotlin
 
 }

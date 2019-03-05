@@ -33,7 +33,9 @@ class MatchingPresenter(
     private val preferencesManager: PreferencesManager,
     private val sessionEventsManager: SessionEventsManager,
     private val crashReportManager: CrashReportManager,
-    private val timeHelper: TimeHelper
+    private val timeHelper: TimeHelper,
+    private val libMatcherConstructor: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+                                        LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher
 ) : MatchingContract.Presenter {
 
     private lateinit var matchTaskDisposable: Disposable
@@ -67,7 +69,7 @@ class MatchingPresenter(
             val callback = matchCallback(emitter, candidates, scores)
             val libProbe = probe.toLibCommonPerson()
             val libCandidates = candidates.map { it.toLibCommonPerson() }
-            LibMatcher(libProbe, libCandidates, matcherType, scores, callback, 1).start()
+            libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
     private fun MatchTask.matchCallback(
