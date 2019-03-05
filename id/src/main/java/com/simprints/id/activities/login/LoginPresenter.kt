@@ -107,7 +107,7 @@ class LoginPresenter(val view: LoginContract.View,
                 it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             }
 
-            it.events.add(AuthenticationEvent(
+            it.addEvent(AuthenticationEvent(
                 it.timeRelativeToStartTime(startTimeLogin),
                 it.timeRelativeToStartTime(timeHelper.now()),
                 UserInfo(suppliedProjectId, suppliedUserId),

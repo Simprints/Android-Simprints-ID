@@ -7,7 +7,8 @@ import io.realm.annotations.RealmModule
 
 internal class SessionRealmMigration : RealmMigration {
 
-    @RealmModule(classes = [RlDatabaseInfo::class, RlDevice::class, RlLocation::class, RlEvent::class, RlSession::class])
+    //StopShip: classes renamed. Migration Required.
+    @RealmModule(classes = [DbDatabaseInfo::class, DbDevice::class, DbLocation::class, DbEvent::class, DbSession::class])
     class SessionModule
 
     companion object {

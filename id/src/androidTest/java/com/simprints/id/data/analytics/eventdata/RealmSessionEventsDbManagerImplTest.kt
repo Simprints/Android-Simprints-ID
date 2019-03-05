@@ -94,7 +94,7 @@ class RealmSessionEventsDbManagerImplTest {
         sessionEventsManagerSpy.updateSession {
             it.databaseInfo = DatabaseInfo(0)
             it.location = Location(0.0, 0.0)
-            it.events.add(RefusalEvent(200, 200, RefusalEvent.Answer.OTHER, "fake_event"))
+            it.addEvent(RefusalEvent(200, 200, RefusalEvent.Answer.OTHER, "fake_event"))
         }.blockingGet()
 
         verifyNumberOfSessionsInDb(5, realmForDataEvent)

@@ -101,7 +101,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
             requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
 
-            val response = data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)?.let {
+            val domainResponse = data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)
+            viewPresenter.handleActivityResult(requestCode, resultCode, domainResponse)
+
+            val response = domainResponse.let {
                 when (it) {
                     is EnrolResponse -> it.toClientApiEnrolResponse()
                     is VerifyResponse -> it.toClientApiVerifyResponse()
@@ -110,8 +113,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
                     else -> null
                 }
             }
-
-            viewPresenter.handleActivityResult(requestCode, resultCode, response)
             setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
             finish()
         }

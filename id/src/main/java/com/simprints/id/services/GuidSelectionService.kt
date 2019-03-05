@@ -2,11 +2,12 @@ package com.simprints.id.services
 
 import android.app.IntentService
 import android.content.Intent
+import com.google.gson.Gson
 import com.simprints.id.Application
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -52,7 +53,9 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(onComplete = {
-                        Timber.d(SessionEventsApiAdapterFactory().gson.toJson(sessionEventsManager.loadSessionById(sessionId).blockingGet()))
+                        if(BuildConfig.DEBUG) {
+                            Timber.d(Gson().toJson(sessionEventsManager.loadSessionById(sessionId).blockingGet()))
+                        }
                         Timber.d("Added Guid Selection Event")
                     }, onError = { e ->
                         crashReportManager.logExceptionOrThrowable(e)
