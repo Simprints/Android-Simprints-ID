@@ -308,7 +308,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun addCaptureEventInSession(finger: Finger) {
         sessionEventsManager.updateSessionInBackground { sessionEvents ->
-            sessionEvents.events.add(FingerprintCaptureEvent(
+            sessionEvents.addEvent(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
                 finger.id,

@@ -108,10 +108,10 @@ fun verifyEventsAfterIdentification(events: List<Event>, realmForDataEvent: Real
 fun checkDbHasOnlyTheExpectedInfo(realmForDataEvent: Realm, nEvents: Int) {
     with(realmForDataEvent) {
         realmForDataEvent.executeTransaction {
-            assertEquals(nEvents, where(RlEvent::class.java).findAll().size)
-            assertEquals(1, where(RlDatabaseInfo::class.java).findAll().size)
-            assertEquals(1, where(RlDevice::class.java).findAll().size)
-            Truth.assertThat(where(RlLocation::class.java).findAll().size).isIn(arrayListOf(0, 1))
+            assertEquals(nEvents, where(DbEvent::class.java).findAll().size)
+            assertEquals(1, where(DbDatabaseInfo::class.java).findAll().size)
+            assertEquals(1, where(DbDevice::class.java).findAll().size)
+            Truth.assertThat(where(DbLocation::class.java).findAll().size).isIn(arrayListOf(0, 1))
         }
     }
 }
@@ -141,30 +141,30 @@ fun saveSessionInDb(session: SessionEvents, realmSessionEventsManager: SessionEv
 
 fun verifyNumberOfSessionsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        assertEquals(count, where(RlSession::class.java).findAll().size)
+        assertEquals(count, where(DbSession::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDatabaseInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        assertEquals(count, where(RlDatabaseInfo::class.java).findAll().size)
+        assertEquals(count, where(DbDatabaseInfo::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfEventsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        assertEquals(count, where(RlEvent::class.java).findAll().size)
+        assertEquals(count, where(DbEvent::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfDeviceInfosInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        assertEquals(count, where(RlDevice::class.java).findAll().size)
+        assertEquals(count, where(DbDevice::class.java).findAll().size)
     }
 }
 
 fun verifyNumberOfLocationsInDb(count: Int, realmForDataEvent: Realm) {
     with(realmForDataEvent) {
-        assertEquals(count, where(RlLocation::class.java).findAll().size)
+        assertEquals(count, where(DbLocation::class.java).findAll().size)
     }
 }

@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.controllers.remote
 
 import com.simprints.core.network.NetworkConstants
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.Body
@@ -15,5 +15,5 @@ interface SessionsRemoteInterface {
 
     @POST("projects/{projectId}/sessions")
     fun uploadSessions(@Path("projectId") projectId: String,
-                       @Body sessionsJson: HashMap<String, Array<SessionEvents>>): Single<Result<Void?>>
+                       @Body sessionsJson: HashMap<String, Array<ApiSessionEvents>>): Single<Result<Void?>>
 }

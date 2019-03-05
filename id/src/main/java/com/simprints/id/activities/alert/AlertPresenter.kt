@@ -38,7 +38,7 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertMessageWithStringRes(alertType.alertMessageId)
 
         sessionManager.updateSessionInBackground {
-            it.events.add(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alertType))
+            it.addEvent(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alertType))
         }
     }
 

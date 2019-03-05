@@ -260,7 +260,7 @@ class LaunchPresenter(private val view: LaunchContract.View, private val appRequ
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
         sessionEventsManager.updateSessionInBackground {
-            it.events.add(
+            it.addEvent(
                 ConsentEvent(
                     it.timeRelativeToStartTime(startConsentEventTime),
                     it.nowRelativeToStartTime(timeHelper),

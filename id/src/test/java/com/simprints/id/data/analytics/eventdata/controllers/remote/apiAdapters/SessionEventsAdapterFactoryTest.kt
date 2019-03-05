@@ -233,7 +233,7 @@ class SessionEventsAdapterFactoryTest {
             "en",
             Device("28","phone", "device_id"),
             0)
-        session.events.add(AlertScreenEvent(0, ALERT_TYPE.NOT_PAIRED))
+        session.addEvent(AlertScreenEvent(0, ALERT_TYPE.NOT_PAIRED))
 
         val json = gsonWithAdapters.toJsonTree(session).asJsonObject
         validateSessionEventsApiModel(json)

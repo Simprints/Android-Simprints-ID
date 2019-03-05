@@ -1,7 +1,5 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
-
 class AuthorizationEvent(val relativeStartTime: Long,
                          val result: Result,
                          val userInfo: UserInfo?) : Event(EventType.AUTHORIZATION) {
