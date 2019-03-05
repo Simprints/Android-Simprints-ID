@@ -9,6 +9,7 @@ import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
@@ -35,6 +36,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
             .filterClosedSessions()
             .uploadClosedSessionsOrThrowIfNoSessions(projectId)
             .deleteSessionsFromDb()
+            .trace("uploadSessionsBatch")
 
     @SuppressLint("CheckResult")
     internal fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
