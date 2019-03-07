@@ -28,6 +28,9 @@ android {
             initWith debug
             testCoverageEnabled false
         }
+        profiling {
+            initWith debug
+        }
     }
 }
 
