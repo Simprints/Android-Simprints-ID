@@ -61,7 +61,7 @@ dependencies {
     implementation project(':id')
     implementation project(':libcommon')
     implementation project(':libsimprints')
-    implementation deps.simprints.libmatcher
+    implementation project(':libmatcher')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
