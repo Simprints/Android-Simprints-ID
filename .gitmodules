@@ -1,6 +1,3 @@
 [submodule "libsimprints"]
 	path = libsimprints
 	url = https://github.com/Simprints/LibSimprints
-[submodule "SimMatcher"]
-	path = /libmatcher/src/main/jni/SimMatcher/
-	url = https://github.com/Simprints/SimMatcher
