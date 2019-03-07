@@ -46,6 +46,8 @@ __pycache__/
 
 #NDK
 obj/
+.externalNativeBuild/
+app/profiling_apk_add_dir/
 
 # Test Log Files
 testing/logs/
