@@ -11,7 +11,7 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock

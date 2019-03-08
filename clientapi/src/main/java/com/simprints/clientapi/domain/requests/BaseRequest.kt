@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.requests
 
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.moduleinterfaces.app.requests.IAppRequest
+import com.simprints.moduleapi.app.requests.IAppRequest
 
 
 interface BaseRequest : ClientBase {

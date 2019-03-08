@@ -2,11 +2,11 @@ package com.simprints.id.tools.extensions
 
 import android.content.Intent
 import com.simprints.id.domain.requests.*
-import com.simprints.moduleinterfaces.app.confirmations.IAppIdentifyConfirmation
-import com.simprints.moduleinterfaces.app.requests.IAppEnrollRequest
-import com.simprints.moduleinterfaces.app.requests.IAppIdentifyRequest
-import com.simprints.moduleinterfaces.app.requests.IAppRequest
-import com.simprints.moduleinterfaces.app.requests.IAppVerifyRequest
+import com.simprints.moduleapi.app.confirmations.IAppIdentifyConfirmation
+import com.simprints.moduleapi.app.requests.IAppEnrollRequest
+import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
+import com.simprints.moduleapi.app.requests.IAppRequest
+import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 
 fun Intent.parseClientApiRequest(): BaseRequest =
     this.extras?.let {

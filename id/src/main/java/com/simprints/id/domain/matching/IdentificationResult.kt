@@ -1,8 +1,8 @@
 package com.simprints.id.domain.matching
 
 import android.os.Parcelable
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse.IIdentificationResult
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiIdentifyResponse.IIdentificationResult
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

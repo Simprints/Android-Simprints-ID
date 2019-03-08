@@ -1,6 +1,6 @@
 package com.simprints.id.domain.matching
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
 
 enum class Tier {
     TIER_1,

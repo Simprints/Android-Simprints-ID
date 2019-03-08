@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiIdentifyResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
 
 
 data class IdentifyResponse(val identifications: List<Identification>,

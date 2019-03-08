@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.confirmations
 
-import com.simprints.moduleinterfaces.app.confirmations.IAppConfirmation
-import com.simprints.moduleinterfaces.app.confirmations.IAppIdentifyConfirmation
+import com.simprints.moduleapi.app.confirmations.IAppConfirmation
+import com.simprints.moduleapi.app.confirmations.IAppIdentifyConfirmation
 import kotlinx.android.parcel.Parcelize
 
 

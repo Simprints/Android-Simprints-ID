@@ -127,7 +127,7 @@ dependencies {
     implementation project(':core')
     implementation project(':clientapi')
     implementation project(':fingerprintscanner')
-    api project(':moduleinterfaces')
+    api project(':moduleapi')
 
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
