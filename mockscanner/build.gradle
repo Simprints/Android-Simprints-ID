@@ -54,6 +54,7 @@ dependencies {
     // Unit tests
     testImplementation project(':testtools')
     testImplementation deps.testing.junit
+    testImplementation deps.testing.robolectric.core
 }
 
 def libraryGroupId = 'com.simprints'
