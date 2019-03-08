@@ -1,0 +1,104 @@
+apply plugin: 'com.android.dynamic-feature'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
+
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "2019.1.0-dev0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+    }
+
+    buildTypes {
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+
+    testBuildType "debug"
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        google()
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    maven { url "https://maven.google.com" }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven { url "https://maven.fabric.io/public" }
+    maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+    maven {
+        url "http://178.62.61.39:8081/artifactory/libs-release-local"
+        credentials {
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':id')
+    implementation project(':libcommon')
+    implementation project(':libsimprints')
+    implementation project(':fingerprintmatcher')
+    implementation project(':libscanner')
+    implementation project(':mockscanner')
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation deps.dagger.core
+    kapt deps.dagger.compiler
+
+    implementation deps.timber.core
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+    implementation deps.androidx.core
+    implementation deps.androidx.multidex
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.legacy
+    implementation deps.androidx.room.core
+    implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.livedata
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.androidx.ui.cardview
+    implementation deps.androidx.ui.preference
+    implementation deps.androidx.ui.fragment
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
+
+    testImplementation project(':testtools')
+    testImplementation(deps.testing.junit) {
+        exclude group: "com.android.support"
+    }
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.androidx.runner
+    kaptTest deps.dagger.compiler
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.truth
+
+}
