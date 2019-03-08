@@ -1,10 +1,10 @@
 package com.simprints.id.testtools
 
 import com.simprints.id.scanner.ScannerManager
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.Scanner
-import com.simprints.libscanner.ScannerCallback
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.SCANNER_ERROR
+import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.ScannerCallback
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import timber.log.Timber
 
 object ScannerUtils {

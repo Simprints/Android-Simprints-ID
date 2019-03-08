@@ -126,7 +126,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':core')
     implementation project(':clientapi')
-    implementation project(':libscanner')
+    implementation project(':fingerprintscanner')
     api project(':moduleinterfaces')
 
     implementation deps.dagger.core

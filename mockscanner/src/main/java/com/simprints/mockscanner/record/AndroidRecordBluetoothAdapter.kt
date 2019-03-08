@@ -1,8 +1,8 @@
 package com.simprints.mockscanner.record
 
 import android.bluetooth.BluetoothAdapter
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.libscanner.bluetooth.BluetoothComponentDevice
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentDevice
 
 class AndroidRecordBluetoothAdapter(private val adapter: BluetoothAdapter?,
                                     private val fileWithFakeBytes: String?): BluetoothComponentAdapter {

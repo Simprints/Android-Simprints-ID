@@ -1,6 +1,6 @@
 package com.simprints.mockscanner
 
-import com.simprints.libscanner.Message
+import com.simprints.fingerprintscanner.Message
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 

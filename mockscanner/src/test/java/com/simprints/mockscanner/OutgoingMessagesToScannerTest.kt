@@ -1,8 +1,8 @@
 package com.simprints.mockscanner
 
-import com.simprints.libscanner.Scanner
-import com.simprints.libscanner.ScannerCallback
-import com.simprints.libscanner.wrappedScannerCallback
+import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.ScannerCallback
+import com.simprints.fingerprintscanner.wrappedScannerCallback
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before

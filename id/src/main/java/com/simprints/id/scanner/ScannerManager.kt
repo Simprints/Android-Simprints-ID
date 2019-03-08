@@ -1,7 +1,7 @@
 package com.simprints.id.scanner
 
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.libscanner.Scanner
+import com.simprints.fingerprintscanner.Scanner
 import io.reactivex.Completable
 
 interface ScannerManager {

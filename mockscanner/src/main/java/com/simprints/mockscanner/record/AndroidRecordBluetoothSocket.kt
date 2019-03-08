@@ -1,7 +1,7 @@
 package com.simprints.mockscanner.record
 
 import android.bluetooth.BluetoothSocket
-import com.simprints.libscanner.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket
 import org.apache.commons.io.input.TeeInputStream
 import java.io.File
 import java.io.FileOutputStream
