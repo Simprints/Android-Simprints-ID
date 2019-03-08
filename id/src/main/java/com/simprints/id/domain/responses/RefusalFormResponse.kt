@@ -1,7 +1,7 @@
 package com.simprints.id.domain.responses
 
 import com.simprints.id.domain.refusal_form.RefusalFormAnswer
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiRefusalFormResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiRefusalFormResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

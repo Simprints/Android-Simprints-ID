@@ -2,8 +2,8 @@ package com.simprints.id.domain.responses
 
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.toClientApiIClientApiResponseTier
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiVerifyResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiVerifyResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

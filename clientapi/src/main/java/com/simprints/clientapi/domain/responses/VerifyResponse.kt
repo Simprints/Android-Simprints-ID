@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponseTier
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiVerifyResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.clientapi.responses.IClientApiVerifyResponse
 
 
 data class VerifyResponse(val guid: String,

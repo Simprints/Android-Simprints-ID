@@ -17,8 +17,8 @@ import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmati
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
 import com.simprints.libsimprints.Constants
-import com.simprints.moduleinterfaces.clientapi.responses.*
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
+import com.simprints.moduleapi.clientapi.responses.*
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {

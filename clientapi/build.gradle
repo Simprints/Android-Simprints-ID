@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
-    implementation project(':moduleinterfaces')
+    implementation project(':moduleapi')
 }
 
 repositories {

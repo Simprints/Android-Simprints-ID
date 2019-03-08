@@ -2,7 +2,7 @@ package com.simprints.id.domain.responses
 
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.toClientApiIdentificationResult
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiIdentifyResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiIdentifyResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

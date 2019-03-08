@@ -1,6 +1,6 @@
 package com.simprints.id.domain.requests
 
-import com.simprints.moduleinterfaces.app.requests.IAppVerifyRequest
+import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

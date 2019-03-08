@@ -1,6 +1,6 @@
 package com.simprints.id.domain.requests
 
-import com.simprints.moduleinterfaces.app.confirmations.IAppIdentifyConfirmation
+import com.simprints.moduleapi.app.confirmations.IAppIdentifyConfirmation
 
 data class IdentityConfirmationRequest(override val projectId: String,
                                        val sessionId: String,

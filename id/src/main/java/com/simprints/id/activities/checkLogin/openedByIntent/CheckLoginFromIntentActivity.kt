@@ -17,7 +17,7 @@ import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceExcepti
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)

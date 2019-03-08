@@ -1,6 +1,6 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiRefusalFormResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiRefusalFormResponse
 
 
 data class RefusalFormResponse(val reason: String,

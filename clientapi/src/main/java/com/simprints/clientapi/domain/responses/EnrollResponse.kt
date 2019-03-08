@@ -1,6 +1,6 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiEnrollResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiEnrollResponse
 
 
 data class EnrollResponse(val guid: String) {

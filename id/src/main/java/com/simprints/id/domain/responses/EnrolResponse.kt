@@ -1,6 +1,6 @@
 package com.simprints.id.domain.responses
 
-import com.simprints.moduleinterfaces.clientapi.responses.IClientApiEnrollResponse
+import com.simprints.moduleapi.clientapi.responses.IClientApiEnrollResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
