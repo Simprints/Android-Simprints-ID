@@ -1,11 +1,13 @@
 package com.simprints.id.data.analytics.eventdata.models.local
 
+import com.google.gson.GsonBuilder
 import com.simprints.id.data.analytics.eventdata.models.domain.EventType
 import com.simprints.id.data.analytics.eventdata.models.domain.EventType.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.tools.json.JsonHelper
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import timber.log.Timber
 
 open class RlEvent : RealmObject {
 
@@ -24,6 +26,7 @@ open class RlEvent : RealmObject {
     constructor()
     constructor(event: Event) : this() {
         saveType(event.type)
+        Timber.d(GsonBuilder().create().toJson(event))
         id = event.id
         jsonEvent = JsonHelper.toJson(event)
     }

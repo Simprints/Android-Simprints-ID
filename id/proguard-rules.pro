@@ -53,10 +53,9 @@
 -keep class com.simprints.id.domain.ALERT_TYPE { *; }
 -keep class com.simprints.id.session.Session { *; }
 
--keep class com.simprints.id.data.db.remote.local.** { *; }
 -keep class com.simprints.id.data.db.remote.models.** { *; }
 -keep class com.simprints.id.services.scheduledSync.peopleDownSync.models.** { *; }
--keep class com.simprints.id.data.analytics.eventData.models.** { *; }
+-keep class com.simprints.id.data.analytics.eventdata.models.** { *; }
 -keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
 
 -keep class com.simprints.id.session.callout.** { *; }
@@ -75,6 +74,7 @@
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
+-keep public class * extends java.lang.RuntimeException
 -keep public class * extends java.lang.Throwable
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
