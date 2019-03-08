@@ -1,4 +1,4 @@
-package com.simprints.mockscanner
+package com.simprints.fingerprintscannermock
 
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins

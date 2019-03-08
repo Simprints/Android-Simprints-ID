@@ -17,9 +17,9 @@ import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
 import com.simprints.id.integration.testtools.models.TestProject
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockFinger
-import com.simprints.mockscanner.MockScannerManager
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.MockFinger
+import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.log
 import org.junit.Before
 import org.junit.Rule

@@ -9,10 +9,10 @@
       <module fileurl="file://$PROJECT_DIR$/fingerprint/fingerprint.iml" filepath="$PROJECT_DIR$/fingerprint/fingerprint.iml" />
       <module fileurl="file://$PROJECT_DIR$/fingerprintmatcher/fingerprintmatcher.iml" filepath="$PROJECT_DIR$/fingerprintmatcher/fingerprintmatcher.iml" />
       <module fileurl="file://$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" filepath="$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" filepath="$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
       <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mockscanner/mockscanner.iml" filepath="$PROJECT_DIR$/mockscanner/mockscanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/moduleinterfaces/moduleinterfaces.iml" filepath="$PROJECT_DIR$/moduleinterfaces/moduleinterfaces.iml" />
       <module fileurl="file://$PROJECT_DIR$/testtools/testtools.iml" filepath="$PROJECT_DIR$/testtools/testtools.iml" />
     </modules>

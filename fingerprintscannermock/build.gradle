@@ -58,7 +58,7 @@ dependencies {
 }
 
 def libraryGroupId = 'com.simprints'
-def libraryArtifactId = 'mockscanner'
+def libraryArtifactId = 'fingerprintscannermock'
 
 publishing.publications {
     aar(MavenPublication) {

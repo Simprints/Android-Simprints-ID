@@ -31,8 +31,8 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.libsimprints.Constants
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockScannerManager
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever

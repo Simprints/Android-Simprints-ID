@@ -1,4 +1,4 @@
-package com.simprints.mockscanner
+package com.simprints.fingerprintscannermock
 
 
 enum class MockFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99

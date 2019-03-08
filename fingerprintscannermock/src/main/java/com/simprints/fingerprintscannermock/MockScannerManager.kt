@@ -1,7 +1,7 @@
-package com.simprints.mockscanner
+package com.simprints.fingerprintscannermock
 
 import com.simprints.fingerprintscanner.Message
-import com.simprints.mockscanner.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.ByteArrayUtils.bytesToMessage
 import io.reactivex.observers.DisposableObserver
 import java.io.PipedInputStream
 import java.io.PipedOutputStream

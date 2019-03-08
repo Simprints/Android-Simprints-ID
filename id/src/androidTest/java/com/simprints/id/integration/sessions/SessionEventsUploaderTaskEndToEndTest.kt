@@ -30,9 +30,9 @@ import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.libsimprints.FingerIdentifier
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockFinger
-import com.simprints.mockscanner.MockScannerManager
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.MockFinger
+import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver

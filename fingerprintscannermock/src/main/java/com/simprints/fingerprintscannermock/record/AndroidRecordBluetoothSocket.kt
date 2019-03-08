@@ -1,4 +1,4 @@
-package com.simprints.mockscanner.record
+package com.simprints.fingerprintscannermock.record
 
 import android.bluetooth.BluetoothSocket
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket
