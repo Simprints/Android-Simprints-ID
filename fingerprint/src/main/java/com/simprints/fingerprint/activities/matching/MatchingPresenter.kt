@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.activities.matching
+package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

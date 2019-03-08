@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.testtools
+package com.simprints.fingerprint.testtools
 
 object DefaultTestConstants { // TODO : Factor with id version of this file
     const val DEFAULT_PROJECT_ID = "TESTzbq8ZBOs1LLOOH6p"

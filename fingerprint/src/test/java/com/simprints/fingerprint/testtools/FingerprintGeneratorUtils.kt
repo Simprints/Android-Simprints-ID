@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.testtools
+package com.simprints.fingerprint.testtools
 
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint

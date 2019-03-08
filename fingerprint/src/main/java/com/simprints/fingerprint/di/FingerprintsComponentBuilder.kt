@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.di
+package com.simprints.fingerprint.di
 
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager

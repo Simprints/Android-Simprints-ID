@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.activities.matching
+package com.simprints.fingerprint.activities.matching
 
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.Request

@@ -12,7 +12,7 @@
 
     <application tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".activities.matching.MatchingActivity"
+            android:name="com.simprints.fingerprint.activities.matching.MatchingActivity"
             android:label="Matching"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"

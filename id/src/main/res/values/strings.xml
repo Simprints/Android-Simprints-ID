@@ -421,6 +421,6 @@
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_fingerprint">Fingerprint</string>
-    <string name="title_faces">Faces</string>
+    <string name="title_face">Face</string>
 
 </resources>
