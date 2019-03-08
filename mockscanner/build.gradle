@@ -1,0 +1,95 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
+
+project.version = "2018.3.0"
+
+android {
+    compileSdkVersion 28
+
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName project.version
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Simprints
+    implementation project(':libscanner')
+
+    // Kotlin
+    implementation deps.kotlin.stdlib
+
+    // Reactive
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.kotlin
+
+    // For Tee-ing output streams
+    implementation deps.commons_io.commons_io
+
+    // Android
+    implementation deps.androidx.appcompat
+
+    // Unit tests
+    testImplementation project(':testtools')
+    testImplementation deps.testing.junit
+    testImplementation deps.testing.robolectric.core
+}
+
+def libraryGroupId = 'com.simprints'
+def libraryArtifactId = 'mockscanner'
+
+publishing.publications {
+    aar(MavenPublication) {
+        groupId libraryGroupId
+        //noinspection GroovyAssignabilityCheck
+        version project.version
+        artifactId libraryArtifactId
+
+        artifact("$buildDir/outputs/aar/${artifactId}-release.aar")
+    }
+}
+
+artifactory {
+    contextUrl = 'http://178.62.61.39:8081/artifactory'
+    publish {
+        repository {
+            repoKey = 'libs-release-local'
+
+            username = SIMPRINTS_ARTIFACTORY_USERNAME
+            password = SIMPRINTS_ARTIFACTORY_PASSWORD
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
