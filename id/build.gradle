@@ -126,10 +126,9 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':core')
     implementation project(':clientapi')
+    implementation project(':libscanner')
     api project(':moduleinterfaces')
-    api deps.simprints.libscanner
 
-    implementation deps.simprints.libscanner
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
@@ -184,7 +183,7 @@ dependencies {
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
     // Test
-    testImplementation deps.simprints.mockscanner
+    testImplementation project(':mockscanner')
     testImplementation deps.testing.retrofit
     testImplementation(deps.testing.junit) {
         exclude group: "com.android.support"
@@ -204,7 +203,7 @@ dependencies {
     kaptTest deps.dagger.compiler
     testImplementation project(':testtools')
     // Android test
-    androidTestImplementation deps.simprints.mockscanner
+    androidTestImplementation project(':mockscanner')
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
