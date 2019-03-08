@@ -1,7 +1,7 @@
-package com.simprints.fingerprints.di
+package com.simprints.fingerprint.di
 
-import com.simprints.fingerprints.activities.matching.MatchingActivity
-import com.simprints.fingerprints.activities.matching.MatchingPresenter
+import com.simprints.fingerprint.activities.matching.MatchingActivity
+import com.simprints.fingerprint.activities.matching.MatchingPresenter
 import com.simprints.id.di.AppModule
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.di.SerializerModule

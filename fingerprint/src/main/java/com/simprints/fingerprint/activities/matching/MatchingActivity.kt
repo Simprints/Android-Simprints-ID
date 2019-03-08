@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.activities.matching
+package com.simprints.fingerprint.activities.matching
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
@@ -9,8 +9,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.fingerprints.R
-import com.simprints.fingerprints.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.R
+import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity

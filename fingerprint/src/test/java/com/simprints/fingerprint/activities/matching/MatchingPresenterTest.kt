@@ -1,4 +1,4 @@
-package com.simprints.fingerprints.activities.matching
+package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -6,10 +6,10 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.eq
-import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.fingerprints.testtools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.fingerprints.testtools.PeopleGeneratorUtils
+import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.fingerprint.testtools.PeopleGeneratorUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
