@@ -291,7 +291,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        val fingerprintsModule = "com.simprints.fingerprint" //STOPSHIP
+        val fingerprintsModule = "com.simprints.id" //STOPSHIP
         val matchingActivityClassName = "com.simprints.fingerprint.activities.matching.MatchingActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, matchingActivityClassName)
