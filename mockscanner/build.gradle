@@ -35,7 +35,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Simprints
-    implementation project(':libscanner')
+    implementation project(':fingerprintscanner')
 
     // Kotlin
     implementation deps.kotlin.stdlib

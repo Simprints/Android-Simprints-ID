@@ -34,7 +34,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 
 class TestAppModule(app: Application,
                     var localDbManagerRule: DependencyRule = RealRule,

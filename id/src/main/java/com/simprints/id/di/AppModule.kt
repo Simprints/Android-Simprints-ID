@@ -59,8 +59,8 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.utils.*
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

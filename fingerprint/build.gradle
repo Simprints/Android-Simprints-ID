@@ -62,7 +62,7 @@ dependencies {
     implementation project(':libcommon')
     implementation project(':libsimprints')
     implementation project(':fingerprintmatcher')
-    implementation project(':libscanner')
+    implementation project(':fingerprintscanner')
     implementation project(':mockscanner')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

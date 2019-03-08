@@ -29,7 +29,7 @@ import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.libscanner.Scanner
+import com.simprints.fingerprintscanner.Scanner
 import com.simprints.libsimprints.Constants
 import com.simprints.mockscanner.MockBluetoothAdapter
 import com.simprints.mockscanner.MockScannerManager

@@ -20,10 +20,10 @@ import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.activities.collectFingerprints.views.TimeoutBar
 import com.simprints.id.tools.Vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
-import com.simprints.libscanner.ButtonListener
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.SCANNER_ERROR.*
-import com.simprints.libscanner.ScannerCallback
+import com.simprints.fingerprintscanner.ButtonListener
+import com.simprints.fingerprintscanner.SCANNER_ERROR
+import com.simprints.fingerprintscanner.SCANNER_ERROR.*
+import com.simprints.fingerprintscanner.ScannerCallback
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers

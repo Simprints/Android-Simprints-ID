@@ -14,12 +14,12 @@ import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.id.exceptions.unexpected.NullScannerException
 import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
-import com.simprints.libscanner.SCANNER_ERROR
-import com.simprints.libscanner.Scanner
-import com.simprints.libscanner.ScannerCallback
-import com.simprints.libscanner.ScannerUtils
-import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.SCANNER_ERROR
+import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.ScannerCallback
+import com.simprints.fingerprintscanner.ScannerUtils
+import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import io.reactivex.Completable
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
