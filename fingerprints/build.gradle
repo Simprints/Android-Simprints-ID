@@ -62,6 +62,8 @@ dependencies {
     implementation project(':libcommon')
     implementation project(':libsimprints')
     implementation project(':libmatcher')
+    implementation project(':libscanner')
+    implementation project(':mockscanner')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
