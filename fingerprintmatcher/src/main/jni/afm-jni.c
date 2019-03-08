@@ -81,7 +81,7 @@ JavaVM *jvm;
 
 
 // Resolve and cache once all the jclass and jmethodId used later
-JNIEXPORT jboolean JNICALL Java_com_simprints_libmatcher_JNILibAfis_nativeInit(
+JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_nativeInit(
         JNIEnv* env,
         jobject obj)
 {
@@ -109,7 +109,7 @@ JNIEXPORT jboolean JNICALL Java_com_simprints_libmatcher_JNILibAfis_nativeInit(
     return JNI_TRUE;
 }
 
-JNIEXPORT jint JNICALL Java_com_simprints_libmatcher_JNILibAfis_getNbCores(
+JNIEXPORT jint JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_getNbCores(
         JNIEnv *env,
         jobject obj)
 {
@@ -117,7 +117,7 @@ JNIEXPORT jint JNICALL Java_com_simprints_libmatcher_JNILibAfis_getNbCores(
 }
 
 
-JNIEXPORT jfloat JNICALL Java_com_simprints_libmatcher_JNILibAfis_verify(
+JNIEXPORT jfloat JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_verify(
         JNIEnv* env,
         jobject obj,
         jobject probe,
@@ -285,7 +285,7 @@ void* performMatchingTask(void *arg)
     return NULL;
 }
 
-JNIEXPORT jfloatArray JNICALL Java_com_simprints_libmatcher_JNILibAfis_identify(
+JNIEXPORT jfloatArray JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_identify(
         JNIEnv* env,
         jobject obj,
         jobject probe,
