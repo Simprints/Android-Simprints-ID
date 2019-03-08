@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Dynamic module names -->
+    <string name="title_fingerprint">Fingerprint</string>
+    <string name="title_face">Face</string>
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- App Name -->
@@ -420,7 +423,5 @@
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
-    <string name="title_fingerprint">Fingerprint</string>
-    <string name="title_face">Face</string>
 
 </resources>
