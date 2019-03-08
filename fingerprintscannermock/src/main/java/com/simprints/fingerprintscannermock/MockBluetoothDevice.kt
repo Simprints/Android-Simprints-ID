@@ -1,4 +1,4 @@
-package com.simprints.mockscanner
+package com.simprints.fingerprintscannermock
 
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentDevice
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket

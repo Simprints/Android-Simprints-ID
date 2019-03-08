@@ -24,7 +24,7 @@ import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.mockscanner.MockBluetoothAdapter
+import fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
 import org.junit.Rule

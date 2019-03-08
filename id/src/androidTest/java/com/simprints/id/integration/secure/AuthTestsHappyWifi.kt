@@ -19,8 +19,8 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.checkLoginFromIntentActivityTestRule
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockScannerManager
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.MockScannerManager
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

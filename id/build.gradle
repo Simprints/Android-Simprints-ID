@@ -183,7 +183,7 @@ dependencies {
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
     // Test
-    testImplementation project(':mockscanner')
+    testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
     testImplementation(deps.testing.junit) {
         exclude group: "com.android.support"
@@ -203,7 +203,7 @@ dependencies {
     kaptTest deps.dagger.compiler
     testImplementation project(':testtools')
     // Android test
-    androidTestImplementation project(':mockscanner')
+    androidTestImplementation project(':fingerprintscannermock')
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin

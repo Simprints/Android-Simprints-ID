@@ -1,8 +1,8 @@
-package com.simprints.mockscanner
+package com.simprints.fingerprintscannermock
 
 import com.simprints.fingerprintscanner.Message
-import com.simprints.mockscanner.ByteArrayUtils.byteArrayFromHexString
-import com.simprints.mockscanner.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.ByteArrayUtils.byteArrayFromHexString
+import com.simprints.fingerprintscannermock.ByteArrayUtils.bytesToMessage
 import com.simprints.fingerprintscanner.enums.MESSAGE_TYPE.*
 
 

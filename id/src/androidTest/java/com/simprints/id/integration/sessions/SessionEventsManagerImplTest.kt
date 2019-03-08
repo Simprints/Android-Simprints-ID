@@ -38,9 +38,9 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.tools.utils.EncodingUtils
 import com.simprints.libsimprints.FingerIdentifier
-import com.simprints.mockscanner.MockBluetoothAdapter
-import com.simprints.mockscanner.MockFinger
-import com.simprints.mockscanner.MockScannerManager
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.MockFinger
+import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_LONG
 import com.simprints.testtools.android.WaitingUtils.UI_TIMEOUT
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
