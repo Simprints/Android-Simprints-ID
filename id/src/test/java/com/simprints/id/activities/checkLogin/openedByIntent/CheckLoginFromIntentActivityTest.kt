@@ -9,7 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
-import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
@@ -154,7 +154,7 @@ class CheckLoginFromIntentActivityTest {
         val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
         val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
 
-        assertActivityStarted(LaunchActivity::class.java, activity)
+        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, activity)
     }
 
     @Test
@@ -188,7 +188,7 @@ class CheckLoginFromIntentActivityTest {
 
         assertFalse(activity.isFinishing)
         val intent = sActivity.nextStartedActivity
-        assertActivityStarted(LaunchActivity::class.java, intent)
+        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, intent)
 
         sActivity.receiveResult(
             intent,
@@ -221,7 +221,7 @@ class CheckLoginFromIntentActivityTest {
             Intent())
 
         controller.resume()
-        assertActivityStarted(LaunchActivity::class.java, sActivity)
+        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, sActivity)
         assertFalse(activity.isFinishing)
     }
 

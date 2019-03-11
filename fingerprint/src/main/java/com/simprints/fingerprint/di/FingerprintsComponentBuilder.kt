@@ -20,18 +20,51 @@ import com.simprints.id.tools.TimeHelper
 class FingerprintsComponentBuilder {
 
     companion object {
+
+        private var component: FingerprintsComponent? = null
+
         //StopShip
-        @JvmStatic fun getComponent(app: Application): FingerprintsComponent =
+        @JvmStatic
+        fun getComponent(app: Application): FingerprintsComponent =
+            component?.let {
+                it
+            } ?: buildComponent(app).also { component = it }
+
+        private fun buildComponent(app: Application): FingerprintsComponent =
             DaggerFingerprintsComponent
                 .builder()
-                .appModule(object : AppModule(app){
-                    override fun provideDbManager(localDbManager: LocalDbManager, remoteDbManager: RemoteDbManager, secureDataManager: SecureDataManager, loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager, sessionEventsManager: SessionEventsManager, remotePeopleManager: RemotePeopleManager, remoteProjectManager: RemoteProjectManager, timeHelper: TimeHelper, peopleUpSyncMaster: PeopleUpSyncMaster, database: SyncStatusDatabase): DbManager {
-                        return super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
-                            .also { it.initialiseDb() }
+                .appModule(object : AppModule(app) {
+
+                    override fun provideDbManager(
+                        localDbManager: LocalDbManager,
+                        remoteDbManager: RemoteDbManager,
+                        secureDataManager: SecureDataManager,
+                        loginInfoManager: LoginInfoManager,
+                        preferencesManager: PreferencesManager,
+                        sessionEventsManager: SessionEventsManager,
+                        remotePeopleManager: RemotePeopleManager,
+                        remoteProjectManager: RemoteProjectManager,
+                        timeHelper: TimeHelper,
+                        peopleUpSyncMaster: PeopleUpSyncMaster,
+                        database: SyncStatusDatabase): DbManager {
+
+                        return super.provideDbManager(
+                            localDbManager,
+                            remoteDbManager,
+                            secureDataManager,
+                            loginInfoManager,
+                            preferencesManager,
+                            sessionEventsManager,
+                            remotePeopleManager,
+                            remoteProjectManager,
+                            timeHelper,
+                            peopleUpSyncMaster, database).also { it.initialiseDb() }
                     }
                 })
+                .fingerprintModule(FingerprintModule(app))
                 .preferencesModule(PreferencesModule())
                 .serializerModule(SerializerModule())
                 .build()
+
     }
 }

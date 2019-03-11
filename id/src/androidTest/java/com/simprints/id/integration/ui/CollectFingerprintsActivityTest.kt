@@ -6,15 +6,15 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
-import com.simprints.id.activities.collectFingerprints.ViewPagerCustom
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.integration.testsnippets.collectFingerprintsPressScan
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
@@ -43,7 +43,7 @@ class CollectFingerprintsActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
+    @get:Rule val collectFingerprintsRule = ActivityTestRule(com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity::class.java, false, false)
 
     private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -80,7 +80,7 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
@@ -102,7 +102,7 @@ class CollectFingerprintsActivityTest {
         setupToCollectFourFingerprints()
         launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
         Assert.assertEquals(4, viewPager?.adapter?.count)
 
@@ -126,7 +126,7 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
@@ -143,7 +143,7 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
 
@@ -160,7 +160,7 @@ class CollectFingerprintsActivityTest {
         setupToCollectFourFingerprints()
         launchCollectFingerprintsActivity(collectFingerprintsRule)
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
 
