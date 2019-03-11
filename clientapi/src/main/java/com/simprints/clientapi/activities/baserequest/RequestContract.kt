@@ -11,6 +11,7 @@ import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.exceptions.InvalidRequestException
 
 
 interface RequestContract {
@@ -31,7 +32,7 @@ interface RequestContract {
 
         fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation)
 
-        fun handleClientRequestError(exception: Exception)
+        fun handleClientRequestError(exception: InvalidRequestException)
 
         fun returnIntentActionErrorToClient()
 
