@@ -117,7 +117,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Should the UI automatically slide forward?
     override var nudgeMode: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
+        by PrimitivePreference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
 
     // Has the CHW given consent to use Simprints ID?
     override var consent: Boolean
@@ -125,7 +125,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Threshold that determines the UI feedback for a given fingerprint quality
     override var qualityThreshold: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
+        by PrimitivePreference(prefs, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
     override var returnIdCount: Int
@@ -145,11 +145,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Matcher type
     override var matcherType: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
+        by PrimitivePreference(prefs, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
 
     // Timeout seconds
     override var timeoutS: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, TIMEOUT_KEY, TIMEOUT_DEFAULT)
+        by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
     override var moduleIdOptions: Set<String>
@@ -169,11 +169,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     // Is the vibrate on
     override var vibrateMode: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, VIBRATE_KEY, VIBRATE_DEFAULT)
+        by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
 
     // The number of seconds the screens pauses for when a match is complete
     override var matchingEndWaitTimeSeconds: Int
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
+        by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // The map of default fingers
     /** @throws JsonSyntaxException */
