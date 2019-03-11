@@ -1,7 +1,6 @@
 package com.simprints.clientapi.routers
 
 import android.app.Activity
-import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
 import com.simprints.clientapi.domain.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
@@ -9,6 +8,7 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
 import com.simprints.clientapi.domain.requests.VerifyRequest
+import com.simprints.clientapi.exceptions.InvalidClientRequestException
 
 
 object AppRequestRouter {

@@ -13,6 +13,7 @@ import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.exceptions.InvalidRequestException
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
@@ -43,7 +44,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finishAffinity()
     }
 
-    override fun handleClientRequestError(exception: Exception) {
+    override fun handleClientRequestError(exception: InvalidRequestException) {
         ClientRequestErrorRouter.routeClientRequestError(this, exception)
         finish()
     }
