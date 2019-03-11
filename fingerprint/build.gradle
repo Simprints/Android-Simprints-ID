@@ -84,9 +84,12 @@ dependencies {
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
+    implementation deps.rxjava2.permissions
+    implementation deps.rxjava2.location
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
+    implementation deps.playservices.location
 
     testImplementation project(':testtools')
     testImplementation(deps.testing.junit) {

@@ -1,6 +1,6 @@
 package com.simprints.id.testtools
 
-import com.simprints.id.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback

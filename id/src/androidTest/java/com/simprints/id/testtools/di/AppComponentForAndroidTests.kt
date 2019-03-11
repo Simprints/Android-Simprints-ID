@@ -1,7 +1,7 @@
 package com.simprints.id.testtools.di
 
 import com.simprints.id.integration.sync.DashboardActivityAndroidTest
-import com.simprints.id.activities.launch.LaunchActivityAndroidTest
+import com.simprints.fingerprint.activities.launch.LaunchActivityAndroidTest
 import com.simprints.id.integration.ui.CollectFingerprintsActivityTest
 import com.simprints.id.integration.core.HappyWorkflowAllMainFeatures
 import com.simprints.id.data.analytics.eventdata.RealmSessionEventsDbManagerImplTest
