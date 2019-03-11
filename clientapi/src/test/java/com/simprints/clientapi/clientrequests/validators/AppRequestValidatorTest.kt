@@ -4,9 +4,9 @@ import com.simprints.clientapi.exceptions.InvalidModuleIdException
 import com.simprints.clientapi.exceptions.InvalidProjectIdException
 import com.simprints.clientapi.exceptions.InvalidUserIdException
 import com.simprints.clientapi.requestFactories.RequestFactory
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert
 import org.junit.Test
-import org.mockito.Mockito
 
 abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) {
 
@@ -18,7 +18,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnProjectId() {
         val extractor = mockFactory.getMockExtractor()
-        Mockito.`when`(extractor.getProjectId()).thenReturn("")
+        whenever(extractor) { getProjectId() } thenReturn ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -31,7 +31,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnUserId() {
         val extractor = mockFactory.getMockExtractor()
-        Mockito.`when`(extractor.getUserId()).thenReturn("")
+        whenever(extractor) { getUserId() } thenReturn ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -44,7 +44,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldFailOnModuleId() {
         val extractor = mockFactory.getMockExtractor()
-        Mockito.`when`(extractor.getModuleId()).thenReturn("")
+        whenever(extractor) { getModuleId() } thenReturn ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -57,7 +57,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldSucceedOnEmptyMetadata() {
         val extractor = mockFactory.getMockExtractor()
-        Mockito.`when`(extractor.getMetatdata()).thenReturn("")
+        whenever(extractor) { getMetatdata() } thenReturn ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()
@@ -65,5 +65,4 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
             Assert.fail()
         }
     }
-
 }

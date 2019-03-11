@@ -1,32 +1,30 @@
 package com.simprints.clientapi.activities.errors
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnce
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
 
-
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 class ErrorPresenterTest {
 
     companion object {
         private const val TEST_ERROR_MESSAGE = "TEST ERROR MESSAGE"
     }
 
-    @Mock
-    private val view: ErrorContract.View = ErrorActivity()
+    private val view = mock<ErrorActivity>()
 
     @Test
     fun start_shouldSetCorrectErrorMessage() {
         ErrorPresenter(view, TEST_ERROR_MESSAGE).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).setErrorMessageText(TEST_ERROR_MESSAGE)
+        verifyOnce(view) { setErrorMessageText(TEST_ERROR_MESSAGE) }
     }
 
     @Test
     fun handleCloseClick_ShouldTellTheViewToClose() {
         ErrorPresenter(view, TEST_ERROR_MESSAGE).apply { start(); handleCloseClick() }
-        Mockito.verify(view, Mockito.times(1)).closeActivity()
+        verifyOnce(view) { closeActivity() }
     }
 
 }

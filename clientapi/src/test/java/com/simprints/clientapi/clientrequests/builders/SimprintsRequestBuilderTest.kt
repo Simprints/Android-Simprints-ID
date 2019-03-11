@@ -4,7 +4,6 @@ import com.simprints.clientapi.requestFactories.RequestFactory
 import org.junit.Assert
 import org.junit.Test
 
-
 abstract class SimprintsRequestBuilderTest(val mockFactory: RequestFactory) {
 
     @Test

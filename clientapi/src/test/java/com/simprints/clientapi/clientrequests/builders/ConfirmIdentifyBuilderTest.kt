@@ -5,7 +5,6 @@ import com.simprints.clientapi.requestFactories.RequestFactory
 import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
 import org.junit.Assert
 
-
 class ConfirmIdentifyBuilderTest : SimprintsRequestBuilderTest(ConfirmIdentifyFactory) {
 
     override fun buildSimprintsRequest_shouldSucceed() {
