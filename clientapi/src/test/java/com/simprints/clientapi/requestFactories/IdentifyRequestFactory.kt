@@ -6,8 +6,7 @@ import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
-import org.mockito.Mockito
-
+import com.simprints.testtools.common.syntax.mock
 
 object IdentifyRequestFactory : RequestFactory() {
 
@@ -25,9 +24,8 @@ object IdentifyRequestFactory : RequestFactory() {
         IdentifyBuilder(extractor as IdentifyExtractor, getValidator(extractor))
 
     override fun getMockExtractor(): IdentifyExtractor {
-        val mockIdentifyExtractor = Mockito.mock(IdentifyExtractor::class.java)
+        val mockIdentifyExtractor = mock<IdentifyExtractor>()
         setMockDefaultExtractor(mockIdentifyExtractor)
         return mockIdentifyExtractor
     }
-
 }

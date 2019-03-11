@@ -5,7 +5,6 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import org.junit.Assert
 import org.junit.Test
 
-
 abstract class ActionRequestBuilderTest(mockFactory: RequestFactory)
     : SimprintsRequestBuilderTest(mockFactory) {
 

@@ -6,9 +6,8 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
 import com.simprints.clientapi.domain.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.confirmations.IdentifyConfirmation
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
 
 object ConfirmIdentifyFactory : RequestFactory() {
 
@@ -25,11 +24,10 @@ object ConfirmIdentifyFactory : RequestFactory() {
         ConfirmIdentifyBuilder(extractor as ConfirmIdentifyExtractor, getValidator(extractor))
 
     override fun getMockExtractor(): ConfirmIdentifyExtractor {
-        val mockConfirmIdentifyExtractor = mock(ConfirmIdentifyExtractor::class.java)
+        val mockConfirmIdentifyExtractor = mock<ConfirmIdentifyExtractor>()
         setMockDefaultExtractor(mockConfirmIdentifyExtractor)
-        `when`(mockConfirmIdentifyExtractor.getSessionId()).thenReturn(MOCK_SESSION_ID)
-        `when`(mockConfirmIdentifyExtractor.getSelectedGuid()).thenReturn(MOCK_SELECTED_GUID)
+        whenever(mockConfirmIdentifyExtractor) { getSessionId() } thenReturn MOCK_SESSION_ID
+        whenever(mockConfirmIdentifyExtractor) { getSelectedGuid() } thenReturn MOCK_SELECTED_GUID
         return mockConfirmIdentifyExtractor
     }
-
 }
