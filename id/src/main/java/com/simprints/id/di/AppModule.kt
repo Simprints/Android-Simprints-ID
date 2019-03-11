@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
@@ -38,8 +40,6 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.scanner.ScannerManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -58,9 +58,10 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.utils.*
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.id.tools.utils.AndroidResourcesHelper
+import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -162,13 +163,6 @@ open class AppModule(val app: Application) {
     @Provides
     open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
 
-    @Provides
-    @Singleton
-    open fun provideScannerManager(preferencesManager: PreferencesManager,
-                                   analyticsManager: AnalyticsManager,
-                                   crashReportManager: CrashReportManager,
-                                   bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        ScannerManagerImpl(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter)
 
     @Provides
     @Singleton
@@ -247,9 +241,5 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
-
-    @Provides
-    @Singleton
-    open fun provideLocationProvider(ctx: Context): LocationProvider = LocationProviderImpl(ctx)
 }
 

@@ -21,7 +21,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.id.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
@@ -32,7 +32,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.LocationProvider
+import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 
@@ -173,6 +173,6 @@ class TestAppModule(app: Application,
     override fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
         downSyncManagerRule.resolveDependency { super.provideDownSyncManager(syncScopesBuilder) }
 
-    override fun provideLocationProvider(ctx: Context): LocationProvider =
+    override fun provideLocationProvider(ctx: Context): com.simprints.fingerprint.tools.utils.LocationProvider =
         locationProverRule.resolveDependency { super.provideLocationProvider(ctx) }
 }
