@@ -7,7 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.rule.ActivityTestRule
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.activities.collectFingerprints.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.libsimprints.Constants
 import com.simprints.testtools.android.log
@@ -58,7 +58,7 @@ fun grantPermissions() {
     permissions.forEach { PermissionGranter.allowPermissionsIfNeeded(it) }
 }
 
-fun launchCollectFingerprintsActivity(collectFingerprintsTestRule: ActivityTestRule<CollectFingerprintsActivity>) {
+fun launchCollectFingerprintsActivity(collectFingerprintsTestRule: ActivityTestRule<com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity>) {
     val intent = Intent()
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     collectFingerprintsTestRule.launchActivity(intent)

@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -87,9 +86,12 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun openLaunchActivity(appRequest: Request) {
-        val nextIntent = Intent(this, LaunchActivity::class.java)
-        nextIntent.putExtra(Request.BUNDLE_KEY, appRequest)
-        startActivityForResult(nextIntent, LAUNCH_ACTIVITY_REQUEST_CODE)
+        val fingerprintsModule = "com.simprints.id" //STOPSHIP
+        val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+
+        val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
+            .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
+        startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
