@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -12,64 +13,58 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
-
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(AndroidJUnit4::class)
 class LibSimprintsPresenterTest {
 
-    @Mock
-    private val view: LibSimprintsContract.View = LibSimprintsActivity()
+    private val view = mock<LibSimprintsActivity>()
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-        Mockito.`when`(view.enrollExtractor).thenReturn(enrollmentExtractor)
+        whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
-            EnrollRequestFactory.getValidSimprintsRequest())
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
-        Mockito.`when`(view.identifyExtractor).thenReturn(identifyExtractor)
+        whenever(view.identifyExtractor) thenReturn identifyExtractor
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
-            IdentifyRequestFactory.getValidSimprintsRequest())
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterForVerify_ShouldRequestVerify() {
-        val verifyExractor = VerifyRequestFactory.getMockExtractor()
-        Mockito.`when`(view.verifyExtractor).thenReturn(verifyExractor)
+        val verificationExtractor = VerifyRequestFactory.getMockExtractor()
+        whenever(view.verifyExtractor) thenReturn verificationExtractor
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1)).sendSimprintsRequest(
-            VerifyRequestFactory.getValidSimprintsRequest())
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        Mockito.`when`(view.confirmIdentifyExtractor).thenReturn(confirmIdentify)
+        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
-        Mockito.verify(view, Mockito.times(1))
-            .sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest())
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         LibSimprintsPresenter(view, "Garbage").apply { start() }
-        Mockito.verify(view, Mockito.times(1)).returnIntentActionErrorToClient()
+        verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
     @Test
@@ -78,8 +73,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT)
             .handleEnrollResponse(EnrollResponse(registerId))
-        Mockito.verify(view, Mockito.times(1))
-            .returnRegistration(Registration(registerId))
+        verifyOnce(view) { returnRegistration(Registration(registerId)) }
     }
 
     @Test
@@ -93,11 +87,12 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
-        Mockito.verify(view, Mockito.times(1)).returnIdentification(
-            ArrayList(idList.map {
-                Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
-            }), sessionId
-        )
+        verifyOnce(view) {
+            returnIdentification(
+                ArrayList(idList.map {
+                    Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
+                }), sessionId)
+        }
     }
 
     @Test
@@ -106,18 +101,18 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
 
-        Mockito.verify(view, Mockito.times(1)).returnVerification(
-            verification.confidence,
-            Tier.valueOf(verification.tier.name),
-            verification.guid
-        )
+        verifyOnce(view) {
+            returnVerification(
+                verification.confidence,
+                Tier.valueOf(verification.tier.name),
+                verification.guid)
+        }
     }
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
         LibSimprintsPresenter(view, "").handleResponseError()
-        Mockito.verify(view, Mockito.times(1))
-            .returnIntentActionErrorToClient()
+        verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
 }

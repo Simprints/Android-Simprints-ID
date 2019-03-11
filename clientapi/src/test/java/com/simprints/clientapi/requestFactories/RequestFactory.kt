@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.domain.ClientBase
-import org.mockito.Mockito
+import com.simprints.testtools.common.syntax.whenever
 
 abstract class RequestFactory {
 
@@ -27,10 +27,9 @@ abstract class RequestFactory {
     abstract fun getValidSimprintsRequest(): ClientBase
 
     open fun setMockDefaultExtractor(mockExtractor: ClientRequestExtractor) {
-        Mockito.`when`(mockExtractor.getProjectId()).thenReturn(MOCK_PROJECT_ID)
-        Mockito.`when`(mockExtractor.getUserId()).thenReturn(MOCK_USER_ID)
-        Mockito.`when`(mockExtractor.getModuleId()).thenReturn(MOCK_MODULE_ID)
-        Mockito.`when`(mockExtractor.getMetatdata()).thenReturn(MOCK_METADATA)
+        whenever(mockExtractor) { getProjectId() } thenReturn MOCK_PROJECT_ID
+        whenever(mockExtractor) { getUserId() } thenReturn MOCK_USER_ID
+        whenever(mockExtractor) { getModuleId() } thenReturn MOCK_MODULE_ID
+        whenever(mockExtractor) { getMetatdata() } thenReturn MOCK_METADATA
     }
-
 }

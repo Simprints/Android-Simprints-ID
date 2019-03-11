@@ -5,7 +5,6 @@ import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.domain.requests.VerifyRequest
 import org.junit.Assert
 
-
 class VerifyBuilderTest : ActionRequestBuilderTest(VerifyRequestFactory) {
 
     override fun buildSimprintsRequest_shouldSucceed() {
@@ -15,5 +14,4 @@ class VerifyBuilderTest : ActionRequestBuilderTest(VerifyRequestFactory) {
             Assert.assertEquals(it.verifyGuid, MOCK_VERIFY_GUID)
         }
     }
-
 }
