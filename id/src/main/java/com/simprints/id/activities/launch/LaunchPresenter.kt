@@ -217,7 +217,7 @@ class LaunchPresenter(private val view: LaunchContract.View) : LaunchContract.Pr
         preferencesManager.msSinceBootOnLoadEnd = timeHelper.now()
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
-        view.doVibrateIfNecessary(preferencesManager.vibrateMode)
+        view.doVibrate()
     }
 
     private fun setTextToConsentTabs() {

@@ -68,6 +68,8 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
     @NonNull @Inject SessionEventsManager sessionEventsManager;
     private Long startTimeVerification = 0L;
     private Long startTimeIdentification = 0L;
+    private static final Integer matcherType = 0;
+    private static final Integer matchingEndWaitTimeInMillis = 1000;
     private String sessionId = "";
 
     @SuppressLint("CheckResult")
@@ -157,7 +159,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                     "Successfully loaded %d candidates", candidates.size()));
                 matchingView.setIdentificationProgressMatchingStart(candidates.size());
 
-                int matcherType = preferencesManager.getMatcherType();
+                int matcherType = MatchingPresenter.matcherType;
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -205,7 +207,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
             public void onSuccess(boolean isDataFromRemote) {
                 logMessageForCrashReport("Successfully loaded candidate");
 
-                int matcherType = preferencesManager.getMatcherType();
+                int matcherType = MatchingPresenter.matcherType;
 
                 final LibMatcher.MATCHER_TYPE matcher_type;
 
@@ -303,7 +305,7 @@ public class MatchingPresenter implements MatchingContract.Presenter, MatcherEve
                         FormatResult.put(resultData, topCandidates, preferencesManager, sessionId);
                         matchingView.doSetResult(RESULT_OK, resultData);
                         matchingView.setIdentificationProgressFinished(topCandidates.size(),
-                            tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.getMatchingEndWaitTimeSeconds() * 1000);
+                            tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis);
 
                         break;
                     }

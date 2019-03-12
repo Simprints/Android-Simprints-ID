@@ -4,7 +4,6 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
-import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
@@ -30,15 +29,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     companion object {
 
-        const val NUDGE_MODE_KEY = "NudgeModeBool"
-        const val NUDGE_MODE_DEFAULT = true
-
-        const val CONSENT_KEY = "ConsentBool"
-        const val CONSENT_DEFAULT = true
-
-        const val QUALITY_THRESHOLD_KEY = "QualityThresholdInt"
-        const val QUALITY_THRESHOLD_DEFAULT = 60
-
         const val NB_IDS_KEY = "NbOfIdsInt"
         const val NB_IDS_DEFAULT = 10
 
@@ -47,15 +37,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val LANGUAGE_KEY = "SelectedLanguage"
         const val LANGUAGE_DEFAULT = "en"
-
-        const val LANGUAGE_POSITION_KEY = "SelectedLanguagePosition"
-        const val LANGUAGE_POSITION_DEFAULT = 0
-
-        const val MATCHER_TYPE_KEY = "MatcherType"
-        const val MATCHER_TYPE_DEFAULT = 0
-
-        const val TIMEOUT_KEY = "TimeoutInt"
-        const val TIMEOUT_DEFAULT = 3
 
         const val MODULE_ID_OPTIONS_KEY = "ModuleIdOptions"
         val MODULE_ID_OPTIONS_DEFAULT = setOf<String>()
@@ -68,12 +49,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val MATCH_GROUP_KEY = "MatchGroup"
         val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
-
-        const val VIBRATE_KEY = "VibrateOn"
-        const val VIBRATE_DEFAULT = true
-
-        const val MATCHING_END_WAIT_TIME_KEY = "MatchingEndWaitTime"
-        const val MATCHING_END_WAIT_TIME_DEFAULT = 1
 
         const val FINGER_STATUS_KEY = "FingerStatus"
         val FINGER_STATUS_DEFAULT = mapOf(
@@ -115,18 +90,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         )
     }
 
-    // Should the UI automatically slide forward?
-    override var nudgeMode: Boolean
-        by PrimitivePreference(prefs, NUDGE_MODE_KEY, NUDGE_MODE_DEFAULT)
-
-    // Has the CHW given consent to use Simprints ID?
-    override var consent: Boolean
-        by PrimitivePreference(prefs, CONSENT_KEY, CONSENT_DEFAULT)
-
-    // Threshold that determines the UI feedback for a given fingerprint quality
-    override var qualityThreshold: Int
-        by PrimitivePreference(prefs, QUALITY_THRESHOLD_KEY, QUALITY_THRESHOLD_DEFAULT)
-
     // Number of GUIDs to be returned to the calling app as the result of an identification
     override var returnIdCount: Int
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, NB_IDS_KEY, NB_IDS_DEFAULT)
@@ -138,18 +101,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Selected language
     override var language: String
         by OverridableRemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LANGUAGE_KEY, LANGUAGE_DEFAULT)
-
-    // Active language position to be displayed in the list
-    override var languagePosition: Int
-        by PrimitivePreference(prefs, LANGUAGE_POSITION_KEY, LANGUAGE_POSITION_DEFAULT)
-
-    // Matcher type
-    override var matcherType: Int
-        by PrimitivePreference(prefs, MATCHER_TYPE_KEY, MATCHER_TYPE_DEFAULT)
-
-    // Timeout seconds
-    override var timeoutS: Int
-        by PrimitivePreference(prefs, TIMEOUT_KEY, TIMEOUT_DEFAULT)
 
     // What modules will be available to sync by for this project. Serialize as pipe (|) separated list. Empty list indicates that module sync should not be possible.
     override var moduleIdOptions: Set<String>
@@ -166,14 +117,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Match group. Default is user
     override var matchGroup: Constants.GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
-
-    // Is the vibrate on
-    override var vibrateMode: Boolean
-        by PrimitivePreference(prefs, VIBRATE_KEY, VIBRATE_DEFAULT)
-
-    // The number of seconds the screens pauses for when a match is complete
-    override var matchingEndWaitTimeSeconds: Int
-        by PrimitivePreference(prefs, MATCHING_END_WAIT_TIME_KEY, MATCHING_END_WAIT_TIME_DEFAULT)
 
     // The map of default fingers
     /** @throws JsonSyntaxException */
