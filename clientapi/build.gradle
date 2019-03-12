@@ -1,4 +1,4 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -20,21 +20,24 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-        }
-        releaseWithLogfile {
-            initWith release
+            proguardFiles 'proguard-rules-dynamic-features.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':id')
     implementation project(':moduleapi')
 
     // LibSimprints
@@ -62,8 +65,4 @@ dependencies {
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
-}
-
-repositories {
-    mavenCentral()
 }

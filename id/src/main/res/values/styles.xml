@@ -32,7 +32,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    
+
     <style name="SimprintsTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/muli</item>
     </style>
@@ -40,5 +40,12 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- clientapi themes-->
+    <style name="ClientApiTheme" />
+
+    <style name="ClientApiTheme.Launcher" />
+
+    <style name="ClientApiTheme.NoActionBar" />
 
 </resources>
