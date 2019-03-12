@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.clientapi">
 
-    <application>
+    <dist:module
+        dist:instant="false"
+        dist:onDemand="false"
+        dist:title="@string/dynamic_module_title_clientapi">
+        <dist:fusing dist:include="true" />
+    </dist:module>
+
+    <application tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
 
         <activity
             android:name=".activities.odk.OdkActivity"
@@ -58,7 +67,6 @@
 
         <activity
             android:name=".activities.errors.ErrorActivity"
-            android:label="@string/title_activity_project_id_error"
             android:theme="@style/ClientApiTheme.NoActionBar" />
 
     </application>
