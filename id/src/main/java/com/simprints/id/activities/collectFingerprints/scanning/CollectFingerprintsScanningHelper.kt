@@ -7,6 +7,8 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsContract
 import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter.Companion.qualityThreshold
+import com.simprints.id.activities.collectFingerprints.CollectFingerprintsPresenter.Companion.timeoutInMillis
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -17,7 +19,7 @@ import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.id.scanner.ScannerManager
 import com.simprints.id.tools.TimeoutBar
-import com.simprints.id.tools.Vibrate
+import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.libcommon.Fingerprint
 import com.simprints.libscanner.ButtonListener
@@ -70,7 +72,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun initTimeoutBar(): TimeoutBar =
-        TimeoutBar(context.applicationContext, view.progressBar, preferencesManager.timeoutS * 1000)
+        TimeoutBar(context.applicationContext, view.progressBar, timeoutInMillis)
 
     // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog =
@@ -193,8 +195,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         view.scanButton.isEnabled = true
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
-        scannerManager.scanner?.startContinuousCapture(preferencesManager.qualityThreshold,
-            (preferencesManager.timeoutS * 1000).toLong(), startContinuousCaptureScannerCallback)
+        scannerManager.scanner?.startContinuousCapture(qualityThreshold,
+            (timeoutInMillis).toLong(), startContinuousCaptureScannerCallback)
     }
 
     private fun stopContinuousCapture() {
@@ -202,7 +204,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun forceCapture() {
-        scannerManager.scanner?.forceCapture(preferencesManager.qualityThreshold, object : ScannerCallback {
+        scannerManager.scanner?.forceCapture(qualityThreshold, object : ScannerCallback {
             override fun onSuccess() {
                 handleCaptureSuccess()
             }
@@ -216,7 +218,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     // For hardware version <=4, set bad scan if force capture isn't possible
     private fun handleNoFingerTemplateDetected() {
         currentFingerStatus = NO_FINGER_DETECTED
-        Vibrate.vibrate(context, preferencesManager.vibrateMode)
+        vibrate(context)
         presenter.refreshDisplay()
     }
 
@@ -232,7 +234,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             val quality = it.imageQuality
             parseTemplateAndAddToCurrentFinger(template)
             setGoodOrBadScanFingerStatusToCurrentFinger(quality)
-            Vibrate.vibrate(context, preferencesManager.vibrateMode)
+            vibrate(context)
             presenter.refreshDisplay()
             presenter.handleCaptureSuccess()
         }
@@ -248,7 +250,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         }
 
     private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) {
-        if (quality >= preferencesManager.qualityThreshold) {
+        if (quality >= qualityThreshold) {
             currentFingerStatus = Finger.Status.GOOD_SCAN
         } else {
             currentFingerStatus = Finger.Status.BAD_SCAN

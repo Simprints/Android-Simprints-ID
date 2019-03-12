@@ -305,7 +305,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
                 finger.id,
-                preferencesManager.qualityThreshold,
+                qualityThreshold,
                 FingerprintCaptureEvent.Result.fromFingerStatus(finger.status),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, Utils.byteArrayToBase64(it.templateBytes))
@@ -359,5 +359,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val targetNumberOfGoodScans = 2
         private const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+        const val qualityThreshold = 60
+        const val timeoutInMillis = 3000
     }
 }
