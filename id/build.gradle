@@ -64,7 +64,7 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release" ||
-                variant.buildType.name == "releaseWithLogfile") {
+            variant.buildType.name == "releaseWithLogfile") {
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
@@ -93,8 +93,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    dynamicFeatures = [":fingerprint", ":face"]
 
+    dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
 
 }
 
@@ -125,7 +125,6 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     api project(':core')
-    implementation project(':clientapi')
     implementation project(':fingerprintscanner')
     api project(':moduleapi')
 
