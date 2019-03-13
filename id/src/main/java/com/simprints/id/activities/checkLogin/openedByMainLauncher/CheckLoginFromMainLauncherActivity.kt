@@ -5,10 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.launchAlert
 import org.jetbrains.anko.startActivity
 
@@ -32,8 +31,8 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
         viewPresenter.start()
     }
 
-    override fun openAlertActivityForError(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun openAlertActivityForError(alert: Alert) {
+        launchAlert(alert)
     }
 
     override fun openRequestLoginActivity() {
