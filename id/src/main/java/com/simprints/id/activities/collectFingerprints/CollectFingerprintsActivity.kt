@@ -108,7 +108,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun refreshFingerFragment() {
-        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo).let {
+        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
             reverseFingerFragmentIfNeeded(it)
             it.updateTextAccordingToStatus()
         }

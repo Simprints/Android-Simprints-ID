@@ -21,7 +21,7 @@ class FingerPageAdapter(fragmentManager: FragmentManager, private val activeFing
         fragmentSparseArray.remove(position)
     }
 
-    fun getFragment(pos: Int): FingerFragment = fragmentSparseArray.get(pos)
+    fun getFragment(pos: Int): FingerFragment? = fragmentSparseArray.get(pos)
 
     override fun getCount() = activeFingers.size
 

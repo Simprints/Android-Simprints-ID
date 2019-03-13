@@ -22,13 +22,15 @@ class FingerFragment : Fragment() {
 
         FingerRes.setFingerRes()
 
-        if(isAdded) {
+        if(activityIsPresentAndFragmentIsAdded()) {
             updateFingerImageAccordingToStatus()
             updateTextAccordingToStatus()
         }
 
         return view
     }
+
+    private fun activityIsPresentAndFragmentIsAdded(): Boolean = activity != null && isAdded
 
     private fun updateFingerImageAccordingToStatus() {
         fingerImage.setImageResource(FingerRes.get(finger).drawableId)
