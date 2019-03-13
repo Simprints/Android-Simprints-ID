@@ -68,7 +68,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeResponse(response: IClientApiResponse) = when (response) {
-        is IClientApiEnrollResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
+        is IClientApiEnrolResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
         is IClientApiIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
         is IClientApiVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
         is IClientApiRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))

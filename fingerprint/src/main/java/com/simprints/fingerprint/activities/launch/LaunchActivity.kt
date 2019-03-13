@@ -8,6 +8,7 @@ import android.view.WindowManager
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -18,6 +19,7 @@ import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
 import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
@@ -30,21 +32,21 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
-    private lateinit var appRequest: Request
+    private lateinit var fingerprintRequest: FingerprintRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+        fingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
         val component = FingerprintsComponentBuilder.getComponent(this.application as Application)
-        viewPresenter = LaunchPresenter(component, this, appRequest)
+        viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }
 
@@ -148,7 +150,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         val collectActivityClassName = "com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, collectActivityClassName)
-            .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
+            .also { it.putExtra(Request.BUNDLE_KEY, fingerprintRequest) }
         startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
     }
 

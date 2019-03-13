@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
@@ -20,7 +21,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.Request
+import com.simprints.fingerprint.moduleapi.Request
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
@@ -59,10 +60,10 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
             ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP : Custom error
 
-        val appRequest: Request = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
+        val fingerprintRequest: FingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
-        viewPresenter = MatchingPresenter(this, probe, appRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
+        viewPresenter = MatchingPresenter(this, probe, fingerprintRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
     }
 
     override fun onResume() {

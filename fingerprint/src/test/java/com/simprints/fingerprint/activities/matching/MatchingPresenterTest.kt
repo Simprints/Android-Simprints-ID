@@ -6,27 +6,27 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.eq
+import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.fingerprint.testtools.PeopleGeneratorUtils
+import com.simprints.fingerprintmatcher.EVENT
+import com.simprints.fingerprintmatcher.LibMatcher
+import com.simprints.fingerprintmatcher.Progress
+import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
 import com.simprints.id.tools.TimeHelper
-import com.simprints.fingerprintmatcher.EVENT
-import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.fingerprintmatcher.Progress
-import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.RxSchedulerRule
 import io.reactivex.Single
@@ -183,8 +183,8 @@ class MatchingPresenterTest {
         verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
-    private fun createPresenter(request: Request, probe: Person, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
-                                                                                  LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
+    private fun createPresenter(request: FingerprintRequest, probe: Person, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+                                                                                             LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, probe, request, dbManagerMock, preferencesManagerMock,
             sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockLibMatcher)
 
@@ -226,13 +226,13 @@ class MatchingPresenterTest {
             moduleId = DEFAULT_USER_ID
         )
 
-        private val identifyRequest = IdentifyRequest(
+        private val identifyRequest = FingerprintIdentifyRequest(
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,
             "")
 
-        private val verifyRequest = VerifyRequest(
+        private val verifyRequest = FingerprintVerifyRequest(
             DEFAULT_PROJECT_ID,
             DEFAULT_USER_ID,
             DEFAULT_MODULE_ID,

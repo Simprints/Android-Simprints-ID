@@ -13,7 +13,6 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.refusal_form.RefusalFormAnswer
 import com.simprints.id.domain.responses.RefusalFormResponse
 import com.simprints.id.domain.responses.Response
-import com.simprints.id.domain.responses.toClientApiRefusalFormResponse
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange

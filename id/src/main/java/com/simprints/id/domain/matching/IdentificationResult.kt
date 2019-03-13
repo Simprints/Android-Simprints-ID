@@ -9,12 +9,3 @@ import kotlinx.android.parcel.Parcelize
 data class IdentificationResult(val guidFound: String,
                                 val confidence: Int,
                                 val tier: Tier): Parcelable
-
-fun IdentificationResult.toClientApiIdentificationResult():IIdentificationResult =
-    ClientApiIdentificationResult(guidFound, confidence, tier.toClientApiIClientApiResponseTier())
-
-@Parcelize
-private data class ClientApiIdentificationResult(
-    override val guid: String,
-    override val confidence: Int,
-    override val tier: IClientApiResponseTier): Parcelable, IIdentificationResult

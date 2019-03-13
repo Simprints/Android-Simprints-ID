@@ -1,11 +1,11 @@
-package com.simprints.id.domain.consent
+package com.simprints.fingerprint.data.domain.consent
 
 import android.content.Context
 import com.google.gson.annotations.SerializedName
+import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.id.R
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
 
 
 data class GeneralConsent(
@@ -19,9 +19,9 @@ data class GeneralConsent(
     @SerializedName("consent_confirmation") var consentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, appRequest: Request, programName: String, organisationName: String) = StringBuilder().apply {
-        when (appRequest) {
-            is IdentifyRequest, is VerifyRequest -> {
+    fun assembleText(context: Context, fingerprint: FingerprintRequest, programName: String, organisationName: String) = StringBuilder().apply {
+        when (fingerprint) {
+            is FingerprintIdentifyRequest, is FingerprintVerifyRequest -> {
                 if (consentIdVerify) append(context.getString(R.string.consent_id_verify).format(programName))
             }
             else -> {

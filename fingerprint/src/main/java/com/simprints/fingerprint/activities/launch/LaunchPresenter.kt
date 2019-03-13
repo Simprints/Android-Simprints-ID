@@ -7,6 +7,10 @@ import android.content.Intent
 import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.fingerprint.data.domain.consent.GeneralConsent
+import com.simprints.fingerprint.data.domain.consent.ParentalConsent
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
@@ -25,10 +29,6 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.domain.consent.GeneralConsent
-import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
@@ -43,7 +43,7 @@ import javax.inject.Inject
 
 class LaunchPresenter(component: FingerprintsComponent,
                       private val view: LaunchContract.View,
-                      private val appRequest: Request) : LaunchContract.Presenter {
+                      private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -121,8 +121,8 @@ class LaunchPresenter(component: FingerprintsComponent,
             .andThen(tryToFetchGuid())
 
     private fun tryToFetchGuid(): Completable {
-        return if (appRequest is VerifyRequest) {
-            val guid = appRequest.verifyGuid
+        return if (fingerprintRequest is FingerprintVerifyRequest) {
+            val guid = fingerprintRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
             dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess { personFetchResult ->
                 handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
@@ -232,7 +232,7 @@ class LaunchPresenter(component: FingerprintsComponent,
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
+        return generalConsent.assembleText(activity, fingerprintRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -242,7 +242,7 @@ class LaunchPresenter(component: FingerprintsComponent,
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, appRequest, preferencesManager.programName, preferencesManager.organizationName)
+        return parentalConsent.assembleText(activity, fingerprintRequest, preferencesManager.programName, preferencesManager.organizationName)
     }
 
     override fun handleOnBackPressed() {

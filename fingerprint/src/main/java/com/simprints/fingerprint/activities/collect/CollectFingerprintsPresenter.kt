@@ -9,6 +9,10 @@ import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsF
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.tools.extensions.toResultEvent
 import com.simprints.id.R
@@ -24,8 +28,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.RequestAction
 import com.simprints.id.domain.responses.EnrolResponse
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.exceptions.SimprintsException
@@ -42,7 +44,7 @@ import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
-                                   private val appRequest: Request,
+                                   private val fingerprintRequest: FingerprintRequest,
                                    private val component: FingerprintsComponent)
     : CollectFingerprintsContract.Presenter {
 
@@ -195,10 +197,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (Request.action(appRequest)) {
-            RequestAction.ENROL -> context.getString(R.string.register_title)
-            RequestAction.IDENTIFY -> context.getString(R.string.identify_title)
-            RequestAction.VERIFY -> context.getString(R.string.verify_title)
+        when (fingerprintRequest) {
+            is FingerprintEnrolRequest -> context.getString(R.string.register_title)
+            is FingerprintIdentifyRequest -> context.getString(R.string.identify_title)
+            is FingerprintVerifyRequest -> context.getString(R.string.verify_title)
             else -> {
                 handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
                 ""
@@ -255,7 +257,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             UUID.randomUUID().toString(),
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             loginInfoManager.getSignedInUserIdOrEmpty(),
-            appRequest.moduleId,
+            fingerprintRequest.moduleId,
             fingerprints)
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
@@ -266,7 +268,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun isRegisteringElseIsMatching() = Request.action(appRequest) == RequestAction.ENROL
+    private fun isRegisteringElseIsMatching() = fingerprintRequest is FingerprintEnrolRequest
 
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)
