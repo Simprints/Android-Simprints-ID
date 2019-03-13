@@ -112,7 +112,4 @@ class OdkPresenterTest {
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
-
-
 }
-

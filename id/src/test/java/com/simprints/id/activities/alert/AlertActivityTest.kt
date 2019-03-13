@@ -14,7 +14,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
@@ -55,7 +55,7 @@ class AlertActivityTest {
 
     @Test
     fun anUnexpectedErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = ALERT_TYPE.UNEXPECTED_ERROR
+        val alertType = Alert.UNEXPECTED_ERROR
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -65,7 +65,7 @@ class AlertActivityTest {
 
     @Test
     fun anBluetoothErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = ALERT_TYPE.BLUETOOTH_NOT_ENABLED
+        val alertType = Alert.BLUETOOTH_NOT_ENABLED
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -79,7 +79,7 @@ class AlertActivityTest {
 
     @Test
     fun anOfflineError_shouldShowTheRightAlertView() {
-        val alertType = ALERT_TYPE.GUID_NOT_FOUND_OFFLINE
+        val alertType = Alert.GUID_NOT_FOUND_OFFLINE
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -94,25 +94,25 @@ class AlertActivityTest {
     private fun createRoboAlertActivity(intent: Intent) =
         createActivity<AlertActivity>(intent)
 
-    private fun createIntentForAlertType(alertType: ALERT_TYPE) = Intent().apply {
-        putExtra(IntentKeys.alertActivityAlertTypeKey, alertType)
+    private fun createIntentForAlertType(alert: Alert) = Intent().apply {
+        putExtra(IntentKeys.alertActivityAlertTypeKey, alert)
     }
 
-    private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alertType: ALERT_TYPE) {
-        assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alertType.backgroundColor))
+    private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: Alert) {
+        assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alert.backgroundColor))
 
-        if (alertType.isTwoButton) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alertType.backgroundColor))
-        assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alertType.backgroundColor))
+        if (alert.isTwoButton) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alert.backgroundColor))
+        assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alert.backgroundColor))
 
-        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alertType.alertTitleId))
+        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alert.alertTitleId))
 
         val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
-        assertEquals(alertImageDrawableShown, alertType.alertMainDrawableId)
+        assertEquals(alertImageDrawableShown, alert.alertMainDrawableId)
 
-        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alertType.alertMessageId))
+        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alert.alertMessageId))
 
-        if (alertType.isTwoButton) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alertType.alertLeftButtonTextId))
-        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alertType.alertRightButtonTextId))
+        if (alert.isTwoButton) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alert.alertLeftButtonTextId))
+        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alert.alertRightButtonTextId))
     }
 
     private fun getBackgroundColor(view: View): Int =

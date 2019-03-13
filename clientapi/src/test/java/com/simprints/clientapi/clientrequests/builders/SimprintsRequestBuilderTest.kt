@@ -12,5 +12,4 @@ abstract class SimprintsRequestBuilderTest(val mockFactory: RequestFactory) {
 
         Assert.assertEquals(request.projectId, RequestFactory.MOCK_PROJECT_ID)
     }
-
 }

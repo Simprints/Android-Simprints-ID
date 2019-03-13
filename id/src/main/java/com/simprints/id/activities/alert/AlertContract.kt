@@ -1,33 +1,34 @@
 package com.simprints.id.activities.alert
 
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 
 interface AlertContract {
 
     interface View : BaseView<Presenter> {
-        fun getColorForColorRes(colorRes: Int): Int
-        fun setLayoutBackgroundColor(color: Int)
-        fun setLeftButtonBackgroundColor(color: Int)
-        fun setRightButtonBackgroundColor(color: Int)
-        fun setAlertTitleWithStringRes(stringRes: Int)
-        fun setAlertImageWithDrawableId(drawableId: Int)
-        fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int)
-        fun initLeftButton(alertType: ALERT_TYPE)
-        fun setAlertMessageWithStringRes(stringRes: Int)
-        fun initRightButton(alertType: ALERT_TYPE)
+        @ColorInt fun getColorForColorRes(colorRes: Int): Int
+        fun setLayoutBackgroundColor(@ColorInt color: Int)
+        fun setLeftButtonBackgroundColor(@ColorInt color: Int)
+        fun setRightButtonBackgroundColor(@ColorInt color: Int)
+        fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
+        fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
+        fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
+        fun initLeftButton(leftButtonAction: Alert.ButtonAction)
+        fun initRightButton(rightButtonAction: Alert.ButtonAction)
+        fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun setResult(resultCode: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
         fun closeActivity()
         fun closeAllActivities()
-        fun hideLeftButton()
     }
 
     interface Presenter : BasePresenter {
-        fun handleLeftButtonClick()
-        fun handleRightButtonClick()
+        fun handleButtonClick(buttonAction: Alert.ButtonAction)
         fun handleBackButton()
     }
 }

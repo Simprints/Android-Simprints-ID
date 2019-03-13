@@ -16,5 +16,4 @@ class ConfirmIdentifyBuilderTest : SimprintsRequestBuilderTest(ConfirmIdentifyFa
             Assert.assertEquals(it.selectedGuid, RequestFactory.MOCK_SELECTED_GUID)
         }
     }
-
 }

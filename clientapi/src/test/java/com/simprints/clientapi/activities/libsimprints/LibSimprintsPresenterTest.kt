@@ -114,7 +114,4 @@ class LibSimprintsPresenterTest {
         LibSimprintsPresenter(view, "").handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
-
 }
-
-

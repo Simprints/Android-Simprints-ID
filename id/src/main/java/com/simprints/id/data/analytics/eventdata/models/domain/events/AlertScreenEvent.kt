@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 
 class AlertScreenEvent(val relativeStartTime: Long,
-                       val alertType: ALERT_TYPE) : Event(EventType.ALERT_SCREEN)
+                       val alert: Alert) : Event(EventType.ALERT_SCREEN)

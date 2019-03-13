@@ -9,7 +9,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
@@ -77,8 +77,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         return callingPackage ?: ""
     }
 
-    override fun openAlertActivityForError(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun openAlertActivityForError(alert: Alert) {
+        launchAlert(alert)
     }
 
     override fun openLoginActivity(appRequest: Request) {
