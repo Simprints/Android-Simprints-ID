@@ -17,7 +17,7 @@ import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
@@ -175,8 +175,8 @@ class CollectFingerprintsActivity :
         viewPresenter.handleOnPause()
     }
 
-    override fun doLaunchAlert(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun doLaunchAlert(alert: Alert) {
+        launchAlert(alert)
     }
 
     override fun showSplashScreen() {

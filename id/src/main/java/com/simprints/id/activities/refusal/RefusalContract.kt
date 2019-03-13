@@ -2,14 +2,14 @@ package com.simprints.id.activities.refusal
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.refusal_form.RefusalFormAnswer
 
 interface RefusalContract {
 
     interface View : BaseView<Presenter> {
 
-        fun doLaunchAlert(alertType: ALERT_TYPE)
+        fun doLaunchAlert(alert: Alert)
 
         fun setResultAndFinish(activityResult: Int, refusalAnswer: RefusalFormAnswer)
 

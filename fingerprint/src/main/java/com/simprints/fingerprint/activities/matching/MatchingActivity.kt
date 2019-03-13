@@ -18,7 +18,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
@@ -126,7 +126,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun launchAlert() {
         val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, ALERT_TYPE.UNEXPECTED_ERROR)
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, Alert.UNEXPECTED_ERROR)
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
     }
 

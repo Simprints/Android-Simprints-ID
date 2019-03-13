@@ -12,7 +12,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
@@ -152,15 +152,15 @@ open class ScannerManagerImpl(private val preferencesManager: PreferencesManager
         }
     }
 
-    override fun getAlertType(it: Throwable): ALERT_TYPE =
+    override fun getAlertType(it: Throwable): Alert =
         when (it) {
-            is BluetoothNotEnabledException -> ALERT_TYPE.BLUETOOTH_NOT_ENABLED
-            is BluetoothNotSupportedException -> ALERT_TYPE.BLUETOOTH_NOT_SUPPORTED
-            is MultipleScannersPairedException -> ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS
-            is ScannerLowBatteryException -> ALERT_TYPE.LOW_BATTERY
-            is ScannerNotPairedException -> ALERT_TYPE.NOT_PAIRED
-            is UnknownBluetoothIssueException -> ALERT_TYPE.DISCONNECTED
-            else -> ALERT_TYPE.UNEXPECTED_ERROR
+            is BluetoothNotEnabledException -> Alert.BLUETOOTH_NOT_ENABLED
+            is BluetoothNotSupportedException -> Alert.BLUETOOTH_NOT_SUPPORTED
+            is MultipleScannersPairedException -> Alert.MULTIPLE_PAIRED_SCANNERS
+            is ScannerLowBatteryException -> Alert.LOW_BATTERY
+            is ScannerNotPairedException -> Alert.NOT_PAIRED
+            is UnknownBluetoothIssueException -> Alert.DISCONNECTED
+            else -> Alert.UNEXPECTED_ERROR
         }
 
     override fun disconnectScannerIfNeeded() {

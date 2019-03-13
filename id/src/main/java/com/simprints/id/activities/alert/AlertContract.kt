@@ -2,7 +2,7 @@ package com.simprints.id.activities.alert
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 
 interface AlertContract {
 
@@ -13,21 +13,19 @@ interface AlertContract {
         fun setRightButtonBackgroundColor(color: Int)
         fun setAlertTitleWithStringRes(stringRes: Int)
         fun setAlertImageWithDrawableId(drawableId: Int)
-        fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int)
-        fun initLeftButton(alertType: ALERT_TYPE)
+        fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int?)
+        fun initLeftButton(leftButtonAction: Alert.ButtonAction)
+        fun initRightButton(rightButtonAction: Alert.ButtonAction)
         fun setAlertMessageWithStringRes(stringRes: Int)
-        fun initRightButton(alertType: ALERT_TYPE)
         fun setResult(resultCode: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
         fun closeActivity()
         fun closeAllActivities()
-        fun hideLeftButton()
     }
 
     interface Presenter : BasePresenter {
-        fun handleLeftButtonClick()
-        fun handleRightButtonClick()
+        fun handleButtonClick(buttonAction: Alert.ButtonAction)
         fun handleBackButton()
     }
 }
