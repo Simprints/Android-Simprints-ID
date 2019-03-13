@@ -28,7 +28,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
@@ -149,11 +149,11 @@ class LaunchPresenter(component: FingerprintsComponent,
     private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
-            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_ONLINE)
+            view.doLaunchAlert(Alert.GUID_NOT_FOUND_ONLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
         } else {
             // We're offline but might find the person if we sync
-            view.doLaunchAlert(ALERT_TYPE.GUID_NOT_FOUND_OFFLINE)
+            view.doLaunchAlert(Alert.GUID_NOT_FOUND_OFFLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }

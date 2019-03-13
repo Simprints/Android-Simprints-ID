@@ -13,7 +13,7 @@ import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
@@ -163,8 +163,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         finish()
     }
 
-    override fun doLaunchAlert(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun doLaunchAlert(alert: Alert) {
+        launchAlert(alert)
     }
 
     override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.scanner
 
 import com.simprints.fingerprintscanner.Scanner
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import io.reactivex.Completable
 
 interface ScannerManager {
@@ -18,6 +18,6 @@ interface ScannerManager {
     fun wakeUpVero(): Completable
     fun shutdownVero(): Completable
     fun resetVeroUI(): Completable
-    fun getAlertType(it: Throwable): ALERT_TYPE
+    fun getAlertType(it: Throwable): Alert
     fun disconnectScannerIfNeeded()
 }

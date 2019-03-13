@@ -9,7 +9,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.refusal_form.RefusalFormAnswer
 import com.simprints.id.domain.responses.RefusalFormResponse
 import com.simprints.id.domain.responses.Response
@@ -83,8 +83,8 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    override fun doLaunchAlert(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun doLaunchAlert(alert: Alert) {
+        launchAlert(alert)
     }
 
     override fun setResultAndFinish(activityResult: Int, refusalAnswer: RefusalFormAnswer) {

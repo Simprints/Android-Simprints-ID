@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonObject
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 import com.simprints.libsimprints.FingerIdentifier
@@ -12,7 +12,7 @@ import com.simprints.libsimprints.FingerIdentifier
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo(EventType.ALERT_SCREEN.toString())
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("alertType").asString).isIn(ALERT_TYPE.values().valuesAsStrings())
+    assertThat(json.get("alert").asString).isIn(Alert.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(3)
 }
 
