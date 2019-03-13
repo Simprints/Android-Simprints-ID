@@ -10,7 +10,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseI
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
@@ -31,7 +31,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_alertScreenEventApiModel() {
-        val event = AlertScreenEvent(0, ALERT_TYPE.NOT_PAIRED)
+        val event = AlertScreenEvent(0, Alert.NOT_PAIRED)
         val json = gsonWithAdapters.toJsonTree(event).asJsonObject
         validateAlertScreenEventApiModel(json)
     }
@@ -233,7 +233,7 @@ class SessionEventsAdapterFactoryTest {
             "en",
             Device("28","phone", "device_id"),
             0)
-        session.addEvent(AlertScreenEvent(0, ALERT_TYPE.NOT_PAIRED))
+        session.addEvent(AlertScreenEvent(0, Alert.NOT_PAIRED))
 
         val json = gsonWithAdapters.toJsonTree(session).asJsonObject
         validateSessionEventsApiModel(json)

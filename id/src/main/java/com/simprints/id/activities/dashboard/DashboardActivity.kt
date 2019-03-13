@@ -16,7 +16,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast
@@ -135,7 +135,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         return getString(stringRes, currentValue, maxValue)
     }
 
-    override fun launchAlertView(error: ALERT_TYPE) {
+    override fun launchAlertView(error: Alert) {
         this.launchAlert(error)
     }
 

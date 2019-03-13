@@ -8,13 +8,13 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     val alertType: ALERT_TYPE) : AlertContract.Presenter {
+                     val alert: Alert) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
@@ -27,44 +27,43 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun start() {
         logToCrashReport()
-        checkAlertTypeAndHandleButtons()
-        val color = view.getColorForColorRes(alertType.backgroundColor)
-        view.setLayoutBackgroundColor(color)
-        view.setLeftButtonBackgroundColor(color)
-        view.setRightButtonBackgroundColor(color)
-        view.setAlertTitleWithStringRes(alertType.alertTitleId)
-        view.setAlertImageWithDrawableId(alertType.alertMainDrawableId)
-        view.setAlertHintImageWithDrawableId(alertType.alertHintDrawableId)
-        view.setAlertMessageWithStringRes(alertType.alertMessageId)
+
+        initButtons()
+        initColours()
+        initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alertType))
+            it.addEvent(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alert))
         }
     }
 
-    override fun handleLeftButtonClick() {
-        view.setResult(alertType.resultCode)
-        view.closeActivity()
+    private fun initButtons() {
+        view.initLeftButton(alert.leftButton)
+        view.initRightButton(alert.rightButton)
     }
 
-    override fun handleRightButtonClick() {
-        when (alertType) {
-            ALERT_TYPE.BLUETOOTH_NOT_ENABLED,
-            ALERT_TYPE.NOT_PAIRED,
-            ALERT_TYPE.MULTIPLE_PAIRED_SCANNERS,
-            ALERT_TYPE.DISCONNECTED -> {
-                view.openBluetoothSettings()
-            }
+    private fun initColours() {
+        val color = view.getColorForColorRes(alert.backgroundColor)
+        view.setLayoutBackgroundColor(color)
+        view.setLeftButtonBackgroundColor(color)
+        view.setRightButtonBackgroundColor(color)
+    }
 
-            ALERT_TYPE.GUID_NOT_FOUND_OFFLINE,
-            ALERT_TYPE.UNVERIFIED_API_KEY -> {
-                view.openWifiSettings()
-            }
+    private fun initTextAndDrawables() {
+        view.setAlertTitleWithStringRes(alert.title)
+        view.setAlertImageWithDrawableId(alert.mainDrawable)
+        view.setAlertHintImageWithDrawableId(alert.hintDrawable)
+        view.setAlertMessageWithStringRes(alert.message)
+    }
 
-            else -> {
-                view.setResult(RESULT_CANCELED)
-                view.closeAllActivities()
-            }
+    override fun handleButtonClick(buttonAction: Alert.ButtonAction) {
+        buttonAction.resultCode?.let { view.setResult(it) }
+        when (buttonAction) {
+            is Alert.ButtonAction.None -> Unit
+            is Alert.ButtonAction.WifiSettings -> view.openWifiSettings()
+            is Alert.ButtonAction.BluetoothSettings -> view.openBluetoothSettings()
+            is Alert.ButtonAction.TryAgain -> view.closeActivity()
+            is Alert.ButtonAction.Close -> view.closeAllActivities()
         }
     }
 
@@ -72,16 +71,7 @@ class AlertPresenter(val view: AlertContract.View,
         view.setResult(RESULT_CANCELED)
     }
 
-    private fun checkAlertTypeAndHandleButtons() {
-        if (alertType.isTwoButton) {
-            view.initLeftButton(alertType)
-        } else {
-            view.hideLeftButton()
-        }
-        view.initRightButton(alertType)
-    }
-
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alert.name)
     }
 }
