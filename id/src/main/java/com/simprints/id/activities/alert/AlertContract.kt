@@ -1,5 +1,8 @@
 package com.simprints.id.activities.alert
 
+import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.alert.Alert
@@ -7,16 +10,16 @@ import com.simprints.id.domain.alert.Alert
 interface AlertContract {
 
     interface View : BaseView<Presenter> {
-        fun getColorForColorRes(colorRes: Int): Int
-        fun setLayoutBackgroundColor(color: Int)
-        fun setLeftButtonBackgroundColor(color: Int)
-        fun setRightButtonBackgroundColor(color: Int)
-        fun setAlertTitleWithStringRes(stringRes: Int)
-        fun setAlertImageWithDrawableId(drawableId: Int)
-        fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int?)
+        @ColorInt fun getColorForColorRes(colorRes: Int): Int
+        fun setLayoutBackgroundColor(@ColorInt color: Int)
+        fun setLeftButtonBackgroundColor(@ColorInt color: Int)
+        fun setRightButtonBackgroundColor(@ColorInt color: Int)
+        fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
+        fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
+        fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
         fun initLeftButton(leftButtonAction: Alert.ButtonAction)
         fun initRightButton(rightButtonAction: Alert.ButtonAction)
-        fun setAlertMessageWithStringRes(stringRes: Int)
+        fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun setResult(resultCode: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()

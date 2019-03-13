@@ -4,6 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.id.Application
@@ -11,7 +15,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.domain.alert.Alert
 import kotlinx.android.synthetic.main.activity_alert.*
-
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
@@ -31,13 +34,13 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         viewPresenter.start()
     }
 
-    override fun getColorForColorRes(colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
-    override fun setLayoutBackgroundColor(color: Int) = alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(color: Int) = left_button.setBackgroundColor(color)
-    override fun setRightButtonBackgroundColor(color: Int) = right_button.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(stringRes: Int) = alert_title.setText(stringRes)
-    override fun setAlertImageWithDrawableId(drawableId: Int) = alert_image.setImageResource(drawableId)
-    override fun setAlertHintImageWithDrawableId(alertHintDrawableId: Int?) {
+    override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
+    override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = left_button.setBackgroundColor(color)
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = right_button.setBackgroundColor(color)
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alert_title.setText(stringRes)
+    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alert_image.setImageResource(drawableId)
+    override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
             hintGraphic.setImageResource(alertHintDrawableId)
         } else {
@@ -45,7 +48,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(stringRes: Int) = message.setText(stringRes)
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
 
     override fun initLeftButton(leftButtonAction: Alert.ButtonAction) {
         if (leftButtonAction !is Alert.ButtonAction.None) {
