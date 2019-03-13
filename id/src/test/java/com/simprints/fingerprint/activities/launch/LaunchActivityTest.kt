@@ -9,8 +9,8 @@ import com.simprints.id.commontesttools.state.mockSettingsPreferencesManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.domain.consent.GeneralConsent
-import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.fingerprint.data.domain.consent.GeneralConsent
+import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

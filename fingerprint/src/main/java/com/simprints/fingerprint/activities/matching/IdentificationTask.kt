@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.matching
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -12,7 +13,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.Tier
-import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.tools.TimeHelper
@@ -30,7 +30,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(appRequest: Request): Single<List<Person>> =
+    override fun loadCandidates(fingerprintRequest: FingerprintRequest): Single<List<Person>> =
         Completable.fromAction { view.setIdentificationProgressLoadingStart() }
             .andThen(dbManager.loadPeople(preferencesManager.matchGroup))
 

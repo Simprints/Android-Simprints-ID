@@ -13,10 +13,16 @@ import com.simprints.id.domain.ALERT_TYPE
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
+import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiEnrolResponse
+import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiIdentifyResponse
+import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiRefusalFormResponse
+import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiVerifyResponse
+import com.simprints.id.moduleapi.FingerprintAdapter.toFingerprintRequest
 import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
 import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
+import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -90,7 +96,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
-            .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
+            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, toFingerprintRequest(appRequest)) }
         startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST_CODE)
     }
 
@@ -108,10 +114,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
             val response = domainResponse.let {
                 when (it) {
-                    is EnrolResponse -> it.toClientApiEnrolResponse()
-                    is VerifyResponse -> it.toClientApiVerifyResponse()
-                    is IdentifyResponse -> it.toClientApiIdentifyResponse()
-                    is RefusalFormResponse -> it.toClientApiRefusalFormResponse()
+                    is EnrolResponse -> toClientApiEnrolResponse(it)
+                    is VerifyResponse -> toClientApiVerifyResponse(it)
+                    is IdentifyResponse -> toClientApiIdentifyResponse(it)
+                    is RefusalFormResponse -> toClientApiRefusalFormResponse(it)
                     else -> null
                 }
             }

@@ -3,6 +3,8 @@ package com.simprints.fingerprint.activities.matching
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -12,7 +14,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.VerificationResult
-import com.simprints.id.domain.requests.Request
+import com.simprints.fingerprint.moduleapi.Request
 import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
@@ -30,8 +32,8 @@ internal class VerificationTask(private val view: MatchingContract.View,
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(appRequest: Request): Single<List<Person>> =
-        dbManager.loadPerson(appRequest.projectId, (appRequest as VerifyRequest).verifyGuid).map { listOf(it.person) }
+    override fun loadCandidates(fingerprintRequest: FingerprintRequest): Single<List<Person>> =
+        dbManager.loadPerson(fingerprintRequest.projectId, (fingerprintRequest as FingerprintVerifyRequest).verifyGuid).map { listOf(it.person) }
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,

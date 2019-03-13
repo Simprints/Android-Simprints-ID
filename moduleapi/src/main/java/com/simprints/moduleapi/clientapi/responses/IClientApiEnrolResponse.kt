@@ -1,7 +1,7 @@
 package com.simprints.moduleapi.clientapi.responses
 
 
-interface IClientApiEnrollResponse : IClientApiResponse {
+interface IClientApiEnrolResponse : IClientApiResponse {
 
     val guid: String
 
