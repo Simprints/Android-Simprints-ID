@@ -4,12 +4,12 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.id.R
@@ -20,7 +20,6 @@ import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
 import com.simprints.id.tools.TimeoutBar
 import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
-
 import kotlinx.android.synthetic.main.content_main.*
 
 class CollectFingerprintsActivity :
@@ -109,7 +108,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun refreshFingerFragment() {
-        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo)?.let {
+        pageAdapter.getFragment(viewPresenter.currentActiveFingerNo).let {
             reverseFingerFragmentIfNeeded(it)
             it.updateTextAccordingToStatus()
         }
