@@ -54,7 +54,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 setLastUser()
                 setSessionIdCrashlyticsKey()
             } catch (exception: InvalidCalloutError) {
-                view.openAlertActivityForError(exception.alertType)
+                view.openAlertActivityForError(exception.alert)
                 setupFailed = true
             }
         }.subscribeBy(onError = { it.printStackTrace() })

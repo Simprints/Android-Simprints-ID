@@ -18,6 +18,4 @@ abstract class ActionRequestBuilderTest(mockFactory: RequestFactory)
         Assert.assertEquals(request.userId, RequestFactory.MOCK_USER_ID)
         Assert.assertEquals(request.metadata, RequestFactory.MOCK_METADATA)
     }
-
 }
-

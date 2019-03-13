@@ -21,7 +21,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Fingerprin
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.requests.Request
@@ -302,7 +302,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun handleException(simprintsException: SimprintsException) {
         crashReportManager.logExceptionOrThrowable(simprintsException)
         Timber.e(simprintsException)
-        view.doLaunchAlert(ALERT_TYPE.UNEXPECTED_ERROR)
+        view.doLaunchAlert(Alert.UNEXPECTED_ERROR)
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
