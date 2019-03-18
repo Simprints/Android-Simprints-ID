@@ -14,18 +14,17 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.data.InternalConstants.REFUSAL_ACTIVITY_REQUEST
+import com.simprints.fingerprint.data.InternalConstants.RESULT_TRY_AGAIN
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
-import com.simprints.id.R as appR
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),

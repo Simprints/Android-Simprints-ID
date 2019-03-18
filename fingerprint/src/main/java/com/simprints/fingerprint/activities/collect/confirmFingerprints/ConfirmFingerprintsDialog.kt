@@ -2,7 +2,7 @@ package com.simprints.fingerprint.activities.collect.confirmFingerprints
 
 import android.app.AlertDialog
 import android.content.Context
-import com.simprints.id.R
+import com.simprints.fingerprint.R
 
 class ConfirmFingerprintsDialog(private val context: Context,
                                 private val scannedFingers: MutableMap<String, Boolean>,

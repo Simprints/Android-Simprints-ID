@@ -13,4 +13,8 @@ interface IFingerprintRequest : Parcelable {
     val userId: String
     val moduleId: String
     val metadata: String
+    val language: String
+    val fingerStatus: Map<IFingerIdentifier, Boolean>
+    val nudgeMode: Boolean
+    val qualityThreshold: Int
 }

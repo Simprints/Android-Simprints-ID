@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.simprints.id.R;
+import com.simprints.fingerprint.R;
 import com.simprints.fingerprint.activities.collect.models.Finger;
 import com.simprints.fingerprint.activities.collect.models.FingerRes;
 import com.simprints.fingerprint.activities.collect.models.FingerStatus;

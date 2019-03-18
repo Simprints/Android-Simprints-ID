@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.activities.launch.LaunchPresenter
@@ -22,4 +23,5 @@ interface FingerprintsComponent {
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
     fun inject(scannerManager: ScannerManager)
     fun inject(launchPresenter: LaunchPresenter)
+    fun inject(alertPresenter: AlertPresenter)
 }

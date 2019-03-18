@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="App module" pattern="src[id]:*..*" />
+</component>

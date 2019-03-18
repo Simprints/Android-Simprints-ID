@@ -7,6 +7,8 @@ import android.content.Intent
 import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
@@ -15,7 +17,6 @@ import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.id.R
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
@@ -28,7 +29,6 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
@@ -48,6 +48,7 @@ class LaunchPresenter(component: FingerprintsComponent,
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var consentDataManager: ConsentDataManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
@@ -220,14 +221,14 @@ class LaunchPresenter(component: FingerprintsComponent,
 
     private fun setTextToConsentTabs() {
         view.setTextToGeneralConsent(getGeneralConsentText())
-        if (preferencesManager.parentalConsentExists) {
+        if (consentDataManager.parentalConsentExists) {
             view.addParentalConsentTabWithText(getParentalConsentText())
         }
     }
 
     private fun getGeneralConsentText(): String {
         val generalConsent = try {
-            JsonHelper.gson.fromJson(preferencesManager.generalConsentOptionsJson, GeneralConsent::class.java)
+            JsonHelper.gson.fromJson(consentDataManager.generalConsentOptionsJson, GeneralConsent::class.java)
         } catch (e: JsonSyntaxException) {
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
@@ -237,7 +238,7 @@ class LaunchPresenter(component: FingerprintsComponent,
 
     private fun getParentalConsentText(): String {
         val parentalConsent = try {
-            JsonHelper.gson.fromJson(preferencesManager.parentalConsentOptionsJson, ParentalConsent::class.java)
+            JsonHelper.gson.fromJson(consentDataManager.parentalConsentOptionsJson, ParentalConsent::class.java)
         } catch (e: JsonSyntaxException) {
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()

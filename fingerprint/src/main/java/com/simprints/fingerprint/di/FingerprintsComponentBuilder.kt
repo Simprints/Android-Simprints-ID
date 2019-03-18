@@ -61,7 +61,7 @@ class FingerprintsComponentBuilder {
                             peopleUpSyncMaster, database).also { it.initialiseDb() }
                     }
                 })
-                .fingerprintModule(FingerprintModule(app))
+                .fingerprintModule(FingerprintModule())
                 .preferencesModule(PreferencesModule())
                 .serializerModule(SerializerModule())
                 .build()

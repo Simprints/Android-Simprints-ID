@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.activities.launch
 
 import android.content.Intent
-import com.simprints.id.activities.BasePresenter
-import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.alert.Alert
+import com.simprints.fingerprint.activities.BasePresenter
+import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
