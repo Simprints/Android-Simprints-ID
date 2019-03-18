@@ -2,7 +2,7 @@ package com.simprints.id.data.db.local.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.FingerprintGeneratorUtils
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
@@ -38,7 +38,7 @@ class DbPersonTest {
     @Test
     fun buildRlPersonWithFingerprint() {
         val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            listOf(Fingerprint(FingerIdentifier.LEFT_3RD_FINGER, PeopleGeneratorUtils.getRandomFingerprint().template)))
+            listOf(Fingerprint(FingerIdentifier.LEFT_3RD_FINGER, FingerprintGeneratorUtils.generateRandomFingerprint().templateBytes)))
 
         val dbPerson = domainPerson.toRealmPerson()
 
