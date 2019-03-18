@@ -8,14 +8,15 @@ import android.view.WindowManager
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.moduleapi.AppAdapter.toDomainFingerprintRequest
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
@@ -38,8 +39,9 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
+        fingerprintRequest = toDomainFingerprintRequest(iFingerprintRequest)
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
@@ -144,12 +146,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun continueToNextActivity() {
-
-        val fingerprintsModule = "com.simprints.id" //STOPSHIP
-        val collectActivityClassName = "com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
-
-        val intent = Intent().setClassName(fingerprintsModule, collectActivityClassName)
-            .also { it.putExtra(Request.BUNDLE_KEY, fingerprintRequest) }
+        val intent = Intent(this, CollectFingerprintsActivity::class.java)
+            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
         startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
     }
 
@@ -162,7 +160,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         finish()
     }
 
-    override fun doLaunchAlert(alert: Alert) {
+    override fun doLaunchAlert(alert: FingerprintAlert) {
         launchAlert(alert)
     }
 

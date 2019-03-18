@@ -4,19 +4,18 @@ import android.annotation.SuppressLint
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
-import com.simprints.id.tools.TimeHelper
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.exceptions.SimprintsException
+import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -30,7 +29,6 @@ class MatchingPresenter(
     private val probe: Person,
     private val fingerprintRequest: FingerprintRequest,
     private val dbManager: DbManager,
-    private val preferencesManager: PreferencesManager,
     private val sessionEventsManager: SessionEventsManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
@@ -49,11 +47,13 @@ class MatchingPresenter(
         }
     }
 
-    private fun startMatchTask(matchTaskConstructor: (MatchingContract.View, DbManager, PreferencesManager,
+    private fun startMatchTask(matchTaskConstructor: (MatchingContract.View,
+                                                      FingerprintRequest,
+                                                      DbManager,
                                                       SessionEventsManager, CrashReportManager, TimeHelper) -> MatchTask) {
-        val matchTask = matchTaskConstructor(view, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
+        val matchTask = matchTaskConstructor(view, fingerprintRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
 
-        matchTaskDisposable = matchTask.loadCandidates(fingerprintRequest)
+        matchTaskDisposable = matchTask.loadCandidates()
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }
             .flatMap { matchTask.runMatch(it, probe) }
             .setMatchingSchedulers()

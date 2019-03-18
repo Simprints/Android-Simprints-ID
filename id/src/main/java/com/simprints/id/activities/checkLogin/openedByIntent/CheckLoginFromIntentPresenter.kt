@@ -64,7 +64,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(buildRequestEvent(it.nowRelativeToStartTime(timeHelper), appRequest))
+                add(buildRequestEvent(it.timeRelativeToStartTime(timeHelper.now()), appRequest))
             }
         }
     }
@@ -144,6 +144,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
         view.openLaunchActivity(appRequest)
+        initOrUpdateAnalyticsKeys()
+    }
+
+    private fun initOrUpdateAnalyticsKeys() {
+        crashReportManager.apply {
+            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+            setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -177,7 +188,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(
-            session.nowRelativeToStartTime(timeHelper),
+            session.timeRelativeToStartTime(timeHelper.now()),
             result,
             if (result == AUTHORIZED) {
                 UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
@@ -189,7 +200,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override fun handleActivityResult(requestCode: Int, resultCode: Int, response: Response?) {
         sessionEventsManager.updateSessionInBackground {
-            it.addEvent(buildResponseEvent(it.nowRelativeToStartTime(timeHelper), response)) //STOPSHIP: Fix me
+            it.addEvent(buildResponseEvent(it.timeRelativeToStartTime(timeHelper.now()), response)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)
         }
     }

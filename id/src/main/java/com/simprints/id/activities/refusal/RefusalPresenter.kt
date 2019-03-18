@@ -12,7 +12,6 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.refusal_form.RefusalFormAnswer
 import com.simprints.id.domain.refusal_form.RefusalFormReason
 import com.simprints.id.domain.refusal_form.RefusalFormReason.*
-import com.simprints.id.tools.InternalConstants
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
@@ -61,7 +60,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
             sessionEventsManager.updateSession {
                 it.addEvent(RefusalEvent(
                         it.timeRelativeToStartTime(refusalStartTime),
-                        it.nowRelativeToStartTime(timeHelper),
+                        it.timeRelativeToStartTime(timeHelper.now()),
                         RefusalEvent.Answer.fromRefusalReason(refusalReason),
                         refusalText))
             }.subscribeBy(onError = {

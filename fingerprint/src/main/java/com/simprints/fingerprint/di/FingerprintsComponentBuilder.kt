@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -15,7 +16,6 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.di.SerializerModule
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.tools.TimeHelper
 
 class FingerprintsComponentBuilder {
 

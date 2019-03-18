@@ -1,7 +1,8 @@
 package com.simprints.fingerprint.scanner
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert.*
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
@@ -152,15 +153,15 @@ open class ScannerManagerImpl(private val preferencesManager: PreferencesManager
         }
     }
 
-    override fun getAlertType(it: Throwable): Alert =
+    override fun getAlertType(it: Throwable): FingerprintAlert =
         when (it) {
-            is BluetoothNotEnabledException -> Alert.BLUETOOTH_NOT_ENABLED
-            is BluetoothNotSupportedException -> Alert.BLUETOOTH_NOT_SUPPORTED
-            is MultipleScannersPairedException -> Alert.MULTIPLE_PAIRED_SCANNERS
-            is ScannerLowBatteryException -> Alert.LOW_BATTERY
-            is ScannerNotPairedException -> Alert.NOT_PAIRED
-            is UnknownBluetoothIssueException -> Alert.DISCONNECTED
-            else -> Alert.UNEXPECTED_ERROR
+            is BluetoothNotEnabledException -> BLUETOOTH_NOT_ENABLED
+            is BluetoothNotSupportedException -> BLUETOOTH_NOT_SUPPORTED
+            is MultipleScannersPairedException -> MULTIPLE_PAIRED_SCANNERS
+            is ScannerLowBatteryException -> LOW_BATTERY
+            is ScannerNotPairedException -> NOT_PAIRED
+            is UnknownBluetoothIssueException -> DISCONNECTED
+            else -> UNEXPECTED_ERROR
         }
 
     override fun disconnectScannerIfNeeded() {

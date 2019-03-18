@@ -8,7 +8,7 @@ import android.widget.ProgressBar
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.id.exceptions.SimprintsException
 
 interface CollectFingerprintsContract {
@@ -24,7 +24,7 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
-        fun doLaunchAlert(alert: Alert)
+        fun doLaunchAlert(alert: FingerprintAlert)
         fun finishSuccessEnrol(result: Intent)
         fun finishSuccessAndStartMatching(intent: Intent)
         fun cancelAndFinish()

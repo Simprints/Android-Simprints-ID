@@ -103,7 +103,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
             it.addEvent(GuidSelectionEvent(
-                it.nowRelativeToStartTime(timeHelper),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 selectedGuid
             ))
             insertOrUpdateSessionEvents(it)
@@ -113,7 +113,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground { session ->
             session.addEvent(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 patientId,
                 match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
         }
@@ -123,7 +123,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground { session ->
             session.addEvent(OneToManyMatchEvent(
                 session.timeRelativeToStartTime(startTimeIdentification),
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
                 matches.map { MatchEntry(it.guidFound, it.confidence.toFloat()) }.toList().toTypedArray()))
         }
@@ -133,7 +133,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground {
             if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
                 it.addEvent(ScannerConnectionEvent(
-                    it.nowRelativeToStartTime(timeHelper),
+                    it.timeRelativeToStartTime(timeHelper.now()),
                     scannerInfo
                 ))
             }
@@ -150,7 +150,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addPersonCreationEventInBackground(person: Person) {
         updateSessionInBackground { session ->
             session.addEvent(PersonCreationEvent(
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
@@ -163,7 +163,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground {
             it.addEvent(CandidateReadEvent(
                 it.timeRelativeToStartTime(startCandidateSearchTime),
-                it.nowRelativeToStartTime(timeHelper),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 guid,
                 localResult,
                 remoteResult

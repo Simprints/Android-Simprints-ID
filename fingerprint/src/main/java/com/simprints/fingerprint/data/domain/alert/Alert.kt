@@ -7,120 +7,12 @@ import com.simprints.fingerprint.R
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.InternalConstants
 
-enum class Alert(val type: Type,
-                 val leftButton: ButtonAction,
-                 val rightButton: ButtonAction,
-                 @StringRes val message: Int) {
-
-    //Configuration errors
-
-    INVALID_PROJECT_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_PROJECT_ID),
-        message = R.string.invalid_projectId_message
-    ),
-
-    MISSING_PROJECT_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_MISSING_PROJECT_ID),
-        message = R.string.missing_projectId_message
-    ),
-
-    DIFFERENT_PROJECT_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_DIFFERENT_PROJECT_ID),
-        message = R.string.different_projectId_message
-    ),
-
-    DIFFERENT_USER_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_DIFFERENT_USER_ID),
-        message = R.string.different_userId_message
-    ),
-
-    INVALID_INTENT_ACTION(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_INTENT_ACTION),
-        message = R.string.invalid_intentAction_message
-    ),
-
-    INVALID_METADATA(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_METADATA),
-        message = R.string.invalid_metadata_message
-    ),
-
-    MISSING_USER_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_MISSING_USER_ID),
-        message = R.string.missing_userId_message
-    ),
-
-    INVALID_USER_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_USER_ID),
-        message = R.string.invalid_userId_message
-    ),
-
-    MISSING_MODULE_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_MISSING_MODULE_ID),
-        message = R.string.missing_moduleId_message
-    ),
-
-    INVALID_MODULE_ID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_MODULE_ID),
-        message = R.string.invalid_moduleId_message
-    ),
-
-    MISSING_VERIFY_GUID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_MISSING_VERIFY_GUID),
-        message = R.string.missing_verifyId_message
-    ),
-
-    INVALID_VERIFY_GUID(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_VERIFY_GUID),
-        message = R.string.invalid_verifyId_message
-    ),
-
-    INVALID_RESULT_FORMAT(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_RESULT_FORMAT),
-        message = R.string.invalid_resultFormat_message
-    ),
-
-    INVALID_CALLING_PACKAGE(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_INVALID_CALLING_PACKAGE),
-        message = R.string.invalid_callingPackage_message
-    ),
-
-    UNEXPECTED_PARAMETER(
-        type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_cog),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
-        message = R.string.unexpected_parameter_message
-    ),
+enum class FingerprintAlert(val type: Type,
+                            val leftButton: ButtonAction,
+                            val rightButton: ButtonAction,
+                            @StringRes val message: Int) {
 
     // Data errors
-
     GUID_NOT_FOUND_ONLINE(
         type = Type.DataError(
             title = R.string.verify_guid_not_found_title,
@@ -220,12 +112,6 @@ enum class Alert(val type: Type,
                       @ColorRes val backgroundColor: Int,
                       @DrawableRes val mainDrawable: Int,
                       @DrawableRes val hintDrawable: Int? = null) {
-
-        class ConfigurationError(title: Int = R.string.configuration_error_title,
-                                 backgroundColor: Int = R.color.simprints_yellow,
-                                 mainDrawable: Int = R.drawable.error_icon,
-                                 hintDrawable: Int?)
-            : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         class DataError(title: Int,
                         backgroundColor: Int = R.color.simprints_grey,

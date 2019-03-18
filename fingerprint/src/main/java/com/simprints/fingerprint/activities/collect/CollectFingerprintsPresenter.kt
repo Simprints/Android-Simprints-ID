@@ -10,13 +10,15 @@ import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsF
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.activities.matching.MatchingActivity
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.tools.extensions.toResultEvent
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -34,9 +36,7 @@ import com.simprints.id.exceptions.SimprintsException
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
 import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
-import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -296,26 +296,23 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        val fingerprintModule = "com.simprints.id" //STOPSHIP
-        val matchingActivityClassName = "com.simprints.fingerprint.activities.matching.MatchingActivity"
-
-        val intent = Intent().setClassName(fingerprintModule, matchingActivityClassName)
+        val intent = Intent(context, MatchingActivity::class.java)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
-        intent.putExtra(IFingerprintRequest.BUNDLE_KEY, fingerprintRequest)
+        intent.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest)
         view.finishSuccessAndStartMatching(intent)
     }
 
     override fun handleException(simprintsException: SimprintsException) {
         crashReportManager.logExceptionOrThrowable(simprintsException)
         Timber.e(simprintsException)
-        view.doLaunchAlert(Alert.UNEXPECTED_ERROR)
+        view.doLaunchAlert(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
         sessionEventsManager.updateSessionInBackground { sessionEvents ->
             sessionEvents.addEvent(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
-                sessionEvents.nowRelativeToStartTime(timeHelper),
+                sessionEvents.timeRelativeToStartTime(timeHelper.now()),
                 FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
                 fingerprintRequest.qualityThreshold,
                 finger.status.toResultEvent(),

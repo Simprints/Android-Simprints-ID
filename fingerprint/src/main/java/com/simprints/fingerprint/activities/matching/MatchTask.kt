@@ -9,7 +9,7 @@ internal interface MatchTask {
 
     val matchStartTime: Long
 
-    fun loadCandidates(fingerprintRequest: FingerprintRequest): Single<List<Person>>
+    fun loadCandidates(): Single<List<Person>>
 
     fun handlesCandidatesLoaded(candidates: List<Person>)
 

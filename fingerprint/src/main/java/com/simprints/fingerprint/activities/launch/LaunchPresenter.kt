@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
@@ -16,6 +16,7 @@ import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -27,11 +28,8 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -46,10 +44,8 @@ class LaunchPresenter(component: FingerprintsComponent,
                       private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var consentDataManager: ConsentDataManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -80,8 +76,8 @@ class LaunchPresenter(component: FingerprintsComponent,
     }
 
     override fun start() {
-        view.setLanguage(preferencesManager.language)
-        view.setLogoVisibility(preferencesManager.logoExists)
+        view.setLanguage(fingerprintRequest.language)
+        view.setLogoVisibility(fingerprintRequest.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
 
@@ -91,7 +87,6 @@ class LaunchPresenter(component: FingerprintsComponent,
         setTextToConsentTabs()
 
         startSetup()
-        initOrUpdateAnalyticsKeys()
     }
 
     @SuppressLint("CheckResult")
@@ -125,7 +120,7 @@ class LaunchPresenter(component: FingerprintsComponent,
         return if (fingerprintRequest is FingerprintVerifyRequest) {
             val guid = fingerprintRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
-            dbManager.loadPerson(loginInfoManager.getSignedInProjectIdOrEmpty(), guid).doOnSuccess { personFetchResult ->
+            dbManager.loadPerson(fingerprintRequest.projectId, guid).doOnSuccess { personFetchResult ->
                 handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
             }.doOnError {
                 it.printStackTrace()
@@ -150,11 +145,11 @@ class LaunchPresenter(component: FingerprintsComponent,
     private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
-            view.doLaunchAlert(Alert.GUID_NOT_FOUND_ONLINE)
+            view.doLaunchAlert(FingerprintAlert.GUID_NOT_FOUND_ONLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
         } else {
             // We're offline but might find the person if we sync
-            view.doLaunchAlert(Alert.GUID_NOT_FOUND_OFFLINE)
+            view.doLaunchAlert(FingerprintAlert.GUID_NOT_FOUND_OFFLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }
@@ -216,7 +211,7 @@ class LaunchPresenter(component: FingerprintsComponent,
     private fun handleSetupFinished() {
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
-        view.doVibrateIfNecessary(preferencesManager.vibrateMode)
+        view.doVibrateIfNecessary(fingerprintRequest.vibrateMode)
     }
 
     private fun setTextToConsentTabs() {
@@ -233,7 +228,7 @@ class LaunchPresenter(component: FingerprintsComponent,
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, fingerprintRequest, preferencesManager.programName, preferencesManager.organizationName)
+        return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -243,7 +238,7 @@ class LaunchPresenter(component: FingerprintsComponent,
             crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, fingerprintRequest, preferencesManager.programName, preferencesManager.organizationName)
+        return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
     }
 
     override fun handleOnBackPressed() {
@@ -266,7 +261,7 @@ class LaunchPresenter(component: FingerprintsComponent,
             it.addEvent(
                 ConsentEvent(
                     it.timeRelativeToStartTime(startConsentEventTime),
-                    it.nowRelativeToStartTime(timeHelper),
+                    it.timeRelativeToStartTime(timeHelper.now()),
                     if (view.isCurrentTabParental()) {
                         PARENTAL
                     } else {
@@ -313,15 +308,5 @@ class LaunchPresenter(component: FingerprintsComponent,
                 scannerManager.scannerId ?: "",
                 scannerManager.macAddress ?: "",
                 scannerManager.hardwareVersion ?: ""))
-    }
-
-    private fun initOrUpdateAnalyticsKeys() {
-        crashReportManager.apply {
-            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
-            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
-            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
-            setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
-        }
     }
 }

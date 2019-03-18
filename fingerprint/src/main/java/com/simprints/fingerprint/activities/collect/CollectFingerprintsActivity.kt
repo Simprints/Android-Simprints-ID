@@ -16,13 +16,12 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.data.InternalConstants.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -49,7 +48,7 @@ class CollectFingerprintsActivity :
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
 
         configureRightToLeft()
@@ -175,7 +174,7 @@ class CollectFingerprintsActivity :
         viewPresenter.handleOnPause()
     }
 
-    override fun doLaunchAlert(alert: Alert) {
+    override fun doLaunchAlert(alert: FingerprintAlert) {
         launchAlert(alert)
     }
 

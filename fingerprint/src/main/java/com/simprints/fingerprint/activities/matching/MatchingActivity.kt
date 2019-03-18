@@ -10,22 +10,20 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.activities.alert.AlertActivity
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
-import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
 
@@ -34,7 +32,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     override lateinit var viewPresenter: MatchingContract.Presenter
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -43,8 +40,11 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         super.onCreate(savedInstanceState)
         val component = FingerprintsComponentBuilder.getComponent(application as Application)
         component.inject(this)
+        val fingerprintRequest: FingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
-        LanguageHelper.setLanguage(this, preferencesManager.language)
+        LanguageHelper.setLanguage(this, fingerprintRequest.language)
+
         setContentView(R.layout.activity_matching)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -59,10 +59,8 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
             ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP : Custom error
 
-        val fingerprintRequest: FingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
-        viewPresenter = MatchingPresenter(this, probe, fingerprintRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
+        viewPresenter = MatchingPresenter(this, probe, fingerprintRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
     }
 
     override fun onResume() {
@@ -126,7 +124,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun launchAlert() {
         val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, Alert.UNEXPECTED_ERROR)
+        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, FingerprintAlert.UNEXPECTED_ERROR)
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
     }
 

@@ -26,7 +26,7 @@ import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.responses.IdentifyResponse
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
-import com.simprints.id.tools.TimeHelper
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.RxSchedulerRule
 import io.reactivex.Single

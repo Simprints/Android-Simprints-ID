@@ -3,7 +3,7 @@ package com.simprints.fingerprint.activities.launch
 import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.data.domain.alert.Alert
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
@@ -21,7 +21,7 @@ interface LaunchContract {
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
-        fun doLaunchAlert(alert: Alert)
+        fun doLaunchAlert(alert: FingerprintAlert)
         fun doVibrateIfNecessary(doVibrate: Boolean)
 
         fun setTextToGeneralConsent(generalConsentText: String)
