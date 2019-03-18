@@ -14,6 +14,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.IntentKeys
@@ -21,7 +22,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
@@ -50,7 +50,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
         val extras = intent.extras
         if (extras == null) {
-            crashReportManager.logExceptionOrThrowable(NoIntentExtrasError("Null extras passed to MatchingActivity"))
+            crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Null extras passed to MatchingActivity")) //STOPSHIP : Custom error
             launchAlert()
             finish()
             return

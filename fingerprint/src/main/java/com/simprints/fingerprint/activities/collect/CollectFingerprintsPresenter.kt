@@ -17,6 +17,9 @@ import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.tools.extensions.toResultEvent
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.FingerIdentifier
@@ -32,9 +35,6 @@ import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.responses.EnrolResponse
 import com.simprints.id.domain.responses.Response
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.rxkotlin.subscribeBy
@@ -206,7 +206,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             is FingerprintIdentifyRequest -> context.getString(R.string.identify_title)
             is FingerprintVerifyRequest -> context.getString(R.string.verify_title)
             else -> {
-                handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                handleException(FingerprintSafeException("CalloutParameters")) //StopShip: Custom Error
                 ""
             }
         }
@@ -291,7 +291,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
-        handleException(UnexpectedException(throwable))
+        handleException(FingerprintUnexpectedException(throwable))
         view.cancelAndFinish()
     }
 
@@ -302,7 +302,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.finishSuccessAndStartMatching(intent)
     }
 
-    override fun handleException(simprintsException: SimprintsException) {
+    override fun handleException(simprintsException: FingerprintSimprintsException) {
         crashReportManager.logExceptionOrThrowable(simprintsException)
         Timber.e(simprintsException)
         view.doLaunchAlert(FingerprintAlert.UNEXPECTED_ERROR)

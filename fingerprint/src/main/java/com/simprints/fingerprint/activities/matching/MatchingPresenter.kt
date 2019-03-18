@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
@@ -14,8 +15,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -87,7 +86,7 @@ class MatchingPresenter(
         override fun onMatcherEvent(event: EVENT?) =
             when (event) {
                 EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
-                else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
+                else -> emitter.onError(FingerprintSimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
             }
     }
 
@@ -100,7 +99,7 @@ class MatchingPresenter(
         com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
-        crashReportManager.logExceptionOrThrowable(InvalidMatchingCalloutError("Invalid action in MatchingActivity"))
+        crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception
         view.launchAlert()
     }
 

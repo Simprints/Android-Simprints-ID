@@ -1,6 +1,5 @@
 package com.simprints.id.session.callout
 
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterTypeError
 import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Assert.assertEquals
 import org.junit.Test
