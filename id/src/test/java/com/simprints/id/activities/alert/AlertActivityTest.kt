@@ -10,7 +10,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -18,6 +17,7 @@ import com.simprints.id.domain.alert.Alert
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
 import com.simprints.testtools.unit.robolectric.showOnScreen
 import kotlinx.android.synthetic.main.activity_alert.*
@@ -101,18 +101,18 @@ class AlertActivityTest {
     private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: Alert) {
         assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alert.backgroundColor))
 
-        if (alert.isTwoButton) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alert.backgroundColor))
+        if (alert.isTwoButton()) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alert.backgroundColor))
         assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alert.backgroundColor))
 
-        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alert.alertTitleId))
+        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alert.title))
 
         val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
-        assertEquals(alertImageDrawableShown, alert.alertMainDrawableId)
+        assertEquals(alertImageDrawableShown, alert.mainDrawable)
 
-        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alert.alertMessageId))
+        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alert.message))
 
-        if (alert.isTwoButton) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alert.alertLeftButtonTextId))
-        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alert.alertRightButtonTextId))
+        if (alert.isTwoButton()) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alert.leftButton.buttonText))
+        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alert.rightButton.buttonText))
     }
 
     private fun getBackgroundColor(view: View): Int =
@@ -123,4 +123,7 @@ class AlertActivityTest {
         }
 
     private fun getColorWithColorRes(colorRes: Int, resources: Resources = app.resources) = ResourcesCompat.getColor(resources, colorRes, null)
+
+    private fun Alert.isTwoButton() =
+        leftButton != Alert.ButtonAction.None || rightButton != Alert.ButtonAction.None
 }
