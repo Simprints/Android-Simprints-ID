@@ -12,9 +12,12 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
     private val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-    override fun isConnected(): Boolean {
-        return cm.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
+    override fun isConnected(): Boolean = try {
+        cm.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
+    } catch (e: IllegalStateException) {
+        false
     }
+
 
     override var connectionsStates: List<Connection> =
         arrayListOf<Connection>().apply {
