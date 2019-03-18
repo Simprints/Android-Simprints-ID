@@ -8,23 +8,22 @@ import android.view.WindowManager
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.tools.InternalConstants.*
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import com.simprints.id.R as appR //StopShip move strings from app to fingerprint module
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
@@ -69,8 +68,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
 
     override fun initTextsInButtons() {
-        consentAcceptButton.text = getString(appR.string.launch_consent_accept_button)
-        consentDeclineButton.text = getString(appR.string.launch_consent_decline_button)
+        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
     }
 
     override fun setLogoVisibility(visible: Boolean) {
@@ -102,8 +101,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun initConsentTabs() {
         tabHost.setup()
-        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(appR.string.consent_general_title)).setContent(R.id.generalConsentTextView)
-        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(appR.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
 

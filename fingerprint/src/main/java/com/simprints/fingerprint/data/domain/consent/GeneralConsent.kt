@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
-import com.simprints.id.R
+import com.simprints.fingerprint.R
 
 
 data class GeneralConsent(

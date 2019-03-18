@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.scanner
 
 import android.annotation.SuppressLint
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
@@ -12,7 +13,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException

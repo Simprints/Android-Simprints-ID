@@ -31,9 +31,6 @@ interface SettingsPreferencesManager {
     var organizationName: String
 
     var logoExists: Boolean
-    var parentalConsentExists: Boolean
-    var generalConsentOptionsJson: String
-    var parentalConsentOptionsJson: String
 
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 

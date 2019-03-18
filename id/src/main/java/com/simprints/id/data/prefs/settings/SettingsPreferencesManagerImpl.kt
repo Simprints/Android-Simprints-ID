@@ -96,15 +96,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
 
-        const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
-        const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
-
-        const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(GeneralConsent())
-
-        const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
-
         const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
         val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
             PeopleDownSyncTrigger.MANUAL to true,
@@ -188,16 +179,6 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Whether to show the Simprints logo at the top of the launch activity
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
-
-    // Whether the parental consent should be shown
-    override var parentalConsentExists: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
-    // The options of the general consent as a JSON string of booleans
-    override var generalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
-    // The options of the parental consent as a JSON string of booleans
-    override var parentalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)

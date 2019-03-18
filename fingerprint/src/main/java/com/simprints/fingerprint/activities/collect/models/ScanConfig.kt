@@ -1,8 +1,5 @@
 package com.simprints.fingerprint.activities.collect.models
 
-
-import com.simprints.id.FingerIdentifier
-
 class ScanConfig {
 
     val fingerConfigs: Map<FingerIdentifier, ScanConfigFingerEntry> =

@@ -7,12 +7,11 @@ import com.simprints.fingerprint.activities.collect.FingerPageAdapter
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerConfig.OPTIONAL
 import com.simprints.fingerprint.activities.collect.models.FingerConfig.REQUIRED
+import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.activities.collect.models.FingerIdentifier.*
 import com.simprints.fingerprint.activities.collect.models.ScanConfig
 import com.simprints.fingerprint.activities.collect.models.ScanConfigFingerEntry
 import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.FingerIdentifier.*
-
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,

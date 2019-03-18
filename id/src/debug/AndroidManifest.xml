@@ -116,10 +116,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity
-            android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
-
         <service
             android:name=".services.GuidSelectionService"
             android:exported="true"
@@ -131,9 +127,6 @@
             </intent-filter>
         </service>
 
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />

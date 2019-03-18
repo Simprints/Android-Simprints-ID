@@ -96,7 +96,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
-            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, toFingerprintRequest(appRequest)) }
+            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, toFingerprintRequest(appRequest, preferencesManager)) }
         startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST_CODE)
     }
 

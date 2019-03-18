@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -14,12 +15,9 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.VerificationResult
-import com.simprints.fingerprint.moduleapi.Request
-import com.simprints.id.domain.requests.VerifyRequest
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
 import com.simprints.id.tools.TimeHelper
-import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 

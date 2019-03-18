@@ -4,18 +4,20 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.data.domain.alert.Alert
 import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.tools.extensions.toResultEvent
-import com.simprints.id.R
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
@@ -24,8 +26,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.responses.EnrolResponse
@@ -36,6 +36,7 @@ import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.moduleapi.fingerprint.IFingerprintRequest
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -50,7 +51,6 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -73,7 +73,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun start() {
-        LanguageHelper.setLanguage(context, preferencesManager.language)
+        LanguageHelper.setLanguage(context, fingerprintRequest.language)
 
         initFingerDisplayHelper(view)
         initIndicatorsHelper(context, view)
@@ -83,7 +83,11 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initFingerDisplayHelper(view: CollectFingerprintsContract.View) {
-        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(view, this, preferencesManager.fingerStatus, preferencesManager.nudgeMode)
+        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
+            view,
+            this,
+            fingerprintRequest.fingerStatus,
+            fingerprintRequest.nudgeMode)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -191,7 +195,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         activeFingers.filter { fingerHasSatisfiedTerminalCondition(it) }.size >= maximumTotalNumberOfFingersForAutoAdding
 
     private fun numberOfOriginalFingers() =
-        preferencesManager.fingerStatus.filter { it.value }.size
+        fingerprintRequest.fingerStatus.filter { it.value }.size
 
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
@@ -280,7 +284,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     //STOPSHIP
     //We shouldn't be using any client API models in ID past the interface layer.
     private fun handleSavePersonSuccess(guidCreated: String) {
-        preferencesManager.lastEnrolDate = Date()
+        //preferencesManager.lastEnrolDate = Date() //StopShip
         val result = Intent()
         result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated))
         view.finishSuccessEnrol(result)
@@ -297,7 +301,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         val intent = Intent().setClassName(fingerprintModule, matchingActivityClassName)
         intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
-        intent.putExtra(Request.BUNDLE_KEY, appRequest)
+        intent.putExtra(IFingerprintRequest.BUNDLE_KEY, fingerprintRequest)
         view.finishSuccessAndStartMatching(intent)
     }
 
@@ -312,8 +316,8 @@ class CollectFingerprintsPresenter(private val context: Context,
             sessionEvents.addEvent(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.nowRelativeToStartTime(timeHelper),
-                finger.id,
-                preferencesManager.qualityThreshold,
+                FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
+                fingerprintRequest.qualityThreshold,
                 finger.status.toResultEvent(),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))

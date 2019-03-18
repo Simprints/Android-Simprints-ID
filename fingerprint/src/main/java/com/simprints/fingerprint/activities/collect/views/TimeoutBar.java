@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
 import android.widget.ProgressBar;
 
-import com.simprints.id.R;
+import com.simprints.fingerprint.R;
 import com.simprints.fingerprint.activities.collect.models.FingerStatus;
 
 import androidx.core.content.ContextCompat;
