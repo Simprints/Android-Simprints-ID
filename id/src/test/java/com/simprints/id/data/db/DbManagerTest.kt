@@ -212,11 +212,11 @@ class DbManagerTest {
     fun tearDown() {
         mockServer.shutdown()
     }
-}
 
-fun mockResponseForDownloadPatient(patient: ApiPerson): MockResponse {
-    return MockResponse().let {
-        it.setResponseCode(200)
-        it.setBody(JsonHelper.toJson(patient))
+    private fun mockResponseForDownloadPatient(patient: ApiPerson): MockResponse {
+        return MockResponse().let {
+            it.setResponseCode(200)
+            it.setBody(JsonHelper.toJson(patient))
+        }
     }
 }
