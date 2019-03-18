@@ -1,24 +1,22 @@
 package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintsComponent,
-                     val alert: Alert) : AlertContract.Presenter {
+                     val alert: FingerprintAlert) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
     init {
@@ -33,7 +31,7 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alert))
+            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alert.name))
         }
     }
 
@@ -56,14 +54,14 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertMessageWithStringRes(alert.message)
     }
 
-    override fun handleButtonClick(buttonAction: Alert.ButtonAction) {
+    override fun handleButtonClick(buttonAction: FingerprintAlert.ButtonAction) {
         buttonAction.resultCode?.let { view.setResult(it) }
         when (buttonAction) {
-            is Alert.ButtonAction.None -> Unit
-            is Alert.ButtonAction.WifiSettings -> view.openWifiSettings()
-            is Alert.ButtonAction.BluetoothSettings -> view.openBluetoothSettings()
-            is Alert.ButtonAction.TryAgain -> view.closeActivity()
-            is Alert.ButtonAction.Close -> view.closeAllActivities()
+            is FingerprintAlert.ButtonAction.None -> Unit
+            is FingerprintAlert.ButtonAction.WifiSettings -> view.openWifiSettings()
+            is FingerprintAlert.ButtonAction.BluetoothSettings -> view.openBluetoothSettings()
+            is FingerprintAlert.ButtonAction.TryAgain -> view.closeActivity()
+            is FingerprintAlert.ButtonAction.Close -> view.closeAllActivities()
         }
     }
 

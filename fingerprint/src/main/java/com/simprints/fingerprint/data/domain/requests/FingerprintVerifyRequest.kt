@@ -14,6 +14,10 @@ data class FingerprintVerifyRequest(override val projectId: String,
                                     override val fingerStatus: Map<FingerIdentifier, Boolean>,
                                     override val nudgeMode: Boolean,
                                     override val qualityThreshold: Int,
+                                    override val logoExists: Boolean,
+                                    override val programName: String,
+                                    override val organizationName: String,
+                                    override val vibrateMode: Boolean,
                                     val verifyGuid: String) : FingerprintRequest {
 
     constructor(fingerprintRequest: IFingerprintVerifyRequest) : this(
@@ -25,5 +29,9 @@ data class FingerprintVerifyRequest(override val projectId: String,
         fingerprintRequest.fingerStatus.mapKeys { it.key.toDomainClass() },
         fingerprintRequest.nudgeMode,
         fingerprintRequest.qualityThreshold,
+        fingerprintRequest.logoExists,
+        fingerprintRequest.programName,
+        fingerprintRequest.organizationName,
+        fingerprintRequest.vibrateMode,
         fingerprintRequest.verifyGuid)
 }

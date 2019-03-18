@@ -5,45 +5,41 @@ import android.content.Intent
 import android.util.Log
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
-import com.simprints.id.tools.TimeHelper
 import io.reactivex.Single
 import java.util.*
 
 internal class VerificationTask(private val view: MatchingContract.View,
+                                fingerprintRequest: FingerprintRequest,
                                 private val dbManager: DbManager,
-                                private val preferencesManager: PreferencesManager,
                                 private val sessionEventsManager: SessionEventsManager,
                                 private val crashReportManager: CrashReportManager,
                                 timeHelper: TimeHelper) : MatchTask {
 
+    private val fingerprintVerifyRequest = fingerprintRequest as FingerprintVerifyRequest
+
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(fingerprintRequest: FingerprintRequest): Single<List<Person>> =
-        dbManager.loadPerson(fingerprintRequest.projectId, (fingerprintRequest as FingerprintVerifyRequest).verifyGuid).map { listOf(it.person) }
+    override fun loadCandidates(): Single<List<Person>> =
+        dbManager.loadPerson(fingerprintVerifyRequest.projectId, fingerprintVerifyRequest.verifyGuid).map { listOf(it.person) }
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
     }
 
-    override fun getMatcherType(): LibMatcher.MATCHER_TYPE =
-        when (preferencesManager.matcherType) {
-            0 -> LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
-            1 -> LibMatcher.MATCHER_TYPE.SOURCEAFIS_VERIFY
-            else -> LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
-        }
+    override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
 
     override fun onMatchProgressDo(progress: Int) {
         view.setVerificationProgress()

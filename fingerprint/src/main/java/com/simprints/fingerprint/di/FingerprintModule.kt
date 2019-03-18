@@ -7,6 +7,8 @@ import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.fingerprint.tools.utils.LocationProviderImpl
+import com.simprints.fingerprint.tools.utils.TimeHelper
+import com.simprints.fingerprint.tools.utils.TimeHelperImpl
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -23,6 +25,11 @@ class FingerprintModule {
     @Provides
     @Singleton
     fun provideLocationProvider(ctx: Context): LocationProvider = LocationProviderImpl(ctx)
+
+    @Provides
+    @Singleton
+    fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
+
 
     @Provides
     @Singleton

@@ -16,7 +16,7 @@ class ConnectivitySnapshotEvent(
 
             return simNetworkUtils.let {
                 ConnectivitySnapshotEvent(
-                    sessionEvents.nowRelativeToStartTime(timeHelper),
+                    sessionEvents.timeRelativeToStartTime(timeHelper.now()),
                     it.mobileNetworkType ?: "",
                     it.connectionsStates)
             }
