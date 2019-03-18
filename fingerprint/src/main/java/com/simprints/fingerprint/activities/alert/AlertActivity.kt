@@ -1,22 +1,34 @@
-package com.simprints.id.activities.alert
+package com.simprints.fingerprint.activities.alert
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.domain.alert.Alert
-import kotlinx.android.synthetic.main.activity_alert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
+
+    private val alertLayout by lazy { findViewById<LinearLayout>(R.id.alertLayout) }
+    private val leftButton by lazy { findViewById<Button>(R.id.left_button) }
+    private val rightButton by lazy { findViewById<Button>(R.id.right_button) }
+    private val alertTitle by lazy { findViewById<TextView>(R.id.alert_title) }
+    private val alertImage by lazy { findViewById<ImageView>(R.id.alert_image) }
+    private val hintGraphic by lazy { findViewById<ImageView>(R.id.hintGraphic) }
+    private val message by lazy { findViewById<TextView>(R.id.message) }
 
     override lateinit var viewPresenter: AlertContract.Presenter
 
@@ -24,22 +36,22 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alert)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val app = application as Application
 
         val alertType = intent.extras?.let {
             it.get(IntentKeys.alertActivityAlertTypeKey) as Alert
         } ?: Alert.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.component, alertType)
+        val component = FingerprintsComponentBuilder.getComponent(application as Application)
+        viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = left_button.setBackgroundColor(color)
-    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = right_button.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alert_title.setText(stringRes)
-    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alert_image.setImageResource(drawableId)
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = leftButton.setBackgroundColor(color)
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) = rightButton.setBackgroundColor(color)
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alertTitle.setText(stringRes)
+    override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
             hintGraphic.setImageResource(alertHintDrawableId)
@@ -52,19 +64,19 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun initLeftButton(leftButtonAction: Alert.ButtonAction) {
         if (leftButtonAction !is Alert.ButtonAction.None) {
-            left_button.setText(leftButtonAction.buttonText)
-            left_button.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
+            leftButton.setText(leftButtonAction.buttonText)
+            leftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
-            left_button.visibility = View.GONE
+            leftButton.visibility = View.GONE
         }
     }
 
     override fun initRightButton(rightButtonAction: Alert.ButtonAction) {
         if (rightButtonAction !is Alert.ButtonAction.None) {
-            right_button.setText(rightButtonAction.buttonText)
-            right_button.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
+            rightButton.setText(rightButtonAction.buttonText)
+            rightButton.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
-            right_button.visibility = View.GONE
+            rightButton.visibility = View.GONE
         }
     }
 

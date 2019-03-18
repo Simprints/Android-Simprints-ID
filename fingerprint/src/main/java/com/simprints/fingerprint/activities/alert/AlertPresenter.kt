@@ -1,19 +1,19 @@
-package com.simprints.id.activities.alert
+package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
+import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
-                     val component: AppComponent,
+                     val component: FingerprintsComponent,
                      val alert: Alert) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
