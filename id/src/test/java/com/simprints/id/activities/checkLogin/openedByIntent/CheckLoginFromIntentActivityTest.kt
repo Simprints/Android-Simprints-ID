@@ -9,7 +9,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity.Companion.LOGIN_REQUEST_CODE
-import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
@@ -19,7 +18,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEvents
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -27,16 +25,15 @@ import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.verifyExactly
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.assertActivityStarted
 import com.simprints.testtools.unit.robolectric.createActivity
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.robolectric.Robolectric.buildActivity
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
@@ -68,7 +65,6 @@ class CheckLoginFromIntentActivityTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var crashReportManagerMock: CrashReportManager
-    @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
@@ -110,19 +106,7 @@ class CheckLoginFromIntentActivityTest {
     }
 
     private fun verifyExceptionWasThrownAlongWithNoSessionException(times: Int) {
-        Mockito.verify(crashReportManagerMock, Mockito.times(times)).logExceptionOrThrowable(anyNotNull())
-    }
-
-    @Test
-    fun validIntentParams_extractParamsForLogin() {
-
-        val intent = createACallingAppIntentWithProjectId()
-
-        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
-        controller.resume().visible()
-
-        Assert.assertEquals(DEFAULT_PROJECT_ID, preferences.projectId)
-        Assert.assertEquals(DEFAULT_USER_ID, preferences.userId)
+        verifyExactly(times, crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
     @Test
@@ -154,7 +138,7 @@ class CheckLoginFromIntentActivityTest {
         val checkLoginIntent = createACallingAppIntentWithLegacyApiKey()
         val activity = startCheckLoginFromIntentActivity(checkLoginIntent)
 
-        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, activity)
+        assertActivityStarted(CheckLoginFromIntentActivity.launchActivityClassName, activity)
     }
 
     @Test
@@ -188,7 +172,7 @@ class CheckLoginFromIntentActivityTest {
 
         assertFalse(activity.isFinishing)
         val intent = sActivity.nextStartedActivity
-        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, intent)
+        assertActivityStarted(CheckLoginFromIntentActivity.launchActivityClassName, intent)
 
         sActivity.receiveResult(
             intent,
@@ -221,7 +205,7 @@ class CheckLoginFromIntentActivityTest {
             Intent())
 
         controller.resume()
-        assertActivityStarted(com.simprints.fingerprint.activities.launch.LaunchActivity::class.java, sActivity)
+        assertActivityStarted(CheckLoginFromIntentActivity.launchActivityClassName, sActivity)
         assertFalse(activity.isFinishing)
     }
 
