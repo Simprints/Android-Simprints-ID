@@ -8,13 +8,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
 import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
 import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
 import javax.inject.Inject
@@ -22,11 +20,12 @@ import javax.inject.Inject
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
 
     companion object {
+        const val fingerprintsModule = "com.simprints.id" //STOPSHIP
+        const val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+
         const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
         private const val LAUNCH_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 2
         private const val ALERT_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 3
@@ -86,8 +85,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun openLaunchActivity(appRequest: Request) {
-        val fingerprintsModule = "com.simprints.id" //STOPSHIP
-        val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
             .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
