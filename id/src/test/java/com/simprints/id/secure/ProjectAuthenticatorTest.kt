@@ -3,18 +3,17 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.core.network.SimApiClient
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -52,7 +51,6 @@ class ProjectAuthenticatorTest {
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
     @Inject lateinit var loginInfoManagerMock: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
 
