@@ -1,4 +1,4 @@
-package com.simprints.id.activities.alert
+package com.simprints.fingerprint.activities.alert
 
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
