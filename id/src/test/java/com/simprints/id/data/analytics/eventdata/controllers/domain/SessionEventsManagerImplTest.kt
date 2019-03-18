@@ -51,8 +51,6 @@ class SessionEventsManagerImplTest {
     }
 
     private fun mockPreferenceManagerInfo() {
-        whenever(preferencesManagerMock.appVersionName).thenReturn("app_version_name")
-        whenever(preferencesManagerMock.libVersionName).thenReturn("lib_version_name")
         whenever(preferencesManagerMock.language).thenReturn("language")
     }
 
@@ -69,7 +67,7 @@ class SessionEventsManagerImplTest {
     @Test
     fun createSession_shouldCreateASession() {
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
         val createdSession = sessionsInFakeDb.first()
@@ -83,7 +81,7 @@ class SessionEventsManagerImplTest {
         sessionsInFakeDb.add(openSession)
         assertThat(openSession.isOpen()).isTrue()
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(2)
         val newCreatedSession = sessionsInFakeDb.find { it.id != "old_session_id" }
@@ -100,7 +98,7 @@ class SessionEventsManagerImplTest {
     fun closeLastSessionsIfPending_shouldSwallowException() {
         whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.error(Throwable("error_reading_db")))
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
 
         verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
@@ -108,7 +106,7 @@ class SessionEventsManagerImplTest {
 
     @Test
     fun updateSession_shouldUpdateSession() {
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
         sessionsEventsManagerSpy.updateSession {
             it.projectId = "new_project"
         }.blockingAwait()
@@ -132,5 +130,9 @@ class SessionEventsManagerImplTest {
 
         tester.awaitTerminalEvent()
         assertThat(tester.errorCount()).isEqualTo(1)
+    }
+
+    companion object {
+        private const val appVersionName = "app_version_name"
     }
 }

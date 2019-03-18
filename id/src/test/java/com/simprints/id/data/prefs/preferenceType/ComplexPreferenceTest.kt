@@ -1,11 +1,11 @@
 package com.simprints.id.data.prefs.preferenceType
 
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.domain.Constants
+import com.simprints.id.domain.GROUP
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libsimprints.FingerIdentifier
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
