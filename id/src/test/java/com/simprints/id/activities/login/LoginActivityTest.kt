@@ -12,7 +12,6 @@ import com.simprints.id.activities.IntentKeys
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -49,7 +48,6 @@ class LoginActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val module by lazy {
@@ -70,7 +68,7 @@ class LoginActivityTest {
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-        preferencesManager.userId = userId
+//        preferencesManager.userId = userId // TODO : get userId from AppRequest
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
