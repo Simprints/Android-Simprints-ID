@@ -28,7 +28,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.exceptions.unexpected.MalformedConsentTextException
+import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.tbruyelle.rxpermissions2.Permission

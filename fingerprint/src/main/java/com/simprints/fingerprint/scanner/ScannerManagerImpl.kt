@@ -14,13 +14,13 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
-import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
-import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
-import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
-import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
-import com.simprints.id.exceptions.unexpected.NullScannerException
-import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
+import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
+import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
+import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
+import com.simprints.fingerprint.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.exceptions.unexpected.NullScannerException
+import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import io.reactivex.Completable
 
 open class ScannerManagerImpl(private val preferencesManager: PreferencesManager,

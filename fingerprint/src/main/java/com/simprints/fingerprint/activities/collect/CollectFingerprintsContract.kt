@@ -9,7 +9,7 @@ import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.id.exceptions.SimprintsException
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
 
@@ -59,7 +59,7 @@ interface CollectFingerprintsContract {
         fun handleBackPressedWhileScanning()
         fun handleOnBackPressedToLeave()
         fun handleTryAgainFromDifferentActivity()
-        fun handleException(simprintsException: SimprintsException)
+        fun handleException(simprintsException: FingerprintSimprintsException)
 
         // Scanning
         var isConfirmDialogShown: Boolean

@@ -21,8 +21,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.exceptions.safe.setup.*
-import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
@@ -88,7 +87,7 @@ class LaunchActivityAndroidTest {
     @Test
     fun notScannerFromInitVeroStep_shouldAnErrorAlert() {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
-        whenever(scannerManagerSpy) { initVero()} thenReturn Completable.error(ScannerNotPairedException())
+        whenever(scannerManagerSpy) { initVero()} thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.NOT_PAIRED.alertTitleId)))
@@ -97,7 +96,7 @@ class LaunchActivityAndroidTest {
     @Test
     fun multiScannersPairedFromInitVeroStep_shouldAnErrorAlert() {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
-        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(MultipleScannersPairedException())
+        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.MULTIPLE_PAIRED_SCANNERS.alertTitleId)))
@@ -108,7 +107,7 @@ class LaunchActivityAndroidTest {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         makeInitVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.BLUETOOTH_NOT_ENABLED.alertTitleId)))
@@ -119,7 +118,7 @@ class LaunchActivityAndroidTest {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         makeInitVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.BLUETOOTH_NOT_SUPPORTED.alertTitleId)))
@@ -130,7 +129,7 @@ class LaunchActivityAndroidTest {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         makeInitVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.NOT_PAIRED.alertTitleId)))
@@ -141,7 +140,7 @@ class LaunchActivityAndroidTest {
         mockSettingsPreferencesManager(settingsPreferencesManagerSpy, parentalConsentExists = false, generalConsentOptions = REMOTE_CONSENT_GENERAL_OPTIONS)
         makeInitVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.alertTitleId)))
@@ -153,7 +152,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.alertTitleId)))
@@ -166,7 +165,7 @@ class LaunchActivityAndroidTest {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(ScannerLowBatteryException())
+        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.LOW_BATTERY.alertTitleId)))
@@ -179,7 +178,7 @@ class LaunchActivityAndroidTest {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(Intent())
         waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.alertTitleId)))

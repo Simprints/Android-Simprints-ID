@@ -1,4 +1,4 @@
-package com.simprints.id.exceptions.unexpected
+package com.simprints.fingerprint.exceptions.unexpected
 
 class UnknownBluetoothIssueException(message: String = "UnknownBluetoothIssueException") : // TODO : include ScannerError in exception
-    UnexpectedException(message)
+    FingerprintUnexpectedException(message)

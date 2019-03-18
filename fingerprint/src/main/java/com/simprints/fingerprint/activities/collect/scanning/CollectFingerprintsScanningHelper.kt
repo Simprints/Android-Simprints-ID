@@ -3,26 +3,26 @@ package com.simprints.fingerprint.activities.collect.scanning
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
+import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprint.R
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.exceptions.unexpected.UnexpectedException
-import com.simprints.id.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.id.tools.Vibrate
-import com.simprints.id.FingerIdentifier
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -247,7 +247,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Fingerprint(FingerIdentifier.valueOf(presenter.currentFinger().id.name), template) //StopShip FingerIdentifier from id
         } catch (e: IllegalArgumentException) {
             // TODO : change exceptions in libcommon
-            crashReportManager.logExceptionOrThrowable(UnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
+            // StopShip: Custom Error
+            crashReportManager.logExceptionOrThrowable(FingerprintUnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 
