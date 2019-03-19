@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingActVerifyResult(
+data class MatchingResult(
     val guid: String,
     val confidence: Int,
-    val tier: MatchingTier) : MatchingActResult, Parcelable
+    val tier: MatchingTier) : Parcelable
