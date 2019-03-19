@@ -22,7 +22,7 @@ interface LaunchContract {
         fun continueToNextActivity()
         fun goToRefusalActivity()
         fun doLaunchAlert(alertType: ALERT_TYPE)
-        fun doVibrateIfNecessary(doVibrate: Boolean)
+        fun doVibrate()
 
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)
