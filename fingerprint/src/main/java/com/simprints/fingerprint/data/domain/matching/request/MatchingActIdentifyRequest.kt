@@ -5,7 +5,7 @@ import com.simprints.id.domain.fingerprint.Person
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingIdentifyRequest(override val language: String,
-                              override val probe: Person,
-                              val matchGroup: MatchGroup,
-                              val returnIdCount: Int): MatchingRequest
+class MatchingActIdentifyRequest(override val language: String,
+                                 override val probe: Person,
+                                 val matchGroup: MatchGroup,
+                                 val returnIdCount: Int): MatchingActRequest
