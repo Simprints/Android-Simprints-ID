@@ -8,11 +8,9 @@ import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -49,7 +47,6 @@ class LoginActivityTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val module by lazy {
@@ -70,7 +67,7 @@ class LoginActivityTest {
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-        preferencesManager.userId = userId
+//        preferencesManager.userId = userId // TODO : get userId from AppRequest
 
         val controller = createRoboLoginActivity().start().resume().visible()
         val activity = controller.get()
@@ -193,28 +190,6 @@ class LoginActivityTest {
                 "some_project_id",
                 "some_project_secret",
                 "")
-    }
-
-    @Test
-    fun passedLegacyApiKey_shouldLoginInAndStoreIt() {
-        val intent = Intent()
-        intent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, "some_legacy_api_key")
-        val controller = createRoboLoginActivity(intent).start().resume().visible()
-        val act = controller.get()
-        act.loginEditTextUserId.setText(DEFAULT_USER_ID)
-        act.loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
-        act.loginEditTextProjectSecret.setText(DEFAULT_PROJECT_SECRET)
-        act.viewPresenter = mock(LoginPresenter::class.java)
-
-        act.loginButtonSignIn.performClick()
-
-        Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .signIn(
-                DEFAULT_USER_ID,
-                DEFAULT_PROJECT_ID,
-                DEFAULT_PROJECT_SECRET,
-                "",
-                "some_legacy_api_key")
     }
 
     private fun createRoboLoginActivity() = createRoboLoginActivity(null)

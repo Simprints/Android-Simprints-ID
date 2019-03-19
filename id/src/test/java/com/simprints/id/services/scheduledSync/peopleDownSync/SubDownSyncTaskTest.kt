@@ -3,22 +3,25 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.simprints.core.network.SimApiClient
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
+import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.ApiPerson
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.IdPerson
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
-import com.simprints.core.network.SimApiClient
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -26,7 +29,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.mockserver.assertPathUrlParam
 import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
@@ -213,7 +215,7 @@ class SubDownSyncTaskTest {
             lastPatientId = lastPatientId,
             lastPatientUpdatedAt = lastPatientUpdateAt))
 
-        val argForInsertOrUpdateInLocalDb = argumentCaptor<List<IdPerson>>()
+        val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
         whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).thenReturn(Completable.complete())
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
@@ -228,7 +230,7 @@ class SubDownSyncTaskTest {
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
-    private fun verifyLastPatientSaveIsTheRightOne(saved: List<IdPerson>, inResponse: List<ApiPerson>) {
+    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiPerson>) {
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
     }

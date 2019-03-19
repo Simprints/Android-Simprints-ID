@@ -6,6 +6,7 @@ import android.util.Log
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprint.tools.utils.TimeHelper
@@ -54,7 +55,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
 
         sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
-            MatchingResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
+            MatchingActVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
     }

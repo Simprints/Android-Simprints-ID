@@ -18,7 +18,6 @@ import com.simprints.id.moduleapi.fromDomainToClientApiAdapter.fromDomainToClien
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LAUNCH_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
 import com.simprints.moduleapi.app.responses.IAppResponse
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -28,9 +27,13 @@ import javax.inject.Inject
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
+    companion object {
+        const val fingerprintsModule = "com.simprints.id" //STOPSHIP
+        const val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+    }
+
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
@@ -86,8 +89,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun openLaunchActivity(appRequest: Request) {
-        val fingerprintsModule = "com.simprints.id" //STOPSHIP
-        val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
             .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, fromDomainToFingerprintRequest(appRequest, preferencesManager)) }

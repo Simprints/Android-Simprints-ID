@@ -4,7 +4,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.IdPerson
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
@@ -34,9 +34,9 @@ class PeopleUpSyncUploaderTaskTest {
     private val differentProjectId = "differentProjectId"
 //    private val differentUserId = "differentUserId" // TODO: uncomment userId when multitenancy is properly implemented
 
-    private val notYetSyncedPerson1 = IdPerson(
+    private val notYetSyncedPerson1 = Person(
         "patientId1", "projectId", "userId", "moduleId",
-        Date(1), null, true, emptyList()
+        emptyList(), Date(1), null, true
     )
     private val notYetSyncedPerson2 = notYetSyncedPerson1.copy(patientId = "patientId2")
     private val notYetSyncedPerson3 = notYetSyncedPerson1.copy(patientId = "patientId3")
@@ -125,9 +125,9 @@ class PeopleUpSyncUploaderTaskTest {
         )
 
     private fun testSuccessfulUpSync(
-        localQueryResults: Array<List<IdPerson>>,
-        expectedUploadBatches: Array<List<IdPerson>>,
-        expectedLocalUpdates: Array<List<IdPerson>>
+        localQueryResults: Array<List<Person>>,
+        expectedUploadBatches: Array<List<Person>>,
+        expectedLocalUpdates: Array<List<Person>>
     ) {
         mockSignedInUser(projectIdToSync, userIdToSync)
         mockSuccessfulLocalPeopleQueries(*localQueryResults)
@@ -147,7 +147,7 @@ class PeopleUpSyncUploaderTaskTest {
         whenever(loginInfoManager.signedInUserId).thenReturn(userId)
     }
 
-    private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<IdPerson>) {
+    private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Person>) {
         queryResults
             .fold(whenever(localDbManager.getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true))) { ongoingStub, queryResult ->
                 ongoingStub.thenReturn(Single.just(queryResult.size))
@@ -159,13 +159,13 @@ class PeopleUpSyncUploaderTaskTest {
             }
     }
 
-    private fun mockSuccessfulPeopleUploads(vararg batches: List<IdPerson>) {
+    private fun mockSuccessfulPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
             whenever(remotePeopleManager.uploadPeople(projectIdToSync, batch)).thenReturn(Completable.complete())
         }
     }
 
-    private fun mockSuccessfulLocalPeopleUpdates(vararg updates: List<IdPerson>) {
+    private fun mockSuccessfulLocalPeopleUpdates(vararg updates: List<Person>) {
         updates.forEach { update ->
             whenever(localDbManager.insertOrUpdatePeopleInLocal(update)).thenReturn(Completable.complete())
         }
@@ -175,19 +175,19 @@ class PeopleUpSyncUploaderTaskTest {
         whenever(upSyncDao.insertLastUpSyncTime(anyNotNull())).then { }
     }
 
-    private fun verifyLocalPeopleQueries(vararg queryResults: List<IdPerson>) {
+    private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
 
         verifyExactly(queryResults.size + 1, localDbManager) { getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true) }
         verifyExactly(queryResults.size, localDbManager) { loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true) }
     }
 
-    private fun verifyPeopleUploads(vararg batches: List<IdPerson>) {
+    private fun verifyPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
             verifyOnce(remotePeopleManager) { uploadPeople(projectIdToSync, batch) }
         }
     }
 
-    private fun verifyLocalPeopleUpdates(vararg updates: List<IdPerson>) {
+    private fun verifyLocalPeopleUpdates(vararg updates: List<Person>) {
         updates.forEach { update ->
             verifyOnce(localDbManager) { insertOrUpdatePeopleInLocal(update) }
         }
