@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.collect.models
 
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 
 enum class FingerIdentifier {
     RIGHT_5TH_FINGER,

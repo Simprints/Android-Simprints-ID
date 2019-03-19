@@ -2,7 +2,7 @@ package com.simprints.fingerprint.data.domain.requests
 
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.models.toDomainClass
-import com.simprints.moduleapi.fingerprint.IFingerprintEnrolRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

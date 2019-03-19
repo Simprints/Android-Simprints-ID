@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
@@ -25,8 +25,7 @@ import io.reactivex.schedulers.Schedulers
 
 class MatchingPresenter(
     private val view: MatchingContract.View,
-    private val probe: Person,
-    private val fingerprintRequest: FingerprintRequest,
+    private val matchingRequest: MatchingActRequest,
     private val dbManager: DbManager,
     private val sessionEventsManager: SessionEventsManager,
     private val crashReportManager: CrashReportManager,
@@ -39,22 +38,22 @@ class MatchingPresenter(
 
     @SuppressLint("CheckResult")
     override fun start() {
-        when (fingerprintRequest) {
-            is FingerprintIdentifyRequest -> startMatchTask(::IdentificationTask)
-            is FingerprintVerifyRequest -> startMatchTask(::VerificationTask)
+        when (matchingRequest) {
+            is MatchingActIdentifyRequest -> startMatchTask(::IdentificationTask)
+            is MatchingActVerifyRequest -> startMatchTask(::VerificationTask)
             else -> handleUnexpectedCallout()
         }
     }
 
     private fun startMatchTask(matchTaskConstructor: (MatchingContract.View,
-                                                      FingerprintRequest,
+                                                      MatchingActRequest,
                                                       DbManager,
                                                       SessionEventsManager, CrashReportManager, TimeHelper) -> MatchTask) {
-        val matchTask = matchTaskConstructor(view, fingerprintRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
+        val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
 
         matchTaskDisposable = matchTask.loadCandidates()
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }
-            .flatMap { matchTask.runMatch(it, probe) }
+            .flatMap { matchTask.runMatch(it, matchingRequest.probe) }
             .setMatchingSchedulers()
             .subscribeBy(
                 onSuccess = { matchTask.handleMatchResult(it.candidates, it.scores) },

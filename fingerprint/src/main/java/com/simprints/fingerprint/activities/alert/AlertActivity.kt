@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.id.Application
-import com.simprints.id.activities.IntentKeys
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
@@ -26,9 +26,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         setContentView(R.layout.activity_fingerprint_alert)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val alertType = intent.extras?.let {
-            it.get(IntentKeys.alertActivityAlertTypeKey) as FingerprintAlert
-        } ?: FingerprintAlert.UNEXPECTED_ERROR
+        val alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)
 
         val component = FingerprintsComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)

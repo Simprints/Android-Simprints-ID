@@ -1,7 +1,7 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleapi.clientapi.responses.IClientApiIdentifyResponse
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 
 
 data class IdentifyResponse(val identifications: List<Identification>,
@@ -9,9 +9,9 @@ data class IdentifyResponse(val identifications: List<Identification>,
 
     data class Identification(val guid: String,
                               val confidence: Int,
-                              val tier: IClientApiResponseTier)
+                              val tier: IAppResponseTier)
 
-    constructor(request: IClientApiIdentifyResponse) : this(
+    constructor(request: IAppIdentifyResponse) : this(
         request.identifications.map { Identification(it.guid, it.confidence, it.tier) },
         request.sessionId
     )

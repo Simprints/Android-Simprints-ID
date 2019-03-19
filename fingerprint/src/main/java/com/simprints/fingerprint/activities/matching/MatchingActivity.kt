@@ -12,16 +12,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.Application
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
@@ -40,10 +39,10 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         super.onCreate(savedInstanceState)
         val component = FingerprintsComponentBuilder.getComponent(application as Application)
         component.inject(this)
-        val fingerprintRequest: FingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
+        val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
-        LanguageHelper.setLanguage(this, fingerprintRequest.language)
+        LanguageHelper.setLanguage(this, matchingRequest.language)
 
         setContentView(R.layout.activity_matching)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -56,11 +55,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
             return
         }
 
-        val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
-            ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP : Custom error
-
-
-        viewPresenter = MatchingPresenter(this, probe, fingerprintRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
+        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
     }
 
     override fun onResume() {
@@ -124,7 +119,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun launchAlert() {
         val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, FingerprintAlert.UNEXPECTED_ERROR)
+        intent.putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(FingerprintAlert.UNEXPECTED_ERROR))
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
     }
 

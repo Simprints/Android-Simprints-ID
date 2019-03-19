@@ -3,8 +3,11 @@ package com.simprints.fingerprint.activities.matching
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -15,24 +18,22 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.matching.VerificationResult
-import com.simprints.id.domain.responses.Response
-import com.simprints.id.domain.responses.VerifyResponse
 import io.reactivex.Single
 import java.util.*
 
 internal class VerificationTask(private val view: MatchingContract.View,
-                                fingerprintRequest: FingerprintRequest,
+                                matchingRequest: MatchingActRequest,
                                 private val dbManager: DbManager,
                                 private val sessionEventsManager: SessionEventsManager,
                                 private val crashReportManager: CrashReportManager,
                                 timeHelper: TimeHelper) : MatchTask {
 
-    private val fingerprintVerifyRequest = fingerprintRequest as FingerprintVerifyRequest
+    private val matchingVerifyRequest = matchingRequest as MatchingActVerifyRequest
 
     override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(): Single<List<Person>> =
-        dbManager.loadPerson(fingerprintVerifyRequest.projectId, fingerprintVerifyRequest.verifyGuid).map { listOf(it.person) }
+        dbManager.loadPerson(matchingVerifyRequest.projectId, matchingVerifyRequest.verifyGuid).map { listOf(it.person) }
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
@@ -52,8 +53,8 @@ internal class VerificationTask(private val view: MatchingContract.View,
         val verificationResult = VerificationResult(candidate.patientId, score.toInt(), Tier.computeTier(score))
 
         sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
-        val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            VerifyResponse(candidate.patientId, score.toInt(), Tier.computeTier(score)))
+        val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
+            MatchingResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
     }
