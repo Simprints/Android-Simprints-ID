@@ -154,7 +154,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1
 
-    override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
+    override fun doVibrate() = vibrate(this)
 
     companion object {
         const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1

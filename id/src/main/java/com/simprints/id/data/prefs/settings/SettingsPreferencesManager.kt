@@ -9,21 +9,13 @@ import com.simprints.libsimprints.FingerIdentifier
 
 interface SettingsPreferencesManager {
 
-    var nudgeMode: Boolean
-    var consent: Boolean
-    var qualityThreshold: Int
     var returnIdCount: Int
     var language: String
-    var languagePosition: Int
     var projectLanguages: Array<String>
-    var matcherType: Int
-    var timeoutS: Int
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
     var syncGroup: Constants.GROUP
     var matchGroup: Constants.GROUP
-    var vibrateMode: Boolean
-    var matchingEndWaitTimeSeconds: Int
     /** @throws JsonSyntaxException */
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
