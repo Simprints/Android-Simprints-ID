@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.matching
 
-import com.simprints.moduleapi.fingerprint.IMatchGroup
+import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 
 enum class MatchGroup {
     GLOBAL,

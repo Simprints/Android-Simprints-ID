@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.domain.Constants
-import com.simprints.id.tools.InternalConstants
+import com.simprints.id.tools.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 
 enum class Alert(val type: Type,
                  val leftButton: ButtonAction,
@@ -257,7 +257,7 @@ enum class Alert(val type: Type,
         object None : ButtonAction()
         object WifiSettings : ButtonAction(R.string.settings_label)
         object BluetoothSettings : ButtonAction(R.string.settings_label)
-        object TryAgain : ButtonAction(R.string.try_again_label, InternalConstants.RESULT_TRY_AGAIN)
+        object TryAgain : ButtonAction(R.string.try_again_label, ALERT_TRY_AGAIN_RESULT)
         class Close(resultCode: Int) : ButtonAction(R.string.close, resultCode)
     }
 }

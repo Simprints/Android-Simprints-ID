@@ -9,18 +9,22 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.LONG_CONSENT_ACTIVITY_REQUEST_CODE
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
+import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
-import com.simprints.fingerprint.moduleapi.AppAdapter.toDomainFingerprintRequest
+import com.simprints.fingerprint.moduleapi.AppAdapter.fromModuleApiToDomainRequest
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.tools.InternalConstants.*
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.moduleapi.fingerprint.IFingerprintRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
@@ -41,7 +45,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
-        fingerprintRequest = toDomainFingerprintRequest(iFingerprintRequest)
+        fingerprintRequest = fromModuleApiToDomainRequest(iFingerprintRequest)
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
@@ -123,7 +127,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     private fun whenReturningFromAnotherActivity(resultCode: Int, data: Intent?) {
         when (resultCode) {
-            RESULT_TRY_AGAIN -> viewPresenter.tryAgainFromErrorScreen()
+            ALERT_TRY_AGAIN_RESULT -> viewPresenter.tryAgainFromErrorScreen()
             else -> viewPresenter.tearDownAppWithResult(resultCode, data)
         }
     }
@@ -169,9 +173,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
 
     companion object {
-        const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
-        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 2
-
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
     }

@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.collect
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
@@ -10,8 +9,8 @@ import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsF
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
-import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
@@ -23,18 +22,14 @@ import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedExce
 import com.simprints.fingerprint.tools.extensions.toResultEvent
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.responses.EnrolResponse
-import com.simprints.id.domain.responses.Response
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.rxkotlin.subscribeBy
@@ -49,7 +44,6 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val component: FingerprintsComponent)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -130,10 +124,6 @@ class CollectFingerprintsPresenter(private val context: Context,
         currentActiveFingerNo = position
         refreshDisplay()
         scanningHelper.resetScannerUi()
-    }
-
-    override fun handleBackPressedWhileScanning() {
-        stopCapturing()
     }
 
     override fun handleScannerButtonPressed() {
@@ -229,8 +219,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.stopListeners()
     }
 
-    override fun handleOnBackPressedToLeave() {
-        scanningHelper.stopReconnecting()
+    override fun handleOnBackPressed() {
+        if (isScanning()) {
+            stopCapturing()
+        } else {
+            scanningHelper.stopReconnecting()
+            view.startRefusalActivity()
+        }
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
@@ -259,8 +254,8 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         val person = Person(
             UUID.randomUUID().toString(),
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
+            fingerprintRequest.projectId,
+            fingerprintRequest.userId,
             fingerprintRequest.moduleId,
             fingerprints)
         sessionEventsManager.addPersonCreationEventInBackground(person)
@@ -277,17 +272,13 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)
             .subscribeBy(
-                onComplete = { handleSavePersonSuccess(person.patientId) },
+                onComplete = { handleSavePersonSuccess(person) },
                 onError = { handleSavePersonFailure(it) })
     }
 
-    //STOPSHIP
-    //We shouldn't be using any client API models in ID past the interface layer.
-    private fun handleSavePersonSuccess(guidCreated: String) {
+    private fun handleSavePersonSuccess(probe: Person) {
         //preferencesManager.lastEnrolDate = Date() //StopShip
-        val result = Intent()
-        result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated))
-        view.finishSuccessEnrol(result)
+        view.finishSuccessEnrol(CollectResult.BUNDLE_KEY, CollectResult(probe))
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
@@ -296,10 +287,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        val intent = Intent(context, MatchingActivity::class.java)
-        intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
-        intent.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest)
-        view.finishSuccessAndStartMatching(intent)
+        view.finishSuccessAndStartMatching(CollectResult.BUNDLE_KEY, CollectResult(person))
     }
 
     override fun handleException(simprintsException: FingerprintSimprintsException) {

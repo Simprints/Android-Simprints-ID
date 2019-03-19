@@ -13,8 +13,8 @@ import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier.TIER_1
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier.TIER_5
+import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_1
+import com.simprints.moduleapi.app.responses.IAppResponseTier.TIER_5
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever

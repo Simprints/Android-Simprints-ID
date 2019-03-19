@@ -2,7 +2,7 @@ package com.simprints.id.tools.extensions
 
 import android.content.Intent
 import com.simprints.id.domain.requests.*
-import com.simprints.moduleapi.app.confirmations.IAppIdentifyConfirmation
+import com.simprints.moduleapi.app.requests.confirmations.IAppIdentifyConfirmation
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
 import com.simprints.moduleapi.app.requests.IAppRequest

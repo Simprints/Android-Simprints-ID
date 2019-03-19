@@ -6,9 +6,9 @@ import android.widget.Toast
 import com.simprints.id.activities.IntentKeys
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.tools.InternalConstants
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 
-fun Activity.launchAlert(alert: Alert, requestCode: Int = InternalConstants.ALERT_ACTIVITY_REQUEST) {
+fun Activity.launchAlert(alert: Alert, requestCode: Int = ALERT_ACTIVITY_REQUEST) {
     val intent = Intent(this, AlertActivity::class.java)
     intent.putExtra(IntentKeys.alertActivityAlertTypeKey, alert)
     startActivityForResult(intent, requestCode)

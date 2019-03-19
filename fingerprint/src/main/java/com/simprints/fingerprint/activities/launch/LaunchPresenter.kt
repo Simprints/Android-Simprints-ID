@@ -9,11 +9,24 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.responses.FingerprintEnrolResponse
+import com.simprints.fingerprint.data.domain.responses.FingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
+import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiEnrolResponse
+import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiIdentifyResponse
+import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiVerifyResponse
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.fingerprint.tools.utils.TimeHelper
@@ -28,9 +41,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -285,7 +298,36 @@ class LaunchPresenter(component: FingerprintsComponent,
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
-        view.setResultAndFinish(resultCode, resultData)
+        val returnIntent = Intent()
+        val possibleMatchResult = resultData?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
+        val possibleCollectResult = resultData?.getParcelableExtra<CollectResult>(CollectResult.BUNDLE_KEY)
+
+        when(fingerprintRequest) {
+            is FingerprintEnrolRequest -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
+            is FingerprintIdentifyRequest -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?, "")//STOPSHIP: CurrentSessions
+            is FingerprintVerifyRequest -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
+        }
+        view.setResultAndFinish(resultCode, returnIntent)
+    }
+
+    private fun prepareVerifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActVerifyResult?) {
+        possibleMatchResult?.let {
+            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
+                fromDomainToModuleApiVerifyResponse(FingerprintVerifyResponse(it.guid, it.confidence, it.tier)))
+        }
+    }
+
+    private fun prepareIdentifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActIdentifyResult?, currentSession: String) {
+        possibleMatchResult?.let {
+            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
+                fromDomainToModuleApiIdentifyResponse(FingerprintIdentifyResponse(it.identifications, currentSession)))
+        }
+    }
+
+    private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectResult: CollectResult?) {
+        possibleCollectResult?.let {
+            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToModuleApiEnrolResponse(FingerprintEnrolResponse(it.probe.patientId)))
+        }
     }
 
     override fun confirmConsentAndContinueToNextActivity() {

@@ -12,7 +12,7 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
@@ -79,9 +79,9 @@ class LibSimprintsPresenterTest {
     @Test
     fun handleIdentification_ShouldReturnValidIdentification() {
         val id1 = IdentifyResponse
-            .Identification(UUID.randomUUID().toString(), 100, IClientApiResponseTier.TIER_1)
+            .Identification(UUID.randomUUID().toString(), 100, IAppResponseTier.TIER_1)
         val id2 = IdentifyResponse
-            .Identification(UUID.randomUUID().toString(), 15, IClientApiResponseTier.TIER_5)
+            .Identification(UUID.randomUUID().toString(), 15, IAppResponseTier.TIER_5)
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
@@ -97,7 +97,7 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(UUID.randomUUID().toString(), 100, IClientApiResponseTier.TIER_1)
+        val verification = VerifyResponse(UUID.randomUUID().toString(), 100, IAppResponseTier.TIER_1)
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
 

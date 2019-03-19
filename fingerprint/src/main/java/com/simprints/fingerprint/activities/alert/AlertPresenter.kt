@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -13,7 +14,9 @@ import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintsComponent,
-                     val alert: FingerprintAlert) : AlertContract.Presenter {
+                     alertActRequest: AlertActRequest?) : AlertContract.Presenter {
+
+    private val alertType = alertActRequest?.alert ?: FingerprintAlert.UNEXPECTED_ERROR
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
@@ -31,27 +34,27 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alert.name))
+            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alertType.name))
         }
     }
 
     private fun initButtons() {
-        view.initLeftButton(alert.leftButton)
-        view.initRightButton(alert.rightButton)
+        view.initLeftButton(alertType.leftButton)
+        view.initRightButton(alertType.rightButton)
     }
 
     private fun initColours() {
-        val color = view.getColorForColorRes(alert.backgroundColor)
+        val color = view.getColorForColorRes(alertType.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
         view.setRightButtonBackgroundColor(color)
     }
 
     private fun initTextAndDrawables() {
-        view.setAlertTitleWithStringRes(alert.title)
-        view.setAlertImageWithDrawableId(alert.mainDrawable)
-        view.setAlertHintImageWithDrawableId(alert.hintDrawable)
-        view.setAlertMessageWithStringRes(alert.message)
+        view.setAlertTitleWithStringRes(alertType.title)
+        view.setAlertImageWithDrawableId(alertType.mainDrawable)
+        view.setAlertHintImageWithDrawableId(alertType.hintDrawable)
+        view.setAlertMessageWithStringRes(alertType.message)
     }
 
     override fun handleButtonClick(buttonAction: FingerprintAlert.ButtonAction) {
@@ -70,6 +73,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alert.name)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
     }
 }

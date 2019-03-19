@@ -4,7 +4,7 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.models.toDomainClass
 import com.simprints.fingerprint.data.domain.matching.MatchGroup
 import com.simprints.fingerprint.data.domain.matching.toDomainClass
-import com.simprints.moduleapi.fingerprint.IFingerprintIdentifyRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintIdentifyRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

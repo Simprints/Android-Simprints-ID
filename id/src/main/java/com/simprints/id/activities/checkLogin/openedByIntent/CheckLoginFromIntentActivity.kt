@@ -11,18 +11,18 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
-import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiEnrolResponse
-import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiIdentifyResponse
-import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiRefusalFormResponse
-import com.simprints.id.moduleapi.ClientApiAdapter.toClientApiVerifyResponse
-import com.simprints.id.moduleapi.FingerprintAdapter.toFingerprintRequest
-import com.simprints.id.tools.InternalConstants
+import com.simprints.id.moduleapi.DomainToFingerprintAdapter.fromDomainToFingerprintRequest
+import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainResponse
+import com.simprints.id.moduleapi.fromDomainToClientApiAdapter.fromDomainToClientApiResponse
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LAUNCH_ACTIVITY_REQUEST
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.*
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
-import com.simprints.moduleapi.fingerprint.IFingerprintRequest
+import com.simprints.moduleapi.app.responses.IAppResponse
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -31,12 +31,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
-
-    companion object {
-        const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
-        private const val LAUNCH_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 2
-        private const val ALERT_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 3
-    }
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
@@ -84,7 +78,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun openLoginActivity(appRequest: Request) {
         val loginIntent = Intent(this, LoginActivity::class.java)
         loginIntent.putExtra(Request.BUNDLE_KEY, appRequest)
-        startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
+        startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
     }
 
     override fun finishCheckLoginFromIntentActivity() {
@@ -96,8 +90,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
-            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, toFingerprintRequest(appRequest, preferencesManager)) }
-        startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST_CODE)
+            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, fromDomainToFingerprintRequest(appRequest, preferencesManager)) }
+        startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -106,23 +100,19 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
         // in a error screen.
         // If the activity doesn't finish, then we check again the SignedInState in onResume.
-        if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
-            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == LAUNCH_ACTIVITY_REQUEST ||
+            requestCode == ALERT_ACTIVITY_REQUEST && resultCode == Activity.RESULT_OK) {
 
-            val domainResponse = data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)
-            viewPresenter.handleActivityResult(requestCode, resultCode, domainResponse)
+            val fingerprintResponse = data?.extras?.getParcelable<IFingerprintResponse>(IFingerprintResponse.BUNDLE_KEY)
+            fingerprintResponse?.let {
+                val domainResponse = fromFingerprintToDomainResponse(fingerprintResponse)
+                viewPresenter.handleActivityResult(requestCode, resultCode, domainResponse)
 
-            val response = domainResponse.let {
-                when (it) {
-                    is EnrolResponse -> toClientApiEnrolResponse(it)
-                    is VerifyResponse -> toClientApiVerifyResponse(it)
-                    is IdentifyResponse -> toClientApiIdentifyResponse(it)
-                    is RefusalFormResponse -> toClientApiRefusalFormResponse(it)
-                    else -> null
-                }
+                val clientApiResponse = fromDomainToClientApiResponse(domainResponse)
+                setResult(resultCode, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, clientApiResponse) })
             }
-            setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
-            finish()
         }
+
+        finish()
     }
 }
