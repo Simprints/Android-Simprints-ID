@@ -35,5 +35,5 @@ fun createFakeClosedSession(timeHelper: TimeHelper,
                             projectId: String = "some_project",
                             id: String = UUID.randomUUID().toString()) =
     createFakeSession(timeHelper, projectId, id, timeHelper.nowMinus(1000)).apply {
-        relativeEndTime = nowRelativeToStartTime(timeHelper)
+        relativeEndTime = timeRelativeToStartTime(timeHelper.now())
     }

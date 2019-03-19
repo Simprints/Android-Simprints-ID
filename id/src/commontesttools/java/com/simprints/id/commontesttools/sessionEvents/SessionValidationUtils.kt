@@ -2,12 +2,11 @@ package com.simprints.id.commontesttools.sessionEvents
 
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonObject
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
-import com.simprints.libsimprints.FingerIdentifier
 
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo(EventType.ALERT_SCREEN.toString())
@@ -48,22 +47,6 @@ fun validateAuthorizationEventApiModel(json: JsonObject) {
     }
     assertThat(json.get("result").asString).isIn(AuthorizationEvent.Result.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(4)
-}
-
-fun validateCallbackEventApiModel(json: JsonObject) {
-
-    assertThat(json.get("type").asString).isEqualTo(EventType.RESPONSE.toString())
-    assertThat(json.get("relativeStartTime").asLong)
-    assert(json.has("result"))
-    assertThat(json.size()).isEqualTo(3)
-}
-
-fun validateCalloutEventApiModel(json: JsonObject) {
-
-    assertThat(json.get("type").asString).isEqualTo(EventType.REQUEST.toString())
-    assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("parameters").asJsonObject)
-    assertThat(json.size()).isEqualTo(3)
 }
 
 fun validateCandidateReadEventApiModel(json: JsonObject) {
@@ -205,8 +188,6 @@ fun validateEvent(json: JsonObject) {
     when (EventType.valueOf(type)) {
         EventType.REFUSAL -> validateRefusalEventApiModel(json)
         EventType.CONSENT -> validateConsentEventApiModel(json)
-        EventType.REQUEST -> validateCalloutEventApiModel(json)
-        EventType.RESPONSE -> validateCallbackEventApiModel(json)
         EventType.ENROLLMENT -> validateEnrolmentEventApiModel(json)
         EventType.ALERT_SCREEN -> validateAlertScreenEventApiModel(json)
         EventType.CANDIDATE_READ -> validateCandidateReadEventApiModel(json)
@@ -220,6 +201,15 @@ fun validateEvent(json: JsonObject) {
         EventType.FINGERPRINT_CAPTURE -> validateFingerprintCaptureEventApiModel(json)
         EventType.CONNECTIVITY_SNAPSHOT -> validateConnectivitySnapshotEventApiModel(json)
         EventType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
+        EventType.ENROL_REQUEST -> TODO()
+        EventType.IDENTIFY_REQUEST -> TODO()
+        EventType.IDENTIFY_CONFIRMATION_REQUEST -> TODO()
+        EventType.VERIFY_REQUEST -> TODO()
+        EventType.ENROL_RESPONSE -> TODO()
+        EventType.IDENTIFY_RESPONSE -> TODO()
+        EventType.REFUSAL_RESPONSE -> TODO()
+        EventType.VERIFY_RESPONSE -> TODO()
+        EventType.NO_RESPONSE -> TODO()
     }
 }
 
