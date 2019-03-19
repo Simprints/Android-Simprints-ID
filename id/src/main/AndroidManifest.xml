@@ -89,12 +89,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
 
-        <activity
-            android:name=".activities.refusal.RefusalActivity"
-            android:label="@string/refusal_label"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:label="@string/dashboard_label"
@@ -104,10 +99,6 @@
             android:name=".activities.longConsent.LongConsentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <service
             android:name=".services.GuidSelectionService"

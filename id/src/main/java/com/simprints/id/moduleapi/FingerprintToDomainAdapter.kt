@@ -4,28 +4,22 @@ import com.simprints.id.domain.matching.IdentificationResult
 import com.simprints.id.domain.matching.Tier
 import com.simprints.id.domain.responses.EnrolResponse
 import com.simprints.id.domain.responses.IdentifyResponse
-import com.simprints.id.domain.responses.Response
 import com.simprints.id.domain.responses.VerifyResponse
-import com.simprints.moduleapi.fingerprint.responses.*
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintEnrolResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintIdentifyResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseTier
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintVerifyResponse
 
 object FingerprintToDomainAdapter {
 
-    fun fromFingerprintToDomainResponse(fingerprintResponse: IFingerprintResponse): Response =
-        when (fingerprintResponse) {
-            is IFingerprintEnrolResponse -> fromFingerprintToDomainEnrolResponse(fingerprintResponse)
-            is IFingerprintVerifyResponse -> fromFingerprintToDomainVerifyResponse(fingerprintResponse)
-            is IFingerprintIdentifyResponse -> fromFingerprintToDomainIdentifyResponse(fingerprintResponse)
-            else -> throw IllegalStateException("Invalid fingerprint request")
-        }
-
-    private fun fromFingerprintToDomainVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): VerifyResponse =
+    fun fromFingerprintToDomainVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): VerifyResponse =
         VerifyResponse(fingerprintResponse.guid, fingerprintResponse.confidence, fromFingerprintToDomainTier(fingerprintResponse.tier))
 
-    private fun fromFingerprintToDomainEnrolResponse(fingerprintResponse: IFingerprintEnrolResponse): EnrolResponse =
+    fun fromFingerprintToDomainEnrolResponse(fingerprintResponse: IFingerprintEnrolResponse): EnrolResponse =
             EnrolResponse(fingerprintResponse.guid)
 
-    private fun fromFingerprintToDomainIdentifyResponse(fingerprintResponse: IFingerprintIdentifyResponse): IdentifyResponse =
-        IdentifyResponse(fingerprintResponse.identifications.map { fromFingerprintToDomainIdentificationResult(it) }, fingerprintResponse.sessionId)
+    fun fromFingerprintToDomainIdentifyResponse(fingerprintResponse: IFingerprintIdentifyResponse, currentSessionId: String): IdentifyResponse =
+        IdentifyResponse(fingerprintResponse.identifications.map { fromFingerprintToDomainIdentificationResult(it) }, currentSessionId)
 
     private fun fromFingerprintToDomainIdentificationResult(identification: IFingerprintIdentifyResponse.IIdentificationResult): IdentificationResult =
         IdentificationResult(identification.guid, identification.confidence, fromFingerprintToDomainTier(identification.tier))

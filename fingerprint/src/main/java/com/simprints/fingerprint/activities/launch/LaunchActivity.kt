@@ -20,7 +20,7 @@ import com.simprints.fingerprint.moduleapi.AppAdapter.fromModuleApiToDomainReque
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.id.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate

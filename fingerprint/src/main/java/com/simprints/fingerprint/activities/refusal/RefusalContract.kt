@@ -1,17 +1,17 @@
-package com.simprints.id.activities.refusal
+package com.simprints.fingerprint.activities.refusal
 
-import com.simprints.id.activities.BasePresenter
-import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.refusal_form.RefusalFormAnswer
+import com.simprints.fingerprint.activities.BasePresenter
+import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 
 interface RefusalContract {
 
     interface View : BaseView<Presenter> {
 
-        fun doLaunchAlert(alert: Alert)
+        fun doLaunchAlert(alert: FingerprintAlert)
 
-        fun setResultAndFinish(activityResult: Int, refusalAnswer: RefusalFormAnswer)
+        fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult)
 
         fun scrollToBottom()
 

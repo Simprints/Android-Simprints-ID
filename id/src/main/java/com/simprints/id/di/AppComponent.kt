@@ -20,7 +20,6 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
-import com.simprints.id.activities.refusal.RefusalPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
@@ -47,7 +46,6 @@ interface AppComponent {
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
     fun inject(longConsentActivity: LongConsentActivity)
-    fun inject(refusalPresenter: RefusalPresenter)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)

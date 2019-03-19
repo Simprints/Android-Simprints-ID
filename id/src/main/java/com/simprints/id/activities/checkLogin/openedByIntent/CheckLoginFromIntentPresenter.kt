@@ -19,7 +19,14 @@ import com.simprints.id.domain.responses.*
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainEnrolResponse
+import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainIdentifyResponse
+import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainVerifyResponse
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintEnrolResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintIdentifyResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintVerifyResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -39,6 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     private val appRequest = view.parseRequest()
+    private var currentSession: String = ""
 
     init {
         component.inject(this)
@@ -57,7 +65,12 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 view.openAlertActivityForError(exception.alert)
                 setupFailed = true
             }
-        }.subscribeBy(onError = { it.printStackTrace() })
+        }.subscribeBy(
+            onSuccess = {
+                currentSession = it.id
+            },
+            onError = { it.printStackTrace() }
+        )
     }
 
     private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
@@ -198,12 +211,24 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         ))
     }
 
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: Response?) {
+    override fun handleActivityResult(requestCode: Int, resultCode: Int, fingerprintResponse: IFingerprintResponse?) {
+        val domainResponse = fromFingerprintToDomainResponse(fingerprintResponse)
+
         sessionEventsManager.updateSessionInBackground {
-            it.addEvent(buildResponseEvent(it.timeRelativeToStartTime(timeHelper.now()), response)) //STOPSHIP: Fix me
+            it.addEvent(buildResponseEvent(it.timeRelativeToStartTime(timeHelper.now()), domainResponse)) //STOPSHIP: Fix me
             it.closeIfRequired(timeHelper)
         }
+
+        view.setResultDataAndFinish(resultCode, domainResponse)
     }
+
+    private fun fromFingerprintToDomainResponse(fingerprintResponse: IFingerprintResponse?): Response =
+        when (fingerprintResponse) {
+            is IFingerprintEnrolResponse -> fromFingerprintToDomainEnrolResponse(fingerprintResponse)
+            is IFingerprintVerifyResponse -> fromFingerprintToDomainVerifyResponse(fingerprintResponse)
+            is IFingerprintIdentifyResponse -> fromFingerprintToDomainIdentifyResponse(fingerprintResponse, currentSession)
+            else -> throw IllegalStateException("Invalid fingerprint request")
+        }
 
     @SuppressLint("CheckResult")
     private fun setSessionIdCrashlyticsKey() {

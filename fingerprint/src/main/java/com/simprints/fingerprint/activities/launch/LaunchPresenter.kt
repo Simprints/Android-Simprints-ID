@@ -15,17 +15,20 @@ import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.responses.FingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiEnrolResponse
 import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiIdentifyResponse
+import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiRefusalFormResponse
 import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiVerifyResponse
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
@@ -299,34 +302,52 @@ class LaunchPresenter(component: FingerprintsComponent,
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
         waitingForConfirmation = false
         val returnIntent = Intent()
-        val possibleMatchResult = resultData?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
-        val possibleCollectResult = resultData?.getParcelableExtra<CollectResult>(CollectResult.BUNDLE_KEY)
 
-        when(fingerprintRequest) {
-            is FingerprintEnrolRequest -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
-            is FingerprintIdentifyRequest -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?, "")//STOPSHIP: CurrentSessions
-            is FingerprintVerifyRequest -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
+        if (resultCode == Activity.RESULT_OK) {
+            val possibleMatchResult = resultData?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
+            val possibleCollectResult = resultData?.getParcelableExtra<CollectResult>(CollectResult.BUNDLE_KEY)
+            val possibleRefusalForm = resultData?.getParcelableExtra<RefusalActResult>(RefusalActResult.BUNDLE_KEY)
+
+            if (possibleRefusalForm != null) {
+                prepareRefusalForm(returnIntent, possibleRefusalForm)
+            } else {
+                when (fingerprintRequest) {
+                    is FingerprintEnrolRequest -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
+                    is FingerprintIdentifyRequest -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
+                    is FingerprintVerifyRequest -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
+                }
+            }
         }
+
         view.setResultAndFinish(resultCode, returnIntent)
+    }
+
+    private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
+        val fingerprintResult = FingerprintRefusalFormResponse(possibleRefusalForm.reason.toString(), possibleRefusalForm.optionalText)
+        resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
+            fromDomainToModuleApiRefusalFormResponse(fingerprintResult))
     }
 
     private fun prepareVerifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActVerifyResult?) {
         possibleMatchResult?.let {
+            val fingerprintResult = FingerprintVerifyResponse(it.guid, it.confidence, it.tier)
             resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToModuleApiVerifyResponse(FingerprintVerifyResponse(it.guid, it.confidence, it.tier)))
+                fromDomainToModuleApiVerifyResponse(fingerprintResult))
         }
     }
 
-    private fun prepareIdentifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActIdentifyResult?, currentSession: String) {
+    private fun prepareIdentifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActIdentifyResult?) {
         possibleMatchResult?.let {
+            val fingerprintResult = FingerprintIdentifyResponse(it.identifications)
             resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToModuleApiIdentifyResponse(FingerprintIdentifyResponse(it.identifications, currentSession)))
+                fromDomainToModuleApiIdentifyResponse(fingerprintResult))
         }
     }
 
     private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectResult: CollectResult?) {
         possibleCollectResult?.let {
-            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToModuleApiEnrolResponse(FingerprintEnrolResponse(it.probe.patientId)))
+            val fingerprintResult = FingerprintEnrolResponse(it.probe.patientId)
+            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToModuleApiEnrolResponse(fingerprintResult))
         }
     }
 

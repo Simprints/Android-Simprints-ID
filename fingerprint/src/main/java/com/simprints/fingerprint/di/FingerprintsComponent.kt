@@ -6,6 +6,7 @@ import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprints
 import com.simprints.fingerprint.activities.launch.LaunchPresenter
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.MatchingPresenter
+import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.di.PreferencesModule
@@ -24,4 +25,5 @@ interface FingerprintsComponent {
     fun inject(scannerManager: ScannerManager)
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(alertPresenter: AlertPresenter)
+    fun inject(refusalPresenter: RefusalPresenter)
 }

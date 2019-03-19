@@ -11,9 +11,9 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.responses.Response
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.moduleapi.DomainToFingerprintAdapter.fromDomainToFingerprintRequest
-import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainResponse
 import com.simprints.id.moduleapi.fromDomainToClientApiAdapter.fromDomainToClientApiResponse
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LAUNCH_ACTIVITY_REQUEST
@@ -84,10 +84,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
     }
 
-    override fun finishCheckLoginFromIntentActivity() {
-        finish()
-    }
-
     override fun openLaunchActivity(appRequest: Request) {
 
         val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
@@ -106,14 +102,18 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
             val fingerprintResponse = data?.extras?.getParcelable<IFingerprintResponse>(IFingerprintResponse.BUNDLE_KEY)
             fingerprintResponse?.let {
-                val domainResponse = fromFingerprintToDomainResponse(fingerprintResponse)
-                viewPresenter.handleActivityResult(requestCode, resultCode, domainResponse)
-
-                val clientApiResponse = fromDomainToClientApiResponse(domainResponse)
-                setResult(resultCode, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, clientApiResponse) })
+                viewPresenter.handleActivityResult(requestCode, resultCode, it)
             }
         }
+    }
 
+    override fun setResultDataAndFinish(resultCode: Int, domainResponse: Response) {
+        val clientApiResponse = fromDomainToClientApiResponse(domainResponse)
+        setResult(resultCode, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, clientApiResponse) })
+        finishCheckLoginFromIntentActivity()
+    }
+
+    override fun finishCheckLoginFromIntentActivity() {
         finish()
     }
 }

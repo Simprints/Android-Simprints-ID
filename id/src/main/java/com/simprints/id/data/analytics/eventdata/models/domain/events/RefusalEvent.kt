@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.domain.refusal_form.RefusalFormReason
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 
 class RefusalEvent(val relativeStartTime: Long,
                    val relativeEndTime: Long,
@@ -13,11 +13,11 @@ class RefusalEvent(val relativeStartTime: Long,
         OTHER;
 
         companion object {
-            fun fromRefusalReason(reasonForm: RefusalFormReason): Answer {
+            fun fromRefusalReason(reasonForm: com.simprints.fingerprint.data.domain.refusal.RefusalFormReason): Answer {
                 return when (reasonForm) {
-                    RefusalFormReason.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
-                    RefusalFormReason.REFUSED -> BENEFICIARY_REFUSED
-                    RefusalFormReason.OTHER -> OTHER
+                    com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
+                    com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.REFUSED -> BENEFICIARY_REFUSED
+                    com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.OTHER -> OTHER
                 }
             }
         }

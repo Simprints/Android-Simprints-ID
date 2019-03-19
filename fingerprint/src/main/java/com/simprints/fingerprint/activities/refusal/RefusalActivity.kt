@@ -1,4 +1,4 @@
-package com.simprints.id.activities.refusal
+package com.simprints.fingerprint.activities.refusal
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,13 +7,12 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
-import com.simprints.id.R
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.refusal_form.RefusalFormAnswer
-import com.simprints.id.domain.responses.RefusalFormResponse
-import com.simprints.id.domain.responses.Response
-import com.simprints.id.tools.extensions.launchAlert
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 
@@ -24,7 +23,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = (application as Application).component
+        val component = FingerprintsComponentBuilder.getComponent(application as Application)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -83,19 +82,19 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    override fun doLaunchAlert(alert: Alert) {
+    override fun doLaunchAlert(alert: FingerprintAlert) {
         launchAlert(alert)
     }
 
-    override fun setResultAndFinish(activityResult: Int, refusalAnswer: RefusalFormAnswer) {
-        setResult(activityResult, getIntentForResultData(refusalAnswer))
+    override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {
+        setResult(activityResult, getIntentForResultData(refusalResult))
         finish()
     }
 
-    private fun getIntentForResultData(reason: RefusalFormAnswer) =
+    private fun getIntentForResultData(refusalResult: RefusalActResult) =
         Intent().putExtra(
-            Response.BUNDLE_KEY,
-            RefusalFormResponse(reason))
+            RefusalActResult.BUNDLE_KEY,
+            refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()
 }

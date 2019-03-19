@@ -1,23 +1,23 @@
-package com.simprints.id.activities.refusal
+package com.simprints.fingerprint.activities.refusal
 
 import android.app.Activity
-import com.simprints.id.R
+import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
+import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.refusal_form.RefusalFormAnswer
-import com.simprints.id.domain.refusal_form.RefusalFormReason
-import com.simprints.id.domain.refusal_form.RefusalFormReason.*
-import com.simprints.id.tools.TimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class RefusalPresenter(private val view: RefusalContract.View,
-                       component: AppComponent) : RefusalContract.Presenter {
+                       component: FingerprintsComponent) : RefusalContract.Presenter {
 
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -65,16 +65,16 @@ class RefusalPresenter(private val view: RefusalContract.View,
                         refusalText))
             }.subscribeBy(onError = {
                 crashReportManager.logExceptionOrThrowable(it)
-                view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalFormAnswer(reason, refusalText))
+                view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalActResult(reason, refusalText))
             }, onComplete = {
-                view.setResultAndFinish(Activity.RESULT_OK, RefusalFormAnswer(reason, refusalText))
+                view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason, refusalText))
             })
         }
     }
 
     override fun handleScanFingerprintsClick() {
         logMessageForCrashReport("Scan fingerprints button clicked")
-        view.setResultAndFinish(Activity.RESULT_OK, RefusalFormAnswer(reason))
+        view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason))
     }
 
     override fun handleLayoutChange() {
