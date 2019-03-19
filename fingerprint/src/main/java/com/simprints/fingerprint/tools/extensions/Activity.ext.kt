@@ -7,7 +7,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
-import com.simprints.id.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 
 fun Activity.launchAlert(alert: FingerprintAlert, requestCode: Int = ALERT_ACTIVITY_REQUEST) {

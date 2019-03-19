@@ -101,7 +101,7 @@
             android:theme="@style/AppTheme.ActionBar" />
 
         <activity
-            android:name=".activities.refusal.RefusalActivity"
+            android:name="com.simprints.fingerprint.activities.refusal.RefusalActivity"
             android:label="@string/refusal_label"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"

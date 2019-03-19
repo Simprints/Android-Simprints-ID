@@ -35,7 +35,7 @@ object AppAdapter {
         IFingerprintVerifyResponseImpl(verify.guid, verify.confidence, toIFingerprintResponseTier(verify.tier))
 
     fun fromDomainToModuleApiIdentifyResponse(identify: FingerprintIdentifyResponse): IFingerprintIdentifyResponse =
-        IFingerprintIdentifyResponseImpl(identify.identifications.map { fromDomainToModuleApiIdentificationResult(it) }, identify.sessionId)
+        IFingerprintIdentifyResponseImpl(identify.identifications.map { fromDomainToModuleApiIdentificationResult(it) })
 
     fun fromDomainToModuleApiRefusalFormResponse(refusaResponse: FingerprintRefusalFormResponse): IFingerprintRefusalFormResponse =
         IFingerprintRefusalFormResponseImpl(refusaResponse.reason, refusaResponse.extra)
@@ -57,8 +57,8 @@ object AppAdapter {
 private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse
 
 @Parcelize
-private class IFingerprintIdentifyResponseImpl(override val identifications: List<IFingerprintIdentifyResponse.IIdentificationResult>,
-                                               override val sessionId: String) : IFingerprintIdentifyResponse
+private class IFingerprintIdentifyResponseImpl(
+    override val identifications: List<IFingerprintIdentifyResponse.IIdentificationResult>) : IFingerprintIdentifyResponse
 
 @Parcelize
 private class IFingerprintRefusalFormResponseImpl(

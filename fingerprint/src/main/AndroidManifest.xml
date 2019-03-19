@@ -40,9 +40,18 @@
             android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
+        <activity
+            android:name="com.simprints.fingerprint.activities.refusal.RefusalActivity"
+            android:label="@string/refusal_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+
+
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />
+
 
     </application>
 </manifest>
