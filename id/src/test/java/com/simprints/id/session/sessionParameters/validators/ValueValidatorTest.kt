@@ -1,6 +1,7 @@
 package com.simprints.id.session.sessionParameters.validators
 
-import com.simprints.id.shared.assertThrows
+import com.simprints.id.exceptions.safe.SafeException
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class ValueValidatorTest {
@@ -11,7 +12,7 @@ class ValueValidatorTest {
 
     private val validValues = listOf(validValue1, validValue2)
 
-    private val invalidValueError = Error()
+    private val invalidValueError = SafeException("invalid value error")
     private val valueValidator = ValueValidator(validValues, invalidValueError)
 
     @Test

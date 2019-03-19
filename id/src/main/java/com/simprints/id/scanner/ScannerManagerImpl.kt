@@ -2,10 +2,18 @@ package com.simprints.id.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.safe.setup.*
-import com.simprints.id.exceptions.unsafe.NullScannerError
+import com.simprints.id.exceptions.safe.setup.BluetoothNotEnabledException
+import com.simprints.id.exceptions.safe.setup.MultipleScannersPairedException
+import com.simprints.id.exceptions.safe.setup.ScannerLowBatteryException
+import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
+import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.id.exceptions.unexpected.NullScannerException
+import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
@@ -13,10 +21,10 @@ import com.simprints.libscanner.ScannerUtils
 import com.simprints.libscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
 import io.reactivex.Completable
-import timber.log.Timber
 
 open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
                               val analyticsManager: AnalyticsManager,
+                              val crashReportManager: CrashReportManager,
                               private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
@@ -55,7 +63,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
                 preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
 
-                Timber.d("ScannerManager: Scanner initialized.")
+                logMessageForCrashReport("ScannerManager: Scanner initialized")
                 it.onComplete()
             }
         }
@@ -63,10 +71,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun connectToVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.connect(WrapperScannerCallback({
-                Timber.d("ScannerManager: Connected to Vero.")
+                logMessageForCrashReport("ScannerManager: Connected to Vero")
                 preferencesManager.scannerId = scanner?.scannerId ?: ""
                 analyticsManager.logScannerProperties()
                 result.onComplete()
@@ -87,10 +95,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun wakeUpVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
-                Timber.d("ScannerManager: UN20 ready.")
+                logMessageForCrashReport("ScannerManager: UN20 ready")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -112,10 +120,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
 
     override fun shutdownVero(): Completable = Completable.create { result ->
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
-                Timber.d("ScannerManager: UN20 off.")
+                logMessageForCrashReport("ScannerManager: UN20 off")
                 preferencesManager.hardwareVersion = scanner?.ucVersion ?: -1
 
                 result.onComplete()
@@ -128,10 +136,10 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
     override fun resetVeroUI(): Completable = Completable.create { result ->
 
         if (scanner == null) {
-            result.onError(NullScannerError())
+            result.onError(NullScannerException())
         } else {
             scanner?.resetUI(WrapperScannerCallback({
-                Timber.d("ScannerManager: UI reset.")
+                logMessageForCrashReport("ScannerManager: UI reset")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
@@ -167,5 +175,9 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
         override fun onFailure(error: SCANNER_ERROR?) {
             failure(error)
         }
+    }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SCANNER_SETUP, CrashReportTrigger.SCANNER, message = message)
     }
 }

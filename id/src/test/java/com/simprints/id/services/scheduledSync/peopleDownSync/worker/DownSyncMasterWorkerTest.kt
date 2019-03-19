@@ -2,20 +2,17 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
-import com.google.firebase.FirebaseApp
-import com.simprints.id.activities.ShadowAndroidXMultiDex
-import com.simprints.id.di.DaggerForTests
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -27,10 +24,9 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
-
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DownSyncMasterWorkerTest : DaggerForTests() {
+class DownSyncMasterWorkerTest {
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -54,13 +50,9 @@ class DownSyncMasterWorkerTest : DaggerForTests() {
     private val workerKeyForSubCountScope = "${WorkManagerConstants.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
 
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
+    fun setUp() {
+        UnitTestConfig(this).fullSetup()
 
-        super.setUp()
-        testAppComponent.inject(this)
         MockitoAnnotations.initMocks(this)
         whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(syncScope)))
         downSyncMasterWorker = DownSyncMasterWorker(context, workParams)

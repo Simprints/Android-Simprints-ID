@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.Overr
 import com.simprints.id.domain.Constants
 import com.simprints.id.domain.consent.GeneralConsent
 import com.simprints.id.domain.consent.ParentalConsent
-import com.simprints.id.exceptions.unsafe.preferences.NoSuchPreferenceError
+import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer

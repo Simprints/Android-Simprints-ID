@@ -17,14 +17,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.TimeUnit
 
-
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class SessionEventsSyncManagerImplITest {
 
-    @Rule
-    @JvmField
-    val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
+    @get:Rule val simprintsActionTestRule = ActivityTestRule(CheckLoginFromIntentActivity::class.java, false, false)
 
     @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
     private var sessionEventsSyncManager = SessionEventsSyncManagerImpl()

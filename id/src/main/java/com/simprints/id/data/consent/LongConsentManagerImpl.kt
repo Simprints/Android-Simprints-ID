@@ -3,7 +3,7 @@ package com.simprints.id.data.consent
 import android.content.Context
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
-import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
@@ -13,7 +13,7 @@ import java.io.File
 
 class LongConsentManagerImpl(context: Context,
                              private val loginInfoManager: LoginInfoManager,
-                             private val analyticsManager: AnalyticsManager) : LongConsentManager {
+                             private val crashReportManager: CrashReportManager) : LongConsentManager {
 
     companion object {
         private const val FILE_PATH = "long-consents"
@@ -50,7 +50,7 @@ class LongConsentManagerImpl(context: Context,
                 downloadTasks.add(
                     downloadLongConsentWithProgress(language)
                         .ignoreElements()
-                        .doOnError { analyticsManager.logThrowable(it) }
+                        .doOnError { crashReportManager.logExceptionOrThrowable(it) }
                         .onErrorComplete()
                 )
         }

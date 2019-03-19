@@ -1,6 +1,5 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync
 
-import com.nhaarman.mockito_kotlin.*
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -9,7 +8,7 @@ import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
-import com.simprints.id.shared.assertThrows
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -33,7 +32,7 @@ class PeopleUpSyncUploaderTaskTest {
     )
 
     private val differentProjectId = "differentProjectId"
-    private val differentUserId = "differentUserId"
+//    private val differentUserId = "differentUserId" // TODO: uncomment userId when multitenancy is properly implemented
 
     private val notYetSyncedPerson1 = Person(
         "patientId1", "projectId", "userId", "moduleId",
@@ -173,23 +172,24 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSyncStatusModel() {
-        whenever(upSyncDao.insertLastUpSyncTime(any())).then { }
+        whenever(upSyncDao.insertLastUpSyncTime(anyNotNull())).then { }
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
-        verify(localDbManager, times(queryResults.size + 1)).getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true)
-        verify(localDbManager, times(queryResults.size)).loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true)
+
+        verifyExactly(queryResults.size + 1, localDbManager) { getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true) }
+        verifyExactly(queryResults.size, localDbManager) { loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true) }
     }
 
     private fun verifyPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
-            verify(remotePeopleManager).uploadPeople(projectIdToSync, batch)
+            verifyOnce(remotePeopleManager) { uploadPeople(projectIdToSync, batch) }
         }
     }
 
     private fun verifyLocalPeopleUpdates(vararg updates: List<Person>) {
         updates.forEach { update ->
-            verify(localDbManager).insertOrUpdatePeopleInLocal(update)
+            verifyOnce(localDbManager) { insertOrUpdatePeopleInLocal(update) }
         }
     }
 }

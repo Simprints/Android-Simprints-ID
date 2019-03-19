@@ -1,21 +1,22 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import android.annotation.SuppressLint
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventData.models.domain.events.CallbackEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.CalloutEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.ConnectivitySnapshotEvent
-import com.simprints.id.data.analytics.eventData.models.domain.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventData.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.exceptions.unsafe.InvalidCalloutError
 import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -30,8 +31,7 @@ import javax.inject.Inject
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
-    @Inject
-    lateinit var remoteConfigFetcher: RemoteConfigFetcher
+    @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
     private val loginAlreadyTried: AtomicBoolean = AtomicBoolean(false)
     private var possibleLegacyApiKey: String = ""
@@ -61,6 +61,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 extractSessionParametersOrThrow()
                 addCalloutAndConnectivityEventsInSession()
                 setLastUser()
+                setSessionIdCrashlyticsKey()
             } catch (exception: InvalidCalloutError) {
                 view.openAlertActivityForError(exception.alertType)
                 setupFailed = true
@@ -189,6 +190,13 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSessionInBackground {
             it.events.add(CallbackEvent(it.nowRelativeToStartTime(timeHelper), returnCallout))
             it.closeIfRequired(timeHelper)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun setSessionIdCrashlyticsKey() {
+        sessionEventsManager.getCurrentSession().subscribeBy {
+            crashReportManager.setSessionIdCrashlyticsKey(it.id)
         }
     }
 }

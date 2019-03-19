@@ -2,16 +2,16 @@ package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.domain.Constants
-import com.simprints.id.exceptions.unsafe.MismatchedTypeError
-import com.simprints.id.shared.assertThrows
-import com.simprints.id.shared.mock
-import com.simprints.id.shared.whenever
+import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
 
@@ -65,7 +65,7 @@ class ComplexPreferenceTest {
 
     private fun mockImprovedEditor(): ImprovedSharedPreferences.Editor {
         val editor = mock<ImprovedSharedPreferences.Editor>()
-        whenever(editor.putPrimitive(anyString(), any())).thenReturn(editor)
+        whenever(editor.putPrimitive(anyString(), anyNotNull())).thenReturn(editor)
         return editor
     }
 
@@ -76,7 +76,7 @@ class ComplexPreferenceTest {
         whenever(prefs.getPrimitive(aKey, -1)).thenReturn(2)
         whenever(prefs.getPrimitive(aKey, serializedDefaultGroupEnum))
             .thenThrow(
-                MismatchedTypeError("Expecting String, integer stored",
+                MismatchedTypeException("Expecting String, integer stored",
                 Throwable("Expecting String, integer stored")))
 
         whenever(prefs.getPrimitive(bKey, serializedDefaultGroupEnum)).thenReturn(Constants.GROUP.MODULE.name)
@@ -84,7 +84,7 @@ class ComplexPreferenceTest {
         whenever(prefs.getPrimitive(cKey, -1)).thenReturn(5)
         whenever(prefs.getPrimitive(cKey, serializedDefaultGroupEnum))
             .thenThrow(
-                MismatchedTypeError("Expecting String, integer stored",
+                MismatchedTypeException("Expecting String, integer stored",
                 Throwable("Expecting String, integer stored")))
 
         whenever(prefs.edit()).thenReturn(editorToReturn)
@@ -100,7 +100,7 @@ class ComplexPreferenceTest {
     @Test
     fun testDeserializingEnumWithWrongIndexInSharedPrefsThrowsAnException() {
         //SharedPref: 5
-        assertThrows<MismatchedTypeError> { enumFromWrongIndexInSharedPrefs }
+        assertThrows<MismatchedTypeException> { enumFromWrongIndexInSharedPrefs }
     }
 
     @Test

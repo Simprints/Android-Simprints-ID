@@ -3,8 +3,9 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -22,13 +23,12 @@ import javax.inject.Inject
 class DashboardPresenter(private val view: DashboardContract.View,
                          val component: AppComponent) : DashboardContract.Presenter {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
@@ -44,6 +44,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
 
         initCards()
+        initOrUpdateAnalyticsKeys()
     }
 
     private fun initCards() {
@@ -79,6 +80,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
 
     private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
         viewModel.viewModelState.onSyncActionClicked = {
+            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
             when {
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
@@ -117,5 +119,15 @@ class DashboardPresenter(private val view: DashboardContract.View,
         !simNetworkUtils.isConnected()
     } catch (e: IllegalStateException) {
         true
+    }
+
+    private fun initOrUpdateAnalyticsKeys() {
+        crashReportManager.apply {
+            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+            setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        }
     }
 }

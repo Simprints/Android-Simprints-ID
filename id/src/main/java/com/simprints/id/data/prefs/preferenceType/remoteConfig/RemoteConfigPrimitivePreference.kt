@@ -3,7 +3,7 @@ package com.simprints.id.data.prefs.preferenceType.remoteConfig
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
-import com.simprints.id.exceptions.unsafe.NonPrimitiveTypeError
+import com.simprints.id.exceptions.unexpected.NonPrimitiveTypeException
 import kotlin.reflect.KProperty
 
 open class RemoteConfigPrimitivePreference<T : Any>(prefs: ImprovedSharedPreferences,
@@ -35,6 +35,6 @@ open class RemoteConfigPrimitivePreference<T : Any>(prefs: ImprovedSharedPrefere
             is Double -> remoteConfigWrapper.getDouble(key)
             is Float -> remoteConfigWrapper.getDouble(key)?.toFloat()
             is String -> remoteConfigWrapper.getString(key)
-            else -> throw NonPrimitiveTypeError.forTypeOf(defValue)
+            else -> throw NonPrimitiveTypeException.forTypeOf(defValue)
         } ?: defValue) as T
 }

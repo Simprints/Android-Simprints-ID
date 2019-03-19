@@ -1,12 +1,12 @@
 package com.simprints.id.data.secure.keystore
 
-import com.simprints.id.exceptions.unsafe.MissingPrivateKeyInKeystoreError
-import com.simprints.id.exceptions.unsafe.InvalidDecryptionData
+import com.simprints.id.exceptions.unexpected.MissingPrivateKeyInKeystoreException
+import com.simprints.id.exceptions.safe.callout.InvalidDecryptionData
 
 interface KeystoreManager {
 
     /**
-     * @throws MissingPrivateKeyInKeystoreError
+     * @throws MissingPrivateKeyInKeystoreException
      * @throws InvalidDecryptionData
      **/
     fun decryptString(string: String): String

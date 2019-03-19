@@ -7,8 +7,10 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -22,7 +24,7 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         const val SUBCOUNT_WORKER_SUB_SCOPE_INPUT = "SUBCOUNT_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var countTask: CountTask
 
@@ -36,24 +38,27 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         val key = subSyncScope.uniqueKey
 
         return try {
+            logMessageForCrashReport("Making count request for $subSyncScope")
             val totalCount = countTask.execute(subSyncScope).blockingGet()
             val data = Data.Builder()
                 .putInt(key, totalCount.toInt())
                 .build()
-            toastForDebugBuilds(subSyncScope, data)
+
+            logToAnalyticsAndToastForDebugBuilds(subSyncScope, data)
             Result.success(data)
         } catch (e: Throwable) {
             e.printStackTrace()
-            analyticsManager.logThrowable(e)
-            toastForDebugBuilds(subSyncScope)
+            logToAnalyticsAndToastForDebugBuilds(subSyncScope)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.success()
         }
     }
 
-    private fun toastForDebugBuilds(subSyncScope: SubSyncScope, data: Data? = null) {
+    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SubSyncScope, data: Data? = null) {
+        val message = "SubCountWorker($subSyncScope): Success - ${data?.keyValueMap}"
+        logMessageForCrashReport(message)
         if (BuildConfig.DEBUG) {
             applicationContext.runOnUiThread {
-                val message = "WM - SubCountWorker($subSyncScope): Success - ${data?.keyValueMap}"
                 Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
                 Timber.d(message)
             }
@@ -64,6 +69,9 @@ class SubCountWorker(context: Context, params: WorkerParameters) : Worker(contex
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SubCountWorker>()
+        } else throw WorkerInjectionFailedException.forWorker<SubCountWorker>()
     }
+
+    private fun logMessageForCrashReport(message: String) =
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
 }

@@ -1,12 +1,12 @@
 package com.simprints.id.data.local
 
-import androidx.test.InstrumentationRegistry
+import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.PeopleRealmConfig
 import com.simprints.id.data.db.local.realm.models.rl_Person
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.Person
-import com.simprints.id.shared.PeopleGeneratorUtils
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File
@@ -18,14 +18,14 @@ open class RealmTestsBase {
         const val KEY_LENGTH = 64
     }
 
-    val newDatabaseKey: ByteArray = Arrays.copyOf("newKey".toByteArray(), KEY_LENGTH)
+    val newDatabaseKey: ByteArray = "newKey".toByteArray().copyOf(KEY_LENGTH)
     val legacyDatabaseName: String = "${Date().time}legacyDB"
     val newDatabaseName: String = "${Date().time}newDatabase"
 
     protected val localDbKey = LocalDbKey(newDatabaseName, newDatabaseKey, legacyDatabaseName)
     protected val config: RealmConfiguration
 
-    protected val testContext = InstrumentationRegistry.getTargetContext()
+    protected val testContext = InstrumentationRegistry.getInstrumentation().targetContext
         ?: throw IllegalStateException()
 
     init {

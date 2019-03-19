@@ -6,8 +6,10 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
@@ -21,7 +23,7 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
         const val SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT = "SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var scopesBuilder: SyncScopesBuilder
     @Inject lateinit var downSyncTask: DownSyncTask
 
@@ -34,22 +36,24 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
             ?: throw IllegalArgumentException("SyncScope required")
 
         val result = try {
+            logMessageForCrashReport("DownSyncing for $subSyncScope")
             downSyncTask.execute(subSyncScope).blockingAwait()
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()
-            analyticsManager.logThrowable(e)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.failure()
         }
 
-        toastForDebugBuilds(subSyncScope, result)
+        logToAnalyticsAndToastForDebugBuilds(subSyncScope, result)
         return result
     }
 
-    private fun toastForDebugBuilds(subSyncScope: SubSyncScope, result: Result) {
+    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SubSyncScope, result: Result) {
+        val message = "WM - SubDownSyncWorker($subSyncScope): $result"
+        logMessageForCrashReport(message)
         if (BuildConfig.DEBUG) {
             applicationContext.runOnUiThread {
-                val message = "WM - SubDownSyncWorker($subSyncScope): $result"
                 Toast.makeText(applicationContext, message, Toast.LENGTH_SHORT).show()
                 Timber.d(message)
             }
@@ -60,6 +64,9 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<SubDownSyncWorker>()
+        } else throw WorkerInjectionFailedException.forWorker<SubDownSyncWorker>()
     }
+
+    private fun logMessageForCrashReport(message: String) =
+        crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
 }
