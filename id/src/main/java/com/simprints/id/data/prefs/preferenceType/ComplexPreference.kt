@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.preferenceType
 
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.exceptions.unsafe.MismatchedTypeError
+import com.simprints.id.exceptions.unexpected.MismatchedTypeException
 import com.simprints.id.tools.serializers.EnumSerializer
 import com.simprints.id.tools.serializers.Serializer
 import timber.log.Timber
@@ -22,12 +22,12 @@ open class ComplexPreference<T : Any>(val prefs: ImprovedSharedPreferences,
 
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): T = try {
         serializer.deserialize(serializedValue)
-    } catch (e: MismatchedTypeError) {
+    } catch (e: MismatchedTypeException) {
         ifEnumDeserializationFailedThenTryIndex() ?: throw e
     }
 
     /**
-     * when we deserialize an Enum, sometimes we get MismatchedTypeError in Fabric.
+     * when we deserialize an Enum, sometimes we get MismatchedTypeException in Fabric.
      * That is because in the SharedPreference an integer (enum index) instead of a String (enum name) is stored.
      * It can happen when we changed the type stored in the SharedPref between versions
      * without a migration process (as we do for Realm). So tentatively we try to

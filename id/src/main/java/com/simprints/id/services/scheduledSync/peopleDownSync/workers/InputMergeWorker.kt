@@ -6,8 +6,8 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.exceptions.unsafe.WorkerInjectionFailedError
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.SaveCountsTask
@@ -19,7 +19,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
 
     @Inject lateinit var saveCountsTask: SaveCountsTask
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     override fun doWork(): Result {
         inject()
@@ -33,7 +33,7 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
             Result.success(inputData)
         } catch (e: Throwable) {
             e.printStackTrace()
-            analyticsManager.logThrowable(e)
+            crashReportManager.logExceptionOrThrowable(e)
             Result.failure()
         }
         toastForDebugBuilds(result)
@@ -66,6 +66,6 @@ class InputMergeWorker(context: Context, params: WorkerParameters) : Worker(cont
         val context = applicationContext
         if (context is Application) {
             context.component.inject(this)
-        } else throw WorkerInjectionFailedError.forWorker<InputMergeWorker>()
+        } else throw WorkerInjectionFailedException.forWorker<InputMergeWorker>()
     }
 }

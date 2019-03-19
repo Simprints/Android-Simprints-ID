@@ -1,8 +1,9 @@
 package com.simprints.id.session.sessionParameters.validators
 
+import com.simprints.id.exceptions.safe.SafeException
 import java.util.regex.Pattern
 
-class GuidValidator(private val errorWhenInvalid: Error,
+class GuidValidator(private val errorWhenInvalid: SafeException,
                     private val pattern: Pattern = Pattern.compile(GUID_REG_EX))
     : Validator<String> {
 

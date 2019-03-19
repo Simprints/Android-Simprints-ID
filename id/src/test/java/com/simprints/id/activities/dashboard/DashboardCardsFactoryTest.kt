@@ -2,13 +2,11 @@ package com.simprints.id.activities.dashboard
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.R
-import com.simprints.id.activities.ShadowAndroidXMultiDex
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
@@ -17,27 +15,30 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
-import com.simprints.id.shared.DependencyRule.MockRule
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.roboletric.*
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
-import com.simprints.id.tools.delegates.lazyVar
+import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import org.robolectric.annotation.Config
 import java.util.*
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DashboardCardsFactoryTest : DaggerForTests() {
+class DashboardCardsFactoryTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
@@ -48,8 +49,8 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
-    override var module by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             remoteDbManagerRule = MockRule,
             remotePeopleManagerRule = MockRule,
             remoteProjectManagerRule = MockRule,
@@ -57,16 +58,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
             syncStatusDatabaseRule = MockRule)
     }
 
-    val activity = spy<DashboardActivity>()
-
     @Before
-    override fun setUp() {
-        app = (ApplicationProvider.getApplicationContext() as TestApplication)
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
 
-        super.setUp()
-        testAppComponent.inject(this)
         dbManager.initialiseDb()
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
@@ -76,15 +71,15 @@ class DashboardCardsFactoryTest : DaggerForTests() {
         whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
         whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
-        initLogInStateMock(getRoboSharedPreferences(), remoteDbManagerMock)
-        setUserLogInState(true, getRoboSharedPreferences(), userId = "userId")
-
-        mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        RobolectricTestMocker
+            .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+            .setUserLogInState(true, getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
+            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
     }
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
 
         val card = getCardIfCreated(factory, "project name")
         Assert.assertEquals(card?.description, "project desc")
@@ -103,11 +98,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastEnrolCard_onlyWhenAnEnrolEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastEnrolDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
-
             { factory.dateFormat.format(lastEnrolDate).also { preferencesManager.lastEnrolDate = lastEnrolDate } },
             { preferencesManager.lastEnrolDate = null },
             app.getString(R.string.dashboard_card_enrol_title))
@@ -115,7 +109,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastIdentificationCard_onlyWhenAnIdentificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastIdentificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -126,7 +120,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastVerificationCard_onlyWhenAnVerificationEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastVerificationDate = Date()
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -138,7 +132,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     @Test
     @Config(sdk = [25]) // Bug with Robolectric and SharedPreferences.commit() on API >= 26. apply() works fine
     fun shouldCreateTheCurrentUserCard_onlyIfValidUserSignedIn() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val signedInUser = "someone"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -149,7 +143,7 @@ class DashboardCardsFactoryTest : DaggerForTests() {
 
     @Test
     fun shouldCreateTheLastScannerCard_onlyWhenALastScannerEventHappened() {
-        val factory = DashboardCardsFactory(testAppComponent)
+        val factory = DashboardCardsFactory(app.component)
         val lastScanner = "SPXXXX"
         assertThatCardEventsAreCreatedOnlyWhenRequired(
             factory,
@@ -198,10 +192,10 @@ class DashboardCardsFactoryTest : DaggerForTests() {
     }
 
     private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
-        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), any(), any())).thenReturn(Single.just(count))
+        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(count))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
-        whenever(localDbManager.getPeopleCountFromLocal(any(), any(), any(), any())).thenReturn(Single.just(nLocalPeople))
+        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
     }
 }

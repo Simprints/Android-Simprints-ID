@@ -2,9 +2,11 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.firebase.FirebaseApp
-import com.nhaarman.mockito_kotlin.*
-import com.simprints.id.activities.ShadowAndroidXMultiDex
+import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
+import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.rl_SyncInfo
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
@@ -16,8 +18,6 @@ import com.simprints.id.data.db.remote.models.fb_Person
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.di.AppModuleForTests
-import com.simprints.id.di.DaggerForTests
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
 import com.simprints.id.network.SimApiClient
@@ -25,20 +25,14 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
-import com.simprints.id.shared.DependencyRule
-import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPeople
-import com.simprints.id.shared.PeopleGeneratorUtils.getRandomPerson
-import com.simprints.id.shared.anyNotNull
-import com.simprints.id.shared.testTools.extensions.awaitAndAssertSuccess
-import com.simprints.id.shared.whenever
-import com.simprints.id.testUtils.base.RxJavaTest
-import com.simprints.id.testUtils.mockServer.assertPathUrlParam
-import com.simprints.id.testUtils.mockServer.assertQueryUrlParam
-import com.simprints.id.testUtils.roboletric.TestApplication
-import com.simprints.id.testUtils.workManager.initWorkManagerIfRequired
+import com.simprints.id.testtools.TestApplication
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
-import com.simprints.id.tools.delegates.lazyVar
 import com.simprints.id.tools.json.JsonHelper
+import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.mockserver.assertPathUrlParam
+import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
@@ -55,10 +49,11 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.math.ceil
 
-
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
+class SubDownSyncTaskTest {
+
+    private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
     private lateinit var apiClient: SimApiClient<PeopleRemoteInterface>
@@ -70,19 +65,15 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
     private val remotePeopleManagerSpy: RemotePeopleManager = spy()
     private val downSyncDao: DownSyncDao = mock()
 
-    override var module: AppModuleForTests by lazyVar {
-        AppModuleForTests(app,
+    private val module by lazy {
+        TestAppModule(app,
             syncScopesBuilderRule = DependencyRule.MockRule,
             syncStatusDatabaseRule = DependencyRule.SpyRule)
     }
 
     @Before
-    override fun setUp() {
-        app = ApplicationProvider.getApplicationContext()
-        FirebaseApp.initializeApp(app)
-        initWorkManagerIfRequired(app)
-        super.setUp()
-        testAppComponent.inject(this)
+    fun setUp() {
+        UnitTestConfig(this, module).fullSetup()
 
         whenever(remoteDbManagerSpy.getCurrentFirestoreToken()).thenReturn(Single.just(""))
         mockServer.start()
@@ -187,7 +178,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
             rl_SyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
-        doNothing().whenever(downSyncDao).insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture())
+        whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
 
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
@@ -204,7 +195,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
         Assert.assertEquals(downSyncStatusAfterRealmMigration.id, downSyncDao.getStatusId(subScope))
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientUpdatedAt, lastPatientUpdateAt.time)
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientId, lastPatientId)
-        verify(localDbMock, atLeast(1)).deleteSyncInfo(anyNotNull())
+        verifyAtLeast(1, localDbMock) { deleteSyncInfo(anyNotNull()) }
     }
 
     private fun runDownSyncAndVerifyConditions(
@@ -225,17 +216,17 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
             lastPatientUpdatedAt = lastPatientUpdateAt))
 
         val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).doReturn(Completable.complete())
+        whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).thenReturn(Completable.complete())
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
-        doNothing().whenever(downSyncDao).updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture())
+        whenever(downSyncDao) { updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture()) } thenDoNothing {}
 
         val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
-        verify(localDbMock, times(batches)).insertOrUpdatePeopleInLocal(anyNotNull())
-        verify(downSyncDao, times(batches)).updateLastPatientId(anyString(), anyString())
-        verify(downSyncDao, times(batches + 1)).updateLastSyncTime(anyString(), anyLong())
+        verifyExactly(batches, localDbMock) { insertOrUpdatePeopleInLocal(anyNotNull()) }
+        verifyExactly(batches, downSyncDao) { updateLastPatientId(anyString(), anyString()) }
+        verifyExactly(batches + 1, downSyncDao) { updateLastSyncTime(anyString(), anyLong()) }
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
@@ -245,7 +236,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
     }
 
     private fun doReturnScopeFromBuilder(scope: SyncScope) {
-        doReturn(scope).`when`(syncScopeBuilderSpy).buildSyncScope()
+        whenever(syncScopeBuilderSpy) { buildSyncScope() } thenReturn scope
     }
 
     private fun prepareResponseForSubScope(subSyncScope: SubSyncScope, nPeople: Int) =
@@ -269,14 +260,14 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
 
     private fun doReturnDownSyncStatusFromRoom(downSyncStatus: DownSyncStatus?) {
         downSyncStatus?.let {
-            whenever(downSyncDao.getDownSyncStatusForId(anyString())).doReturn(downSyncStatus)
+            whenever(downSyncDao.getDownSyncStatusForId(anyString())).thenReturn(downSyncStatus)
         }
     }
 
     private fun doNothingForDownStatusInRoom() {
-        doNothing().whenever(downSyncDao).updateLastSyncTime(anyString(), anyLong())
-        doNothing().whenever(downSyncDao).updatePeopleToDownSync(anyString(), anyInt())
-        doNothing().whenever(downSyncDao).updateLastPatientId(anyString(), anyString())
+        whenever(downSyncDao) { updateLastSyncTime(anyString(), anyLong()) } thenDoNothing {}
+        whenever(downSyncDao) { updatePeopleToDownSync(anyString(), anyInt()) } thenDoNothing {}
+        whenever(downSyncDao) { updateLastPatientId(anyString(), anyString()) } thenDoNothing {}
     }
 
 
@@ -285,7 +276,7 @@ class SubDownSyncTaskTest : DaggerForTests(), RxJavaTest {
     }
 
     private fun doNothingForInsertPeopleToLocalDb(localDbMock: LocalDbManager) {
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).doReturn(Completable.complete())
+        whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
     }
 
     private fun mockSuccessfulResponseForDownloadPatients(patients: List<fb_Person>): MockResponse? {

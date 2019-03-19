@@ -1,8 +1,9 @@
 package com.simprints.id.session.sessionParameters.validators
 
+import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.sessionParameters.SessionParameters
-import com.simprints.id.shared.assertThrows
+import com.simprints.testtools.common.syntax.assertThrows
 import org.junit.Test
 
 class ProjectIdOrApiKeyValidatorTest {
@@ -11,7 +12,7 @@ class ProjectIdOrApiKeyValidatorTest {
     private val sessionParametersWithProjectId = SessionParameters(CalloutAction.IDENTIFY, "", "some_project_id", "", "", "", "", "", "")
     private val invalidSessionParameters = SessionParameters(CalloutAction.IDENTIFY, "", "", "", "", "", "", "", "")
 
-    private val missingProjectIdOrApiKeyError = Error()
+    private val missingProjectIdOrApiKeyError = SafeException("missing projectid or api key error")
     private val validator = ProjectIdOrApiKeyValidator(missingProjectIdOrApiKeyError)
 
     @Test

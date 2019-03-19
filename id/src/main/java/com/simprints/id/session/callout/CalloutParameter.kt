@@ -1,6 +1,6 @@
 package com.simprints.id.session.callout
 
-import com.simprints.id.exceptions.unsafe.InvalidCalloutParameterTypeError
+import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterTypeError
 import kotlin.reflect.KClass
 
 class CalloutParameter(val key: String, val value: Any?) {

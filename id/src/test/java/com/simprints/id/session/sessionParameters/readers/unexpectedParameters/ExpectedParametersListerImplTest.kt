@@ -3,7 +3,7 @@ package com.simprints.id.session.sessionParameters.readers.unexpectedParameters
 import com.simprints.id.session.callout.Callout
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.session.callout.CalloutParameters
-import com.simprints.id.shared.mock
+import com.simprints.testtools.common.syntax.mock
 import com.simprints.libsimprints.Constants
 import org.junit.Assert.assertTrue
 import org.junit.Test

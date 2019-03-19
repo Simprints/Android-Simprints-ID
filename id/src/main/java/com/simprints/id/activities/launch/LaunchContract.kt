@@ -6,7 +6,6 @@ import com.simprints.id.activities.BaseView
 import com.simprints.id.domain.ALERT_TYPE
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
-import pl.charmas.android.reactivelocation2.ReactiveLocationProvider
 
 interface LaunchContract {
 

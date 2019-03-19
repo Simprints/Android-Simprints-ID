@@ -1,10 +1,12 @@
 package com.simprints.id.activities.login
 
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.eventData.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.Result.*
-import com.simprints.id.data.analytics.eventData.models.domain.events.AuthenticationEvent.UserInfo
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.Result.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -30,7 +32,7 @@ class LoginPresenter(val view: LoginContract.View,
                      override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -48,14 +50,17 @@ class LoginPresenter(val view: LoginContract.View,
                         suppliedProjectSecret: String,
                         intentProjectId: String?,
                         intentLegacyProjectId: String?) =
-        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId))
+        if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId)) {
             doAuthenticate(
                 suppliedProjectId,
                 suppliedUserId,
                 suppliedProjectSecret,
                 intentProjectId,
                 intentLegacyProjectId)
-        else view.handleMissingCredentials()
+        }
+        else {
+            view.handleMissingCredentials()
+        }
 
     private fun areMandatoryCredentialsPresent(possibleProjectId: String, possibleProjectSecret: String, possibleUserId: String) =
         possibleProjectId.isNotEmpty() && possibleProjectSecret.isNotEmpty() && possibleUserId.isNotEmpty()
@@ -64,6 +69,7 @@ class LoginPresenter(val view: LoginContract.View,
                                suppliedUserId: String,
                                suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
 
+        logMessageForCrashReportWithNetworkTrigger("Making authentication request")
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
@@ -85,6 +91,7 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun handleSignInSuccess(suppliedProjectId: String,
                                     suppliedUserId: String) {
+        logMessageForCrashReportWithNetworkTrigger("Sign in success")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(AUTHENTICATED, suppliedProjectId, suppliedUserId)
         view.handleSignInSuccess()
     }
@@ -120,13 +127,14 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
+        logMessageForCrashReportWithNetworkTrigger("Sign in error - $reason")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
     private fun logSignInError(e: Throwable) {
         when (e) {
             is IOException -> Timber.d("Attempted login offline")
-            else -> analyticsManager.logThrowable(e)
+            else -> crashReportManager.logExceptionOrThrowable(e)
         }
     }
 
@@ -145,9 +153,19 @@ class LoginPresenter(val view: LoginContract.View,
             val potentialProjectSecret = scannedJson.getString(PROJECT_SECRET_JSON_KEY)
             view.updateProjectIdInTextView(potentialProjectId)
             view.updateProjectSecretInTextView(potentialProjectSecret)
+            logMessageForCrashReportWithUITrigger("QR scanning successful")
         } catch (e: JSONException) {
             view.showErrorForInvalidQRCode()
+            logMessageForCrashReportWithUITrigger("QR scanning unsuccessful")
         }
+    }
+
+    override fun logMessageForCrashReportWithUITrigger(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.LOGIN, CrashReportTrigger.UI, message = message)
+    }
+
+    private fun logMessageForCrashReportWithNetworkTrigger(message: String) {
+        crashReportManager.logMessageForCrashReport(CrashReportTag.LOGIN, CrashReportTrigger.NETWORK, message = message)
     }
 
     companion object {
