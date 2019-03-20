@@ -72,6 +72,9 @@ class TestAppModule(app: Application,
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
 
+    override fun provideRemoteDbManager(): RemoteDbManager =
+        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager() }
+
     override fun provideDbManager(localDbManager: LocalDbManager,
                                   remoteDbManager: RemoteDbManager,
                                   secureDataManager: SecureDataManager,
