@@ -41,8 +41,6 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
 import org.robolectric.annotation.Config
 import java.io.IOException
 import java.util.*
@@ -109,14 +107,14 @@ class DbManagerTest {
         Thread.sleep(1000)
 
         val argument = argumentCaptor<Person>()
-        verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
+        verifyOnce(localDbManagerSpy) { insertOrUpdatePersonInLocal(argument.capture()) }
 
         // First time we save the person in the local dbManager, it doesn't have times and it needs to be sync
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
         Assert.assertTrue(argument.firstValue.toSync)
 
-        verify(peopleUpSyncMasterMock).schedule(fakePerson.projectId/*, fakePerson.userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+        verifyOnce(peopleUpSyncMasterMock) { schedule(fakePerson.projectId/*, fakePerson.userId*/) } // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
@@ -148,7 +146,7 @@ class DbManagerTest {
         testObservable.awaitTerminalEvent()
 
         val argument = argumentCaptor<Person>()
-        verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
+        verifyOnce(localDbManagerSpy) { insertOrUpdatePersonInLocal(argument.capture()) }
 
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
@@ -163,7 +161,7 @@ class DbManagerTest {
         }.toDomainPerson()
 
         val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remotePeopleManagerSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
 
         val testObservable = dbManager.savePerson(fakePerson).test()
 
@@ -171,7 +169,7 @@ class DbManagerTest {
         testObservable.assertNoErrors()
 
         val argument = argumentCaptor<Person>()
-        verify(localDbManagerSpy, times(1)).insertOrUpdatePersonInLocal(argument.capture())
+        verifyOnce(localDbManagerSpy) { insertOrUpdatePersonInLocal(argument.capture()) }
 
         Assert.assertNull(argument.firstValue.createdAt)
         Assert.assertNull(argument.firstValue.updatedAt)
@@ -197,7 +195,7 @@ class DbManagerTest {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
         val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(poorNetworkClientMock))
+        whenever(remotePeopleManagerSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
 
         val testObserver = dbManager.loadPerson(person.projectId, person.patientId).test()
 
