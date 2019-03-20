@@ -8,10 +8,11 @@ import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.domain.requests.IdentifyRequest
+import com.simprints.id.domain.requests.Request
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -19,6 +20,7 @@ import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEvents
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.createActivity
@@ -29,7 +31,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
@@ -58,6 +59,10 @@ class LoginActivityTest {
             crashReportManagerRule = MockRule)
     }
 
+    private val defaultRequest = IdentifyRequest(
+        DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "moduleId", "metaData"
+    )
+
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
@@ -68,9 +73,9 @@ class LoginActivityTest {
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-//        preferencesManager.userId = userId // TODO : get userId from AppRequest
+        val request = IdentifyRequest(DEFAULT_PROJECT_ID, userId, "moduleId", "metaData")
 
-        val controller = createRoboLoginActivity().start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentFromRequest(request)).start().resume().visible()
         val activity = controller.get()
         val userIdInEditText = activity.loginEditTextUserId.text.toString()
         assertEquals(userIdInEditText, userId)
@@ -78,8 +83,7 @@ class LoginActivityTest {
 
     @Test
     fun loginSuccesses_shouldReturnSuccessResultCode() {
-
-        val controller = createRoboLoginActivity().start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
         val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
         whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), anyOrNull())).thenReturn(Completable.complete())
 
@@ -100,7 +104,7 @@ class LoginActivityTest {
     @Test
     fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
-        val controller = createRoboLoginActivity().start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
         val activity = controller.get()
 
         activity.loginButtonScanQr.performClick()
@@ -120,7 +124,7 @@ class LoginActivityTest {
         val app = ApplicationProvider.getApplicationContext() as TestApplication
         val pm = app.packageManager
 
-        val controller = createRoboLoginActivity()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest))
         val activity = controller.get()
 
         val spm = shadowOf(pm)
@@ -138,7 +142,7 @@ class LoginActivityTest {
 
     @Test
     fun invalidScannedText_shouldOpenErrorAlert() {
-        val controller = createRoboLoginActivity()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest))
         controller.start().resume().visible()
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"someProjectId\",\"projectSecretWrong\":\"someSecret\"}"))
@@ -148,7 +152,7 @@ class LoginActivityTest {
 
     @Test
     fun validScannedText_shouldHaveProjectIdAndSecretInEditTexts() {
-        val controller = createRoboLoginActivity().start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
         val act = controller.get()
         assertTrue(act.loginEditTextProjectId.text!!.isEmpty())
         assertTrue(act.loginEditTextProjectSecret.text!!.isEmpty())
@@ -164,7 +168,7 @@ class LoginActivityTest {
 
     @Test
     fun loginPressed_shouldLoginInOnlyWithValidCredentials() {
-        val controller = createRoboLoginActivity().start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
         val act = controller.get()
         act.loginEditTextUserId.setText("")
         act.loginEditTextProjectId.setText("")
@@ -173,50 +177,30 @@ class LoginActivityTest {
         act.loginButtonSignIn.performClick()
         assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
 
-        act.loginEditTextProjectSecret.setText("some_project_secret")
-        act.loginButtonSignIn.performClick()
-        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
-
-        act.loginEditTextProjectId.setText("some_project_id")
-        act.loginButtonSignIn.performClick()
-        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
-
-        act.viewPresenter = mock(LoginPresenter::class.java)
-
-        act.loginEditTextUserId.setText("some_user_id")
-        act.loginButtonSignIn.performClick()
-        Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .signIn(
-                "some_user_id",
-                "some_project_id",
-                "some_project_secret",
-                "")
-    }
-
-    @Test
-    fun passedLegacyApiKey_shouldLoginInAndStoreIt() {
-        val intent = Intent()
-        intent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, "some_legacy_api_key")
-        val controller = createRoboLoginActivity(intent).start().resume().visible()
-        val act = controller.get()
-        act.loginEditTextUserId.setText(DEFAULT_USER_ID)
-        act.loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
         act.loginEditTextProjectSecret.setText(DEFAULT_PROJECT_SECRET)
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
+        act.loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
+        act.loginButtonSignIn.performClick()
+        assertEquals(app.getString(R.string.login_missing_credentials), ShadowToast.getTextOfLatestToast())
+
         act.viewPresenter = mock(LoginPresenter::class.java)
 
+        act.loginEditTextUserId.setText(DEFAULT_USER_ID)
         act.loginButtonSignIn.performClick()
-
-        Mockito.verify(act.viewPresenter, Mockito.times(1))
-            .signIn(
-                DEFAULT_USER_ID,
+        verifyOnce(act.viewPresenter) {
+            signIn(DEFAULT_USER_ID,
                 DEFAULT_PROJECT_ID,
                 DEFAULT_PROJECT_SECRET,
-                "",
-                "some_legacy_api_key")
+                DEFAULT_PROJECT_ID)
+        }
     }
 
-    private fun createRoboLoginActivity() = createRoboLoginActivity(null)
-    private fun createRoboLoginActivity(intent: Intent?) =
+    private fun getIntentFromRequest(request: Request) = Intent(Request.action(request).toString())
+        .apply { putExtra(Request.BUNDLE_KEY, request) }
+
+    private fun createRoboLoginActivity(intent: Intent) =
         createActivity<LoginActivity>(intent)
 
     private fun injectHowToResolveScannerAppIntent(): ResolveInfo {
