@@ -111,7 +111,7 @@ class CheckLoginFromIntentActivityTest {
     @Test
     fun unknownCallingAppSource_shouldLogEvent() {
         buildActivity(CheckLoginFromIntentActivityWithInvalidCallingPackage::class.java).setup()
-        verifyExceptionWasThrownAlongWithNoSessionException(2)
+        verifyExceptionWasThrownAlongWithNoSessionAndNoRequestException(3)
     }
 
     @Test
@@ -120,10 +120,10 @@ class CheckLoginFromIntentActivityTest {
         pm.setInstallerPackageName("com.app.installed.from.playstore", "com.android.vending")
 
         buildActivity(CheckLoginFromIntentActivityWithValidCallingPackage::class.java).setup()
-        verifyExceptionWasThrownAlongWithNoSessionException(1)
+        verifyExceptionWasThrownAlongWithNoSessionAndNoRequestException(2)
     }
 
-    private fun verifyExceptionWasThrownAlongWithNoSessionException(times: Int) {
+    private fun verifyExceptionWasThrownAlongWithNoSessionAndNoRequestException(times: Int) {
         verifyExactly(times, crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
@@ -147,7 +147,7 @@ class CheckLoginFromIntentActivityTest {
     @Test
     fun invalidParams_shouldAlertActComeUp() {
 
-        val controller = createRoboCheckLoginFromIntentViewActivity(null).start()
+        val controller = createRoboCheckLoginFromIntentViewActivity(Intent()).start()
         val activity = controller.get() as CheckLoginFromIntentActivity
         controller.visible()
 
@@ -262,7 +262,7 @@ class CheckLoginFromIntentActivityTest {
         return activity
     }
 
-    private fun createRoboCheckLoginFromIntentViewActivity(intent: Intent?) =
+    private fun createRoboCheckLoginFromIntentViewActivity(intent: Intent) =
         createActivity<CheckLoginFromIntentActivity>(intent)
 
     private fun createACallingAppIntentWithLegacyApiKey(request: AppEnrollRequest,
