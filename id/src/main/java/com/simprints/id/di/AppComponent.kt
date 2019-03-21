@@ -20,6 +20,7 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
+import com.simprints.id.activities.orchestrator.OrchestratorPresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
@@ -76,4 +77,6 @@ interface AppComponent {
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(orchestratorPresenter: OrchestratorPresenter)
+
 }

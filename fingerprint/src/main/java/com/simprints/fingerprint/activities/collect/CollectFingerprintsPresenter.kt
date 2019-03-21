@@ -11,10 +11,10 @@ import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
-import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException

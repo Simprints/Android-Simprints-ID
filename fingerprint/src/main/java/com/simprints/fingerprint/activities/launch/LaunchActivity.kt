@@ -9,18 +9,18 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.LONG_CONSENT_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.fromFingerprintToDomainRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
-import com.simprints.fingerprint.moduleapi.AppAdapter.fromModuleApiToDomainRequest
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
@@ -44,8 +44,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
-        fingerprintRequest = fromModuleApiToDomainRequest(iFingerprintRequest)
+            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+        fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()

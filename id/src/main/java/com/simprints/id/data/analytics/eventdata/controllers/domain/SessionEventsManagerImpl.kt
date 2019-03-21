@@ -9,8 +9,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.matching.IdentificationResult
-import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
@@ -109,23 +107,23 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             insertOrUpdateSessionEvents(it)
         }
 
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: VerificationResult?) {
+    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?) {
         updateSessionInBackground { session ->
             session.addEvent(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
                 session.timeRelativeToStartTime(timeHelper.now()),
                 patientId,
-                match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
+                match))
         }
     }
 
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<IdentificationResult>, matchSize: Int) {
+    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int) {
         updateSessionInBackground { session ->
             session.addEvent(OneToManyMatchEvent(
                 session.timeRelativeToStartTime(startTimeIdentification),
                 session.timeRelativeToStartTime(timeHelper.now()),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchEntry(it.guidFound, it.confidence.toFloat()) }.toList().toTypedArray()))
+                matches))
         }
     }
 

@@ -1,6 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.domain.requests.EnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 
 class EnrolRequestEvent(val relativeStartTime: Long,
-                        val enrolRequest: EnrolRequest) : Event(EventType.ENROL_REQUEST)
+                        val enrolRequest: AppEnrolRequest) : Event(EventType.ENROL_REQUEST)

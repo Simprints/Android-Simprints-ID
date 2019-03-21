@@ -24,9 +24,9 @@ import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentif
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
-import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
@@ -60,7 +60,7 @@ class CollectFingerprintsActivity :
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
+            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
 
         configureRightToLeft()
 

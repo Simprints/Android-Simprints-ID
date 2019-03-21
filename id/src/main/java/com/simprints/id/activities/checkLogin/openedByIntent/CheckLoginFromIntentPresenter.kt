@@ -11,22 +11,15 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.requests.EnrolRequest
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
-import com.simprints.id.domain.responses.*
+import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
-import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainEnrolResponse
-import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainIdentifyResponse
-import com.simprints.id.moduleapi.FingerprintToDomainAdapter.fromFingerprintToDomainVerifyResponse
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintEnrolResponse
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintIdentifyResponse
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintVerifyResponse
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -73,7 +66,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         )
     }
 
-    private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
+    private fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
@@ -82,24 +75,24 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun buildRequestEvent(relativeStarTime: Long, request: Request): Event =
+    private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is EnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
-            is VerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
-            is IdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
+            is AppEnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
+            is AppVerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
+            is AppIdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
             else -> throw Throwable("unrecognised request") //StopShip
         }
 
 
-    private fun buildResponseEvent(relativeStarTime: Long, response: Response?): Event =
+    private fun buildResponseEvent(relativeStarTime: Long, response: AppResponse?): Event =
         if (response == null) {
             NoResponseEvent(relativeStarTime)
         } else {
             when (response) {
-                is EnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
-                is VerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
-                is IdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
-                is RefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
+                is AppEnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
+                is AppVerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
+                is AppIdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
+                is AppRefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
                 else -> throw Throwable("unrecognised request") //StopShip
             }
         }
@@ -156,7 +149,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
-        view.openLaunchActivity(appRequest)
+
+        view.openOrchestratorActivity(appRequest)
+
         initOrUpdateAnalyticsKeys()
     }
 
@@ -210,25 +205,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             }
         ))
     }
-
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, fingerprintResponse: IFingerprintResponse?) {
-        val domainResponse = fromFingerprintToDomainResponse(fingerprintResponse)
-
-        sessionEventsManager.updateSessionInBackground {
-            it.addEvent(buildResponseEvent(it.timeRelativeToStartTime(timeHelper.now()), domainResponse)) //STOPSHIP: Fix me
-            it.closeIfRequired(timeHelper)
-        }
-
-        view.setResultDataAndFinish(resultCode, domainResponse)
-    }
-
-    private fun fromFingerprintToDomainResponse(fingerprintResponse: IFingerprintResponse?): Response =
-        when (fingerprintResponse) {
-            is IFingerprintEnrolResponse -> fromFingerprintToDomainEnrolResponse(fingerprintResponse)
-            is IFingerprintVerifyResponse -> fromFingerprintToDomainVerifyResponse(fingerprintResponse)
-            is IFingerprintIdentifyResponse -> fromFingerprintToDomainIdentifyResponse(fingerprintResponse, currentSession)
-            else -> throw IllegalStateException("Invalid fingerprint request")
-        }
 
     @SuppressLint("CheckResult")
     private fun setSessionIdCrashlyticsKey() {

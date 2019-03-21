@@ -5,6 +5,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
+import com.simprints.fingerprint.data.domain.refusal.toAnswerEvent
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -61,7 +62,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
                 it.addEvent(RefusalEvent(
                         it.timeRelativeToStartTime(refusalStartTime),
                         it.timeRelativeToStartTime(timeHelper.now()),
-                        RefusalEvent.Answer.fromRefusalReason(refusalReason),
+                        refusalReason.toAnswerEvent(),
                         refusalText))
             }.subscribeBy(onError = {
                 crashReportManager.logExceptionOrThrowable(it)

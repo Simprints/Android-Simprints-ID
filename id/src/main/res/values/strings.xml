@@ -423,5 +423,6 @@
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
+    <string name="title_activity_orchestrator">Orchestrator</string>
 
 </resources>
