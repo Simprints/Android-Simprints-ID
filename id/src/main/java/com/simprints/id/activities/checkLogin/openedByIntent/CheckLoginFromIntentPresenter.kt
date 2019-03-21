@@ -11,6 +11,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.requests.EnrolRequest
 import com.simprints.id.domain.requests.IdentifyRequest
 import com.simprints.id.domain.requests.Request
@@ -46,27 +47,25 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     override fun setup() {
-        parseAppRequest()
         view.checkCallingAppIsFromKnownSource()
         sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
             try {
+                parseAppRequest()
                 extractSessionParametersOrThrow()
                 addCalloutAndConnectivityEventsInSession(appRequest)
                 setLastUser()
                 setSessionIdCrashlyticsKey()
-            } catch (exception: InvalidCalloutError) {
-                view.openAlertActivityForError(exception.alert)
+            } catch (exception: Throwable) { // STOPSHIP : catch custom exception and display some alert
+                crashReportManager.logExceptionOrThrowable(exception)
+                val alert = if (exception is InvalidCalloutError) exception.alert else Alert.UNEXPECTED_ERROR
+                view.openAlertActivityForError(alert)
                 setupFailed = true
             }
         }.subscribeBy(onError = { it.printStackTrace() })
     }
 
     private fun parseAppRequest() {
-        try {
             appRequest = view.parseRequest()
-        } catch (e: Throwable) { // STOPSHIP : catch custom exception and display some alert
-            crashReportManager.logExceptionOrThrowable(e)
-        }
     }
 
     private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
