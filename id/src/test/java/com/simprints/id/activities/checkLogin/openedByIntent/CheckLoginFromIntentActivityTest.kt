@@ -19,6 +19,8 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.domain.requests.RequestAction
+import com.simprints.id.domain.responses.EnrolResponse
+import com.simprints.id.domain.responses.Response
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -26,6 +28,7 @@ import com.simprints.id.testtools.state.RobolectricTestMocker.setUserLogInState
 import com.simprints.id.testtools.state.setupFakeKeyStore
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppRequest
+import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.verifyExactly
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -193,14 +196,15 @@ class CheckLoginFromIntentActivityTest {
         val intent = sActivity.nextStartedActivity
         assertActivityStarted(CheckLoginFromIntentActivity.launchActivityClassName, intent)
 
+        val returnIntent = Intent().putExtra(Response.BUNDLE_KEY, EnrolResponse("someGuid"))
         sActivity.receiveResult(
             intent,
             Activity.RESULT_OK,
-            Intent().putExtra("result", "some_result"))
+            returnIntent)
 
         assertTrue(activity.isFinishing)
         assertEquals(Activity.RESULT_OK, sActivity.resultCode)
-        assertEquals("some_result", sActivity.resultIntent.getStringExtra("result"))
+        assertNotNull(sActivity.resultIntent.getParcelableExtra(IClientApiResponse.BUNDLE_KEY))
     }
 
     @Test
