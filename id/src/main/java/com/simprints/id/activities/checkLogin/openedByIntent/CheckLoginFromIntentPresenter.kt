@@ -38,7 +38,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    private val appRequest = view.parseRequest()
+    private lateinit var appRequest: Request
 
     init {
         component.inject(this)
@@ -46,6 +46,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     override fun setup() {
+        parseAppRequest()
         view.checkCallingAppIsFromKnownSource()
         sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
             try {
@@ -58,6 +59,14 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 setupFailed = true
             }
         }.subscribeBy(onError = { it.printStackTrace() })
+    }
+
+    private fun parseAppRequest() {
+        try {
+            appRequest = view.parseRequest()
+        } catch (e: Throwable) { // STOPSHIP : catch custom exception and display some alert
+            crashReportManager.logExceptionOrThrowable(e)
+        }
     }
 
     private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
