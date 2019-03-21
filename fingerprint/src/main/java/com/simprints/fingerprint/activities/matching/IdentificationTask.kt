@@ -15,11 +15,10 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.matching.IdentificationResult
-import com.simprints.id.domain.matching.Tier
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
@@ -66,7 +65,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
                 MatchingResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score))
             }
 
-        sessionEventsManager.addOneToManyEventInBackground(matchStartTime, topCandidates.map { IdentificationResult(it.guid, it.confidence, Tier.valueOf(it.tier.name)) }, candidates.size)
+        sessionEventsManager.addOneToManyEventInBackground(matchStartTime,
+            topCandidates.map { MatchEntry(it.guid, it.confidence.toFloat()) }, candidates.size)
 
         val tier1Or2Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_1 || tier == MatchingTier.TIER_2 }
         val tier3Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_3 }

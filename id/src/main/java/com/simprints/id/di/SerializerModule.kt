@@ -3,6 +3,7 @@ package com.simprints.id.di
 import com.google.gson.Gson
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modal.Modal
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.*
 import dagger.Module
@@ -18,6 +19,7 @@ class SerializerModule {
     @Provides @Singleton @Named("BooleanSerializer") fun provideBooleanSerializer(): Serializer<Boolean> = BooleanSerializer()
     @Provides @Singleton @Named("FingerIdentifierSerializer") fun provideFingerIdentifierSerializer(): Serializer<FingerIdentifier> = EnumSerializer(FingerIdentifier::class.java)
     @Provides @Singleton @Named("GroupSerializer") fun provideGroupSerializer(): Serializer<GROUP> = EnumSerializer(GROUP::class.java)
+    @Provides @Singleton @Named("ModalSerializer") fun provideModalSerializer(): Serializer<Modal> = EnumSerializer(Modal::class.java)
     @Provides @Singleton @Named("PeopleDownSyncTriggerSerializer") fun providePeopleDownSyncTriggerSerializer(): Serializer<PeopleDownSyncTrigger> = EnumSerializer(PeopleDownSyncTrigger::class.java)
     @Provides @Singleton fun provideGson(): Gson = Gson()
 

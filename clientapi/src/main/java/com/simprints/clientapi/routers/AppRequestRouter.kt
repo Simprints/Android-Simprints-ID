@@ -30,7 +30,7 @@ object AppRequestRouter {
         is IdentifyRequest -> act.route(request, IDENTIFY, IDENTIFY_REQUEST_CODE)
 
         // Handle Error
-        else -> throw InvalidClientRequestException("Invalid Action Request")
+        else -> throw InvalidClientRequestException("Invalid Action AppRequest")
     }
 
     fun routeSimprintsConfirmation(act: Activity,
@@ -41,7 +41,7 @@ object AppRequestRouter {
                 act.startService(request.convertToAppRequest().toIntent(SELECT_GUID_INTENT))
 
             // Handle Error
-            else -> throw InvalidClientRequestException("Invalid Confirmation Request")
+            else -> throw InvalidClientRequestException("Invalid Confirmation AppRequest")
         }
     }
 

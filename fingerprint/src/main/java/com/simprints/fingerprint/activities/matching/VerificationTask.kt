@@ -7,7 +7,6 @@ import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.LibMatcher
@@ -15,10 +14,9 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.matching.Tier
-import com.simprints.id.domain.matching.VerificationResult
 import io.reactivex.Single
 import java.util.*
 
@@ -51,7 +49,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
         val candidate = candidates.first()
         val score = scores.first()
 
-        val verificationResult = VerificationResult(candidate.patientId, score.toInt(), Tier.computeTier(score))
+        val verificationResult = MatchEntry(candidate.patientId, score)
 
         sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,

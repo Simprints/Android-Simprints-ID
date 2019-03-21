@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.matching
 
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single

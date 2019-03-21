@@ -15,21 +15,21 @@ import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.data.domain.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
-import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiEnrolResponse
-import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiIdentifyResponse
-import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiRefusalFormResponse
-import com.simprints.fingerprint.moduleapi.AppAdapter.fromDomainToModuleApiVerifyResponse
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.fingerprint.tools.utils.TimeHelper
@@ -325,14 +325,14 @@ class LaunchPresenter(component: FingerprintsComponent,
     private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
         val fingerprintResult = FingerprintRefusalFormResponse(possibleRefusalForm.reason.toString(), possibleRefusalForm.optionalText)
         resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
-            fromDomainToModuleApiRefusalFormResponse(fingerprintResult))
+            fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
     }
 
     private fun prepareVerifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActVerifyResult?) {
         possibleMatchResult?.let {
             val fingerprintResult = FingerprintVerifyResponse(it.guid, it.confidence, it.tier)
             resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToModuleApiVerifyResponse(fingerprintResult))
+                fromDomainToFingerprintVerifyResponse(fingerprintResult))
         }
     }
 
@@ -340,14 +340,14 @@ class LaunchPresenter(component: FingerprintsComponent,
         possibleMatchResult?.let {
             val fingerprintResult = FingerprintIdentifyResponse(it.identifications)
             resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToModuleApiIdentifyResponse(fingerprintResult))
+                fromDomainToFingerprintIdentifyResponse(fingerprintResult))
         }
     }
 
     private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectResult: CollectResult?) {
         possibleCollectResult?.let {
             val fingerprintResult = FingerprintEnrolResponse(it.probe.patientId)
-            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToModuleApiEnrolResponse(fingerprintResult))
+            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintEnrolResponse(fingerprintResult))
         }
     }
 

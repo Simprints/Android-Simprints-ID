@@ -1,7 +1,6 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -12,6 +11,7 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimi
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modal.Modal
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
@@ -21,6 +21,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<GROUP>,
+                                          modalSerializer: Serializer<Modal>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
@@ -102,6 +103,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
+
+        val MODAL_DEFAULT = Modal.FINGER
+        const val MODAL_KEY = "Modal"
     }
 
     // Should the UI automatically slide forward?
@@ -179,6 +183,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Whether to show the Simprints logo at the top of the launch activity
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
+
+    override var modal: Modal
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODAL_KEY, MODAL_DEFAULT, modalSerializer)
+
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)

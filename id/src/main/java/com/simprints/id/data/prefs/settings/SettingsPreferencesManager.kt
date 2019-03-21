@@ -3,6 +3,7 @@ package com.simprints.id.data.prefs.settings
 import com.google.gson.JsonSyntaxException
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modal.Modal
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 
@@ -32,6 +33,7 @@ interface SettingsPreferencesManager {
 
     var logoExists: Boolean
 
+    var modal: Modal
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 
     fun getRemoteConfigStringPreference(key: String): String

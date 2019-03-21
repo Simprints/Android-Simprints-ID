@@ -3,9 +3,9 @@ package com.simprints.fingerprint.data.domain.consent
 import android.content.Context
 import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 
 data class ParentalConsent(
     @SerializedName("consent_parent_enrol_only") var consentParentEnrolOnly: Boolean = false,

@@ -28,11 +28,11 @@ class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: Str
 
     override fun handleIdentifyResponse(identify: IdentifyResponse) =
         view.returnIdentification(ArrayList(identify.identifications.map {
-            Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
+            Identification(it.guidFound, it.confidence, Tier.valueOf(it.tier.name))
         }), identify.sessionId)
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.confidence, Tier.valueOf(verify.tier.name), verify.guid
+        verify.matchResult.confidence, Tier.valueOf(verify.matchResult.tier.name), verify.matchResult.tier.name
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
