@@ -1,10 +1,8 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.moduleapi.fingerprint.responses.*
 
@@ -15,6 +13,7 @@ object FingerprintToDomainResponse {
             is IFingerprintEnrolResponse -> fromFingerprintToDomainEnrolResponse(fingerprintResponse)
             is IFingerprintVerifyResponse -> fromFingerprintToDomainVerifyResponse(fingerprintResponse)
             is IFingerprintIdentifyResponse -> fromFingerprintToDomainIdentifyResponse(fingerprintResponse)
+            is IFingerprintRefusalFormResponse -> fromFingerprintToDomainRefusalResponse(fingerprintResponse)
             else -> throw IllegalArgumentException("Invalid fingerprint request")
         }
 
@@ -35,6 +34,10 @@ object FingerprintToDomainResponse {
 
     private fun fromFingerprintToDomainMatchingResult(matchingResult: IMatchingResult): FingerprintMatchingResult =
         FingerprintMatchingResult(matchingResult.guid, matchingResult.confidence, fromFingerprintToDomainTier(matchingResult.tier))
+
+    private fun fromFingerprintToDomainRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse =
+        FingerprintRefusalFormResponse(FingerprintRefusalFormReason.valueOf(fingerprintResponse.reason), fingerprintResponse.extra)
+
 
     private fun fromFingerprintToDomainTier(tier: IFingerprintResponseTier): FingerprintTier =
         when (tier) {

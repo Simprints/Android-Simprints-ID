@@ -1,7 +1,6 @@
-package com.simprints.face.data.moduleapi.face.responses
+package com.simprints.id.domain.moduleapi.face.responses
 
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchingResult
-import com.simprints.id.domain.moduleapi.face.responses.FaceResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchingResult
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

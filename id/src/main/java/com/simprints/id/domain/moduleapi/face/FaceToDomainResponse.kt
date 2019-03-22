@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.face
 
-import com.simprints.face.data.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchingResult
+import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchingResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse

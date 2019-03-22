@@ -32,7 +32,7 @@ class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: Str
         }), identify.sessionId)
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.confidence, Tier.valueOf(verify.matchResult.tier.name), verify.matchResult.tier.name
+        verify.matchResult.confidence, Tier.valueOf(verify.matchResult.tier.name), verify.matchResult.guidFound
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =

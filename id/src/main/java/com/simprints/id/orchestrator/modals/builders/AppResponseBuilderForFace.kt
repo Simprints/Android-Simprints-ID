@@ -1,7 +1,7 @@
 package com.simprints.id.orchestrator.modals.builders
 
-import com.simprints.face.data.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.face.data.moduleapi.face.responses.entities.toAppMatchResult
+import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.toAppMatchResult
 import com.simprints.id.domain.modal.ModalResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
