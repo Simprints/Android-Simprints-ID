@@ -55,7 +55,7 @@ class DbPersonTest {
     @Test
     fun buildRlPersonFromACompleteFbPerson() {
         val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            emptyList(), Date(0), Date(1))
+            emptyList(), Date(0), Date(1), false)
 
         val dbPerson = domainPerson.toRealmPerson()
 

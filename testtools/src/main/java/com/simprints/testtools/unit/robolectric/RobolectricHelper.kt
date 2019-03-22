@@ -43,7 +43,7 @@ fun assertActivityStarted(clazzName: String, shadowActivity: ShadowActivity) {
 }
 
 fun assertActivityStarted(clazzName: String, intent: Intent) {
-    assertEquals(intent.component?.className, clazzName)
+    assertEquals(clazzName, intent.component?.className)
 }
 
 fun <T : Activity> ActivityController<T>.showOnScreen(): ActivityController<T> = this.start().resume().visible()
