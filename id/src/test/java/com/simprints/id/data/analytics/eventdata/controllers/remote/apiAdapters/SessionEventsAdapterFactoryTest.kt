@@ -13,9 +13,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.moduleapi.fingerprint.responses.Tier
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.VerifyResponse
+import com.simprints.id.domain.matching.Tier
+import com.simprints.id.domain.requests.VerifyRequest
+import com.simprints.id.domain.responses.VerifyResponse
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -80,7 +80,7 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_calloutEventApiModel() {
         val event = VerifyRequestEvent(10,
-            AppVerifyRequest("projectId", "userId", "moduleId", "metaData", "verifyGuid"))
+            VerifyRequest("projectId", "userId", "moduleId", "metaData", "verifyGuid"))
         val json = gsonWithAdapters.toJsonTree(event).asJsonObject
 
 //        validateCalloutEventApiModel(json) TODO
