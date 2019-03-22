@@ -9,25 +9,29 @@ import com.simprints.id.domain.moduleapi.fingerprint.DomainToFingerprintRequest.
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory.buildFingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintToDomainResponse.fromFingerprintToDomainResponse
 import com.simprints.id.orchestrator.ModalStepRequest
+import com.simprints.id.orchestrator.modals.ModalFlowIntentRequestCodes.REQUEST_CODE_FINGERPRINT
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
-class ModalFlowFingerprintImpl(private val packageName: String,
-                               private val appRequest: AppRequest,
-                               private val prefs: PreferencesManager) : ModalFlow {
+class FingerModalFlowImpl(private val packageName: String,
+                          private val appRequest: AppRequest,
+                          private val prefs: PreferencesManager) : ModalFlow {
 
     companion object {
         const val launchFingerprintClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
-        const val REQUEST_CODE_FINGERPRINT = 1
     }
 
-    private lateinit var emitter: ObservableEmitter<ModalStepRequest>
-    override var flow: Observable<ModalStepRequest> = Observable.create { emitter = it }
+    private lateinit var responsesEmitter: ObservableEmitter<ModalResponse>
+    override var modalResponses: Observable<ModalResponse> = Observable.create {
+        responsesEmitter = it
+    }
 
-    override fun startFlow() {
-        emitter.onNext(getNextIntent())
+    private lateinit var nextIntentEmitter: ObservableEmitter<ModalStepRequest>
+    override var nextIntent: Observable<ModalStepRequest> = Observable.create {
+        nextIntentEmitter = it
+        nextIntentEmitter.onNext(getNextIntent())
     }
 
     private fun getNextIntent(): ModalStepRequest {
@@ -37,16 +41,19 @@ class ModalFlowFingerprintImpl(private val packageName: String,
     }
 
     @Throws(IllegalArgumentException::class)
-    override fun handleModalResponse(requestCode: Int, resultCode: Int, data: Intent?) {
-        try {
+    override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?) {
+        return try {
             val potentialModalResponse = extractModalResponse(data)
             require(resultCode == Activity.RESULT_OK)
             require(potentialModalResponse != null)
 
-            emitter.onComplete()
+            responsesEmitter.onNext(potentialModalResponse)
+            responsesEmitter.onComplete()
+            nextIntentEmitter.onComplete()
         } catch (t: Throwable) {
             t.printStackTrace()
-            emitter.onError(t)
+            responsesEmitter.onError(t)
+            nextIntentEmitter.onError(t)
         }
     }
 

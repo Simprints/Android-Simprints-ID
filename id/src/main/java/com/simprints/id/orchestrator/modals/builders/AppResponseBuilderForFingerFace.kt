@@ -6,18 +6,18 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
+import com.simprints.id.domain.moduleapi.app.responses.*
+import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 
-class AppResponseForFingerFaceModalBuilder : AppResponseBuilderForModal {
+class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
                                modalResponses: List<ModalResponse>,
@@ -25,6 +25,10 @@ class AppResponseForFingerFaceModalBuilder : AppResponseBuilderForModal {
 
         val fingerResponse = modalResponses.first()
         val faceResponse = modalResponses[1]
+
+        if (fingerResponse is FingerprintRefusalFormResponse)
+            return buildAppRefusalFormResponse(fingerResponse)
+
         return when (appRequest) {
             is AppEnrolRequest -> buildAppEnrolResponse(fingerResponse as FingerprintEnrolResponse, faceResponse as FaceEnrolResponse)
             is AppIdentifyRequest -> {
@@ -36,6 +40,14 @@ class AppResponseForFingerFaceModalBuilder : AppResponseBuilderForModal {
         }
     }
 
+    private fun buildAppRefusalFormResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse): AppRefusalFormResponse {
+        val fingerprintRefusalFormAnswer = fingerprintRefusalFormResponse.answer
+        return AppRefusalFormResponse(RefusalFormAnswer(
+            fingerprintRefusalFormAnswer.reason?.toAppRefusalFormReason(),
+            fingerprintRefusalFormAnswer.optionalText))
+    }
+
+    //TODO: Ignoring face response for now.
     private fun buildAppIdentifyResponse(fingerprintResponse: FingerprintIdentifyResponse,
                                          faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse =
         AppIdentifyResponse(fingerprintResponse.identifications.map { it.toAppMatchResult() }, sessionId)

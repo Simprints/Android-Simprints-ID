@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.modals.face
+package com.simprints.id.orchestrator.modals
 
 import android.app.Activity
 import android.content.Intent
@@ -8,7 +8,6 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceReques
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
 import com.simprints.id.orchestrator.ModalStepRequest
-import com.simprints.id.orchestrator.modals.ModalFlow
 import com.simprints.id.orchestrator.modals.ModalFlowIntentRequestCodes.REQUEST_CODE_FACE
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
@@ -22,10 +21,15 @@ class FaceModalFlowImpl(private val packageName: String,
         const val launchFaceClassName = "com.simprints.face.activities.FaceCaptureActivity"
     }
 
-    private lateinit var emitter: ObservableEmitter<ModalStepRequest>
-    override var flow: Observable<ModalStepRequest> = Observable.create {
-        emitter = it
-        emitter.onNext(getNextIntent())
+    private lateinit var responsesEmitter: ObservableEmitter<ModalResponse>
+    override var modalResponses: Observable<ModalResponse> = Observable.create {
+        responsesEmitter = it
+    }
+
+    private lateinit var nextIntentEmitter: ObservableEmitter<ModalStepRequest>
+    override var nextIntent: Observable<ModalStepRequest> = Observable.create {
+        nextIntentEmitter = it
+        nextIntentEmitter.onNext(getNextIntent())
     }
 
     private fun getNextIntent(): ModalStepRequest {
@@ -35,20 +39,21 @@ class FaceModalFlowImpl(private val packageName: String,
     }
 
     @Throws(IllegalArgumentException::class)
-    override fun handleModalResponse(requestCode: Int, resultCode: Int, data: Intent?): Observable<ModalResponse> =
+    override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             val potentialModalResponse = extractModalResponse(data)
             require(resultCode == Activity.RESULT_OK)
             require(potentialModalResponse != null)
 
-            emitter.onComplete()
-            Observable.just(potentialModalResponse)
+            responsesEmitter.onNext(potentialModalResponse)
+            responsesEmitter.onComplete()
+            nextIntentEmitter.onComplete()
         } catch (t: Throwable) {
             t.printStackTrace()
-            emitter.onError(t)
-            Observable.error(Throwable("Impossible to create ModalResponse"))
+            responsesEmitter.onError(t)
+            nextIntentEmitter.onError(t)
         }
-
+    }
 
     private fun extractModalResponse(data: Intent?): ModalResponse? {
         val potentialFaceResponse = data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
