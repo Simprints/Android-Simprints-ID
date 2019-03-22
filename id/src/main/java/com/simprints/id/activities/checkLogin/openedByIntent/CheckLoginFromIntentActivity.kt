@@ -11,11 +11,9 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory.buildFingerprintRequest
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.*
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -75,8 +73,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun openOrchestratorActivity(appRequest: AppRequest) {
 
-        val intent = Intent(this, OrchestratorActivity::class.java)
-            .also { it.putExtra(IFingerprintRequest.BUNDLE_KEY, buildFingerprintRequest(appRequest, preferencesManager)) }
+        val intent = Intent(this, OrchestratorActivity::class.java).apply {
+            putExtra(AppRequest.BUNDLE_KEY, appRequest)
+            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+        }
         startActivity(intent)
         finish()
     }

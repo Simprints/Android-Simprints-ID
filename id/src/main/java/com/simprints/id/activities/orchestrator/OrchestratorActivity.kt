@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.moduleapi.app.DomainToAppResponse.fromDomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -42,7 +43,7 @@ class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
     }
 
     override fun setResultAndFinish(response: AppResponse) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, response) })
+        setResult(Activity.RESULT_OK, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, fromDomainToAppResponse(response)) })
         finishOrchestratorAct()
     }
 

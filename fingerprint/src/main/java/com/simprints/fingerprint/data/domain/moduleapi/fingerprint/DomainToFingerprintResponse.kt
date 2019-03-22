@@ -3,14 +3,22 @@ package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.*
 import kotlinx.android.parcel.Parcelize
 
 object DomainToFingerprintResponse {
+
+    fun fromDomainToFingerprintResponse(fingerprintResponse: FingerprintResponse): IFingerprintResponse =
+        when (fingerprintResponse) {
+            is FingerprintEnrolResponse ->
+                fromDomainToFingerprintEnrolResponse(fingerprintResponse)
+            is FingerprintVerifyResponse ->
+                fromDomainToFingerprintVerifyResponse(fingerprintResponse)
+            is FingerprintIdentifyResponse ->
+                fromDomainToFingerprintIdentifyResponse(fingerprintResponse)
+            else -> throw IllegalArgumentException("Invalid Fingerprint Response") //StopShip
+        }
 
     fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
 

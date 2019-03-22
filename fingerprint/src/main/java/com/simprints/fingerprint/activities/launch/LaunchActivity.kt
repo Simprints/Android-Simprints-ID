@@ -15,7 +15,7 @@ import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Co
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.fromFingerprintToDomainRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert

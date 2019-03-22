@@ -1,4 +1,4 @@
-package com.simprints.face.data.moduleapi.face.responses.entities
+package com.simprints.id.domain.moduleapi.face.responses.entities
 
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 
