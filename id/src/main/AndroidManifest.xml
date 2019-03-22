@@ -118,9 +118,6 @@
         </service>
 
         <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />
-        <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />
         <meta-data

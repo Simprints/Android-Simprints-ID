@@ -11,10 +11,9 @@
     </dist:module>
 
     <application tools:ignore="GoogleAppIndexingWarning">
-
-    <activity
-        android:name="com.simprints.face.activitiies.FaceCaptureActivity"
-        android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+        <activity
+            android:name="com.simprints.face.activities.FaceCaptureActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
     </application>
 
 </manifest>

@@ -246,7 +246,6 @@ open class AppModule(val app: Application) {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    @Singleton
     open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager, prefs: PreferencesManager): OrchestratorManager =
         OrchestratorManagerImpl(settingsPreferencesManager.modal, prefs)
 }

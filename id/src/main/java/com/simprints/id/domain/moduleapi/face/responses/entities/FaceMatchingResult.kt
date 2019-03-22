@@ -2,6 +2,8 @@ package com.simprints.face.data.moduleapi.face.responses.entities
 
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceTier
+import com.simprints.id.domain.moduleapi.face.responses.entities.toAppTier
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

@@ -68,12 +68,13 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun routeResponse(response: IAppResponse) = when (response) {
-        is IAppEnrolResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
-        is IAppIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
-        is IAppVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
-        is IAppRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
-        else -> presenter.handleResponseError()
-    }
+    private fun routeResponse(response: IAppResponse) =
+        when (response) {
+            is IAppEnrolResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
+            is IAppIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
+            is IAppVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
+            is IAppRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
+            else -> presenter.handleResponseError()
+        }
 
 }
