@@ -128,23 +128,6 @@ class CheckLoginFromIntentActivityTest {
     }
 
     @Test
-    fun invalidModuleIdInParams_shouldAlertActComeUp() {
-
-        val intent = AppEnrollRequest(
-            DEFAULT_PROJECT_ID,
-            DEFAULT_USER_ID,
-            "Invalid module ID with pipes | ",
-            "metdaData"
-        ).toIntent()
-
-        val controller = createRoboCheckLoginFromIntentViewActivity(intent).start()
-        val activity = controller.get() as CheckLoginFromIntentActivity
-        controller.visible()
-
-        assertActivityStarted(AlertActivity::class.java, activity)
-    }
-
-    @Test
     fun invalidParams_shouldAlertActComeUp() {
 
         val controller = createRoboCheckLoginFromIntentViewActivity(Intent()).start()
