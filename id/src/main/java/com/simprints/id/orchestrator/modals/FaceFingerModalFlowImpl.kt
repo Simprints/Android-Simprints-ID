@@ -9,8 +9,8 @@ class FaceFingerModalFlowImpl(private val fingerModalFlow: ModalFlow,
                               private val faceModalFlow: ModalFlow) : ModalFlow {
 
 
-    override var modalResponses: Observable<ModalResponse> = Observable.concat(fingerModalFlow.modalResponses, faceModalFlow.modalResponses)
-    override var nextIntent: Observable<ModalStepRequest> = Observable.concat(fingerModalFlow.nextIntent, faceModalFlow.nextIntent)
+    override var modalResponses: Observable<ModalResponse> = Observable.concat(faceModalFlow.modalResponses, fingerModalFlow.modalResponses)
+    override var nextIntent: Observable<ModalStepRequest> = Observable.concat(faceModalFlow.nextIntent, fingerModalFlow.nextIntent)
 
     @Throws(IllegalArgumentException::class)
     override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?) {

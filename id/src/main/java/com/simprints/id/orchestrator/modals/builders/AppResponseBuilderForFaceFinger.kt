@@ -1,6 +1,5 @@
 package com.simprints.id.orchestrator.modals.builders
 
-import com.simprints.face.data.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.modal.ModalResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
@@ -9,6 +8,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
@@ -41,10 +41,9 @@ class AppResponseBuilderForFaceFinger : AppResponseBuilderForModal {
     }
 
     private fun buildAppRefusalFormResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse): AppRefusalFormResponse {
-        val fingerprintRefusalFormAnswer = fingerprintRefusalFormResponse.answer
         return AppRefusalFormResponse(RefusalFormAnswer(
-            fingerprintRefusalFormAnswer.reason?.toAppRefusalFormReason(),
-            fingerprintRefusalFormAnswer.optionalText))
+            fingerprintRefusalFormResponse.reason?.toAppRefusalFormReason(),
+            fingerprintRefusalFormResponse.optionalText))
     }
 
     //TODO: Ignoring face response for now.

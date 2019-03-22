@@ -36,10 +36,9 @@ class AppResponseBuilderForFinger : AppResponseBuilderForModal {
     }
 
     private fun buildAppRefusalFormResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse): AppRefusalFormResponse {
-        val fingerprintRefusalFormAnswer = fingerprintRefusalFormResponse.answer
         return AppRefusalFormResponse(RefusalFormAnswer(
-            fingerprintRefusalFormAnswer.reason?.toAppRefusalFormReason(),
-            fingerprintRefusalFormAnswer.optionalText))
+            fingerprintRefusalFormResponse.reason?.toAppRefusalFormReason(),
+            fingerprintRefusalFormResponse.optionalText))
     }
 
     //TODO: Ignoring face response for now.
