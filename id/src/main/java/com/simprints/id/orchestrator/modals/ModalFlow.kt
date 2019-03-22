@@ -1,15 +1,13 @@
-package com.simprints.id.orchestrator
+package com.simprints.id.orchestrator.modals
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.orchestrator.ModalStepRequest
+import io.reactivex.Observable
 
 interface ModalFlow {
 
-    var results: MutableList<ModalResponse>
-
-    fun getIntent(): ModalStepRequest
-
-    @Throws(IllegalArgumentException::class)
-    fun handleModalResultAndGetPotentialFinalAppResponse(requestCode: Int, resultCode: Int, data: Intent?): AppResponse?
+    var nextIntent: Observable<ModalStepRequest>
+    var modalResponses: Observable<ModalResponse>
+    fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?)
 }

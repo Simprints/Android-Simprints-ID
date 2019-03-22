@@ -14,7 +14,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 
-class AppResponseForFaceModal : AppResponseBuilderForModal {
+class AppResponseBuilderForFace : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
                                modalResponses: List<ModalResponse>,
