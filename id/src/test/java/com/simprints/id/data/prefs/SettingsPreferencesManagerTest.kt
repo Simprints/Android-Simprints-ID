@@ -43,16 +43,16 @@ class SettingsPreferencesManagerTest {
 
     @Test
     fun fetchingRemoteConfigPrimitive_worksAndDoesNotGetOverridden() {
-        val originalValue = settingsPreferencesManager.parentalConsentExists
-        Assert.assertEquals(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_DEFAULT, originalValue)
+        val originalValue = settingsPreferencesManager.logoExists
+        Assert.assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
 
-        settingsPreferencesManager.parentalConsentExists = !originalValue
+        settingsPreferencesManager.logoExists != originalValue
 
-        val newValue = settingsPreferencesManager.parentalConsentExists
+        val newValue = settingsPreferencesManager.logoExists
 
         Assert.assertEquals(originalValue, newValue)
 
-        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY) }
+        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.LOGO_EXISTS_KEY) }
     }
 
     @Test

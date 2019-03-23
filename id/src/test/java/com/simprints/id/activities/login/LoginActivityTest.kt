@@ -8,11 +8,11 @@ import android.content.pm.ResolveInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
+import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -59,10 +59,6 @@ class LoginActivityTest {
             crashReportManagerRule = MockRule)
     }
 
-    private val defaultRequest = IdentifyRequest(
-        DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "moduleId", "metaData"
-    )
-
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
@@ -73,9 +69,9 @@ class LoginActivityTest {
     @Test
     fun shouldUserIdPreFilled() {
         val userId = "some_user_id"
-        val request = IdentifyRequest(DEFAULT_PROJECT_ID, userId, "moduleId", "metaData")
+        val request = AppIdentifyRequest(DEFAULT_PROJECT_ID, userId, "moduleId", "metaData")
 
-        val controller = createRoboLoginActivity(getIntentFromRequest(request)).start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val activity = controller.get()
         val userIdInEditText = activity.loginEditTextUserId.text.toString()
         assertEquals(userIdInEditText, userId)
@@ -83,7 +79,7 @@ class LoginActivityTest {
 
     @Test
     fun loginSuccesses_shouldReturnSuccessResultCode() {
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
         whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), anyOrNull())).thenReturn(Completable.complete())
 
@@ -104,7 +100,7 @@ class LoginActivityTest {
     @Test
     fun qrScanPressedAndScannerAppNotAvailable_shouldOpenPlayStore() {
 
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val activity = controller.get()
 
         activity.loginButtonScanQr.performClick()
@@ -124,7 +120,7 @@ class LoginActivityTest {
         val app = ApplicationProvider.getApplicationContext() as TestApplication
         val pm = app.packageManager
 
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest))
+        val controller = createRoboLoginActivity(getIntentForLoginAct())
         val activity = controller.get()
 
         val spm = shadowOf(pm)
@@ -142,7 +138,7 @@ class LoginActivityTest {
 
     @Test
     fun invalidScannedText_shouldOpenErrorAlert() {
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest))
+        val controller = createRoboLoginActivity(getIntentForLoginAct())
         controller.start().resume().visible()
         val act = controller.get()
         act.handleScannerAppResult(Activity.RESULT_OK, Intent().putExtra("SCAN_RESULT", "{\"projectId\":\"someProjectId\",\"projectSecretWrong\":\"someSecret\"}"))
@@ -152,7 +148,7 @@ class LoginActivityTest {
 
     @Test
     fun validScannedText_shouldHaveProjectIdAndSecretInEditTexts() {
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val act = controller.get()
         assertTrue(act.loginEditTextProjectId.text!!.isEmpty())
         assertTrue(act.loginEditTextProjectSecret.text!!.isEmpty())
@@ -168,7 +164,7 @@ class LoginActivityTest {
 
     @Test
     fun loginPressed_shouldLoginInOnlyWithValidCredentials() {
-        val controller = createRoboLoginActivity(getIntentFromRequest(defaultRequest)).start().resume().visible()
+        val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val act = controller.get()
         act.loginEditTextUserId.setText("")
         act.loginEditTextProjectId.setText("")
@@ -197,8 +193,8 @@ class LoginActivityTest {
         }
     }
 
-    private fun getIntentFromRequest(request: Request) = Intent(Request.action(request).toString())
-        .apply { putExtra(Request.BUNDLE_KEY, request) }
+    private fun getIntentForLoginAct() = Intent()
+        .apply { putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID)) }
 
     private fun createRoboLoginActivity(intent: Intent) =
         createActivity<LoginActivity>(intent)

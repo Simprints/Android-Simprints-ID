@@ -4,6 +4,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.entities.MatchResult
+import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
+import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
@@ -12,7 +15,6 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.moduleapi.app.responses.IAppResponseTier
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
@@ -78,10 +80,8 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleIdentification_ShouldReturnValidIdentification() {
-        val id1 = IdentifyResponse
-            .Identification(UUID.randomUUID().toString(), 100, IAppResponseTier.TIER_1)
-        val id2 = IdentifyResponse
-            .Identification(UUID.randomUUID().toString(), 15, IAppResponseTier.TIER_5)
+        val id1 = MatchResult(UUID.randomUUID().toString(), 100, TIER_1)
+        val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
@@ -90,22 +90,22 @@ class LibSimprintsPresenterTest {
         verifyOnce(view) {
             returnIdentification(
                 ArrayList(idList.map {
-                    Identification(it.guid, it.confidence, Tier.valueOf(it.tier.name))
+                    Identification(it.guidFound, it.confidence, Tier.valueOf(it.tier.name))
                 }), sessionId)
         }
     }
 
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
-        val verification = VerifyResponse(UUID.randomUUID().toString(), 100, IAppResponseTier.TIER_1)
+        val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
-                verification.confidence,
-                Tier.valueOf(verification.tier.name),
-                verification.guid)
+                verification.matchResult.confidence,
+                Tier.valueOf(verification.matchResult.tier.name),
+                verification.matchResult.guidFound)
         }
     }
 

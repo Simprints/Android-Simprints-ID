@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
+import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -67,7 +68,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     override fun openLoginActivity(appRequest: AppRequest) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(AppRequest.BUNDLE_KEY, appRequest)
+        loginIntent.putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(appRequest.projectId, appRequest.userId))
         startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
     }
 
