@@ -7,6 +7,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
+import org.junit.Assert.fail
 
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo(EventType.ALERT_SCREEN.toString())
@@ -34,6 +35,16 @@ fun validateAuthenticationEventApiModel(json: JsonObject) {
     }
     assertThat(json.get("result").asString).isIn(AuthenticationEvent.Result.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(5)
+}
+
+fun validateCallbackEventApiModel(json: JsonObject) {
+    //TODO()
+    fail()
+}
+
+fun validateCalloutEventApiModel(json: JsonObject){
+    //TODO()
+    fail()
 }
 
 fun validateAuthorizationEventApiModel(json: JsonObject) {
@@ -222,7 +233,7 @@ fun validateDatabaseInfoApiModel(json: JsonObject) {
 fun validateDeviceApiModel(json: JsonObject) {
     assertThat(json.get("androidSdkVersion").asString).isNotEmpty()
     assertThat(json.get("deviceModel").asString).isNotEmpty()
-    assertThat(json.get("deviceUniqueId").asString).isNotEmpty()
+    assertThat(json.get("deviceId").asString).isNotEmpty()
     assertThat(json.size()).isEqualTo(3)
 }
 

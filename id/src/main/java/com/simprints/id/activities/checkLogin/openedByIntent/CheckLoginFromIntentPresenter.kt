@@ -16,7 +16,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
@@ -89,20 +88,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             is AppVerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
             is AppIdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
             else -> throw Throwable("unrecognised request") //StopShip
-        }
-
-
-    private fun buildResponseEvent(relativeStarTime: Long, response: AppResponse?): Event =
-        if (response == null) {
-            NoResponseEvent(relativeStarTime)
-        } else {
-            when (response) {
-                is AppEnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
-                is AppVerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
-                is AppIdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
-                is AppRefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
-                else -> throw Throwable("unrecognised request") //StopShip
-            }
         }
 
     private fun setLastUser() {

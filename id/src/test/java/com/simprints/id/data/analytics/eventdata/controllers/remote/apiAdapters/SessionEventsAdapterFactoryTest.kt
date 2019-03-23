@@ -12,10 +12,16 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseI
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.remote.events.*
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDatabaseInfo
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDevice
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocation
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.matching.Tier
-import com.simprints.id.domain.requests.VerifyRequest
-import com.simprints.id.domain.responses.VerifyResponse
+import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -33,14 +39,16 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_alertScreenEventApiModel() {
         val event = AlertScreenEvent(0, Alert.NOT_PAIRED)
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiAlertScreenEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateAlertScreenEventApiModel(json)
     }
 
     @Test
     fun validate_artificialTerminationEventApiModel() {
         val event = ArtificialTerminationEvent(0, ArtificialTerminationEvent.Reason.NEW_SESSION)
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiArtificialTerminationEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
         validateArtificialTerminationEventApiModel(json)
     }
@@ -52,7 +60,8 @@ class SessionEventsAdapterFactoryTest {
             0,
             AuthenticationEvent.UserInfo("projectId", "userId"),
             AuthenticationEvent.Result.AUTHENTICATED)
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiAuthenticationEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
         validateAuthenticationEventApiModel(json)
     }
@@ -63,7 +72,8 @@ class SessionEventsAdapterFactoryTest {
             10,
             AuthorizationEvent.Result.AUTHORIZED,
             AuthorizationEvent.UserInfo("projectId", "userId"))
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiAuthorizationEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
         validateAuthorizationEventApiModel(json)
     }
@@ -71,19 +81,21 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_callbackEventApiModel() {
         val event = VerifyResponseEvent(10,
-            VerifyResponse("guid", 75, Tier.TIER_1))
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+            AppVerifyResponse(MatchResult("guid", 75, Tier.TIER_1)))
+        val apiEvent = ApiCallbackEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
-//        validateCallbackEventApiModel(json) TODO
+
+        validateCallbackEventApiModel(json)
     }
 
     @Test
     fun validate_calloutEventApiModel() {
-        val event = VerifyRequestEvent(10,
-            VerifyRequest("projectId", "userId", "moduleId", "metaData", "verifyGuid"))
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val event = VerifyRequestEvent(10, AppVerifyRequest("projectId", "userId", "moduleId", "metaData", "verifyGuid"))
+        val apiEvent = ApiCalloutEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
-//        validateCalloutEventApiModel(json) TODO
+        validateCalloutEventApiModel(json)
     }
 
     @Test
@@ -95,7 +107,8 @@ class SessionEventsAdapterFactoryTest {
             CandidateReadEvent.LocalResult.FOUND,
             CandidateReadEvent.RemoteResult.NOT_FOUND)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiCandidateReadEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateCandidateReadEventApiModel(json)
     }
 
@@ -106,7 +119,8 @@ class SessionEventsAdapterFactoryTest {
             "GSM",
             listOf(SimNetworkUtils.Connection("WIFI", NetworkInfo.DetailedState.CONNECTED)))
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiConnectivitySnapshotEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateConnectivitySnapshotEventApiModel(json)
     }
 
@@ -118,7 +132,8 @@ class SessionEventsAdapterFactoryTest {
             ConsentEvent.Type.INDIVIDUAL,
             ConsentEvent.Result.ACCEPTED)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiConsentEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateConsentEventApiModel(json)
     }
 
@@ -128,7 +143,8 @@ class SessionEventsAdapterFactoryTest {
             10,
             UUID.randomUUID().toString())
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val apiEvent = ApiEnrollmentEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateEnrolmentEventApiModel(json)
     }
 
@@ -141,8 +157,9 @@ class SessionEventsAdapterFactoryTest {
             10,
             FingerprintCaptureEvent.Result.BAD_QUALITY,
             FingerprintCaptureEvent.Fingerprint(10, "some_template".toByteArray().toString()))
+        val apiEvent = ApiFingerprintCaptureEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateFingerprintCaptureEventApiModel(json)
     }
 
@@ -151,8 +168,9 @@ class SessionEventsAdapterFactoryTest {
         val event = GuidSelectionEvent(
             10,
             UUID.randomUUID().toString())
+        val apiEvent = ApiGuidSelectionEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateGuidSelectionEventApiModel(json)
     }
 
@@ -162,9 +180,10 @@ class SessionEventsAdapterFactoryTest {
             10,
             10,
             MatchPool(MatchPoolType.MODULE, 10),
-            arrayOf(MatchEntry(UUID.randomUUID().toString(), 10F)))
+            listOf(MatchEntry(UUID.randomUUID().toString(), 10F)))
+        val apiEvent = ApiOneToManyMatchEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateOneToManyMatchEventApiModel(json)
     }
 
@@ -175,8 +194,9 @@ class SessionEventsAdapterFactoryTest {
             10,
             UUID.randomUUID().toString(),
             MatchEntry(UUID.randomUUID().toString(), 10F))
+        val apiEvent = ApiOneToOneMatchEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateOneToOneMatchEventApiModel(json)
     }
 
@@ -185,8 +205,9 @@ class SessionEventsAdapterFactoryTest {
         val event = PersonCreationEvent(
             10,
             listOf(UUID.randomUUID().toString()))
+        val apiEvent = ApiPersonCreationEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validatePersonCreationEvent(json)
     }
 
@@ -197,29 +218,34 @@ class SessionEventsAdapterFactoryTest {
             10,
             RefusalEvent.Answer.OTHER,
             "")
+        val apiEvent = ApiRefusalEvent(event)
 
-        val json = gsonWithAdapters.toJsonTree(event).asJsonObject
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateRefusalEventApiModel(json)
     }
 
     @Test
     fun validate_databaseInfoApiModel() {
         val databaseInfo = DatabaseInfo(0, 0)
-        val json = gsonWithAdapters.toJsonTree(databaseInfo).asJsonObject
+        val apiDatabaseInfo = ApiDatabaseInfo(databaseInfo)
+
+        val json = gsonWithAdapters.toJsonTree(apiDatabaseInfo).asJsonObject
         validateDatabaseInfoApiModel(json)
     }
 
     @Test
     fun validate_deviceApiModel() {
         val device = Device("28", "phone", "device_id")
-        val json = gsonWithAdapters.toJsonTree(device).asJsonObject
+        val apiDevice = ApiDevice(device)
+        val json = gsonWithAdapters.toJsonTree(apiDevice).asJsonObject
         validateDeviceApiModel(json)
     }
 
     @Test
     fun validate_locationApiModel() {
         val location = Location(1.2, 2.4)
-        val json = gsonWithAdapters.toJsonTree(location).asJsonObject
+        val apiLocation = ApiLocation(location)
+        val json = gsonWithAdapters.toJsonTree(apiLocation).asJsonObject
         validateLocationApiModel(json)
     }
 
@@ -233,8 +259,8 @@ class SessionEventsAdapterFactoryTest {
             Device("28", "phone", "device_id"),
             0)
         session.addEvent(AlertScreenEvent(0, Alert.NOT_PAIRED))
-
-        val json = gsonWithAdapters.toJsonTree(session).asJsonObject
+        val apiSession = ApiSessionEvents(session)
+        val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)
     }
 }
