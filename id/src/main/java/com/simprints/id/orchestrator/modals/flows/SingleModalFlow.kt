@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.modals.flows
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.ModalStepRequest
 import com.simprints.id.orchestrator.modals.ModalFlow
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
@@ -11,7 +10,7 @@ import io.reactivex.ObservableEmitter
  * Generic class for a ModalFlow with a single action.
  * It completes immediately after the first step completes.
  */
-abstract class SingleModalFlowImpl : ModalFlow {
+abstract class SingleModalFlow : ModalFlow {
 
     abstract val intentRequestCode: Int
 

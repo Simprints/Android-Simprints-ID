@@ -2,13 +2,13 @@ package com.simprints.id.orchestrator.modals
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.ModalStepRequest
+import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
 import io.reactivex.Observable
 
 /**
  * Representation of the flow for a specific modality.
  * It can be either a single step only (see SingleModalFlow) or a more complicate
- * and generic one (see ModalFlowImpl)
+ * and generic one (see MultiModalFlow)
  */
 interface ModalFlow {
 

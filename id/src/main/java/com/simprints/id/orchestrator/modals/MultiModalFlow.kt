@@ -2,10 +2,10 @@ package com.simprints.id.orchestrator.modals
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.ModalStepRequest
+import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
 import io.reactivex.Observable
 
-class ModalFlowImpl(private val steps: ArrayList<ModalFlow>) : ModalFlow {
+class MultiModalFlow(private val steps: ArrayList<ModalFlow>) : ModalFlow {
 
     override var modalResponses: Observable<ModalResponse> =
         Observable.concat(steps.map { it.modalResponses })

@@ -7,12 +7,11 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceRequest
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
-import com.simprints.id.orchestrator.ModalStepRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
-class FaceModalAction(private val appRequest: AppRequest,
-                      private val packageName: String) : SingleModalFlow() {
+class FaceModal(private val appRequest: AppRequest,
+                private val packageName: String) : SingleModalFlow() {
 
     companion object {
         const val faceActivityClassName = "com.simprints.face.activities.FaceCaptureActivity"
@@ -23,8 +22,9 @@ class FaceModalAction(private val appRequest: AppRequest,
 
     override fun getNextIntent(): ModalStepRequest {
         val intent = Intent().setClassName(packageName, faceActivityClassName)
-         intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(buildFaceRequest(appRequest)))
-        return ModalStepRequest(intentRequestCode, intent)    }
+        intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(buildFaceRequest(appRequest)))
+        return ModalStepRequest(intentRequestCode, intent)
+    }
 
     override fun extractModalResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalResponse {
         require(resultCode == Activity.RESULT_OK)
