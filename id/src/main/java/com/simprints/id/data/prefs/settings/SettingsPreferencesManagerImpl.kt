@@ -104,7 +104,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
 
-        val MODAL_DEFAULT = Modal.FINGER
+        val MODAL_DEFAULT = Modal.FACE_FINGER
         const val MODAL_KEY = "Modal"
     }
 
