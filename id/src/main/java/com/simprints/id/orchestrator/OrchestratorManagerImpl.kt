@@ -8,14 +8,14 @@ import com.simprints.id.domain.modal.Modal.*
 import com.simprints.id.domain.modal.ModalResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modals.FaceFingerModalFlowImpl
-import com.simprints.id.orchestrator.modals.FaceModalFlowImpl
-import com.simprints.id.orchestrator.modals.FingerFaceModalFlowImpl
-import com.simprints.id.orchestrator.modals.FingerModalFlowImpl
+import com.simprints.id.orchestrator.modals.MultiModalFlow
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFace
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFaceFinger
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFinger
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFingerFace
+import com.simprints.id.orchestrator.modals.flows.FaceModal
+import com.simprints.id.orchestrator.modals.flows.FingerprintModal
+import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -32,17 +32,18 @@ class OrchestratorManagerImpl(val modal: Modal,
     private var appResponseEmitter: SingleEmitter<AppResponse>? = null
 
     private lateinit var appRequest: AppRequest
-    private val results: MutableList<ModalResponse> = mutableListOf()
+    private val stepsResults: MutableList<ModalResponse> = mutableListOf()
+    private var sessionId: String = ""
 
-    private val face by lazy { FaceModalFlowImpl(packageName, appRequest) }
-    private val fingerprint by lazy { FingerModalFlowImpl(packageName, appRequest, prefs) }
+    private val faceFlow by lazy { FaceModal(appRequest, packageName) }
+    private val fingerprintFlow by lazy { FingerprintModal(appRequest, packageName, prefs) }
 
     private val flowModal by lazy {
         when (modal) {
-            FACE -> face
-            FINGER -> fingerprint
-            FINGER_FACE -> FingerFaceModalFlowImpl(fingerprint, face)
-            FACE_FINGER -> FaceFingerModalFlowImpl(fingerprint, face)
+            FACE -> MultiModalFlow(arrayListOf(faceFlow))
+            FINGER -> MultiModalFlow(arrayListOf(fingerprintFlow))
+            FINGER_FACE -> MultiModalFlow(arrayListOf(fingerprintFlow, faceFlow))
+            FACE_FINGER -> MultiModalFlow(arrayListOf(faceFlow, fingerprintFlow))
         }
     }
 
@@ -55,25 +56,36 @@ class OrchestratorManagerImpl(val modal: Modal,
         }
     }
 
-    private var sessionId: String = ""
 
     @SuppressLint("CheckResult")
     override fun startFlow(appRequest: AppRequest, sessionId: String): Observable<ModalStepRequest> {
         this.sessionId = sessionId
         this.appRequest = appRequest
-        results.clear()
-
-        flowModal.modalResponses
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    results.add(it)
-                },
-                onComplete = {
-                    appResponseEmitter?.onSuccess(appResponseBuilder.buildResponse(appRequest, results, sessionId))
-                })
+        stepsResults.clear()
+        subscribeForStepsIntentResults(appRequest, sessionId)
 
         return flowModal.nextIntent
+    }
+
+    @SuppressLint("CheckResult")
+    private fun subscribeForStepsIntentResults(appRequest: AppRequest, sessionId: String) {
+        flowModal.modalResponses
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        addNewStepIntentResult(it)
+                    },
+                    onComplete = {
+                        buildAndEmitFinalResult(appRequest, sessionId)
+                    })
+    }
+
+    private fun buildAndEmitFinalResult(appRequest: AppRequest, sessionId: String) {
+        appResponseEmitter?.onSuccess(appResponseBuilder.buildResponse(appRequest, stepsResults, sessionId))
+    }
+
+    private fun addNewStepIntentResult(it: ModalResponse) {
+        stepsResults.add(it)
     }
 
 
