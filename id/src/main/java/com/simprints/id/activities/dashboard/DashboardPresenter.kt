@@ -115,11 +115,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.startCheckLoginActivityAndFinish()
     }
 
-    private fun userIsOffline() = try {
-        !simNetworkUtils.isConnected()
-    } catch (e: IllegalStateException) {
-        true
-    }
+    private fun userIsOffline() = !simNetworkUtils.isConnected()
 
     private fun initOrUpdateAnalyticsKeys() {
         crashReportManager.apply {
