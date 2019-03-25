@@ -16,8 +16,8 @@ class FingerPageAdapter(fragmentManager: FragmentManager, private val activeFing
         fragmentSparseArray.append(pos, it)
     }
 
-    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        super.destroyItem(container, position, `object`)
+    override fun destroyItem(container: ViewGroup, position: Int, item: Any) {
+        super.destroyItem(container, position, item)
         fragmentSparseArray.remove(position)
     }
 
@@ -25,5 +25,5 @@ class FingerPageAdapter(fragmentManager: FragmentManager, private val activeFing
 
     override fun getCount() = activeFingers.size
 
-    override fun getItemPosition(`object`: Any) = PagerAdapter.POSITION_NONE
+    override fun getItemPosition(item: Any) = PagerAdapter.POSITION_NONE
 }
