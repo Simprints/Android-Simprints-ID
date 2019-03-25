@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.simprints.id.R
 import com.simprints.id.domain.Finger
 import com.simprints.id.domain.FingerRes
+import com.simprints.id.tools.extensions.activityIsPresentAndFragmentIsAdded
 import kotlinx.android.synthetic.main.fragment_finger.*
 
 class FingerFragment : Fragment() {
@@ -29,8 +30,6 @@ class FingerFragment : Fragment() {
 
         return view
     }
-
-    private fun activityIsPresentAndFragmentIsAdded(): Boolean = activity != null && isAdded
 
     private fun updateFingerImageAccordingToStatus() {
         fingerImage.setImageResource(FingerRes.get(finger).drawableId)
