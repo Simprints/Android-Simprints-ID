@@ -1,22 +1,20 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidMatchingCalloutError
-import com.simprints.id.tools.TimeHelper
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.domain.fingerprint.Person
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -27,10 +25,8 @@ import io.reactivex.schedulers.Schedulers
 
 class MatchingPresenter(
     private val view: MatchingContract.View,
-    private val probe: Person,
-    private val appRequest: Request,
+    private val matchingRequest: MatchingActRequest,
     private val dbManager: DbManager,
-    private val preferencesManager: PreferencesManager,
     private val sessionEventsManager: SessionEventsManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
@@ -42,20 +38,22 @@ class MatchingPresenter(
 
     @SuppressLint("CheckResult")
     override fun start() {
-        when (appRequest) {
-            is IdentifyRequest -> startMatchTask(::IdentificationTask)
-            is VerifyRequest -> startMatchTask(::VerificationTask)
+        when (matchingRequest) {
+            is MatchingActIdentifyRequest -> startMatchTask(::IdentificationTask)
+            is MatchingActVerifyRequest -> startMatchTask(::VerificationTask)
             else -> handleUnexpectedCallout()
         }
     }
 
-    private fun startMatchTask(matchTaskConstructor: (MatchingContract.View, DbManager, PreferencesManager,
+    private fun startMatchTask(matchTaskConstructor: (MatchingContract.View,
+                                                      MatchingActRequest,
+                                                      DbManager,
                                                       SessionEventsManager, CrashReportManager, TimeHelper) -> MatchTask) {
-        val matchTask = matchTaskConstructor(view, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
+        val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
 
-        matchTaskDisposable = matchTask.loadCandidates(appRequest)
+        matchTaskDisposable = matchTask.loadCandidates()
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }
-            .flatMap { matchTask.runMatch(it, probe) }
+            .flatMap { matchTask.runMatch(it, matchingRequest.probe) }
             .setMatchingSchedulers()
             .subscribeBy(
                 onSuccess = { matchTask.handleMatchResult(it.candidates, it.scores) },
@@ -87,7 +85,7 @@ class MatchingPresenter(
         override fun onMatcherEvent(event: EVENT?) =
             when (event) {
                 EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
-                else -> emitter.onError(SimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
+                else -> emitter.onError(FingerprintSimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
             }
     }
 
@@ -100,7 +98,7 @@ class MatchingPresenter(
         com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
-        crashReportManager.logExceptionOrThrowable(InvalidMatchingCalloutError("Invalid action in MatchingActivity"))
+        crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception
         view.launchAlert()
     }
 

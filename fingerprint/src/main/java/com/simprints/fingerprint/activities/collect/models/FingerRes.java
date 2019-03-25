@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.collect.models;
 
-import com.simprints.id.R;
+import com.simprints.fingerprint.R;
 
 public class FingerRes {
 

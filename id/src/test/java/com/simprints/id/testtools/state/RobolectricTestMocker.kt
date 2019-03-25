@@ -2,7 +2,11 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_LEGACY_API_KEY
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -19,6 +23,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.mockito.stubbing.Answer
+import java.math.BigInteger
 
 object RobolectricTestMocker {
 
@@ -48,11 +53,11 @@ object RobolectricTestMocker {
 
     fun setUserLogInState(logged: Boolean,
                           sharedPrefs: SharedPreferences,
-                          projectId: String = CheckLoginFromIntentActivityTest.DEFAULT_PROJECT_ID,
-                          legacyApiKey: String = CheckLoginFromIntentActivityTest.DEFAULT_LEGACY_API_KEY,
-                          userId: String = CheckLoginFromIntentActivityTest.DEFAULT_USER_ID,
-                          projectSecret: String = CheckLoginFromIntentActivityTest.DEFAULT_PROJECT_SECRET,
-                          realmKey: String = CheckLoginFromIntentActivityTest.DEFAULT_REALM_KEY): RobolectricTestMocker {
+                          projectId: String = DEFAULT_PROJECT_ID,
+                          legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
+                          userId: String = DEFAULT_USER_ID,
+                          projectSecret: String = DEFAULT_PROJECT_SECRET,
+                          realmKey: String = BigInteger(1, DEFAULT_REALM_KEY).toString(16)): RobolectricTestMocker {
 
         Thread.sleep(1000)
         val editor = sharedPrefs.edit()

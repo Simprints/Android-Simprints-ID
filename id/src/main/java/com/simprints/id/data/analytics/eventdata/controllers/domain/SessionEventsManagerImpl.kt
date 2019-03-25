@@ -9,8 +9,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.matching.IdentificationResult
-import com.simprints.id.domain.matching.VerificationResult
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
@@ -103,29 +101,29 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
             it.addEvent(GuidSelectionEvent(
-                it.nowRelativeToStartTime(timeHelper),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 selectedGuid
             ))
             insertOrUpdateSessionEvents(it)
         }
 
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: VerificationResult?) {
+    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?) {
         updateSessionInBackground { session ->
             session.addEvent(OneToOneMatchEvent(
                 session.timeRelativeToStartTime(startTimeVerification),
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 patientId,
-                match?.let { MatchEntry(it.guidVerified, match.confidence.toFloat()) }))
+                match))
         }
     }
 
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<IdentificationResult>, matchSize: Int) {
+    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int) {
         updateSessionInBackground { session ->
             session.addEvent(OneToManyMatchEvent(
                 session.timeRelativeToStartTime(startTimeIdentification),
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchEntry(it.guidFound, it.confidence.toFloat()) }.toList().toTypedArray()))
+                matches))
         }
     }
 
@@ -133,7 +131,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground {
             if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
                 it.addEvent(ScannerConnectionEvent(
-                    it.nowRelativeToStartTime(timeHelper),
+                    it.timeRelativeToStartTime(timeHelper.now()),
                     scannerInfo
                 ))
             }
@@ -150,7 +148,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addPersonCreationEventInBackground(person: Person) {
         updateSessionInBackground { session ->
             session.addEvent(PersonCreationEvent(
-                session.nowRelativeToStartTime(timeHelper),
+                session.timeRelativeToStartTime(timeHelper.now()),
                 extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
@@ -163,7 +161,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground {
             it.addEvent(CandidateReadEvent(
                 it.timeRelativeToStartTime(startCandidateSearchTime),
-                it.nowRelativeToStartTime(timeHelper),
+                it.timeRelativeToStartTime(timeHelper.now()),
                 guid,
                 localResult,
                 remoteResult

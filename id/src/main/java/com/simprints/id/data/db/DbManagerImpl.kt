@@ -21,7 +21,6 @@ import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
@@ -101,7 +100,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 sessionEventsManager
                     .updateSession {
                         it.addEvent(EnrollmentEvent(
-                            it.nowRelativeToStartTime(timeHelper),
+                            it.timeRelativeToStartTime(timeHelper.now()),
                             person.patientId
                         ))
                     }

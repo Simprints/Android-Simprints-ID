@@ -1,15 +1,15 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import com.simprints.fingerprint.activities.BasePresenter
+import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.id.activities.BasePresenter
-import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.exceptions.SimprintsException
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
 
@@ -24,9 +24,10 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
-        fun doLaunchAlert(alert: Alert)
-        fun finishSuccessEnrol(result: Intent)
-        fun finishSuccessAndStartMatching(intent: Intent)
+        fun doLaunchAlert(alert: FingerprintAlert)
+        fun startRefusalActivity()
+        fun finishSuccessEnrol(bundleKey: String, result: CollectResult)
+        fun finishSuccessAndStartMatching(bundleKey: String, result: CollectResult)
         fun cancelAndFinish()
 
         fun showSplashScreen()
@@ -56,10 +57,9 @@ interface CollectFingerprintsContract {
         fun handleOnResume()
         fun handleOnPause()
         fun handleConfirmFingerprintsAndContinue()
-        fun handleBackPressedWhileScanning()
-        fun handleOnBackPressedToLeave()
+        fun handleOnBackPressed()
         fun handleTryAgainFromDifferentActivity()
-        fun handleException(simprintsException: SimprintsException)
+        fun handleException(simprintsException: FingerprintSimprintsException)
 
         // Scanning
         var isConfirmDialogShown: Boolean

@@ -14,17 +14,27 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.activities.matching.MatchingActivity
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
+import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.extensions.launchAlert
+import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
-import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.tools.InternalConstants.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.id.tools.InternalConstants.RESULT_TRY_AGAIN
-import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
-import com.simprints.id.R as appR
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),
@@ -39,23 +49,23 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var appRequest: Request
+    private lateinit var fingerprintRequest: FingerprintRequest
 
     private var rightToLeft: Boolean = false
-
+    private val resultIntent = Intent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
+        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
 
         configureRightToLeft()
 
         val component = FingerprintsComponentBuilder.getComponent(application as Application)
-        viewPresenter = CollectFingerprintsPresenter(this, this, appRequest, component)
+        viewPresenter = CollectFingerprintsPresenter(this, this, fingerprintRequest, component)
         initBar()
         initViewFields()
         viewPresenter.start()
@@ -133,62 +143,83 @@ class CollectFingerprintsActivity :
         }
     }
 
-    override fun finishSuccessEnrol(result: Intent) =
-        setResultAndFinish(Activity.RESULT_OK, result)
+    override fun finishSuccessEnrol(bundleKey: String, result: CollectResult) =
+        setCollectResultInIntent(bundleKey, result).also {
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
+        }
 
-    override fun finishSuccessAndStartMatching(intent: Intent) =
-        startActivityForResult(intent, MATCHING_ACTIVITY_REQUEST_CODE)
+    override fun finishSuccessAndStartMatching(bundleKey: String, result: CollectResult) =
+        setCollectResultInIntent(bundleKey, result).also {
+            startMatchingActivity(result.probe)
+        }
+
+    private fun setCollectResultInIntent(bundleKey: String, result: CollectResult) {
+        resultIntent.putExtra(bundleKey, result)
+    }
+
+    override fun startRefusalActivity() = launchRefusalActivity()
+
+    private fun startMatchingActivity(probe: Person) {
+        val matchingIntent = Intent(this, MatchingActivity::class.java)
+        with(fingerprintRequest) {
+            val extra = when {
+                this is FingerprintVerifyRequest -> MatchingActVerifyRequest(
+                        language,
+                        probe,
+                        projectId,
+                        this.verifyGuid)
+                this is FingerprintIdentifyRequest -> MatchingActIdentifyRequest(
+                        language,
+                        probe,
+                        matchGroup,
+                        returnIdCount)
+                else -> null
+            }
+            matchingIntent.putExtra(MatchingActRequest.BUNDLE_KEY, extra)
+        }
+
+        startActivityForResult(matchingIntent, MATCHING_ACTIVITY_REQUEST)
+    }
+
 
     override fun cancelAndFinish() =
-        setResultAndFinish(Activity.RESULT_CANCELED)
+        setResult(Activity.RESULT_CANCELED).also { finish() }
 
     override fun onBackPressed() {
-        when {
-            viewPresenter.isScanning() -> viewPresenter.handleBackPressedWhileScanning()
-            else -> {
-                viewPresenter.handleOnBackPressedToLeave()
-                startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
-            }
-        }
+        viewPresenter.handleOnBackPressed()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
         when (requestCode) {
-            SETTINGS_ACTIVITY_REQUEST_CODE,
-            PRIVACY_ACTIVITY_REQUEST_CODE,
-            ABOUT_ACTIVITY_REQUEST_CODE ->
-                super.onActivityResult(requestCode, resultCode, data)
-            REFUSAL_ACTIVITY_REQUEST, ALERT_ACTIVITY_REQUEST_CODE ->
-                if (resultCode == RESULT_TRY_AGAIN)
+            ALERT_ACTIVITY_REQUEST ->
+                if (resultCode == ALERT_TRY_AGAIN_RESULT)
                     viewPresenter.handleTryAgainFromDifferentActivity()
-                else setResultAndFinish(resultCode, data)
-            else -> setResultAndFinish(resultCode, data)
-        }
-
-    private fun setResultAndFinish(resultCode: Int, data: Intent? = null) {
-        setResult(resultCode, data)
-        finish()
-    }
+                else setResult(Activity.RESULT_CANCELED)
+            MATCHING_ACTIVITY_REQUEST -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val matchingResult = data?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
+                    resultIntent.putExtra(MatchingActResult.BUNDLE_KEY, matchingResult)
+                }
+                setResult(resultCode, resultIntent)
+            }
+            REFUSAL_ACTIVITY_REQUEST -> {
+                setResult(resultCode, data)
+            }
+            else -> throw IllegalArgumentException("Invalid request Code")
+        }.also { finish() }
 
     override fun onPause() {
         super.onPause()
         viewPresenter.handleOnPause()
     }
 
-    override fun doLaunchAlert(alert: Alert) {
+    override fun doLaunchAlert(alert: FingerprintAlert) {
         launchAlert(alert)
     }
 
     override fun showSplashScreen() {
         startActivity(Intent(this, SplashScreenActivity::class.java))
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
-    }
-
-    companion object {
-        private const val ALERT_ACTIVITY_REQUEST_CODE = 0
-        private const val MATCHING_ACTIVITY_REQUEST_CODE = 1
-        private const val SETTINGS_ACTIVITY_REQUEST_CODE = 2
-        private const val PRIVACY_ACTIVITY_REQUEST_CODE = 3
-        private const val ABOUT_ACTIVITY_REQUEST_CODE = 4
     }
 }

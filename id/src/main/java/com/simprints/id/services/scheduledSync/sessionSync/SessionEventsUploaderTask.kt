@@ -44,7 +44,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
 
             sessions.forEach {
                 forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
-                it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
+                it.relativeUploadTime = it.timeRelativeToStartTime(timeHelper.now())
                 sessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
             }
             Single.just(sessions)

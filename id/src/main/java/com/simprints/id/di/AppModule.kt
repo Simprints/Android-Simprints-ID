@@ -36,10 +36,13 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.orchestrator.OrchestratorManager
+import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -241,5 +244,9 @@ open class AppModule(val app: Application) {
     @Provides
     @Singleton
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
+
+    @Provides
+    open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager, prefs: PreferencesManager): OrchestratorManager =
+        OrchestratorManagerImpl(settingsPreferencesManager.modal, prefs)
 }
 

@@ -35,18 +35,17 @@ open class SessionEvents(var projectId: String,
 
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
         if (isOpen()) {
-            addEvent(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
+            addEvent(ArtificialTerminationEvent(timeRelativeToStartTime(timeHelper.now()), reason))
         }
     }
 
     fun closeIfRequired(timeHelper: TimeHelper) {
         if (!isClosed()) {
-            relativeEndTime = nowRelativeToStartTime(timeHelper)
+            relativeEndTime = timeRelativeToStartTime(timeHelper.now())
         }
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
-    fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.now())
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD

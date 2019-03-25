@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- This language is Wolayata (used in Ethiopia) -->
+
+    <string name="consent_general_title">Kumetta maayuwaa marajjaa</string>
+    <string name="consent_parental_title">Dichchiyaageetu maayuwaa marajjaa</string>
+
+    <string name="consent_enrol">Taani ne na\'a Geeshiyaaro giyo projjektiya garssi gelissanawu aaga biraldhdhiya ashaara ekkada sinttanawu ha marajja madettana.&#160;</string>
+    <string name="consent_parental_enrol">Taani ne na\'aa kushiyaa ashaara ekkiyoogee ha Geeshiyaaro getettiyaa pilggettaa projektiyaa garssi gelissanawunne sinttanawu a marajjaa qottanaassa.&#160;</string>
+    <string name="consent_id_verify">Taani ne mazgabaa Geeshiyaaro giyo projjektiyan demmanawu ne ashaara madettada.&#160;</string>
+    <string name="consent_parental_id_verify">Taani ne na\'aa mazgabaa Geeshiyaaro giyo projjektiyan demmanawu ne na\'aa ashaara madettada.&#160;</string>
+    <string name="consent_share_data_yes">Itophiyaa dere asaa payyatetaa naago ooso keettaynne(EPHI) Inglize biittan de\'iyaa Simprints geetettiyaa waanna ha pilggettaa xaabetu xalaalay ne ashaaranne neeni de\'iyoo heeraa marajjaa ha projektiyaa oosuwaawu madettana.&#160;</string>
+    <string name="consent_parental_share_data_yes">Itoophiya dere asaa payyatetta nagoo ooso keettaynne Simprints teknolojjee uttido waanna United Kingdom giyoo ooso dirijjite ne ashaaranne neeni de\'yoo hera marajja demmana.&#160;</string>
+    <string name="consent_collect_yes">Simprints teknolojjee ne marajja pilggetta qofaas madettana.&#160;</string>
+    <string name="consent_privacy_rights">Mayikko, neen koyido wodiyan ne qofaa lamanawunne ne marajjay komppiiteriyaappe kichchana mala oychchana danddayaasa.&#160;</string>
+    <string name="consent_parental_privacy_rights">Mayidaba gidikkokka, ne koyido wodiyan ne qofaa lamanawunne ne na\'aa marajja komppiiteriyaappe kichchana mala oychchana danddayaasa.&#160;</string>
+    <string name="consent_confirmation">Taani ne ashaara ekkoo? Hagaadan gaada zaara: \"Taani maayas\", \"Taani maayikke\", woykko \"Taayyoo oyshay de\'ees\".</string>
+    <string name="consent_parental_confirmation">Taani ne na\'aa ashaara ekkoo? Hagaadan gaada zaara: \"Taani maayas\", \"Taani maayikke\", woykko \"Taayyoo oyshay de\'ees\".</string>
+
+    <string name="launch_consent_decline_button">Maayikke</string>
+    <string name="launch_consent_accept_button">Maayaas</string>
+
+</resources>

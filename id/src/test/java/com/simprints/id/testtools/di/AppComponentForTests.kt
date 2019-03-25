@@ -1,12 +1,11 @@
 package com.simprints.id.testtools.di
 
+import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
-import com.simprints.fingerprint.activities.launch.LaunchActivityTest
-import com.simprints.id.activities.login.LoginActivityTest
-import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
+import com.simprints.id.activities.login.LoginActivityTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
@@ -35,7 +34,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(dbManagerTest: DbManagerTest)
     fun inject(projectAuthenticatorTest: ProjectAuthenticatorTest)
     fun inject(alertActivityTest: AlertActivityTest)
-    fun inject(launchActivityTest: LaunchActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
     fun inject(peopleDownSyncTaskTest: SubDownSyncTaskTest)
     fun inject(downSyncManagerTest: DownSyncManagerTest)

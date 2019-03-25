@@ -3,36 +3,44 @@ package com.simprints.fingerprint.activities.matching
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
+import com.simprints.fingerprint.tools.utils.TimeHelper
+import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.matching.IdentificationResult
-import com.simprints.id.domain.matching.Tier
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.IdentifyResponse
-import com.simprints.id.domain.responses.Response
-import com.simprints.id.tools.TimeHelper
-import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
 internal class IdentificationTask(private val view: MatchingContract.View,
+                                  matchingRequest: MatchingActRequest,
                                   private val dbManager: DbManager,
-                                  private val preferencesManager: PreferencesManager,
                                   private val sessionEventsManager: SessionEventsManager,
                                   private val crashReportManager: CrashReportManager,
                                   timeHelper: TimeHelper) : MatchTask {
 
+    private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
+
+    companion object {
+        const val matchingEndWaitTimeSeconds = 1 * 1000
+    }
+
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(appRequest: Request): Single<List<Person>> =
+    override fun loadCandidates(): Single<List<Person>> =
         Completable.fromAction { view.setIdentificationProgressLoadingStart() }
-            .andThen(dbManager.loadPeople(preferencesManager.matchGroup))
+            .andThen(dbManager.loadPeople(GROUP.valueOf(matchingIdentifyRequest.matchGroup.name)))
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
@@ -40,12 +48,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
         view.setIdentificationProgressMatchingStart(candidates.size)
     }
 
-    override fun getMatcherType(): LibMatcher.MATCHER_TYPE =
-        when (preferencesManager.matcherType) {
-            0 -> LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
-            1 -> LibMatcher.MATCHER_TYPE.SOURCEAFIS_IDENTIFY
-            else -> LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
-        }
+    override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
 
     override fun onMatchProgressDo(progress: Int) {
         view.setIdentificationProgress(progress)
@@ -57,25 +60,23 @@ internal class IdentificationTask(private val view: MatchingContract.View,
         val topCandidates = candidates
             .zip(scores)
             .sortedByDescending { (_, score) -> score }
-            .take(preferencesManager.returnIdCount)
+            .take(matchingIdentifyRequest.returnIdCount)
             .map { (candidate, score) ->
-                IdentificationResult(candidate.patientId, score.toInt(), Tier.computeTier(score))
+                MatchingResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score))
             }
 
-        sessionEventsManager.addOneToManyEventInBackground(matchStartTime, topCandidates, candidates.size)
+        sessionEventsManager.addOneToManyEventInBackground(matchStartTime,
+            topCandidates.map { MatchEntry(it.guid, it.confidence.toFloat()) }, candidates.size)
 
-        val tier1Or2Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_1 || tier == Tier.TIER_2 }
-        val tier3Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_3 }
-        val tier4Matches = topCandidates.count { (_, _, tier) -> tier == Tier.TIER_4 }
+        val tier1Or2Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_1 || tier == MatchingTier.TIER_2 }
+        val tier3Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_3 }
+        val tier4Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_4 }
 
-        val resultData = Intent().putExtra(Response.BUNDLE_KEY,
-            IdentifyResponse(topCandidates, getCurrentSessionId()))
+        val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
+            MatchingActIdentifyResult(topCandidates))
         view.doSetResult(Activity.RESULT_OK, resultData)
-        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, preferencesManager.matchingEndWaitTimeSeconds * 1000)
+        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeSeconds)
     }
-
-    private fun getCurrentSessionId() = ""
-    // sessionEventsManager.getCurrentSession().map { it.id }.blockingGet() STOPSHIP
 
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(CrashReportTag.MATCHING, CrashReportTrigger.UI, Log.INFO, message)

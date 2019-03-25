@@ -57,12 +57,12 @@ class DashboardSyncCardViewModelTest {
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
     @Inject lateinit var dbManagerMock: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncSCopeBuilder: SyncScopesBuilder
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var timeHelper: TimeHelper
 
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
-    private val syncScope by lazy { syncSCopeBuilder.buildSyncScope()!! }
+    private val syncScope by lazy { syncScopeBuilder.buildSyncScope()!! }
     private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
     private val fakeSyncStateLiveData = MutableLiveData<SyncState>()

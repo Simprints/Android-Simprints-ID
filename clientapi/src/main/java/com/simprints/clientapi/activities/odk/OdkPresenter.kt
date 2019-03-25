@@ -1,13 +1,13 @@
 package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
-import com.simprints.clientapi.extensions.getConfidencesString
-import com.simprints.clientapi.extensions.getIdsString
-import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.extensions.getConfidencesString
+import com.simprints.clientapi.extensions.getIdsString
+import com.simprints.clientapi.extensions.getTiersString
 
 
 class OdkPresenter(val view: OdkContract.View,
@@ -39,9 +39,9 @@ class OdkPresenter(val view: OdkContract.View,
     )
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.guid,
-        verify.confidence.toString(),
-        verify.tier.toString()
+        verify.matchResult.guidFound,
+        verify.matchResult.confidence.toString(),
+        verify.matchResult.tier.toString()
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =

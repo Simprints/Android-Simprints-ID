@@ -1,9 +1,9 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.di.DependencyRule.RealRule
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -21,7 +21,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
-import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
@@ -32,9 +31,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.fingerprint.tools.utils.LocationProvider
 import com.simprints.id.tools.utils.SimNetworkUtils
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 
 class TestAppModule(app: Application,
                     var localDbManagerRule: DependencyRule = RealRule,
@@ -44,7 +41,6 @@ class TestAppModule(app: Application,
                     var remoteSessionsManagerRule: DependencyRule = RealRule,
                     var dbManagerRule: DependencyRule = RealRule,
                     var secureDataManagerRule: DependencyRule = RealRule,
-                    var dataManagerRule: DependencyRule = RealRule,
                     var loginInfoManagerRule: DependencyRule = RealRule,
                     var randomGeneratorRule: DependencyRule = RealRule,
                     var keystoreManagerRule: DependencyRule = RealRule,
@@ -56,15 +52,13 @@ class TestAppModule(app: Application,
                     var simNetworkUtilsRule: DependencyRule = RealRule,
                     var secureApiInterfaceRule: DependencyRule = RealRule,
                     var longConsentManagerRule: DependencyRule = RealRule,
-                    var scannerManagerRule: DependencyRule = RealRule,
                     var peopleUpSyncMasterRule: DependencyRule = RealRule,
                     var syncStatusDatabaseRule: DependencyRule = RealRule,
                     var syncScopesBuilderRule: DependencyRule = RealRule,
                     var countTaskRule: DependencyRule = RealRule,
                     var downSyncTaskRule: DependencyRule = RealRule,
                     var syncSchedulerHelperRule: DependencyRule = RealRule,
-                    var downSyncManagerRule: DependencyRule = RealRule,
-                    var locationProverRule: DependencyRule = RealRule) : AppModule(app) {
+                    var downSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
     override fun provideLocalDbManager(ctx: Context): LocalDbManager =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
@@ -72,14 +66,14 @@ class TestAppModule(app: Application,
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }
 
-    override fun provideRemoteDbManager(ctx: Context): RemoteDbManager =
-        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(ctx) }
-
     override fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
         loginInfoManagerRule.resolveDependency { super.provideLoginInfoManager(improvedSharedPreferences) }
 
     override fun provideRandomGenerator(): RandomGenerator =
         randomGeneratorRule.resolveDependency { super.provideRandomGenerator() }
+
+    override fun provideRemoteDbManager(): RemoteDbManager =
+        remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager() }
 
     override fun provideDbManager(localDbManager: LocalDbManager,
                                   remoteDbManager: RemoteDbManager,
@@ -98,12 +92,6 @@ class TestAppModule(app: Application,
                                           keystoreManager: KeystoreManager,
                                           randomGenerator: RandomGenerator): SecureDataManager =
         secureDataManagerRule.resolveDependency { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) }
-
-    override fun provideDataManager(preferencesManager: PreferencesManager,
-                                    loginInfoManager: LoginInfoManager,
-                                    analyticsManager: AnalyticsManager,
-                                    remoteDbManager: RemoteDbManager): DataManager =
-        dataManagerRule.resolveDependency { super.provideDataManager(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager) }
 
     override fun provideKeystoreManager(): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
@@ -136,13 +124,6 @@ class TestAppModule(app: Application,
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
 
-    override fun provideScannerManager(preferencesManager: PreferencesManager,
-                                       analyticsManager: AnalyticsManager,
-                                       crashReportManager: CrashReportManager,
-                                       bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-
-        scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter) }
-
     override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager =
         remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
 
@@ -172,7 +153,4 @@ class TestAppModule(app: Application,
 
     override fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
         downSyncManagerRule.resolveDependency { super.provideDownSyncManager(syncScopesBuilder) }
-
-    override fun provideLocationProvider(ctx: Context): com.simprints.fingerprint.tools.utils.LocationProvider =
-        locationProverRule.resolveDependency { super.provideLocationProvider(ctx) }
 }

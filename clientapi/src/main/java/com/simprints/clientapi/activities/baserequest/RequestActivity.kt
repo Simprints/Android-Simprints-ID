@@ -18,8 +18,8 @@ import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmati
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
 import com.simprints.libsimprints.Constants
-import com.simprints.moduleapi.clientapi.responses.*
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponse.Companion.BUNDLE_KEY
+import com.simprints.moduleapi.app.responses.*
+import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
@@ -68,12 +68,13 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun routeResponse(response: IClientApiResponse) = when (response) {
-        is IClientApiEnrollResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
-        is IClientApiIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
-        is IClientApiVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
-        is IClientApiRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
-        else -> presenter.handleResponseError()
-    }
+    private fun routeResponse(response: IAppResponse) =
+        when (response) {
+            is IAppEnrolResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
+            is IAppIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
+            is IAppVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
+            is IAppRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
+            else -> presenter.handleResponseError()
+        }
 
 }

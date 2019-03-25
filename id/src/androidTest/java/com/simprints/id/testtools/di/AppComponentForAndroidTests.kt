@@ -29,7 +29,7 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(sessionEventsManagerImplTest: SessionEventsManagerImplTest)
     fun inject(collectFingerprintsActivityTest: CollectFingerprintsActivityTest)
     fun inject(guidSelectionServiceTest: GuidSelectionServiceTest)
-    fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
+    fun inject(launchActivityAndroidTest: com.simprints.fingerprint.activities.launch.LaunchActivityAndroidTest)
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(sessionEventsUploaderTaskEndToEndTest: SessionEventsUploaderTaskEndToEndTest)

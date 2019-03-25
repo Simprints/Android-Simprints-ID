@@ -8,21 +8,27 @@ import android.view.WindowManager
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.LONG_CONSENT_ACTIVITY_REQUEST_CODE
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
+import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.id.activities.refusal.RefusalActivity
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.tools.InternalConstants.*
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.Vibrate.vibrate
-import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import com.simprints.id.R as appR //StopShip move strings from app to fingerprint module
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
@@ -30,21 +36,22 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
-    private lateinit var appRequest: Request
+    private lateinit var fingerprintRequest: FingerprintRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        appRequest = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No Request in the bundle") //STOPSHIP
+        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+        fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
         val component = FingerprintsComponentBuilder.getComponent(this.application as Application)
-        viewPresenter = LaunchPresenter(component, this, appRequest)
+        viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }
 
@@ -67,8 +74,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
 
     override fun initTextsInButtons() {
-        consentAcceptButton.text = getString(appR.string.launch_consent_accept_button)
-        consentDeclineButton.text = getString(appR.string.launch_consent_decline_button)
+        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
     }
 
     override fun setLogoVisibility(visible: Boolean) {
@@ -100,8 +107,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun initConsentTabs() {
         tabHost.setup()
-        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(appR.string.consent_general_title)).setContent(R.id.generalConsentTextView)
-        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(appR.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
 
@@ -120,7 +127,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     private fun whenReturningFromAnotherActivity(resultCode: Int, data: Intent?) {
         when (resultCode) {
-            RESULT_TRY_AGAIN -> viewPresenter.tryAgainFromErrorScreen()
+            ALERT_TRY_AGAIN_RESULT -> viewPresenter.tryAgainFromErrorScreen()
             else -> viewPresenter.tearDownAppWithResult(resultCode, data)
         }
     }
@@ -143,12 +150,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun continueToNextActivity() {
-
-        val fingerprintsModule = "com.simprints.id" //STOPSHIP
-        val collectActivityClassName = "com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
-
-        val intent = Intent().setClassName(fingerprintsModule, collectActivityClassName)
-            .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
+        val intent = Intent(this, CollectFingerprintsActivity::class.java)
+            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
         startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
     }
 
@@ -161,7 +164,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         finish()
     }
 
-    override fun doLaunchAlert(alert: Alert) {
+    override fun doLaunchAlert(alert: FingerprintAlert) {
         launchAlert(alert)
     }
 
@@ -170,9 +173,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
 
     companion object {
-        const val COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 1
-        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = LAST_GLOBAL_REQUEST_CODE + 2
-
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
     }

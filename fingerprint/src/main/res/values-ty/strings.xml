@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- This is infact not Tahitian but is actually Chinyanja, the Zambian dialect of Chichewa.
+     There's a bug in pre-7.0 Android that meant that Android could not find locales for a specific
+      region, so an obscure 2-letter language was chosen instead. -->
+
+    <string name="consent_general_title">Chilolezo</string>
+    <string name="consent_parental_title">Chilolezo kuchoka ku Makolo</string>
+
+    <string name="consent_enrol">Ndifuna kusewenzetsa chizindikilo cha chala chanu kuti mukhale mu %1$s kotelo kuti mukazindikilidwe musogolo.&#160;</string>
+    <string name="consent_parental_enrol">Ndifuna kusewenzetsa chizindikilo cha chala chamwanayu kuti akhale mu %1$s kuti akazindikilidwe musogolo.&#160;</string>
+    <string name="consent_id_verify">Ndifuna kusewenzetsa chizindikilo cha chala chanu kuti tizikwanilitsa kupeza zolembedwa zanu mu %1$s.&#160;</string>
+    <string name="consent_parental_id_verify">Ndifuna kusewenzetsa chizindikilo cha chala cha mwanawanu kuti tizikwanilitsa kupeza zolembedwa zake mu %1$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, Bungwe lochoka ku dela la UK, izakhala ndi chilolezo pa zithunzi zonse zokhuza chizindikilo tizatengachi ndipo azadziwa kumene muli.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, Bungwe lochoka ku dela la UK, izakhala ndi chilolezo pa zithunzi zonse zokhuza chizindikilo tizatengachi ndipo azadziwa kumene muli.&#160;</string>
+    <string name="consent_privacy_rights">Ngati mwavomeleza, muloledwa kuchotsa chilolezo chanu pa nthawi ina iliyonse ndi kupempha kuti zolembedwa zanu zonse zichosedwe.&#160;</string>
+    <string name="consent_parental_privacy_rights">Ngati mwavomeleza, muloledwa kuchotsa chilolezo chanu pa nthawi ina iliyonse ndi kupempha kuti zolembewa za mwanayu zichosedwe.&#160;</string>
+    <string name="consent_confirmation">Kodi ndinga gwiritse nchito chizindikilo cha chala chanu? Nenani \"Ndibvomela\", \"Ai\", kapena \"Ndili ndi mafunso\".</string>
+    <string name="consent_parental_confirmation">Kodi ndinga gwiritse nchito chizindikilo cha chala chamwanayu? Nenani \"Ndibvomela\", \"Ai\", kapena \"Ndili ndi mafunso\".</string>
+
+    <string name="launch_consent_decline_button">Kukana</string>
+    <string name="launch_consent_accept_button">Kubvomera</string>
+
+</resources>

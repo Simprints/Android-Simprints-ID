@@ -1,36 +1,27 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.LoginActivity
+import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.responses.*
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
-import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.*
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
-
-    companion object {
-        const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
-        private const val LAUNCH_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 2
-        private const val ALERT_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 3
-    }
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
@@ -57,12 +48,12 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun getDeviceUniqueId() = deviceId
 
     override fun parseRequest() =
-        intent.parseClientApiRequest() as Request
+        intent.parseAppRequest() as AppRequest
 
     override fun getCheckCallingApp() = getCallingPackageName()
 
     override fun checkCallingAppIsFromKnownSource() {
-        if (app.packageManager.isCallingAppFromUnknownSource(callingPackage)) {
+        if (app.packageManager.isCallingAppFromUnknownSource(getCallingPackageName())) {
             crashReportManager.logExceptionOrThrowable(CallingAppFromUnknownSourceException())
         }
     }
@@ -75,48 +66,23 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         launchAlert(alert)
     }
 
-    override fun openLoginActivity(appRequest: Request) {
+    override fun openLoginActivity(appRequest: AppRequest) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(Request.BUNDLE_KEY, appRequest)
-        startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
+        loginIntent.putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(appRequest.projectId, appRequest.userId))
+        startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
+    }
+
+    override fun openOrchestratorActivity(appRequest: AppRequest) {
+
+        val intent = Intent(this, OrchestratorActivity::class.java).apply {
+            putExtra(AppRequest.BUNDLE_KEY, appRequest)
+            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+        }
+        startActivity(intent)
+        finish()
     }
 
     override fun finishCheckLoginFromIntentActivity() {
         finish()
-    }
-
-    override fun openLaunchActivity(appRequest: Request) {
-        val fingerprintsModule = "com.simprints.id" //STOPSHIP
-        val launchActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
-
-        val intent = Intent().setClassName(fingerprintsModule, launchActivityClassName)
-            .also { it.putExtra(Request.BUNDLE_KEY, appRequest) }
-        startActivityForResult(intent, LAUNCH_ACTIVITY_REQUEST_CODE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        // We need to call setResult and finish when the either CollectFingerprintsActivity returns a result
-        // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
-        // in a error screen.
-        // If the activity doesn't finish, then we check again the SignedInState in onResume.
-        if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
-            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-
-            val domainResponse = data?.extras?.getParcelable<Response>(Response.BUNDLE_KEY)
-            viewPresenter.handleActivityResult(requestCode, resultCode, domainResponse)
-
-            val response = domainResponse.let {
-                when (it) {
-                    is EnrolResponse -> it.toClientApiEnrolResponse()
-                    is VerifyResponse -> it.toClientApiVerifyResponse()
-                    is IdentifyResponse -> it.toClientApiIdentifyResponse()
-                    is RefusalFormResponse -> it.toClientApiRefusalFormResponse()
-                    else -> null
-                }
-            }
-            setResult(resultCode, Intent().apply { putExtra(IClientApiResponse.BUNDLE_KEY, response) })
-            finish()
-        }
     }
 }

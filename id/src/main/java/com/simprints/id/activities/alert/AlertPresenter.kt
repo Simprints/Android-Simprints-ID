@@ -33,7 +33,7 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.nowRelativeToStartTime(timeHelper), alert))
+            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alert))
         }
     }
 
