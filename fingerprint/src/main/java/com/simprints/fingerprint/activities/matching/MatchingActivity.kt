@@ -9,32 +9,28 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.AlertActivity
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.Application
-import com.simprints.id.activities.IntentKeys
-import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.exceptions.safe.callout.NoIntentExtrasError
 import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
-import com.simprints.id.R as appR
 
 class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override lateinit var viewPresenter: MatchingContract.Presenter
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var timeHelper: TimeHelper
@@ -43,26 +39,23 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         super.onCreate(savedInstanceState)
         val component = FingerprintsComponentBuilder.getComponent(application as Application)
         component.inject(this)
+        val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
+            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
 
-        LanguageHelper.setLanguage(this, preferencesManager.language)
+        LanguageHelper.setLanguage(this, matchingRequest.language)
+
         setContentView(R.layout.activity_matching)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val extras = intent.extras
         if (extras == null) {
-            crashReportManager.logExceptionOrThrowable(NoIntentExtrasError("Null extras passed to MatchingActivity"))
+            crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Null extras passed to MatchingActivity")) //STOPSHIP : Custom error
             launchAlert()
             finish()
             return
         }
 
-        val probe = extras.getParcelable<Person>(IntentKeys.matchingActivityProbePersonKey)
-            ?: throw IllegalArgumentException("No probe in the bundle") //STOPSHIP : Custom error
-
-        val appRequest: Request = this.intent.extras?.getParcelable(Request.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
-
-        viewPresenter = MatchingPresenter(this, probe, appRequest, dbManager, preferencesManager, sessionEventsManager, crashReportManager, timeHelper)
+        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
     }
 
     override fun onResume() {
@@ -85,38 +78,38 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun setIdentificationProgressLoadingStart() =
         runOnUiThread {
-            tv_matchingProgressStatus1.setText(appR.string.loading_candidates)
+            tv_matchingProgressStatus1.setText(R.string.loading_candidates)
             setIdentificationProgress(25)
         }
 
     override fun setIdentificationProgressMatchingStart(matchSize: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, appR.string.loaded_candidates_quantity_key, matchSize, matchSize)
-            tv_matchingProgressStatus2.setText(appR.string.matching_fingerprints)
+            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, matchSize, matchSize)
+            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
             setIdentificationProgress(50)
         }
 
     override fun setIdentificationProgressReturningStart() =
         runOnUiThread {
-            tv_matchingProgressStatus2.setText(appR.string.returning_results)
+            tv_matchingProgressStatus2.setText(R.string.returning_results)
             setIdentificationProgress(90)
         }
 
     override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, appR.string.returned_results_quantity_key, returnSize, returnSize)
+            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, returnSize, returnSize)
 
             if (tier1Or2Matches > 0) {
                 tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, appR.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
+                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
             }
             if (tier3Matches > 0) {
                 tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, appR.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
+                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
             }
             if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
                 tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, appR.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
+                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
             }
             setIdentificationProgress(100)
 
@@ -126,7 +119,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun launchAlert() {
         val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(IntentKeys.alertActivityAlertTypeKey, Alert.UNEXPECTED_ERROR)
+        intent.putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(FingerprintAlert.UNEXPECTED_ERROR))
         startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
     }
 

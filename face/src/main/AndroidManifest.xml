@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.face">
 
     <dist:module
@@ -8,5 +9,12 @@
         dist:title="@string/title_face">
         <dist:fusing dist:include="true" />
     </dist:module>
+
+    <application tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name="com.simprints.face.activities.FaceCaptureActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+    </application>
+
 </manifest>
 

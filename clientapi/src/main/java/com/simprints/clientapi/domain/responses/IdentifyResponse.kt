@@ -1,18 +1,15 @@
 package com.simprints.clientapi.domain.responses
 
-import com.simprints.moduleapi.clientapi.responses.IClientApiIdentifyResponse
-import com.simprints.moduleapi.clientapi.responses.IClientApiResponseTier
+import com.simprints.clientapi.domain.responses.entities.MatchResult
+import com.simprints.clientapi.domain.responses.entities.Tier
+import com.simprints.moduleapi.app.responses.IAppIdentifyResponse
 
 
-data class IdentifyResponse(val identifications: List<Identification>,
+data class IdentifyResponse(val identifications: List<MatchResult>,
                             val sessionId: String) {
 
-    data class Identification(val guid: String,
-                              val confidence: Int,
-                              val tier: IClientApiResponseTier)
-
-    constructor(request: IClientApiIdentifyResponse) : this(
-        request.identifications.map { Identification(it.guid, it.confidence, it.tier) },
+    constructor(request: IAppIdentifyResponse) : this(
+        request.identifications.map { MatchResult(it.guid, it.confidence, Tier.valueOf(it.tier.name)) },
         request.sessionId
     )
 

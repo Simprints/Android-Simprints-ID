@@ -11,7 +11,7 @@ import retrofit2.adapter.rxjava2.Result
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.Calls
 
-// It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing responses due to no connectivity).
+// It's required to use NetworkBehavior, even if response is not used in the tests (e.g failing modalResponses due to no connectivity).
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteInterface>) : PeopleRemoteInterface {
 

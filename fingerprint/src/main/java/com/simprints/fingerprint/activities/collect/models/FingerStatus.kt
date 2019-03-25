@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.collect.models
 
 import android.graphics.Color
-import com.simprints.id.R
+import com.simprints.fingerprint.R
 
 enum class FingerStatus(private val dotSelectedDrawableId: Int,
                         private val dotDeselectedDrawableId: Int,

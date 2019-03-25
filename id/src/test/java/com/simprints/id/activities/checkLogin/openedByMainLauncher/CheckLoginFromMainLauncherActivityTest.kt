@@ -35,11 +35,8 @@ class CheckLoginFromMainLauncherActivityTest {
 
     private lateinit var editor: SharedPreferences.Editor
 
-    @Inject
-    lateinit var remoteDbManagerMock: RemoteDbManager
-
-    @Inject
-    lateinit var dbManager: DbManager
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
+    @Inject lateinit var dbManager: DbManager
 
     private val module by lazy {
         TestAppModule(app,

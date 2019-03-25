@@ -2,9 +2,8 @@ package com.simprints.fingerprint.activities.matching
 
 
 import android.content.Intent
-
-import com.simprints.id.activities.BasePresenter
-import com.simprints.id.activities.BaseView
+import com.simprints.fingerprint.activities.BasePresenter
+import com.simprints.fingerprint.activities.BaseView
 
 
 interface MatchingContract {

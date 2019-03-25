@@ -33,6 +33,12 @@
         </activity>
 
         <activity
+            android:name=".activities.orchestrator.OrchestratorActivity"
+            android:label="@string/title_activity_orchestrator"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
@@ -89,12 +95,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
 
-        <activity
-            android:name=".activities.refusal.RefusalActivity"
-            android:label="@string/refusal_label"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:label="@string/dashboard_label"
@@ -104,10 +105,6 @@
             android:name=".activities.longConsent.LongConsentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <service
             android:name=".services.GuidSelectionService"
@@ -120,9 +117,6 @@
             </intent-filter>
         </service>
 
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />

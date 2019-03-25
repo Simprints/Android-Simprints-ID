@@ -16,6 +16,7 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modal.Modal
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -57,6 +58,7 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
+                                               @Named("ModalSerializer") modalSerializer: Serializer<Modal>,
                                                @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
                                                @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                                @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
@@ -64,6 +66,7 @@ open class PreferencesModule {
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
             groupSerializer,
+            modalSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer)

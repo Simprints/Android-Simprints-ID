@@ -4,20 +4,6 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-//@Parcelize
-//data class Person(
-//    val guid: String,
-//    var fingerprints: List<Fingerprint> = emptyList()): Parcelable {
-//
-//    init {
-//        fingerprints = fingerprints
-//            .groupBy { it.fingerId }
-//            .mapValues { it.value.maxBy { it.qualityScore } }
-//            .values
-//            .toMutableList() as MutableList<Fingerprint>
-//    }
-//}
-
 @Parcelize
 data class Person (
     val patientId: String,

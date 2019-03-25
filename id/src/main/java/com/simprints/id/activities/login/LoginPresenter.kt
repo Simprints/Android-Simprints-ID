@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authentica
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.Result.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -35,7 +34,6 @@ class LoginPresenter(val view: LoginContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
     private var startTimeLogin: Long = 0
@@ -52,6 +50,7 @@ class LoginPresenter(val view: LoginContract.View,
                         intentProjectId: String?,
                         intentLegacyProjectId: String?) =
         if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId)) {
+
             doAuthenticate(
                 suppliedProjectId,
                 suppliedUserId,

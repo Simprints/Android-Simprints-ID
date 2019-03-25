@@ -1,0 +1,5 @@
+<component name="DependencyValidationManager">
+  <state>
+    <deny_rule from_scope="Fingerprint module" to_scope="App module" is_deny="true" />
+  </state>
+</component>

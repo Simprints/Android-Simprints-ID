@@ -11,11 +11,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.requests.EnrolRequest
-import com.simprints.id.domain.requests.IdentifyRequest
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.VerifyRequest
-import com.simprints.id.domain.responses.*
+import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
@@ -38,7 +38,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    private val appRequest = view.parseRequest()
+    private var currentSession: String = ""
+    private lateinit var appRequest: AppRequest
 
     init {
         component.inject(this)
@@ -49,46 +50,44 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.checkCallingAppIsFromKnownSource()
         sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
             try {
+                parseAppRequest()
                 extractSessionParametersOrThrow()
                 addCalloutAndConnectivityEventsInSession(appRequest)
                 setLastUser()
                 setSessionIdCrashlyticsKey()
-            } catch (exception: InvalidCalloutError) {
-                view.openAlertActivityForError(exception.alert)
+            } catch (exception: Throwable) { // STOPSHIP : catch custom exception and display some alert
+                crashReportManager.logExceptionOrThrowable(exception)
+                val alert = if (exception is InvalidCalloutError) exception.alert else Alert.UNEXPECTED_ERROR
+                view.openAlertActivityForError(alert)
                 setupFailed = true
             }
-        }.subscribeBy(onError = { it.printStackTrace() })
+        }.subscribeBy(
+            onSuccess = {
+                currentSession = it.id
+            },
+            onError = { it.printStackTrace() }
+        )
     }
 
-    private fun addCalloutAndConnectivityEventsInSession(appRequest: Request) {
+    private fun parseAppRequest() {
+            appRequest = view.parseRequest()
+    }
+
+    private fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(buildRequestEvent(it.nowRelativeToStartTime(timeHelper), appRequest))
+                add(buildRequestEvent(it.timeRelativeToStartTime(timeHelper.now()), appRequest))
             }
         }
     }
 
-    private fun buildRequestEvent(relativeStarTime: Long, request: Request): Event =
+    private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is EnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
-            is VerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
-            is IdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
+            is AppEnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
+            is AppVerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
+            is AppIdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
             else -> throw Throwable("unrecognised request") //StopShip
-        }
-
-
-    private fun buildResponseEvent(relativeStarTime: Long, response: Response?): Event =
-        if (response == null) {
-            NoResponseEvent(relativeStarTime)
-        } else {
-            when (response) {
-                is EnrolResponse -> EnrolResponseEvent(relativeStarTime, response)
-                is VerifyResponse -> VerifyResponseEvent(relativeStarTime, response)
-                is IdentifyResponse -> IdentifyResponseEvent(relativeStarTime, response)
-                is RefusalFormResponse -> RefusalFormResponseEvent(relativeStarTime, response)
-                else -> throw Throwable("unrecognised request") //StopShip
-            }
         }
 
     private fun setLastUser() {
@@ -143,7 +142,20 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
         addInfoIntoSessionEventsAfterUserSignIn()
-        view.openLaunchActivity(appRequest)
+
+        view.openOrchestratorActivity(appRequest)
+
+        initOrUpdateAnalyticsKeys()
+    }
+
+    private fun initOrUpdateAnalyticsKeys() {
+        crashReportManager.apply {
+            setProjectIdCrashlyticsKey(loginInfoManager.getSignedInProjectIdOrEmpty())
+            setUserIdCrashlyticsKey(loginInfoManager.getSignedInUserIdOrEmpty())
+            setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
+            setDownSyncTriggersCrashlyticsKey(preferencesManager.peopleDownSyncTriggers)
+            setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -177,7 +189,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(
-            session.nowRelativeToStartTime(timeHelper),
+            session.timeRelativeToStartTime(timeHelper.now()),
             result,
             if (result == AUTHORIZED) {
                 UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())
@@ -185,13 +197,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 null
             }
         ))
-    }
-
-    override fun handleActivityResult(requestCode: Int, resultCode: Int, response: Response?) {
-        sessionEventsManager.updateSessionInBackground {
-            it.addEvent(buildResponseEvent(it.nowRelativeToStartTime(timeHelper), response)) //STOPSHIP: Fix me
-            it.closeIfRequired(timeHelper)
-        }
     }
 
     @SuppressLint("CheckResult")

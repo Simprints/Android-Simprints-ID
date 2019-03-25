@@ -2,37 +2,35 @@ package com.simprints.fingerprint.activities.collect
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.tools.extensions.toResultEvent
-import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
+import com.simprints.fingerprint.tools.utils.TimeHelper
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.domain.requests.Request
-import com.simprints.id.domain.requests.RequestAction
-import com.simprints.id.domain.responses.EnrolResponse
-import com.simprints.id.domain.responses.Response
-import com.simprints.id.exceptions.SimprintsException
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutParameterError
-import com.simprints.id.exceptions.unexpected.UnexpectedException
 import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
@@ -42,13 +40,11 @@ import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
-                                   private val appRequest: Request,
+                                   private val fingerprintRequest: FingerprintRequest,
                                    private val component: FingerprintsComponent)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var sessionEventsManager: SessionEventsManager
@@ -71,7 +67,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun start() {
-        LanguageHelper.setLanguage(context, preferencesManager.language)
+        LanguageHelper.setLanguage(context, fingerprintRequest.language)
 
         initFingerDisplayHelper(view)
         initIndicatorsHelper(context, view)
@@ -81,7 +77,11 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initFingerDisplayHelper(view: CollectFingerprintsContract.View) {
-        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(view, this, preferencesManager.fingerStatus, preferencesManager.nudgeMode)
+        fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
+            view,
+            this,
+            fingerprintRequest.fingerStatus,
+            fingerprintRequest.nudgeMode)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -124,10 +124,6 @@ class CollectFingerprintsPresenter(private val context: Context,
         currentActiveFingerNo = position
         refreshDisplay()
         scanningHelper.resetScannerUi()
-    }
-
-    override fun handleBackPressedWhileScanning() {
-        stopCapturing()
     }
 
     override fun handleScannerButtonPressed() {
@@ -189,18 +185,18 @@ class CollectFingerprintsPresenter(private val context: Context,
         activeFingers.filter { fingerHasSatisfiedTerminalCondition(it) }.size >= maximumTotalNumberOfFingersForAutoAdding
 
     private fun numberOfOriginalFingers() =
-        preferencesManager.fingerStatus.filter { it.value }.size
+        fingerprintRequest.fingerStatus.filter { it.value }.size
 
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (Request.action(appRequest)) {
-            RequestAction.ENROL -> context.getString(R.string.register_title)
-            RequestAction.IDENTIFY -> context.getString(R.string.identify_title)
-            RequestAction.VERIFY -> context.getString(R.string.verify_title)
+        when (fingerprintRequest) {
+            is FingerprintEnrolRequest -> context.getString(R.string.register_title)
+            is FingerprintIdentifyRequest -> context.getString(R.string.identify_title)
+            is FingerprintVerifyRequest -> context.getString(R.string.verify_title)
             else -> {
-                handleException(InvalidCalloutParameterError.forParameter("CalloutParameters"))
+                handleException(FingerprintSafeException("CalloutParameters")) //StopShip: Custom Error
                 ""
             }
         }
@@ -223,8 +219,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         scanningHelper.stopListeners()
     }
 
-    override fun handleOnBackPressedToLeave() {
-        scanningHelper.stopReconnecting()
+    override fun handleOnBackPressed() {
+        if (isScanning()) {
+            stopCapturing()
+        } else {
+            scanningHelper.stopReconnecting()
+            view.startRefusalActivity()
+        }
     }
 
     override fun handleConfirmFingerprintsAndContinue() {
@@ -253,9 +254,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
         val person = Person(
             UUID.randomUUID().toString(),
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            loginInfoManager.getSignedInUserIdOrEmpty(),
-            appRequest.moduleId,
+            fingerprintRequest.projectId,
+            fingerprintRequest.userId,
+            fingerprintRequest.moduleId,
             fingerprints)
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
@@ -266,52 +267,42 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun isRegisteringElseIsMatching() = Request.action(appRequest) == RequestAction.ENROL
+    private fun isRegisteringElseIsMatching() = fingerprintRequest is FingerprintEnrolRequest
 
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)
             .subscribeBy(
-                onComplete = { handleSavePersonSuccess(person.patientId) },
+                onComplete = { handleSavePersonSuccess(person) },
                 onError = { handleSavePersonFailure(it) })
     }
 
-    //STOPSHIP
-    //We shouldn't be using any client API models in ID past the interface layer.
-    private fun handleSavePersonSuccess(guidCreated: String) {
-        preferencesManager.lastEnrolDate = Date()
-        val result = Intent()
-        result.putExtra(Response.BUNDLE_KEY, EnrolResponse(guidCreated))
-        view.finishSuccessEnrol(result)
+    private fun handleSavePersonSuccess(probe: Person) {
+        //preferencesManager.lastEnrolDate = Date() //StopShip
+        view.finishSuccessEnrol(CollectResult.BUNDLE_KEY, CollectResult(probe))
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
-        handleException(UnexpectedException(throwable))
+        handleException(FingerprintUnexpectedException(throwable))
         view.cancelAndFinish()
     }
 
     private fun goToMatching(person: Person) {
-        val fingerprintModule = "com.simprints.id" //STOPSHIP
-        val matchingActivityClassName = "com.simprints.fingerprint.activities.matching.MatchingActivity"
-
-        val intent = Intent().setClassName(fingerprintModule, matchingActivityClassName)
-        intent.putExtra(IntentKeys.matchingActivityProbePersonKey, person)
-        intent.putExtra(Request.BUNDLE_KEY, appRequest)
-        view.finishSuccessAndStartMatching(intent)
+        view.finishSuccessAndStartMatching(CollectResult.BUNDLE_KEY, CollectResult(person))
     }
 
-    override fun handleException(simprintsException: SimprintsException) {
+    override fun handleException(simprintsException: FingerprintSimprintsException) {
         crashReportManager.logExceptionOrThrowable(simprintsException)
         Timber.e(simprintsException)
-        view.doLaunchAlert(Alert.UNEXPECTED_ERROR)
+        view.doLaunchAlert(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
         sessionEventsManager.updateSessionInBackground { sessionEvents ->
             sessionEvents.addEvent(FingerprintCaptureEvent(
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
-                sessionEvents.nowRelativeToStartTime(timeHelper),
-                finger.id,
-                preferencesManager.qualityThreshold,
+                sessionEvents.timeRelativeToStartTime(timeHelper.now()),
+                FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
+                fingerprintRequest.qualityThreshold,
                 finger.status.toResultEvent(),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))

@@ -2,6 +2,10 @@ apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
+androidExtensions {
+    experimental = true
+}
+
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -50,4 +54,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    implementation deps.androidx.appcompat
 }
