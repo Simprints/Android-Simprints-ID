@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -19,10 +18,8 @@ import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Test
-import org.junit.runner.RunWith
 import java.util.*
 
-@RunWith(AndroidJUnit4::class)
 class LibSimprintsPresenterTest {
 
     private val view = mock<LibSimprintsActivity>()
