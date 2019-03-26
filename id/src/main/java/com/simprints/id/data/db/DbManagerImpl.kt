@@ -135,7 +135,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .trace("savePerson")
 
     @Suppress("UNUSED_PARAMETER")
     private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {

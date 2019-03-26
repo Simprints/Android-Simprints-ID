@@ -14,6 +14,7 @@ import com.simprints.id.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.id.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.id.exceptions.unexpected.NullScannerException
 import com.simprints.id.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.id.tools.extensions.trace
 import com.simprints.libscanner.SCANNER_ERROR
 import com.simprints.libscanner.Scanner
 import com.simprints.libscanner.ScannerCallback
@@ -37,6 +38,7 @@ open class ScannerManagerImpl(val preferencesManager: PreferencesManager,
             .andThen(resetVeroUI())
             .andThen(shutdownVero())
             .andThen(wakeUpVero())
+            .trace("scannerSetup")
 
     override fun disconnectVero(): Completable = Completable.create { result ->
         if (scanner == null) {
