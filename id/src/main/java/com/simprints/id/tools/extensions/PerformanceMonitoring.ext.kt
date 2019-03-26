@@ -42,10 +42,12 @@ fun <T> Task<T>.trace(traceName: String): Task<T> {
 }
 
 private fun Trace.setSuccess(success: Boolean) =
-    if (success)
-        this.incrementCounter(CALL_SUCCESS_NAME, SUCCESS)
-    else
-        this.incrementCounter(CALL_SUCCESS_NAME, FAILURE)
+    if (success) {
+        this.incrementMetric(CALL_SUCCESS_NAME, SUCCESS)
+    }
+    else {
+        this.incrementMetric(CALL_SUCCESS_NAME, FAILURE)
+    }
 
 
 

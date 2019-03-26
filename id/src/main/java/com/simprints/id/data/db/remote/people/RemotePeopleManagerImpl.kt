@@ -11,6 +11,7 @@ import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOn
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.HttpException
@@ -36,6 +37,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
         getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
                 .retry(::retryCriteria)
+                .trace("uploadPatientBatch")
                 .handleResult(::defaultResponseErrorHandling)
         }
 
@@ -44,6 +46,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
             peopleRemoteInterface.requestPeopleCount(projectId, userId, moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
+                .trace("countRequest")
                 .map { it.count }
         }
 

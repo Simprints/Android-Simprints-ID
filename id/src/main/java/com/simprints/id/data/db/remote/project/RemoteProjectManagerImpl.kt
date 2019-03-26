@@ -8,6 +8,7 @@ import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.network.SimApiClient
 import com.simprints.id.tools.extensions.handleResponse
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Single
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,6 +20,7 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         getProjectApiClient().flatMap {
             it.requestProject(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProject")
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
@@ -26,6 +28,7 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         getProjectApiClient().flatMap {
             it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProjectConfig")
                 .handleResponse(::defaultResponseErrorHandling)
         }
 
