@@ -86,6 +86,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun updateCardViews() {
         runOnUiThread {
+            dashboardCardsView.recycledViewPool.clear()
             cardsViewAdapter.notifyDataSetChanged()
         }
     }
