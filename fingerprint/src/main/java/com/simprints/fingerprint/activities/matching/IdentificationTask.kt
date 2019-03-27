@@ -33,7 +33,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
 
     companion object {
-        const val matchingEndWaitTimeSeconds = 1 * 1000
+        const val matchingEndWaitTimeInMillis = 1000
     }
 
     override val matchStartTime = timeHelper.now()
@@ -75,7 +75,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
             MatchingActIdentifyResult(topCandidates))
         view.doSetResult(Activity.RESULT_OK, resultData)
-        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeSeconds)
+        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis)
     }
 
     private fun logMessageForCrashReport(message: String) {

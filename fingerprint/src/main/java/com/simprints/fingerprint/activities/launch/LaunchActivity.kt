@@ -170,7 +170,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1
 
-    override fun doVibrateIfNecessary(doVibrate: Boolean) = vibrate(this, doVibrate)
+    override fun doVibrate() = vibrate(this)
 
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
