@@ -15,10 +15,7 @@ interface IFingerprintRequest : Parcelable {
     val metadata: String
     val language: String
     val fingerStatus: Map<IFingerIdentifier, Boolean>
-    val nudgeMode: Boolean
-    val qualityThreshold: Int
     val logoExists: Boolean
     val programName: String
     val organizationName: String
-    val vibrateMode: Boolean
 }
