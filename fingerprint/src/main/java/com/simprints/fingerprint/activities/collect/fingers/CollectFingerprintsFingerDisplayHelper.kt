@@ -15,8 +15,7 @@ import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,
-                                             var fingerStatus: Map<FingerIdentifier, Boolean>,
-                                             var nudgeMode: Boolean) {
+                                             var fingerStatus: Map<FingerIdentifier, Boolean>) {
 
 
     private val allFingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)

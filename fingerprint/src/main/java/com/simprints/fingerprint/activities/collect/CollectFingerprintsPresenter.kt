@@ -80,8 +80,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            fingerprintRequest.fingerStatus,
-            fingerprintRequest.nudgeMode)
+            fingerprintRequest.fingerStatus)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -302,7 +301,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.timeRelativeToStartTime(timeHelper.now()),
                 FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
-                fingerprintRequest.qualityThreshold,
+                qualityThreshold,
                 finger.status.toResultEvent(),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))

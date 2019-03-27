@@ -11,12 +11,9 @@ data class FingerprintIdentifyRequest(val projectId: String,
                                       val metadata: String,
                                       val language: String,
                                       val fingerStatus: Map<FingerprintFingerIdentifier, Boolean>,
-                                      val nudgeMode: Boolean,
-                                      val qualityThreshold: Int,
                                       val logoExists: Boolean,
                                       val programName: String,
                                       val organizationName: String,
-                                      val vibrateMode: Boolean,
                                       val matchGroup: FingerprintMatchGroup,
                                       val returnIdCount: Int) : FingerprintRequest
 
