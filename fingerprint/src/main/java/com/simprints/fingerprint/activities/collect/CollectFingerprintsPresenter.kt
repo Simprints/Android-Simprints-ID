@@ -150,7 +150,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanningEndStateAchieved()) {
             createMapAndShowDialog()
         } else if (currentFinger().isGoodScan || currentFinger().isRescanGoodScan) {
-            fingerDisplayHelper.doNudgeIfNecessary()
+            fingerDisplayHelper.doNudge()
         } else {
             if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
                 fingerDisplayHelper.showSplashAndNudgeAndAddNewFinger()
@@ -356,5 +356,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val targetNumberOfGoodScans = 2
         private const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+        const val qualityThreshold = 60
+        const val timeoutInMillis = 3000
     }
 }
