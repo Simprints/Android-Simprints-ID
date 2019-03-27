@@ -67,8 +67,8 @@ artifactory {
         repository {
             repoKey = 'libs-release-local'
 
-            username = artifactory_username
-            password = artifactory_password
+            username = "${SIMPRINTS_ARTIFACTORY_USERNAME}"
+            password = "${SIMPRINTS_ARTIFACTORY_PASSWORD}"
         }
         defaults {
             publications('aar')
