@@ -48,10 +48,10 @@ class MatchingPresenterTest {
 
     private val matchTaskFinishedFlag = LinkedBlockingQueue<Unit>()
 
-    private val viewMock = mock<MatchingContract.View>().apply {
-        whenever(this) { makeToastMatchFailed() } then { matchTaskFinishedFlag.put(Unit) }
-        whenever(this) { doFinish() } then { matchTaskFinishedFlag.put(Unit) }
-        whenever(this) {
+    private val viewMock = mock<MatchingContract.View> {
+        whenever(it) { makeToastMatchFailed() } then { matchTaskFinishedFlag.put(Unit) }
+        whenever(it) { doFinish() } then { matchTaskFinishedFlag.put(Unit) }
+        whenever(it) {
             setIdentificationProgressFinished(anyInt(), anyInt(), anyInt(), anyInt(), anyInt())
         } then { matchTaskFinishedFlag.put(Unit) }
     }
@@ -60,16 +60,16 @@ class MatchingPresenterTest {
     private val preferencesManagerMock = mock<PreferencesManager>()
     private val sessionEventsManagerMock = mock<SessionEventsManager>()
     private val crashReportManagerMock = mock<CrashReportManager>()
-    private val timeHelperMock = mock<TimeHelper>().apply {
-        whenever(this) { now() } thenReturn System.currentTimeMillis()
+    private val timeHelperMock = mock<TimeHelper> {
+        whenever(it) { now() } thenReturn System.currentTimeMillis()
     }
 
     private val mockIdentificationLibMatcher: (Person, List<Person>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, candidates, _, scores, callback, _ ->
-            mock<LibMatcher>().apply {
-                whenever(this) { start() } then {
-                    IDENTIFY_PROGRESS_RANGE.forEach { callback.onMatcherProgress(Progress(it)) }
+            mock {
+                whenever(it) { start() } then {
+                    IDENTIFY_PROGRESS_RANGE.forEach { n -> callback.onMatcherProgress(Progress(n)) }
                     repeat(candidates.size) { scores.add(Random.nextFloat() * 100f) }
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
                 }
@@ -79,8 +79,8 @@ class MatchingPresenterTest {
     private val mockVerificationLibMatcher: (Person, List<Person>,
                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, scores, callback, _ ->
-            mock<LibMatcher>().apply {
-                whenever(this) { start() } then {
+            mock {
+                whenever(it) { start() } then {
                     callback.onMatcherProgress(Progress(0))
                     scores.add(Random.nextFloat())
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
@@ -91,8 +91,8 @@ class MatchingPresenterTest {
     private val mockErrorLibMatcher: (Person, List<Person>,
                                       LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, _, callback, _ ->
-            mock<LibMatcher>().apply {
-                whenever(this) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
+            mock {
+                whenever(it) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
             }
         }
 
