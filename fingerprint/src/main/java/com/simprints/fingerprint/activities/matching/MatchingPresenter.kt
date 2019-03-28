@@ -68,8 +68,8 @@ class MatchingPresenter(
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
-            val libProbe = probe.toLibCommonPerson()
-            val libCandidates = candidates.map { it.toLibCommonPerson() }
+            val libProbe = probe.toMatcherPerson()
+            val libCandidates = candidates.map { it.toMatcherPerson() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
@@ -91,10 +91,10 @@ class MatchingPresenter(
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
-    private fun Person.toLibCommonPerson() =
-        com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toLibCommonFingerprint() }) // STOPSHIP : Change LibMatcher interface
+    private fun Person.toMatcherPerson() =
+        com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
 
-    private fun Fingerprint.toLibCommonFingerprint() =
+    private fun Fingerprint.toMatcherFingerprint() =
         com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
