@@ -20,6 +20,7 @@ import com.simprints.fingerprint.testtools.PeopleGeneratorUtils
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
+import com.simprints.fingerprintmatcher.Person
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -63,7 +64,7 @@ class MatchingPresenterTest {
         whenever(this) { now() } thenReturn System.currentTimeMillis()
     }
 
-    private val mockIdentificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+    private val mockIdentificationLibMatcher: (Person, List<Person>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, candidates, _, scores, callback, _ ->
             mock<LibMatcher>().apply {
@@ -75,7 +76,7 @@ class MatchingPresenterTest {
             }
         }
 
-    private val mockVerificationLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+    private val mockVerificationLibMatcher: (Person, List<Person>,
                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, scores, callback, _ ->
             mock<LibMatcher>().apply {
@@ -87,7 +88,7 @@ class MatchingPresenterTest {
             }
         }
 
-    private val mockErrorLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+    private val mockErrorLibMatcher: (Person, List<Person>,
                                       LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, _, callback, _ ->
             mock<LibMatcher>().apply {
@@ -183,8 +184,8 @@ class MatchingPresenterTest {
         verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
     }
 
-    private fun createPresenter(request: MatchingActRequest, mockLibMatcher: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
-                                                                                             LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
+    private fun createPresenter(request: MatchingActRequest, mockLibMatcher: (Person, List<Person>,
+                                                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, request, dbManagerMock,
             sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockLibMatcher)
 

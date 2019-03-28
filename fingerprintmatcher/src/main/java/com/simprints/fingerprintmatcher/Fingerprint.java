@@ -1,4 +1,4 @@
-package com.simprints.libcommon;
+package com.simprints.fingerprintmatcher;
 
 import android.os.Parcel;
 import android.os.Parcelable;
