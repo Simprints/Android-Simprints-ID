@@ -67,7 +67,6 @@
 
 # These contain serialised models
 -keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.libcommon.** { *; }
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
