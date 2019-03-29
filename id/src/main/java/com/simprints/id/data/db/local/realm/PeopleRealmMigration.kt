@@ -60,6 +60,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
                 4 -> migrateTo5(realm.schema)
+                5 -> migrateTo6(realm.schema)
             }
         }
     }
@@ -146,6 +147,13 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     private fun migrateTo5(schema: RealmSchema) {
         //We want to delete RlSyncInfo, but we need to migrate to Room.
         //In the next version, we will drop this class.
+    }
+
+    private fun migrateTo6(schema: RealmSchema) {
+        schema.get("rl_Person")?.className = PERSON_TABLE
+        schema.get("rl_Fingerprint")?.className = FINGERPRINT_TABLE
+        schema.get("rl_Project")?.className = PROJECT_TABLE
+        schema.get("rl_SyncInfo")?.className = SYNC_INFO_TABLE
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
