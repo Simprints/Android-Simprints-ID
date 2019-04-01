@@ -40,7 +40,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                                         component: FingerprintsComponent) {
 
     @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
