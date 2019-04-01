@@ -201,10 +201,8 @@ class MatchingPresenterTest {
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(PersonFetchResult(candidate, false))
     }
 
-    private fun setupPrefs(numberIdReturns: Int = NUMBER_OF_ID_RETURNS,
-                           matcherTypeInt: Int = 0) {
+    private fun setupPrefs(numberIdReturns: Int = NUMBER_OF_ID_RETURNS) {
         whenever(preferencesManagerMock) { returnIdCount } thenReturn numberIdReturns
-        whenever(preferencesManagerMock) { matcherType } thenReturn matcherTypeInt
     }
 
     private fun captureMatchingResult(): KArgumentCaptor<Intent> {

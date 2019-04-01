@@ -15,8 +15,7 @@ import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,
-                                             var fingerStatus: Map<FingerIdentifier, Boolean>,
-                                             var nudgeMode: Boolean) {
+                                             var fingerStatus: Map<FingerIdentifier, Boolean>) {
 
 
     private val allFingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
@@ -111,17 +110,15 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     // Swipes ViewPager automatically when the current finger is complete
-    fun doNudgeIfNecessary() {
-        if (nudgeMode) {
-            if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
-                presenter.isNudging = true
-                Handler().postDelayed({
-                    view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
-                    view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
-                    view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
-                    presenter.isNudging = false
-                }, AUTO_SWIPE_DELAY)
-            }
+    fun doNudge() {
+        if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
+            presenter.isNudging = true
+            Handler().postDelayed({
+                view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
+                view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
+                view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
+                presenter.isNudging = false
+            }, AUTO_SWIPE_DELAY)
         }
     }
 
@@ -129,13 +126,13 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         showTryDifferentFingerSplash()
         Handler().postDelayed({
             handleAutoAddFinger()
-            doNudgeIfNecessary()
+            doNudge()
         }, TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
 
     fun showSplashAndNudgeIfNecessary() {
         showTryDifferentFingerSplash()
-        doNudgeIfNecessary()
+        doNudge()
     }
 
 

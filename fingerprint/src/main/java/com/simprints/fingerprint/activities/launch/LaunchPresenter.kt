@@ -227,7 +227,7 @@ class LaunchPresenter(component: FingerprintsComponent,
     private fun handleSetupFinished() {
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
-        view.doVibrateIfNecessary(fingerprintRequest.vibrateMode)
+        view.doVibrate()
     }
 
     private fun setTextToConsentTabs() {

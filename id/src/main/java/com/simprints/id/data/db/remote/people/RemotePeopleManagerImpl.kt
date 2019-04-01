@@ -12,6 +12,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.HttpException
@@ -39,6 +40,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
+                .trace("uploadPatientBatch")
         }
 
     override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
@@ -46,6 +48,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
             peopleRemoteInterface.requestPeopleCount(projectId, userId, moduleId)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
+                .trace("countRequest")
                 .map { it.count }
         }
 

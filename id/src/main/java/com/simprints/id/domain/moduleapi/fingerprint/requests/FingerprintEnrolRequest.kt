@@ -10,9 +10,6 @@ data class FingerprintEnrolRequest(val projectId: String,
                                    val metadata: String,
                                    val language: String,
                                    val fingerStatus: Map<FingerprintFingerIdentifier, Boolean>,
-                                   val nudgeMode: Boolean,
-                                   val qualityThreshold: Int,
                                    val logoExists: Boolean,
                                    val programName: String,
-                                   val organizationName: String,
-                                   val vibrateMode: Boolean): FingerprintRequest
+                                   val organizationName: String): FingerprintRequest

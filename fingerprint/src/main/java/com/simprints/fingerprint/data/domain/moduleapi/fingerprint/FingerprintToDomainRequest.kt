@@ -29,7 +29,7 @@ object FingerprintToDomainRequest {
             FingerprintIdentifyRequest(
                 projectId, userId, moduleId, metadata, language,
                 fingerStatus.mapKeys { it.key.toDomainClass() },
-                nudgeMode, qualityThreshold, logoExists, organizationName, programName, vibrateMode, matchGroup.toDomainClass(), returnIdCount
+                logoExists, organizationName, programName, matchGroup.toDomainClass(), returnIdCount
             )
         }
 
@@ -39,7 +39,7 @@ object FingerprintToDomainRequest {
             FingerprintVerifyRequest(
                 projectId, userId, moduleId, metadata, language,
                 fingerStatus.mapKeys { it.key.toDomainClass() },
-                nudgeMode, qualityThreshold, logoExists, programName, organizationName, vibrateMode, verifyGuid)
+                logoExists, programName, organizationName, verifyGuid)
         }
 
 
@@ -48,7 +48,7 @@ object FingerprintToDomainRequest {
             FingerprintEnrolRequest(
                 projectId, userId, moduleId, metadata, language,
                 fingerStatus.mapKeys { it.key.toDomainClass() },
-                nudgeMode, qualityThreshold, logoExists, programName, organizationName, vibrateMode)
+                logoExists, programName, organizationName)
         }
 
 }
