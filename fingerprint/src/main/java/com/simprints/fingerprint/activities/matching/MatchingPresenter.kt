@@ -30,7 +30,7 @@ class MatchingPresenter(
     private val sessionEventsManager: SessionEventsManager,
     private val crashReportManager: CrashReportManager,
     private val timeHelper: TimeHelper,
-    private val libMatcherConstructor: (com.simprints.libcommon.Person, List<com.simprints.libcommon.Person>,
+    private val libMatcherConstructor: (com.simprints.fingerprintmatcher.Person, List<com.simprints.fingerprintmatcher.Person>,
                                         LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher
 ) : MatchingContract.Presenter {
 
@@ -68,8 +68,8 @@ class MatchingPresenter(
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
-            val libProbe = probe.toLibCommonPerson()
-            val libCandidates = candidates.map { it.toLibCommonPerson() }
+            val libProbe = probe.toMatcherPerson()
+            val libCandidates = candidates.map { it.toMatcherPerson() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
@@ -91,11 +91,11 @@ class MatchingPresenter(
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
-    private fun Person.toLibCommonPerson() =
-        com.simprints.libcommon.Person(patientId, fingerprints.map { it.toLibCommonFingerprint() }) // STOPSHIP : Change LibMatcher interface
+    private fun Person.toMatcherPerson() =
+        com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
 
-    private fun Fingerprint.toLibCommonFingerprint() =
-        com.simprints.libcommon.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
+    private fun Fingerprint.toMatcherFingerprint() =
+        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception

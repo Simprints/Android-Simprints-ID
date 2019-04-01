@@ -1,4 +1,4 @@
-package com.simprints.libcommon;
+package com.simprints.fingerprintmatcher;
 
 import com.simprints.libsimprints.FingerIdentifier;
 
