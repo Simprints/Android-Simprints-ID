@@ -10,21 +10,13 @@ import com.simprints.id.tools.serializers.Serializer
 
 interface SettingsPreferencesManager {
 
-    var nudgeMode: Boolean
-    var consent: Boolean
-    var qualityThreshold: Int
     var returnIdCount: Int
     var language: String
-    var languagePosition: Int
     var projectLanguages: Array<String>
-    var matcherType: Int
-    var timeoutS: Int
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
     var syncGroup: GROUP
     var matchGroup: GROUP
-    var vibrateMode: Boolean
-    var matchingEndWaitTimeSeconds: Int
     /** @throws JsonSyntaxException */
     var fingerStatus: Map<FingerIdentifier, Boolean>
 

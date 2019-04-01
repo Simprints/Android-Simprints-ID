@@ -32,12 +32,9 @@ object FingerprintRequestFactory {
                 projectId, userId, moduleId, metadata,
                 prefs.language,
                 prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.nudgeMode,
-                prefs.qualityThreshold,
                 prefs.logoExists,
                 prefs.organizationName,
-                prefs.programName,
-                prefs.vibrateMode)
+                prefs.programName)
         }
 
     private fun buildFingerprintVerifyRequest(verify: AppVerifyRequest, prefs: PreferencesManager): FingerprintVerifyRequest =
@@ -46,12 +43,9 @@ object FingerprintRequestFactory {
                 projectId, userId, moduleId, metadata,
                 prefs.language,
                 prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.nudgeMode,
-                prefs.qualityThreshold,
                 prefs.logoExists,
                 prefs.organizationName,
                 prefs.programName,
-                prefs.vibrateMode,
                 verifyGuid)
         }
 
@@ -65,12 +59,9 @@ object FingerprintRequestFactory {
                 projectId, userId, moduleId, metadata,
                 prefs.language,
                 prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.nudgeMode,
-                prefs.qualityThreshold,
                 prefs.logoExists,
                 prefs.organizationName,
                 prefs.programName,
-                prefs.vibrateMode,
                 buildFingerprintMatchGroup(prefs.matchGroup),
                 returnIdCount)
         }

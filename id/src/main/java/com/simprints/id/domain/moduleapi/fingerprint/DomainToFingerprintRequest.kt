@@ -24,24 +24,18 @@ object DomainToFingerprintRequest {
         with(enrolRequest) {
             FingerprintEnrolRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
-                nudgeMode,
-                qualityThreshold,
                 logoExists,
                 organizationName,
-                programName,
-                vibrateMode)
+                programName)
         }
 
     private fun fromDomainToFingerprintVerifyRequest(verifyRequest: FingerprintVerifyRequest): IFingerprintVerifyRequest =
         with(verifyRequest) {
             FingerprintVerifyRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
-                nudgeMode,
-                qualityThreshold,
                 logoExists,
                 organizationName,
                 programName,
-                vibrateMode,
                 verifyGuid)
         }
 
@@ -51,12 +45,9 @@ object DomainToFingerprintRequest {
             FingerprintIdentifyRequestImpl(
                 projectId, userId, moduleId, metadata, language,
                 fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
-                nudgeMode,
-                qualityThreshold,
                 logoExists,
                 organizationName,
                 programName,
-                vibrateMode,
                 fromDomainToFingerprintMatchGroup(matchGroup),
                 returnIdCount)
         }
@@ -90,12 +81,9 @@ private data class FingerprintEnrolRequestImpl(override val projectId: String,
                                                override val metadata: String,
                                                override val language: String,
                                                override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                               override val nudgeMode: Boolean,
-                                               override val qualityThreshold: Int,
                                                override val logoExists: Boolean,
                                                override val programName: String,
-                                               override val organizationName: String,
-                                               override val vibrateMode: Boolean) : IFingerprintEnrolRequest
+                                               override val organizationName: String) : IFingerprintEnrolRequest
 
 @Parcelize
 private data class FingerprintIdentifyRequestImpl(override val projectId: String,
@@ -104,12 +92,9 @@ private data class FingerprintIdentifyRequestImpl(override val projectId: String
                                                   override val metadata: String,
                                                   override val language: String,
                                                   override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                                  override val nudgeMode: Boolean,
-                                                  override val qualityThreshold: Int,
                                                   override val logoExists: Boolean,
                                                   override val programName: String,
                                                   override val organizationName: String,
-                                                  override val vibrateMode: Boolean,
                                                   override val matchGroup: IMatchGroup,
                                                   override val returnIdCount: Int) : IFingerprintIdentifyRequest
 
@@ -120,10 +105,7 @@ private data class FingerprintVerifyRequestImpl(override val projectId: String,
                                                 override val metadata: String,
                                                 override val language: String,
                                                 override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                                override val nudgeMode: Boolean,
-                                                override val qualityThreshold: Int,
                                                 override val logoExists: Boolean,
                                                 override val programName: String,
                                                 override val organizationName: String,
-                                                override val vibrateMode: Boolean,
                                                 override val verifyGuid: String) : IFingerprintVerifyRequest

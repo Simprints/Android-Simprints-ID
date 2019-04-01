@@ -8,6 +8,7 @@ import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmF
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
+import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
@@ -80,8 +81,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            fingerprintRequest.fingerStatus,
-            fingerprintRequest.nudgeMode)
+            fingerprintRequest.fingerStatus)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -150,7 +150,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         if (isScanningEndStateAchieved()) {
             createMapAndShowDialog()
         } else if (currentFinger().isGoodScan || currentFinger().isRescanGoodScan) {
-            fingerDisplayHelper.doNudgeIfNecessary()
+            fingerDisplayHelper.doNudge()
         } else {
             if (haveNotExceedMaximumNumberOfFingersToAutoAdd()) {
                 fingerDisplayHelper.showSplashAndNudgeAndAddNewFinger()
@@ -302,7 +302,7 @@ class CollectFingerprintsPresenter(private val context: Context,
                 sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
                 sessionEvents.timeRelativeToStartTime(timeHelper.now()),
                 FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
-                fingerprintRequest.qualityThreshold,
+                qualityThreshold,
                 finger.status.toResultEvent(),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
@@ -325,7 +325,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
         mutableMapOf<String, Boolean>().also { mapOfScannedFingers ->
             activeFingers.forEach {
-                mapOfScannedFingers[context.getString(com.simprints.fingerprint.activities.collect.models.FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
+                mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
             }
         }
 
@@ -356,5 +356,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val targetNumberOfGoodScans = 2
         private const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
+        const val qualityThreshold = 60
+        const val timeoutInMillis = 3000
     }
 }
