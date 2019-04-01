@@ -37,7 +37,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':libcommon')
     implementation project(':libsimprints')
 
     implementation deps.androidx.appcompat

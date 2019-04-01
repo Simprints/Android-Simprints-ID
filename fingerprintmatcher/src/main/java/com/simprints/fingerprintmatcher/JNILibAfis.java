@@ -1,7 +1,5 @@
 package com.simprints.fingerprintmatcher;
 
-import com.simprints.libcommon.Person;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 

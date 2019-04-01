@@ -59,7 +59,6 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
-    implementation project(':libcommon')
     implementation project(':libsimprints')
     implementation project(':fingerprintmatcher')
     implementation project(':fingerprintscanner')

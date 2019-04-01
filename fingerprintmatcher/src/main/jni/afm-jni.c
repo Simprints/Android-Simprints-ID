@@ -87,8 +87,8 @@ JNIEXPORT jboolean JNICALL Java_com_simprints_fingerprintmatcher_JNILibAfis_nati
 {
     LOG("nativeInit() Initializing classes");
     DEFINE_GLOBAL_CLASS(c_List, "java/util/List");
-    DEFINE_GLOBAL_CLASS(c_Person, "com/simprints/libcommon/Person");
-    DEFINE_GLOBAL_CLASS(c_Fingerprint, "com/simprints/libcommon/Fingerprint");
+    DEFINE_GLOBAL_CLASS(c_Person, "com/simprints/fingerprintmatcher/Person");
+    DEFINE_GLOBAL_CLASS(c_Fingerprint, "com/simprints/fingerprintmatcher/Fingerprint");
     DEFINE_GLOBAL_CLASS(c_FingerIdentifier, "com/simprints/libsimprints/FingerIdentifier");
 
     LOG("nativeInit() Initializing methods");

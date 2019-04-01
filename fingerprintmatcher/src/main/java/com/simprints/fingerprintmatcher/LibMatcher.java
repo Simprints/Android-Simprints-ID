@@ -3,8 +3,6 @@ package com.simprints.fingerprintmatcher;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.simprints.libcommon.Fingerprint;
-import com.simprints.libcommon.Person;
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener;
 import com.simprints.fingerprintmatcher.sourceafis.matching.ParallelMatcher;
 import com.simprints.fingerprintmatcher.sourceafis.simple.SourceAfisEngine;

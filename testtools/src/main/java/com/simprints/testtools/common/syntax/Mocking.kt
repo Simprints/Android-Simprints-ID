@@ -14,6 +14,10 @@ inline fun <reified T> spy(): T =
 fun <T> spy(t: T): T =
     Mockito.spy(t)
 
+inline fun <reified T> mock(setup: (T) -> Unit): T = mock<T>().apply(setup)
+inline fun <reified T> spy(setup: (T) -> Unit): T = spy<T>().apply(setup)
+inline fun <T> spy(t: T, setup: (T) -> Unit): T = spy(t).apply(setup)
+
 /** For mocks only */
 fun <T> whenever(methodCall: T): InfixOngoingStubbing<T> =
     InfixOngoingStubbing(Mockito.`when`(methodCall))
