@@ -19,9 +19,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         const val REALM_SCHEMA_VERSION: Long = 5
 
         const val PERSON_TABLE: String = "DbPerson"
-        const val USER_TABLE: String = "rl_User"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
-        const val API_KEY_TABLE: String = "rl_ApiKey"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"
         const val PROJECT_TABLE: String = "DbProject"
 
@@ -70,7 +68,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
             it.set(MODULE_FIELD, Constants.GLOBAL_ID)
         }
 
-        schema.remove(USER_TABLE)
+        schema.remove("rl_User")
     }
 
     private fun migrateTo2(schema: RealmSchema) {
@@ -79,7 +77,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         migrateProjectInfoTo2(schema)
 
         schema.get(FINGERPRINT_TABLE)?.removeField(FINGERPRINT_PERSON)
-        schema.remove(API_KEY_TABLE)
+        schema.remove("rl_ApiKey")
     }
 
     private fun migratePersonTo2(schema: RealmSchema) {
@@ -145,7 +143,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo5(schema: RealmSchema) {
-        //We want to delete RlSyncInfo, but we need to migrate to Room.
+        //We want to delete DbSyncInfo, but we need to migrate to Room.
         //In the next version, we will drop this class.
     }
 
