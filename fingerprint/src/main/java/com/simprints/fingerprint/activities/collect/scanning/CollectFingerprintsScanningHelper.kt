@@ -11,6 +11,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter.Companion.timeoutInMillis
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
+import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.di.FingerprintsComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
@@ -75,8 +76,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.scanner?.unregisterButtonListener(scannerButtonListener)
     }
 
-    private fun initTimeoutBar(): com.simprints.fingerprint.activities.collect.views.TimeoutBar =
-        com.simprints.fingerprint.activities.collect.views.TimeoutBar(context.applicationContext, view.progressBar, timeoutInMillis * 1000)
+    private fun initTimeoutBar(): TimeoutBar =
+        TimeoutBar(context.applicationContext, view.progressBar, timeoutInMillis)
 
     // Creates a progress dialog when the scan gets disconnected
     private fun initUn20Dialog(): ProgressDialog =
@@ -201,7 +202,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scannerManager.scanner?.startContinuousCapture(qualityThreshold,
-            (timeoutInMillis * 1000).toLong(), startContinuousCaptureScannerCallback)
+            timeoutInMillis.toLong(), startContinuousCaptureScannerCallback)
     }
 
     private fun stopContinuousCapture() {
