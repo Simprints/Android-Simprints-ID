@@ -11,7 +11,6 @@
       <module fileurl="file://$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" filepath="$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" />
       <module fileurl="file://$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" filepath="$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
       <module fileurl="file://$PROJECT_DIR$/moduleapi/moduleapi.iml" filepath="$PROJECT_DIR$/moduleapi/moduleapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/testtools/testtools.iml" filepath="$PROJECT_DIR$/testtools/testtools.iml" />

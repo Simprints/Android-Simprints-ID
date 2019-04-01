@@ -4,18 +4,24 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.Fragment
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
-import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.tools.extensions.activityIsPresentAndFragmentIsAdded
-import kotlinx.android.synthetic.main.fragment_finger.*
 
 class FingerFragment : Fragment() {
 
     lateinit var finger: Finger
+    private lateinit var fingerImage: ImageView
+    private lateinit var fingerResultText: TextView
+    private lateinit var fingerDirectionText: TextView
+    private lateinit var fingerNumberText: TextView
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_finger, container, false)
@@ -23,6 +29,11 @@ class FingerFragment : Fragment() {
         finger = arguments?.get(FINGER_ARG) as Finger
 
         FingerRes.setFingerRes()
+
+        fingerImage = view.findViewById(R.id.fingerImage)
+        fingerResultText = view.findViewById(R.id.fingerResultText)
+        fingerDirectionText = view.findViewById(R.id.fingerDirectionText)
+        fingerNumberText = view.findViewById(R.id.fingerNumberText)
 
         if(activityIsPresentAndFragmentIsAdded()) {
             updateFingerImageAccordingToStatus()
