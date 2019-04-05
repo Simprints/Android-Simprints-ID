@@ -16,7 +16,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 5
+        const val REALM_SCHEMA_VERSION: Long = 6
 
         const val PERSON_TABLE: String = "DbPerson"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
@@ -58,7 +58,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
                 4 -> migrateTo5(realm.schema)
-                5 -> migrateTo6(realm.schema)
+                6 -> migrateTo6(realm.schema)
             }
         }
     }
