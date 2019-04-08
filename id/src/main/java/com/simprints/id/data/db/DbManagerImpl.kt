@@ -36,17 +36,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
                          private val peopleUpSyncMaster: PeopleUpSyncMaster,
                          private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
-    override fun initialiseDb() {
-        val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-        if (projectId.isNotEmpty()) {
-            try {
-                local.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
         remote.signInToRemoteDb(tokens.legacyToken)
             .andThen(signInToLocal(projectId))
