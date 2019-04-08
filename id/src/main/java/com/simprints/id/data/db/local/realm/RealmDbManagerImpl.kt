@@ -48,7 +48,6 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
 
     override fun signInToLocal(localDbKey: LocalDbKey) {
         this.localDbKey = localDbKey
-        PeopleRealmEncryptionMigration(localDbKey, appContext)
     }
 
     override fun insertOrUpdatePersonInLocal(person: Person): Completable =

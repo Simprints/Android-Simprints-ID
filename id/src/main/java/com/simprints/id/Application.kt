@@ -62,8 +62,6 @@ open class Application : MultiDexApplication() {
 
         initFabric()
 
-        dbManager.initialiseDb()
-
         handleUndeliverableExceptionInRxJava()
     }
 
