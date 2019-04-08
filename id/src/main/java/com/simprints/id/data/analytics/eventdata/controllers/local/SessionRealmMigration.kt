@@ -13,7 +13,7 @@ internal class SessionRealmMigration : RealmMigration {
     class SessionModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 3
+        const val REALM_SCHEMA_VERSION: Long = 4
         const val DB_INFO_TABLE = "DbDatabaseInfo"
         const val DB_DEVICE_TABLE = "DbDevice"
         const val DB_LOCATION_TABLE = "DbLocation"
