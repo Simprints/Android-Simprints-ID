@@ -144,6 +144,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
 
     private fun migrateTo5(schema: RealmSchema) {
         //We want to delete DbSyncInfo, but we need to migrate to Room.
+        //We do the migration in DownSyncTask
         //In the next version, we will drop this class.
     }
 
