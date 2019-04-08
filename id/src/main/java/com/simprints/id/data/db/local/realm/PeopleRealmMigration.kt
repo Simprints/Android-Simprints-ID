@@ -58,7 +58,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
                 4 -> migrateTo5(realm.schema)
-                6 -> migrateTo6(realm.schema)
+                5 -> migrateTo6(realm.schema)
             }
         }
     }
