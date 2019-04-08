@@ -82,7 +82,10 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideLocalDbManager(ctx: Context): LocalDbManager = RealmDbManagerImpl(ctx)
+    open fun provideLocalDbManager(ctx: Context,
+                                   secureDataManager: SecureDataManager,
+                                   loginInfoManager: LoginInfoManager): LocalDbManager =
+        RealmDbManagerImpl(ctx, secureDataManager, loginInfoManager)
 
     @Provides
     @Singleton
@@ -113,7 +116,7 @@ open class AppModule(val app: Application) {
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
+        DbManagerImpl(localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton

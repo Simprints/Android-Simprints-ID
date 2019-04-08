@@ -3,24 +3,16 @@ package com.simprints.id
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
-import javax.inject.Inject
 
 open class Application : MultiDexApplication() {
 
     lateinit var component: AppComponent
-
-    @Inject
-    lateinit var dbManager: DbManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
 
     open fun createComponent() {
         component = DaggerAppComponent
