@@ -20,7 +20,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var crashReportManager: CrashReportManager
 

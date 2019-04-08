@@ -9,7 +9,6 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
@@ -26,7 +25,6 @@ import io.reactivex.schedulers.Schedulers
 
 open class DbManagerImpl(override val local: LocalDbManager,
                          override val remote: RemoteDbManager,
-                         private val secureDataManager: SecureDataManager,
                          private val loginInfoManager: LoginInfoManager,
                          private val preferencesManager: PreferencesManager,
                          private val sessionEventsManager: SessionEventsManager,
@@ -38,21 +36,10 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
         remote.signInToRemoteDb(tokens.legacyToken)
-            .andThen(signInToLocal(projectId))
             .andThen(refreshProjectInfoWithServer(projectId))
             .flatMapCompletable(storeCredentials(userId))
             .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")
-
-    private fun signInToLocal(projectId: String): Completable =
-        Completable.create {
-            try {
-                local.signInToLocal(secureDataManager.getLocalDbKeyOrThrow(projectId))
-                it.onComplete()
-            } catch (t: Throwable) {
-                it.onError(t)
-            }
-        }
 
     private fun storeCredentials(userId: String) = { project: Project ->
         Completable.create {

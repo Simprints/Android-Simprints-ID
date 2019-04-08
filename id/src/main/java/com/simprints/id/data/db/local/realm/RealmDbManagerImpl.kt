@@ -5,6 +5,8 @@ import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
+import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
@@ -24,7 +26,9 @@ import io.realm.Sort
 import timber.log.Timber
 
 //TODO: investigate potential concurrency issues using .use
-open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager {
+open class RealmDbManagerImpl(appContext: Context,
+                              val secureDataManager: SecureDataManager,
+                              val loginInfoManager: LoginInfoManager) : LocalDbManager {
 
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -36,18 +40,9 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     }
 
     private var realmConfig: RealmConfiguration? = null
-    private var localDbKey: LocalDbKey? = null
-        set(value) {
-            field = value
-            value?.let { createAndSaveRealmConfig(value) }
-        }
 
     init {
         Realm.init(appContext)
-    }
-
-    override fun signInToLocal(localDbKey: LocalDbKey) {
-        this.localDbKey = localDbKey
     }
 
     override fun insertOrUpdatePersonInLocal(person: Person): Completable =
@@ -153,7 +148,16 @@ open class RealmDbManagerImpl(private val appContext: Context) : LocalDbManager 
     private fun getRealmConfig(): Single<RealmConfiguration> =
         realmConfig
             ?.let { Single.just(it) }
-            ?: throw RealmUninitialisedException("No valid realm Config")
+            ?: getProjectIdAndCreateRealmConfig()
+
+    private fun getProjectIdAndCreateRealmConfig() =
+        loginInfoManager.getSignedInProjectIdOrEmpty().let {
+            if (!it.isEmpty()) {
+                createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
+            } else {
+                throw RealmUninitialisedException("No valid realm config")
+            }
+        }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
         Single.just(PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
