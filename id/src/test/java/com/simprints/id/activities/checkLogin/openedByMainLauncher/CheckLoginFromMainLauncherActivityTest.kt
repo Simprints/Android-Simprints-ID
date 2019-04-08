@@ -48,7 +48,6 @@ class CheckLoginFromMainLauncherActivityTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-        dbManager.initialiseDb()
 
         val sharedPrefs = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
         editor = sharedPrefs.edit()

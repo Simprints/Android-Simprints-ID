@@ -62,8 +62,6 @@ class DashboardCardsFactoryTest {
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
 
-        dbManager.initialiseDb()
-
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
 
