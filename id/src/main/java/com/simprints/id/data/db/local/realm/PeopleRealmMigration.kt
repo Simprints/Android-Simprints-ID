@@ -10,8 +10,7 @@ import io.realm.annotations.RealmModule
 import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
-
-    //StopShip: classes were renamed. Write Migration.
+    
     @RealmModule(classes = [DbFingerprint::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
     class PeopleModule
 
