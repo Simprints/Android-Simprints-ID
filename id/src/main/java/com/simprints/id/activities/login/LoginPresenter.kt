@@ -86,6 +86,7 @@ class LoginPresenter(val view: LoginContract.View,
                     handleSignInSuccess(suppliedProjectId, suppliedUserId)
                 },
                 onError = { e ->
+                    e.printStackTrace()
                     handleSignInError(e, suppliedProjectId, suppliedUserId)
                 })
     }
