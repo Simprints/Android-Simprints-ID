@@ -103,8 +103,8 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
         signedInUserId = ""
     }
 
-    override fun storeCredentials(projectId: String, legacyProjectId: String?, userId: String) {
-        storeProjectIdWithLegacyProjectIdPair(projectId, legacyProjectId)
+    override fun storeCredentials(projectId: String, userId: String) {
+        storeProjectIdWithLegacyProjectIdPair(projectId, "") //StopShip: Remove legacy Key
         signedInProjectId = projectId
         signedInUserId = userId
     }

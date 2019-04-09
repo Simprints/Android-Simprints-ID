@@ -36,21 +36,20 @@ open class DbManagerImpl(override val local: LocalDbManager,
 
     override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
         remote.signInToRemoteDb(tokens.legacyToken)
-            .andThen(refreshProjectInfoWithServer(projectId))
-            .flatMapCompletable(storeCredentials(userId))
+            .andThen(storeCredentials(userId, projectId))
+            .andThen(refreshProjectInfoWithServer(projectId).ignoreElement())
             .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")
 
-    private fun storeCredentials(userId: String) = { project: Project ->
+    private fun storeCredentials(userId: String, projectId: String) =
         Completable.create {
             try {
-                loginInfoManager.storeCredentials(project.id, project.legacyId, userId)
+                loginInfoManager.storeCredentials(projectId, userId)
                 it.onComplete()
             } catch (t: Throwable) {
                 it.onError(t)
             }
         }
-    }
 
     @Suppress("UNUSED_PARAMETER")
     private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
