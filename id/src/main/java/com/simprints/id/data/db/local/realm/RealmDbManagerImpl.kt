@@ -148,9 +148,9 @@ open class RealmDbManagerImpl(appContext: Context,
     private fun getRealmConfig(): Single<RealmConfiguration> =
         realmConfig
             ?.let { Single.just(it) }
-            ?: getProjectIdAndCreateRealmConfig()
+            ?: getLocalDbKeyAndCreateRealmConfig()
 
-    private fun getProjectIdAndCreateRealmConfig() =
+    private fun getLocalDbKeyAndCreateRealmConfig() =
         loginInfoManager.getSignedInProjectIdOrEmpty().let {
             if (!it.isEmpty()) {
                 createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
