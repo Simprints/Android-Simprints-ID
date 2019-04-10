@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
+import com.simprints.id.orchestrator.modals.ModalStepRequest
 import io.reactivex.Observable
 import io.reactivex.Single
 

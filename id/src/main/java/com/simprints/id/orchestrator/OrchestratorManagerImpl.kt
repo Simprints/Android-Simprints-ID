@@ -8,22 +8,23 @@ import com.simprints.id.domain.modal.Modal.*
 import com.simprints.id.domain.modal.ModalResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modals.MultiModalFlow
+import com.simprints.id.orchestrator.modals.ModalFlowBuilder
+import com.simprints.id.orchestrator.modals.ModalStepRequest
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFace
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFaceFinger
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFinger
 import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFingerFace
-import com.simprints.id.orchestrator.modals.flows.FaceModal
-import com.simprints.id.orchestrator.modals.flows.FingerprintModal
-import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
+import com.simprints.id.orchestrator.modals.flows.FaceModalFlow
+import com.simprints.id.orchestrator.modals.flows.FingerprintModalFlow
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 
-class OrchestratorManagerImpl(val modal: Modal,
-                              prefs: PreferencesManager) : OrchestratorManager {
+open class OrchestratorManagerImpl(val modal: Modal,
+                                   flowModalBuilder: ModalFlowBuilder,
+                                   prefs: PreferencesManager) : OrchestratorManager {
 
     companion object {
         private const val packageName = "com.simprints.id"
@@ -31,19 +32,19 @@ class OrchestratorManagerImpl(val modal: Modal,
 
     private var appResponseEmitter: SingleEmitter<AppResponse>? = null
 
-    private lateinit var appRequest: AppRequest
+    internal lateinit var appRequest: AppRequest
     private val stepsResults: MutableList<ModalResponse> = mutableListOf()
     private var sessionId: String = ""
 
-    private val faceFlow by lazy { FaceModal(appRequest, packageName) }
-    private val fingerprintFlow by lazy { FingerprintModal(appRequest, packageName, prefs) }
+    private val faceFlow by lazy { FaceModalFlow(appRequest, packageName) }
+    private val fingerprintFlow by lazy { FingerprintModalFlow(appRequest, packageName, prefs) }
 
-    private val flowModal by lazy {
+    internal val flowModal by lazy {
         when (modal) {
-            FACE -> MultiModalFlow(arrayListOf(faceFlow))
-            FINGER -> MultiModalFlow(arrayListOf(fingerprintFlow))
-            FINGER_FACE -> MultiModalFlow(arrayListOf(fingerprintFlow, faceFlow))
-            FACE_FINGER -> MultiModalFlow(arrayListOf(faceFlow, fingerprintFlow))
+            FACE -> flowModalBuilder.buildModalFlow(arrayListOf(faceFlow))
+            FINGER -> flowModalBuilder.buildModalFlow(arrayListOf(fingerprintFlow))
+            FINGER_FACE -> flowModalBuilder.buildModalFlow(arrayListOf(fingerprintFlow, faceFlow))
+            FACE_FINGER -> flowModalBuilder.buildModalFlow(arrayListOf(faceFlow, fingerprintFlow))
         }
     }
 

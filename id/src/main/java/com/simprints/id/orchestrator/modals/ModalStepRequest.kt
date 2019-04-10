@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.modals.flows
+package com.simprints.id.orchestrator.modals
 
 import android.content.Intent
 
