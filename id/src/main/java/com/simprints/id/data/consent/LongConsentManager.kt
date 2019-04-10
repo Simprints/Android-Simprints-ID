@@ -12,4 +12,6 @@ interface LongConsentManager {
     fun checkIfLongConsentExists(language: String): Boolean
 
     fun getLongConsentText(language: String): String
+
+    fun deleteLongConsents()
 }
