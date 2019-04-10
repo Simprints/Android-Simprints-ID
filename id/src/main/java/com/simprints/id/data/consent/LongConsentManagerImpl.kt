@@ -11,7 +11,7 @@ import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
 
-class LongConsentManagerImpl(context: Context,
+class LongConsentManagerImpl(val context: Context,
                              private val loginInfoManager: LoginInfoManager,
                              private val crashReportManager: CrashReportManager) : LongConsentManager {
 
@@ -101,4 +101,10 @@ class LongConsentManagerImpl(context: Context,
 
     private fun createFileForLanguage(language: String): File =
         File(filePath, "$language.$FILE_TYPE")
+
+    override fun deleteLongConsents() {
+        File(context.filesDir.absolutePath +
+            File.separator +
+            FILE_PATH).delete()
+    }
 }
