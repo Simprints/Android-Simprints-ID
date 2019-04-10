@@ -7,6 +7,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceRequest
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
+import com.simprints.id.orchestrator.modals.ModalStepRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 

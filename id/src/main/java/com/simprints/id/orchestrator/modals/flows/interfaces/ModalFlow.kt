@@ -1,8 +1,8 @@
-package com.simprints.id.orchestrator.modals
+package com.simprints.id.orchestrator.modals.flows
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.modals.flows.ModalStepRequest
+import com.simprints.id.orchestrator.modals.ModalStepRequest
 import io.reactivex.Observable
 
 /**

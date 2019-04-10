@@ -16,6 +16,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusa
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 
 class AppResponseBuilderForFaceFinger : AppResponseBuilderForModal {
 
@@ -36,7 +37,7 @@ class AppResponseBuilderForFaceFinger : AppResponseBuilderForModal {
                 buildAppIdentifyResponse(fingerResponse as FingerprintIdentifyResponse, faceResponse as FaceIdentifyResponse, sessionId)
             }
             is AppVerifyRequest -> buildAppVerifyResponse(fingerResponse as FingerprintVerifyResponse, faceResponse as FaceVerifyResponse)
-            else -> throw Throwable("Invalid AppRequest")
+            else -> throw InvalidAppRequest()
         }
     }
 
