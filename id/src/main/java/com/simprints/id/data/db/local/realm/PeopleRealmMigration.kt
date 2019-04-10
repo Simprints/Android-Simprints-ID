@@ -4,6 +4,7 @@ import com.simprints.id.data.db.local.realm.models.DbFingerprint
 import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.local.realm.models.DbProject
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
+import com.simprints.id.data.db.local.realm.oldschemas.PeopleSchemaV5
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
@@ -148,10 +149,10 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo6(schema: RealmSchema) {
-        schema.get("rl_Person")?.className = PERSON_TABLE
-        schema.get("rl_Fingerprint")?.className = FINGERPRINT_TABLE
-        schema.get("rl_Project")?.className = PROJECT_TABLE
-        schema.get("rl_SyncInfo")?.className = SYNC_INFO_TABLE
+        schema.get(PeopleSchemaV5.PERSON_TABLE)?.className = PERSON_TABLE
+        schema.get(PeopleSchemaV5.FINGERPRINT_TABLE)?.className = FINGERPRINT_TABLE
+        schema.get(PeopleSchemaV5.PROJECT_TABLE)?.className = PROJECT_TABLE
+        schema.get(PeopleSchemaV5.SYNC_INFO_TABLE)?.className = SYNC_INFO_TABLE
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
