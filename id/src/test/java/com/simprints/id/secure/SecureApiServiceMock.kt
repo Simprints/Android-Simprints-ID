@@ -13,11 +13,6 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
 
-    override fun requestLegacyProject(legacyIdMD5: String, key: String): Single<Response<LegacyProject>> {
-        val legacyProjectResponse = LegacyProject("project_id", "legacy_project_id")
-        return delegate.returning(buildSuccessResponseWith(legacyProjectResponse)).requestLegacyProject(legacyIdMD5, key)
-    }
-
     override fun requestPublicKey(projectId: String, userId: String, key: String): Single<Response<PublicKeyString>> {
         val publicKeyResponse = PublicKeyString("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
         return delegate.returning(buildSuccessResponseWith(publicKeyResponse)).requestPublicKey(projectId, userId, key)

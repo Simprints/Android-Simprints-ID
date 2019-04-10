@@ -60,8 +60,10 @@ class TestAppModule(app: Application,
                     var syncSchedulerHelperRule: DependencyRule = RealRule,
                     var downSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
 
-    override fun provideLocalDbManager(ctx: Context): LocalDbManager =
-        localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx) }
+    override fun provideLocalDbManager(ctx: Context,
+                                       secureDataManager: SecureDataManager,
+                                       loginInfoManager: LoginInfoManager): LocalDbManager =
+        localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx, secureDataManager, loginInfoManager) }
 
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }

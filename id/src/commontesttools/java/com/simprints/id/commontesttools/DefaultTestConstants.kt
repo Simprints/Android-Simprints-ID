@@ -22,6 +22,5 @@ object DefaultTestConstants {
 
     val DEFAULT_LOCAL_DB_KEY = LocalDbKey(
         projectId = DEFAULT_PROJECT_ID,
-        value = DEFAULT_REALM_KEY,
-        legacyApiKey = DEFAULT_LEGACY_API_KEY)
+        value = DEFAULT_REALM_KEY)
 }
