@@ -51,6 +51,7 @@ open class ProjectAuthenticator(component: AppComponent,
         prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
+            .andThen(createLocalDbKeyForProject(nonceScope.projectId))
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
@@ -91,6 +92,11 @@ open class ProjectAuthenticator(component: AppComponent,
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, userId, tokens)
         }
+
+    private fun createLocalDbKeyForProject(projectId: String): Completable {
+        secureDataManager.setLocalDatabaseKey(projectId)
+        return Completable.complete()
+    }
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
