@@ -13,10 +13,6 @@ interface SecureApiInterface {
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
-    @GET("legacy-projects/{legacyIdMD5}")
-    fun requestLegacyProject(@Path("legacyIdMD5") legacyIdMD5: String,
-                             @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<LegacyProject>>
-
     @POST("projects/{projectId}/users/{userId}/nonces")
     fun requestNonce(@Path("projectId") projectId: String,
                      @Path("userId") userId: String,

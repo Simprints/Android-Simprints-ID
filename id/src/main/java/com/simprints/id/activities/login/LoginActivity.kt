@@ -12,7 +12,7 @@ import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.launchAlert
@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
         initUI()
 
-        val projectAuthenticator = LegacyCompatibleProjectAuthenticator(
+        val projectAuthenticator = ProjectAuthenticator(
             component,
             SafetyNet.getClient(this),
             secureApiInterface)

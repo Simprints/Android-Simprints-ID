@@ -16,21 +16,15 @@ open class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
     companion object {
         private const val PROJECT_ID_ENC_DATA = "ProjectIdEncData"
         const val SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER = "realmKey"
-        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER = "legacyRealmKey"
         const val SHARED_PREFS_KEY_FOR_REALM_KEY = "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER}_"
-        const val SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY = "${PROJECT_ID_ENC_DATA}_${SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER}_"
     }
 
-    override fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?) {
+    override fun setLocalDatabaseKey(projectId: String) {
         getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId).let {
             val possibleEncRealmKey = prefsManager.getSharedPreference(it, "")
             if (possibleEncRealmKey.isEmpty()) {
                 generateAndSaveRealmKeyInSharedPrefs(projectId)
             }
-        }
-
-        legacyApiKey?.let {
-            generateAndSaveLegacyRealmKeyInSharedPrefs(projectId, it)
         }
     }
 
@@ -39,12 +33,6 @@ open class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
             ?: throw MissingLocalDatabaseKeyException()
 
         return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT))
-    }
-
-    private fun generateAndSaveLegacyRealmKeyInSharedPrefs(projectId: String, legacyApiKey: String) {
-        val encLegacyRealmKey = keystoreManager.encryptString(legacyApiKey)
-        val sharedPrefKeyForLegacyRealmKey = getSharedKeyForProjectId(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
-        prefsManager.setSharedPreference(sharedPrefKeyForLegacyRealmKey, encLegacyRealmKey)
     }
 
     private fun generateAndSaveRealmKeyInSharedPrefs(projectId: String) {

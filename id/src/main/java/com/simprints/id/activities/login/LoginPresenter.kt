@@ -13,8 +13,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
-import com.simprints.id.exceptions.safe.secure.InvalidLegacyProjectIdReceivedFromIntentException
-import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
@@ -29,7 +28,7 @@ import javax.inject.Inject
 
 class LoginPresenter(val view: LoginContract.View,
                      component: AppComponent,
-                     override var projectAuthenticator: LegacyCompatibleProjectAuthenticator) : LoginContract.Presenter {
+                     override var projectAuthenticator: ProjectAuthenticator) : LoginContract.Presenter {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var crashReportManager: CrashReportManager
@@ -47,16 +46,13 @@ class LoginPresenter(val view: LoginContract.View,
     override fun signIn(suppliedUserId: String,
                         suppliedProjectId: String,
                         suppliedProjectSecret: String,
-                        intentProjectId: String?,
-                        intentLegacyProjectId: String?) =
+                        intentProjectId: String?) =
         if (areMandatoryCredentialsPresent(suppliedProjectId, suppliedProjectSecret, suppliedUserId)) {
 
             doAuthenticate(
                 suppliedProjectId,
                 suppliedUserId,
-                suppliedProjectSecret,
-                intentProjectId,
-                intentLegacyProjectId)
+                suppliedProjectSecret)
         }
         else {
             view.handleMissingCredentials()
@@ -68,16 +64,14 @@ class LoginPresenter(val view: LoginContract.View,
     @SuppressLint("CheckResult")
     private fun doAuthenticate(suppliedProjectId: String,
                                suppliedUserId: String,
-                               suppliedProjectSecret: String, intentProjectId: String?, intentLegacyProjectId: String?) {
+                               suppliedProjectSecret: String) {
 
         logMessageForCrashReportWithNetworkTrigger("Making authentication request")
         loginInfoManager.cleanCredentials()
         startTimeLogin = timeHelper.now()
         projectAuthenticator.authenticate(
             NonceScope(suppliedProjectId, suppliedUserId),
-            suppliedProjectSecret,
-            intentProjectId,
-            intentLegacyProjectId)
+            suppliedProjectSecret)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .trace("doAuthenticate")
@@ -119,11 +113,10 @@ class LoginPresenter(val view: LoginContract.View,
                                   suppliedProjectId: String,
                                   suppliedUserId: String) {
         logSignInError(e)
-        var reason = TECHNICAL_FAILURE
+        var reason: AuthenticationEvent.Result
         when (e) {
             is IOException -> view.handleSignInFailedNoConnection().also { reason = OFFLINE }
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
-            is InvalidLegacyProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials().also { reason = BAD_CREDENTIALS }
             is SimprintsInternalServerException -> view.handleSignInFailedServerError().also { reason = TECHNICAL_FAILURE }
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
