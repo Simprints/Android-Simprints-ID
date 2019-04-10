@@ -38,8 +38,7 @@ open class SecureDataManagerImpl(private val keystoreManager: KeystoreManager,
         val realmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_REALM_KEY, projectId)
             ?: throw MissingLocalDatabaseKeyException()
 
-        val possibleLegacyRealmKey = readFromSharedPrefsAndDecrypt(SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY, projectId)
-        return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT) , possibleLegacyRealmKey ?: "")
+        return LocalDbKey(projectId, Base64.decode(realmKey, Base64.DEFAULT))
     }
 
     private fun generateAndSaveLegacyRealmKeyInSharedPrefs(projectId: String, legacyApiKey: String) {
