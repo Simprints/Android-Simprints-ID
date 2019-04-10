@@ -53,6 +53,6 @@ interface LocalDbManager {
     fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?)
 
     //@Deprecated: do not use it. Use Room SyncStatus
-    fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo>
+    fun getDbSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo>
     fun deleteSyncInfo(subSyncScope: SubSyncScope): Completable
 }
