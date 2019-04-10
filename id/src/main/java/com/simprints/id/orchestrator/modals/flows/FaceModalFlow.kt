@@ -8,11 +8,12 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceReques
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
 import com.simprints.id.orchestrator.modals.ModalStepRequest
+import com.simprints.id.orchestrator.modals.flows.interfaces.SingleModalFlow
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
-class FaceModal(private val appRequest: AppRequest,
-                private val packageName: String) : SingleModalFlow() {
+class FaceModalFlow(private val appRequest: AppRequest,
+                    private val packageName: String) : SingleModalFlowBase(), SingleModalFlow {
 
     companion object {
         const val faceActivityClassName = "com.simprints.face.activities.FaceCaptureActivity"

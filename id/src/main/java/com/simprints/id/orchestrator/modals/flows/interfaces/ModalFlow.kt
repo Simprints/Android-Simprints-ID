@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.modals.flows
+package com.simprints.id.orchestrator.modals.flows.interfaces
 
 import android.content.Intent
 import com.simprints.id.domain.modal.ModalResponse
@@ -8,7 +8,7 @@ import io.reactivex.Observable
 /**
  * Representation of the flow for a specific modality.
  * It can be either a single step only (see SingleModalFlow) or a more complicate
- * and generic one (see MultiModalFlow)
+ * and generic one (see MultiModalFlowBase)
  */
 interface ModalFlow {
 
@@ -16,3 +16,6 @@ interface ModalFlow {
     var modalResponses: Observable<ModalResponse>
     fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean
 }
+
+interface SingleModalFlow: ModalFlow
+interface MultiModalFlow: ModalFlow
