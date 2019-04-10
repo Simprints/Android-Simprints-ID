@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.controllers.local
 
+import com.simprints.id.data.analytics.eventdata.controllers.local.oldschemas.SessionEventsSchemaV3
 import com.simprints.id.data.analytics.eventdata.models.local.*
 import io.realm.DynamicRealm
 import io.realm.RealmMigration
@@ -29,11 +30,11 @@ internal class SessionRealmMigration : RealmMigration {
     }
 
     private fun migrateTo4(schema: RealmSchema) {
-        schema.get("RlDatabaseInfo")?.className = DB_INFO_TABLE
-        schema.get("RlDevice")?.className = DB_DEVICE_TABLE
-        schema.get("RlLocation")?.className = DB_LOCATION_TABLE
-        schema.get("RlEvent")?.className = DB_EVENT_TABLE
-        schema.get("RlSession")?.className = DB_SESSION_TABLE
+        schema.get(SessionEventsSchemaV3.DB_INFO_TABLE)?.className = DB_INFO_TABLE
+        schema.get(SessionEventsSchemaV3.DB_DEVICE_TABLE)?.className = DB_DEVICE_TABLE
+        schema.get(SessionEventsSchemaV3.DB_LOCATION_TABLE)?.className = DB_LOCATION_TABLE
+        schema.get(SessionEventsSchemaV3.DB_EVENT_TABLE)?.className = DB_EVENT_TABLE
+        schema.get(SessionEventsSchemaV3.DB_SESSION_TABLE)?.className = DB_SESSION_TABLE
     }
 
     override fun hashCode(): Int {
