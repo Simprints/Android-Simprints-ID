@@ -103,8 +103,13 @@ class LongConsentManagerImpl(val context: Context,
         File(filePath, "$language.$FILE_TYPE")
 
     override fun deleteLongConsents() {
+        getAllLongConsentFiles()?.forEach {
+            it.delete()
+        }
+    }
+
+    private fun getAllLongConsentFiles() =
         File(context.filesDir.absolutePath +
             File.separator +
-            FILE_PATH).delete()
-    }
+            FILE_PATH).listFiles()
 }
