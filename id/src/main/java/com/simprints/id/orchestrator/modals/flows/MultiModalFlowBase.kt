@@ -7,7 +7,7 @@ import com.simprints.id.orchestrator.modals.flows.interfaces.ModalFlow
 import com.simprints.id.orchestrator.modals.flows.interfaces.MultiModalFlow
 import io.reactivex.Observable
 
-class MultiModalFlowImpl(private val steps: List<ModalFlow>) : MultiModalFlow {
+class MultiModalFlowBase(private val steps: List<ModalFlow>) : MultiModalFlow {
 
     override var modalResponses: Observable<ModalResponse> =
         Observable.concat(steps.map { it.modalResponses })

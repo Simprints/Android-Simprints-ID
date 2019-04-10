@@ -12,9 +12,9 @@ import com.simprints.id.orchestrator.modals.ModalStepRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
-class FingerprintModal(private val appRequest: AppRequest,
-                       private val packageName: String,
-                       private val prefs: PreferencesManager) : SingleModalFlow() {
+class FingerprintModalFlow(private val appRequest: AppRequest,
+                           private val packageName: String,
+                           private val prefs: PreferencesManager) : SingleModalFlowBase() {
 
     companion object {
         const val fingerprintActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"

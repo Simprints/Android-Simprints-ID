@@ -11,7 +11,7 @@ import io.reactivex.ObservableEmitter
  * Generic class for a ModalFlow with a single action.
  * It completes immediately after the first step completes.
  */
-abstract class SingleModalFlowImpl : SingleModalFlow {
+abstract class SingleModalFlowBase : SingleModalFlow {
 
     abstract val intentRequestCode: Int
 
