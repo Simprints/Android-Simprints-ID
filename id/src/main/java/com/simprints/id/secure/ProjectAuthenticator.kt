@@ -48,10 +48,10 @@ open class ProjectAuthenticator(component: AppComponent,
      * @throws SimprintsInternalServerException
      */
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
-        prepareAuthRequestParameters(nonceScope, projectSecret)
+        createLocalDbKeyForProject(nonceScope.projectId)
+            .andThen(prepareAuthRequestParameters(nonceScope, projectSecret))
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
-            .andThen(createLocalDbKeyForProject(nonceScope.projectId))
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
@@ -83,12 +83,12 @@ open class ProjectAuthenticator(component: AppComponent,
             AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
         }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
         flatMap { authRequest ->
             authManager.requestAuthToken(authRequest)
         }
 
-    private fun Single<out Tokens>.signIn(projectId: String, userId: String): Completable =
+    private fun Single<out Token>.signIn(projectId: String, userId: String): Completable =
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, userId, tokens)
         }
