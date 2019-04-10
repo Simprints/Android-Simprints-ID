@@ -152,10 +152,10 @@ open class RealmDbManagerImpl(appContext: Context,
 
     private fun getLocalDbKeyAndCreateRealmConfig() =
         loginInfoManager.getSignedInProjectIdOrEmpty().let {
-            if (!it.isEmpty()) {
+            if (it.isNotEmpty()) {
                 createAndSaveRealmConfig(secureDataManager.getLocalDbKeyOrThrow(it))
             } else {
-                throw RealmUninitialisedException("No valid realm config")
+                throw RealmUninitialisedException("No signed in project id found")
             }
         }
 
