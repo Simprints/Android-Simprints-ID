@@ -16,7 +16,7 @@ interface LoginInfoManager: ProjectIdProvider {
     fun getSignedInUserIdOrEmpty(): String
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
-    fun storeCredentials(projectId: String, legacyProjectId: String?, userId: String)
+    fun storeCredentials(projectId: String, userId: String)
     fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?)
     fun getHashedLegacyProjectIdForProjectIdOrEmpty(projectId: String): String
     fun getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey: String): String
