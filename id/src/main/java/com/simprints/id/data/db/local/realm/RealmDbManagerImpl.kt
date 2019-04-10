@@ -10,7 +10,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -209,13 +209,13 @@ open class RealmDbManagerImpl(appContext: Context,
     /**
      *  @Deprecated: do not use it. Use Room DownSyncStatus
      */
-    override fun getRlSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo> =
+    override fun getDbSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo> =
         useRealmInstance { realm ->
             realm
                 .where(DbSyncInfo::class.java).equalTo(DbSyncInfo.SYNC_ID_FIELD, subSyncScope.group.ordinal)
                 .findFirst()
                 ?.let { realm.copyFromRealm(it) }
-                ?: throw NoSuchRlSessionInfoException()
+                ?: throw NoSuchDbSyncInfoException()
         }
 
     /**
