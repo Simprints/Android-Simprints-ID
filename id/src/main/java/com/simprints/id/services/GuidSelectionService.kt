@@ -25,7 +25,6 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
