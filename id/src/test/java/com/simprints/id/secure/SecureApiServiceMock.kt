@@ -1,6 +1,7 @@
 package com.simprints.id.secure
 
 import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.remote.ApiToken
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import io.reactivex.Single
 import retrofit2.Call
@@ -23,8 +24,8 @@ class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInter
         return delegate.returning(buildSuccessResponseWith(nonceResponse)).requestNonce(projectId, userId)
     }
 
-    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<Tokens>> {
-        val tokens = Tokens("firestore_token", "legacy_token")
+    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<ApiToken>> {
+        val tokens = Token("legacy_token")
         return delegate.returning(buildSuccessResponseWith(tokens)).requestCustomTokens(projectId, userId, credentials)
     }
 
