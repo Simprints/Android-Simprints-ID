@@ -25,7 +25,7 @@ class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInter
     }
 
     override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<ApiToken>> {
-        val tokens = Token("legacy_token")
+        val tokens = ApiToken("legacy_token")
         return delegate.returning(buildSuccessResponseWith(tokens)).requestCustomTokens(projectId, userId, credentials)
     }
 
