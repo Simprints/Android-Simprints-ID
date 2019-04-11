@@ -11,7 +11,7 @@ import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
 
-class LongConsentManagerImpl(val context: Context,
+class LongConsentManagerImpl(context: Context,
                              private val loginInfoManager: LoginInfoManager,
                              private val crashReportManager: CrashReportManager) : LongConsentManager {
 
@@ -23,22 +23,27 @@ class LongConsentManagerImpl(val context: Context,
         private const val TIMEOUT_FAILURE_WINDOW_MILLIS = 1L
     }
 
-    private val filePath: File
+    private val baseFilePath: File
+    private val filePathForProject: File
     private val firebaseStorage = FirebaseStorage.getInstance()
 
     init {
-        filePath = createLocalFilePath(context)
+        baseFilePath = createBaseFilePath(context)
+        filePathForProject = createLocalFilePath()
     }
 
-    private fun createLocalFilePath(context: Context): File {
-        val filePath = File(context.filesDir.absolutePath +
-            File.separator +
-            FILE_PATH +
+    private fun createBaseFilePath(context: Context) = File (context.filesDir.absolutePath +
+        File.separator +
+        FILE_PATH)
+
+    private fun createLocalFilePath(): File {
+        val filePath = File(baseFilePath.absolutePath +
             File.separator +
             loginInfoManager.getSignedInProjectIdOrEmpty())
 
-        if (!filePath.exists())
+        if (!filePath.exists()) {
             filePath.mkdirs()
+        }
 
         return filePath
     }
@@ -84,7 +89,7 @@ class LongConsentManagerImpl(val context: Context,
             "$language.$FILE_TYPE"
         }
 
-        return File(filePath, fileName).exists()
+        return File(filePathForProject, fileName).exists()
     }
 
     override fun getLongConsentText(language: String): String {
@@ -100,7 +105,7 @@ class LongConsentManagerImpl(val context: Context,
     }
 
     private fun createFileForLanguage(language: String): File =
-        File(filePath, "$language.$FILE_TYPE")
+        File(filePathForProject, "$language.$FILE_TYPE")
 
     override fun deleteLongConsents() {
         getAllLongConsentFiles()?.forEach {
@@ -109,7 +114,5 @@ class LongConsentManagerImpl(val context: Context,
     }
 
     private fun getAllLongConsentFiles() =
-        File(context.filesDir.absolutePath +
-            File.separator +
-            FILE_PATH).listFiles()
+        baseFilePath.listFiles()
 }
