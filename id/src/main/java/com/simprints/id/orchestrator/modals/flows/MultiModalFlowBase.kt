@@ -8,16 +8,16 @@ import com.simprints.id.orchestrator.modals.flows.interfaces.MultiModalFlow
 import io.reactivex.Observable
 
 /**
- * Base class for multi modals flow.
- * @param steps list of Modal Flows to concatenate
+ * Concatenates multi modalities for more complicate flows.
+ * @param steps list of ModalFlows to concatenate
  */
 class MultiModalFlowBase(private val steps: List<ModalFlow>) : MultiModalFlow {
 
-    override var modalResponses: Observable<ModalResponse> =
+    override val modalResponses: Observable<ModalResponse> =
         Observable.concat(steps.map { it.modalResponses })
 
-    override var nextIntent: Observable<ModalStepRequest> =
-        Observable.concat(steps.map { it.nextIntent })
+    override val nextModalStepRequest: Observable<ModalStepRequest> =
+        Observable.concat(steps.map { it.nextModalStepRequest })
 
     override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         val stepHandler = steps.firstOrNull { it.handleIntentResponse(requestCode, resultCode, data) }
