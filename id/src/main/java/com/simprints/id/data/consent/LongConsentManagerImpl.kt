@@ -1,6 +1,5 @@
 package com.simprints.id.data.consent
 
-import android.content.Context
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -11,7 +10,7 @@ import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
 
-class LongConsentManagerImpl(context: Context,
+class LongConsentManagerImpl(absolutePath: String,
                              private val loginInfoManager: LoginInfoManager,
                              private val crashReportManager: CrashReportManager) : LongConsentManager {
 
@@ -23,21 +22,22 @@ class LongConsentManagerImpl(context: Context,
         private const val TIMEOUT_FAILURE_WINDOW_MILLIS = 1L
     }
 
-    private val baseFilePath: File
-    private val filePathForProject: File
-    private val firebaseStorage = FirebaseStorage.getInstance()
-
-    init {
-        baseFilePath = createBaseFilePath(context)
-        filePathForProject = createLocalFilePath()
+    internal val baseFilePath: File by lazy {
+        createBaseFilePath(absolutePath)
     }
 
-    private fun createBaseFilePath(context: Context) = File (context.filesDir.absolutePath +
+    internal val filePathForProject: File by lazy {
+        createLocalFilePath(baseFilePath.absolutePath)
+    }
+
+    private val firebaseStorage = FirebaseStorage.getInstance()
+
+    private fun createBaseFilePath(absolutePath: String) = File (absolutePath +
         File.separator +
         FILE_PATH)
 
-    private fun createLocalFilePath(): File {
-        val filePath = File(baseFilePath.absolutePath +
+    internal fun createLocalFilePath(absolutePath: String): File {
+        val filePath = File(absolutePath +
             File.separator +
             loginInfoManager.getSignedInProjectIdOrEmpty())
 
@@ -65,7 +65,7 @@ class LongConsentManagerImpl(context: Context,
     override fun downloadLongConsentWithProgress(language: String): Flowable<Int> = Flowable.create<Int>(
         { emitter ->
             firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
-            val file = createFileForLanguage(language)
+            val file = createFileForLanguage(filePathForProject, language)
             getFileDownloadTask(language, file)
                 .addOnSuccessListener {
                     emitter.onComplete()
@@ -94,7 +94,7 @@ class LongConsentManagerImpl(context: Context,
 
     override fun getLongConsentText(language: String): String {
 
-        val br: BufferedReader = createFileForLanguage(language).bufferedReader()
+        val br: BufferedReader = createFileForLanguage(filePathForProject, language).bufferedReader()
         val fileContent = StringBuffer("")
 
         br.forEachLine {
@@ -104,8 +104,8 @@ class LongConsentManagerImpl(context: Context,
         return fileContent.toString()
     }
 
-    private fun createFileForLanguage(language: String): File =
-        File(filePathForProject, "$language.$FILE_TYPE")
+    internal fun createFileForLanguage(parentLanguageFilePath: File, language: String): File =
+        File(parentLanguageFilePath, "$language.$FILE_TYPE")
 
     override fun deleteLongConsents() {
         getAllLongConsentFiles()?.forEach {
