@@ -44,6 +44,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.orchestrator.modals.ModalFlowBuilderImpl
+import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderFactory
+import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -247,8 +249,12 @@ open class AppModule(val app: Application) {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
+    open fun provideAppResponseBuilderFactory(): AppResponseBuilderFactory = AppResponseBuilderFactoryImpl()
+
+    @Provides
     open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager,
-                                        prefs: PreferencesManager): OrchestratorManager =
-        OrchestratorManagerImpl(settingsPreferencesManager.modal, ModalFlowBuilderImpl(), prefs)
+                                        prefs: PreferencesManager,
+                                        apResponseBuilderFactory: AppResponseBuilderFactory): OrchestratorManager =
+        OrchestratorManagerImpl(settingsPreferencesManager.modal, ModalFlowBuilderImpl(), prefs, apResponseBuilderFactory)
 }
 

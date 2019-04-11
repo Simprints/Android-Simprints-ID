@@ -50,6 +50,6 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
     }
 
     override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        orchestratorManager.notifyResult(requestCode, resultCode, data)
+        orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
     }
 }

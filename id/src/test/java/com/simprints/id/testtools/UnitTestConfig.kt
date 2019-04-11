@@ -18,7 +18,10 @@ class UnitTestConfig<T : Any>(
     private val preferencesModule: TestPreferencesModule? = null
 ) {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val app by lazy {
+        ApplicationProvider.getApplicationContext() as TestApplication
+    }
+
     private lateinit var testAppComponent: AppComponentForTests
 
     fun fullSetup() =
