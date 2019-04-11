@@ -22,7 +22,7 @@ class FaceModalFlow(private val appRequest: AppRequest,
 
     override val intentRequestCode: Int = REQUEST_CODE_FACE
 
-    override fun getNextIntent(): ModalStepRequest {
+    override fun getNextModalStepRequest(): ModalStepRequest {
         val intent = Intent().setClassName(packageName, faceActivityClassName)
         intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(buildFaceRequest(appRequest)))
         return ModalStepRequest(intentRequestCode, intent)

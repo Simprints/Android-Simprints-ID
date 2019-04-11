@@ -8,12 +8,10 @@ import com.simprints.id.domain.modal.Modal.*
 import com.simprints.id.domain.modal.ModalResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modals.ModalFlowBuilder
+import com.simprints.id.exceptions.unexpected.UnexpectedErrorInModalFlow
+import com.simprints.id.orchestrator.modals.ModalFlowFactory
 import com.simprints.id.orchestrator.modals.ModalStepRequest
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFace
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFaceFinger
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFinger
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderForFingerFace
+import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderFactory
 import com.simprints.id.orchestrator.modals.flows.FaceModalFlow
 import com.simprints.id.orchestrator.modals.flows.FingerprintModalFlow
 import io.reactivex.Observable
@@ -23,8 +21,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 
 open class OrchestratorManagerImpl(val modal: Modal,
-                                   flowModalBuilder: ModalFlowBuilder,
-                                   prefs: PreferencesManager) : OrchestratorManager {
+                                   flowModalBuilder: ModalFlowFactory,
+                                   prefs: PreferencesManager,
+                                   appResponseFactory: AppResponseBuilderFactory) : OrchestratorManager {
 
     companion object {
         private const val packageName = "com.simprints.id"
@@ -33,7 +32,7 @@ open class OrchestratorManagerImpl(val modal: Modal,
     private var appResponseEmitter: SingleEmitter<AppResponse>? = null
 
     internal lateinit var appRequest: AppRequest
-    private val stepsResults: MutableList<ModalResponse> = mutableListOf()
+    internal val stepsResults: MutableList<ModalResponse> = mutableListOf()
     private var sessionId: String = ""
 
     private val faceFlow by lazy { FaceModalFlow(appRequest, packageName) }
@@ -48,28 +47,22 @@ open class OrchestratorManagerImpl(val modal: Modal,
         }
     }
 
-    private val appResponseBuilder by lazy {
-        when (modal) {
-            FACE -> AppResponseBuilderForFace()
-            FINGER -> AppResponseBuilderForFinger()
-            FINGER_FACE -> AppResponseBuilderForFingerFace()
-            FACE_FINGER -> AppResponseBuilderForFaceFinger()
-        }
-    }
-
+    private val appResponseBuilder = appResponseFactory.buildAppResponseBuilder(modal)
 
     @SuppressLint("CheckResult")
-    override fun startFlow(appRequest: AppRequest, sessionId: String): Observable<ModalStepRequest> {
+    override fun startFlow(appRequest: AppRequest,
+                           sessionId: String): Observable<ModalStepRequest> {
+
         this.sessionId = sessionId
         this.appRequest = appRequest
         stepsResults.clear()
         subscribeForStepsIntentResults(appRequest, sessionId)
 
-        return flowModal.nextIntent
+        return flowModal.nextModalStepRequest
     }
 
     @SuppressLint("CheckResult")
-    private fun subscribeForStepsIntentResults(appRequest: AppRequest, sessionId: String) {
+    internal fun subscribeForStepsIntentResults(appRequest: AppRequest, sessionId: String) {
         flowModal.modalResponses
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -78,14 +71,22 @@ open class OrchestratorManagerImpl(val modal: Modal,
                     },
                     onComplete = {
                         buildAndEmitFinalResult(appRequest, sessionId)
+                    },
+                    onError = {
+                        it.printStackTrace()
+                        emitErrorAsFinalResult()
                     })
     }
 
-    private fun buildAndEmitFinalResult(appRequest: AppRequest, sessionId: String) {
+    internal fun emitErrorAsFinalResult() {
+        appResponseEmitter?.onError(UnexpectedErrorInModalFlow())
+    }
+
+    internal fun buildAndEmitFinalResult(appRequest: AppRequest, sessionId: String) {
         appResponseEmitter?.onSuccess(appResponseBuilder.buildResponse(appRequest, stepsResults, sessionId))
     }
 
-    private fun addNewStepIntentResult(it: ModalResponse) {
+    internal fun addNewStepIntentResult(it: ModalResponse) {
         stepsResults.add(it)
     }
 
@@ -95,7 +96,7 @@ open class OrchestratorManagerImpl(val modal: Modal,
     }
 
     @SuppressLint("CheckResult")
-    override fun notifyResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
         flowModal.handleIntentResponse(requestCode, resultCode, data)
     }
 }

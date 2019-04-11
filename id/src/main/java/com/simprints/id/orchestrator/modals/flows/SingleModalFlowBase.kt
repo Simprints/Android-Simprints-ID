@@ -8,28 +8,28 @@ import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
 /**
- * Generic class for a ModalFlow with a single action.
- * It completes immediately after the first step completes.
+ * Generic class for a single modal flows such as Fingerprint or Face.
+ * It requests only a step (see #nextIntentEmitter) and emits only a response (see #nextIntentEmitter).
+ * The specific class needs to implement #getNextModalStepRequest and #extractModalResponse
  */
 abstract class SingleModalFlowBase : SingleModalFlow {
 
     abstract val intentRequestCode: Int
 
     private lateinit var responsesEmitter: ObservableEmitter<ModalResponse>
-    override var modalResponses: Observable<ModalResponse> = Observable.create {
+    override val modalResponses: Observable<ModalResponse> = Observable.create {
         responsesEmitter = it
     }
 
     private lateinit var nextIntentEmitter: ObservableEmitter<ModalStepRequest>
-    override var nextIntent: Observable<ModalStepRequest> = Observable.create {
+    override val nextModalStepRequest: Observable<ModalStepRequest> = Observable.create {
         nextIntentEmitter = it
-        nextIntentEmitter.onNext(getNextIntent())
+        nextIntentEmitter.onNext(getNextModalStepRequest())
     }
 
 
     @Throws(IllegalArgumentException::class)
-    override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        var intentHandled = false
+    override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
         if (requestCode == intentRequestCode) {
             try {
                 val potentialModalResponse = extractModalResponse(requestCode, resultCode, data)
@@ -43,12 +43,11 @@ abstract class SingleModalFlowBase : SingleModalFlow {
                 responsesEmitter.onError(t)
                 nextIntentEmitter.onError(t)
             }
-            intentHandled = true
+            true
+        } else {
+            false
         }
 
-        return intentHandled
-    }
-
-    abstract fun getNextIntent(): ModalStepRequest
+    abstract fun getNextModalStepRequest(): ModalStepRequest
     abstract fun extractModalResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalResponse
 }
