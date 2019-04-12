@@ -108,11 +108,18 @@ class LongConsentManagerImpl(absolutePath: String,
         File(parentLanguageFilePath, "$language.$FILE_TYPE")
 
     override fun deleteLongConsents() {
-        getAllLongConsentFiles()?.forEach {
-            it.delete()
+        getAllLongConsentFiles()?.forEach { baseFile ->
+            if(baseFile.isDirectory) {
+                deleteFilesInDirectory(baseFile)
+            }
+            baseFile.delete()
         }
     }
 
     private fun getAllLongConsentFiles() =
         baseFilePath.listFiles()
+
+    private fun deleteFilesInDirectory(baseFile: File) {
+        baseFile.listFiles().forEach { it.delete() }
+    }
 }
