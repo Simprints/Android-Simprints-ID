@@ -10,7 +10,7 @@ import io.reactivex.ObservableEmitter
 /**
  * Generic class for a single modality flows such as Fingerprint or Face.
  * It requests only a step (see #nextIntentEmitter) and emits only a response (see #nextIntentEmitter).
- * The specific class needs to implement #getNextModalityStepRequest and #extractModalityResponse
+ * The specific class needs to implement #getModalityStepRequests and #extractModalityResponse
  */
 abstract class SingleModalityFlowBase : SingleModalityFlow {
 
@@ -22,9 +22,9 @@ abstract class SingleModalityFlowBase : SingleModalityFlow {
     }
 
     private lateinit var nextIntentEmitter: ObservableEmitter<ModalityStepRequest>
-    override val nextModalityStepRequest: Observable<ModalityStepRequest> = Observable.create {
+    override val modalityStepRequests: Observable<ModalityStepRequest> = Observable.create {
         nextIntentEmitter = it
-        nextIntentEmitter.onNext(getNextModalityStepRequest())
+        nextIntentEmitter.onNext(getModalityStepRequests())
     }
 
 
@@ -48,6 +48,6 @@ abstract class SingleModalityFlowBase : SingleModalityFlow {
             false
         }
 
-    abstract fun getNextModalityStepRequest(): ModalityStepRequest
+    abstract fun getModalityStepRequests(): ModalityStepRequest
     abstract fun extractModalityResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalityResponse
 }

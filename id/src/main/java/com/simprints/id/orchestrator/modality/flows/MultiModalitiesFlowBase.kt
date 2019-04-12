@@ -16,8 +16,8 @@ class MultiModalitiesFlowBase(private val steps: List<ModalityFlow>) : MultiModa
     override val modalityResponses: Observable<ModalityResponse> =
         Observable.concat(steps.map { it.modalityResponses })
 
-    override val nextModalityStepRequest: Observable<ModalityStepRequest> =
-        Observable.concat(steps.map { it.nextModalityStepRequest })
+    override val modalityStepRequests: Observable<ModalityStepRequest> =
+        Observable.concat(steps.map { it.modalityStepRequests })
 
     override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         val stepHandler = steps.firstOrNull { it.handleIntentResponse(requestCode, resultCode, data) }
