@@ -3,15 +3,15 @@ package com.simprints.id.orchestrator
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.*
-import com.simprints.id.domain.modal.Modal
-import com.simprints.id.domain.modal.Modal.*
-import com.simprints.id.domain.modal.ModalResponse
+import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.exceptions.unexpected.UnexpectedErrorInModalFlow
-import com.simprints.id.orchestrator.modals.ModalFlowFactory
-import com.simprints.id.orchestrator.modals.ModalStepRequest
-import com.simprints.id.orchestrator.modals.flows.FaceModalFlow
-import com.simprints.id.orchestrator.modals.flows.FingerprintModalFlow
-import com.simprints.id.orchestrator.modals.flows.interfaces.ModalFlow
+import com.simprints.id.orchestrator.modality.ModalityFlowFactory
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow
+import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
@@ -25,41 +25,41 @@ import org.junit.Test
 
 class OrchestratorManagerImplTest {
 
-    private lateinit var captorArgsForBuilderModalFlow: KArgumentCaptor<List<ModalFlow>>
-    private lateinit var modalFlowBuilderMock: ModalFlowFactory
+    private lateinit var captorArgsForBuilderModalityFlow: KArgumentCaptor<List<ModalityFlow>>
+    private lateinit var modalityFlowBuilderMock: ModalityFlowFactory
 
-    private var firstModalStepRequest = ModalStepRequest(1, Intent())
-    private var firstModalResponse = mock<ModalResponse>()
+    private var firstModalityStepRequest = ModalityStepRequest(1, Intent())
+    private var firstModalityResponse = mock<ModalityResponse>()
 
     @Before
     fun setUp() {
         UnitTestConfig(this).rescheduleRxMainThread()
 
-        captorArgsForBuilderModalFlow = argumentCaptor()
-        modalFlowBuilderMock = mock()
+        captorArgsForBuilderModalityFlow = argumentCaptor()
+        modalityFlowBuilderMock = mock()
     }
 
     @Test
-    fun givenFaceModal_buildAFlowModal_thenItShouldContainAFaceModal() {
-        val orchestrator = buildOrchestratorToBuildFlowModal(FACE)
+    fun givenFaceModality_buildAFlowModality_itShouldContainAFaceModality() {
+        val orchestrator = buildOrchestratorToBuildFlowModality(FACE)
 
-        orchestrator.flowModal
+        orchestrator.flowModality
 
-        verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock, captorArgsForBuilderModalFlow,
-            listOf(FaceModalFlow::class.java))
+        verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock, captorArgsForBuilderModalityFlow,
+            listOf(FaceModalityFlow::class.java))
     }
 
     @Test
-    fun startFlowModal_thenOrchestratorShouldStartTheFlowModal() {
-        val orchestrator = buildOrchestratorToStartFlow(listOf(firstModalStepRequest))
+    fun startFlowModality_orchestratorShouldStartTheFlowModality() {
+        val orchestrator = buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
 
-        startFlowModal(orchestrator).assertResult(firstModalStepRequest)
+        startFlowModal(orchestrator).assertResult(firstModalityStepRequest)
     }
 
     @Test
-    fun startFlowModal_thenOrchestratorShouldClearPreviousResults() {
-        val orchestrator = buildOrchestratorToStartFlow(listOf(firstModalStepRequest))
-        orchestrator.stepsResults.add(firstModalResponse)
+    fun startFlowModality_orchestratorShouldClearPreviousResults() {
+        val orchestrator = buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
+        orchestrator.stepsResults.add(firstModalityResponse)
 
         startFlowModal(orchestrator).assertValueCount(1)
 
@@ -67,9 +67,9 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun flowModalStarted_modalFlowReturnsAResponse_thenOrchestratorShouldHandleIt() {
+    fun flowModalStarted_modalFlowReturnsAResponse_orchestratorShouldHandleIt() {
         val orchestrator =
-            spy(buildOrchestratorToStartFlow(listOf(firstModalStepRequest), listOf(firstModalResponse))
+            spy(buildOrchestratorToStartFlow(listOf(firstModalityStepRequest), listOf(firstModalityResponse))
                 .apply { appRequest = mock() })
 
         startFlowModal(orchestrator).assertValueCount(1)
@@ -79,9 +79,9 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun flowModalStarted_modalFlowReturnsAnError_thenOrchestratorShouldHandleIt() {
+    fun flowModalStarted_modalFlowReturnsAnError_orchestratorShouldHandleIt() {
         val orchestrator =
-            spy(buildOrchestratorToStartFlow(listOf(firstModalStepRequest))
+            spy(buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
                 .apply { appRequest = mock() })
 
         startFlowModal(orchestrator)
@@ -92,11 +92,11 @@ class OrchestratorManagerImplTest {
 
     @Test
     fun flowModalStarted_modalFlowEmitsAnError_orchestratorShouldHandleIt() {
-        val modalFlowMock = mock<ModalFlow>()
-        whenever { modalFlowBuilderMock.buildModalFlow(any()) } thenReturn modalFlowMock
-        whenever { modalFlowMock.nextModalStepRequest } thenReturn Observable.empty()
-        whenever { modalFlowMock.modalResponses } thenReturn Observable.error(UnexpectedErrorInModalFlow())
-        val orchestrator = spy(OrchestratorManagerImpl(FACE, modalFlowBuilderMock, mock(), mock())
+        val modalFlowMock = mock<ModalityFlow>()
+        whenever { modalityFlowBuilderMock.buildModalityFlow(any()) } thenReturn modalFlowMock
+        whenever { modalFlowMock.nextModalityStepRequest } thenReturn Observable.empty()
+        whenever { modalFlowMock.modalityResponses } thenReturn Observable.error(UnexpectedErrorInModalFlow())
+        val orchestrator = spy(OrchestratorManagerImpl(FACE, modalityFlowBuilderMock, mock(), mock())
             .apply { appRequest = mock() })
 
         startFlowModal(orchestrator)
@@ -107,84 +107,84 @@ class OrchestratorManagerImplTest {
     @Test
     fun flowModalStarted_someActivityReturnsAnIntent_orchestratorShouldNotifyTheModalFlow() {
         val orchestrator =
-            spy(buildOrchestratorToStartFlow(listOf(firstModalStepRequest))
+            spy(buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
                 .apply { appRequest = mock() })
 
         startFlowModal(orchestrator)
 
         val intentReceived = Intent()
         orchestrator.onModalStepRequestDone(0, 0, intentReceived)
-        verifyOnce(orchestrator.flowModal) { handleIntentResponse(0, 0, intentReceived) }
+        verifyOnce(orchestrator.flowModality) { handleIntentResponse(0, 0, intentReceived) }
     }
 
-    private fun startFlowModal(orchestrator: OrchestratorManagerImpl): TestObserver<ModalStepRequest> =
+    private fun startFlowModal(orchestrator: OrchestratorManagerImpl): TestObserver<ModalityStepRequest> =
         orchestrator
             .startFlow(mock(), "")
             .test()
 
     @Test
-    fun givenFaceModal_buildAFlowModal_itShouldContainAFingerprintModal() {
-        val orchestrator = buildOrchestratorToBuildFlowModal(FACE)
+    fun givenFaceModality_buildAFlowModality_shouldContainAFingerprintModality() {
+        val orchestrator = buildOrchestratorToBuildFlowModality(FACE)
 
-        orchestrator.flowModal
+        orchestrator.flowModality
 
-        verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock, captorArgsForBuilderModalFlow,
-            listOf(FaceModalFlow::class.java))
+        verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock, captorArgsForBuilderModalityFlow,
+            listOf(FaceModalityFlow::class.java))
     }
 
 
     @Test
-    fun givenFingerprintModal_buildAFlowModal_itShouldContainAFingerprintModal() {
-        val orchestrator = buildOrchestratorToBuildFlowModal(FINGER)
+    fun givenFingerprintModality_buildAFlowModality_shouldContainAFingerprintModality() {
+        val orchestrator = buildOrchestratorToBuildFlowModality(FINGER)
 
-        orchestrator.flowModal
+        orchestrator.flowModality
 
-        verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock, captorArgsForBuilderModalFlow,
-            listOf(FingerprintModalFlow::class.java))
+        verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock, captorArgsForBuilderModalityFlow,
+            listOf(FingerprintModalityFlow::class.java))
     }
 
     @Test
-    fun givenFaceFingerprintModal_buildAFlowModal_itShouldContainAFaceAndFingerprintModals() {
-        val orchestrator = buildOrchestratorToBuildFlowModal(FACE_FINGER)
+    fun givenFaceFingerprintModality_buildAFlowModality_shouldContainAFaceAndFingerprintModals() {
+        val orchestrator = buildOrchestratorToBuildFlowModality(FACE_FINGER)
 
-        orchestrator.flowModal
+        orchestrator.flowModality
 
-        verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock, captorArgsForBuilderModalFlow,
-            listOf(FaceModalFlow::class.java, FingerprintModalFlow::class.java))
+        verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock, captorArgsForBuilderModalityFlow,
+            listOf(FaceModalityFlow::class.java, FingerprintModalityFlow::class.java))
     }
 
     @Test
-    fun givenFingerprintFaceModal_buildAFlowModal_itShouldContainAFingerprintAndFaceModals() {
-        val orchestrator = buildOrchestratorToBuildFlowModal(FINGER_FACE)
+    fun givenFingerprintFaceModality_buildAFlowModality_shouldContainAFingerprintAndFaceModals() {
+        val orchestrator = buildOrchestratorToBuildFlowModality(FINGER_FACE)
 
-        orchestrator.flowModal
+        orchestrator.flowModality
 
-        verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock, captorArgsForBuilderModalFlow,
-            listOf(FingerprintModalFlow::class.java, FaceModalFlow::class.java))
+        verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock, captorArgsForBuilderModalityFlow,
+            listOf(FingerprintModalityFlow::class.java, FaceModalityFlow::class.java))
     }
 
-    private fun buildOrchestratorToStartFlow(mockModalRequests: List<ModalStepRequest> = emptyList(),
-                                             mockModalResponses: List<ModalResponse> = emptyList()): OrchestratorManagerImpl {
+    private fun buildOrchestratorToStartFlow(mockModalityRequests: List<ModalityStepRequest> = emptyList(),
+                                             mockModalityResponses: List<ModalityResponse> = emptyList()): OrchestratorManagerImpl {
 
-        val modalFlowMock = mock<ModalFlow>()
-        whenever { modalFlowBuilderMock.buildModalFlow(any()) } thenReturn modalFlowMock
-        whenever { modalFlowMock.nextModalStepRequest } thenReturn Observable.fromIterable(mockModalRequests)
-        whenever { modalFlowMock.modalResponses } thenReturn Observable.fromIterable(mockModalResponses)
-        return OrchestratorManagerImpl(FACE, modalFlowBuilderMock, mock(), mock())
+        val modalFlowMock = mock<ModalityFlow>()
+        whenever { modalityFlowBuilderMock.buildModalityFlow(any()) } thenReturn modalFlowMock
+        whenever { modalFlowMock.nextModalityStepRequest } thenReturn Observable.fromIterable(mockModalityRequests)
+        whenever { modalFlowMock.modalityResponses } thenReturn Observable.fromIterable(mockModalityResponses)
+        return OrchestratorManagerImpl(FACE, modalityFlowBuilderMock, mock(), mock())
     }
 
-    private fun buildOrchestratorToBuildFlowModal(modal: Modal) =
-        OrchestratorManagerImpl(modal, modalFlowBuilderMock, mock(), mock())
+    private fun buildOrchestratorToBuildFlowModality(modality: Modality) =
+        OrchestratorManagerImpl(modality, modalityFlowBuilderMock, mock(), mock())
             .apply { appRequest = mock() }
 
     // Verifies the modalFlow builder is called from the
-    // orchestrator with the right Modal Flow params
-    private fun verifyBuilderCalledWithRightModalFlows(modalFlowBuilderMock: ModalFlowFactory,
-                                                       captorArgsForBuilderModalFlow: KArgumentCaptor<List<ModalFlow>>,
+    // orchestrator with the right Modality Flow params
+    private fun verifyBuilderCalledWithRightModalFlows(modalityFlowBuilderMock: ModalityFlowFactory,
+                                                       captorArgsForBuilderModalityFlow: KArgumentCaptor<List<ModalityFlow>>,
                                                        modalFlowClasses: List<Class<*>>) {
 
-        verify(modalFlowBuilderMock, times(1)).buildModalFlow(captorArgsForBuilderModalFlow.capture())
-        val steps = captorArgsForBuilderModalFlow.firstValue
+        verify(modalityFlowBuilderMock, times(1)).buildModalityFlow(captorArgsForBuilderModalityFlow.capture())
+        val steps = captorArgsForBuilderModalityFlow.firstValue
         steps.forEachIndexed { index, modalFlow ->
             assertThat(modalFlow).isInstanceOf(modalFlowClasses[index])
         }

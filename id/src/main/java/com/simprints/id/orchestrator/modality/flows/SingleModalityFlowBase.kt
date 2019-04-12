@@ -8,7 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
 /**
- * Generic class for a single modal flows such as Fingerprint or Face.
+ * Generic class for a single modality flows such as Fingerprint or Face.
  * It requests only a step (see #nextIntentEmitter) and emits only a response (see #nextIntentEmitter).
  * The specific class needs to implement #getNextModalStepRequest and #extractModalResponse
  */
