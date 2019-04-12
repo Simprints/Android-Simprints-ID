@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.modals
+package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
 

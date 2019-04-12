@@ -6,7 +6,7 @@ import com.simprints.id.orchestrator.modals.ModalStepRequest
 import io.reactivex.Observable
 
 /**
- * Representation of a modal flow for a specific modality.
+ * Representation of a modality flow for a specific modality.
  */
 interface ModalFlow {
 
@@ -16,13 +16,13 @@ interface ModalFlow {
 }
 
 /**
- * Represents a single Modal Flow
+ * Represents a single Modality Flow
  * @see com.simprints.id.orchestrator.modals.flows.SingleModalFlowBase
  */
 interface SingleModalFlow: ModalFlow
 
 /**
- * Represents a multi Modal Flow.
+ * Represents a multi Modality Flow.
  * MultiModalFlow can host single SingleModalFlow
  * @see com.simprints.id.orchestrator.modals.flows.MultiModalFlowBase
  */

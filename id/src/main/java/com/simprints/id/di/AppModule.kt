@@ -43,9 +43,9 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.modals.ModalFlowBuilderImpl
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderFactory
-import com.simprints.id.orchestrator.modals.builders.AppResponseBuilderFactoryImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowBuilderImpl
+import com.simprints.id.orchestrator.modality.builders.AppResponseBuilderFactory
+import com.simprints.id.orchestrator.modality.builders.AppResponseBuilderFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -255,6 +255,6 @@ open class AppModule(val app: Application) {
     open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager,
                                         prefs: PreferencesManager,
                                         apResponseBuilderFactory: AppResponseBuilderFactory): OrchestratorManager =
-        OrchestratorManagerImpl(settingsPreferencesManager.modal, ModalFlowBuilderImpl(), prefs, apResponseBuilderFactory)
+        OrchestratorManagerImpl(settingsPreferencesManager.modality, ModalityFlowBuilderImpl(), prefs, apResponseBuilderFactory)
 }
 

@@ -5,13 +5,12 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
-import com.simprints.id.data.prefs.preferenceType.PrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.modal.Modal
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
@@ -21,7 +20,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<GROUP>,
-                                          modalSerializer: Serializer<Modal>,
+                                          modalitySerializer: Serializer<Modality>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
@@ -80,8 +79,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
 
-        val MODAL_DEFAULT = Modal.FACE_FINGER
-        const val MODAL_KEY = "Modal"
+        val MODALITY_DEFAULT = Modality.FACE_FINGER
+        const val MODALITY_KEY = "Modality"
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -128,8 +127,8 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
 
-    override var modal: Modal
-        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODAL_KEY, MODAL_DEFAULT, modalSerializer)
+    override var modality: Modality
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
 
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
