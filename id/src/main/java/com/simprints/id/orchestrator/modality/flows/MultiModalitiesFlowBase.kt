@@ -4,14 +4,14 @@ import android.content.Intent
 import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
-import com.simprints.id.orchestrator.modality.flows.interfaces.MultiModalityFlow
+import com.simprints.id.orchestrator.modality.flows.interfaces.MultiModalitiesFlow
 import io.reactivex.Observable
 
 /**
  * Concatenates multi modalities for more complicate flows.
  * @param steps list of ModalFlows to concatenate
  */
-class MultiModalityFlowBase(private val steps: List<ModalityFlow>) : MultiModalityFlow {
+class MultiModalitiesFlowBase(private val steps: List<ModalityFlow>) : MultiModalitiesFlow {
 
     override val modalityResponses: Observable<ModalityResponse> =
         Observable.concat(steps.map { it.modalityResponses })

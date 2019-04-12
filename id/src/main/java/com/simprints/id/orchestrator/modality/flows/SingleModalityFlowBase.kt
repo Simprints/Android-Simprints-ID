@@ -1,30 +1,30 @@
-package com.simprints.id.orchestrator.modals.flows
+package com.simprints.id.orchestrator.modality.flows
 
 import android.content.Intent
-import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.modals.ModalStepRequest
-import com.simprints.id.orchestrator.modals.flows.interfaces.SingleModalFlow
+import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.id.orchestrator.modality.flows.interfaces.SingleModalityFlow
 import io.reactivex.Observable
 import io.reactivex.ObservableEmitter
 
 /**
  * Generic class for a single modality flows such as Fingerprint or Face.
  * It requests only a step (see #nextIntentEmitter) and emits only a response (see #nextIntentEmitter).
- * The specific class needs to implement #getNextModalStepRequest and #extractModalResponse
+ * The specific class needs to implement #getNextModalityStepRequest and #extractModalityResponse
  */
-abstract class SingleModalFlowBase : SingleModalFlow {
+abstract class SingleModalityFlowBase : SingleModalityFlow {
 
     abstract val intentRequestCode: Int
 
-    private lateinit var responsesEmitter: ObservableEmitter<ModalResponse>
-    override val modalResponses: Observable<ModalResponse> = Observable.create {
+    private lateinit var responsesEmitter: ObservableEmitter<ModalityResponse>
+    override val modalityResponses: Observable<ModalityResponse> = Observable.create {
         responsesEmitter = it
     }
 
-    private lateinit var nextIntentEmitter: ObservableEmitter<ModalStepRequest>
-    override val nextModalStepRequest: Observable<ModalStepRequest> = Observable.create {
+    private lateinit var nextIntentEmitter: ObservableEmitter<ModalityStepRequest>
+    override val nextModalityStepRequest: Observable<ModalityStepRequest> = Observable.create {
         nextIntentEmitter = it
-        nextIntentEmitter.onNext(getNextModalStepRequest())
+        nextIntentEmitter.onNext(getNextModalityStepRequest())
     }
 
 
@@ -32,7 +32,7 @@ abstract class SingleModalFlowBase : SingleModalFlow {
     override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
         if (requestCode == intentRequestCode) {
             try {
-                val potentialModalResponse = extractModalResponse(requestCode, resultCode, data)
+                val potentialModalResponse = extractModalityResponse(requestCode, resultCode, data)
 
                 responsesEmitter.onNext(potentialModalResponse)
                 responsesEmitter.onComplete()
@@ -48,6 +48,6 @@ abstract class SingleModalFlowBase : SingleModalFlow {
             false
         }
 
-    abstract fun getNextModalStepRequest(): ModalStepRequest
-    abstract fun extractModalResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalResponse
+    abstract fun getNextModalityStepRequest(): ModalityStepRequest
+    abstract fun extractModalityResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalityResponse
 }

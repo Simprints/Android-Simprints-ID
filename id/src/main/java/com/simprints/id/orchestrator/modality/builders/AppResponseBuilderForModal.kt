@@ -1,12 +1,12 @@
-package com.simprints.id.orchestrator.modals.builders
+package com.simprints.id.orchestrator.modality.builders
 
-import com.simprints.id.domain.modal.ModalResponse
+import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 
 interface AppResponseBuilderForModal {
 
     fun buildResponse(appRequest: AppRequest,
-                      modalResponses: List<ModalResponse>,
+                      modalityRespons: List<ModalityResponse>,
                       sessionId: String = ""): AppResponse
 }
