@@ -1,18 +1,22 @@
 package com.simprints.id.orchestrator.modality.builders
 
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 
 class AppResponseFactoryImpl : AppResponseFactory {
 
-    override fun buildAppResponseBuilder(modality: Modality): AppResponseBuilderForModal =
+    override fun buildAppResponse(modality: Modality,
+                                  appRequest: AppRequest,
+                                  modalityResponses: List<ModalityResponse>,
+                                  sessionId: String): AppResponse =
         when (modality) {
-            Modality.FACE -> AppResponseBuilderForFace()
-            Modality.FINGER -> AppResponseBuilderForFinger()
-            Modality.FINGER_FACE -> AppResponseBuilderForFingerFace()
-            Modality.FACE_FINGER -> AppResponseBuilderForFaceFinger()
-        }
+            FACE -> AppResponseBuilderForFace()
+            FINGER -> AppResponseBuilderForFinger()
+            FINGER_FACE -> AppResponseBuilderForFingerFace()
+            FACE_FINGER -> AppResponseBuilderForFaceFinger()
+        }.buildResponse(appRequest, modalityResponses, sessionId)
 }
 
-interface AppResponseFactory {
-    fun buildAppResponseBuilder(modality: Modality): AppResponseBuilderForModal
-}
