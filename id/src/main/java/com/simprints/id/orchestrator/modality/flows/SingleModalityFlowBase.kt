@@ -16,12 +16,13 @@ abstract class SingleModalityFlowBase : SingleModalityFlow {
 
     abstract val intentRequestCode: Int
 
-    private lateinit var responsesEmitter: ObservableEmitter<ModalityResponse>
+    internal lateinit var responsesEmitter: ObservableEmitter<ModalityResponse>
     override val modalityResponses: Observable<ModalityResponse> = Observable.create {
         responsesEmitter = it
     }
 
-    private lateinit var nextIntentEmitter: ObservableEmitter<ModalityStepRequest>
+    internal lateinit var nextIntentEmitter: ObservableEmitter<ModalityStepRequest>
+
     override val modalityStepRequests: Observable<ModalityStepRequest> = Observable.create {
         nextIntentEmitter = it
         nextIntentEmitter.onNext(getModalityStepRequests())
@@ -32,21 +33,28 @@ abstract class SingleModalityFlowBase : SingleModalityFlow {
     override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
         if (requestCode == intentRequestCode) {
             try {
-                val potentialModalResponse = extractModalityResponse(requestCode, resultCode, data)
+                val modalityResponse = extractModalityResponse(requestCode, resultCode, data)
+                completeWithValidResponse(modalityResponse)
 
-                responsesEmitter.onNext(potentialModalResponse)
-                responsesEmitter.onComplete()
-                nextIntentEmitter.onComplete()
-
-            } catch (t: Throwable) {
+            } catch (t: RuntimeException) {
                 t.printStackTrace()
-                responsesEmitter.onError(t)
-                nextIntentEmitter.onError(t)
+                completeWithAnError(t)
             }
             true
         } else {
             false
         }
+
+    internal fun completeWithAnError(t: Throwable) {
+        responsesEmitter.onError(t)
+        nextIntentEmitter.onError(t)
+    }
+
+    internal fun completeWithValidResponse(modalityResponse: ModalityResponse) {
+        responsesEmitter.onNext(modalityResponse)
+        responsesEmitter.onComplete()
+        nextIntentEmitter.onComplete()
+    }
 
     abstract fun getModalityStepRequests(): ModalityStepRequest
     abstract fun extractModalityResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalityResponse
