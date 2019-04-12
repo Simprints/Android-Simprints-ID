@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.modality.builders
 
 import com.simprints.id.domain.modality.Modality
 
-class AppResponseBuilderFactoryImpl : AppResponseBuilderFactory {
+class AppResponseFactoryImpl : AppResponseFactory {
 
     override fun buildAppResponseBuilder(modality: Modality): AppResponseBuilderForModal =
         when (modality) {
@@ -13,6 +13,6 @@ class AppResponseBuilderFactoryImpl : AppResponseBuilderFactory {
         }
 }
 
-interface AppResponseBuilderFactory {
+interface AppResponseFactory {
     fun buildAppResponseBuilder(modality: Modality): AppResponseBuilderForModal
 }

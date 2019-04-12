@@ -23,7 +23,7 @@ class FingerprintModalityFlow(private val appRequest: AppRequest,
 
     override val intentRequestCode: Int = REQUEST_CODE_FINGERPRINT
 
-    override fun getNextModalityStepRequest(): ModalityStepRequest {
+    override fun getModalityStepRequests(): ModalityStepRequest {
         val intent = Intent().setClassName(packageName, fingerprintActivityClassName)
         intent.putExtra(IFingerprintRequest.BUNDLE_KEY, fromDomainToFingerprintRequest(buildFingerprintRequest(appRequest, prefs)))
         return ModalityStepRequest(intentRequestCode, intent)

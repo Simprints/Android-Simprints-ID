@@ -10,7 +10,7 @@ import io.reactivex.Observable
  */
 interface ModalityFlow {
 
-    val nextModalityStepRequest: Observable<ModalityStepRequest>
+    val modalityStepRequests: Observable<ModalityStepRequest>
     val modalityResponses: Observable<ModalityResponse>
     fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean
 }
