@@ -1,6 +1,6 @@
-package com.simprints.id.orchestrator.modals.builders
+package com.simprints.id.orchestrator.modality.builders
 
-import com.simprints.id.domain.modal.Modality
+import com.simprints.id.domain.modality.Modality
 
 class AppResponseBuilderFactoryImpl : AppResponseBuilderFactory {
 

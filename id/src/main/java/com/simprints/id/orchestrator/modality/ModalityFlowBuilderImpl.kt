@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator.modality
 
-import com.simprints.id.orchestrator.modality.flows.MultiModalityFlowBase
+import com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 
-class ModalFlowBuilderImpl: ModalFlowFactory {
+class ModalityFlowBuilderImpl: ModalityFlowFactory {
 
-    override fun buildModalFlow(steps: List<ModalityFlow>): ModalityFlow =  MultiModalityFlowBase(steps)
+    override fun buildModalityFlow(steps: List<ModalityFlow>): ModalityFlow =  MultiModalitiesFlowBase(steps)
 
 }

@@ -1,6 +1,6 @@
-package com.simprints.id.orchestrator.modals.builders
+package com.simprints.id.orchestrator.modality.builders
 
-import com.simprints.id.domain.modal.ModalResponse
+import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -21,11 +21,11 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
-                               modalResponses: List<ModalResponse>,
+                               modalityRespons: List<ModalityResponse>,
                                sessionId: String): AppResponse {
 
-        val fingerResponse = modalResponses.first()
-        val faceResponse = modalResponses[1]
+        val fingerResponse = modalityRespons.first()
+        val faceResponse = modalityRespons[1]
 
         if (fingerResponse is FingerprintRefusalFormResponse)
             return buildAppRefusalFormResponse(fingerResponse)

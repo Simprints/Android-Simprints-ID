@@ -1,29 +1,29 @@
-package com.simprints.id.orchestrator.modals.flows.interfaces
+package com.simprints.id.orchestrator.modality.flows.interfaces
 
 import android.content.Intent
-import com.simprints.id.domain.modal.ModalResponse
-import com.simprints.id.orchestrator.modals.ModalStepRequest
+import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import io.reactivex.Observable
 
 /**
  * Representation of a modality flow for a specific modality.
  */
-interface ModalFlow {
+interface ModalityFlow {
 
-    val nextModalStepRequest: Observable<ModalStepRequest>
-    val modalResponses: Observable<ModalResponse>
+    val nextModalityStepRequest: Observable<ModalityStepRequest>
+    val modalityResponses: Observable<ModalityResponse>
     fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean
 }
 
 /**
  * Represents a single Modality Flow
- * @see com.simprints.id.orchestrator.modals.flows.SingleModalFlowBase
+ * @see com.simprints.id.orchestrator.modality.flows.SingleModalityFlowBase
  */
-interface SingleModalFlow: ModalFlow
+interface SingleModalityFlow: ModalityFlow
 
 /**
  * Represents a multi Modality Flow.
- * MultiModalFlow can host single SingleModalFlow
- * @see com.simprints.id.orchestrator.modals.flows.MultiModalFlowBase
+ * MultiModalitiesFlow can host SingleModalityFlows
+ * @see com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
  */
-interface MultiModalFlow: ModalFlow
+interface MultiModalitiesFlow: ModalityFlow
