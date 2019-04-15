@@ -19,9 +19,6 @@ interface DbManager {
     val remotePeopleManager: RemotePeopleManager
     val remoteProjectManager: RemoteProjectManager
 
-    // Lifecycle
-    fun initialiseDb()
-
     fun signIn(projectId: String, userId: String, tokens: Tokens): Completable
     fun signOut()
 

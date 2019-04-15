@@ -18,8 +18,6 @@ import io.realm.Sort
 /** @throws NotSignedInException */
 interface LocalDbManager {
 
-    fun signInToLocal(localDbKey: LocalDbKey)
-
     // Data transfer
     // TODO: stop leaking Realm model into domain layer
     fun insertOrUpdatePersonInLocal(person: Person): Completable

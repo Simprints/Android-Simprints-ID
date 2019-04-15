@@ -7,7 +7,6 @@ import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -46,7 +45,6 @@ class DashboardCardsFactoryTest {
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private val module by lazy {
@@ -61,8 +59,6 @@ class DashboardCardsFactoryTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-
-        dbManager.initialiseDb()
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
