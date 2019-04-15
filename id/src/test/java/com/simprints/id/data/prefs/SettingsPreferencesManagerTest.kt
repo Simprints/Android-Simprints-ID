@@ -46,7 +46,7 @@ class SettingsPreferencesManagerTest {
         val originalValue = settingsPreferencesManager.logoExists
         Assert.assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
 
-        settingsPreferencesManager.logoExists != originalValue
+        settingsPreferencesManager.logoExists = !originalValue
 
         val newValue = settingsPreferencesManager.logoExists
 
