@@ -4,24 +4,22 @@ import com.simprints.id.data.db.local.realm.models.DbFingerprint
 import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.local.realm.models.DbProject
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
+import com.simprints.id.data.db.local.realm.oldschemas.PeopleSchemaV5
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
 import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
-
-    //StopShip: classes were renamed. Write Migration.
+    
     @RealmModule(classes = [DbFingerprint::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 5
+        const val REALM_SCHEMA_VERSION: Long = 6
 
         const val PERSON_TABLE: String = "DbPerson"
-        const val USER_TABLE: String = "rl_User"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
-        const val API_KEY_TABLE: String = "rl_ApiKey"
         const val SYNC_INFO_TABLE: String = "DbSyncInfo"
         const val PROJECT_TABLE: String = "DbProject"
 
@@ -60,6 +58,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 2 -> migrateTo3(realm.schema)
                 3 -> migrateTo4(realm.schema)
                 4 -> migrateTo5(realm.schema)
+                5 -> migrateTo6(realm.schema)
             }
         }
     }
@@ -69,7 +68,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
             it.set(MODULE_FIELD, Constants.GLOBAL_ID)
         }
 
-        schema.remove(USER_TABLE)
+        schema.remove("rl_User")
     }
 
     private fun migrateTo2(schema: RealmSchema) {
@@ -78,7 +77,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         migrateProjectInfoTo2(schema)
 
         schema.get(FINGERPRINT_TABLE)?.removeField(FINGERPRINT_PERSON)
-        schema.remove(API_KEY_TABLE)
+        schema.remove("rl_ApiKey")
     }
 
     private fun migratePersonTo2(schema: RealmSchema) {
@@ -144,8 +143,16 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo5(schema: RealmSchema) {
-        //We want to delete RlSyncInfo, but we need to migrate to Room.
+        //We want to delete DbSyncInfo, but we need to migrate to Room.
+        //We do the migration in DownSyncTask
         //In the next version, we will drop this class.
+    }
+
+    private fun migrateTo6(schema: RealmSchema) {
+        schema.get(PeopleSchemaV5.PERSON_TABLE)?.className = PERSON_TABLE
+        schema.get(PeopleSchemaV5.FINGERPRINT_TABLE)?.className = FINGERPRINT_TABLE
+        schema.get(PeopleSchemaV5.PROJECT_TABLE)?.className = PROJECT_TABLE
+        schema.get(PeopleSchemaV5.SYNC_INFO_TABLE)?.className = SYNC_INFO_TABLE
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
@@ -129,25 +129,25 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientUpdatedAt
             ?: getLastPatientUpdatedAtFromRealmAndMigrateIt()
 
-    private fun getLastPatientIdFromRealmAndMigrateIt(): String? = fetchRlSessionInfoFromRealmAndMigrateIt()?.lastPatientId
-    private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchRlSessionInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
-    private fun fetchRlSessionInfoFromRealmAndMigrateIt(): DownSyncStatus? {
+    private fun getLastPatientIdFromRealmAndMigrateIt(): String? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientId
+    private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
+    private fun fetchDbSyncInfoFromRealmAndMigrateIt(): DownSyncStatus? {
         return try {
-            val rlSyncInfo = localDbManager.getRlSyncInfo(subSyncScope).blockingGet()
+            val dbSyncInfo = localDbManager.getDbSyncInfo(subSyncScope).blockingGet()
             val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
 
             val newDownSyncStatus =
                 currentDownSyncStatus?.copy(
-                    lastPatientId = rlSyncInfo.lastKnownPatientId,
-                    lastPatientUpdatedAt = rlSyncInfo.lastKnownPatientUpdatedAt.time)
-                    ?: DownSyncStatus(subSyncScope, rlSyncInfo.lastKnownPatientId, rlSyncInfo.lastKnownPatientUpdatedAt.time)
+                    lastPatientId = dbSyncInfo.lastKnownPatientId,
+                    lastPatientUpdatedAt = dbSyncInfo.lastKnownPatientUpdatedAt.time)
+                    ?: DownSyncStatus(subSyncScope, dbSyncInfo.lastKnownPatientId, dbSyncInfo.lastKnownPatientUpdatedAt.time)
 
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
             localDbManager.deleteSyncInfo(subSyncScope)
             newDownSyncStatus
         } catch (t: Throwable) {
-            if (t is NoSuchRlSessionInfoException) {
-                Timber.e("No such realm session info")
+            if (t is NoSuchDbSyncInfoException) {
+                Timber.e("No such realm sync info")
             } else {
                 Timber.e(t)
             }
