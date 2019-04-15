@@ -21,7 +21,7 @@ import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -174,7 +174,7 @@ class SubDownSyncTaskTest {
         doReturnScopeFromBuilder(scope)
         mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
-        whenever(localDbMock.getRlSyncInfo(subScope)).thenReturn(Single.just(
+        whenever(localDbMock.getDbSyncInfo(subScope)).thenReturn(Single.just(
             DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
@@ -272,7 +272,7 @@ class SubDownSyncTaskTest {
 
 
     private fun doNothingForRealmMigration(localDbMock: LocalDbManager) {
-        whenever(localDbMock.getRlSyncInfo(anyNotNull())).thenReturn(Single.error(NoSuchRlSessionInfoException("no RlInfo")))
+        whenever(localDbMock.getDbSyncInfo(anyNotNull())).thenReturn(Single.error(NoSuchDbSyncInfoException("no RlInfo")))
     }
 
     private fun doNothingForInsertPeopleToLocalDb(localDbMock: LocalDbManager) {
