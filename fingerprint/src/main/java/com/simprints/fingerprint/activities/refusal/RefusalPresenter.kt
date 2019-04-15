@@ -20,7 +20,6 @@ import javax.inject.Inject
 class RefusalPresenter(private val view: RefusalContract.View,
                        component: FingerprintsComponent) : RefusalContract.Presenter {
 
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var timeHelper: TimeHelper
