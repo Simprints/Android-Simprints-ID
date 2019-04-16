@@ -5,16 +5,11 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.moduleapi.app.DomainToAppResponse.fromDomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import javax.inject.Inject
 
-class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
-
-    @Inject lateinit var preferences: PreferencesManager
+open class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
 
     override lateinit var viewPresenter: OrchestratorContract.Presenter
 
@@ -24,11 +19,15 @@ class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
         val appRequest = this.intent.extras?.getParcelable<AppRequest>(AppRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
 
+        startPresenter(appRequest)
+    }
+
+    internal open fun startPresenter(appRequest: AppRequest) {
         viewPresenter = OrchestratorPresenter(this, appRequest, (application as Application).component)
         viewPresenter.start()
     }
 
-    override fun startActivity(requestCode:Int, intent: Intent) {
+    override fun startNextActivity(requestCode:Int, intent: Intent) {
         startActivityForResult(intent, requestCode)
     }
 
@@ -43,7 +42,10 @@ class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
     }
 
     override fun setResultAndFinish(response: AppResponse) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtra(IAppResponse.BUNDLE_KEY, fromDomainToAppResponse(response)) })
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(IAppResponse.BUNDLE_KEY, viewPresenter.fromDomainToAppResponse(response))
+        })
+
         finishOrchestratorAct()
     }
 

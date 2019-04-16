@@ -4,8 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.OrchestratorManager
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.moduleapi.app.responses.IAppResponse
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
@@ -24,32 +29,54 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
 
     @SuppressLint("CheckResult")
     override fun start() {
-        orchestratorManager.startFlow(appRequest, sessionEventsManager.getCurrentSession().blockingGet().id) //StopShip: Avoid blocking get            .subscribeOn(Schedulers.io())
+        subscribeForModalitiesRequests()
+        subscribeForFinalAppResponse()
+    }
+
+    @SuppressLint("CheckResult")
+    internal fun subscribeForModalitiesRequests() =
+        getSessionId().flatMapObservable { orchestratorManager.startFlow(appRequest, it) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
-                    view.startActivity(it.requestCode, it.intent)
+                    handleNextModalityRequest(it)
                 },
                 onError = {
-                    it.printStackTrace()
-                    view.setCancelResultAndFinish()
-                    Timber.d(it.message)
+                    handleErrorInTheModalitiesFlow(it)
                 })
 
+    @SuppressLint("CheckResult")
+    internal fun subscribeForFinalAppResponse() =
         orchestratorManager.getAppResponse()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    view.setResultAndFinish(it)
+                    handleAppResponse(it)
                 },
                 onError = {
-                    it.printStackTrace()
-                    view.setCancelResultAndFinish()
-                    Timber.d(it.message)
+                    handleErrorInTheModalitiesFlow(it)
                 })
+
+    private fun handleAppResponse(appResponse: AppResponse) =
+        view.setResultAndFinish(appResponse)
+
+    @SuppressLint("CheckResult")
+    internal fun getSessionId(): Single<String> =
+        sessionEventsManager.getCurrentSession().map { it.id }
+
+    private fun handleNextModalityRequest(modalityRequest: ModalityStepRequest) =
+        view.startNextActivity(modalityRequest.requestCode, modalityRequest.intent)
+
+    private fun handleErrorInTheModalitiesFlow(it: Throwable) {
+        it.printStackTrace()
+        view.setCancelResultAndFinish()
+        Timber.d(it.message)
     }
 
     override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        orchestratorManager.notifyResult(requestCode, resultCode, data)
+        orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
     }
+
+    override fun fromDomainToAppResponse(response: AppResponse?): IAppResponse? =
+        DomainToAppResponse.fromDomainToAppResponse(response)
 }

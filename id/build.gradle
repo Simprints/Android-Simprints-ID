@@ -192,6 +192,10 @@ dependencies {
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
     testImplementation deps.testing.androidx.room
+    testImplementation deps.testing.androidx.rules
+    testImplementation deps.testing.espresso.core
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.testing.espresso.contrib
     testImplementation deps.testing.truth
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
