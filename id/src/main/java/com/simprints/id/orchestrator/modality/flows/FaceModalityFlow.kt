@@ -1,17 +1,19 @@
-package com.simprints.id.orchestrator.modals.flows
+package com.simprints.id.orchestrator.modality.flows
 
 import android.app.Activity
 import android.content.Intent
-import com.simprints.id.domain.modal.ModalResponse
+import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceRequest
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.id.orchestrator.modality.flows.interfaces.SingleModalityFlow
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
-class FaceModal(private val appRequest: AppRequest,
-                private val packageName: String) : SingleModalFlow() {
+class FaceModalityFlow(private val appRequest: AppRequest,
+                       private val packageName: String) : SingleModalityFlowBase(), SingleModalityFlow {
 
     companion object {
         const val faceActivityClassName = "com.simprints.face.activities.FaceCaptureActivity"
@@ -20,13 +22,13 @@ class FaceModal(private val appRequest: AppRequest,
 
     override val intentRequestCode: Int = REQUEST_CODE_FACE
 
-    override fun getNextIntent(): ModalStepRequest {
+    override fun getModalityStepRequests(): ModalityStepRequest {
         val intent = Intent().setClassName(packageName, faceActivityClassName)
         intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(buildFaceRequest(appRequest)))
-        return ModalStepRequest(intentRequestCode, intent)
+        return ModalityStepRequest(intentRequestCode, intent)
     }
 
-    override fun extractModalResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalResponse {
+    override fun extractModalityResponse(requestCode: Int, resultCode: Int, data: Intent?): ModalityResponse {
         require(resultCode == Activity.RESULT_OK)
         require(data != null)
 

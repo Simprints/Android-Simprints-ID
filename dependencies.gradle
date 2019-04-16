@@ -114,6 +114,7 @@ def testing = [
     espresso     : [
         core   : "androidx.test.espresso:espresso-core:$espresso_version",
         intents: "androidx.test.espresso:espresso-intents:$espresso_version",
+        contrib: "androidx.test.espresso:espresso-contrib:$espresso_version",
         barista: "com.schibsted.spain:barista:2.7.1" //Used to grant permissions in AndroidTests
     ],
     dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
