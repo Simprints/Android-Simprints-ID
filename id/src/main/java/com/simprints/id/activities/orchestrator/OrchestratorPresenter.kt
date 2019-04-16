@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.moduleapi.app.responses.IAppResponse
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -63,7 +65,7 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
         sessionEventsManager.getCurrentSession().map { it.id }
 
     private fun handleNextModalityRequest(modalityRequest: ModalityStepRequest) =
-        view.startActivity(modalityRequest.requestCode, modalityRequest.intent)
+        view.startNextActivity(modalityRequest.requestCode, modalityRequest.intent)
 
     private fun handleErrorInTheModalitiesFlow(it: Throwable) {
         it.printStackTrace()
@@ -74,4 +76,7 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
     override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
         orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
     }
+
+    override fun fromDomainToAppResponse(response: AppResponse?): IAppResponse? =
+        DomainToAppResponse.fromDomainToAppResponse(response)
 }

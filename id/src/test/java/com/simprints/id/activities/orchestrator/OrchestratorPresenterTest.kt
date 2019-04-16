@@ -60,7 +60,7 @@ class OrchestratorPresenterTest {
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter.view) { startActivity(modalityRequest.requestCode, modalityRequest.intent) }
+        verifyOnce(orchestratorPresenter.view) { startNextActivity(modalityRequest.requestCode, modalityRequest.intent) }
     }
 
     @Test

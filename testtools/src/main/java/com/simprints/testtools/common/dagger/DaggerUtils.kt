@@ -11,7 +11,7 @@ fun injectClassFromComponent(component: Any, clazz: Any) {
         // These inject KFunctions take two parameters, the first is the AppComponent, the second is the injectee
         function.parameters.size == 2 && function.parameters.last().type == clazz::class.createType()
 
-    } ?: throw NoSuchMethodError("Forgot to add inject method to ${component::class.createType()} for ${clazz::class.createType()}")
+    } ?: throw NoSuchMethodError("Forgot to add inject method to ${component::class.createType()} \"(see AppComponentFor[Android]Tests)\":: for ${clazz::class.createType()}")
 
     injectFunction.call(component, clazz)
 }
