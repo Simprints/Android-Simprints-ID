@@ -51,14 +51,12 @@
 -keep class com.simprints.fingerprint.data.domain.consent.** { *; }
 -keep class com.simprints.id.domain.Project { *; }
 -keep class com.simprints.id.domain.alert.Alert { *; }
--keep class com.simprints.id.session.Session { *; }
 
 -keep class com.simprints.id.data.db.remote.models.** { *; }
 -keep class com.simprints.id.services.scheduledSync.peopleDownSync.models.** { *; }
 -keep class com.simprints.id.data.analytics.eventdata.models.** { *; }
 -keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
 
--keep class com.simprints.id.session.callout.** { *; }
 -keep class com.simprints.core.tools.json.** { *; }
 -keepclassmembers enum * { *; }
 
