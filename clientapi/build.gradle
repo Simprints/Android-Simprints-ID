@@ -20,7 +20,12 @@ android {
 
     buildTypes {
         release {
-            proguardFiles 'proguard-rules-dynamic-features.pro'
+            // If we enable a specific pro-guard, then we need to add rules for the Activities.
+            // in DF, aapt doesn't pull out them from the Manifest as it does with the base model
+            //proguardFiles 'proguard-rules-dynamic-features.pro'
+        }
+        releaseWithLogfile {
+            initWith release
         }
     }
 

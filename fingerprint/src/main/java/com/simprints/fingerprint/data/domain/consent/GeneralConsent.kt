@@ -2,12 +2,13 @@ package com.simprints.fingerprint.data.domain.consent
 
 import android.content.Context
 import com.google.gson.annotations.SerializedName
+import androidx.annotation.Keep
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.R
 
-
+@Keep
 data class GeneralConsent(
     @SerializedName("consent_enrol_only") var consentEnrolOnly: Boolean = false,
     @SerializedName("consent_enrol") var consentEnrol: Boolean = true,
