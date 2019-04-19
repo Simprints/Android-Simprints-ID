@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator
 
 import android.content.Intent
-import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -13,7 +12,6 @@ import com.simprints.id.orchestrator.modality.ModalityFlowFactory
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
@@ -48,51 +46,26 @@ class OrchestratorManagerImplTest {
     }
 
     @Test
-    fun startFlowModality_orchestratorShouldClearPreviousResults() {
-        val orchestrator = buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
-        orchestrator.stepsResults.add(firstModalityResponseMock)
-
-        startFlowModal(orchestrator).assertValueCount(1)
-
-        assertThat(orchestrator.stepsResults.size).isEqualTo(0)
-    }
-
-    @Test
     fun flowModalStarted_modalFlowReturnsAResponse_orchestratorShouldHandleIt() {
         val orchestrator =
             spy(buildOrchestratorToStartFlow(listOf(firstModalityStepRequest), listOf(firstModalityResponseMock))
                 .apply { appRequest = mock() })
 
-        startFlowModal(orchestrator).assertValueCount(1)
-
-        verifyOnce(orchestrator) { subscribeForStepsIntentResults(anyNotNull(), anyNotNull()) }
-        verifyOnce(orchestrator) { addNewStepIntentResult(anyNotNull()) }
-    }
-
-    @Test
-    fun flowModalStarted_modalFlowReturnsAnError_orchestratorShouldHandleIt() {
-        val orchestrator =
-            spy(buildOrchestratorToStartFlow(listOf(firstModalityStepRequest))
-                .apply { appRequest = mock() })
-
         startFlowModal(orchestrator)
-
-        verifyOnce(orchestrator) { subscribeForStepsIntentResults(anyNotNull(), anyNotNull()) }
-        verifyOnce(orchestrator) { buildAndEmitFinalResult(anyNotNull(), anyNotNull()) }
+            .assertValueCount(1)
     }
 
     @Test
     fun flowModalStarted_modalFlowEmitsAnError_orchestratorShouldHandleIt() {
         val modalFlowMock = mock<ModalityFlow>()
         whenever { modalitiesFlowFactoryMock.buildModalityFlow(any(), any()) } thenReturn modalFlowMock
-        whenever { modalFlowMock.modalityStepRequests } thenReturn Observable.empty()
         whenever { modalFlowMock.modalityResponses } thenReturn Observable.error(UnexpectedErrorInModalFlow())
         val orchestrator = spy(OrchestratorManagerImpl(FACE, modalitiesFlowFactoryMock, mock())
             .apply { appRequest = mock() })
 
-        startFlowModal(orchestrator)
-
-        verifyOnce(orchestrator) { emitErrorAsFinalResult() }
+        orchestrator.getAppResponse()
+            .test()
+            .assertError(UnexpectedErrorInModalFlow::class.java)
     }
 
     @Test
