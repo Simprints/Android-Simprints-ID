@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.di;
+package com.simprints.fingerprint.di
 
 import android.content.Context
 import com.simprints.fingerprint.activities.launch.ConsentDataManager

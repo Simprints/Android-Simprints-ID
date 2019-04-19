@@ -1,9 +1,6 @@
 package com.simprints.id.data.db.local
 
-import com.simprints.id.data.db.DataCallback
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
@@ -50,7 +47,6 @@ interface LocalDbManager {
 
     fun deletePeopleFromLocal(syncScope: SyncScope): Completable
     fun deletePeopleFromLocal(subSyncScope: SubSyncScope): Completable
-    fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?)
 
     //@Deprecated: do not use it. Use Room SyncStatus
     fun getDbSyncInfo(subSyncScope: SubSyncScope): Single<DbSyncInfo>
