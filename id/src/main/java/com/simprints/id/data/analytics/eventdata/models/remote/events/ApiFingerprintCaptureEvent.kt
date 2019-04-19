@@ -1,7 +1,9 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
+import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 
+@Keep
 class ApiFingerprintCaptureEvent(val id: String,
                                  val relativeStartTime: Long,
                                  val relativeEndTime: Long,
@@ -10,10 +12,12 @@ class ApiFingerprintCaptureEvent(val id: String,
                                  val result: ApiResult,
                                  val fingerprint: ApiFingerprint?) : ApiEvent(ApiEventType.FINGERPRINT_CAPTURE) {
 
+    @Keep
     class ApiFingerprint(val quality: Int, val template: String) {
         constructor(finger: FingerprintCaptureEvent.Fingerprint) : this(finger.quality, finger.template)
     }
 
+    @Keep
     enum class ApiFingerIdentifier {
         RIGHT_5TH_FINGER,
         RIGHT_4TH_FINGER,
@@ -27,6 +31,7 @@ class ApiFingerprintCaptureEvent(val id: String,
         LEFT_5TH_FINGER
     }
 
+    @Keep
     enum class ApiResult {
         GOOD_SCAN,
         BAD_QUALITY,
