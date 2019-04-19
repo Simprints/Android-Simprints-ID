@@ -1,5 +1,8 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
+import androidx.annotation.Keep
+
+@Keep
 enum class ApiEventType {
     CALLOUT,
     CALLBACK,
