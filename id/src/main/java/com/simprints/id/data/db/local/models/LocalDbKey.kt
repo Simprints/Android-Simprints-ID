@@ -1,8 +1,9 @@
 package com.simprints.id.data.db.local.models
 
+import androidx.annotation.Keep
 import java.util.*
 
-
+@Keep
 data class LocalDbKey(val projectId: String, val value: ByteArray, val legacyApiKey: String = "") {
 
     val legacyRealmKey: ByteArray = Arrays.copyOf(legacyApiKey.toByteArray(), 64)

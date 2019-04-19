@@ -1,10 +1,12 @@
 package com.simprints.id.data.db.remote.models
 
+import androidx.annotation.Keep
 import com.simprints.core.tools.json.SkipSerialisationField
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.tools.utils.EncodingUtils
 
+@Keep
 data class ApiFingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,
                           val template: String,
                           val quality: Int) {

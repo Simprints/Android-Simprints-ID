@@ -1,9 +1,11 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
+import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 
+@Keep
 class ConnectivitySnapshotEvent(
     val relativeStartTime: Long,
     val networkType: String,

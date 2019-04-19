@@ -6,12 +6,14 @@ import com.google.gson.TypeAdapterFactory
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import androidx.annotation.Keep
 import java.io.IOException
 
 interface PostGsonProcessable {
     fun gsonPostProcess()
 }
 
+@Keep
 class PostProcessingEnabler : TypeAdapterFactory {
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T> {
         val delegate = gson.getDelegateAdapter(this, type)

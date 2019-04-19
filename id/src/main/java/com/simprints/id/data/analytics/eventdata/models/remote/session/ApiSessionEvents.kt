@@ -1,10 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.session
 
+import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.toApiEvent
 import java.util.*
 
+@Keep
 open class ApiSessionEvents(var appVersionName: String,
                             var libVersionName: String,
                             var language: String,
