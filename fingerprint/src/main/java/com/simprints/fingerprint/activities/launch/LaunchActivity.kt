@@ -17,7 +17,7 @@ import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Com
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -50,7 +50,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        val component = FingerprintsComponentBuilder.getComponent(this.application as Application)
+        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }

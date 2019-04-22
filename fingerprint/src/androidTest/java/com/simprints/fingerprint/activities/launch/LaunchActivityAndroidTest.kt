@@ -21,13 +21,12 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.domain.alert.Alert
-import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
-import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.id.session.callout.CalloutAction
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.fingerprint.controllers.core.simnetworkutils.SimNetworkUtils
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.libsimprints.Constants
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter

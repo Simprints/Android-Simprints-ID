@@ -6,23 +6,22 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.data.domain.refusal.toAnswerEvent
-import com.simprints.fingerprint.di.FingerprintsComponent
-import com.simprints.fingerprint.tools.utils.TimeHelper
+import com.simprints.fingerprint.di.FingerprintComponent
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
-import com.simprints.id.data.db.DbManager
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
 class RefusalPresenter(private val view: RefusalContract.View,
-                       component: FingerprintsComponent) : RefusalContract.Presenter {
+                       component: FingerprintComponent) : RefusalContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
 
     private var reason: RefusalFormReason = OTHER
     private var refusalStartTime: Long = 0

@@ -8,6 +8,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.controllers.core.consentdata.FingerprintConsentDataManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.locationprovider.FingerprintLocationProvider
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
@@ -28,24 +36,16 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.tools.utils.LocationProvider
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -55,19 +55,18 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class LaunchPresenter(component: FingerprintsComponent,
+class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
                       private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    @Inject lateinit var consentDataManager: ConsentDataManager
-    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var dbManager: FingerprintDbManager
+    @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
+    @Inject lateinit var consentDataManager: FingerprintConsentDataManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
-    @Inject lateinit var locationProvider: LocationProvider
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
+    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
+    @Inject lateinit var locationProvider: FingerprintLocationProvider
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -96,9 +95,6 @@ class LaunchPresenter(component: FingerprintsComponent,
         view.setLogoVisibility(fingerprintRequest.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
-
-        syncSchedulerHelper.scheduleBackgroundSyncs()
-        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
 
         setTextToConsentTabs()
 

@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,6 +23,7 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
 
     @Inject lateinit var orchestratorManager: OrchestratorManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     init {
         component.inject(this)
@@ -31,6 +33,9 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
     override fun start() {
         subscribeForModalitiesRequests()
         subscribeForFinalAppResponse()
+
+        syncSchedulerHelper.scheduleBackgroundSyncs()
+        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
     }
 
     @SuppressLint("CheckResult")
