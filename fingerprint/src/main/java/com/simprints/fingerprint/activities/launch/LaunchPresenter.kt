@@ -8,13 +8,13 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.controllers.core.consentdata.FingerprintConsentDataManager
+import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.locationprovider.FingerprintLocationProvider
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.locationProvider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
@@ -61,12 +61,12 @@ class LaunchPresenter(component: FingerprintComponent,
 
     @Inject lateinit var dbManager: FingerprintDbManager
     @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
-    @Inject lateinit var consentDataManager: FingerprintConsentDataManager
+    @Inject lateinit var consentDataManager: ConsentDataManager
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var locationProvider: FingerprintLocationProvider
+    @Inject lateinit var locationProvider: LocationProvider
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity

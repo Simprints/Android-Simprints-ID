@@ -17,7 +17,8 @@ open class Application : MultiDexApplication() {
     open fun createComponent() {
         component = DaggerAppComponent
             .builder()
-            .appModule(AppModule(this))
+            .application(this)
+            .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
             .build()

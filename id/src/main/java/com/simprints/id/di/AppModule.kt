@@ -74,15 +74,12 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-open class AppModule(val app: Application) {
+open class AppModule {
 
     @Provides
     @Singleton
-    fun provideApplication(): Application = app
+    fun provideContext(app: Application): Context = app
 
-    @Provides
-    @Singleton
-    fun provideContext(): Context = app
 
     @Provides
     @Singleton
@@ -145,7 +142,7 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
+    open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
 
     @Provides
     @Singleton
@@ -206,8 +203,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideSyncStatusDatabase(): SyncStatusDatabase =
-        SyncStatusDatabase.getDatabase(provideContext())
+    open fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
+        SyncStatusDatabase.getDatabase(ctx)
 
     @Provides
     @Singleton

@@ -12,10 +12,15 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.id.di.AppComponent
 import dagger.Component
 
-@Component(modules =  [FingerprintModule::class],
+@Component(modules =  [FingerprintCoreModule::class, FingerprintModule::class],
            dependencies = [AppComponent::class])
 @FeatureScope
 interface FingerprintComponent {
+
+    @Component.Builder interface Builder {
+        fun appComponent(component: AppComponent): Builder
+        fun build(): FingerprintComponent
+    }
 
     fun inject(matchingActivity: MatchingActivity)
     fun inject(matchingPresenter: MatchingPresenter)
@@ -25,10 +30,4 @@ interface FingerprintComponent {
     fun inject(launchPresenter: LaunchPresenter)
     fun inject(alertPresenter: AlertPresenter)
     fun inject(refusalPresenter: RefusalPresenter)
-
-    @Component.Builder
-    interface Builder {
-        fun appComponent(component: AppComponent): Builder
-        fun build(): FingerprintComponent
-    }
 }
