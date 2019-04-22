@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch
+package com.simprints.fingerprint.controllers.consentdata
 
 interface ConsentDataManager {
     var parentalConsentExists: Boolean

@@ -2,6 +2,8 @@ package com.simprints.fingerprint.activities.refusal
 
 import android.app.Activity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
@@ -19,8 +21,8 @@ import javax.inject.Inject
 class RefusalPresenter(private val view: RefusalContract.View,
                        component: FingerprintComponent) : RefusalContract.Presenter {
 
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
 
     private var reason: RefusalFormReason = OTHER

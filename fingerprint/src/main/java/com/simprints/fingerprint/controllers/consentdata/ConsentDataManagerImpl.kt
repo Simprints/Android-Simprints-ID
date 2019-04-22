@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch
+package com.simprints.fingerprint.controllers.consentdata
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent

@@ -7,6 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 
 interface FingerprintDbManager {
+
     fun loadPeople(group: GROUP): Single<List<Person>>
     fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult>
     fun savePerson(person: Person): Completable

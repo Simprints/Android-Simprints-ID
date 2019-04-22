@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import android.content.Context
 import com.simprints.id.Application
 
 class FingerprintComponentBuilder {
@@ -23,3 +24,4 @@ class FingerprintComponentBuilder {
 
     }
 }
+

@@ -5,6 +5,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.fingerprint.Person
+import io.reactivex.Completable
 
 //TODO: Not use shared model class.
 interface FingerprintSessionEventsManager {
@@ -21,4 +22,5 @@ interface FingerprintSessionEventsManager {
 
     fun addLocationToSession(latitude: Double, longitude: Double)
     fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
+    fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable
 }
