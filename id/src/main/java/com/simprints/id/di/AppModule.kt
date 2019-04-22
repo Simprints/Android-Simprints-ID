@@ -80,7 +80,6 @@ open class AppModule {
     @Singleton
     fun provideContext(app: Application): Context = app
 
-
     @Provides
     @Singleton
     open fun provideLocalDbManager(ctx: Context,

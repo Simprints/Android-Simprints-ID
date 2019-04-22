@@ -64,6 +64,7 @@ class UnitTestConfig<T : Any>(
     private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForTests.builder()
+            .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutReam)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
