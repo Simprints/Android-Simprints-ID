@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote.models
 
 import com.google.gson.annotations.SerializedName
+import androidx.annotation.Keep
 import com.simprints.core.tools.json.PostGsonProcessable
 import com.simprints.core.tools.json.SkipSerialisationProperty
 import com.simprints.id.FingerIdentifier
@@ -10,6 +11,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
+@Keep
 data class ApiPerson(@SerializedName("id") var patientId: String,
                      var projectId: String,
                      var userId: String,

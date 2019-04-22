@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
+import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
@@ -18,7 +19,16 @@ class UnitTestConfig<T : Any>(
     private val preferencesModule: TestPreferencesModule? = null
 ) {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val defaultAppModuleWithoutReam by lazy {
+        TestAppModule(app,
+            localDbManagerRule = MockRule,
+            sessionEventsLocalDbManagerRule = MockRule)
+    }
+
+    private val app by lazy {
+        ApplicationProvider.getApplicationContext() as TestApplication
+    }
+
     private lateinit var testAppComponent: AppComponentForTests
 
     fun fullSetup() =
@@ -54,7 +64,7 @@ class UnitTestConfig<T : Any>(
     private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForTests.builder()
-            .appModule(appModule ?: TestAppModule(app))
+            .appModule(appModule ?: defaultAppModuleWithoutReam)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
 

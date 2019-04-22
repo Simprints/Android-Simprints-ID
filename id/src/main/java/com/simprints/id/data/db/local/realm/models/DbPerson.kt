@@ -34,16 +34,6 @@ open class DbPerson(
     var fingerprints: RealmList<DbFingerprint> = RealmList()
 ) : RealmObject() {
 
-    companion object {
-        const val USER_ID_FIELD = "userId"
-        const val PROJECT_ID_FIELD = "projectId"
-        const val PATIENT_ID_FIELD = "patientId"
-        const val MODULE_ID_FIELD = "moduleId"
-        const val TO_SYNC_FIELD = "toSync"
-        const val UPDATE_TIME_FIELD = "updatedAt"
-        const val CREATE_TIME_FIELD = "createdAt"
-    }
-
     constructor(person: ApiPerson, toSync: Boolean = person.updatedAt == null || person.createdAt == null):
      this(person.patientId, person.projectId, person.userId, person.moduleId, person.createdAt, person.updatedAt, toSync,
          person.fingerprintsAsList

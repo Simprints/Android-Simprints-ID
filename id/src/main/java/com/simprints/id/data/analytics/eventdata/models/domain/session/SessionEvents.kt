@@ -1,6 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.session
 
 import com.google.gson.GsonBuilder
+import androidx.annotation.Keep
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
@@ -8,6 +9,7 @@ import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import java.util.*
 
+@Keep
 open class SessionEvents(var projectId: String,
                          var appVersionName: String,
                          var libVersionName: String = "",

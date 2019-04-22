@@ -43,6 +43,10 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowFactoryImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowFactory
+import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
+import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -249,7 +253,18 @@ open class AppModule(val app: Application) {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager, prefs: PreferencesManager): OrchestratorManager =
-        OrchestratorManagerImpl(settingsPreferencesManager.modal, prefs)
+    open fun provideAppResponseBuilderFactory(): AppResponseFactory = AppResponseFactoryImpl()
+
+    @Provides
+    open fun provideModalityFlowFactory(ctx: Context, prefs: PreferencesManager): ModalityFlowFactory = ModalityFlowFactoryImpl(prefs, ctx.packageName)
+
+    @Provides
+    open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager,
+                                        modalityFlowFactory: ModalityFlowFactory,
+                                        appResponseFactory: AppResponseFactory): OrchestratorManager =
+        OrchestratorManagerImpl(
+            settingsPreferencesManager.modality,
+            modalityFlowFactory,
+            appResponseFactory)
 }
 

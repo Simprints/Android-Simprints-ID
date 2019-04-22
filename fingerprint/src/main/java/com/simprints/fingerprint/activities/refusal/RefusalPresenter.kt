@@ -56,7 +56,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
-        reason?.let { refusalReason ->
+        reason.let { refusalReason ->
             sessionEventsManager.updateSession {
                 it.addEvent(RefusalEvent(
                         it.timeRelativeToStartTime(refusalStartTime),

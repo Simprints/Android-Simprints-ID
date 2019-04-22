@@ -1,13 +1,11 @@
 package com.simprints.id.data.db.local.realm
 
 import android.content.Context
-import com.simprints.id.data.db.DataCallback
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
@@ -194,17 +192,6 @@ open class RealmDbManagerImpl(appContext: Context,
             moduleId = subSyncScope.moduleId
 
         )
-
-    override fun loadPeopleFromLocal(destinationList: MutableList<Person>, group: GROUP, userId: String, moduleId: String, callback: DataCallback?) {
-        val result = when (group) {
-            GROUP.GLOBAL -> loadPeopleFromLocal()
-            GROUP.USER -> loadPeopleFromLocal(userId = userId)
-            GROUP.MODULE -> loadPeopleFromLocal(moduleId = moduleId)
-        }.blockingGet()
-
-        destinationList.addAll(result)
-        callback?.onSuccess(false)
-    }
 
     /**
      *  @Deprecated: do not use it. Use Room DownSyncStatus
