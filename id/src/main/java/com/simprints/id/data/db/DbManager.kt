@@ -7,7 +7,7 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -19,7 +19,7 @@ interface DbManager {
     val remotePeopleManager: RemotePeopleManager
     val remoteProjectManager: RemoteProjectManager
 
-    fun signIn(projectId: String, userId: String, token: Token): Completable
+    fun signIn(projectId: String, userId: String, token: AttestToken): Completable
     fun signOut()
 
     // Data transfer

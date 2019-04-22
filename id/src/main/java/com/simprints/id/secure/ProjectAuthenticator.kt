@@ -83,12 +83,12 @@ open class ProjectAuthenticator(component: AppComponent,
             AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
         }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<AttestToken> =
         flatMap { authRequest ->
             authManager.requestAuthToken(authRequest)
         }
 
-    private fun Single<out Token>.signIn(projectId: String, userId: String): Completable =
+    private fun Single<out AttestToken>.signIn(projectId: String, userId: String): Completable =
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, userId, tokens)
         }
