@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.secure.models.Token
+import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.TimeHelper
@@ -34,8 +34,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
                          private val peopleUpSyncMaster: PeopleUpSyncMaster,
                          private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
-    override fun signIn(projectId: String, userId: String, token: Token): Completable =
-        remote.signInToRemoteDb(token.legacyToken)
+    override fun signIn(projectId: String, userId: String, token: AttestToken): Completable =
+        remote.signInToRemoteDb(token.value)
             .andThen(storeCredentials(userId, projectId))
             .andThen(refreshProjectInfoWithServer(projectId).ignoreElement())
             .andThen(resumePeopleUpSync(projectId, userId))
