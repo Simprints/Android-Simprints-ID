@@ -1,8 +1,8 @@
-package com.simprints.fingerprint.tools.utils
+package com.simprints.fingerprint.controllers.core.timehelper
 
 import java.util.concurrent.TimeUnit
 
-interface TimeHelper {
+interface FingerprintTimeHelper {
 
     fun now(): Long
     fun nowMinus(duration: Long, unit: TimeUnit = TimeUnit.MILLISECONDS): Long

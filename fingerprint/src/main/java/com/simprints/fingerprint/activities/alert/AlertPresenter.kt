@@ -3,7 +3,8 @@ package com.simprints.fingerprint.activities.alert
 import android.app.Activity.RESULT_CANCELED
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
-import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.di.FingerprintComponent
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
@@ -13,14 +14,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScree
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
-                     val component: FingerprintsComponent,
+                     val component: FingerprintComponent,
                      alertActRequest: AlertActRequest?) : AlertContract.Presenter {
 
     private val alertType = alertActRequest?.alert ?: FingerprintAlert.UNEXPECTED_ERROR
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
 
     init {
         component.inject(this)

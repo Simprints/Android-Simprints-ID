@@ -43,8 +43,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.modality.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowFactory
+import com.simprints.id.orchestrator.modality.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface

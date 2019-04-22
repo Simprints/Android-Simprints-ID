@@ -27,7 +27,7 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
@@ -64,7 +64,7 @@ class CollectFingerprintsActivity :
 
         configureRightToLeft()
 
-        val component = FingerprintsComponentBuilder.getComponent(application as Application)
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = CollectFingerprintsPresenter(this, this, fingerprintRequest, component)
         initBar()
         initViewFields()

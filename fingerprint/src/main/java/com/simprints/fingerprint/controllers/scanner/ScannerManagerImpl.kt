@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.scanner
+package com.simprints.fingerprint.controllers.scanner
 
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert

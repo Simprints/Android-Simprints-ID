@@ -11,16 +11,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivity
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.tools.LanguageHelper
 import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
@@ -30,14 +30,14 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override lateinit var viewPresenter: MatchingContract.Presenter
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var dbManager: FingerprintDbManager
+    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val component = FingerprintsComponentBuilder.getComponent(application as Application)
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
         val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
             ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
