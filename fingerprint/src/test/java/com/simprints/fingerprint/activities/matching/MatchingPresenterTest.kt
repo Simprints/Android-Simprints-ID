@@ -6,6 +6,10 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.eq
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchGroup
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
@@ -17,15 +21,11 @@ import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_I
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.fingerprint.testtools.PeopleGeneratorUtils
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Person
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.testtools.common.syntax.*
@@ -56,11 +56,11 @@ class MatchingPresenterTest {
         } then { matchTaskFinishedFlag.put(Unit) }
     }
 
-    private val dbManagerMock = mock<DbManager>()
+    private val dbManagerMock = mock<FingerprintDbManager>()
     private val preferencesManagerMock = mock<PreferencesManager>()
-    private val sessionEventsManagerMock = mock<SessionEventsManager>()
-    private val crashReportManagerMock = mock<CrashReportManager>()
-    private val timeHelperMock = mock<TimeHelper> {
+    private val sessionEventsManagerMock = mock<FingerprintSessionEventsManager>()
+    private val crashReportManagerMock = mock<FingerprintCrashReportManager>()
+    private val timeHelperMock = mock<FingerprintTimeHelper> {
         whenever(it) { now() } thenReturn System.currentTimeMillis()
     }
 

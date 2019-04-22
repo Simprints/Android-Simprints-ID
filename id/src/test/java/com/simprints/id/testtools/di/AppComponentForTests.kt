@@ -1,5 +1,6 @@
 package com.simprints.id.testtools.di
 
+import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
@@ -20,12 +21,25 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMan
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMasterWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
+import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class])
 interface AppComponentForTests : AppComponent {
+    @Component.Builder interface Builder {
+
+        @BindsInstance
+        fun application(app: Application): Builder
+
+        fun appModule(appModule: AppModule): Builder
+        fun preferencesModule(preferencesModule: PreferencesModule): Builder
+        fun serializerModule(serializerModule: SerializerModule): Builder
+
+        fun build(): AppComponentForTests
+    }
+
     fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(loginActivityTest: LoginActivityTest)

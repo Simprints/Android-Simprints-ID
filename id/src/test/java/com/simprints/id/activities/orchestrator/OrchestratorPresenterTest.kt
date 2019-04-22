@@ -27,6 +27,7 @@ class OrchestratorPresenterTest {
     @Test
     fun givenOrchestratorPresenter_startIsCalled_orchestratorShouldSubscribeForModalitiesRequests() {
         val orchestratorPresenter = spy(OrchestratorPresenter(mock(), mock(), mock())).apply {
+            syncSchedulerHelper = mock()
             whenever(this) { subscribeForModalitiesRequests() } thenReturn mock()
             whenever(this) { subscribeForFinalAppResponse() } thenReturn mock()
         }
@@ -39,6 +40,7 @@ class OrchestratorPresenterTest {
     @Test
     fun givenOrchestratorPresenter_startIsCalled_itShouldSubscribeForAppResponse() {
         val orchestratorPresenter = spy(OrchestratorPresenter(mock(), mock(), mock())).apply {
+            syncSchedulerHelper = mock()
             whenever(this) { subscribeForModalitiesRequests() } thenReturn mock()
             whenever(this) { subscribeForFinalAppResponse() } thenReturn mock()
         }
@@ -52,6 +54,7 @@ class OrchestratorPresenterTest {
     fun givenOrchestratorPresenter_aModalityRequestIsReceived_presenterShouldLaunchAnIntent() {
         val modalityRequest = ModalityStepRequest(1, Intent())
         val orchestratorPresenter = OrchestratorPresenter(mock(), mock(), mock())
+        orchestratorPresenter.syncSchedulerHelper = mock()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.never()
@@ -66,6 +69,7 @@ class OrchestratorPresenterTest {
     @Test
     fun givenOrchestratorPresenter_aModalityRequestErrorHappens_presenterShouldReturnAnError() {
         val orchestratorPresenter = OrchestratorPresenter(mock(), mock(), mock())
+        orchestratorPresenter.syncSchedulerHelper = mock()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.never()
@@ -81,6 +85,7 @@ class OrchestratorPresenterTest {
     fun givenOrchestratorPresenter_anAppResponseIsReceived_presenterShouldReturnIt() {
         val mockAppResponse = mock<AppResponse>()
         val orchestratorPresenter = OrchestratorPresenter(mock(), mock(), mock())
+        orchestratorPresenter.syncSchedulerHelper = mock()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.just(mockAppResponse)
@@ -95,6 +100,7 @@ class OrchestratorPresenterTest {
     @Test
     fun givenOrchestratorPresenter_anAppResponseErrorHappens_presenterShouldReturnAnError() {
         val orchestratorPresenter = OrchestratorPresenter(mock(), mock(), mock())
+        orchestratorPresenter.syncSchedulerHelper = mock()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.error(Throwable("Error trying to generate App Response"))
