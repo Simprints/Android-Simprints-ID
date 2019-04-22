@@ -1,8 +1,9 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.session
 
+import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
-import java.util.*
 
+@Keep
 open class ApiDatabaseInfo(var recordCount: Int = 0,
                            var sessionCount: Int = 0) {
     constructor(databaseInfo: DatabaseInfo) :

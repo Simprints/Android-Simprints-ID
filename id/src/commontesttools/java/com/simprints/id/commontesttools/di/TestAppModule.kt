@@ -62,7 +62,7 @@ class TestAppModule(app: Application,
 
     override fun provideLocalDbManager(ctx: Context,
                                        secureDataManager: SecureDataManager,
-                                       loginInfoManager: LoginInfoManager): LocalDbManager =
+                                       loginInfoManager: LoginInfoManager): LocalDbManager  =
         localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx, secureDataManager, loginInfoManager) }
 
     override fun provideCrashManager(): CrashReportManager =

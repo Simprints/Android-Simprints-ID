@@ -3,10 +3,13 @@ package com.simprints.id.domain.alert
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.annotation.Keep
 import com.simprints.id.R
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 
+//TODO: originally in the pro-guard. Do we really need it unobfuscated?
+@Keep
 enum class Alert(val type: Type,
                  val leftButton: ButtonAction,
                  val rightButton: ButtonAction,
@@ -216,35 +219,41 @@ enum class Alert(val type: Type,
     @DrawableRes val mainDrawable: Int = type.mainDrawable
     @DrawableRes val hintDrawable: Int? = type.hintDrawable
 
+    @Keep
     sealed class Type(@StringRes val title: Int,
                       @ColorRes val backgroundColor: Int,
                       @DrawableRes val mainDrawable: Int,
                       @DrawableRes val hintDrawable: Int? = null) {
 
+        @Keep
         class ConfigurationError(title: Int = R.string.configuration_error_title,
                                  backgroundColor: Int = R.color.simprints_yellow,
                                  mainDrawable: Int = R.drawable.error_icon,
                                  hintDrawable: Int?)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
+        @Keep
         class DataError(title: Int,
                         backgroundColor: Int = R.color.simprints_grey,
                         mainDrawable: Int = R.drawable.error_icon,
                         hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
+        @Keep
         class BluetoothError(title: Int = R.string.error_occurred_title,
                              backgroundColor: Int = R.color.simprints_blue,
                              mainDrawable: Int = R.drawable.bt_error_icon,
                              hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
+        @Keep
         class ScannerError(title: Int,
                            backgroundColor: Int = R.color.simprints_blue,
                            mainDrawable: Int = R.drawable.scanner_error_icon,
                            hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
+        @Keep
         class UnexpectedError(title: Int = R.string.error_occurred_title,
                               backgroundColor: Int = R.color.simprints_red,
                               mainDrawable: Int = R.drawable.error_icon,
@@ -252,6 +261,7 @@ enum class Alert(val type: Type,
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
     }
 
+    @Keep
     sealed class ButtonAction(@StringRes val buttonText: Int = R.string.empty,
                               val resultCode: Int? = null) {
         object None : ButtonAction()

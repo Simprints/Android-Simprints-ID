@@ -1,9 +1,11 @@
 package com.simprints.core.tools.json
 
 import com.google.gson.*
+import androidx.annotation.Keep
 import com.simprints.libsimprints.FingerIdentifier
 import java.util.*
 
+@Keep
 class JsonHelper {
     companion object {
         val gson: Gson by lazy {
