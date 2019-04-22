@@ -118,4 +118,47 @@ class SettingsAboutPresenterTest {
             verifyOnce(viewMock) { showConfirmationDialogForLogout() }
         } ?: fail("Action for logout preference not set.")
     }
+
+    @Test
+    fun presenterLogout_dbManagerShouldSignOut() {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verifyOnce(presenter.dbManager) { signOut() }
+    }
+
+    @Test
+    fun presenterLogout_downSyncWorkersAreCancelled() {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verifyOnce(presenter.syncSchedulerHelper) { cancelDownSyncWorkers() }
+    }
+
+    @Test
+    fun presenterLogout_longConsentsAreDeleted() {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verifyOnce(presenter.longConsentManager) { deleteLongConsents() }
+    }
+
+    @Test
+    fun presenterLogout_sessionsManagerSignsOut() {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verifyOnce(presenter.sessionEventManager) { signOut() }
+    }
+
+    private fun mockDepsForLogout(presenter: SettingsAboutPresenter){
+        presenter.dbManager = mock()
+        presenter.syncSchedulerHelper = mock()
+        presenter.longConsentManager = mock()
+        presenter.sessionEventManager = mock()
+    }
 }

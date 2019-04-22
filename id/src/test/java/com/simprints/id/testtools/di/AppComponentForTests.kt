@@ -7,6 +7,7 @@ import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.activities.login.LoginActivityTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
+import com.simprints.id.data.consent.LongConsentManagerImplTest
 import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.AppComponent
@@ -42,4 +43,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
+    fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
 }
