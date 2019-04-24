@@ -6,7 +6,7 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
 
 @Keep
-data class ApiAuthenticationData(val nonce: String, val publicKeyString: String)
+data class ApiAuthenticationData(val nonce: String, val publicKey: String)
 
-fun ApiAuthenticationData.toDomainAuthData() = AuthenticationData(Nonce(nonce), PublicKeyString(publicKeyString))
+fun ApiAuthenticationData.toDomainAuthData() = AuthenticationData(Nonce(nonce), PublicKeyString(publicKey))
 
