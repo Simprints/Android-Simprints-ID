@@ -32,7 +32,7 @@ class AuthenticationDataManagerTest {
     }
 
     @Test
-    fun successfulResponse_shouldObtainValidNonceAndPublicKey() {
+    fun successfulResponse_shouldObtainValidAuthenticationData() {
         UnitTestConfig(this).rescheduleRxMainThread()
 
         forceOkHttpToReturnSuccessfulResponse(apiClient.okHttpClientConfig)
