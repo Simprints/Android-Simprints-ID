@@ -2,7 +2,7 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticator
 
 interface LoginContract {
 
@@ -27,13 +27,12 @@ interface LoginContract {
     }
 
     interface Presenter : BasePresenter {
-        var projectAuthenticator: LegacyCompatibleProjectAuthenticator
+        var projectAuthenticator: ProjectAuthenticator
 
         fun signIn(suppliedUserId: String,
                    suppliedProjectId: String,
                    suppliedProjectSecret: String,
-                   intentProjectId: String? = null,
-                   intentLegacyProjectId: String? = null)
+                   intentProjectId: String? = null)
 
         fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)

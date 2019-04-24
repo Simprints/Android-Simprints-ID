@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.secure.models.Tokens
+import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.TimeHelper
@@ -34,28 +34,22 @@ open class DbManagerImpl(override val local: LocalDbManager,
                          private val peopleUpSyncMaster: PeopleUpSyncMaster,
                          private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
 
-    override fun signIn(projectId: String, userId: String, tokens: Tokens): Completable =
-        remote.signInToRemoteDb(tokens.legacyToken)
+    override fun signIn(projectId: String, userId: String, token: Token): Completable =
+        remote.signInToRemoteDb(token.value)
             .andThen(storeCredentials(userId, projectId))
             .andThen(refreshProjectInfoWithServer(projectId).ignoreElement())
             .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")
 
     private fun storeCredentials(userId: String, projectId: String) =
-        Completable.create {
-            try {
-                loginInfoManager.storeCredentials(projectId, userId)
-                it.onComplete()
-            } catch (t: Throwable) {
-                it.onError(t)
-            }
+        Completable.fromAction {
+            loginInfoManager.storeCredentials(projectId, userId)
         }
 
     @Suppress("UNUSED_PARAMETER")
     private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
-        Completable.create {
+        Completable.fromAction {
             peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-            it.onComplete()
         }
 
     override fun signOut() {
@@ -89,9 +83,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .observeOn(AndroidSchedulers.mainThread())
 
     @Suppress("UNUSED_PARAMETER")
-    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
+    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.fromAction {
         peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-        it.onComplete()
     }
 
     override fun loadPerson(projectId:String, guid: String): Single<PersonFetchResult> =

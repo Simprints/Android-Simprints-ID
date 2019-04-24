@@ -66,7 +66,6 @@ object RobolectricTestMocker {
         editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "")
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
         editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
-        editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY + projectId, if (logged) "enc_$legacyApiKey" else "")
 
         if (!legacyApiKey.isEmpty()) {
             val hashedLegacyApiKey = Hasher().hash(legacyApiKey)

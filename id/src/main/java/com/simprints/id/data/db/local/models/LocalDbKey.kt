@@ -4,9 +4,7 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-data class LocalDbKey(val projectId: String, val value: ByteArray, val legacyApiKey: String = "") {
-
-    val legacyRealmKey: ByteArray = Arrays.copyOf(legacyApiKey.toByteArray(), 64)
+data class LocalDbKey(val projectId: String, val value: ByteArray) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -19,8 +17,5 @@ data class LocalDbKey(val projectId: String, val value: ByteArray, val legacyApi
         return true
     }
 
-    override fun hashCode(): Int {
-        return Arrays.hashCode(value)
-    }
-
+    override fun hashCode() = Arrays.hashCode(value)
 }
