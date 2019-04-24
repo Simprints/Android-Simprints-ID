@@ -21,7 +21,7 @@ class AuthenticationDataManagerTest {
 
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
-    private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKeyString\":\"$publicKeyFromServer\"}"
+    private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
