@@ -9,13 +9,12 @@ import io.reactivex.Single
 
 class FingerprintDbManagerImpl(private val dbManager: DbManager): FingerprintDbManager {
 
-    override fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult> =
+        dbManager.loadPerson(projectId, verifyGuid)
 
-    override fun savePerson(person: Person): Completable {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun savePerson(person: Person): Completable =
+        dbManager.savePerson(person)
 
-    override fun loadPeople(group: GROUP): Single<List<Person>> = dbManager.loadPeople(group)
+    override fun loadPeople(group: GROUP): Single<List<Person>> =
+        dbManager.loadPeople(group)
 }
