@@ -27,6 +27,11 @@ interface SecureApiInterface {
                          @Path("userId") userId: String,
                          @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
 
+    @GET("projects/{projectId}/users/{userId}/authentication-data")
+    fun getAuthenticationData(@Path("projectId") projectId: String,
+                              @Path("userId") userId: String,
+                              @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiAuthenticationData>>
+
     @POST("projects/{projectId}/users/{userId}/custom-tokens")
     fun requestCustomTokens(@Path("projectId") projectId: String,
                             @Path("userId") userId: String,
