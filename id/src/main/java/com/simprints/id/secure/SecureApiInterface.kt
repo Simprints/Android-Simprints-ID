@@ -15,16 +15,6 @@ interface SecureApiInterface {
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
-    @POST("projects/{projectId}/users/{userId}/nonces")
-    fun requestNonce(@Path("projectId") projectId: String,
-                     @Path("userId") userId: String,
-                     @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
-
-    @GET("projects/{projectId}/users/{userId}/public-key")
-    fun requestPublicKey(@Path("projectId") projectId: String,
-                         @Path("userId") userId: String,
-                         @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
-
     @GET("projects/{projectId}/users/{userId}/authentication-data")
     fun requestAuthenticationData(@Path("projectId") projectId: String,
                                   @Path("userId") userId: String,
