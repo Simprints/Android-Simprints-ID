@@ -42,20 +42,14 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .trace("signInToRemoteDb")
 
     private fun storeCredentials(userId: String, projectId: String) =
-        Completable.create {
-            try {
-                loginInfoManager.storeCredentials(projectId, userId)
-                it.onComplete()
-            } catch (t: Throwable) {
-                it.onError(t)
-            }
+        Completable.fromAction {
+            loginInfoManager.storeCredentials(projectId, userId)
         }
 
     @Suppress("UNUSED_PARAMETER")
     private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
-        Completable.create {
+        Completable.fromAction {
             peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-            it.onComplete()
         }
 
     override fun signOut() {
@@ -89,9 +83,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .observeOn(AndroidSchedulers.mainThread())
 
     @Suppress("UNUSED_PARAMETER")
-    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.create {
+    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.fromAction {
         peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-        it.onComplete()
     }
 
     override fun loadPerson(projectId:String, guid: String): Single<PersonFetchResult> =
