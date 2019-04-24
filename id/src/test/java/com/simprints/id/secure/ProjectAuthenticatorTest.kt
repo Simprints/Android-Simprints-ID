@@ -89,14 +89,14 @@ class ProjectAuthenticatorTest {
     @Test
     fun successfulResponse_userShouldSignIn() {
 
-        val authenticator = LegacyCompatibleProjectAuthenticator(
+        val authenticator = ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator
-            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret", projectId, null)
+            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -113,11 +113,11 @@ class ProjectAuthenticatorTest {
 
         val nonceScope = NonceScope(projectId, userId)
 
-        val testObserver = LegacyCompatibleProjectAuthenticator(
+        val testObserver = ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
-            .authenticate(nonceScope, "encrypted_project_secret", projectId, null)
+            .authenticate(nonceScope, "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()

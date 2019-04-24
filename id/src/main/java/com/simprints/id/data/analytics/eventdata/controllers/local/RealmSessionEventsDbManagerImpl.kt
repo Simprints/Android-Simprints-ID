@@ -125,7 +125,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         try {
             secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
         } catch (e: MissingLocalDatabaseKeyException) {
-            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME, null)
+            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME)
         }
         return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
     }
