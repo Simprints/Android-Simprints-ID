@@ -15,22 +15,20 @@ import retrofit2.mock.Calls
 // To mock response (code, body, type) use FakeResponseInterceptor for okHttpClient
 class SecureApiServiceMock(private val delegate: BehaviorDelegate<SecureApiInterface>) : SecureApiInterface {
 
-    override fun requestAuthenticationData(projectId: String, userId: String, key: String): Single<Response<ApiAuthenticationData>> {
-        val authData = ApiAuthenticationData("nonce_from_server",
-            "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
-        return delegate.returning(buildSuccessResponseWith(authData)).requestAuthenticationData(projectId, userId, key)
-    }
-    
-    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<ApiToken>> {
-        val tokens = ApiToken("legacy_token")
-        return delegate.returning(buildSuccessResponseWith(tokens)).requestCustomTokens(projectId, userId, credentials)
-    }
+    override fun requestAuthenticationData(projectId: String, userId: String, key: String): Single<Response<ApiAuthenticationData>> =
+        delegate.returning(buildSuccessResponseWith(getApiAuthenticationData())).requestAuthenticationData(projectId, userId, key)
 
-    private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
-        return Calls.response(Response.success(body))
-    }
+    override fun requestCustomTokens(projectId: String, userId: String, credentials: AuthRequestBody, key: String): Single<Response<ApiToken>> =
+        delegate.returning(buildSuccessResponseWith(getApiToken())).requestCustomTokens(projectId, userId, credentials)
+
+    private fun getApiAuthenticationData() = ApiAuthenticationData("nonce_from_server",
+        "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCAmxhSp1nSNOkRianJtMEP6uEznURRKeLmnr5q/KJnMosVeSHCtFlsDeNrjaR9r90sUgn1oA++ixcu3h6sG4nq4BEgDHi0aHQnZrFNq+frd002ji5sb9dUM2n6M7z8PPjMNiy7xl//qDIbSuwMz9u5G1VjovE4Ej0E9x1HLmXHRQIDAQAB")
+
+    private fun <T> buildSuccessResponseWith(body: T?) = Calls.response(Response.success(body))
+
+    private fun getApiToken() = ApiToken("legacy_token")
 }
 
-fun createMockServiceToFailRequests(retrofit: Retrofit): SecureApiInterface {
-    return SecureApiServiceMock(createMockBehaviorService(retrofit, 100, SecureApiInterface::class.java))
-}
+fun createMockServiceToFailRequests(retrofit: Retrofit): SecureApiInterface =
+    SecureApiServiceMock(createMockBehaviorService(retrofit, 100, SecureApiInterface::class.java))
+
