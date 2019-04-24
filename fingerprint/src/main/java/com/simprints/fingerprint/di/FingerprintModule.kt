@@ -4,8 +4,8 @@ import android.content.Context
 import com.simprints.core.di.FeatureScope
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManagerImpl
-import com.simprints.fingerprint.controllers.locationProvider.LocationProvider
-import com.simprints.fingerprint.controllers.locationProvider.LocationProviderImpl
+import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
+import com.simprints.fingerprint.controllers.locationprovider.LocationProviderImpl
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter

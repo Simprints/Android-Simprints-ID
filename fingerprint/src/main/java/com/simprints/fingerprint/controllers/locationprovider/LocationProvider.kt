@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.locationProvider
+package com.simprints.fingerprint.controllers.locationprovider
 
 import android.location.Location
 import com.google.android.gms.location.LocationRequest

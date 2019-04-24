@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.locationProvider
+package com.simprints.fingerprint.controllers.locationprovider
 
 import android.annotation.SuppressLint
 import android.content.Context
