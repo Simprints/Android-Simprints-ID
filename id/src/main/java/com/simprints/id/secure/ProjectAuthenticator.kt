@@ -93,9 +93,8 @@ open class ProjectAuthenticator(component: AppComponent,
             dbManager.signIn(projectId, userId, tokens)
         }
 
-    private fun createLocalDbKeyForProject(projectId: String): Completable {
+    private fun createLocalDbKeyForProject(projectId: String) = Completable.fromAction {
         secureDataManager.setLocalDatabaseKey(projectId)
-        return Completable.complete()
     }
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
