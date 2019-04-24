@@ -15,6 +15,7 @@ import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.activities.matching.MatchingActivity
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
@@ -32,7 +33,6 @@ import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
 import com.simprints.id.domain.fingerprint.Person
-import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 

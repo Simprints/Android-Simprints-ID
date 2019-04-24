@@ -12,6 +12,8 @@ import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -27,8 +29,6 @@ import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.tools.extensions.toResultEvent
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
@@ -351,7 +351,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
     }
 
     companion object {

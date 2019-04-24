@@ -2,13 +2,13 @@ package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import javax.inject.Inject
 
@@ -73,6 +73,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
+        crashReportManager.logMessageForCrashReport(ALERT, UI, message = alertType.name)
     }
 }
