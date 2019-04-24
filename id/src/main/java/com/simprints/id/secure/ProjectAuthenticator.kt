@@ -33,9 +33,8 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var preferencesManager: PreferencesManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
-    private val publicKeyManager = PublicKeyManager(secureApiClient)
-    private val nonceManager = NonceManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
+    private val authenticationDataManager = AuthenticationDataManager(secureApiClient)
 
  	init {
         component.inject(this)
@@ -58,21 +57,24 @@ open class ProjectAuthenticator(component: AppComponent,
             .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
-        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, nonceScope)
-        val googleAttestation = getGoogleAttestation(safetyNetClient, nonceScope)
+        val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
+        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, authenticationData)
+        val googleAttestation = getGoogleAttestation(safetyNetClient, authenticationData)
+
         return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
     }
 
-    private fun getEncryptedProjectSecret(projectSecret: String, noneScope: NonceScope): Single<String> =
-        publicKeyManager.requestPublicKey(noneScope.projectId, noneScope.userId)
-            .flatMap { publicKey ->
-                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey))
-            }
+    private fun getAuthenticationData(userId: String, projectId: String) =
+        authenticationDataManager.requestAuthenticationData(projectId, userId)
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
-        nonceManager.requestNonce(noneScope)
-            .flatMap { nonce ->
-                attestationManager.requestAttestation(safetyNetClient, nonce)
+    private fun getEncryptedProjectSecret(projectSecret: String, authenticationDataSingle: Single<AuthenticationData>): Single<String> =
+        authenticationDataSingle.flatMap {
+            Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, it.publicKeyString))
+        }
+
+    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
+        authenticationDataSingle.flatMap {
+                attestationManager.requestAttestation(safetyNetClient, it.nonce)
             }
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,

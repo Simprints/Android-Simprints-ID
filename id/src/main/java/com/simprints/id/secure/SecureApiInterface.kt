@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.core.network.NetworkConstants
 import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
 import io.reactivex.Single
 import retrofit2.Response
@@ -25,9 +26,9 @@ interface SecureApiInterface {
                          @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
 
     @GET("projects/{projectId}/users/{userId}/authentication-data")
-    fun getAuthenticationData(@Path("projectId") projectId: String,
-                              @Path("userId") userId: String,
-                              @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiAuthenticationData>>
+    fun requestAuthenticationData(@Path("projectId") projectId: String,
+                                  @Path("userId") userId: String,
+                                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiAuthenticationData>>
 
     @POST("projects/{projectId}/users/{userId}/custom-tokens")
     fun requestCustomTokens(@Path("projectId") projectId: String,
