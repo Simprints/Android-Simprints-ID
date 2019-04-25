@@ -95,7 +95,7 @@ class MatchingPresenter(
         com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
 
     private fun Fingerprint.toMatcherFingerprint() =
-        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
+        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[finger.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception

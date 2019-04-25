@@ -36,10 +36,7 @@ open class DbPerson(
 
     constructor(person: ApiPerson, toSync: Boolean = person.updatedAt == null || person.createdAt == null):
      this(person.patientId, person.projectId, person.userId, person.moduleId, person.createdAt, person.updatedAt, toSync,
-         person.fingerprintsAsList
-             .map { it.toDomainFingerprint().toRealmFingerprint() }
-             .filter { it.template != null}
-             .toRealmList()
+         person.fingerprints.map { it.toDomainFingerprint().toRealmFingerprint() }.toRealmList()
          )
 
 }
