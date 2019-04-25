@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import androidx.annotation.Keep
 import com.simprints.core.tools.json.PostGsonProcessable
 import com.simprints.core.tools.json.SkipSerialisationProperty
-import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import java.util.*
@@ -18,17 +17,8 @@ data class ApiPerson(@SerializedName("id") var patientId: String,
                      var moduleId: String,
                      var createdAt: Date?,
                      var updatedAt: Date?,
-                     var fingerprints: HashMap<FingerIdentifier, ArrayList<ApiFingerprint>>) : PostGsonProcessable {
-
-    @SkipSerialisationProperty
-    val fingerprintsAsList
-        get() = ArrayList(fingerprints.flatMap { t -> t.value })
-
-    override fun gsonPostProcess() {
-        //The server returns a map with Finerprint (quality and template), we need to set the fingerId
-        fingerprints.mapValues { entry -> entry.value.forEach { it.fingerId = entry.key } }
-    }
-}
+                     var fingerprints:  ArrayList<ApiFingerprint>,
+                     var faces: ArrayList<ApiFace> = arrayListOf(ApiFace()))
 
 fun Person.toFirebasePerson(): ApiPerson =
     ApiPerson(
@@ -38,10 +28,7 @@ fun Person.toFirebasePerson(): ApiPerson =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = HashMap(fingerprints
-            .map(Fingerprint::toFirebaseFingerprint)
-            .groupBy { it.fingerId }
-            .mapValues { ArrayList(it.value) })
+        fingerprints = ArrayList(fingerprints.map { it.toFirebaseFingerprint() })
     )
 
 fun ApiPerson.toDomainPerson(): Person =
@@ -52,8 +39,6 @@ fun ApiPerson.toDomainPerson(): Person =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = fingerprints.flatMap { (_, fingerFingerprints) ->
-            fingerFingerprints.map(ApiFingerprint::toDomainFingerprint)
-        },
+        fingerprints = fingerprints.map { it.toDomainFingerprint() },
         toSync = false
     )

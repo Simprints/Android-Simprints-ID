@@ -75,7 +75,7 @@ object PeopleGeneratorUtils {
 
     fun getRandomFingerprint(): Fingerprint {
         val commonFingerprint = FingerprintGeneratorUtils.generateRandomFingerprint()
-        return Fingerprint(commonFingerprint.fingerId, commonFingerprint.templateBytes)
+        return Fingerprint(commonFingerprint.finger, commonFingerprint.templateBytes)
     }
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
