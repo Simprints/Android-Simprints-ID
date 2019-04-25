@@ -18,7 +18,7 @@ import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.PeopleApiServiceMock
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster

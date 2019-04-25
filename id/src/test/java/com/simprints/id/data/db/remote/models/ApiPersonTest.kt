@@ -10,7 +10,7 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
 import com.simprints.id.data.db.local.realm.models.toDomainPerson
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,8 +90,7 @@ class ApiPersonTest {
         assertTrue(personJson.has("moduleId"))
         assertTrue(personJson.get("createdAt").asJsonPrimitive.isNumber)
         assertTrue(personJson.get("updatedAt").asJsonPrimitive.isNumber)
-        assertTrue(personJson.has("fingerprints"))
-        assertTrue(personJson.has("faces"))
+        assertTrue(personJson.has("fingerprints") or personJson.has("faces"))
 
         apiPerson.fingerprints.first().finger.name
         val fingerprintJson = personJson.get("fingerprints").asJsonArray.first().asJsonObject
@@ -100,7 +99,7 @@ class ApiPersonTest {
         assertTrue(fingerprintJson.has("template"))
         assertTrue(fingerprintJson.has("finger"))
 
-        assertEquals(personJson.keySet().size, 8)
+        assertEquals(personJson.keySet().size, 7)
         assertEquals(fingerprintJson.keySet().size, 3)
     }
 }

@@ -16,7 +16,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import io.reactivex.Single
 import java.util.*
 

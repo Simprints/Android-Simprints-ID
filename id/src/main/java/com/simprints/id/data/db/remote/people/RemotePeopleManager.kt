@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.people
 
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import io.reactivex.Completable
 import io.reactivex.Single
 
