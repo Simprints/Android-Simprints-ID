@@ -6,7 +6,7 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.Project
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable

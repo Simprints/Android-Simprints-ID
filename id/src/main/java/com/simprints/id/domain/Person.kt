@@ -1,6 +1,8 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.id.domain
 
 import android.os.Parcelable
+import com.simprints.id.domain.face.Face
+import com.simprints.id.domain.fingerprint.Fingerprint
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -13,7 +15,8 @@ data class Person (
     var fingerprints: List<Fingerprint>,
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
-    var toSync: Boolean = true
+    var toSync: Boolean = true,
+    var faces: List<Face>? = null
 ): Parcelable {
     init {
         fingerprints = fingerprints

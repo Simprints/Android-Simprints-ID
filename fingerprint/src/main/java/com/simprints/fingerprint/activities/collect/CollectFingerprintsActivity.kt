@@ -31,7 +31,7 @@ import com.simprints.fingerprint.di.FingerprintsComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
