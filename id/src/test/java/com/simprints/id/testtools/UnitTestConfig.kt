@@ -65,7 +65,7 @@ class UnitTestConfig<T : Any>(
 
         testAppComponent = DaggerAppComponentForTests.builder()
             .application(app)
-            .appModule(appModule ?: defaultAppModuleWithoutReam)
+            .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
 

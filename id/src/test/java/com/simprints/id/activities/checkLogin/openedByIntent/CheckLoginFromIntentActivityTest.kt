@@ -1,20 +1,13 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
-import android.os.Build
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
-
 // for O_MR1 = 27, Roboletric hangs around after it calls SharedPrefs.'apply' and then it accesses to
 // the SharedPrefs again. https://github.com/robolectric/robolectric/issues/3641
-@RunWith(AndroidJUnit4::class)
-@Config(
-    application = TestApplication::class,
-    sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
+//@RunWith(AndroidJUnit4::class)
+//@Config(
+//    application = TestApplication::class,
+//    sdk = [Build.VERSION_CODES.N_MR1], shadows = [ShadowAndroidXMultiDex::class])
 //StopShip: the CheckLogin doesn't manage the activities flow anymore, so these tests are out of date.
-class CheckLoginFromIntentActivityTest {
+//class CheckLoginFromIntentActivityTest {
 
 //    companion object {
 //        const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -228,4 +221,4 @@ class CheckLoginFromIntentActivityTest {
 //            return "com.app.installed.from.playstore"
 //        }
 //    }
-}
+//}
