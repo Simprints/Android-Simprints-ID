@@ -2,7 +2,6 @@ package com.simprints.fingerprint.commontesttools.di
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.FingerIdentifier
-import com.simprints.testtools.common.di.DependencyRule.RealRule
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -12,6 +11,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 // Duplicated from id/commontestttools
 

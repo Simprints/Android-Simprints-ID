@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.integration.testtools.remote
+package com.simprints.id.testtools.testingapi.remote
 
 import com.google.gson.Gson
 import com.simprints.core.network.SimApiClient
