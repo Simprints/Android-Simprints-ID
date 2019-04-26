@@ -1,15 +1,17 @@
 package com.simprints.fingerprint.activities.launch
 
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
+import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
@@ -17,17 +19,10 @@ import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryExceptio
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
-import com.simprints.id.Application
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
@@ -43,40 +38,32 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@LargeTest
 class LaunchActivityAndroidTest {
-
-    private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @get:Rule val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    private val module by lazy {
-        TestAppModule(app,
-            dbManagerRule = DependencyRule.MockRule,
-            randomGeneratorRule = DependencyRule.MockRule,
-            bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter },
-            simNetworkUtilsRule = DependencyRule.MockRule,
-            syncSchedulerHelperRule = DependencyRule.MockRule)
-    }
-
-    private val fingerprintModule by lazy {
-        TestFingerprintModule(
-            scannerManagerRule = DependencyRule.SpyRule
-        )
-    }
 
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
     @Inject lateinit var scannerManagerSpy: ScannerManager
-    @Inject lateinit var randomGeneratorMock: RandomGenerator
-    @Inject lateinit var dbManagerMock: DbManager
-    @Inject lateinit var simNetworkUtilsMock: SimNetworkUtils
+    @Inject lateinit var dbManagerMock: FingerprintDbManager
+    @Inject lateinit var simNetworkUtilsMock: FingerprintSimNetworkUtils
+
+    private val fingerprintModule by lazy {
+        TestFingerprintModule(
+            scannerManagerRule = DependencyRule.SpyRule,
+            bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
+    }
+
+    private val fingerprintCoreModule by lazy {
+        TestFingerprintCoreModule(
+            fingerprintDbManagerRule = DependencyRule.MockRule,
+            fingerprintSimNetworkUtilsRule = DependencyRule.MockRule)
+    }
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, null, fingerprintModule).fullSetup()
-
-        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
+        AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
     }
 
     @Test

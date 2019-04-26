@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -110,7 +109,6 @@ interface AppComponent {
     fun getTimeHelper(): TimeHelper
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
-    fun getBluetoothComponentAdapter(): BluetoothComponentAdapter
     fun getSimNetworkUtils(): SimNetworkUtils
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper

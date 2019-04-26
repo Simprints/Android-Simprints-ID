@@ -1,32 +1,24 @@
 package com.simprints.fingerprint.testtools
 
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.commontesttools.DefaultTestConstants
-import com.simprints.fingerprint.commontesttools.di.TestAppModule
+import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
-import com.simprints.fingerprint.commontesttools.di.TestPreferencesModule
-import com.simprints.fingerprint.di.DaggerFingerprintComponent
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.testtools.di.AppComponentForFingerprintAndroidTests
-import com.simprints.fingerprint.testtools.di.DaggerAppComponentForFingerprintAndroidTests
+import com.simprints.fingerprint.di.FingerprintCoreModule
+import com.simprints.fingerprint.di.FingerprintModule
+import com.simprints.fingerprint.testtools.di.DaggerFingerprintComponentForAndroidTests
+import com.simprints.fingerprint.testtools.di.FingerprintComponentForAndroidTests
 import com.simprints.id.Application
-import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionRealmConfig
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
-import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.testtools.android.StorageUtils
 import com.simprints.testtools.common.di.injectClassFromComponent
-import io.realm.Realm
 
-// TODO : Currently used for Fingerprint Android tests & Integration tests
-// TODO : Combine/extend functionality from id/../AndroidTestConfig
 class AndroidTestConfig<T : Any>(
-    private val test: T
+    private val test: T,
+    private val fingerprintModule: FingerprintModule? = null,
+    private val fingerprintCoreModule: FingerprintCoreModule? = null
 ) {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
-    private lateinit var testAppComponent: AppComponentForFingerprintAndroidTests
+    private lateinit var testAppComponent: FingerprintComponentForAndroidTests
 
     fun fullSetup() = initAndInjectComponent()
 
@@ -41,8 +33,10 @@ class AndroidTestConfig<T : Any>(
 
     private fun initComponent() = also {
 
-        testAppComponent = DaggerAppComponentForFingerprintAndroidTests
+        testAppComponent = DaggerFingerprintComponentForAndroidTests
             .builder()
+            .fingerprintModule(fingerprintModule ?: TestFingerprintModule())
+            .fingerprintCoreModule(fingerprintCoreModule ?: TestFingerprintCoreModule())
             .appComponent(app.component)
             .build()
 

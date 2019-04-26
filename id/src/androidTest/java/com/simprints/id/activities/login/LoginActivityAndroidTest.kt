@@ -3,8 +3,6 @@ package com.simprints.id.activities.login
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
@@ -18,7 +16,6 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.di.DependencyRule.MockRule
-import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,11 +42,8 @@ class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being
 
     private val module by lazy {
         TestAppModule(app,
-            randomGeneratorRule = MockRule,
-            bluetoothComponentAdapterRule = ReplaceRule { mockBluetoothAdapter })
+            randomGeneratorRule = MockRule)
     }
-
-    private val mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
 
     @Before
     fun setUp() {
