@@ -155,7 +155,7 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
-        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, crashReportManager)
+        LongConsentManager = LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton

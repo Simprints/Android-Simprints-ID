@@ -8,19 +8,19 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.extensions.parseAppRequest
+import com.simprints.id.tools.extensions.parseAppConfirmation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
+// STOPSHIP : GuidSelectionServiceTest currently failing
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
     @Inject lateinit var analyticsManager: AnalyticsManager
@@ -36,7 +36,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent.parseAppRequest() as AppIdentityConfirmationRequest)
+            onHandleNonNullIntent(intent.parseAppConfirmation() as AppIdentityConfirmationRequest)
         }
     }
 

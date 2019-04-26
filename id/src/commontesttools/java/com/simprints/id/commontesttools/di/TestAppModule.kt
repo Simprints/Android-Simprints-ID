@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
-import com.simprints.id.commontesttools.di.DependencyRule.RealRule
+import com.simprints.testtools.common.di.DependencyRule.RealRule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -32,6 +32,7 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.testtools.common.di.DependencyRule
 
 class TestAppModule(app: Application,
                     var localDbManagerRule: DependencyRule = RealRule,

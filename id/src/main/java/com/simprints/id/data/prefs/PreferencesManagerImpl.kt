@@ -45,5 +45,4 @@ class PreferencesManagerImpl(settings: SettingsPreferencesManager,
 
     private fun containsRealmKey(it: Map.Entry<String, Any?>) =
         it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
-            || it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER)
 }

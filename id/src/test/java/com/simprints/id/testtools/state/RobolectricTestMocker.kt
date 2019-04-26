@@ -2,7 +2,6 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_LEGACY_API_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
@@ -54,7 +53,6 @@ object RobolectricTestMocker {
     fun setUserLogInState(logged: Boolean,
                           sharedPrefs: SharedPreferences,
                           projectId: String = DEFAULT_PROJECT_ID,
-                          legacyApiKey: String = DEFAULT_LEGACY_API_KEY,
                           userId: String = DEFAULT_USER_ID,
                           projectSecret: String = DEFAULT_PROJECT_SECRET,
                           realmKey: String = BigInteger(1, DEFAULT_REALM_KEY).toString(16)): RobolectricTestMocker {
@@ -66,13 +64,6 @@ object RobolectricTestMocker {
         editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "")
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
         editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
-        editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY + projectId, if (logged) "enc_$legacyApiKey" else "")
-
-        if (!legacyApiKey.isEmpty()) {
-            val hashedLegacyApiKey = Hasher().hash(legacyApiKey)
-            editor.putString(projectId, if (logged) hashedLegacyApiKey else "")
-            editor.putString(hashedLegacyApiKey, if (logged) projectId else "")
-        }
         editor.commit()
         return this
     }

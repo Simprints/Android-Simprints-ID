@@ -40,7 +40,7 @@ open class RealmDbManagerImpl(appContext: Context,
     private var realmConfig: RealmConfiguration? = null
 
     init {
-        Realm.init(appContext)
+        Realm.init(appContext) //TODO: Avoid doing stuff in init, chain with createAndSaveRealmConfig for easier tests
     }
 
     override fun insertOrUpdatePersonInLocal(person: Person): Completable =

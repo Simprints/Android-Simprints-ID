@@ -47,6 +47,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                 createAndSaveRealmConfig(localKey)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             return Completable.error(e)
         }
 
@@ -125,14 +126,16 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         try {
             secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
         } catch (e: MissingLocalDatabaseKeyException) {
-            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME, null)
+            secureDataManager.setLocalDatabaseKey(SESSIONS_REALM_DB_FILE_NAME)
         }
         return secureDataManager.getLocalDbKeyOrThrow(SESSIONS_REALM_DB_FILE_NAME)
     }
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
         Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
-            .also { realmConfig = it })
+            .also {
+                realmConfig = it
+            })
 
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbSession>) {
         projectId?.let {
