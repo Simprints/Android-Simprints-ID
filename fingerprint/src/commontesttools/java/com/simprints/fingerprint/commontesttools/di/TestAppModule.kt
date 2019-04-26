@@ -3,7 +3,6 @@ package com.simprints.fingerprint.commontesttools.di
 import android.content.Context
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
-import com.simprints.testtools.common.di.DependencyRule.RealRule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -33,6 +32,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 // Duplicated from id/commontestttools
 
@@ -61,7 +61,7 @@ class TestAppModule(app: Application,
                     var countTaskRule: DependencyRule = RealRule,
                     var downSyncTaskRule: DependencyRule = RealRule,
                     var syncSchedulerHelperRule: DependencyRule = RealRule,
-                    var downSyncManagerRule: DependencyRule = RealRule) : AppModule(app) {
+                    var downSyncManagerRule: DependencyRule = RealRule) : AppModule() {
 
     override fun provideLocalDbManager(ctx: Context,
                                        secureDataManager: SecureDataManager,
@@ -98,8 +98,8 @@ class TestAppModule(app: Application,
                                           randomGenerator: RandomGenerator): SecureDataManager =
         secureDataManagerRule.resolveDependency { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) }
 
-    override fun provideKeystoreManager(): KeystoreManager =
-        keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
+    override fun provideKeystoreManager(ctx: Context): KeystoreManager =
+        keystoreManagerRule.resolveDependency { super.provideKeystoreManager(ctx) }
 
     override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         bluetoothComponentAdapterRule.resolveDependency { super.provideBluetoothComponentAdapter() }
@@ -141,8 +141,8 @@ class TestAppModule(app: Application,
     override fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
         peopleUpSyncMasterRule.resolveDependency { super.providePeopleUpSyncMaster() }
 
-    override fun provideSyncStatusDatabase(): SyncStatusDatabase =
-        syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase() }
+    override fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
+        syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
     override fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
         syncScopesBuilderRule.resolveDependency { super.provideSyncScopesBuilder(loginInfoManager, preferencesManager) }

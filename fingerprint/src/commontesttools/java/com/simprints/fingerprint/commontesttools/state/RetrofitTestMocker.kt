@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.commontesttools.state
 
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.core.network.NetworkConstants
 import com.simprints.core.network.SimApiClient
+import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.whenever

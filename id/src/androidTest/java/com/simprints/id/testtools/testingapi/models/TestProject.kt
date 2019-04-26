@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.integration.testtools.models
+package com.simprints.id.testtools.testingapi.models
 
 data class TestProject(val id: String,
                        val name: String,

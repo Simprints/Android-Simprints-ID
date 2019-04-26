@@ -1,7 +1,7 @@
-package com.simprints.fingerprint.integration.testtools.remote
+package com.simprints.id.testtools.testingapi.remote
 
-import com.simprints.fingerprint.integration.testtools.exceptions.TestingRemoteApiError
-import com.simprints.fingerprint.integration.testtools.models.*
+import com.simprints.id.testtools.testingapi.exceptions.TestingRemoteApiError
+import com.simprints.id.testtools.testingapi.models.*
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers

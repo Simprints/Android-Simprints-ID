@@ -5,11 +5,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
+import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -18,11 +18,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseI
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.AndroidTestConfig
+import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
 import org.junit.Rule
@@ -83,6 +83,8 @@ class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because 
 
     @Test
     fun deleteSessions_shouldCleanDb() {
+        verifyNumberOfSessionsInDb(0, realmForDataEvent)
+
         val sessionOpenProject1Id = createAndSaveOpenSession()
         val sessionCloseProject1Id = createAndSaveCloseSession()
         val sessionCloseProject2Id = createAndSaveCloseSession(testProjectId2)

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.commontesttools.di
 
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.di.FingerprintModule
-import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager

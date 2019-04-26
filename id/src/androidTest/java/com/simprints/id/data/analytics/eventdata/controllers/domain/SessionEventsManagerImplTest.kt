@@ -1,345 +1,343 @@
-package com.simprints.id.services.scheduledSync.sessionSync
-
-//package com.simprints.fingerprint.integration.sessions
+//package com.simprints.id.data.analytics.eventData.controllers.domain
 //
-//import androidx.test.core.app.ApplicationProvider
-//import androidx.test.ext.junit.runners.AndroidJUnit4
-//import androidx.test.filters.SmallTest
-//import com.google.common.truth.Truth
-//import com.nhaarman.mockito_kotlin.argumentCaptor
-//import com.simprints.fingerprint.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-//import com.simprints.fingerprint.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-//import com.simprints.fingerprint.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-//import com.simprints.fingerprint.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
-//import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
-//import com.simprints.fingerprint.commontesttools.di.TestAppModule
-//import com.simprints.fingerprint.commontesttools.di.TestPreferencesModule
-//import com.simprints.fingerprint.commontesttools.sessionEvents.createFakeSession
+//import androidx.test.core.app.applicationprovider
+//import androidx.test.ext.junit.runners.androidjunit4
+//import androidx.test.filters.smalltest
+//import com.google.common.truth.truth
+//import com.nhaarman.mockito_kotlin.argumentcaptor
+//import com.simprints.fingerprint.commontesttools.defaulttestconstants.default_project_id
+//import com.simprints.fingerprint.commontesttools.defaulttestconstants.default_project_secret
+//import com.simprints.fingerprint.commontesttools.defaulttestconstants.default_realm_key
+//import com.simprints.fingerprint.commontesttools.defaulttestconstants.default_test_callout_credentials
+//import com.simprints.fingerprint.commontesttools.peoplegeneratorutils
+//import com.simprints.fingerprint.commontesttools.di.testappmodule
+//import com.simprints.fingerprint.commontesttools.di.testpreferencesmodule
+//import com.simprints.fingerprint.commontesttools.sessionevents.createfakesession
 //import com.simprints.fingerprint.integration.testsnippets.*
-//import com.simprints.fingerprint.testtools.AndroidTestConfig
-//import com.simprints.fingerprint.testtools.checkLoginFromIntentActivityTestRule
-//import com.simprints.fingerprint.testtools.state.setupRandomGeneratorToGenerateKey
-//import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-//import com.simprints.fingerprintscannermock.MockFinger
-//import com.simprints.fingerprintscannermock.MockScannerManager
-//import com.simprints.id.Application
-//import com.simprints.id.FingerIdentifier
-//import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-//import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-//import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-//import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
-//import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
-//import com.simprints.id.data.analytics.eventdata.models.domain.events.PersonCreationEvent
-//import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-//import com.simprints.id.data.analytics.eventdata.models.local.DbSession
-//import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
-//import com.simprints.id.data.db.DbManager
-//import com.simprints.id.data.db.local.LocalDbManager
-//import com.simprints.id.data.db.remote.RemoteDbManager
-//import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-//import com.simprints.id.domain.fingerprint.Person
-//import com.simprints.id.tools.RandomGenerator
-//import com.simprints.id.tools.TimeHelper
-//import com.simprints.id.tools.utils.EncodingUtils
-//import com.simprints.testtools.android.WaitingUtils.UI_POLLING_INTERVAL_LONG
-//import com.simprints.testtools.android.WaitingUtils.UI_TIMEOUT
-//import com.simprints.testtools.android.tryOnSystemUntilTimeout
-//import com.simprints.testtools.android.waitOnUi
-//import com.simprints.testtools.common.di.DependencyRule
-//import com.simprints.testtools.common.syntax.anyNotNull
-//import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+//import com.simprints.fingerprint.testtools.androidtestconfig
+//import com.simprints.fingerprint.testtools.checkloginfromintentactivitytestrule
+//import com.simprints.fingerprint.testtools.state.setuprandomgeneratortogeneratekey
+//import com.simprints.fingerprintscannermock.mockbluetoothadapter
+//import com.simprints.fingerprintscannermock.mockfinger
+//import com.simprints.fingerprintscannermock.mockscannermanager
+//import com.simprints.id.application
+//import com.simprints.id.fingeridentifier
+//import com.simprints.id.data.analytics.eventdata.controllers.domain.sessioneventsmanager
+//import com.simprints.id.data.analytics.eventdata.controllers.local.realmsessioneventsdbmanagerimpl
+//import com.simprints.id.data.analytics.eventdata.controllers.local.sessioneventslocaldbmanager
+//import com.simprints.id.data.analytics.eventdata.models.domain.events.artificialterminationevent
+//import com.simprints.id.data.analytics.eventdata.models.domain.events.fingerprintcaptureevent
+//import com.simprints.id.data.analytics.eventdata.models.domain.events.personcreationevent
+//import com.simprints.id.data.analytics.eventdata.models.domain.session.sessionevents
+//import com.simprints.id.data.analytics.eventdata.models.local.dbsession
+//import com.simprints.id.data.analytics.eventdata.models.local.todomainsession
+//import com.simprints.id.data.db.dbmanager
+//import com.simprints.id.data.db.local.localdbmanager
+//import com.simprints.id.data.db.remote.remotedbmanager
+//import com.simprints.id.data.prefs.settings.settingspreferencesmanager
+//import com.simprints.id.domain.fingerprint.person
+//import com.simprints.id.tools.randomgenerator
+//import com.simprints.id.tools.timehelper
+//import com.simprints.id.tools.utils.encodingutils
+//import com.simprints.testtools.android.waitingutils.ui_polling_interval_long
+//import com.simprints.testtools.android.waitingutils.ui_timeout
+//import com.simprints.testtools.android.tryonsystemuntiltimeout
+//import com.simprints.testtools.android.waitonui
+//import com.simprints.testtools.common.di.dependencyrule
+//import com.simprints.testtools.common.syntax.anynotnull
+//import com.simprints.testtools.common.syntax.awaitandassertsuccess
 //import com.simprints.testtools.common.syntax.whenever
-//import io.realm.Sort
-//import junit.framework.TestCase.*
-//import org.junit.Before
-//import org.junit.Ignore
-//import org.junit.Rule
-//import org.junit.Test
-//import org.junit.runner.RunWith
-//import org.mockito.Mockito
+//import io.realm.sort
+//import junit.framework.testcase.*
+//import org.junit.before
+//import org.junit.ignore
+//import org.junit.rule
+//import org.junit.test
+//import org.junit.runner.runwith
+//import org.mockito.mockito
 //import java.util.*
-//import javax.inject.Inject
+//import javax.inject.inject
 //
-//@RunWith(AndroidJUnit4::class)
-//@SmallTest
-//class SessionEventsManagerImplTest { // TODO : Failing since Sessions Realm is being decrypted with wrong key
+//@runwith(androidjunit4::class)
+//@smalltest
+//class sessioneventsmanagerimpltest { // todo : failing since sessions realm is being decrypted with wrong key
 //
-//    private val app = ApplicationProvider.getApplicationContext<Application>()
+//    private val app = applicationprovider.getapplicationcontext<application>()
 //
-//    @get:Rule val simprintsActionTestRule = checkLoginFromIntentActivityTestRule()
+//    @get:rule val simprintsactiontestrule = checkloginfromintentactivitytestrule()
 //
-//    @Inject lateinit var randomGeneratorMock: RandomGenerator
-//    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
-//    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
-//    @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
-//    @Inject lateinit var remoteDbManager: RemoteDbManager
-//    @Inject lateinit var localDbManager: LocalDbManager
-//    @Inject lateinit var dbManagerSpy: DbManager
-//    @Inject lateinit var timeHelper: TimeHelper
+//    @inject lateinit var randomgeneratormock: randomgenerator
+//    @inject lateinit var realmsessioneventsmanager: sessioneventslocaldbmanager
+//    @inject lateinit var sessioneventsmanagerspy: sessioneventsmanager
+//    @inject lateinit var settingspreferencesmanagerspy: settingspreferencesmanager
+//    @inject lateinit var remotedbmanager: remotedbmanager
+//    @inject lateinit var localdbmanager: localdbmanager
+//    @inject lateinit var dbmanagerspy: dbmanager
+//    @inject lateinit var timehelper: timehelper
 //
-//    private val preferencesModule by lazy {
-//        TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
+//    private val preferencesmodule by lazy {
+//        testpreferencesmodule(settingspreferencesmanagerrule = dependencyrule.spyrule)
 //    }
 //
 //    private val module by lazy {
-//        TestAppModule(
+//        testappmodule(
 //            app,
-//            dbManagerRule = DependencyRule.SpyRule,
-//            localDbManagerRule = DependencyRule.SpyRule,
-//            remoteDbManagerRule = DependencyRule.SpyRule,
-//            remoteSessionsManagerRule = DependencyRule.SpyRule,
-//            sessionEventsManagerRule = DependencyRule.SpyRule,
-//            scheduledSessionsSyncManagerRule = DependencyRule.MockRule,
-//            randomGeneratorRule = DependencyRule.MockRule,
-//            bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
+//            dbmanagerrule = dependencyrule.spyrule,
+//            localdbmanagerrule = dependencyrule.spyrule,
+//            remotedbmanagerrule = dependencyrule.spyrule,
+//            remotesessionsmanagerrule = dependencyrule.spyrule,
+//            sessioneventsmanagerrule = dependencyrule.spyrule,
+//            scheduledsessionssyncmanagerrule = dependencyrule.mockrule,
+//            randomgeneratorrule = dependencyrule.mockrule,
+//            bluetoothcomponentadapterrule = dependencyrule.replacerule { mockbluetoothadapter }
 //        )
 //    }
 //
-//    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-//    private val realmForDataEvent
-//        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
+//    private lateinit var mockbluetoothadapter: mockbluetoothadapter
+//    private val realmfordataevent
+//        get() = (realmsessioneventsmanager as realmsessioneventsdbmanagerimpl).getrealminstance().blockingget()
 //
-//    private val mostRecentSessionInDb: SessionEvents
+//    private val mostrecentsessionindb: sessionevents
 //        get() {
-//            realmForDataEvent.refresh()
-//            return realmForDataEvent
-//                .where(DbSession::class.java)
-//                .findAll()
-//                .sort("startTime", Sort.DESCENDING).first()!!.toDomainSession()
+//            realmfordataevent.refresh()
+//            return realmfordataevent
+//                .where(dbsession::class.java)
+//                .findall()
+//                .sort("starttime", sort.descending).first()!!.todomainsession()
 //        }
 //
-//    @Before
-//    fun setUp() {
-//        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+//    @before
+//    fun setup() {
+//        androidtestconfig(this, module, preferencesmodule).fullsetup()
 //
-//        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
+//        setuprandomgeneratortogeneratekey(default_realm_key, randomgeneratormock)
 //
-//        signOut()
+//        signout()
 //
-//        whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(mapOf(
-//            FingerIdentifier.LEFT_THUMB to true,
-//            FingerIdentifier.LEFT_INDEX_FINGER to true))
+//        whenever(settingspreferencesmanagerspy.fingerstatus).thenreturn(mapof(
+//            fingeridentifier.left_thumb to true,
+//            fingeridentifier.left_index_finger to true))
 //    }
 //
-//    @Test
-//    fun createSession_shouldReturnASession() {
-//        val result = sessionEventsManagerSpy.createSession("app_version_name").test()
+//    @test
+//    fun createsession_shouldreturnasession() {
+//        val result = sessioneventsmanagerspy.createsession("app_version_name").test()
 //
-//        result.awaitAndAssertSuccess()
-//        val newSession = result.values().first()
-//        verifySessionIsOpen(newSession)
+//        result.awaitandassertsuccess()
+//        val newsession = result.values().first()
+//        verifysessionisopen(newsession)
 //    }
 //
-//    @Test
-//    @Ignore("Need to fix SessionEventsApiAdapterFactory")
-//    fun sessionCount_shouldBeAccurate() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
-//        val numberOfPreviousSessions = 5
-//        repeat(numberOfPreviousSessions) { createAndSaveCloseSession(projectId = DEFAULT_PROJECT_ID, id = UUID.randomUUID().toString()) }
+//    @test
+//    @ignore("need to fix sessioneventsapiadapterfactory")
+//    fun sessioncount_shouldbeaccurate() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
+//        val numberofprevioussessions = 5
+//        repeat(numberofprevioussessions) { createandsaveclosesession(projectid = default_project_id, id = uuid.randomuuid().tostring()) }
 //
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        setupActivityAndContinue()
-//        waitOnUi(100)
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        setupactivityandcontinue()
+//        waitonui(100)
 //
-//        realmForDataEvent.refresh()
-//        with(mostRecentSessionInDb) {
-////            val jsonString = SessionEventsApiAdapterFactory().gson.toJson(this)
-////            val jsonObject = JSONObject(jsonString)
-////            assertTrue(jsonObject.getJSONObject("databaseInfo").has("sessionCount"))
-////            assertEquals(numberOfPreviousSessions + 1, jsonObject.getJSONObject("databaseInfo").getInt("sessionCount"))
-//        }
-//    }
-//
-//    @Test
-//    fun createSession_shouldStopPreviousSessions() {
-//        val oldSession = createFakeSession(projectId = DEFAULT_PROJECT_ID, id = "oldSession")
-//            .also { saveSessionInDb(it, realmSessionEventsManager) }
-//
-//        sessionEventsManagerSpy.createSession("app_version_name").blockingGet()
-//        sessionEventsManagerSpy.updateSession { it.projectId = DEFAULT_PROJECT_ID }.blockingGet()
-//
-//        val sessions = realmSessionEventsManager.loadSessions(DEFAULT_PROJECT_ID).blockingGet()
-//        val oldSessionFromDb = sessions[0]
-//        oldSessionFromDb.also {
-//            assertTrue(it.isOpen())
-//        }
-//        val newSessionFromDb = sessions[1]
-//        newSessionFromDb.also {
-//            assertEquals(it.id, oldSession.id)
-//            assertTrue(it.isClosed())
-//            val finalEvent = it.events.filterIsInstance(ArtificialTerminationEvent::class.java).first()
-//            assertEquals(finalEvent.reason, ArtificialTerminationEvent.Reason.NEW_SESSION)
+//        realmfordataevent.refresh()
+//        with(mostrecentsessionindb) {
+////            val jsonstring = sessioneventsapiadapterfactory().gson.tojson(this)
+////            val jsonobject = jsonobject(jsonstring)
+////            asserttrue(jsonobject.getjsonobject("databaseinfo").has("sessioncount"))
+////            assertequals(numberofprevioussessions + 1, jsonobject.getjsonobject("databaseinfo").getint("sessioncount"))
 //        }
 //    }
 //
-//    @Test
-//    fun userRefusesConsent_sessionShouldNotHaveTheLocation() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//    @test
+//    fun createsession_shouldstopprevioussessions() {
+//        val oldsession = createfakesession(projectid = default_project_id, id = "oldsession")
+//            .also { savesessionindb(it, realmsessioneventsmanager) }
 //
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        setupActivityAndDecline()
-//        Thread.sleep(100)
+//        sessioneventsmanagerspy.createsession("app_version_name").blockingget()
+//        sessioneventsmanagerspy.updatesession { it.projectid = default_project_id }.blockingget()
 //
-//        assertNull(mostRecentSessionInDb.location)
+//        val sessions = realmsessioneventsmanager.loadsessions(default_project_id).blockingget()
+//        val oldsessionfromdb = sessions[0]
+//        oldsessionfromdb.also {
+//            asserttrue(it.isopen())
+//        }
+//        val newsessionfromdb = sessions[1]
+//        newsessionfromdb.also {
+//            assertequals(it.id, oldsession.id)
+//            asserttrue(it.isclosed())
+//            val finalevent = it.events.filterisinstance(artificialterminationevent::class.java).first()
+//            assertequals(finalevent.reason, artificialterminationevent.reason.new_session)
+//        }
 //    }
 //
-//    @Test
-//    fun userAcceptsConsent_sessionShouldHaveTheLocation() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//    @test
+//    fun userrefusesconsent_sessionshouldnothavethelocation() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        setupActivityAndContinue()
-//        Thread.sleep(100)
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        setupactivityanddecline()
+//        thread.sleep(100)
 //
-//        assertNotNull(mostRecentSessionInDb.location)
+//        assertnull(mostrecentsessionindb.location)
 //    }
 //
-//    @Test
-//    fun anErrorWithEvents_shouldBeSwallowed() {
-//        realmSessionEventsManager.deleteSessions()
+//    @test
+//    fun useracceptsconsent_sessionshouldhavethelocation() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        // There is not activeSession open or pending in the db. So it should fail, but it swallows the error
-//        sessionEventsManagerSpy.updateSession {
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        setupactivityandcontinue()
+//        thread.sleep(100)
+//
+//        assertnotnull(mostrecentsessionindb.location)
+//    }
+//
+//    @test
+//    fun anerrorwithevents_shouldbeswallowed() {
+//        realmsessioneventsmanager.deletesessions()
+//
+//        // there is not activesession open or pending in the db. so it should fail, but it swallows the error
+//        sessioneventsmanagerspy.updatesession {
 //            it.location = null
-//        }.test().awaitAndAssertSuccess()
+//        }.test().awaitandassertsuccess()
 //    }
 //
-//    @Test
-//    fun enrol_shouldGenerateTheRightEvents() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//    @test
+//    fun enrol_shouldgeneratetherightevents() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        // Launch and sign in
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        // Once signed in proceed to enrol person1
-//        fullHappyWorkflow()
-//        collectFingerprintsEnrolmentCheckFinished(simprintsActionTestRule)
+//        // launch and sign in
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        // once signed in proceed to enrol person1
+//        fullhappyworkflow()
+//        collectfingerprintsenrolmentcheckfinished(simprintsactiontestrule)
 //
-//        realmForDataEvent.refresh()
-//        verifyEventsAfterEnrolment(mostRecentSessionInDb.events, realmForDataEvent)
+//        realmfordataevent.refresh()
+//        verifyeventsafterenrolment(mostrecentsessionindb.events, realmfordataevent)
 //    }
 //
-//    @Test
-//    fun launchSimprints_shouldGenerateTheRightEvents() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//    @test
+//    fun launchsimprints_shouldgeneratetherightevents() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        // Launch
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
+//        // launch
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
 //
-//        tryOnSystemUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
-//            verifyEventsWhenSimprintsIsLaunched(mostRecentSessionInDb.events)
+//        tryonsystemuntiltimeout(ui_timeout, ui_polling_interval_long) {
+//            verifyeventswhensimprintsislaunched(mostrecentsessionindb.events)
 //        }
 //    }
 //
-//    @Test
-//    fun login_shouldGenerateTheRightEvents() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//    @test
+//    fun login_shouldgeneratetherightevents() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        // Launch and sign in
-//        launchActivityEnrol(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET + "wrong")
-//        pressSignIn()
-//        Thread.sleep(6000)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        setupActivityAndContinue()
+//        // launch and sign in
+//        launchactivityenrol(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret + "wrong")
+//        presssignin()
+//        thread.sleep(6000)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        setupactivityandcontinue()
 //
-//        verifyEventsForFailedSignedIdFollowedBySucceedSignIn(mostRecentSessionInDb.events)
+//        verifyeventsforfailedsignedidfollowedbysucceedsignin(mostrecentsessionindb.events)
 //    }
 //
-//    @Test
-//    fun verify_shouldGenerateTheRightEvents() {
+//    @test
+//    fun verify_shouldgeneratetherightevents() {
 //        val guid = "123e4567-e89b-12d3-a456-426655440000"
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
 //
-//        mockLocalToAddFakePersonAfterLogin(guid)
+//        mocklocaltoaddfakepersonafterlogin(guid)
 //
-//        launchActivityVerify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule, guid)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        fullHappyWorkflow()
-//        matchingActivityVerificationCheckFinished(simprintsActionTestRule)
+//        launchactivityverify(default_test_callout_credentials, simprintsactiontestrule, guid)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        fullhappyworkflow()
+//        matchingactivityverificationcheckfinished(simprintsactiontestrule)
 //
-//        verifyEventsAfterVerification(mostRecentSessionInDb.events, realmForDataEvent)
+//        verifyeventsafterverification(mostrecentsessionindb.events, realmfordataevent)
 //    }
 //
-//    @Test
-//    fun identify_shouldGenerateTheRightEvents() {
+//    @test
+//    fun identify_shouldgeneratetherightevents() {
 //        val guid = "123e4567-e89b-12d3-a456-426655440000"
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
-//        mockLocalToAddFakePersonAfterLogin(guid)
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(*mockfinger.person1twofingersgoodscan)))
+//        mocklocaltoaddfakepersonafterlogin(guid)
 //
-//        launchActivityIdentify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        fullHappyWorkflow()
-//        matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
+//        launchactivityidentify(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        fullhappyworkflow()
+//        matchingactivityidentificationcheckfinished(simprintsactiontestrule)
 //
-//        verifyEventsAfterIdentification(mostRecentSessionInDb.events, realmForDataEvent)
+//        verifyeventsafteridentification(mostrecentsessionindb.events, realmfordataevent)
 //    }
 //
-//    @Test
-//    fun multipleScans_shouldGenerateACreatePersonEventWithRightTemplates() {
-//        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-//            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-//            MockFinger.PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN,
-//            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-//            MockFinger.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)))
+//    @test
+//    fun multiplescans_shouldgenerateacreatepersoneventwithrighttemplates() {
+//        mockbluetoothadapter = mockbluetoothadapter(mockscannermanager(mockfingers = arrayof(
+//            mockfinger.person_1_version_1_left_thumb_bad_scan,
+//            mockfinger.person_1_version_2_left_index_good_scan,
+//            mockfinger.person_1_version_1_left_thumb_good_scan,
+//            mockfinger.person_1_version_1_left_index_good_scan)))
 //
-//        launchActivityIdentify(DEFAULT_TEST_CALLOUT_CREDENTIALS, simprintsActionTestRule)
-//        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
-//        pressSignIn()
-//        setupActivityAndContinue()
-//        collectFingerprintsPressScan()
-//        skipFinger()
-//        waitForSplashScreenAppearsAndDisappears()
-//        collectFingerprintsPressScan()
-//        collectFingerprintsPressScan()
-//        checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n✓ LEFT INDEX FINGER\n✓ RIGHT THUMB\n")
-//        matchingActivityIdentificationCheckFinished(simprintsActionTestRule)
+//        launchactivityidentify(default_test_callout_credentials, simprintsactiontestrule)
+//        entercredentialsdirectly(default_test_callout_credentials, default_project_secret)
+//        presssignin()
+//        setupactivityandcontinue()
+//        collectfingerprintspressscan()
+//        skipfinger()
+//        waitforsplashscreenappearsanddisappears()
+//        collectfingerprintspressscan()
+//        collectfingerprintspressscan()
+//        checkifdialogisdisplayedwithresultandclickconfirm("× left thumb\n✓ left index finger\n✓ right thumb\n")
+//        matchingactivityidentificationcheckfinished(simprintsactiontestrule)
 //
-//        val personCreatedArg = argumentCaptor<Person>()
-//        Mockito.verify(sessionEventsManagerSpy, Mockito.times(1)).addPersonCreationEventInBackground(personCreatedArg.capture())
+//        val personcreatedarg = argumentcaptor<person>()
+//        mockito.verify(sessioneventsmanagerspy, mockito.times(1)).addpersoncreationeventinbackground(personcreatedarg.capture())
 //
-//        val eventsInMostRecentSession = mostRecentSessionInDb.events
-//        val personCreatedForMatchingActivity = personCreatedArg.firstValue
-//        val personCreationEvent = eventsInMostRecentSession.filterIsInstance(PersonCreationEvent::class.java)[0]
-//        val usefulTemplatesFromEvents = eventsInMostRecentSession
-//            .filterIsInstance(FingerprintCaptureEvent::class.java)
-//            .filter { it.id in personCreationEvent.fingerprintCaptureIds }
+//        val eventsinmostrecentsession = mostrecentsessionindb.events
+//        val personcreatedformatchingactivity = personcreatedarg.firstvalue
+//        val personcreationevent = eventsinmostrecentsession.filterisinstance(personcreationevent::class.java)[0]
+//        val usefultemplatesfromevents = eventsinmostrecentsession
+//            .filterisinstance(fingerprintcaptureevent::class.java)
+//            .filter { it.id in personcreationevent.fingerprintcaptureids }
 //            .map { it.fingerprint?.template }
 //
-//        Truth.assertThat(usefulTemplatesFromEvents)
-//            .containsExactlyElementsIn(personCreatedForMatchingActivity.fingerprints.map {
-//                EncodingUtils.byteArrayToBase64(it.templateBytes)
+//        truth.assertthat(usefultemplatesfromevents)
+//            .containsexactlyelementsin(personcreatedformatchingactivity.fingerprints.map {
+//                encodingutils.bytearraytobase64(it.templatebytes)
 //            })
 //
-//        val skippedFingerCaptureEvent = eventsInMostRecentSession
-//            .filterIsInstance(FingerprintCaptureEvent::class.java)
-//            .findLast { it.result == FingerprintCaptureEvent.Result.SKIPPED }
+//        val skippedfingercaptureevent = eventsinmostrecentsession
+//            .filterisinstance(fingerprintcaptureevent::class.java)
+//            .findlast { it.result == fingerprintcaptureevent.result.skipped }
 //
-//        assertNotNull(skippedFingerCaptureEvent)
+//        assertnotnull(skippedfingercaptureevent)
 //    }
 //
-//    private fun mockLocalToAddFakePersonAfterLogin(guid: String) {
-//        whenever(dbManagerSpy) { signIn(anyNotNull(), anyNotNull(), anyNotNull()) } then {
-//            it.callRealMethod()
-//            localDbManager.insertOrUpdatePersonInLocal(PeopleGeneratorUtils.getRandomPerson(patientId = guid))
-//                .onErrorComplete().blockingAwait()
+//    private fun mocklocaltoaddfakepersonafterlogin(guid: string) {
+//        whenever(dbmanagerspy) { signin(anynotnull(), anynotnull(), anynotnull()) } then {
+//            it.callrealmethod()
+//            localdbmanager.insertorupdatepersoninlocal(peoplegeneratorutils.getrandomperson(patientid = guid))
+//                .onerrorcomplete().blockingawait()
 //        }
 //    }
 //
-//    private fun createAndSaveCloseSession(projectId: String = DEFAULT_PROJECT_ID, id: String) =
-//        createAndSaveCloseFakeSession(timeHelper, realmSessionEventsManager, projectId, id)
+//    private fun createandsaveclosesession(projectid: string = default_project_id, id: string) =
+//        createandsaveclosefakesession(timehelper, realmsessioneventsmanager, projectid, id)
 //
-//    private fun signOut() {
-//        remoteDbManager.signOutOfRemoteDb()
+//    private fun signout() {
+//        remotedbmanager.signoutofremotedb()
 //    }
 //}
