@@ -10,9 +10,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.fingerprint.commontesttools.di.TestAppModule
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
@@ -25,6 +22,8 @@ import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.id.Application
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.RandomGenerator

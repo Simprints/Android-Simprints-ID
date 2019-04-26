@@ -1,6 +1,6 @@
 package com.simprints.id.testtools.di
 
-import com.simprints.fingerprint.integration.sync.DashboardActivityAndroidTest
+import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.Application
 import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImplTest

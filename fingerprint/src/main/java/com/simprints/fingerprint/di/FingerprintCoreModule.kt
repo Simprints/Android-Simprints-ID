@@ -24,11 +24,13 @@ class FingerprintCoreModule {
 
     @Provides
     @FeatureScope
-    fun provideFingerprintTimeHelper(coreTimeHelper: TimeHelper): FingerprintTimeHelper = FingerprintTimeHelperImpl(coreTimeHelper)
+    fun provideFingerprintTimeHelper(coreTimeHelper: TimeHelper): FingerprintTimeHelper =
+        FingerprintTimeHelperImpl(coreTimeHelper)
 
     @Provides
     @FeatureScope
-    fun provideFingerprintDbManager(coreDbManager: DbManager): FingerprintDbManager = FingerprintDbManagerImpl(coreDbManager)
+    fun provideFingerprintDbManager(coreDbManager: DbManager): FingerprintDbManager =
+        FingerprintDbManagerImpl(coreDbManager)
 
     @Provides
     @FeatureScope
