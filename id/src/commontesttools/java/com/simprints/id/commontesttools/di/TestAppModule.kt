@@ -1,9 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
-import com.simprints.testtools.common.di.DependencyRule.RealRule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -33,6 +31,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestAppModule(app: Application,
                     var localDbManagerRule: DependencyRule = RealRule,
@@ -46,7 +45,6 @@ class TestAppModule(app: Application,
                     var randomGeneratorRule: DependencyRule = RealRule,
                     var keystoreManagerRule: DependencyRule = RealRule,
                     var crashReportManagerRule: DependencyRule = RealRule,
-                    var bluetoothComponentAdapterRule: DependencyRule = RealRule,
                     var sessionEventsManagerRule: DependencyRule = RealRule,
                     var sessionEventsLocalDbManagerRule: DependencyRule = RealRule,
                     var scheduledSessionsSyncManagerRule: DependencyRule = RealRule,
@@ -98,9 +96,6 @@ class TestAppModule(app: Application,
 
     override fun provideKeystoreManager(ctx: Context): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager(ctx) }
-
-    override fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
-        bluetoothComponentAdapterRule.resolveDependency { super.provideBluetoothComponentAdapter() }
 
     override fun provideSecureApiInterface(): SecureApiInterface =
         secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }

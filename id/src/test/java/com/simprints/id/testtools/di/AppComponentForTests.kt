@@ -2,7 +2,6 @@ package com.simprints.id.testtools.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
@@ -41,7 +40,6 @@ interface AppComponentForTests : AppComponent {
         fun build(): AppComponentForTests
     }
 
-    fun inject(checkLoginFromIntentActivityTest: CheckLoginFromIntentActivityTest)
     fun inject(checkLoginFromMainLauncherActivityTest: CheckLoginFromMainLauncherActivityTest)
     fun inject(loginActivityTest: LoginActivityTest)
     fun inject(dashboardCardsFactoryTest: DashboardCardsFactoryTest)

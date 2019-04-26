@@ -1,19 +1,13 @@
 package com.simprints.fingerprint.controllers.scanner
 
 import android.annotation.SuppressLint
+import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert.*
-import com.simprints.fingerprintscanner.SCANNER_ERROR
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprintscanner.ScannerUtils
-import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.id.data.analytics.AnalyticsManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
@@ -21,12 +15,18 @@ import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.exceptions.unexpected.NullScannerException
 import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.fingerprintscanner.SCANNER_ERROR
+import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.ScannerCallback
+import com.simprints.fingerprintscanner.ScannerUtils
+import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
-open class ScannerManagerImpl(private val preferencesManager: PreferencesManager,
-                              private val analyticsManager: AnalyticsManager,
-                              private val crashReportManager: CrashReportManager,
+open class ScannerManagerImpl(private val preferencesManager: FingerprintPreferencesManager,
+                              private val analyticsManager: FingerprintAnalyticsManager,
+                              private val crashReportManager: FingerprintCrashReportManager,
                               private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
@@ -184,6 +184,8 @@ open class ScannerManagerImpl(private val preferencesManager: PreferencesManager
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.SCANNER_SETUP, CrashReportTrigger.SCANNER, message = message)
+        crashReportManager.logMessageForCrashReport(
+            FingerprintCrashReportTag.SCANNER_SETUP,
+            FingerprintCrashReportTrigger.SCANNER, message = message)
     }
 }

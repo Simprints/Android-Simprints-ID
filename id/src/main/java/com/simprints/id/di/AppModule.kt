@@ -1,11 +1,8 @@
 package com.simprints.id.di
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
@@ -162,13 +159,7 @@ open class AppModule {
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    @Singleton
-    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
-        AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
-
-    @Provides
     open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
-
 
     @Provides
     @Singleton
