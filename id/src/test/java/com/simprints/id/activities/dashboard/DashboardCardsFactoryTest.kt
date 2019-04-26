@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase

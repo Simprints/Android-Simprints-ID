@@ -4,8 +4,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.core.network.SimApiClient
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.local.LocalDbManager
@@ -22,6 +20,8 @@ import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.testtools.state.mockLoginInfoManager
 import com.simprints.id.testtools.state.setupFakeKeyStore
+import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
@@ -89,14 +89,14 @@ class ProjectAuthenticatorTest {
     @Test
     fun successfulResponse_userShouldSignIn() {
 
-        val authenticator = LegacyCompatibleProjectAuthenticator(
+        val authenticator = ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
             SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
             getMockAttestationManager())
 
         val testObserver = authenticator
-            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret", projectId, null)
+            .authenticate(NonceScope(projectId, userId), "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()
@@ -113,11 +113,11 @@ class ProjectAuthenticatorTest {
 
         val nonceScope = NonceScope(projectId, userId)
 
-        val testObserver = LegacyCompatibleProjectAuthenticator(
+        val testObserver = ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
             createMockServiceToFailRequests(apiClient.retrofit))
-            .authenticate(nonceScope, "encrypted_project_secret", projectId, null)
+            .authenticate(nonceScope, "encrypted_project_secret")
             .test()
 
         testObserver.awaitTerminalEvent()

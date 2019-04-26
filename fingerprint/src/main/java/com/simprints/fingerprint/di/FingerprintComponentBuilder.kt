@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.di
 
-import android.content.Context
 import com.simprints.id.Application
+import com.simprints.id.di.AppComponent
 
 class FingerprintComponentBuilder {
 
@@ -14,13 +14,17 @@ class FingerprintComponentBuilder {
         fun getComponent(app: Application): FingerprintComponent =
             component?.let {
                 it
-            } ?: buildComponent(app).also { component = it }
+            } ?: buildComponent(app.component).also { component = it }
 
-        private fun buildComponent(app: Application): FingerprintComponent =
+        private fun buildComponent(appComponent: AppComponent): FingerprintComponent =
             DaggerFingerprintComponent
                 .builder()
-                .appComponent(app.component)
+                .appComponent(appComponent)
                 .build()
+
+        fun setComponent(testAppComponent: FingerprintComponent) {
+            component = testAppComponent
+        }
 
     }
 }

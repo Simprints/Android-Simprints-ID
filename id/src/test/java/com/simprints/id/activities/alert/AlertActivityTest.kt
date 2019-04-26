@@ -10,7 +10,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.IntentKeys
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.alert.Alert

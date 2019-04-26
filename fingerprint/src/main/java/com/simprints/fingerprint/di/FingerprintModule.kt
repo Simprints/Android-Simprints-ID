@@ -18,11 +18,11 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class FingerprintModule {
+open class FingerprintModule {
 
     @Provides
     @FeatureScope
-    fun provideScannerManager(
+    open fun provideScannerManager(
         preferencesManager: PreferencesManager,
         analyticsManager: AnalyticsManager,
         crashReportManager: CrashReportManager,

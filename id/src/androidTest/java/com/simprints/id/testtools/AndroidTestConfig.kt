@@ -6,12 +6,13 @@ import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionRealmConfig
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
-import com.simprints.testtools.common.dagger.injectClassFromComponent
+import com.simprints.testtools.android.StorageUtils
+import com.simprints.testtools.android.StorageUtils.deleteAllDatabases
+import com.simprints.testtools.common.di.injectClassFromComponent
 import io.realm.Realm
 
 class AndroidTestConfig<T : Any>(
@@ -23,14 +24,12 @@ class AndroidTestConfig<T : Any>(
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var testAppComponent: AppComponentForAndroidTests
 
-    private val defaultSessionLocalDbKey = LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY)
-    private val sessionRealmConfiguration = SessionRealmConfig.get(defaultSessionLocalDbKey.projectId, defaultSessionLocalDbKey.value)
-    private val peopleRealmConfiguration = PeopleRealmConfig.get(DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.value, DefaultTestConstants.DEFAULT_LOCAL_DB_KEY.projectId)
+    private val defaultSessionLocalDbKey by lazy { LocalDbKey(RealmSessionEventsDbManagerImpl.SESSIONS_REALM_DB_FILE_NAME, DefaultTestConstants.DEFAULT_REALM_KEY) }
 
     fun fullSetup() =
         initAndInjectComponent()
-            .initRealm()
             .clearData()
+            .initRealm()
             .initDependencies()
 
     /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
@@ -48,6 +47,7 @@ class AndroidTestConfig<T : Any>(
     private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForAndroidTests.builder()
+            .application(app)
             .appModule(appModule ?: TestAppModule(app))
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
@@ -64,9 +64,8 @@ class AndroidTestConfig<T : Any>(
     }
 
     fun clearData() = also {
-        StorageUtils.clearApplicationData(app)
-        StorageUtils.clearRealmDatabase(peopleRealmConfiguration)
-        StorageUtils.clearRealmDatabase(sessionRealmConfiguration)
+        StorageUtils.clearSharedPrefs(app, PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+        deleteAllDatabases(app)
     }
 
     fun initDependencies() = also {

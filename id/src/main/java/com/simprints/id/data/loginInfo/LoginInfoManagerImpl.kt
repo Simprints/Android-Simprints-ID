@@ -61,8 +61,6 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
             ""
         }
 
-    override fun getSignedInHashedLegacyApiKeyOrEmpty(): String = getHashedLegacyProjectIdForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
-
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
             signedInProjectId
@@ -92,31 +90,13 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
             getEncryptedProjectSecretOrEmpty().isNotEmpty()
 
     override fun cleanCredentials() {
-
-        val projectId = getSignedInProjectIdOrEmpty()
-        val possibleHashedLegacyApiKey = prefs.getPrimitive(projectId, "")
-        prefs.edit().putPrimitive(projectId, "").commit()
-        prefs.edit().putPrimitive(possibleHashedLegacyApiKey, "").commit()
-
         encryptedProjectSecret = ""
         signedInProjectId = ""
         signedInUserId = ""
     }
 
     override fun storeCredentials(projectId: String, userId: String) {
-        storeProjectIdWithLegacyProjectIdPair(projectId, "") //StopShip: Remove legacy Key
         signedInProjectId = projectId
         signedInUserId = userId
     }
-
-    override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {
-        if (legacyProjectId != null && legacyProjectId.isNotEmpty()) {
-            val hashedLegacyApiKey = Hasher().hash(legacyProjectId)
-            prefs.edit().putPrimitive(hashedLegacyApiKey, projectId).commit()
-            prefs.edit().putPrimitive(projectId, hashedLegacyApiKey).commit()
-        }
-    }
-
-    override fun getHashedLegacyProjectIdForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
-    override fun getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey: String): String = prefs.getString(hashedLegacyApiKey, "")
 }

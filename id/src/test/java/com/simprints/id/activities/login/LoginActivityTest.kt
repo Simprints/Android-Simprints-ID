@@ -9,17 +9,16 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.secure.LegacyCompatibleProjectAuthenticator
+import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
 import com.simprints.id.tools.extensions.scannerAppIntent
+import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -80,8 +79,8 @@ class LoginActivityTest {
     @Test
     fun loginSuccesses_shouldReturnSuccessResultCode() {
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
-        val projectAuthenticator = mock(LegacyCompatibleProjectAuthenticator::class.java)
-        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull(), anyNotNull(), anyOrNull())).thenReturn(Completable.complete())
+        val projectAuthenticator = mock(ProjectAuthenticator::class.java)
+        whenever(projectAuthenticator.authenticate(anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator

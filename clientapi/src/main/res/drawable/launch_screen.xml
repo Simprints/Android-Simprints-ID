@@ -11,7 +11,7 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/client_api_simprints_logo" />
+            android:src="@drawable/clientapi_simprints_logo" />
     </item>
 
 </layer-list>

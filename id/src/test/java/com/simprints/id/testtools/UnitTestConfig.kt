@@ -5,12 +5,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
-import com.simprints.testtools.common.dagger.injectClassFromComponent
+import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.injectClassFromComponent
 import io.fabric.sdk.android.Fabric
 
 class UnitTestConfig<T : Any>(
@@ -19,10 +19,10 @@ class UnitTestConfig<T : Any>(
     private val preferencesModule: TestPreferencesModule? = null
 ) {
 
-    private val defaultAppModuleWithoutReam by lazy {
+    private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
-            localDbManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule)
+            localDbManagerRule = DependencyRule.MockRule,
+            sessionEventsLocalDbManagerRule = DependencyRule.MockRule)
     }
 
     private val app by lazy {
