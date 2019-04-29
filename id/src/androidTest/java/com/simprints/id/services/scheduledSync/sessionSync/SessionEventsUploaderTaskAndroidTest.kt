@@ -74,8 +74,6 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
         )
     }
 
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-
     @Before
     fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
@@ -90,8 +88,6 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
 
     @Test
     fun closeSessions_shouldGetUploaded() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(*MockFinger.person1TwoFingersGoodScan)))
-
         launchCheckLoginActivityEnrol(testProject.toCalloutCredentials(), simprintsActionTestRule)
         enterCredentialsDirectly(testProject.toCalloutCredentials(), testProject.secret)
         pressSignIn()

@@ -13,6 +13,7 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -66,7 +67,7 @@ class ProjectAuthenticatorTest {
             syncSchedulerHelperRule = MockRule,
             longConsentManagerRule = MockRule,
             peopleUpSyncMasterRule = MockRule,
-            keystoreManagerRule = ReplaceRule { setupFakeKeyStore() }
+            keystoreManagerRule = ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } }
         )
     }
 

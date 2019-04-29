@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.state
+package com.simprints.id.commontesttools.state
 
 import android.content.SharedPreferences
 import com.simprints.id.data.db.local.LocalDbManager
