@@ -1,13 +1,10 @@
 package com.simprints.id.testtools.testingapi
 
-import androidx.test.core.app.ApplicationProvider
-import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.models.TestProjectCreationParameters
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
-import com.simprints.testtools.android.StorageUtils
 import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -35,6 +32,5 @@ class TestProjectRule(
 
     override fun finished(description: Description?) {
         RemoteTestingManager.create().deleteTestProject(testProject.id)
-        StorageUtils.deleteAllDatabases( ApplicationProvider.getApplicationContext<Application>())
     }
 }

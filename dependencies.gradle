@@ -129,6 +129,7 @@ def testing = [
         ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
         core        : "androidx.test:core:1.1.1-alpha01",
         core_testing: "android.arch.core:core-testing:1.1.1",
+        orchestrator: "androidx.test:orchestrator:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
         rules       : "androidx.test:rules:1.1.2-alpha01",
         room        : "androidx.room:room-testing:$androidx_room_version"

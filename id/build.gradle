@@ -89,6 +89,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     // Required for deps that use Java 8 (okhttp)
@@ -220,6 +221,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor
     androidTestImplementation deps.testing.androidx.core
+    androidTestUtil deps.testing.androidx.orchestrator
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules

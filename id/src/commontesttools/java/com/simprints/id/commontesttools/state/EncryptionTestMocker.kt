@@ -5,6 +5,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.stubbing.Answer
 import kotlin.random.Random
 
@@ -21,7 +22,7 @@ fun setupFakeKeyStore(keystoreManager: KeystoreManager) {
 }
 
 fun setupRandomGeneratorToGenerateKey(randomGeneratorMock: RandomGenerator) {
-    whenever { randomGeneratorMock.generateByteArray(ArgumentMatchers.anyInt()) } thenAnswer {
+    whenever(randomGeneratorMock) { generateByteArray(anyInt()) } thenAnswer {
         Random(0).nextBytes(ByteArray(it.arguments[0] as Int))
     }
 }

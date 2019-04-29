@@ -6,6 +6,7 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.rule.ActivityTestRule
+import com.google.common.truth.Truth
 import com.simprints.id.R
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -74,12 +75,10 @@ fun pressSignIn() {
         .perform(click())
 }
 
-fun ensureSignInSuccess() {
+fun ensureSignInSuccess(loginActivityTestRule: ActivityTestRule<*>) {
     log("ensureSignInSuccess")
-    tryOnUiUntilTimeout(25000, 1000) {
-        grantPermissions()
-        onView(withText("Accept")) //fingerprintR.id.consentAcceptButton)
-            .check(matches(isDisplayed()))
+    tryOnUiUntilTimeout(25000, 50) {
+        Truth.assertThat(loginActivityTestRule.activity.isFinishing).isTrue()
     }
 }
 
