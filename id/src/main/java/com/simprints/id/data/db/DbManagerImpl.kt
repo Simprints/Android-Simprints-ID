@@ -121,9 +121,9 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int> =
-        remotePeopleManager.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
-            local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false).map {
+    override fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<Int> =
+        remotePeopleManager.getNumberOfPatients(syncScope).flatMap { nPatientsOnServer ->
+            getPeopleCountFromLocalForSyncScope(syncScope).map {
                 Math.max(nPatientsOnServer - it, 0)
             }
         }

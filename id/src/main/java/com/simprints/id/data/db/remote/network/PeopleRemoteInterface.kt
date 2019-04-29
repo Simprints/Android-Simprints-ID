@@ -37,5 +37,6 @@ interface PeopleRemoteInterface {
     fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
-        @Query("moduleId") moduleId: String?): Single<Response<PeopleCount>>
+        @Query("moduleId") moduleId: List<String>?,
+        @Query("mode") mode: List<String>): Single<Response<PeopleCount>>
 }

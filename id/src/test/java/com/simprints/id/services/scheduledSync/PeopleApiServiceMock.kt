@@ -27,8 +27,9 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).requestPeopleCount(projectId, userId, moduleId)
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: List<String>?, mode: List<String>): Single<Response<PeopleCount>> {
+        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}"))
+            .requestPeopleCount(projectId, userId, moduleId, listOf("FINGERPRINT", "FACE"))
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

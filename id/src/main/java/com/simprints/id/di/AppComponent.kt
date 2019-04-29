@@ -31,7 +31,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImp
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.InputMergeWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
@@ -71,7 +71,7 @@ interface AppComponent {
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
-    fun inject(subCountWorker: SubCountWorker)
+    fun inject(countWorker: CountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)

@@ -10,6 +10,8 @@ import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.trace
@@ -43,9 +45,9 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                 .trace("uploadPatientBatch")
         }
 
-    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+    override fun getNumberOfPatients(syncScope: SyncScope): Single<Int> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
-            peopleRemoteInterface.requestPeopleCount(projectId, userId, moduleId)
+            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId, syncScope.moduleIds?.toList(), listOf("FINGERPRINT", "FACE"))
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
