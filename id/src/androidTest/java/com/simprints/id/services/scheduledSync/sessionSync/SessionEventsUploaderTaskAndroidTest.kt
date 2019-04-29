@@ -15,10 +15,10 @@ import com.simprints.id.activities.login.ensureSignInSuccess
 import com.simprints.id.activities.login.enterCredentialsDirectly
 import com.simprints.id.activities.login.launchCheckLoginActivityEnrol
 import com.simprints.id.activities.login.pressSignIn
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
@@ -28,7 +28,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -36,6 +35,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -70,8 +70,7 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
     private val module by lazy {
         TestAppModule(
             app,
-            randomGeneratorRule = DependencyRule.MockRule,
-            bluetoothComponentAdapterRule = DependencyRule.ReplaceRule { mockBluetoothAdapter }
+            randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } }
         )
     }
 
@@ -80,8 +79,6 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
     @Before
     fun setUp() {
         AndroidTestConfig(this, module, preferencesModule).fullSetup()
-
-        setupRandomGeneratorToGenerateKey(DEFAULT_REALM_KEY, randomGeneratorMock)
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,

@@ -57,9 +57,9 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
-        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 200 //200 * 3 (#modules) = 600
+        private const val N_PEOPLE_ON_SERVER_PER_MODULE = 90 //200 * 3 (#modules) = 270
         private const val N_PEOPLE_ON_DB_PER_MODULE = 30
-        private const val PEOPLE_UPLOAD_BATCH_SIZE = 20
+        private const val PEOPLE_UPLOAD_BATCH_SIZE = 45
         private const val SIGNED_ID_USER = "some_user"
     }
 
