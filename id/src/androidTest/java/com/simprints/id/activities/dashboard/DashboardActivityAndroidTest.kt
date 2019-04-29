@@ -30,7 +30,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSy
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.testtools.state.LoginStateMocker
+import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager

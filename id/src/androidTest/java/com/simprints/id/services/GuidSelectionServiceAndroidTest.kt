@@ -16,7 +16,7 @@
 //import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 //import com.simprints.id.data.loginInfo.LoginInfoManager
 //import com.simprints.id.testtools.AndroidTestConfig
-//import com.simprints.id.testtools.state.LoginStateMocker
+//import com.simprints.id.commontesttools.state.LoginStateMocker
 //import com.simprints.id.testtools.state.setupRandomGeneratorToGenerateKey
 //import com.simprints.id.tools.RandomGenerator
 //import com.simprints.libsimprints.Constants
