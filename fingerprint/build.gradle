@@ -41,6 +41,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+    }
 }
 
 buildscript {
@@ -161,6 +165,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
+    androidTestUtil deps.testing.androidx.orchestrator
 
     // Mockito
     androidTestImplementation deps.testing.mockito.core
