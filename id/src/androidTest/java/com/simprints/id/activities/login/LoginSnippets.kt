@@ -19,27 +19,6 @@ import com.simprints.testtools.android.log
 import com.simprints.testtools.android.tryOnUiUntilTimeout
 import kotlinx.android.parcel.Parcelize
 
-@Parcelize
-private data class AppEnrollRequest(
-    override val projectId: String,
-    override val userId: String,
-    override val moduleId: String,
-    override val metadata: String
-) : IAppEnrollRequest
-
-fun launchCheckLoginActivityEnrol(testCalloutCredentials: TestCalloutCredentials,
-                        enrolTestRule: ActivityTestRule<CheckLoginFromIntentActivity>) {
-    log("launchAppFromIntentEnrol")
-    val intent = Intent().apply {
-        putExtra(IAppRequest.BUNDLE_KEY, AppEnrollRequest(
-            testCalloutCredentials.projectId,
-            testCalloutCredentials.userId,
-            testCalloutCredentials.moduleId,
-            ""))
-    }
-    enrolTestRule.launchActivityAndRunOnUiThread(intent)
-}
-
 fun launchLoginActivity(testCalloutCredentials: TestCalloutCredentials,
                         enrolTestRule: ActivityTestRule<LoginActivity>) {
     log("launchAppFromIntentEnrol")
@@ -87,14 +66,5 @@ fun ensureSignInFailure() {
     tryOnUiUntilTimeout(25000, 1000) {
         onView(withId(R.id.loginButtonSignIn))
             .check(matches(isEnabled()))
-    }
-}
-
-fun ensureConfigError() {
-    log("ensureConfigError")
-    tryOnUiUntilTimeout(25000, 1000) {
-        onView(withId(R.id.alert_title))
-            .check(matches(isDisplayed()))
-            .check(matches(withText(R.string.configuration_error_title)))
     }
 }
