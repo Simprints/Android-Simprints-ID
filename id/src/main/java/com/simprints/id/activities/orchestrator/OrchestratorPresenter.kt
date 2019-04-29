@@ -31,24 +31,27 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
 
     @SuppressLint("CheckResult")
     override fun start() {
-        subscribeForModalitiesRequests()
-        subscribeForFinalAppResponse()
+        subscribeForModalitiesResponses()
 
         syncSchedulerHelper.scheduleBackgroundSyncs()
         syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
     }
 
     @SuppressLint("CheckResult")
-    internal fun subscribeForModalitiesRequests() =
-        getSessionId().flatMapObservable { orchestratorManager.startFlow(appRequest, it) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    handleNextModalityRequest(it)
-                },
-                onError = {
-                    handleErrorInTheModalitiesFlow(it)
-                })
+    internal fun subscribeForModalitiesResponses() =
+        getSessionId().flatMapObservable {
+            orchestratorManager.startFlow(appRequest, it).also {
+                subscribeForFinalAppResponse()
+            }
+        }
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onNext = {
+                handleNextModalityRequest(it)
+            },
+            onError = {
+                handleErrorInTheModalitiesFlow(it)
+            })
 
     @SuppressLint("CheckResult")
     internal fun subscribeForFinalAppResponse() =
