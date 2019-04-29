@@ -48,7 +48,7 @@ open class ProjectAuthenticator(component: AppComponent,
      */
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         createLocalDbKeyForProject(nonceScope.projectId)
-            .andThen(prepareAuthRequestParameters(nonceScope, projectSecret))
+            .prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
@@ -56,7 +56,10 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectLongConsentTexts()
             .observeOn(AndroidSchedulers.mainThread())
 
-    private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
+    private fun Completable.prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
+        andThen(buildAuthRequestParameters(nonceScope, projectSecret))
+
+    private fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
         val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
         val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, authenticationData)
         val googleAttestation = getGoogleAttestation(safetyNetClient, authenticationData)
@@ -74,8 +77,8 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
         authenticationDataSingle.flatMap {
-                attestationManager.requestAttestation(safetyNetClient, it.nonce)
-            }
+            attestationManager.requestAttestation(safetyNetClient, it.nonce)
+        }
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
                                          googleAttestationSingle: Single<AttestToken>,
