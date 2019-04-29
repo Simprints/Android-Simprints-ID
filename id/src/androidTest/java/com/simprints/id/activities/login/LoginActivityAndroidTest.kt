@@ -12,7 +12,6 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
-import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
@@ -22,25 +21,13 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being decrypted with wrong key
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    private val invalidCredentials = TestCalloutCredentials(
-        "beefdeadbeefdeadbeef",
-        DEFAULT_MODULE_ID,
-        DEFAULT_USER_ID)
-
-    private val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
-
     @get:Rule val loginTestRule = ActivityTestRule(LoginActivity::class.java, false, false)
-
-
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var randomGeneratorMock: RandomGenerator
 
     private val module by lazy {
         TestAppModule(app,
@@ -52,7 +39,6 @@ class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being
     @Before
     fun setUp() {
         AndroidTestConfig(this, module).fullSetup()
-        signOut()
     }
 
     @Test
@@ -60,8 +46,7 @@ class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being
         launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
-        ensureSignInSuccess()
-        signOut()
+        ensureSignInSuccess(loginTestRule)
     }
 
     @Test
@@ -96,7 +81,12 @@ class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being
         ensureSignInFailure()
     }
 
-    private fun signOut() {
-        remoteDbManager.signOutOfRemoteDb()
+    companion object {
+        private val invalidCredentials = TestCalloutCredentials(
+            "beefdeadbeefdeadbeef",
+            DEFAULT_MODULE_ID,
+            DEFAULT_USER_ID)
+
+        private const val invalidSecret = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
     }
 }

@@ -36,6 +36,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         initDbIfRequired().toSingle {
             realmConfig?.let {
                 Realm.getInstance(it)
+
             } ?: throw RealmUninitialisedException("No valid realm Config")
         }
 
