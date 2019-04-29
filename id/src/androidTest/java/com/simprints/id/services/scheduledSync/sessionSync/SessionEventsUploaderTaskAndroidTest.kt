@@ -5,27 +5,24 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.MockFinger
-import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
-import com.simprints.id.activities.login.ensureSignInSuccess
-import com.simprints.id.activities.login.enterCredentialsDirectly
-import com.simprints.id.activities.login.launchCheckLoginActivityEnrol
-import com.simprints.id.activities.login.pressSignIn
+import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
+import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.integration.testtools.adapters.toCalloutCredentials
+import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.testingapi.TestProjectRule
@@ -48,6 +45,10 @@ import javax.inject.Inject
 @SmallTest
 class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because creating a project remotely is throwing a 404
 
+    companion object {
+        const val SIGNED_ID_USER = "some_signed_user"
+    }
+
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @get:Rule val testProjectRule = TestProjectRule()
@@ -58,10 +59,13 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var randomGeneratorMock: RandomGenerator
+    @Inject lateinit var secureDataManagerSpy: SecureDataManager
+    @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+
+    private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
 
     private val preferencesModule by lazy {
         TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.SpyRule)
@@ -70,7 +74,9 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
     private val module by lazy {
         TestAppModule(
             app,
-            randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } }
+            remoteDbManagerRule = DependencyRule.SpyRule,
+            randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
+            secureDataManagerRule = DependencyRule.SpyRule
         )
     }
 
@@ -88,10 +94,7 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
 
     @Test
     fun closeSessions_shouldGetUploaded() {
-        launchCheckLoginActivityEnrol(testProject.toCalloutCredentials(), simprintsActionTestRule)
-        enterCredentialsDirectly(testProject.toCalloutCredentials(), testProject.secret)
-        pressSignIn()
-        ensureSignInSuccess()
+        mockBeingSignedIn()
 
         val nSession = BATCH_SIZE + 1
         createClosedSessions(nSession).forEach {
@@ -122,6 +125,21 @@ class SessionEventsUploaderTaskAndroidTest { // TODO : Tests are failing because
         }
 
     private fun signOut() {
-        remoteDbManager.signOutOfRemoteDb()
+        remoteDbManagerSpy.signOutOfRemoteDb()
+    }
+
+    private fun mockBeingSignedIn() {
+        val token = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
+        LoginStateMocker.setupLoginStateFullyToBeSignedIn(
+            app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
+            secureDataManagerSpy,
+            remoteDbManagerSpy,
+            testProject.id,
+            SIGNED_ID_USER,
+            testProject.secret,
+            LocalDbKey(
+                testProject.id,
+                DefaultTestConstants.DEFAULT_REALM_KEY),
+            token.token)
     }
 }

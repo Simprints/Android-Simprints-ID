@@ -1,7 +1,6 @@
 package com.simprints.id.commontesttools.state
 
 import android.content.SharedPreferences
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -27,7 +26,6 @@ object LoginStateMocker {
     fun setupLoginStateFullyToBeSignedIn(sharedPrefs: SharedPreferences,
                                          secureDataManagerMock: SecureDataManager,
                                          remoteDbManagerMock: RemoteDbManager,
-                                         localDbManager: LocalDbManager,
                                          projectId: String,
                                          userId: String,
                                          projectSecret: String,
