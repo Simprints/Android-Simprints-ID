@@ -36,7 +36,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
 
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent.parseAppConfirmation() as AppIdentityConfirmationRequest)
+            onHandleNonNullIntent(intent.parseAppConfirmation())
         }
     }
 
