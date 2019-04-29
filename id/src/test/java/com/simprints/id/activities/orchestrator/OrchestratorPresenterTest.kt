@@ -2,6 +2,7 @@ package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
 import com.nhaarman.mockito_kotlin.any
+import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -28,20 +29,23 @@ class OrchestratorPresenterTest {
     fun givenOrchestratorPresenter_startIsCalled_orchestratorShouldSubscribeForModalitiesRequests() {
         val orchestratorPresenter = spy(OrchestratorPresenter(mock(), mock(), mock())).apply {
             syncSchedulerHelper = mock()
-            whenever(this) { subscribeForModalitiesRequests() } thenReturn mock()
+            sessionEventsManager = mock<SessionEventsManager>().apply {
+                whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
+            }
+            whenever(this) { subscribeForModalitiesResponses() } thenReturn mock()
             whenever(this) { subscribeForFinalAppResponse() } thenReturn mock()
         }
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter) { subscribeForModalitiesRequests() }
+        verifyOnce(orchestratorPresenter) { subscribeForModalitiesResponses() }
     }
 
     @Test
     fun givenOrchestratorPresenter_startIsCalled_itShouldSubscribeForAppResponse() {
         val orchestratorPresenter = spy(OrchestratorPresenter(mock(), mock(), mock())).apply {
             syncSchedulerHelper = mock()
-            whenever(this) { subscribeForModalitiesRequests() } thenReturn mock()
+            whenever(this) { subscribeForModalitiesResponses() } thenReturn mock()
             whenever(this) { subscribeForFinalAppResponse() } thenReturn mock()
         }
 
