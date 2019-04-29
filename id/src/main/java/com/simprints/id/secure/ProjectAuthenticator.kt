@@ -77,8 +77,8 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
         authenticationDataSingle.flatMap {
-                attestationManager.requestAttestation(safetyNetClient, it.nonce)
-            }
+            attestationManager.requestAttestation(safetyNetClient, it.nonce)
+        }
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
                                          googleAttestationSingle: Single<AttestToken>,
