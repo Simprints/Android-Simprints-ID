@@ -107,9 +107,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         Completable.fromAction {
             try {
                 var peopleToDownload = 0
-                syncScope?.toSubSyncScopes()?.forEach { it ->
-                    peopleToDownload += dbManager.calculateNPatientsToDownSync(it.projectId, it.userId, it.moduleId).blockingGet()
-                }
+                syncScope?.let {  peopleToDownload += dbManager.calculateNPatientsToDownSync(it).blockingGet() }
                 viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
             } catch (t: Throwable) {
                 t.printStackTrace()

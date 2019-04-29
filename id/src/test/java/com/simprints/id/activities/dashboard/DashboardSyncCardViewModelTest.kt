@@ -108,7 +108,7 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
         Truth.assert_().that(lastState?.peopleToUpload).isEqualTo(2)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(3)
-        verifyOnce(dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(dbManagerMock) { calculateNPatientsToDownSync(anyNotNull()) }
     }
 
     @Test
@@ -257,7 +257,7 @@ class DashboardSyncCardViewModelTest {
         }
 
         peopleToDownload?.let {
-            whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleToDownload))
+            whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         }
     }
 
@@ -289,7 +289,7 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
-        verifyExactly(times, dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyExactly(times, dbManagerMock) { calculateNPatientsToDownSync(anyNotNull()) }
 
     }
 

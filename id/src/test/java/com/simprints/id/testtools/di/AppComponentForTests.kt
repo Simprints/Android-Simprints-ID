@@ -19,7 +19,7 @@ import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.SubDownSyncTaskTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMasterWorkerTest
-import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubCountWorkerTest
+import com.simprints.id.services.scheduledSync.peopleDownSync.worker.CountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.Component
 import javax.inject.Singleton
@@ -39,7 +39,7 @@ interface AppComponentForTests : AppComponent {
     fun inject(peopleDownSyncTaskTest: SubDownSyncTaskTest)
     fun inject(downSyncManagerTest: DownSyncManagerTest)
     fun inject(downSyncManagerWorkerTest: DownSyncMasterWorkerTest)
-    fun inject(subCountWorkerTest: SubCountWorkerTest)
+    fun inject(subCountWorkerTest: CountWorkerTest)
     fun inject(subDownSyncWorkerTest: SubDownSyncWorkerTest)
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)

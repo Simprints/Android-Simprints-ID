@@ -9,9 +9,9 @@ import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker.Companion.COUNT_WORKER_SCOPE_INPUT
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker.Companion.SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SUBCOUNT_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.COUNT_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SUBDOWNSYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SYNC_WORKER_CHAIN
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SYNC_WORKER_TAG
@@ -32,7 +32,7 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
 
         fun getSyncChainWorkersUniqueNameForSync(scope: SyncScope) = "${SYNC_WORKER_CHAIN}_${scope.uniqueKey}"
         fun getDownSyncWorkerKeyForScope(scope: SubSyncScope) = "${SUBDOWNSYNC_WORKER_TAG}_${scope.uniqueKey}"
-        fun getCountWorkerKeyForScope(scope: SubSyncScope) = "${SUBCOUNT_WORKER_TAG}_${scope.uniqueKey}"
+        fun getCountWorkerKeyForScope(scope: SyncScope) = "${COUNT_WORKER_TAG}_${scope.uniqueKey}"
     }
 
     override fun doWork(): Result {
@@ -40,11 +40,11 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
 
         val scope = getScope()
         if (scope.toSubSyncScopes().isNotEmpty()) {
-            val subCountWorkers = buildChainOfSubCountWorker(scope)
+            val countWorker = buildCountWorker(scope)
             val subDownSyncWorkers = scope.toSubSyncScopes().map { this.buildSubDownSyncWorker(it) }
 
             WorkManager.getInstance()
-                .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, subCountWorkers)
+                .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, countWorker)
                 .then(buildInputMergerWorker())
                 .then(subDownSyncWorkers)
                 .enqueue()
@@ -84,17 +84,13 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
             .build()
     }
 
-    private fun buildChainOfSubCountWorker(scope: SyncScope) =
-        scope.toSubSyncScopes().map { this.buildSubCountWorker(it) }
-
-    private fun buildSubCountWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
+    private fun buildCountWorker(syncScope: SyncScope): OneTimeWorkRequest {
         val data: Data =
-            workDataOf(SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope))
+            workDataOf(COUNT_WORKER_SCOPE_INPUT to syncScopeBuilder.fromSyncScopeToJson(syncScope))
 
-        return OneTimeWorkRequestBuilder<SubCountWorker>()
+        return OneTimeWorkRequestBuilder<CountWorker>()
             .setInputData(data)
-            .addTag(getCountWorkerKeyForScope(subSyncScope))
-            .addTag(SUBCOUNT_WORKER_TAG)
+            .addTag(COUNT_WORKER_TAG)
             .addTag(SYNC_WORKER_TAG)
             .build()
     }

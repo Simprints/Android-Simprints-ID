@@ -47,7 +47,7 @@ class DownSyncMasterWorkerTest {
     private val numberOfBlockedInputMergerWorkers = 1
     private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
     private val workerKeyForSubDownSyncScope = "${WorkManagerConstants.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
-    private val workerKeyForSubCountScope = "${WorkManagerConstants.SUBCOUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val workerKeyForSubCountScope = "${WorkManagerConstants.COUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
 
     @Before
     fun setUp() {
@@ -72,7 +72,7 @@ class DownSyncMasterWorkerTest {
 
     @Test
     fun getCountWorkerKeyForScope_shouldCreateCountWorkerKey() {
-        val countWorkerKey = DownSyncMasterWorker.getCountWorkerKeyForScope(subSyncScope)
+        val countWorkerKey = DownSyncMasterWorker.getCountWorkerKeyForScope(syncScope)
         assertEquals(workerKeyForSubCountScope, countWorkerKey)
     }
 

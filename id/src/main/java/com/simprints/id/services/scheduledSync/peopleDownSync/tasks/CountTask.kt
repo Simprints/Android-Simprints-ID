@@ -1,9 +1,9 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Single
 
 interface CountTask {
 
-    fun execute(subSyncScope: SubSyncScope): Single<Int>
+    fun execute(syncScope: SyncScope): Single<Int>
 }

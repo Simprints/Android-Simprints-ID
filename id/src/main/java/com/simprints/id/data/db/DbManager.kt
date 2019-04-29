@@ -35,6 +35,6 @@ interface DbManager {
 
     fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int>
 
-    fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int>
+    fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<Int>
 
 }
