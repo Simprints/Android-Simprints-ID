@@ -54,9 +54,8 @@ class GuidSelectionServiceAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module).fullSetupWith {
-            LoginStateMocker.setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
-        }
+        AndroidTestConfig(this, module).fullSetup()
+        LoginStateMocker.setupLoginInfoToBeSignedIn(loginInfoManagerSpy, DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId, DEFAULT_TEST_CALLOUT_CREDENTIALS.userId)
     }
 
     @Test
