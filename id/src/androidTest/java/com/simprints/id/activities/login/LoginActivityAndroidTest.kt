@@ -10,6 +10,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOU
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
+import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingClientProvider
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.secure.keystore.KeystoreManager
@@ -23,16 +24,19 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being decrypted with wrong key
+class LoginActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
     @get:Rule val loginTestRule = ActivityTestRule(LoginActivity::class.java, false, false)
 
+    private var secureApiInterfaceRule: DependencyRule = DependencyRule.RealRule
+
     private val module by lazy {
         TestAppModule(app,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
-            keystoreManagerRule = DependencyRule.ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } }
+            keystoreManagerRule = DependencyRule.ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } },
+            secureApiInterfaceRule = secureApiInterfaceRule
         )
     }
 
@@ -77,6 +81,17 @@ class LoginActivityAndroidTest { // TODO : Failing since Sessions Realm is being
     fun invalidCredentials_shouldFail() {
         launchLoginActivity(invalidCredentials, loginTestRule)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
+        pressSignIn()
+        ensureSignInFailure()
+    }
+
+    @Test
+    fun validCredentialsWithoutInternet_shouldFail() {
+        secureApiInterfaceRule = DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
+        AndroidTestConfig(this, module).initAndInjectComponent()
+
+        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
     }

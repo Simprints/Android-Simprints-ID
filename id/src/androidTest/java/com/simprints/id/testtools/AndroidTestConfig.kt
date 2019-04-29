@@ -21,15 +21,7 @@ class AndroidTestConfig<T : Any>(
     fun fullSetup() =
         initAndInjectComponent()
             .initRealm()
-            .initDependencies()
-
-    /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
-     * Useful for setting up mocks before the Application is created */
-    fun fullSetupWith(block: () -> Unit) =
-        initAndInjectComponent()
-            .initRealm()
-            .also { block() }
-            .initDependencies()
+            .initModules()
 
     fun initAndInjectComponent() =
         initComponent().inject()
@@ -53,7 +45,7 @@ class AndroidTestConfig<T : Any>(
         Realm.init(app)
     }
 
-    fun initDependencies() = also {
-        app.initDependencies()
+    fun initModules() = also {
+        app.initModules()
     }
 }

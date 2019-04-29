@@ -31,16 +31,7 @@ open class Application : MultiDexApplication() {
 
     open fun initApplication() {
         createComponent()
-        initDependencies()
-    }
-
-    fun initDependencies() {
-        injectDependencies()
-        initModules()
-    }
-
-    open fun injectDependencies() {
-        component.inject(this)
+        this.initModules()
     }
 
     open fun initModules() {
