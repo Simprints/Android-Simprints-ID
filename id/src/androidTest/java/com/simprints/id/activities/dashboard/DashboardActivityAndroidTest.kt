@@ -16,6 +16,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -30,7 +31,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSy
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
 import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
@@ -242,7 +242,6 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
             app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
             secureDataManagerSpy,
             remoteDbManagerSpy,
-            localDbManager,
             testProject.id,
             SIGNED_ID_USER,
             testProject.secret,
