@@ -1,12 +1,14 @@
-package com.simprints.id.testtools.state
+package com.simprints.id.commontesttools.state
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
-import org.mockito.Mockito
+import org.mockito.ArgumentMatchers
 import org.mockito.stubbing.Answer
+import kotlin.random.Random
 
-fun setupFakeKeyStore(): KeystoreManager = Mockito.mock(KeystoreManager::class.java).also { keystoreManager ->
+fun setupFakeKeyStore(keystoreManager: KeystoreManager) {
     val encryptAnswer = Answer<String> {
         "enc_" + it.arguments[0] as String
     }
@@ -16,5 +18,10 @@ fun setupFakeKeyStore(): KeystoreManager = Mockito.mock(KeystoreManager::class.j
         (it.arguments[0] as String).replace("enc_", "")
     }
     whenever { keystoreManager.decryptString(anyNotNull()) } thenAnswer decryptAnswer
+}
 
+fun setupRandomGeneratorToGenerateKey(randomGeneratorMock: RandomGenerator) {
+    whenever { randomGeneratorMock.generateByteArray(ArgumentMatchers.anyInt()) } thenAnswer {
+        Random(0).nextBytes(ByteArray(it.arguments[0] as Int))
+    }
 }

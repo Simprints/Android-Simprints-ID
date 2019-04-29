@@ -1,4 +1,4 @@
-package com.simprints.id.testtools.state
+package com.simprints.id.commontesttools.state
 
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.testtools.common.syntax.whenever
