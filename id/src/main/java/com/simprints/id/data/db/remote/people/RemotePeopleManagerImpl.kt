@@ -3,13 +3,15 @@ package com.simprints.id.data.db.remote.people
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.remote.models.ApiPerson
+import com.simprints.id.data.db.remote.models.toDomainPeopleCount
+import com.simprints.id.data.db.remote.models.toDomainPerson
+import com.simprints.id.data.db.remote.models.toFirebasePerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
