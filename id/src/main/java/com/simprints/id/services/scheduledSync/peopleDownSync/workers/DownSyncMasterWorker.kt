@@ -72,18 +72,6 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
             ?: throw IllegalArgumentException("SyncScope required")
     }
 
-    private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
-        val data: Data = workDataOf(
-            SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope)
-        )
-        return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
-            .setInputData(data)
-            .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
-            .addTag(SUBDOWNSYNC_WORKER_TAG)
-            .addTag(SYNC_WORKER_TAG)
-            .build()
-    }
-
     private fun buildCountWorker(syncScope: SyncScope): OneTimeWorkRequest {
         val data: Data =
             workDataOf(COUNT_WORKER_SCOPE_INPUT to syncScopeBuilder.fromSyncScopeToJson(syncScope))
@@ -98,6 +86,18 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
     private fun buildInputMergerWorker(): OneTimeWorkRequest {
         return OneTimeWorkRequestBuilder<InputMergeWorker>()
             .setInputMerger(ArrayCreatingInputMerger::class.java)
+            .addTag(SYNC_WORKER_TAG)
+            .build()
+    }
+
+    private fun buildSubDownSyncWorker(subSyncScope: SubSyncScope): OneTimeWorkRequest {
+        val data: Data = workDataOf(
+            SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT to syncScopeBuilder.fromSubSyncScopeToJson(subSyncScope)
+        )
+        return OneTimeWorkRequestBuilder<SubDownSyncWorker>()
+            .setInputData(data)
+            .addTag(getDownSyncWorkerKeyForScope(subSyncScope))
+            .addTag(SUBDOWNSYNC_WORKER_TAG)
             .addTag(SYNC_WORKER_TAG)
             .build()
     }

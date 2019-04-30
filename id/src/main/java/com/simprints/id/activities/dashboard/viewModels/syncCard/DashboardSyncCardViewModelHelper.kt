@@ -107,18 +107,23 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         Completable.fromAction {
             try {
                 var peopleToDownload = 0
-                syncScope?.let {  peopleToDownload += dbManager.calculateNPatientsToDownSync(it).blockingGet() }
+                syncScope?.let { peopleToDownload += getPeopleToDownSync(it) }
                 viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
             } catch (t: Throwable) {
                 t.printStackTrace()
             }
         }.subscribeOn(Schedulers.io())
 
+    private fun getPeopleToDownSync(syncScope: SyncScope) =
+        dbManager.calculateNPatientsToDownSync(syncScope)
+            .map { peopleCounts -> peopleCounts.sumBy { it.count } }.blockingGet()
+
+
     private fun updateTotalLocalCount(): Completable =
         syncScope?.let { syncScope ->
             dbManager.getPeopleCountFromLocalForSyncScope(syncScope)
                 .flatMapCompletable {
-                    viewModel.updateState(peopleInDb = it, emitState = true)
+                    viewModel.updateState(peopleInDb = it.sum(), emitState = true)
                     Completable.complete()
                 }.subscribeOn(Schedulers.io())
         } ?: Completable.complete()

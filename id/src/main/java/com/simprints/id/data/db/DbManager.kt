@@ -5,6 +5,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.Person
 import com.simprints.id.secure.models.Token
@@ -33,8 +34,8 @@ interface DbManager {
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int>
+    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<Int>>
 
-    fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<Int>
+    fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
 
 }

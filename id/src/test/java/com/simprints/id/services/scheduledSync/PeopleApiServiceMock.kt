@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync
 
-import com.simprints.id.data.db.remote.models.PeopleCount
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import io.reactivex.Single
