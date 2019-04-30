@@ -115,7 +115,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         }.subscribeOn(Schedulers.io())
 
     private fun getPeopleToDownSync(syncScope: SyncScope) =
-        dbManager.calculateNPatientsToDownSync(syncScope)
+        dbManager.getPeopleCountToDownSync(syncScope)
             .map { peopleCounts -> peopleCounts.sumBy { it.count } }.blockingGet()
 
 

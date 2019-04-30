@@ -6,5 +6,5 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 class CountTaskImpl(private val dbManager: DbManager) : CountTask {
 
     override fun execute(syncScope: SyncScope) =
-        dbManager.calculateNPatientsToDownSync(syncScope)
+        dbManager.getPeopleCountToDownSync(syncScope)
 }
