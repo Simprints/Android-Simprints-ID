@@ -69,7 +69,7 @@ class CountTaskTest {
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0"))
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(20000)))
+        whenever(dbManagerMock.getPeopleCountToDownSync(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(20000)))
 
         val peopleToDownSyncTask = CountTaskImpl(dbManagerMock)
         return peopleToDownSyncTask.execute(SyncScope(DEFAULT_PROJECT_ID, null, null)).test()

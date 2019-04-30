@@ -43,10 +43,7 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
 
         return try {
             logMessageForCrashReport("Making count request for $syncScope")
-            val peopleCounts = countTask.execute(syncScope).blockingGet()
-            val inputForSaveCounts = prepareInputForTask(peopleCounts)
-
-            saveCountsTask.execute(inputForSaveCounts)
+            val peopleCounts = getPeopleCountAndSaveInLocal(syncScope)
 
             val data = Data.Builder()
                 .putInt(key, getTotalCount(peopleCounts))
@@ -61,6 +58,11 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
             Result.success()
         }
     }
+
+    private fun getPeopleCountAndSaveInLocal(syncScope: SyncScope)=
+        countTask.execute(syncScope).blockingGet().also {
+            saveCountsTask.execute(prepareInputForTask(it))
+        }
 
     private fun getTotalCount(peopleCounts: List<PeopleCount>) = peopleCounts.sumBy { it.count }
 

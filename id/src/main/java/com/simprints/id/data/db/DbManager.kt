@@ -6,8 +6,8 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Project
 import com.simprints.id.domain.Person
+import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
@@ -36,6 +36,6 @@ interface DbManager {
 
     fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<Int>>
 
-    fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
+    fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
 
 }

@@ -11,8 +11,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Project
 import com.simprints.id.domain.Person
+import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -122,7 +122,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
+    override fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
         remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { downSyncPeopleData ->
             getPeopleCountFromLocalForSyncScope(syncScope).map { countsInLocal ->
                calculateDifferenceBetweenRemoteAndLocal(downSyncPeopleData, countsInLocal)
