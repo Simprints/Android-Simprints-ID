@@ -5,14 +5,19 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
+import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.data.domain.consent.GeneralConsent
+import com.simprints.fingerprint.data.domain.consent.ParentalConsent
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
@@ -24,12 +29,16 @@ import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
+import junit.framework.Assert.assertEquals
+import junit.framework.TestCase
+import kotlinx.android.synthetic.main.activity_launch.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,15 +52,16 @@ class LaunchActivityAndroidTest {
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @get:Rule val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-
     private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
     @Inject lateinit var scannerManagerSpy: ScannerManager
     @Inject lateinit var dbManagerMock: FingerprintDbManager
     @Inject lateinit var simNetworkUtilsMock: FingerprintSimNetworkUtils
+    @Inject lateinit var consentDataManagerMock: ConsentDataManager
 
     private val fingerprintModule by lazy {
         TestFingerprintModule(
             scannerManagerRule = DependencyRule.SpyRule,
+            consentDataManagerRule = DependencyRule.MockRule,
             bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
     }
 
@@ -64,6 +74,12 @@ class LaunchActivityAndroidTest {
     @Before
     fun setUp() {
         AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
+        mockDefaultConsentDataManager(true)
+        mockDefaultDbManager()
+    }
+
+    private fun mockDefaultDbManager() {
+        whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
     }
 
     @Test
@@ -185,6 +201,145 @@ class LaunchActivityAndroidTest {
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.GUID_NOT_FOUND_ONLINE.title)))
     }
 
+    @Test
+    fun enrollmentCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
+        mockDefaultConsentDataManager(parentalConsentExists = false)
+
+        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val defaultGeneralConsentText = GeneralConsent().assembleText(
+            activity,
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+
+        assertEquals(defaultGeneralConsentText, generalConsentText)
+
+        val parentConsentText = activity.parentalConsentTextView.text.toString()
+        TestCase.assertEquals("", parentConsentText)
+    }
+
+    @Test
+    fun identifyCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
+        mockDefaultConsentDataManager(parentalConsentExists = false)
+
+        launchActivityRule.launchActivity(identifyRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(identifyRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
+
+        val parentConsentText = activity.parentalConsentTextView.text.toString()
+        TestCase.assertEquals("", parentConsentText)
+    }
+
+    @Test
+    fun enrollmentCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
+        mockDefaultConsentDataManager(parentalConsentExists = true)
+
+        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
+
+        val parentConsentText = activity.parentalConsentTextView.text.toString()
+        val defaultParentalConsentText = ParentalConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultParentalConsentText, parentConsentText)
+    }
+
+    @Test
+    fun identifyCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
+        mockDefaultConsentDataManager(parentalConsentExists = true)
+
+        launchActivityRule.launchActivity(identifyRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(identifyRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
+
+        val parentConsentText = activity.parentalConsentTextView.text.toString()
+        val defaultParentalConsentText = ParentalConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(identifyRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultParentalConsentText, parentConsentText)
+    }
+
+    @Test
+    fun malformedConsentJson_showsDefaultConsent() {
+        mockDefaultConsentDataManager(generalConsentOptions = MALFORMED_CONSENT_OPTIONS)
+
+        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(defaultGeneralConsentText, generalConsentText)
+    }
+
+    @Test
+    fun extraUnrecognisedConsentOptions_stillShowsCorrectValues() {
+        mockDefaultConsentDataManager(generalConsentOptions = EXTRA_UNRECOGNISED_CONSENT_OPTIONS)
+
+        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity,
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(targetConsentText, generalConsentText)
+    }
+
+    @Test
+    fun partiallyMissingConsentOptions_stillShowsCorrectValues() {
+        mockDefaultConsentDataManager(generalConsentOptions = PARTIALLY_MISSING_CONSENT_OPTIONS)
+
+        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        val activity = launchActivityRule.activity
+
+        val generalConsentText = activity.generalConsentTextView.text.toString()
+        val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(
+            activity, 
+            fromFingerprintToDomainRequest(enrolRequest),
+            DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME)
+        assertEquals(targetConsentText, generalConsentText)
+    }
+
+
+    private fun mockDefaultConsentDataManager(parentalConsentExists: Boolean = false,
+                                              generalConsentOptions: String = REMOTE_CONSENT_GENERAL_OPTIONS,
+                                              parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
+        whenever(consentDataManagerMock) { this.parentalConsentExists } thenReturn parentalConsentExists
+        whenever(consentDataManagerMock) { this.generalConsentOptionsJson } thenReturn generalConsentOptions
+        whenever(consentDataManagerMock) { this.parentalConsentOptionsJson } thenReturn parentalConsentOptions
+
+    }
+
+
     private fun makeSetupVeroSucceeding() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
@@ -241,5 +396,20 @@ class LaunchActivityAndroidTest {
         private val verifyRequest = FingerprintVerifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
             DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
             DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_VERIFY_GUID)
+
+        private val identifyRequest = FingerprintIdentifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
+            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, IMatchGroup.GLOBAL, 1)
+
+        private const val REMOTE_CONSENT_GENERAL_OPTIONS = "{\"consent_enrol_only\":false,\"consent_enrol\":true,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true}"
+        private const val REMOTE_CONSENT_PARENTAL_OPTIONS = "{\"consent_parent_enrol_only\":false,\"consent_parent_enrol\":true,\"consent_parent_id_verify\":true,\"consent_parent_share_data_no\":true,\"consent_parent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_parent_privacy_rights\":true,\"consent_parent_confirmation\":true}"
+
+        private const val MALFORMED_CONSENT_OPTIONS = "gibberish{\"000}\"\""
+
+        private const val EXTRA_UNRECOGNISED_CONSENT_OPTIONS = "{\"consent_enrol_only\":true,\"consent_enrol\":false,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true,\"this_one_doesnt_exist\":true}"
+        private val EXTRA_UNRECOGNISED_CONSENT_TARGET = GeneralConsent(consentEnrolOnly = true, consentEnrol = false)
+
+        private const val PARTIALLY_MISSING_CONSENT_OPTIONS = "{\"consent_enrol_only\":true,\"consent_enrol\":false,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false}"
+        private val PARTIALLY_MISSING_CONSENT_TARGET = GeneralConsent(consentEnrolOnly = true, consentEnrol = false)
     }
 }

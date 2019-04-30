@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -36,12 +37,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
-import org.robolectric.annotation.Config
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [25], manifest = Config.NONE)
+@MediumTest
 class MatchingPresenterTest {
 
     @get:Rule val rxSchedulerRule = RxSchedulerRule()

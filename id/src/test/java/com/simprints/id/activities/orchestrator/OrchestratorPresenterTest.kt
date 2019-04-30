@@ -42,19 +42,6 @@ class OrchestratorPresenterTest {
     }
 
     @Test
-    fun givenOrchestratorPresenter_startIsCalled_itShouldSubscribeForAppResponse() {
-        val orchestratorPresenter = spy(OrchestratorPresenter(mock(), mock(), mock())).apply {
-            syncSchedulerHelper = mock()
-            whenever(this) { subscribeForModalitiesResponses() } thenReturn mock()
-            whenever(this) { subscribeForFinalAppResponse() } thenReturn mock()
-        }
-
-        orchestratorPresenter.start()
-
-        verifyOnce(orchestratorPresenter) { subscribeForFinalAppResponse() }
-    }
-
-    @Test
     fun givenOrchestratorPresenter_aModalityRequestIsReceived_presenterShouldLaunchAnIntent() {
         val modalityRequest = ModalityStepRequest(1, Intent())
         val orchestratorPresenter = OrchestratorPresenter(mock(), mock(), mock())
