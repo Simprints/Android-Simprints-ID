@@ -11,6 +11,12 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.CandidateReadEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Result.*
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.PARENTAL
+import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -39,12 +45,6 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
@@ -215,7 +215,7 @@ class LaunchPresenter(component: FingerprintComponent,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
+                    sessionEventsManager.addLocationToSessionnBackground(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }
     }
@@ -269,23 +269,18 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.updateSessionInBackground {
-            it.addEvent(
-                ConsentEvent(
-                    it.timeRelativeToStartTime(startConsentEventTime),
-                    it.timeRelativeToStartTime(timeHelper.now()),
-                    if (view.isCurrentTabParental()) {
-                        PARENTAL
-                    } else {
-                        INDIVIDUAL
-                    },
-                    result))
-
-            if (result == DECLINED || result == NO_RESPONSE) {
-                it.location = null
-            }
-        }
+        sessionEventsManager.addConsentEventInBackground(
+            timeHelper.now(),
+            startConsentEventTime,
+            ConsentEvent(
+                if (view.isCurrentTabParental()) {
+                    PARENTAL
+                } else {
+                    INDIVIDUAL
+                },
+                result))
     }
+
 
     override fun handleOnDestroy() {
         scannerManager.disconnectScannerIfNeeded()

@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.data.domain.refusal
 
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
+
 
 enum class RefusalFormReason {
     SCANNER_NOT_WORKING,
@@ -8,9 +9,9 @@ enum class RefusalFormReason {
     OTHER
 }
 
-fun RefusalFormReason.toAnswerEvent(): RefusalEvent.Answer =
+fun RefusalFormReason.toRefusalAnswerForEvent(): RefusalAnswer =
     when(this){
-        RefusalFormReason.SCANNER_NOT_WORKING -> RefusalEvent.Answer.SCANNER_NOT_WORKING
-        RefusalFormReason.REFUSED -> RefusalEvent.Answer.BENEFICIARY_REFUSED
-        RefusalFormReason.OTHER -> RefusalEvent.Answer.OTHER
+        RefusalFormReason.SCANNER_NOT_WORKING -> RefusalAnswer.SCANNER_NOT_WORKING
+        RefusalFormReason.REFUSED -> RefusalAnswer.BENEFICIARY_REFUSED
+        RefusalFormReason.OTHER -> RefusalAnswer.OTHER
     }

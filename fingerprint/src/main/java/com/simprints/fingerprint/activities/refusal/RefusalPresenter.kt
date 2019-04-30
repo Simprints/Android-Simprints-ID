@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.refusal
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -10,9 +11,8 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
-import com.simprints.fingerprint.data.domain.refusal.toAnswerEvent
+import com.simprints.fingerprint.data.domain.refusal.toRefusalAnswerForEvent
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
@@ -53,22 +53,21 @@ class RefusalPresenter(private val view: RefusalContract.View,
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
         reason.let { refusalReason ->
-            sessionEventsManager.updateSession {
-                it.addEvent(RefusalEvent(
-                        it.timeRelativeToStartTime(refusalStartTime),
-                        it.timeRelativeToStartTime(timeHelper.now()),
-                        refusalReason.toAnswerEvent(),
-                        refusalText))
-            }.subscribeBy(onError = {
-                crashReportManager.logExceptionOrThrowable(it)
-                view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalActResult(reason, refusalText))
-            }, onComplete = {
-                view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason, refusalText))
-            })
-        }
+            sessionEventsManager.addRefusalEvent(
+                timeHelper.now(),
+                refusalStartTime,
+                refusalReason.toRefusalAnswerForEvent(),
+                refusalText)
+        }.subscribeBy(onError = {
+            crashReportManager.logExceptionOrThrowable(it)
+            view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalActResult(reason, refusalText))
+        }, onComplete = {
+            view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason, refusalText))
+        })
     }
 
     override fun handleScanFingerprintsClick() {

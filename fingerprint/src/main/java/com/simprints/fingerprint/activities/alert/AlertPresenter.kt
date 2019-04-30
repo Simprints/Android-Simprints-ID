@@ -9,7 +9,6 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
@@ -33,9 +32,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alertType.name))
-        }
+        sessionManager.addAlertEventInBackground(timeHelper.now(), alertType)
     }
 
     private fun initButtons() {

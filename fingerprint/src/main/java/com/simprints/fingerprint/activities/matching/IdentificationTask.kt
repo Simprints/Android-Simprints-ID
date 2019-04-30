@@ -7,6 +7,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -16,7 +17,6 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.fingerprint.Person
 import io.reactivex.Completable
