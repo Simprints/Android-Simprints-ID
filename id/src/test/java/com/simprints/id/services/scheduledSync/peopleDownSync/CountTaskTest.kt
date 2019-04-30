@@ -62,7 +62,7 @@ class CountTaskTest {
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
                                                              peopleInLocalDb: Int): TestObserver<Int> {
 
-        whenever(remotePeopleManagerMock.getNumberOfPatients(anyNotNull())).thenReturn(Single.just(peopleToDownload))
+        whenever(remotePeopleManagerMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
         whenever(preferencesManagerMock.syncGroup).thenReturn(GROUP.GLOBAL)
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0"))

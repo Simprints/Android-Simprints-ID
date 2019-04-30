@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.remote.network
 
-import com.simprints.id.data.db.remote.models.ApiPerson
-import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.core.network.NetworkConstants
+import com.simprints.id.data.db.remote.models.ApiPeopleCount
+import com.simprints.id.data.db.remote.models.ApiPerson
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -38,5 +38,5 @@ interface PeopleRemoteInterface {
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: List<String>?,
-        @Query("mode") mode: List<String>): Single<Response<PeopleCount>>
+        @Query("mode") mode: List<String>): Single<Response<List<ApiPeopleCount>>>
 }

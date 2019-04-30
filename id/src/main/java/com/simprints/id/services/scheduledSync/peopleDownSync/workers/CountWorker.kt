@@ -10,11 +10,13 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.SaveCountsTask
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,6 +30,7 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var countTask: CountTask
+    @Inject lateinit var saveCountsTask: SaveCountsTask
 
     override fun doWork(): Result {
         inject()
@@ -40,9 +43,13 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
 
         return try {
             logMessageForCrashReport("Making count request for $syncScope")
-            val totalCount = countTask.execute(syncScope).blockingGet()
+            val peopleCounts = countTask.execute(syncScope).blockingGet()
+            val inputForSaveCounts = prepareInputForTask(peopleCounts)
+
+            saveCountsTask.execute(inputForSaveCounts)
+
             val data = Data.Builder()
-                .putInt(key, totalCount.toInt())
+                .putInt(key, getTotalCount(peopleCounts))
                 .build()
 
             logToAnalyticsAndToastForDebugBuilds(syncScope, data)
@@ -53,6 +60,20 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
             crashReportManager.logExceptionOrThrowable(e)
             Result.success()
         }
+    }
+
+    private fun getTotalCount(peopleCounts: List<PeopleCount>) = peopleCounts.sumBy { it.count }
+
+    private fun prepareInputForTask(peopleCounts: List<PeopleCount>): Map<SubSyncScope, Int> {
+        val inputForTask = mutableMapOf<SubSyncScope, Int>()
+        val scope = syncScopeBuilder.buildSyncScope()
+        scope?.toSubSyncScopes()?.forEachIndexed { index, subSyncScope ->
+            val counter = peopleCounts[index].count
+            counter.let { counterForSubSync ->
+                inputForTask[subSyncScope] = counterForSubSync
+            }
+        }
+        return inputForTask
     }
 
     private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SyncScope, data: Data? = null) {

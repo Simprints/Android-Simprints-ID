@@ -10,6 +10,7 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.Person
 import com.simprints.id.secure.models.Token
@@ -121,19 +122,24 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<Int> =
-        remotePeopleManager.getNumberOfPatients(syncScope).flatMap { nPatientsOnServer ->
-            getPeopleCountFromLocalForSyncScope(syncScope).map {
-                Math.max(nPatientsOnServer - it, 0)
+    override fun calculateNPatientsToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
+        remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { downSyncPeopleData ->
+            getPeopleCountFromLocalForSyncScope(syncScope).map { countsInLocal ->
+               calculateDifferenceBetweenRemoteAndLocal(downSyncPeopleData, countsInLocal)
             }
         }
 
-    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int> =
+    private fun calculateDifferenceBetweenRemoteAndLocal(downSyncPeopleData: List<PeopleCount>, countsInLocal: List<Int>) =
+        downSyncPeopleData.mapIndexed { index, downSyncPeople ->
+            downSyncPeople.apply { downSyncPeople.count - countsInLocal[index] }
+        }
+    
+    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<Int>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
                 local.getPeopleCountFromLocal(
                     userId = it.userId,
                     moduleId = it.moduleId).blockingGet()
-            }.sum()
+            }
         )
 }
