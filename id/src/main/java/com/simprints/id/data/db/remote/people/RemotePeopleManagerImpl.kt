@@ -46,7 +46,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
 
     override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
-            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId, syncScope.moduleIds?.toList(), listOf("FINGERPRINT", "FACE"))
+            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId, syncScope.moduleIds?.toList(), syncScope.modes)
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
