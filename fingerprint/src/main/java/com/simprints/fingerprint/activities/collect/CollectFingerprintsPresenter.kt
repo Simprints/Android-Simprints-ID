@@ -15,6 +15,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
@@ -27,9 +28,6 @@ import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.fingerprint.tools.extensions.toResultEvent
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.tools.LanguageHelper
@@ -299,19 +297,18 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.updateSessionInBackground { sessionEvents ->
-            sessionEvents.addEvent(FingerprintCaptureEvent(
-                sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
-                sessionEvents.timeRelativeToStartTime(timeHelper.now()),
-                FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
+        sessionEventsManager.addFingerprintCaptureEventInBackground(
+            timeHelper.now(),
+            lastCaptureStartedAt,
+            FingerprintCaptureEvent(
+                finger.id,
                 qualityThreshold,
-                finger.status.toResultEvent(),
+                FingerprintCaptureEvent.buildResult(finger.status),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
                 }
             ))
         }
-    }
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
