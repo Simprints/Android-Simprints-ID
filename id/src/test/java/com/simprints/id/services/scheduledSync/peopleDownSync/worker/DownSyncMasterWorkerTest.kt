@@ -42,12 +42,11 @@ class DownSyncMasterWorkerTest {
     private val moduleId = setOf("moduleId1", "moduleId2", "moduleId3")
     private val syncScope = SyncScope(projectId, userId, moduleId)
     private val subSyncScope = SubSyncScope(projectId, userId, "moduleId1")
-    private val numberOfEnqueuedSyncCountWorkers = 3
+    private val numberOfEnqueuedSyncCountWorkers = 1
     private val numberOfBlockedDownSyncWorkers = 3
-    private val numberOfBlockedInputMergerWorkers = 1
     private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
     private val workerKeyForSubDownSyncScope = "${WorkManagerConstants.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
-    private val workerKeyForSubCountScope = "${WorkManagerConstants.COUNT_WORKER_TAG}_${subSyncScope.uniqueKey}"
+    private val workerKeyForSubCountScope = "${WorkManagerConstants.COUNT_WORKER_TAG}_${syncScope.uniqueKey}"
 
     @Before
     fun setUp() {
@@ -84,10 +83,10 @@ class DownSyncMasterWorkerTest {
             .getWorkInfosForUniqueWork(DownSyncMasterWorker.getSyncChainWorkersUniqueNameForSync(syncScope)).get()
         val seq = workInfo.asSequence().groupBy { it.state }
 
-        assertEquals(numberOfBlockedInputMergerWorkers + numberOfBlockedDownSyncWorkers + numberOfEnqueuedSyncCountWorkers,
+        assertEquals(numberOfBlockedDownSyncWorkers + numberOfEnqueuedSyncCountWorkers,
             workInfo.size)
         assertEquals(numberOfEnqueuedSyncCountWorkers, seq[WorkInfo.State.ENQUEUED]?.size)
-        assertEquals(numberOfBlockedDownSyncWorkers + numberOfBlockedInputMergerWorkers, seq[WorkInfo.State.BLOCKED]?.size)
+        assertEquals(numberOfBlockedDownSyncWorkers, seq[WorkInfo.State.BLOCKED]?.size)
         assert(result is ListenableWorker.Result.Success)
     }
 

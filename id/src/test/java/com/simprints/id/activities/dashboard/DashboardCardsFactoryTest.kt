@@ -15,6 +15,7 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -153,7 +154,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -168,7 +169,7 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
         mockNLocalPeople(localDbManagerMock, 0)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
@@ -187,8 +188,11 @@ class DashboardCardsFactoryTest {
         }
     }
 
-    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
-        whenever(remotePeopleManager.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(count))
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf("FACE", "FINGERPRINT"), counter))
+
+    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, peopleCounts: List<PeopleCount>) {
+        whenever(remotePeopleManager.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {

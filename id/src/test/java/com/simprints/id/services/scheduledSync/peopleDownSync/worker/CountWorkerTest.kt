@@ -9,6 +9,7 @@ import androidx.work.workDataOf
 import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -25,6 +26,7 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
@@ -72,7 +74,7 @@ class CountWorkerTest {
 
     @Test
     fun testWorkerSuccessAndOutputData_shouldSucceedWithCorrectData() {
-        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(5))
+        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(5)))
         val workerResult = countWorker.doWork()
 
         assert(
@@ -89,4 +91,7 @@ class CountWorkerTest {
         verifyOnce(crashReportManager) { logExceptionOrThrowable(anyNotNull()) }
         assert(workerResult is ListenableWorker.Result.Success)
     }
+
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "moduleId", listOf("FACE", "FINGERPRINT"), counter))
 }

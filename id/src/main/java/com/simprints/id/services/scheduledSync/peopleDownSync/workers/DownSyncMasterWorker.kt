@@ -45,7 +45,6 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
 
             WorkManager.getInstance()
                 .beginUniqueWork(getSyncChainWorkersUniqueNameForSync(scope), ExistingWorkPolicy.KEEP, countWorker)
-                .then(buildInputMergerWorker())
                 .then(subDownSyncWorkers)
                 .enqueue()
         }
@@ -79,13 +78,6 @@ class DownSyncMasterWorker(context: Context, params: WorkerParameters) : Worker(
         return OneTimeWorkRequestBuilder<CountWorker>()
             .setInputData(data)
             .addTag(COUNT_WORKER_TAG)
-            .addTag(SYNC_WORKER_TAG)
-            .build()
-    }
-
-    private fun buildInputMergerWorker(): OneTimeWorkRequest {
-        return OneTimeWorkRequestBuilder<InputMergeWorker>()
-            .setInputMerger(ArrayCreatingInputMerger::class.java)
             .addTag(SYNC_WORKER_TAG)
             .build()
     }
