@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync
 
+import com.simprints.id.data.db.remote.models.ApiPeopleCount
 import com.simprints.id.domain.PeopleCount
 import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
@@ -27,8 +28,8 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: List<String>?, mode: List<String>): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}"))
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: List<String>?, mode: List<String>): Single<Response<List<ApiPeopleCount>>> {
+        return delegate.returning(buildSuccessResponseWith("[{\"projectId\":\"project-321\",\"moduleId\":\"module1\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3141}, {\"projectId\":\"project-321\",\"moduleId\":\"module2\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3132}]"))
             .requestPeopleCount(projectId, userId, moduleId, listOf("FINGERPRINT", "FACE"))
     }
 

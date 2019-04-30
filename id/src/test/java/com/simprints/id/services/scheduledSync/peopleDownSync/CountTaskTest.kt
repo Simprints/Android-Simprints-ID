@@ -8,6 +8,7 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.testtools.TestApplication
@@ -46,7 +47,7 @@ class CountTaskTest {
         val peopleInLocalDb = 2000
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
-            nPeopleInRemote,
+            getMockListOfPeopleCountWithCounter(22000),
             peopleInLocalDb
         )
         testObserver.awaitTerminalEvent()
@@ -55,12 +56,12 @@ class CountTaskTest {
             .assertNoErrors()
             .assertComplete()
             .assertValue { peopleToDownload ->
-                peopleToDownload == nPeopleInRemote - peopleInLocalDb
+                peopleToDownload.sumBy { it.count } == nPeopleInRemote - peopleInLocalDb
             }
     }
 
-    private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: Int,
-                                                             peopleInLocalDb: Int): TestObserver<Int> {
+    private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: List<PeopleCount>,
+                                                             peopleInLocalDb: Int): TestObserver<List<PeopleCount>> {
 
         whenever(remotePeopleManagerMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
@@ -68,9 +69,12 @@ class CountTaskTest {
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0"))
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(20000))
+        whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(20000)))
 
         val peopleToDownSyncTask = CountTaskImpl(dbManagerMock)
         return peopleToDownSyncTask.execute(SyncScope(DEFAULT_PROJECT_ID, null, null)).test()
     }
+
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf("FACE", "FINGERPRINT"), counter))
 }
