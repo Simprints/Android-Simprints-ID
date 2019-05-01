@@ -1,4 +1,7 @@
 package com.simprints.clientapi.di
 
-class ClientApiCoreModule {
+import dagger.Module
+
+@Module
+open class ClientApiCoreModule {
 }

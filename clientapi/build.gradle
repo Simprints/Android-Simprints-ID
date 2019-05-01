@@ -1,5 +1,6 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
 apply plugin: 'kotlin-android-extensions'
 
 androidExtensions {
@@ -55,6 +56,10 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.gson.core
+
+    //Dagger
+    implementation deps.dagger.core
+    kapt deps.dagger.compiler
 
     // Unit Tests
     testImplementation project(':testtools')
