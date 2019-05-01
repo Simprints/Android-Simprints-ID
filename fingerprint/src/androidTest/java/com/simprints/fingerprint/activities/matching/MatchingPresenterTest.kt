@@ -10,6 +10,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchGroup
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -27,7 +28,6 @@ import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Person
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.RxSchedulerRule
