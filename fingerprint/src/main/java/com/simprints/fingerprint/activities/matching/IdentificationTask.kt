@@ -18,7 +18,7 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
@@ -40,7 +40,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
     override fun loadCandidates(): Single<List<Person>> =
         Completable.fromAction { view.setIdentificationProgressLoadingStart() }
-            .andThen(dbManager.loadPeople(GROUP.valueOf(matchingIdentifyRequest.matchGroup.name)))
+            .andThen(dbManager.loadPeople(matchingIdentifyRequest.matchGroup))
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,

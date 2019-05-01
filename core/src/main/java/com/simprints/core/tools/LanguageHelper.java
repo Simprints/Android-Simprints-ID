@@ -1,4 +1,4 @@
-package com.simprints.id.tools;
+package com.simprints.core.tools.json;
 
 import android.content.Context;
 import android.content.res.Configuration;

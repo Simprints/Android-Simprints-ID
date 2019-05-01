@@ -18,6 +18,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.T
 import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.PARENTAL
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
@@ -45,7 +46,6 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -215,7 +215,7 @@ class LaunchPresenter(component: FingerprintComponent,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    sessionEventsManager.addLocationToSessionnBackground(it.latitude, it.longitude)
+                    sessionEventsManager.addLocationToSessionInBackground(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }
     }

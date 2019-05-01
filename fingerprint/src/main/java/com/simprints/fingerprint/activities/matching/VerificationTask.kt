@@ -16,7 +16,7 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import io.reactivex.Single
 import java.util.*
 

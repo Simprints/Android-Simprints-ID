@@ -14,7 +14,8 @@ import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -70,8 +71,8 @@ class MatchingPresenter(
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
-            val libProbe = probe.toMatcherPerson()
-            val libCandidates = candidates.map { it.toMatcherPerson() }
+            val libProbe = probe.fromDomainToMatcher()
+            val libCandidates = candidates.map { it.fromDomainToMatcher() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
@@ -92,12 +93,6 @@ class MatchingPresenter(
     }
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
-
-    private fun Person.toMatcherPerson() =
-        com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
-
-    private fun Fingerprint.toMatcherFingerprint() =
-        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception

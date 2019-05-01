@@ -17,6 +17,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
@@ -24,10 +25,8 @@ import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.tools.Vibrate
-import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.fingerprint.tools.extensions.Vibrate
+import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -248,7 +247,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun parseTemplateAndAddToCurrentFinger(template: ByteArray) =
         try {
             presenter.currentFinger().template =
-                Fingerprint(FingerIdentifier.valueOf(presenter.currentFinger().id.name), template) //StopShip FingerIdentifier from id
+                Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // StopShip: Custom Error
             crashReportManager.logExceptionOrThrowable(FingerprintUnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))

@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.matching.request
 
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

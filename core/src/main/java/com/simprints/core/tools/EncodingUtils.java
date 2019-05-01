@@ -1,4 +1,4 @@
-package com.simprints.id.tools.utils;
+package com.simprints.core.tools;
 
 
 import android.util.Base64;

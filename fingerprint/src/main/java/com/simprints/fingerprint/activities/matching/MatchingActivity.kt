@@ -21,8 +21,8 @@ import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.id.Application
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl.Companion.getStringPlural
+import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
 

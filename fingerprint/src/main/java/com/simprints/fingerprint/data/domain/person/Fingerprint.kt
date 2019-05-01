@@ -1,13 +1,16 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.fingerprint.data.domain.person
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.id.FingerIdentifier
+import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.activities.collect.models.fromDomainToCore
+import com.simprints.fingerprint.activities.collect.models.fromDomainToLibsimprints
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-
+import com.simprints.id.domain.fingerprint.Fingerprint as FingerprintCore
+import com.simprints.fingerprintmatcher.Fingerprint as FingerprintMatcher
 
 @Parcelize
 class Fingerprint(val fingerId: FingerIdentifier,
@@ -77,5 +80,14 @@ class Fingerprint(val fingerId: FingerIdentifier,
             template.put(temp)
             return Fingerprint(fingerId, template)
         }
+
+        fun fromCoreToDomain(fingerprint: FingerprintCore) =
+            Fingerprint(FingerIdentifier.fromCoreToDomain(fingerprint.fingerId), fingerprint.template)
     }
 }
+
+fun Fingerprint.fromDomainToCore() =
+    FingerprintCore(fingerId.fromDomainToCore(), template)
+
+fun Fingerprint.fromDomainToMatcher() =
+    FingerprintMatcher(fingerId.fromDomainToLibsimprints(), templateBytes)

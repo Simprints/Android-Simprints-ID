@@ -22,8 +22,8 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions

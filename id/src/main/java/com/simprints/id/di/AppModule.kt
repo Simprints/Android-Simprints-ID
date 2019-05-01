@@ -62,8 +62,8 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.utils.AndroidResourcesHelper
-import com.simprints.id.tools.utils.AndroidResourcesHelperImpl
+import com.simprints.core.tools.AndroidResourcesHelper
+import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
