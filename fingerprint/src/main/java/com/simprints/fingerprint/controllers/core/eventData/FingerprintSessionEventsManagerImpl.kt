@@ -2,16 +2,17 @@ package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.person.fromDomainToCore
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
-import com.simprints.id.domain.fingerprint.Person
 import io.reactivex.Completable
 
 class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) : FingerprintSessionEventsManager {
 
     override fun addPersonCreationEventInBackground(person: Person) =
-        sessionEventsManager.addPersonCreationEventInBackground(person)
+        sessionEventsManager.addPersonCreationEventInBackground(person.fromDomainToCore())
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) =
         sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)

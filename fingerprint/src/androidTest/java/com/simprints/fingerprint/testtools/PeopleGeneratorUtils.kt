@@ -2,7 +2,7 @@ package com.simprints.fingerprint.testtools
 
 import com.simprints.fingerprint.testtools.FingerprintGeneratorUtils.generateRandomFingerprint
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*

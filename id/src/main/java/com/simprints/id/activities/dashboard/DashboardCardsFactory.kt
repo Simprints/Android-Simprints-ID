@@ -10,7 +10,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.tools.utils.AndroidResourcesHelper
+import com.simprints.core.tools.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
 import java.util.*

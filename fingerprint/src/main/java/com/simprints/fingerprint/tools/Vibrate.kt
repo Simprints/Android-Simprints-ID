@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.fingerprint.tools.extensions
 
 import android.content.Context
 import android.os.Vibrator

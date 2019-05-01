@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.core.tools.json.SkipSerialisationField
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.core.tools.EncodingUtils
 
 @Keep
 data class ApiFingerprint(@SkipSerialisationField var fingerId: FingerIdentifier,

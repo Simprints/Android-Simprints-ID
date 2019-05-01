@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.data.domain.collect
 
 import android.os.Parcelable
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
