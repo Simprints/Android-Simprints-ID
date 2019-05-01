@@ -43,7 +43,6 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
-    @Ignore("Often crashes the test suite - investigate later")
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
@@ -65,7 +64,6 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
-    @Ignore("Often crashes the test suite - investigate later")
     fun threeBadAndMaxReached_shouldNotAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
@@ -89,7 +87,6 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
-    @Ignore("Often crashes the test suite - investigate later")
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.NO_FINGER,

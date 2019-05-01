@@ -1,12 +1,10 @@
 package com.simprints.fingerprint.commontesttools
 
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.person.Fingerprint
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
-
-// Duplicated from id/commontestttools
 
 object FingerprintGeneratorUtils {
 

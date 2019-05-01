@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.commontesttools
 
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
