@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import com.simprints.id.BuildConfig
 import com.simprints.core.network.NetworkConstants
 import com.simprints.id.secure.models.*
+import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
 import io.reactivex.Single
 import retrofit2.Response
@@ -14,17 +15,12 @@ interface SecureApiInterface {
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
-    @POST("projects/{projectId}/users/{userId}/nonces")
-    fun requestNonce(@Path("projectId") projectId: String,
-                     @Path("userId") userId: String,
-                     @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<Nonce>>
+    @GET("projects/{projectId}/users/{userId}/authentication-data")
+    fun requestAuthenticationData(@Path("projectId") projectId: String,
+                                  @Path("userId") userId: String,
+                                  @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<ApiAuthenticationData>>
 
-    @GET("projects/{projectId}/users/{userId}/public-key")
-    fun requestPublicKey(@Path("projectId") projectId: String,
-                         @Path("userId") userId: String,
-                         @Query("key") key: String = SecureApiInterface.apiKey): Single<Response<PublicKeyString>>
-
-    @POST("projects/{projectId}/users/{userId}/custom-tokens")
+    @POST("projects/{projectId}/users/{userId}/authenticate")
     fun requestCustomTokens(@Path("projectId") projectId: String,
                             @Path("userId") userId: String,
                             @Body credentials: AuthRequestBody,

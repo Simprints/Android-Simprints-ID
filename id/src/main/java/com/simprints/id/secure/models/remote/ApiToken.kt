@@ -5,6 +5,6 @@ import io.realm.internal.Keep
 import java.io.Serializable
 
 @Keep
-data class ApiToken(val legacyToken: String = ""): Serializable
+data class ApiToken(val firebaseCustomToken: String = ""): Serializable
 
-fun ApiToken.toDomainToken(): Token = Token(legacyToken)
+fun ApiToken.toDomainToken(): Token = Token(firebaseCustomToken)
