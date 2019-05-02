@@ -22,6 +22,8 @@ import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.OrchestratorPresenter
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityModule
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
@@ -50,7 +52,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class)])
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class])
 @Singleton
 interface AppComponent {
 
@@ -101,7 +103,6 @@ interface AppComponent {
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
-    fun inject(orchestratorPresenter: OrchestratorPresenter)
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
@@ -113,4 +114,6 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
+
+    val orchestratorActivityComponentFactory: OrchestratorActivityComponent.Factory
 }

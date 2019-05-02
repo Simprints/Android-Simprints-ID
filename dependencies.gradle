@@ -5,7 +5,7 @@ def kotlin = [
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
 
-def dagger_version = "2.21"
+def dagger_version = "2.22"
 def dagger = [
     core    : "com.google.dagger:dagger:$dagger_version",
     compiler: "com.google.dagger:dagger-compiler:$dagger_version",
@@ -96,7 +96,7 @@ def rxjava2 = [
 ]
 
 def mockito_version = "2.22.0"
-def espresso_version = "3.1.2-alpha01"
+def espresso_version = "3.2.0-alpha04"
 def roboletric_version = "4.1"
 def testing = [
     junit        : "junit:junit:4.13-beta-2",

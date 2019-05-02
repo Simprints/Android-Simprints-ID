@@ -2,8 +2,8 @@ package com.simprints.id.activities.orchestrator
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
@@ -17,16 +17,19 @@ import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import javax.inject.Inject
 
-class OrchestratorPresenter(val view: OrchestratorContract.View,
-                            val appRequest: AppRequest,
-                            component: AppComponent) : OrchestratorContract.Presenter {
+class OrchestratorPresenter: OrchestratorContract.Presenter {
 
     @Inject lateinit var orchestratorManager: OrchestratorManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
+    @Inject
+    lateinit var view: OrchestratorContract.View
+
+    override lateinit var appRequest: AppRequest
+
     init {
-        component.inject(this)
+        OrchestratorComponentInjector.inject(this)
     }
 
     @SuppressLint("CheckResult")
