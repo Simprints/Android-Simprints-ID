@@ -5,13 +5,27 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
 import com.simprints.clientapi.domain.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
+import com.simprints.clientapi.exceptions.InvalidRequestException
+import javax.inject.Inject
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView)
     : RequestContract.Presenter {
+
+    @Inject lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+
+    init {
+        determineIfIntentIsSuspiciousAndStoreInSessions()
+    }
+
+    private fun determineIfIntentIsSuspiciousAndStoreInSessions() {
+
+    }
 
     override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
@@ -36,8 +50,13 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView)
             is BaseConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
             else -> throw InvalidClientRequestException()
         }
-    } catch (exception: InvalidClientRequestException) {
-        view.handleClientRequestError(exception)
+    } catch (exception: InvalidRequestException) {
+        addInvalidSessionInBackground().also { view.handleClientRequestError(exception) }
+    }
+
+    private fun addInvalidSessionInBackground() {
+       clientApiSessionEventsManager
+           .addInvalidSession(InvalidIntentEvent(view.getIntentAction(), view.getIntentExtrasAsJson()))
     }
 
 }

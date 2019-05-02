@@ -36,6 +36,9 @@ interface RequestContract {
 
         fun returnIntentActionErrorToClient()
 
+        fun getIntentAction(): String
+
+        fun getIntentExtrasAsJson(): String
     }
 
     interface Presenter {
