@@ -3,4 +3,4 @@
 	url = https://github.com/Simprints/LibSimprints
 [submodule "fingerprintmatcher/src/main/jni/SimMatcher"]
 	path = fingerprintmatcher/src/main/jni/SimMatcher
-	url = https://github.com/Simprints/SimMatcher
+	url = https://github.com/Simprints/Fingerprint-SimMatcher
