@@ -12,5 +12,4 @@ abstract class ClientRequestBuilder(private val validator: ClientRequestValidato
         validator.validateClientRequest()
         return buildAppRequest()
     }
-
 }

@@ -28,5 +28,6 @@ fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.SCANNER_CONNECTION -> JsonHelper.gson.fromJson(jsonEvent, ScannerConnectionEvent::class.java)
     EventType.FINGERPRINT_CAPTURE -> JsonHelper.gson.fromJson(jsonEvent, FingerprintCaptureEvent::class.java)
     EventType.CONNECTIVITY_SNAPSHOT -> JsonHelper.gson.fromJson(jsonEvent, ConnectivitySnapshotEvent::class.java)
+    EventType.INVALID_INTENT -> JsonHelper.gson.fromJson(jsonEvent, InvalidIntentEvent::class.java)
     null -> null
 }

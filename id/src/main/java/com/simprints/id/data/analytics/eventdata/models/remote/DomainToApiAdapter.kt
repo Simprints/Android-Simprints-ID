@@ -29,4 +29,5 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     SCANNER_CONNECTION -> ApiScannerConnectionEvent(this as ScannerConnectionEvent)
     FINGERPRINT_CAPTURE -> ApiFingerprintCaptureEvent(this as FingerprintCaptureEvent)
     CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
+    INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
 }

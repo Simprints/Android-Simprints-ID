@@ -1,6 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.controllers.domain
 
 import android.os.Build
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
@@ -14,7 +15,6 @@ import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyCl
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.core.tools.EncodingUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -172,6 +172,12 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addLocationToSession(latitude: Double, longitude: Double) {
         this.updateSessionInBackground { sessionEvents ->
             sessionEvents.location = Location(latitude, longitude)
+        }
+    }
+
+    override fun addInvalidIntentEvent(invalidIntentEvent: InvalidIntentEvent) {
+        updateSessionInBackground {
+            it.addEvent(invalidIntentEvent)
         }
     }
 
