@@ -47,7 +47,9 @@ class SessionEventsUploaderTaskTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).rescheduleRxMainThread()
+        UnitTestConfig(this)
+            .rescheduleRxMainThread()
+            .setupFirebase()
 
         ShadowLog.stream = System.out
 
