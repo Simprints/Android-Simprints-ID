@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.models
 
-import com.google.gson.annotations.SerializedName
 import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 import com.simprints.id.domain.Person
 import java.util.*
 import kotlin.collections.ArrayList
@@ -16,7 +16,7 @@ data class ApiPerson(@SerializedName("id") var patientId: String,
                      var fingerprints:  ArrayList<ApiFingerprint>,
                      var faces: ArrayList<ApiFace>? = null)
 
-fun Person.toFirebasePerson(): ApiPerson =
+fun Person.toApiPerson(): ApiPerson =
     ApiPerson(
         patientId = patientId,
         projectId = projectId,
@@ -24,7 +24,7 @@ fun Person.toFirebasePerson(): ApiPerson =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = ArrayList(fingerprints.map { it.toFirebaseFingerprint() })
+        fingerprints = ArrayList(fingerprints.map { it.toApiFingerprint() })
     )
 
 fun ApiPerson.toDomainPerson(): Person =
