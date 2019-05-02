@@ -5,7 +5,7 @@ import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
-import com.simprints.id.data.db.remote.models.toFirebasePerson
+import com.simprints.id.data.db.remote.models.toApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
@@ -37,7 +37,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
 
     override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toFirebasePerson)))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toApiPerson)))
                 .retry(::retryCriteria)
                 .handleResult(::defaultResponseErrorHandling)
                 .trace("uploadPatientBatch")

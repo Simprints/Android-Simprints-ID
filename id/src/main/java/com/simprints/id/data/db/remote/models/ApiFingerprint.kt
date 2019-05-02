@@ -16,7 +16,7 @@ data class ApiFingerprint(var finger: FingerIdentifier,
         quality = fingerprint.qualityScore)
 }
 
-fun Fingerprint.toFirebaseFingerprint(): ApiFingerprint =
+fun Fingerprint.toApiFingerprint(): ApiFingerprint =
     ApiFingerprint(
         finger = finger,
         template = EncodingUtils.byteArrayToBase64(templateBytes), // TODO: get rid of double bang

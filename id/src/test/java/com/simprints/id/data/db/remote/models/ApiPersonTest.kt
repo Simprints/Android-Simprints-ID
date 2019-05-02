@@ -29,7 +29,7 @@ class ApiPersonTest {
             FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
         )).toRealmPerson()
 
-        val apiPerson = dbPerson.toDomainPerson().toFirebasePerson()
+        val apiPerson = dbPerson.toDomainPerson().toApiPerson()
 
         assertEquals(apiPerson.patientId, dbPerson.patientId)
         assertEquals(apiPerson.userId, dbPerson.userId)
@@ -48,7 +48,7 @@ class ApiPersonTest {
                 FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
             ))
 
-        val apiPerson = domainPerson.toFirebasePerson()
+        val apiPerson = domainPerson.toApiPerson()
 
         assertEquals(apiPerson.patientId, domainPerson.patientId)
         assertEquals(apiPerson.userId, "userId")
@@ -80,7 +80,7 @@ class ApiPersonTest {
 
     @Test
     fun serialiseApiPerson_skipUnwantedFields() {
-        val apiPerson = PeopleGeneratorUtils.getRandomPerson().toFirebasePerson()
+        val apiPerson = PeopleGeneratorUtils.getRandomPerson().toApiPerson()
         val jsonString = JsonHelper.toJson(apiPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
