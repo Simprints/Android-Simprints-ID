@@ -64,13 +64,14 @@ import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module
+@Module(subcomponents = [OrchestratorActivityComponent::class])
 open class AppModule {
 
     @Provides
