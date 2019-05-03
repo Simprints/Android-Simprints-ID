@@ -2,7 +2,7 @@ package com.simprints.id.data.db.local
 
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
 import com.simprints.id.domain.Project
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope

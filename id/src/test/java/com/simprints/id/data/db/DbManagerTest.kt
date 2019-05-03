@@ -15,10 +15,10 @@ import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.ApiPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
-import com.simprints.id.data.db.remote.models.toFirebasePerson
+import com.simprints.id.data.db.remote.models.toApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.PeopleApiServiceMock
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -88,7 +88,7 @@ class DbManagerTest {
         val fakePerson = PeopleGeneratorUtils.getRandomPerson().toRealmPerson().apply {
             updatedAt = null
             createdAt = null
-        }.toDomainPerson().toFirebasePerson()
+        }.toDomainPerson().toApiPerson()
 
         mockServer.enqueue(mockSuccessfulResponse())
         mockServer.enqueue(mockResponseForDownloadPatient(fakePerson.copy().apply {
@@ -121,7 +121,7 @@ class DbManagerTest {
     fun loadingPersonMissingInLocalDb_shouldStillLoadFromRemoteDb() {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
-        mockServer.enqueue(mockResponseForDownloadPatient(person.toFirebasePerson()))
+        mockServer.enqueue(mockResponseForDownloadPatient(person.toApiPerson()))
 
         val testObserver = dbManager.loadPerson(person.projectId, person.patientId).test()
 
