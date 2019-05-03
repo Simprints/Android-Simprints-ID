@@ -50,4 +50,4 @@ task clean(type: Delete) {
 
 //to check newer dependencies: ./gradlew dependencyUpdates
 apply plugin: "com.github.ben-manes.versions"
-apply plugin: "android-reporting"
+//apply plugin: "android-reporting"
