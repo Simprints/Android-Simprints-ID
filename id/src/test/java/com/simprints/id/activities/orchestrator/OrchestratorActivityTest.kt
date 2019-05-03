@@ -13,22 +13,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
-import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
-import dagger.Component
-import dagger.Module
-import dagger.Provides
 import org.jetbrains.anko.doAsync
 import org.junit.After
 import org.junit.Before
@@ -50,7 +43,7 @@ class OrchestratorActivityTest {
 
     @Before
     fun setup() {
-        OrchestratorComponentInjector.component = DaggerTestOrchestratorActivityComponent.create()
+        mockOrchestratorDI()
         activityScenario = createScenarioForOrchestratorActivity()
         mockResultForNextActivity()
     }
@@ -126,16 +119,4 @@ class OrchestratorActivityTest {
     fun tearDown() {
         Intents.release()
     }
-}
-
-@Component(modules = [TestOrchestratorActivityModule::class])
-interface TestOrchestratorActivityComponent : OrchestratorActivityComponent
-
-@Module
-open class TestOrchestratorActivityModule {
-    @Provides fun provideOrchestratorPresenter(): OrchestratorContract.Presenter = mock()
-    @Provides fun provideOrchestratorView(): OrchestratorContract.View = mock()
-    @Provides fun getOrchestratorManager(): OrchestratorManager = mock()
-    @Provides fun getSessionEventsManager(): SessionEventsManager = mock()
-    @Provides fun getSyncSchedulerHelper(): SyncSchedulerHelper = mock()
 }
