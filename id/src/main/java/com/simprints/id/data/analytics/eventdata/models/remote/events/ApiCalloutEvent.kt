@@ -1,25 +1,14 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyConfirmationRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.VerifyRequestEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.Callout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
 
 @Keep
 class ApiCalloutEvent(val relativeStartTime: Long,
-                      val parameters: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
+                      val integration: String?,
+                      val callout: Callout) : ApiEvent(ApiEventType.CALLOUT) {
 
-    constructor(enrolRequestEvent: EnrolRequestEvent) :
-        this(enrolRequestEvent.relativeStartTime, ApiCallout(enrolRequestEvent))
-
-    constructor(identifyRequestEvent: IdentifyRequestEvent) :
-        this(identifyRequestEvent.relativeStartTime, ApiCallout(identifyRequestEvent))
-
-    constructor(verifyRequestEvent: VerifyRequestEvent) :
-        this(verifyRequestEvent.relativeStartTime, ApiCallout(verifyRequestEvent))
-
-    constructor(identifyConfirmationRequestEvent: IdentifyConfirmationRequestEvent) :
-        this(identifyConfirmationRequestEvent.relativeStartTime, ApiCallout(identifyConfirmationRequestEvent))
-
+    constructor(calloutEvent: CalloutEvent):
+        this(calloutEvent.relativeStartTime, calloutEvent.integration, calloutEvent.callout)
 }
