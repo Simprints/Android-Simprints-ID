@@ -17,7 +17,7 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     IDENTIFY_RESPONSE -> ApiCallbackEvent(this as IdentifyResponseEvent)
     REFUSAL_RESPONSE -> ApiCallbackEvent(this as RefusalFormResponseEvent)
     NO_RESPONSE -> ApiCallbackEvent(this as NoResponseEvent)
-    ENROLLMENT -> ApiEnrollmentEvent(this as EnrollmentEvent)
+    ENROLMENT -> ApiEnrollmentEvent(this as EnrolmentEvent)
     ALERT_SCREEN ->  ApiAlertScreenEvent(this as AlertScreenEvent)
     CANDIDATE_READ -> ApiCandidateReadEvent(this as CandidateReadEvent)
     AUTHORIZATION -> ApiAuthorizationEvent(this as AuthorizationEvent)

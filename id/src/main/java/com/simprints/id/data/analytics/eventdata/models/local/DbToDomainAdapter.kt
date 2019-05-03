@@ -16,7 +16,7 @@ fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.IDENTIFY_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, IdentifyResponseEvent::class.java)
     EventType.REFUSAL_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, RefusalFormResponseEvent::class.java)
     EventType.NO_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, NoResponseEvent::class.java)
-    EventType.ENROLLMENT -> JsonHelper.gson.fromJson(jsonEvent, EnrollmentEvent::class.java)
+    EventType.ENROLMENT -> JsonHelper.gson.fromJson(jsonEvent, EnrolmentEvent::class.java)
     EventType.ALERT_SCREEN -> JsonHelper.gson.fromJson(jsonEvent, AlertScreenEvent::class.java)
     EventType.CANDIDATE_READ -> JsonHelper.gson.fromJson(jsonEvent, CandidateReadEvent::class.java)
     EventType.AUTHORIZATION -> JsonHelper.gson.fromJson(jsonEvent, AuthorizationEvent::class.java)
