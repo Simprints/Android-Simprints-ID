@@ -88,7 +88,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(patientId = fakePerson.patientId).blockingGet()
+        val count = realmManager.getPeopleCountFromLocal(projectId = fakePerson.patientId).blockingGet()
         assertEquals(count, 1)
     }
 

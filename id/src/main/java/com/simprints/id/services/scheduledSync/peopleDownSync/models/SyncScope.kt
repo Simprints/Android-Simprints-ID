@@ -7,7 +7,7 @@ import com.simprints.id.domain.GROUP
 data class SyncScope(val projectId: String,
                      val userId: String?, //TODO - Discuss: Domain and Real Classes save userId as ""
                      val moduleIds: Set<String>?,
-                     val modes: List<String> = listOf("FACES", "FINGERPRINTS")) {
+                     val modes: List<String> = listOf("FINGERPRINTS")) {
 
     val uniqueKey: String = "${projectId}_${userId ?: ""}${moduleIds?.fold("") { acc, s -> "${acc}_$s"} ?: "_"}"
 

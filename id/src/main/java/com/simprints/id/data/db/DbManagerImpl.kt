@@ -123,23 +123,29 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }.trace("refreshProjectInfoWithServer")
 
     override fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
-        remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { downSyncPeopleData ->
-            getPeopleCountFromLocalForSyncScope(syncScope).map { countsInLocal ->
-               calculateDifferenceBetweenRemoteAndLocal(downSyncPeopleData, countsInLocal)
+        remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
+            getPeopleCountFromLocalForSyncScope(syncScope).map { peopleCountsInLocal ->
+               calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote, peopleCountsInLocal)
             }
         }
 
-    private fun calculateDifferenceBetweenRemoteAndLocal(downSyncPeopleData: List<PeopleCount>, countsInLocal: List<Int>) =
-        downSyncPeopleData.mapIndexed { index, downSyncPeople ->
-            downSyncPeople.apply { downSyncPeople.count - countsInLocal[index] }
+    private fun calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote: List<PeopleCount>,
+                                                         peopleCountsInLocal: List<PeopleCount>) =
+        peopleCountInRemote.mapIndexed { index, downSyncPeople ->
+            downSyncPeople.apply { downSyncPeople.count - peopleCountsInLocal[index].count }
         }
     
-    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<Int>> =
+    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
-                local.getPeopleCountFromLocal(
-                    userId = it.userId,
-                    moduleId = it.moduleId).blockingGet()
+                PeopleCount(it.projectId,
+                    it.userId,
+                    it.moduleId,
+                    syncScope.modes,
+                    local.getPeopleCountFromLocal(
+                        projectId = it.projectId,
+                        userId = it.userId,
+                        moduleId = it.moduleId).blockingGet())
             }
         )
 }
