@@ -34,7 +34,7 @@ interface DbManager {
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
 
-    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<Int>>
+    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>>
 
     fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
 

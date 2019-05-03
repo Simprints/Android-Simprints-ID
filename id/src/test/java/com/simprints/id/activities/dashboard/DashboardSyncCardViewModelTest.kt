@@ -100,7 +100,8 @@ class DashboardSyncCardViewModelTest {
     @Test
     fun downSyncIsNotRunning_shouldFetchDownSyncCounterFromRetrofit() {
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
-        mockCounters(listOf(1), 2, getMockListOfPeopleCountWithCounter(3))
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
@@ -115,7 +116,8 @@ class DashboardSyncCardViewModelTest {
     @Test
     fun downSyncIsNotRunning_shouldEnableTheSyncButton() {
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
-        mockCounters(listOf(1), 2, getMockListOfPeopleCountWithCounter(3))
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
@@ -127,7 +129,7 @@ class DashboardSyncCardViewModelTest {
     @Test
     fun downSyncIsRunning_shouldFetchDownSyncCounterFromWorkers() {
         insertASyncWorkInfoEvent(SyncState.RUNNING)
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -140,7 +142,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun downSyncIsRunning_shouldShowARunningStateForSyncButton() {
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
@@ -154,7 +156,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun upSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
@@ -170,7 +172,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun downSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
@@ -188,7 +190,7 @@ class DashboardSyncCardViewModelTest {
     fun downSyncFinishes_shouldUpdateTheTotalCounter() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitAndUpdateUpSyncCounter = 2
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -206,7 +208,7 @@ class DashboardSyncCardViewModelTest {
     fun whileDownSyncProgresses_shouldNotUpdateTotalAndLocalCounters() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitUpSyncCounter = 1
-        mockCounters(listOf(1), 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -224,7 +226,8 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun manualTriggerIsOff_shouldNotShowTheSyncButton() {
-        mockCounters(listOf(1), 2, getMockListOfPeopleCountWithCounter(3))
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to false))
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -237,7 +240,8 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun manualTriggerIsOn_shouldShowTheSyncButton() {
-        mockCounters(listOf(1), 2, getMockListOfPeopleCountWithCounter(3))
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -248,7 +252,7 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
     }
 
-    private fun mockCounters(peopleInDb: List<Int>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {
+    private fun mockCounters(peopleInDb: List<PeopleCount>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {
         peopleToUpload?.let {
             whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
         }

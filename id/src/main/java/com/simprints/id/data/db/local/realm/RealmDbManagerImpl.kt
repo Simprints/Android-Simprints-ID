@@ -6,6 +6,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.*
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Project
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
@@ -54,12 +55,12 @@ open class RealmDbManagerImpl(appContext: Context,
         }
             .ignoreElement()
 
-    override fun getPeopleCountFromLocal(patientId: String?,
+    override fun getPeopleCountFromLocal(projectId: String?,
                                          userId: String?,
                                          moduleId: String?,
                                          toSync: Boolean?): Single<Int> =
         useRealmInstance { realm ->
-            realm.buildQueryForPerson(patientId, userId, moduleId, toSync)
+            realm.buildQueryForPerson(projectId, userId, moduleId, toSync)
                 .count()
                 .toInt()
         }
@@ -72,20 +73,20 @@ open class RealmDbManagerImpl(appContext: Context,
                 ?: throw IllegalStateException()
         }
 
-    override fun loadPeopleFromLocal(patientId: String?,
+    override fun loadPeopleFromLocal(projectId: String?,
                                      userId: String?,
                                      moduleId: String?,
                                      toSync: Boolean?,
                                      sortBy: Map<String, Sort>?): Single<List<Person>> =
         useRealmInstance { realm ->
             realm
-                .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
+                .buildQueryForPerson(projectId, userId, moduleId, toSync, sortBy)
                 .findAll()
                 .map(DbPerson::toDomainPerson)
         }
 
     // TODO: improve this terrible usage of RxJava
-    override fun loadPeopleFromLocalRx(patientId: String?,
+    override fun loadPeopleFromLocalRx(projectId: String?,
                                        userId: String?,
                                        moduleId: String?,
                                        toSync: Boolean?,
@@ -94,7 +95,7 @@ open class RealmDbManagerImpl(appContext: Context,
             try {
                 useRealmInstance { realm ->
                     realm
-                        .buildQueryForPerson(patientId, userId, moduleId, toSync, sortBy)
+                        .buildQueryForPerson(projectId, userId, moduleId, toSync, sortBy)
                         .findAll()
                         .forEach { realmPerson ->
                             emitter.onNext(realmPerson.toDomainPerson())
