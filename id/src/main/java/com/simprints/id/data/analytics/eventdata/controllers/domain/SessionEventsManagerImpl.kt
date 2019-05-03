@@ -175,9 +175,9 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
     }
 
-    override fun addInvalidIntentEvent(invalidIntentEvent: InvalidIntentEvent) {
+    override fun addSessionEvent(sessionEvent: Event) {
         updateSessionInBackground {
-            it.addEvent(invalidIntentEvent)
+            it.addEvent(sessionEvent)
         }
     }
 

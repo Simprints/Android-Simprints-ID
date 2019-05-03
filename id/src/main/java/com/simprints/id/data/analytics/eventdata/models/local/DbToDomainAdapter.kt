@@ -7,10 +7,6 @@ fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.ARTIFICIAL_TERMINATION -> JsonHelper.gson.fromJson(jsonEvent, ArtificialTerminationEvent::class.java)
     EventType.REFUSAL -> JsonHelper.gson.fromJson(jsonEvent, RefusalEvent::class.java)
     EventType.CONSENT -> JsonHelper.gson.fromJson(jsonEvent, ConsentEvent::class.java)
-    EventType.ENROL_REQUEST -> JsonHelper.gson.fromJson(jsonEvent, EnrolRequestEvent::class.java)
-    EventType.VERIFY_REQUEST -> JsonHelper.gson.fromJson(jsonEvent, VerifyRequestEvent::class.java)
-    EventType.IDENTIFY_REQUEST -> JsonHelper.gson.fromJson(jsonEvent, IdentifyRequestEvent::class.java)
-    EventType.IDENTIFY_CONFIRMATION_REQUEST -> JsonHelper.gson.fromJson(jsonEvent, IdentifyConfirmationRequestEvent::class.java)
     EventType.ENROL_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, EnrolResponseEvent::class.java)
     EventType.VERIFY_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, VerifyResponseEvent::class.java)
     EventType.IDENTIFY_RESPONSE -> JsonHelper.gson.fromJson(jsonEvent, IdentifyResponseEvent::class.java)
@@ -29,5 +25,6 @@ fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.FINGERPRINT_CAPTURE -> JsonHelper.gson.fromJson(jsonEvent, FingerprintCaptureEvent::class.java)
     EventType.CONNECTIVITY_SNAPSHOT -> JsonHelper.gson.fromJson(jsonEvent, ConnectivitySnapshotEvent::class.java)
     EventType.INVALID_INTENT -> JsonHelper.gson.fromJson(jsonEvent, InvalidIntentEvent::class.java)
+    EventType.CALLOUT -> JsonHelper.gson.fromJson(jsonEvent, CalloutEvent::class.java)
     null -> null
 }

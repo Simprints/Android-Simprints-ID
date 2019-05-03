@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.eventdata.controllers.domain
 
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
@@ -32,5 +32,5 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
                                              localResult: CandidateReadEvent.LocalResult,
                                              remoteResult: CandidateReadEvent.RemoteResult?)
 
-    fun addInvalidIntentEvent(invalidIntentEvent: InvalidIntentEvent)
+    fun addSessionEvent(sessionEvent: Event)
 }

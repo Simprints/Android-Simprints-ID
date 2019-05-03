@@ -6,11 +6,14 @@ import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.controllers.core.eventData.model.CalloutEvent
+import com.simprints.clientapi.controllers.core.eventData.model.ConfirmationCallout
 import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
 import com.simprints.clientapi.domain.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import javax.inject.Inject
 
 
@@ -18,6 +21,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView)
     : RequestContract.Presenter {
 
     @Inject lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+    @Inject lateinit var clientApiTimeHelper: ClientApiTimeHelper
 
     init {
         determineIfIntentIsSuspiciousAndStoreInSessions()
@@ -48,6 +52,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView)
         when (request) {
             is BaseRequest -> view.sendSimprintsRequest(request)
             is BaseConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
+                .also { saveConfirmationCalloutEventInBackground() }
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {
@@ -56,7 +61,16 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView)
 
     private fun addInvalidSessionInBackground() {
        clientApiSessionEventsManager
-           .addInvalidSession(InvalidIntentEvent(view.getIntentAction(), view.getIntentExtras()))
+           .addSessionEvent(InvalidIntentEvent(view.getIntentAction(), view.getIntentExtras()))
     }
+
+    private fun saveConfirmationCalloutEventInBackground() {
+        clientApiSessionEventsManager
+            .addSessionEvent(CalloutEvent("", clientApiTimeHelper.now(), buildConfirmationCallout()))
+    }
+
+    private fun buildConfirmationCallout() =
+        ConfirmationCallout(view.confirmIdentifyExtractor.getSelectedGuid(),
+            view.confirmIdentifyExtractor.getSessionId())
 
 }

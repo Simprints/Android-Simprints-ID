@@ -85,11 +85,20 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
-            is AppVerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
-            is AppIdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
+            is AppEnrolRequest -> CalloutEvent(null, relativeStarTime, buildEnrolmentCallout())
+            is AppVerifyRequest -> CalloutEvent(null, relativeStarTime, buildVerificationCallout())
+            is AppIdentifyRequest -> CalloutEvent(null, relativeStarTime, buildIdentificationCallout())
             else -> throw Throwable("unrecognised request") //StopShip
         }
+
+    private fun buildIdentificationCallout(): Callout = IdentificationCallout("", appRequest.projectId,
+        appRequest.userId, appRequest.moduleId, appRequest.metadata)
+
+    private fun buildVerificationCallout(): Callout = VerificationCallout("", appRequest.projectId,
+        appRequest.userId, appRequest.moduleId, (appRequest as AppVerifyRequest).verifyGuid, appRequest.metadata)
+
+    private fun buildEnrolmentCallout(): Callout = EnrolmentCallout("", appRequest.projectId,
+        appRequest.userId, appRequest.moduleId, appRequest.metadata)
 
     private fun setLastUser() {
         preferencesManager.lastUserUsed = appRequest.userId

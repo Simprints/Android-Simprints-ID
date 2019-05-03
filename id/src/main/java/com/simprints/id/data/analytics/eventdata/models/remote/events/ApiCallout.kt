@@ -1,7 +1,10 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolResponseEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyResponseEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalFormResponseEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.VerifyResponseEvent
 
 @Keep
 class ApiCallout {
@@ -11,8 +14,4 @@ class ApiCallout {
     constructor(response: IdentifyResponseEvent)
     constructor(response: VerifyResponseEvent)
     constructor(response: RefusalFormResponseEvent)
-    constructor(request: EnrolRequestEvent)
-    constructor(request: VerifyRequestEvent)
-    constructor(request: IdentifyRequestEvent)
-    constructor(request: IdentifyConfirmationRequestEvent)
 }
