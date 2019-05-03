@@ -14,7 +14,7 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.InvalidRequestException
-import com.simprints.clientapi.extensions.toJson
+import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
@@ -66,7 +66,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun getIntentAction() = intent.action ?: ""
 
-    override fun getIntentExtrasAsJson() = intent.extras.toJson()
+    override fun getIntentExtras() = intent?.extras?.toMap()
 
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)

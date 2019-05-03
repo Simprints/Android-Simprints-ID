@@ -38,7 +38,7 @@ interface RequestContract {
 
         fun getIntentAction(): String
 
-        fun getIntentExtrasAsJson(): String
+        fun getIntentExtras(): Map<String, Any>?
     }
 
     interface Presenter {
