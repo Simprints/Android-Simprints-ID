@@ -1,11 +1,10 @@
 package com.simprints.clientapi.extensions
 
 import android.os.Bundle
-import org.json.JSONObject
 
-fun Bundle.toJson(): String {
-    val json = JSONObject()
-    keySet().forEach { json.put(it, get(it)) }
+fun Bundle.toMap(): Map<String, Any> {
+    val map = HashMap<String, Any>()
+    keySet().forEach { map[it] = get(it) ?: "" }
 
-    return json.toString()
+    return map
 }
