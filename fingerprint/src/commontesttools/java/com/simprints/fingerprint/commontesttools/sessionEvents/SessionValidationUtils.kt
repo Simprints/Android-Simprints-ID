@@ -102,7 +102,7 @@ fun validateConsentEventApiModel(json: JsonObject) {
 }
 
 fun validateEnrolmentEventApiModel(json: JsonObject) {
-    assertThat(json.get("type").asString).isEqualTo(EventType.ENROLLMENT.toString())
+    assertThat(json.get("type").asString).isEqualTo(EventType.ENROLMENT.toString())
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("personId").asString.isGuid()).isTrue()
     assertThat(json.size()).isEqualTo(3)
@@ -201,7 +201,7 @@ fun validateEvent(json: JsonObject) {
     when (EventType.valueOf(type)) {
         EventType.REFUSAL -> validateRefusalEventApiModel(json)
         EventType.CONSENT -> validateConsentEventApiModel(json)
-        EventType.ENROLLMENT -> validateEnrolmentEventApiModel(json)
+        EventType.ENROLMENT -> validateEnrolmentEventApiModel(json)
         EventType.ALERT_SCREEN -> validateAlertScreenEventApiModel(json)
         EventType.CANDIDATE_READ -> validateCandidateReadEventApiModel(json)
         EventType.AUTHORIZATION -> validateAuthorizationEventApiModel(json)

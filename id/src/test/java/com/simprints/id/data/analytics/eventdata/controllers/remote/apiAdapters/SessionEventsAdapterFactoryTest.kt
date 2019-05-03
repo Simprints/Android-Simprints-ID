@@ -139,7 +139,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_enrollmentEventApiModel() {
-        val event = EnrollmentEvent(
+        val event = EnrolmentEvent(
             10,
             UUID.randomUUID().toString())
 

@@ -1,7 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrollmentEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -68,7 +68,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .doOnComplete {
                 sessionEventsManager
                     .updateSession {
-                        it.addEvent(EnrollmentEvent(
+                        it.addEvent(EnrolmentEvent(
                             it.timeRelativeToStartTime(timeHelper.now()),
                             person.patientId
                         ))
