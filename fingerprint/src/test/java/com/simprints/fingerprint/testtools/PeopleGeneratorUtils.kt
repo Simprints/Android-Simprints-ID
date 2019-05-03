@@ -2,7 +2,7 @@ package com.simprints.fingerprint.testtools
 
 import com.simprints.fingerprint.testtools.FingerprintGeneratorUtils.generateRandomFingerprint
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
@@ -76,7 +76,7 @@ object PeopleGeneratorUtils { // TODO : Factor with id version of this file
 
     fun getRandomFingerprint(): Fingerprint {
         val commonFingerprint = generateRandomFingerprint()
-        return Fingerprint(commonFingerprint.fingerId, commonFingerprint.templateBytes)
+        return Fingerprint(commonFingerprint.finger, commonFingerprint.templateBytes)
     }
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {

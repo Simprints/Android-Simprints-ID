@@ -1,6 +1,7 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.id.domain
 
 import android.os.Parcelable
+import com.simprints.id.domain.fingerprint.Fingerprint
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 
@@ -17,7 +18,7 @@ data class Person (
 ): Parcelable {
     init {
         fingerprints = fingerprints
-            .groupBy { it.fingerId }
+            .groupBy { it.finger }
             .mapValues { it.value.maxBy { it.qualityScore } }
             .values
             .toMutableList() as MutableList<Fingerprint>

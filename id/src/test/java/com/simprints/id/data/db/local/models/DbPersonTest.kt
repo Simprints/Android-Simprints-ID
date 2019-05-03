@@ -5,7 +5,7 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert

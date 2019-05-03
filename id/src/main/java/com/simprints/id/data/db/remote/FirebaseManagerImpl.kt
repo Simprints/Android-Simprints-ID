@@ -7,7 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.jetbrains.anko.doAsync
 import timber.log.Timber
-import com.simprints.id.domain.fingerprint.Person as LibPerson
+import com.simprints.id.domain.Person as LibPerson
 
 open class FirebaseManagerImpl: RemoteDbManager {
 

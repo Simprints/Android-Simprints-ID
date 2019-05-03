@@ -14,7 +14,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -95,7 +95,7 @@ class MatchingPresenter(
         com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
 
     private fun Fingerprint.toMatcherFingerprint() =
-        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[fingerId.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
+        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[finger.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception

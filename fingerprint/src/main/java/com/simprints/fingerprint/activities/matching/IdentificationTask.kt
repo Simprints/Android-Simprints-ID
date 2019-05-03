@@ -18,7 +18,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
