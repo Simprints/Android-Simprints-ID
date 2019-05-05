@@ -230,7 +230,7 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
-             remotePeopleManagerSpy.uploadPeople(testProject.id, it)
+            remotePeopleManagerSpy.uploadPeople(testProject.id, it).retry(3)
         }
         Completable.merge(requests).blockingAwait()
 
