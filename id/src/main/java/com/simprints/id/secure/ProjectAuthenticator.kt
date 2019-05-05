@@ -55,7 +55,6 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
-            .observeOn(AndroidSchedulers.mainThread())
 
     private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
         val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, nonceScope)

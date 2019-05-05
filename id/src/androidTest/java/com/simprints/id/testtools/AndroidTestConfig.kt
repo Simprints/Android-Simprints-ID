@@ -7,6 +7,9 @@ import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForAndroidTests
 import com.simprints.id.testtools.di.DaggerAppComponentForAndroidTests
 import com.simprints.testtools.common.di.injectClassFromComponent
+import com.squareup.rx2.idler.Rx2Idler
+import io.reactivex.android.plugins.RxAndroidPlugins
+import io.reactivex.plugins.RxJavaPlugins
 import io.realm.Realm
 
 class AndroidTestConfig<T : Any>(
@@ -20,8 +23,18 @@ class AndroidTestConfig<T : Any>(
 
     fun fullSetup() =
         initAndInjectComponent()
+            .initRxIdler()
             .initRealm()
             .initModules()
+
+    private fun initRxIdler() = also {
+        RxJavaPlugins.setInitComputationSchedulerHandler(Rx2Idler.create("RxJava 2.x Computation Scheduler"))
+        RxJavaPlugins.setInitIoSchedulerHandler(Rx2Idler.create("RxJava 2.x Io Scheduler"))
+        RxJavaPlugins.setInitNewThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x New Thread Scheduler"))
+        RxJavaPlugins.setInitSingleSchedulerHandler(Rx2Idler.create("RxJava 2.x Single Scheduler"))
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler(Rx2Idler.create("RxJava 2.x Main Scheduler"))
+
+    }
 
     fun initAndInjectComponent() =
         initComponent().inject()

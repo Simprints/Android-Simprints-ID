@@ -1,5 +1,6 @@
 package com.simprints.id.data.consent
 
+import android.os.Handler
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -9,6 +10,9 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
+import android.os.Looper
+
+
 
 class LongConsentManagerImpl(absolutePath: String,
                              private val loginInfoManager: LoginInfoManager,
@@ -66,13 +70,20 @@ class LongConsentManagerImpl(absolutePath: String,
         { emitter ->
             firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
             val file = createFileForLanguage(filePathForProject, language)
+            val handler = Handler(Looper.myLooper())
             getFileDownloadTask(language, file)
                 .addOnSuccessListener {
-                    emitter.onComplete()
+                    handler.post {
+                        emitter.onComplete()
+                    }
                 }.addOnFailureListener {
-                    emitter.onError(it)
+                    handler.post {
+                        emitter.onError(it)
+                    }
                 }.addOnProgressListener {
-                    emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
+                    handler.post {
+                        emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
+                    }
                 }
         }, BackpressureStrategy.BUFFER)
 

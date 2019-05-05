@@ -1,49 +1,37 @@
 package com.simprints.id.activities.login
 
 import android.content.Intent
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.*
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
+import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.testtools.grantPermissions
-import com.simprints.id.testtools.launchActivityAndRunOnUiThread
-import com.simprints.moduleapi.app.requests.IAppEnrollRequest
-import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.log
-import com.simprints.testtools.android.tryOnUiUntilTimeout
-import kotlinx.android.parcel.Parcelize
 
-fun launchLoginActivity(testCalloutCredentials: TestCalloutCredentials,
-                        enrolTestRule: ActivityTestRule<LoginActivity>) {
-    log("launchAppFromIntentEnrol")
-    val intent = Intent().apply {
+fun launchLoginActivity(testCalloutCredentials: TestCalloutCredentials) =
+    ActivityScenario.launch<LoginActivity>(Intent().apply {
+        setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, LoginActivity::class.qualifiedName!!)
         putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(
             testCalloutCredentials.projectId,
             testCalloutCredentials.userId))
-    }
-    enrolTestRule.launchActivityAndRunOnUiThread(intent)
-}
+    })
 
 fun enterCredentialsDirectly(testCalloutCredentials: TestCalloutCredentials, projectSecret: String) {
     log("enterCredentialsDirectly")
-    tryOnUiUntilTimeout(20000, 50) {
-        onView(withId(R.id.loginEditTextProjectId))
-            .check(matches(isDisplayed()))
-            .perform(clearText())
-            .perform(typeText(testCalloutCredentials.projectId))
-            .perform(closeSoftKeyboard())
-        onView(withId(R.id.loginEditTextProjectSecret))
-            .check(matches(isDisplayed()))
-            .perform(clearText())
-            .perform(typeText(projectSecret))
-            .perform(closeSoftKeyboard())
-    }
+    onView(withId(R.id.loginEditTextProjectId))
+        .check(matches(isDisplayed()))
+        .perform(replaceText(testCalloutCredentials.projectId))
+    onView(withId(R.id.loginEditTextProjectSecret))
+        .check(matches(isDisplayed()))
+        .perform(replaceText(projectSecret))
+
 }
 
 fun pressSignIn() {
@@ -54,17 +42,13 @@ fun pressSignIn() {
         .perform(click())
 }
 
-fun ensureSignInSuccess(loginActivityTestRule: ActivityTestRule<*>) {
-    log("ensureSignInSuccess")
-    tryOnUiUntilTimeout(25000, 50) {
-        Truth.assertThat(loginActivityTestRule.activity.isFinishing).isTrue()
+fun ensureSignInSuccess(scenario: ActivityScenario<LoginActivity>) {
+    scenario.onActivity {
+        Truth.assertThat(it.isFinishing).isTrue()
     }
 }
 
 fun ensureSignInFailure() {
-    log("ensureSignInFailure")
-    tryOnUiUntilTimeout(25000, 1000) {
-        onView(withId(R.id.loginButtonSignIn))
-            .check(matches(isEnabled()))
-    }
+    onView(withId(R.id.loginButtonSignIn))
+        .check(matches(isEnabled()))
 }
