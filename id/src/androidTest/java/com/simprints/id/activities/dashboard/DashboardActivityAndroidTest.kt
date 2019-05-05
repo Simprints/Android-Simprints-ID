@@ -1,6 +1,7 @@
 package com.simprints.id.activities.dashboard
 
 import android.content.Intent
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -8,10 +9,10 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.rule.ActivityTestRule
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -68,8 +69,6 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
     @get:Rule val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    @get:Rule val launchActivityRule = ActivityTestRule(DashboardActivity::class.java, false, false)
-
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
@@ -93,8 +92,6 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
             secureDataManagerRule = DependencyRule.SpyRule)
     }
 
-    @Inject lateinit var randomGeneratorMock: RandomGenerator
-
     private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
     private var peopleInDb = mutableListOf<Person>()
     private var peopleOnServer = mutableListOf<Person>()
@@ -117,21 +114,21 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
     @Test
     fun openDashboardWithGlobalSync_shouldShowTheRightCounters() {
         uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
-        launchActivityRule.launchActivity(Intent())
+        launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
     }
 
     @Test
     fun openDashboardWithUserSync_shouldShowTheRightCounters() {
         uploadFakePeopleAndPrepareLocalDb(mockUserScope())
-        launchActivityRule.launchActivity(Intent())
+        launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
     }
 
     @Test
     fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
         uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
-        launchActivityRule.launchActivity(Intent())
+        launchActivity(Intent())
         waitForDownSyncCountAndValidateUI()
     }
 
@@ -139,7 +136,7 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
     fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {
         uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
 
-        launchActivityRule.launchActivity(Intent())
+        launchActivity(Intent())
 
         waitOnSystem(2000)
 
@@ -176,13 +173,18 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
         PeopleRemoteInterface.baseUrl = "http://wrong_url_simprints_com.com"
         downSyncManager.enqueueOneTimeDownSyncMasterWorker()
 
-        launchActivityRule.launchActivity(Intent())
+        launchActivity(Intent())
         waitOnSystem(3000)
 
         onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
         onView(withId(R.id.dashboardCardSyncDownloadText))
             .check(matches(withText("")))
     }
+
+    private fun launchActivity(intent: Intent) =
+        ActivityScenario.launch<LoginActivity>(intent.apply {
+            setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, DashboardActivity::class.qualifiedName!!)
+        })
 
     private fun waitForDownSyncCountAndValidateUI() {
         tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
