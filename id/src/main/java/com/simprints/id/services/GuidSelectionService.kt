@@ -1,5 +1,6 @@
 package com.simprints.id.services
 
+import android.annotation.SuppressLint
 import android.app.IntentService
 import android.content.Intent
 import com.google.gson.Gson
@@ -20,60 +21,28 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-// STOPSHIP : GuidSelectionServiceTest currently failing
 class GuidSelectionService : IntentService("GuidSelectionService") {
 
-    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var guidSelectionManager: GuidSelectionManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
 
     override fun onCreate() {
         super.onCreate()
         (application as Application).component.inject(this)
     }
 
+    @SuppressLint("CheckResult")
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
-            onHandleNonNullIntent(intent.parseAppConfirmation())
+            val request = intent.parseAppConfirmation()
+            guidSelectionManager.saveGUIDSelection(request)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(onComplete = {
+                    Timber.d("Added Guid Selection Event")
+                }, onError = { e ->
+                    crashReportManager.logExceptionOrThrowable(e)
+                })
         }
-    }
-
-    private fun onHandleNonNullIntent(intent: AppIdentityConfirmationRequest) {
-        val projectId = intent.projectId
-        val sessionId = intent.sessionId
-        val selectedGuid = intent.selectedGuid
-        val callbackSent = try {
-            checkProjectId(projectId)
-            sessionId.let {
-                sessionEventsManager
-                    .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(onComplete = {
-                        if(BuildConfig.DEBUG) {
-                            Timber.d(Gson().toJson(sessionEventsManager.loadSessionById(sessionId).blockingGet()))
-                        }
-                        Timber.d("Added Guid Selection Event")
-                    }, onError = { e ->
-                        crashReportManager.logExceptionOrThrowable(e)
-                    })
-            }
-            true
-        } catch (t: Throwable) {
-            crashReportManager.logExceptionOrThrowable(t)
-            false
-        }
-        analyticsManager.logGuidSelectionService(
-            loginInfoManager.getSignedInProjectIdOrEmpty(),
-            sessionId,
-            baseContext.deviceId,
-            selectedGuid,
-            callbackSent)
-    }
-
-    private fun checkProjectId(projectId: String) {
-        if (!loginInfoManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
     }
 }

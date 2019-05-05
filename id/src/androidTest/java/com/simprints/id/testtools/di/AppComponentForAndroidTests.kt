@@ -9,7 +9,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModule
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.di.SerializerModule
-import com.simprints.id.services.GuidSelectionServiceAndroidTest
+import com.simprints.id.services.GuidSelectionManagerTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplAndroidTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTaskAndroidTest
 import dagger.BindsInstance
@@ -34,7 +34,7 @@ interface AppComponentForAndroidTests : AppComponent {
 
     fun inject(sessionEventsUploaderTaskAndroidTest: SessionEventsUploaderTaskAndroidTest)
     fun inject(loginActivityAndroidTest: LoginActivityAndroidTest)
-    fun inject(guidSelectionServiceAndroidTest: GuidSelectionServiceAndroidTest)
+    fun inject(guidSelectionServiceAndroidTest: GuidSelectionManagerTest)
     fun inject(dashboardActivityAndroidTest: DashboardActivityAndroidTest)
     fun inject(secureDataManagerTest: SecureDataManagerTest)
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)

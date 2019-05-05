@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.rule.ServiceTestRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -30,10 +31,16 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
+import androidx.test.InstrumentationRegistry.getTargetContext
+import androidx.test.platform.app.InstrumentationRegistry
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
+import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
+import java.util.concurrent.TimeUnit
+
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class GuidSelectionServiceAndroidTest {
+class GuidSelectionManagerTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -51,6 +58,7 @@ class GuidSelectionServiceAndroidTest {
     @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
     @Inject lateinit var loginInfoManagerSpy: LoginInfoManager
     @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    @Inject lateinit var guidSelectionManager: GuidSelectionManager
 
     @Before
     fun setUp() {
@@ -66,29 +74,20 @@ class GuidSelectionServiceAndroidTest {
             it.projectId = loginInfoManagerSpy.getSignedInProjectIdOrEmpty()
         }.blockingGet()
 
-        val intent = Intent("com.simprints.clientapp.CONFIRM_IDENTITY")
-        intent.putExtra(IAppConfirmation.BUNDLE_KEY,
-            AppIdentifyConfirmation(
-                DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId,
-                session.id,
-                "some_guid_confirmed"))
-        intent.setPackage(Constants.SIMPRINTS_PACKAGE_NAME)
+        val request = AppIdentityConfirmationRequest(
+            DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId,
+            session.id,
+            "some_guid_confirmed")
 
-        ApplicationProvider.getApplicationContext<Application>().startService(intent)
+        guidSelectionManager
+            .saveGUIDSelection(request)
+            .test()
+            .awaitAndAssertSuccess()
 
-        tryOnSystemUntilTimeout(10000, 500) {
-            realmForDataEvent.refresh()
-            session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
-            val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).firstOrNull()
-            Assert.assertNotNull(potentialGuidSelectionEvent)
-            Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")
-        }
+        realmForDataEvent.refresh()
+        session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
+        val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).firstOrNull()
+        Assert.assertNotNull(potentialGuidSelectionEvent)
+        Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")
     }
-
-    @Parcelize
-    data class AppIdentifyConfirmation(
-        override val projectId: String,
-        override val sessionId: String,
-        override val selectedGuid: String
-    ) : IAppIdentifyConfirmation
 }
