@@ -12,6 +12,7 @@ import com.google.common.truth.Truth
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
 import com.simprints.testtools.android.log
 
@@ -43,9 +44,8 @@ fun pressSignIn() {
 }
 
 fun ensureSignInSuccess(scenario: ActivityScenario<LoginActivity>) {
-    scenario.onActivity {
-        Truth.assertThat(it.isFinishing).isTrue()
-    }
+    val result = scenario.result
+    Truth.assertThat(result.resultCode).isEqualTo(RESULT_CODE_LOGIN_SUCCEED)
 }
 
 fun ensureSignInFailure() {
