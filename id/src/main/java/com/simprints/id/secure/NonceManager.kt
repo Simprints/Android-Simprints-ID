@@ -15,7 +15,6 @@ class NonceManager(val client: SecureApiInterface) {
     fun requestNonce(nonceScope: NonceScope): Single<Nonce> {
         return client.requestNonce(nonceScope.projectId, nonceScope.userId)
             .handleResponse(::handleResponseError)
-            .subscribeOn(Schedulers.io())
     }
 
     private fun handleResponseError(e: HttpException): Nothing =

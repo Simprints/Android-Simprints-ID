@@ -19,7 +19,6 @@ class AuthManager(val client: SecureApiInterface) {
             authRequest.authRequestBody)
             .handleResponse(::handleResponseError)
             .map { it.toDomainToken() }
-            .subscribeOn(Schedulers.io())
     }
 
     private fun handleResponseError(e: HttpException): Nothing =

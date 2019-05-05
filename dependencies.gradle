@@ -15,10 +15,10 @@ def dagger = [
 def androidx_lifecycle_version = "2.1.0-alpha02"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
-    core        : "androidx.core:core-ktx:1.1.0-alpha04",
-    multidex    : "androidx.multidex:multidex:2.0.1",
-    appcompat   : "androidx.appcompat:appcompat:1.1.0-alpha02",
-    legacy      : "androidx.legacy:legacy-support-v4: 1.0.0",
+    core     : "androidx.core:core-ktx:1.1.0-alpha04",
+    multidex : "androidx.multidex:multidex:2.0.1",
+    appcompat: "androidx.appcompat:appcompat:1.1.0-alpha02",
+    legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
     room     : [
         core    : "androidx.room:room-runtime:$androidx_room_version",
         compiler: "androidx.room:room-compiler:$androidx_room_version"
@@ -53,12 +53,12 @@ def playservices = [
 ]
 
 def firebase = [
-    database : "com.google.firebase:firebase-database:16.0.6",
-    core     : "com.google.firebase:firebase-core:16.0.7",
-    auth     : "com.google.firebase:firebase-auth:16.1.0",
-    config   : "com.google.firebase:firebase-config:16.3.0",
-    perf     : "com.google.firebase:firebase-perf:16.2.3",
-    storage  : "com.google.firebase:firebase-storage:16.0.5"
+    database: "com.google.firebase:firebase-database:16.0.6",
+    core    : "com.google.firebase:firebase-core:16.0.7",
+    auth    : "com.google.firebase:firebase-auth:16.1.0",
+    config  : "com.google.firebase:firebase-config:16.3.0",
+    perf    : "com.google.firebase:firebase-perf:16.2.3",
+    storage : "com.google.firebase:firebase-storage:16.0.5"
 ]
 
 def crashlytics = [
@@ -133,7 +133,8 @@ def testing = [
         runner      : "androidx.test:runner:1.1.2-alpha01",
         rules       : "androidx.test:rules:1.1.2-alpha01",
         room        : "androidx.room:room-testing:$androidx_room_version"
-    ]
+    ],
+    rx2_idler    : ['com.squareup.rx.idler:rx2-idler:0.9.1']
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
@@ -149,7 +150,7 @@ def realm = [
 // For Tee-d stream
 def commons_io_version = "2.6"
 def commons_io = [
-        commons_io       : "commons-io:commons-io:$commons_io_version"
+    commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
 ext.deps = [
@@ -167,5 +168,5 @@ ext.deps = [
     rxjava2        : rxjava2,
     testing        : testing,
     realm          : realm,
-    commons_io    : commons_io
+    commons_io     : commons_io
 ]

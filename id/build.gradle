@@ -229,6 +229,7 @@ dependencies {
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
     androidTestImplementation deps.testing.truth
+    androidTestImplementation deps.testing.rx2_idler
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
@@ -242,6 +243,8 @@ dependencies {
         exclude group: 'org.robolectric'
     }
     androidTestCompile project(path: ':libsimprints')
+
+    implementation 'io.ashdavies.rx.rxtasks:rx-tasks:+'
 }
 
 crashlytics {

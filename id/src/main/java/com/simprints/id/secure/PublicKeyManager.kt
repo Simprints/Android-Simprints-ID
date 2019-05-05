@@ -13,7 +13,6 @@ class PublicKeyManager(val client: SecureApiInterface) {
     fun requestPublicKey(projectId: String, userId: String): Single<PublicKeyString> =
         client.requestPublicKey(projectId, userId)
             .handleResponse(::handleResponseError)
-            .subscribeOn(Schedulers.io())
 
     private fun handleResponseError(e: HttpException): Nothing =
         when (e.code()) {

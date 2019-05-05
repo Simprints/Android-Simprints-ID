@@ -2,7 +2,6 @@ package com.simprints.id.activities.login
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
 import com.simprints.id.Application
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
@@ -19,7 +18,6 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.mock
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -28,17 +26,16 @@ class LoginActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @get:Rule val loginTestRule = ActivityTestRule(LoginActivity::class.java, false, false)
-
     private var secureApiInterfaceRule: DependencyRule = DependencyRule.RealRule
 
-    private val module by lazy {
-        TestAppModule(app,
+    private val module
+        get() = TestAppModule(app,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
             keystoreManagerRule = DependencyRule.ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } },
             secureApiInterfaceRule = secureApiInterfaceRule
         )
-    }
+
+
 
     @Before
     fun setUp() {
@@ -47,15 +44,15 @@ class LoginActivityAndroidTest {
 
     @Test
     fun validCredentials_shouldSucceed() {
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        val scenario = launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
-        ensureSignInSuccess(loginTestRule)
+        ensureSignInSuccess(scenario)
     }
 
     @Test
     fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchLoginActivity(invalidCredentials, loginTestRule)
+        launchLoginActivity(invalidCredentials)
         enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
@@ -63,7 +60,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
@@ -71,7 +68,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun validProjectIdAndInvalidSecret_shouldFail() {
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -79,7 +76,7 @@ class LoginActivityAndroidTest {
 
     @Test
     fun invalidCredentials_shouldFail() {
-        launchLoginActivity(invalidCredentials, loginTestRule)
+        launchLoginActivity(invalidCredentials)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
         ensureSignInFailure()
@@ -90,7 +87,7 @@ class LoginActivityAndroidTest {
         secureApiInterfaceRule = DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
         AndroidTestConfig(this, module).initAndInjectComponent()
 
-        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS, loginTestRule)
+        launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
         ensureSignInFailure()
