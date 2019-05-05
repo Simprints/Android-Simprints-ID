@@ -65,6 +65,8 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.services.GuidSelectionManager
+import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -254,5 +256,14 @@ open class AppModule {
             settingsPreferencesManager.modality,
             modalityFlowFactory,
             appResponseFactory)
+
+    @Provides
+    open fun provideGuidSelectionManager(context: Context,
+                                         loginInfoManager: LoginInfoManager,
+                                         analyticsManager: AnalyticsManager,
+                                         crashReportManager: CrashReportManager,
+                                         sessionEventsManager: SessionEventsManager): GuidSelectionManager =
+        GuidSelectionManagerImpl(
+            context.deviceId, loginInfoManager, analyticsManager, sessionEventsManager)
 }
 
