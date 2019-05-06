@@ -4,7 +4,6 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.domain.Person
 import java.util.*
-import kotlin.collections.ArrayList
 
 @Keep
 data class ApiPerson(@SerializedName("id") var patientId: String,
@@ -13,8 +12,8 @@ data class ApiPerson(@SerializedName("id") var patientId: String,
                      var moduleId: String,
                      var createdAt: Date?,
                      var updatedAt: Date?,
-                     var fingerprints:  ArrayList<ApiFingerprint>,
-                     var faces: ArrayList<ApiFace>? = null)
+                     var fingerprints:  List<ApiFingerprint>?,
+                     var faces: List<ApiFace>? = null)
 
 fun Person.toApiPerson(): ApiPerson =
     ApiPerson(
@@ -24,8 +23,7 @@ fun Person.toApiPerson(): ApiPerson =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = ArrayList(fingerprints.map { it.toApiFingerprint() })
-    )
+        fingerprints = fingerprints.map { it.toApiFingerprint() })
 
 fun ApiPerson.toDomainPerson(): Person =
     Person(
@@ -35,6 +33,6 @@ fun ApiPerson.toDomainPerson(): Person =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = fingerprints.map { it.toDomainFingerprint() },
+        fingerprints = fingerprints?.map { it.toDomainFingerprint() } ?: emptyList(),
         toSync = false
     )
