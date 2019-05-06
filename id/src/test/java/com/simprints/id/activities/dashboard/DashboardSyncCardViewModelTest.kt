@@ -22,6 +22,7 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -267,7 +268,7 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf("FACE", "FINGERPRINT"), counter))
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 
     private fun createViewModelDashboardToTest() =
         DashboardSyncCardViewModel(

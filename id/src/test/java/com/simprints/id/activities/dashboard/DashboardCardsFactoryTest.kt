@@ -16,6 +16,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -189,7 +190,7 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf("FACE", "FINGERPRINT"), counter))
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 
     private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, peopleCounts: List<PeopleCount>) {
         whenever(remotePeopleManager.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))

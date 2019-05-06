@@ -10,6 +10,7 @@ import com.simprints.id.commontesttools.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -26,7 +27,6 @@ import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
@@ -93,5 +93,5 @@ class CountWorkerTest {
     }
 
     private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "moduleId", listOf("FACE", "FINGERPRINT"), counter))
+        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 }
