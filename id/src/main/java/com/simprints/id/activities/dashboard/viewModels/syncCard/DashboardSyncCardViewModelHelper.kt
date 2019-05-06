@@ -12,6 +12,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -104,29 +105,23 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     }
 
     private fun updateTotalDownSyncCount(): Completable =
-        Completable.fromAction {
-            try {
-                var peopleToDownload = 0
-                syncScope?.let { peopleToDownload = getPeopleToDownSync(it) }
-                viewModel.updateState(peopleToDownload = peopleToDownload, emitState = true)
-            } catch (t: Throwable) {
-                t.printStackTrace()
-            }
-        }.subscribeOn(Schedulers.io())
-
-    private fun getPeopleToDownSync(syncScope: SyncScope) =
-        dbManager.getPeopleCountToDownSync(syncScope)
-            .map { peopleCounts -> peopleCounts.sumBy { it.count } }.blockingGet()
-
+        (syncScope?.let { syncScope ->
+            dbManager.getPeopleCountToDownSync(syncScope)
+                .map { peopleCounts -> peopleCounts.sumBy { it.count } }
+                .onErrorResumeNext { Single.just(0) }
+        } ?: Single.just(0))
+            .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
+            .ignoreElement()
+            .subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
-        syncScope?.let { syncScope ->
+        (syncScope?.let { syncScope ->
             dbManager.getPeopleCountFromLocalForSyncScope(syncScope)
-                .flatMapCompletable { peopleCounts ->
-                    viewModel.updateState(peopleInDb = peopleCounts.sumBy { it.count }, emitState = true)
-                    Completable.complete()
-                }.subscribeOn(Schedulers.io())
-        } ?: Completable.complete()
+                .doAfterSuccess { syncScopeCount -> viewModel.updateState(peopleInDb = syncScopeCount.sumBy { it.count }, emitState = true) }
+                .ignoreElement()
+        } ?: Completable.complete())
+            .subscribeOn(Schedulers.io())
+
 
     private fun updateTotalUpSyncCount(): Completable =
         localDbManager.getPeopleCountFromLocal(toSync = true)
@@ -179,7 +174,8 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
             var peopleToDownSync = 0
             syncScope?.let {
                 it.toSubSyncScopes().forEach { subSyncScope ->
-                    peopleToDownSync += filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)?.totalToDownload ?: 0
+                    peopleToDownSync += filterDownSyncStatusesBySubSyncScope(subSyncScope, downSyncStatuses)?.totalToDownload
+                        ?: 0
                 }
             }
             peopleToDownSync
@@ -221,7 +217,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                 goToSyncEnabledIfAllowed()
                 updateTotalLocalCount().subscribeBy(onError = { it.printStackTrace() }, onComplete = {})
             }
-            SyncState.CALCULATING ->  viewModel.updateState(syncCardState = SYNC_CALCULATING, emitState = true)
+            SyncState.CALCULATING -> viewModel.updateState(syncCardState = SYNC_CALCULATING, emitState = true)
         }
     }
 
