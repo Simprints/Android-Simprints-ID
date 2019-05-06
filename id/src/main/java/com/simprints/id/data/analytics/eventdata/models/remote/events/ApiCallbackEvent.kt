@@ -5,22 +5,22 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 
 @Keep
 class ApiCallbackEvent(val relativeStartTime: Long,
-                       val result: ApiCallout) : ApiEvent(ApiEventType.CALLBACK) {
+                       val result: ApiCallout? = null) : ApiEvent(ApiEventType.CALLBACK) {
 
     constructor(noResponseEvent: NoResponseEvent) :
-        this(noResponseEvent.relativeStartTime, ApiCallout())
+        this(noResponseEvent.relativeStartTime)
 
     constructor(enrolResponseEvent: EnrolResponseEvent) :
-        this(enrolResponseEvent.relativeStartTime, ApiCallout(enrolResponseEvent))
+        this(enrolResponseEvent.relativeStartTime)
 
     constructor(identifyResponseEvent: IdentifyResponseEvent) :
-        this(identifyResponseEvent.relativeStartTime, ApiCallout(identifyResponseEvent))
+        this(identifyResponseEvent.relativeStartTime)
 
     constructor(verifyResponseEvent: VerifyResponseEvent) :
-        this(verifyResponseEvent.relativeStartTime, ApiCallout(verifyResponseEvent))
+        this(verifyResponseEvent.relativeStartTime)
 
     constructor(refusalFormResponseEvent: RefusalFormResponseEvent) :
-        this(refusalFormResponseEvent.relativeStartTime, ApiCallout(refusalFormResponseEvent))
+        this(refusalFormResponseEvent.relativeStartTime)
 }
 
 
