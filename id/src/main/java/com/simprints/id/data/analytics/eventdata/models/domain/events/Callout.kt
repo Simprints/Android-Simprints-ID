@@ -4,3 +4,4 @@ import androidx.annotation.Keep
 
 @Keep
 abstract class Callout(var type: CalloutType)
+

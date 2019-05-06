@@ -44,7 +44,12 @@ fun validateCallbackEventApiModel(json: JsonObject) {
 
 fun validateCalloutEventApiModel(json: JsonObject){
     //TODO()
-    fail()
+    assertThat(json.get("integration").asString)
+    assertThat(json.get("projectId").asString)
+    assertThat(json.get("userId").asString)
+    assertThat(json.get("moduleId").asString)
+    assertThat(json.get("verifyGuid").asString)
+    assertThat(json.get("metadata").asString)
 }
 
 fun validateAuthorizationEventApiModel(json: JsonObject) {
@@ -212,10 +217,6 @@ fun validateEvent(json: JsonObject) {
         EventType.FINGERPRINT_CAPTURE -> validateFingerprintCaptureEventApiModel(json)
         EventType.CONNECTIVITY_SNAPSHOT -> validateConnectivitySnapshotEventApiModel(json)
         EventType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
-        EventType.ENROL_REQUEST -> TODO()
-        EventType.IDENTIFY_REQUEST -> TODO()
-        EventType.IDENTIFY_CONFIRMATION_REQUEST -> TODO()
-        EventType.VERIFY_REQUEST -> TODO()
         EventType.ENROL_RESPONSE -> TODO()
         EventType.IDENTIFY_RESPONSE -> TODO()
         EventType.REFUSAL_RESPONSE -> TODO()
