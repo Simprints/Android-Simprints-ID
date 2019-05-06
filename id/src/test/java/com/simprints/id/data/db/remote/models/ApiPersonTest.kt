@@ -2,15 +2,15 @@ package com.simprints.id.data.db.remote.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.id.commontesttools.PeopleGeneratorUtils
-import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.local.realm.models.toDomainPerson
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.domain.Person
+import com.simprints.id.testtools.TestApplication
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +37,7 @@ class ApiPersonTest {
         assertEquals(apiPerson.updatedAt, dbPerson.updatedAt)
         assertEquals(apiPerson.moduleId, dbPerson.moduleId)
         assertEquals(apiPerson.projectId, dbPerson.projectId)
-        assertEquals(apiPerson.fingerprints.size, dbPerson.fingerprints.size)
+        assertEquals(apiPerson.fingerprints?.size, dbPerson.fingerprints.size)
     }
 
     @Test
@@ -56,7 +56,7 @@ class ApiPersonTest {
         assertNull(apiPerson.updatedAt)
         assertEquals(apiPerson.moduleId, "moduleId")
         assertEquals(apiPerson.projectId, "projectId")
-        assertEquals(apiPerson.fingerprints.size, domainPerson.fingerprints.size)
+        assertEquals(apiPerson.fingerprints?.size, domainPerson.fingerprints.size)
     }
 
     @Test
@@ -68,14 +68,14 @@ class ApiPersonTest {
         assertEquals(apiPerson.userId, "user2")
         assertEquals(apiPerson.createdAt!!.time.toString(), "1520621879620")
         assertEquals(apiPerson.updatedAt!!.time.toString(), "1520621879620")
-        assertEquals(apiPerson.fingerprints.size, 2)
+        assertEquals(apiPerson.fingerprints?.size, 2)
 
         val fingerprints = apiPerson.fingerprints
 
         assertNotNull(fingerprints)
-        assertEquals(fingerprints.first().finger, FingerIdentifier.LEFT_THUMB)
-        assertEquals(fingerprints.first().quality, 52)
-        assertEquals(fingerprints.first().template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
+        assertEquals(fingerprints?.first()?.finger, FingerIdentifier.LEFT_THUMB)
+        assertEquals(fingerprints?.first()?.quality, 52)
+        assertEquals(fingerprints?.first()?.template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
     }
 
     @Test
@@ -92,7 +92,7 @@ class ApiPersonTest {
         assertTrue(personJson.get("updatedAt").asJsonPrimitive.isNumber)
         assertTrue(personJson.has("fingerprints") or personJson.has("faces"))
 
-        apiPerson.fingerprints.first().finger.name
+        apiPerson.fingerprints?.first()?.finger?.name
         val fingerprintJson = personJson.get("fingerprints").asJsonArray.first().asJsonObject
 
         assertTrue(fingerprintJson.has("quality"))
