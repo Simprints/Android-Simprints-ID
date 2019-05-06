@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.core.network.NetworkConstants
+import com.simprints.id.data.db.remote.models.ApiModes
 import com.simprints.id.data.db.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.remote.models.ApiPerson
 import io.reactivex.Single
@@ -38,5 +39,5 @@ interface PeopleRemoteInterface {
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: List<String>?,
-        @Query("mode") mode: List<String>): Single<Response<List<ApiPeopleCount>>>
+        @Query("modes") modes: List<ApiModes>): Single<Response<List<ApiPeopleCount>>>
 }
