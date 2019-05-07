@@ -5,7 +5,7 @@ def kotlin = [
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
 
-def dagger_version = "2.21"
+def dagger_version = "2.22"
 def dagger = [
     core    : "com.google.dagger:dagger:$dagger_version",
     compiler: "com.google.dagger:dagger-compiler:$dagger_version",

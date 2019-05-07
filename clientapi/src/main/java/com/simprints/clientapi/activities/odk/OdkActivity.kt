@@ -3,6 +3,9 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
+import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
+import com.simprints.id.Application
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
@@ -17,11 +20,16 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
     }
 
+    override val action
+        get() = intent.action
+
     override lateinit var presenter: OdkContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presenter = OdkPresenter(this, intent.action).apply { start() }
+        OdkComponentInjector.inject(this)
+
+        presenter.start()
     }
 
     override fun returnRegistration(registrationId: String) = Intent().let {
@@ -53,4 +61,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        LibSimprintsComponentInjector.setComponent(null)
+    }
 }
