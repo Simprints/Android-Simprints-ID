@@ -69,6 +69,7 @@ dependencies {
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.robolectric.core
     testImplementation deps.testing.robolectric.multidex
+    testImplementation deps.testing.mockito.kotlin
 
     // Android Tests
     androidTestImplementation(project(':testtools')){

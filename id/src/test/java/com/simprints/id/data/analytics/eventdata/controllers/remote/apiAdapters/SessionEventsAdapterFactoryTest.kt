@@ -2,12 +2,14 @@ package com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters
 
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.gson.Gson
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.commontesttools.sessionEvents.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPoolType
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
@@ -89,9 +91,40 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
-    fun validate_calloutEventApiModel() {
-        val event = VerificationCallout("", "projectId", "userId", "moduleId", "verifyGuid", "metadata")
-        val apiEvent = event.toApiVerificationCallout()
+    fun validate_calloutEventForVerificationApiModel() {
+        val calloutVerification = VerificationCallout("projectId", "userId", "moduleId", "verifyGuid", "metadata")
+        val calloutEvent = CalloutEvent("ODK_SHOULD_BE_ENUM", 10, calloutVerification)
+        val apiEvent = ApiCalloutEvent(calloutEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCalloutEventApiModel(json)
+    }
+
+    @Test
+    fun validate_calloutEventForIdentificationApiModel() {
+        val calloutVerification = IdentificationCallout("projectId", "userId", "moduleId", "metadata")
+        val calloutEvent = CalloutEvent("ODK_SHOULD_BE_ENUM", 10, calloutVerification)
+        val apiEvent = ApiCalloutEvent(calloutEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCalloutEventApiModel(json)
+    }
+
+    @Test
+    fun validate_calloutEventForConfirmationApiModel() {
+        val calloutVerification = ConfirmationCallout("selectedGuid", "sessionId")
+        val calloutEvent = CalloutEvent("ODK_SHOULD_BE_ENUM", 10, calloutVerification)
+        val apiEvent = ApiCalloutEvent(calloutEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCalloutEventApiModel(json)
+    }
+
+    @Test
+    fun validate_calloutEventForEnrolmentApiModel() {
+        val calloutVerification = EnrolmentCallout("projectId", "userId", "moduleId", "metadata")
+        val calloutEvent = CalloutEvent("ODK_SHOULD_BE_ENUM", 10, calloutVerification)
+        val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
         validateCalloutEventApiModel(json)
@@ -246,6 +279,22 @@ class SessionEventsAdapterFactoryTest {
         val apiLocation = ApiLocation(location)
         val json = gsonWithAdapters.toJsonTree(apiLocation).asJsonObject
         validateLocationApiModel(json)
+    }
+
+    @Test
+    fun validate_suspiciousIntentEventApiModel() {
+        val suspiciousIntentEvent = SuspiciousIntentEvent(mapOf("extraFieldKey" to "someUnexpectedField"))
+        val apiSuspiciousIntentEvent = ApiSuspiciousIntentEvent(suspiciousIntentEvent)
+        val json = gsonWithAdapters.toJsonTree(apiSuspiciousIntentEvent).asJsonObject
+        validateSuspiciousIntentEventApiModel(json)
+    }
+
+    @Test
+    fun validate_invalidEventApiModel() {
+        val suspiciousIntentEvent = InvalidIntentEvent("action_should_be_enum", mapOf("projectId" to "someProject"))
+        val apiSuspiciousIntentEvent = ApiInvalidIntentEvent(suspiciousIntentEvent)
+        val json = gsonWithAdapters.toJsonTree(apiSuspiciousIntentEvent).asJsonObject
+        validateSuspiciousIntentEventApiModel(json)
     }
 
     @Test

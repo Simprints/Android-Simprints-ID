@@ -26,5 +26,6 @@ fun DbEvent.toDomainEvent(): Event? = when (getType()) {
     EventType.CONNECTIVITY_SNAPSHOT -> JsonHelper.gson.fromJson(jsonEvent, ConnectivitySnapshotEvent::class.java)
     EventType.INVALID_INTENT -> JsonHelper.gson.fromJson(jsonEvent, InvalidIntentEvent::class.java)
     EventType.CALLOUT -> JsonHelper.gson.fromJson(jsonEvent, CalloutEvent::class.java)
+    EventType.SUSPICIOUS_INTENT -> JsonHelper.gson.fromJson(jsonEvent, SuspiciousIntentEvent::class.java)
     null -> null
 }

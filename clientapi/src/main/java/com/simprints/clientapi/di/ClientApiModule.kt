@@ -8,6 +8,7 @@ import dagger.Provides
 
 @Module
 open class ClientApiModule {
+
     @Provides
     @FeatureScope
     open fun provideGsonBuilder(): GsonBuilder = GsonBuilderImpl()
