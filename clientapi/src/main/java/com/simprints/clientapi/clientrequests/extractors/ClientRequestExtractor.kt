@@ -14,6 +14,7 @@ abstract class ClientRequestExtractor(private val intent: Intent) {
 
     open fun getMetatdata(): String = intent.extractString(Constants.SIMPRINTS_METADATA)
 
+
     protected open fun Intent.extractString(key: String): String = this.getStringExtra(key) ?: ""
 
 }

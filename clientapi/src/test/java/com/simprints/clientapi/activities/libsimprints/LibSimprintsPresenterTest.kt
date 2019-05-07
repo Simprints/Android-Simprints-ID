@@ -29,7 +29,7 @@ class LibSimprintsPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -38,7 +38,7 @@ class LibSimprintsPresenterTest {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view.identifyExtractor) thenReturn identifyExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -47,7 +47,7 @@ class LibSimprintsPresenterTest {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         whenever(view.verifyExtractor) thenReturn verificationExtractor
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -56,13 +56,13 @@ class LibSimprintsPresenterTest {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        LibSimprintsPresenter(view, "Garbage").apply { start() }
+        LibSimprintsPresenter(view, mock(), mock(), "Garbage").apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -70,7 +70,7 @@ class LibSimprintsPresenterTest {
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT)
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_REGISTER_INTENT)
             .handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(Registration(registerId)) }
     }
@@ -82,7 +82,7 @@ class LibSimprintsPresenterTest {
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).handleIdentifyResponse(
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_IDENTIFY_INTENT).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
         verifyOnce(view) {
             returnIdentification(
@@ -96,7 +96,7 @@ class LibSimprintsPresenterTest {
     fun handleVerification_ShouldReturnValidVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
+        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
@@ -108,7 +108,7 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        LibSimprintsPresenter(view, "").handleResponseError()
+        LibSimprintsPresenter(view, mock(), mock(), "").handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 }

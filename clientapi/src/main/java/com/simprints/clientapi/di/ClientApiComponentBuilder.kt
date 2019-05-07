@@ -4,11 +4,10 @@ import com.simprints.id.Application
 import com.simprints.id.di.AppComponent
 
 class ClientApiComponentBuilder {
-    companion object {
 
+    companion object {
         private var component: ClientApiComponent? = null
 
-        //StopShip
         @JvmStatic
         fun getComponent(app: Application): ClientApiComponent =
             component?.let {
@@ -24,6 +23,5 @@ class ClientApiComponentBuilder {
         fun setComponent(testAppComponent: ClientApiComponent) {
             component = testAppComponent
         }
-
     }
 }

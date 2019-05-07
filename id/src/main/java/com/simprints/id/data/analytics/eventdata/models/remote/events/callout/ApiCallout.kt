@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.eventdata.models.remote.events
+package com.simprints.id.data.analytics.eventdata.models.remote.events.callout
 
 import androidx.annotation.Keep
 

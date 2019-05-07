@@ -22,4 +22,5 @@ enum class EventType {
     INVALID_INTENT,
     CALLOUT,
     CALLBACK
+    SUSPICIOUS_INTENT,
 }

@@ -9,6 +9,8 @@ interface OdkContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
+        val action: String?
+
         fun returnRegistration(registrationId: String)
 
         fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String)
