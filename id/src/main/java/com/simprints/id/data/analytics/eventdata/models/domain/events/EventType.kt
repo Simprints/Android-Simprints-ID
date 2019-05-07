@@ -4,11 +4,6 @@ import androidx.annotation.Keep
 
 @Keep
 enum class EventType {
-    ENROL_RESPONSE,
-    IDENTIFY_RESPONSE,
-    REFUSAL_RESPONSE,
-    VERIFY_RESPONSE,
-    NO_RESPONSE,
     ARTIFICIAL_TERMINATION,
     AUTHENTICATION,
     CONSENT,
@@ -25,5 +20,6 @@ enum class EventType {
     CANDIDATE_READ,
     SCANNER_CONNECTION,
     INVALID_INTENT,
-    CALLOUT
+    CALLOUT,
+    CALLBACK
 }

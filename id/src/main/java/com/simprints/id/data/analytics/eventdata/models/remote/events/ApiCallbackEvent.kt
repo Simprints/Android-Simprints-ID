@@ -4,23 +4,15 @@ import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 
 @Keep
-class ApiCallbackEvent(val relativeStartTime: Long,
-                       val result: ApiCallout? = null) : ApiEvent(ApiEventType.CALLBACK) {
+class ApiCallbackEvent(val relativeStartTime: Long, val callback: ApiCallback) : ApiEvent(ApiEventType.CALLBACK) {
 
-    constructor(noResponseEvent: NoResponseEvent) :
-        this(noResponseEvent.relativeStartTime)
-
-    constructor(enrolResponseEvent: EnrolResponseEvent) :
-        this(enrolResponseEvent.relativeStartTime)
-
-    constructor(identifyResponseEvent: IdentifyResponseEvent) :
-        this(identifyResponseEvent.relativeStartTime)
-
-    constructor(verifyResponseEvent: VerifyResponseEvent) :
-        this(verifyResponseEvent.relativeStartTime)
-
-    constructor(refusalFormResponseEvent: RefusalFormResponseEvent) :
-        this(refusalFormResponseEvent.relativeStartTime)
+    constructor(callbackEvent: CallbackEvent): this(callbackEvent.relativeStartTime, getApiCallback(callbackEvent.callback))
 }
 
-
+fun getApiCallback(callback: Callback): ApiCallback = when(callback) {
+    is EnrolmentCallback -> callback.toApiEnrolmentCallback()
+    is IdentificationCallback -> callback.toApiIentificationCallback()
+    is VerificationCallback -> callback.toApiVerificationCallback()
+    is RefusalCallback -> callback.toApiRefusalCallback()
+    else -> throw Exception() //STOPSHIP
+}
