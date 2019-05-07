@@ -288,13 +288,14 @@ fun validateLocationApiModel(json: JsonObject) {
 }
 
 fun validateSuspiciousIntentEventApiModel(json: JsonObject) {
-    assertThat(json.get("extras").asJsonObject.toString()).isNotNull()
     assertThat(json.get("type").asString).isEqualTo("SUSPICIOUS_INTENT")
+    assertThat(json.get("unexpectedExtras").asJsonObject.toString()).isNotNull()
     assertThat(json.size()).isEqualTo(2)
 }
 
 fun validateInvalidEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("INVALID_INTENT")
+    assertThat(json.get("extras").asJsonObject.toString()).isNotNull()
     assertThat(json.get("action").asString).isAnyOf(
         "com.simprints.simodkadapter.REGISTER",
         "com.simprints.simodkadapter.IDENTIFY",
