@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import com.google.gson.Gson
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -10,6 +11,7 @@ import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
@@ -28,8 +30,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForRegister_ShouldRequestRegister() {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -37,8 +41,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForIdentify_ShouldRequestIdentify() {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view.identifyExtractor) thenReturn identifyExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -46,8 +52,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForVerify_ShouldRequestVerify() {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         whenever(view.verifyExtractor) thenReturn verificationExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -55,8 +63,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
+        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
+
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 
@@ -84,6 +94,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, mock(), mock(), Constants.SIMPRINTS_IDENTIFY_INTENT).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
+
         verifyOnce(view) {
             returnIdentification(
                 ArrayList(idList.map {
@@ -111,4 +122,10 @@ class LibSimprintsPresenterTest {
         LibSimprintsPresenter(view, mock(), mock(), "").handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
+
+    private fun mockGsonBuilder() =
+        mock<GsonBuilder>().apply {
+            val gson = mock<Gson>().apply { whenever(this) { toJson("") } thenReturn "{}" }
+            whenever(this) { build() } thenReturn gson
+        }
 }
