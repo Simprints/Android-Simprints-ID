@@ -6,6 +6,10 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCallout
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
@@ -71,7 +75,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     private fun parseAppRequest() {
-            appRequest = view.parseRequest()
+        appRequest = view.parseRequest()
     }
 
     private fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
@@ -91,14 +95,17 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             else -> throw Throwable("unrecognised request") //StopShip
         }
 
-    private fun buildIdentificationCallout(): Callout = IdentificationCallout("", appRequest.projectId,
-        appRequest.userId, appRequest.moduleId, appRequest.metadata)
+    private fun buildIdentificationCallout(): Callout = with(appRequest) {
+        IdentificationCallout(projectId, userId, moduleId, metadata)
+    }
 
-    private fun buildVerificationCallout(): Callout = VerificationCallout("", appRequest.projectId,
-        appRequest.userId, appRequest.moduleId, (appRequest as AppVerifyRequest).verifyGuid, appRequest.metadata)
+    private fun buildVerificationCallout(): Callout = with(appRequest) {
+        VerificationCallout(projectId, userId, moduleId, (this as AppVerifyRequest).verifyGuid, metadata)
+    }
 
-    private fun buildEnrolmentCallout(): Callout = EnrolmentCallout("", appRequest.projectId,
-        appRequest.userId, appRequest.moduleId, appRequest.metadata)
+    private fun buildEnrolmentCallout(): Callout = with(appRequest) {
+        EnrolmentCallout(projectId, userId, moduleId, metadata)
+    }
 
     private fun setLastUser() {
         preferencesManager.lastUserUsed = appRequest.userId

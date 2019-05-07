@@ -2,7 +2,7 @@ package com.simprints.clientapi.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
-import com.simprints.id.data.analytics.eventdata.models.domain.events.Callout as CoreCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout as CoreCallout
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent as CoreCalloutEvent
 
 @Keep

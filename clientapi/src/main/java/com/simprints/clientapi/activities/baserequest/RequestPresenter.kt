@@ -50,28 +50,24 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
         addInvalidSessionInBackground().also { view.handleClientRequestError(exception) }
     }
 
-    protected fun addSuspiciousEventIfRequired(request: ClientBase) {
-        with(gsonBuilder.build()) {
-            val extrasKeys = extractExtraKeysFromIntent(request)
-            if (extrasKeys.isNotEmpty()) {
-                clientApiSessionEventsManager
-                    .addSessionEvent(SuspiciousIntentEvent(this.toJson(extrasKeys)))
-            }
+    private fun addSuspiciousEventIfRequired(request: ClientBase) {
+        val extrasKeys = extractExtraKeysAndValuesFromIntent(request)
+        if (extrasKeys.isNotEmpty()) {
+            clientApiSessionEventsManager
+                .addSessionEvent(SuspiciousIntentEvent(extrasKeys))
         }
     }
 
-    private fun extractExtraKeysFromIntent(request: ClientBase): Set<String> =
+    protected fun extractExtraKeysAndValuesFromIntent(request: ClientBase): Map<String, Any?> =
         with(gsonBuilder.build()) {
             val requestJson = this.toJson(request)
-            val rightKeysAndValues = this.fromJson<Map<String, String>>(requestJson, object : TypeToken<Map<String, String>>() {}.type)
-            val keysAndValuesInIntent = extractKeysFromIntent()
-            keysAndValuesInIntent?.keys?.subtract(rightKeysAndValues.keys) ?: emptySet()
+            val expectedKeysAndValues = this.fromJson<Map<String, String>>(requestJson, object : TypeToken<Map<String, String>>() {}.type)
+            val keysAndValuesFromIntent = extractKeysAndValuesFromIntent()
+            keysAndValuesFromIntent?.filterKeys { !expectedKeysAndValues.containsKey(it) } ?: emptyMap()
         }
 
-    private fun extractKeysFromIntent() =
-        view.getIntentExtras()
-            ?.mapValues { it.value.toString() }
-            ?.filter { it.key.isEmpty() && it.value.isEmpty() }
+    private fun extractKeysAndValuesFromIntent() =
+        view.getIntentExtras()?.filter { it.key.isNotEmpty()}
 
 
     private fun addInvalidSessionInBackground() {

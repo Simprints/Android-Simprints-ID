@@ -29,7 +29,7 @@ class OdkPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        OdkPresenter(view, ACTION_REGISTER).apply { start() }
+        OdkPresenter(view, mock(), mock(), ACTION_REGISTER).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -38,7 +38,7 @@ class OdkPresenterTest {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
 
-        OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
+        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -47,13 +47,13 @@ class OdkPresenterTest {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         whenever(view) { verifyExtractor } thenReturn verifyExractor
 
-        OdkPresenter(view, ACTION_VERIFY).apply { start() }
+        OdkPresenter(view, mock(), mock(), ACTION_VERIFY).apply { start() }
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, "Garbage").apply { start() }
+        OdkPresenter(view, mock(), mock(), "Garbage").apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -61,7 +61,7 @@ class OdkPresenterTest {
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER).handleEnrollResponse(EnrollResponse(registerId))
+        OdkPresenter(view, mock(), mock(), ACTION_REGISTER).handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(registerId) }
     }
 
@@ -71,7 +71,7 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY).handleIdentifyResponse(
+        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
         verifyOnce(view) {
             returnIdentification(
@@ -86,7 +86,7 @@ class OdkPresenterTest {
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        OdkPresenter(view, ACTION_IDENTIFY).handleVerifyResponse(verification)
+        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY).handleVerifyResponse(verification)
         verifyOnce(view) {
             returnVerification(
                 id = verification.matchResult.guidFound,
@@ -97,7 +97,7 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "").handleResponseError()
+        OdkPresenter(view, mock(), mock(), "").handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -106,7 +106,7 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
+        OdkPresenter(view, mock(), mock(), ACTION_CONFIRM_IDENTITY).apply { start() }
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 }

@@ -27,4 +27,5 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
     INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
     CALLOUT -> ApiCalloutEvent(this as CalloutEvent)
+    SUSPICIOUS_INTENT -> ApiSuspiciousIntentEvent(this as SuspiciousIntentEvent)
 }
