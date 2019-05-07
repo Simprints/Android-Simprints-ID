@@ -12,13 +12,13 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 @Keep
-data class ApiPerson(@SerializedName("id") var patientId: String,
-                     var projectId: String,
-                     var userId: String,
-                     var moduleId: String,
-                     var createdAt: Date?,
-                     var updatedAt: Date?,
-                     var fingerprints: HashMap<FingerIdentifier, ArrayList<ApiFingerprint>>) : PostGsonProcessable {
+data class ApiGetPerson(@SerializedName("id") var patientId: String,
+                        var projectId: String,
+                        var userId: String,
+                        var moduleId: String,
+                        var createdAt: Date?,
+                        var updatedAt: Date?,
+                        var fingerprints: HashMap<FingerIdentifier, ArrayList<ApiFingerprint>>) : PostGsonProcessable {
 
     @SkipSerialisationProperty
     val fingerprintsAsList
@@ -30,8 +30,8 @@ data class ApiPerson(@SerializedName("id") var patientId: String,
     }
 }
 
-fun Person.toFirebasePerson(): ApiPerson =
-    ApiPerson(
+fun Person.toApiPerson(): ApiGetPerson =
+    ApiGetPerson(
         patientId = patientId,
         projectId = projectId,
         userId = userId,
@@ -39,12 +39,12 @@ fun Person.toFirebasePerson(): ApiPerson =
         createdAt = createdAt,
         updatedAt = updatedAt,
         fingerprints = HashMap(fingerprints
-            .map(Fingerprint::toFirebaseFingerprint)
+            .map(Fingerprint::toApiFingerprint)
             .groupBy { it.fingerId }
             .mapValues { ArrayList(it.value) })
     )
 
-fun ApiPerson.toDomainPerson(): Person =
+fun ApiGetPerson.toDomainPerson(): Person =
     Person(
         patientId = patientId,
         projectId = projectId,

@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class ApiPersonTest {
+class ApiGetPersonTest {
 
     private val apiPersonJson = "{\"id\":\"aeed3784-a399-445a-9dcd-0a373184709c\",\"projectId\":\"test10MProject\",\"moduleId\":\"module2\",\"userId\":\"user2\",\"createdAt\":1520621879620,\"updatedAt\":1520621879620,\"fingerprints\":{\"LEFT_THUMB\":[{\"quality\":52,\"template\":\"Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA\"}],\"LEFT_INDEX_FINGER\":[{\"quality\":60,\"template\":\"Rk1SACAyMAAAAAGkAAABLAGQAMUAxQEAABBPQUAcACxpAEA3ADd4AEAsADv4AIAfAD5uAEA0AEh7AECPAFFzAIBkAF14AEA/AF54AEAZAGmHAEA0AG/7AEANAHkNAEBRAHn1AEAVAHqRAEBgAH11AIAbAH4GAEAjAISKAEAGAI8UAIBUAJF7AEC7AJnqAECWALDkAIAzALGQAEAVALMRAIByALZyAIAiALyeAECLAMnhAIBEAMuMAICDANBiAEA2ANMVAICqANdiAEAwANmuAEBuAOFxAIA8AOOhAIApAOgpAECqAO1nAEAZAO+zAEBFAPGzAEBdAPSbAEBjAPb0AIB6APZpAEDNAP5oAIB0AP9sAEBfAQH0AEBfAQPRAEBoAQroAIAhAQq7AEDYARd1AEDGARh4AIBfARhNAEB3ARnqAEBYARnZAIBuAR3kAEAYASO7AEDFASyGAICVAS5vAIBqATReAEA4ATjdAEAtATzaAEDGAUOGAEBGAUldAEDEAVCNAECjAVN9AEA4AVpiAEBPAWRoAECjAW6DAIBwAXl1AAAA\"}]}}"
 
@@ -29,7 +29,7 @@ class ApiPersonTest {
             FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
         )).toRealmPerson()
 
-        val apiPerson = dbPerson.toDomainPerson().toFirebasePerson()
+        val apiPerson = dbPerson.toDomainPerson().toApiPerson()
 
         Assert.assertEquals(apiPerson.patientId, dbPerson.patientId)
         Assert.assertEquals(apiPerson.userId, dbPerson.userId)
@@ -49,7 +49,7 @@ class ApiPersonTest {
                 FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
             ))
 
-        val apiPerson = domainPerson.toFirebasePerson()
+        val apiPerson = domainPerson.toApiPerson()
 
         Assert.assertEquals(apiPerson.patientId, domainPerson.patientId)
         Assert.assertEquals(apiPerson.userId, "userId")
@@ -63,7 +63,7 @@ class ApiPersonTest {
 
     @Test
     fun deserialiseApiPerson() {
-        val apiPerson = JsonHelper.gson.fromJson(apiPersonJson, ApiPerson::class.java)
+        val apiPerson = JsonHelper.gson.fromJson(apiPersonJson, ApiGetPerson::class.java)
         Assert.assertEquals(apiPerson.patientId, "aeed3784-a399-445a-9dcd-0a373184709c")
         Assert.assertEquals(apiPerson.projectId, "test10MProject")
         Assert.assertEquals(apiPerson.moduleId, "module2")
@@ -81,7 +81,7 @@ class ApiPersonTest {
 
     @Test
     fun serialiseApiPerson_skipUnwantedFields() {
-        val apiPerson = PeopleGeneratorUtils.getRandomPerson().toFirebasePerson()
+        val apiPerson = PeopleGeneratorUtils.getRandomPerson().toApiPerson()
         val jsonString = JsonHelper.toJson(apiPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 

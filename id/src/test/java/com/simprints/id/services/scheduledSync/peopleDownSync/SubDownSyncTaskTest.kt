@@ -16,8 +16,8 @@ import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiPerson
-import com.simprints.id.data.db.remote.models.toFirebasePerson
+import com.simprints.id.data.db.remote.models.ApiGetPerson
+import com.simprints.id.data.db.remote.models.toApiPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.domain.fingerprint.Person
@@ -230,7 +230,7 @@ class SubDownSyncTaskTest {
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
-    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiPerson>) {
+    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiGetPerson>) {
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
         Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
     }
@@ -240,7 +240,7 @@ class SubDownSyncTaskTest {
     }
 
     private fun prepareResponseForSubScope(subSyncScope: SubSyncScope, nPeople: Int) =
-        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
+        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.toApiPerson() }.sortedBy { it.updatedAt }
 
     private fun setupApi() {
         PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
@@ -279,7 +279,7 @@ class SubDownSyncTaskTest {
         whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
     }
 
-    private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiPerson>): MockResponse? {
+    private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiGetPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {
             it.setResponseCode(200)
@@ -287,7 +287,7 @@ class SubDownSyncTaskTest {
         }
     }
 
-    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiPerson>): MockResponse? {
+    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiGetPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
         return MockResponse().let {
