@@ -12,6 +12,8 @@ interface LibSimprintsContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
+        val action: String?
+
         fun returnRegistration(registration: Registration)
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String)

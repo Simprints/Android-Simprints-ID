@@ -3,16 +3,25 @@ package com.simprints.clientapi.activities.libsimprints
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
+import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
+import com.simprints.id.Application
 import com.simprints.libsimprints.*
+import javax.inject.Inject
 
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
-    override lateinit var presenter: LibSimprintsContract.Presenter
+    @Inject override lateinit var presenter: LibSimprintsContract.Presenter
+
+    override val action
+        get() = intent.action
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presenter = LibSimprintsPresenter(this, intent.action).apply { start() }
+        LibSimprintsComponentInjector.inject(this)
+
+        presenter.start()
     }
 
     override fun returnRegistration(registration: Registration) = Intent().let {
@@ -37,4 +46,8 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        LibSimprintsComponentInjector.setComponent(null)
+    }
 }

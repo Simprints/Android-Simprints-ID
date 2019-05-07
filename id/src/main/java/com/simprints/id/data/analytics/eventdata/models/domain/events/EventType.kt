@@ -25,5 +25,6 @@ enum class EventType {
     CANDIDATE_READ,
     SCANNER_CONNECTION,
     INVALID_INTENT,
+    SUSPICIOUS_INTENT,
     CALLOUT
 }
