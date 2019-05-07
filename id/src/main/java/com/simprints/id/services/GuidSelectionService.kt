@@ -8,10 +8,13 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConfirmationCallout
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
+import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppConfirmation
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -28,6 +31,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var timeHelper: TimeHelper
 
     override fun onCreate() {
         super.onCreate()
@@ -47,6 +51,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         val callbackSent = try {
             checkProjectId(projectId)
             sessionId.let {
+                addConfirmationCalloutEvent(selectedGuid, sessionId)
                 sessionEventsManager
                     .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
                     .subscribeOn(Schedulers.io())
@@ -76,4 +81,11 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     private fun checkProjectId(projectId: String) {
         if (!loginInfoManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
     }
+
+    private fun addConfirmationCalloutEvent(selectedGuid: String, sessionId: String) {
+        sessionEventsManager.addSessionEvent(getConfirmationCalloutEvent(selectedGuid, sessionId))
+    }
+
+    private fun getConfirmationCalloutEvent(selectedGuid: String, sessionId: String) =
+        CalloutEvent("", timeHelper.now(), ConfirmationCallout(selectedGuid, sessionId))
 }
