@@ -11,6 +11,7 @@ import com.simprints.clientapi.domain.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.exceptions.InvalidRequestException
+import javax.inject.Inject
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView)

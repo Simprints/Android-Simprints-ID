@@ -8,11 +8,6 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     ARTIFICIAL_TERMINATION -> ApiArtificialTerminationEvent(this as ArtificialTerminationEvent)
     REFUSAL -> ApiRefusalEvent(this as RefusalEvent)
     CONSENT -> ApiConsentEvent(this as ConsentEvent)
-    ENROL_RESPONSE -> ApiCallbackEvent(this as EnrolResponseEvent)
-    VERIFY_RESPONSE -> ApiCallbackEvent(this as VerifyResponseEvent)
-    IDENTIFY_RESPONSE -> ApiCallbackEvent(this as IdentifyResponseEvent)
-    REFUSAL_RESPONSE -> ApiCallbackEvent(this as RefusalFormResponseEvent)
-    NO_RESPONSE -> ApiCallbackEvent(this as NoResponseEvent)
     ENROLMENT -> ApiEnrollmentEvent(this as EnrolmentEvent)
     ALERT_SCREEN ->  ApiAlertScreenEvent(this as AlertScreenEvent)
     CANDIDATE_READ -> ApiCandidateReadEvent(this as CandidateReadEvent)
@@ -27,4 +22,5 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
     INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
     CALLOUT -> ApiCalloutEvent(this as CalloutEvent)
+    CALLBACK -> ApiCallbackEvent(this as CallbackEvent)
 }

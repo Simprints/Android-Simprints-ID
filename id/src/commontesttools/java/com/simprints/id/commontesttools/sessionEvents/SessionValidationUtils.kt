@@ -217,11 +217,6 @@ fun validateEvent(json: JsonObject) {
         EventType.FINGERPRINT_CAPTURE -> validateFingerprintCaptureEventApiModel(json)
         EventType.CONNECTIVITY_SNAPSHOT -> validateConnectivitySnapshotEventApiModel(json)
         EventType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
-        EventType.ENROL_RESPONSE -> TODO()
-        EventType.IDENTIFY_RESPONSE -> TODO()
-        EventType.REFUSAL_RESPONSE -> TODO()
-        EventType.VERIFY_RESPONSE -> TODO()
-        EventType.NO_RESPONSE -> TODO()
     }
 }
 
