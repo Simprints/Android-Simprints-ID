@@ -9,7 +9,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConfirmationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCallout
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest

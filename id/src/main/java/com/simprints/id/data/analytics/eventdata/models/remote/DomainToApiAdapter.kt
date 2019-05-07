@@ -23,4 +23,5 @@ fun Event.toApiEvent(): ApiEvent = when (this.type) {
     INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
     CALLOUT -> ApiCalloutEvent(this as CalloutEvent)
     CALLBACK -> ApiCallbackEvent(this as CallbackEvent)
+    SUSPICIOUS_INTENT -> ApiSuspiciousIntentEvent(this as SuspiciousIntentEvent)
 }
