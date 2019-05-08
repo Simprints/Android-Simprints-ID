@@ -330,7 +330,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_invalidEventApiModel() {
-        val invalidIntentEvent = InvalidIntentEvent("action_should_be_enum", mapOf("projectId" to "someProject"))
+        val invalidIntentEvent = InvalidIntentEvent(InvalidIntentEvent.IntentAction.ODK_CONFIRM, mapOf("projectId" to "someProject"))
         val apiInvalidIntentEvent = ApiInvalidIntentEvent(invalidIntentEvent)
         val json = gsonWithAdapters.toJsonTree(apiInvalidIntentEvent).asJsonObject
         validateInvalidEventApiModel(json)
