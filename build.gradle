@@ -6,6 +6,12 @@ buildscript {
         google()
         jcenter()
         maven {
+            url "http://storage.googleapis.com/r8-releases/raw/master"
+        }
+        maven {
+            url 'https://kotlin.bintray.com/kotlinx/'
+        }
+        maven {
             url "https://maven.fabric.io/public"
         }
         maven {
@@ -14,6 +20,8 @@ buildscript {
     }
 
     dependencies {
+        //Required for official r8 bug: https://issuetracker.google.com/issues/123242448
+        classpath 'com.android.tools:r8:1.3.52'  // Must be before the Gradle Plugin for Android.
         classpath 'com.android.tools.build:gradle:3.4.0'
 
         classpath "com.google.gms:google-services:4.2.0"

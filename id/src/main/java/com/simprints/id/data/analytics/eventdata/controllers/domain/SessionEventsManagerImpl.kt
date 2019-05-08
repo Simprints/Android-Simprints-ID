@@ -14,7 +14,7 @@ import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyCl
 import com.simprints.id.exceptions.unexpected.SessionNotFoundException
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.utils.EncodingUtils
+import com.simprints.core.tools.EncodingUtils
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers

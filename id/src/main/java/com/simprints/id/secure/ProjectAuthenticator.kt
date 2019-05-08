@@ -54,7 +54,6 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
-            .observeOn(AndroidSchedulers.mainThread())
 
     private fun Completable.prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
         andThen(buildAuthRequestParameters(nonceScope, projectSecret))

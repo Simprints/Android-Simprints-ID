@@ -89,6 +89,8 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
     }
 
     // Required for deps that use Java 8 (okhttp)
@@ -135,7 +137,7 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.androidx.core
-    implementation deps.androidx.multidex
+    api deps.androidx.multidex
     implementation deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
@@ -175,13 +177,14 @@ dependencies {
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     kapt deps.dagger.compiler
-    implementation deps.realm.annotations
-    implementation(deps.realm.kotlin) {
+    api deps.realm.annotations
+    api(deps.realm.kotlin) {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
     }
-    implementation deps.realm.android
+    api deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
+
     // Test
     testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
@@ -207,7 +210,11 @@ dependencies {
     kaptTest deps.dagger.compiler
     testImplementation project(':testtools')
     // Android test
-    androidTestImplementation project(':fingerprintscannermock')
+    androidTestImplementation(project(':fingerprintscannermock')) {
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+    }
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
@@ -215,6 +222,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor
     androidTestImplementation deps.testing.androidx.core
+    androidTestUtil deps.testing.androidx.orchestrator
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
@@ -222,6 +230,7 @@ dependencies {
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
     androidTestImplementation deps.testing.truth
+    androidTestImplementation deps.testing.rx2_idler
     androidTestImplementation(deps.testing.espresso.barista) {
         exclude group: "com.android.support"
         exclude group: "com.google.code.findbugs"
@@ -234,6 +243,9 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
     }
+    androidTestCompile project(path: ':libsimprints')
+
+    implementation 'io.ashdavies.rx.rxtasks:rx-tasks:+'
 }
 
 crashlytics {

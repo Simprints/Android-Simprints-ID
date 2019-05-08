@@ -1,20 +1,21 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.Person
+import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -26,10 +27,10 @@ import io.reactivex.schedulers.Schedulers
 class MatchingPresenter(
     private val view: MatchingContract.View,
     private val matchingRequest: MatchingActRequest,
-    private val dbManager: DbManager,
-    private val sessionEventsManager: SessionEventsManager,
-    private val crashReportManager: CrashReportManager,
-    private val timeHelper: TimeHelper,
+    private val dbManager: FingerprintDbManager,
+    private val sessionEventsManager: FingerprintSessionEventsManager,
+    private val crashReportManager: FingerprintCrashReportManager,
+    private val timeHelper: FingerprintTimeHelper,
     private val libMatcherConstructor: (com.simprints.fingerprintmatcher.Person, List<com.simprints.fingerprintmatcher.Person>,
                                         LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher
 ) : MatchingContract.Presenter {
@@ -47,8 +48,10 @@ class MatchingPresenter(
 
     private fun startMatchTask(matchTaskConstructor: (MatchingContract.View,
                                                       MatchingActRequest,
-                                                      DbManager,
-                                                      SessionEventsManager, CrashReportManager, TimeHelper) -> MatchTask) {
+                                                      FingerprintDbManager,
+                                                      FingerprintSessionEventsManager,
+                                                      FingerprintCrashReportManager,
+                                                      FingerprintTimeHelper) -> MatchTask) {
         val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
 
         matchTaskDisposable = matchTask.loadCandidates()
@@ -68,8 +71,8 @@ class MatchingPresenter(
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
-            val libProbe = probe.toMatcherPerson()
-            val libCandidates = candidates.map { it.toMatcherPerson() }
+            val libProbe = probe.fromDomainToMatcher()
+            val libCandidates = candidates.map { it.fromDomainToMatcher() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
@@ -90,12 +93,6 @@ class MatchingPresenter(
     }
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
-
-    private fun Person.toMatcherPerson() =
-        com.simprints.fingerprintmatcher.Person(patientId, fingerprints.map { it.toMatcherFingerprint() }) // STOPSHIP : Change LibMatcher interface
-
-    private fun Fingerprint.toMatcherFingerprint() =
-        com.simprints.fingerprintmatcher.Fingerprint(FingerIdentifier.values()[finger.ordinal], templateBytes) // STOPSHIP : Change LibMatcher interface
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception

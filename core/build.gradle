@@ -57,6 +57,7 @@ dependencies {
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
 
+    implementation deps.dagger.javax
 }
 
 repositories {

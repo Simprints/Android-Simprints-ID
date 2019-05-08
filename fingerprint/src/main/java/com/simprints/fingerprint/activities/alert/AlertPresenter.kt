@@ -1,26 +1,25 @@
 package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity.RESULT_CANCELED
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
-import com.simprints.fingerprint.di.FingerprintsComponent
-import com.simprints.fingerprint.tools.utils.TimeHelper
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
+import com.simprints.fingerprint.di.FingerprintComponent
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
-                     val component: FingerprintsComponent,
+                     val component: FingerprintComponent,
                      alertActRequest: AlertActRequest?) : AlertContract.Presenter {
 
     private val alertType = alertActRequest?.alert ?: FingerprintAlert.UNEXPECTED_ERROR
 
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var sessionManager: SessionEventsManager
-    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var sessionManager: FingerprintSessionEventsManager
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
 
     init {
         component.inject(this)
@@ -33,9 +32,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(it.timeRelativeToStartTime(timeHelper.now()), alertType.name))
-        }
+        sessionManager.addAlertEventInBackground(timeHelper.now(), alertType)
     }
 
     private fun initButtons() {
@@ -73,6 +70,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertType.name)
+        crashReportManager.logMessageForCrashReport(ALERT, UI, message = alertType.name)
     }
 }

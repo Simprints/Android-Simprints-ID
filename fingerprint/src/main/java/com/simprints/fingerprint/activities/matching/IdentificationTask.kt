@@ -3,32 +3,32 @@ package com.simprints.fingerprint.activities.matching
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.MatchEntry
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.Person
+import com.simprints.fingerprint.data.domain.person.Person
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
 internal class IdentificationTask(private val view: MatchingContract.View,
                                   matchingRequest: MatchingActRequest,
-                                  private val dbManager: DbManager,
-                                  private val sessionEventsManager: SessionEventsManager,
-                                  private val crashReportManager: CrashReportManager,
-                                  timeHelper: TimeHelper) : MatchTask {
+                                  private val dbManager: FingerprintDbManager,
+                                  private val sessionEventsManager: FingerprintSessionEventsManager,
+                                  private val crashReportManager: FingerprintCrashReportManager,
+                                  timeHelper: FingerprintTimeHelper) : MatchTask {
 
     private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
 
@@ -40,7 +40,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
     override fun loadCandidates(): Single<List<Person>> =
         Completable.fromAction { view.setIdentificationProgressLoadingStart() }
-            .andThen(dbManager.loadPeople(GROUP.valueOf(matchingIdentifyRequest.matchGroup.name)))
+            .andThen(dbManager.loadPeople(matchingIdentifyRequest.matchGroup))
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
@@ -79,6 +79,6 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.MATCHING, CrashReportTrigger.UI, Log.INFO, message)
+        crashReportManager.logMessageForCrashReport(MATCHING, UI, Log.INFO, message)
     }
 }

@@ -9,6 +9,8 @@ class InternalConstants {
             const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = PREFIX + 2
             const val REFUSAL_ACTIVITY_REQUEST = PREFIX + 3
             const val MATCHING_ACTIVITY_REQUEST = PREFIX + 4
+            const val ALERT_ACTIVITY_REQUEST = PREFIX + 5
+            const val SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE = PREFIX + 6
         }
     }
 

@@ -4,9 +4,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.core.network.SimApiClient
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.ReplaceRule
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -14,14 +13,15 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
-import com.simprints.id.testtools.state.mockLoginInfoManager
-import com.simprints.id.testtools.state.setupFakeKeyStore
+import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.ReplaceRule
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
@@ -67,7 +67,7 @@ class ProjectAuthenticatorTest {
             syncSchedulerHelperRule = MockRule,
             longConsentManagerRule = MockRule,
             peopleUpSyncMasterRule = MockRule,
-            keystoreManagerRule = ReplaceRule { setupFakeKeyStore() }
+            keystoreManagerRule = ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } }
         )
     }
 
@@ -79,7 +79,6 @@ class ProjectAuthenticatorTest {
             .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
             .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
-        mockLoginInfoManager(loginInfoManagerMock)
         whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
         whenever(longConsentManager.downloadAllLongConsents(anyNotNull())).thenReturn(Completable.complete())
 

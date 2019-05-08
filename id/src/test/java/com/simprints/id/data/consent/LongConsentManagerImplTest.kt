@@ -3,7 +3,7 @@ package com.simprints.id.data.consent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager

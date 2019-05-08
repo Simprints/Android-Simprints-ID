@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync
 
+import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -7,7 +8,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
-import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
@@ -45,6 +46,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLog
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.ceil
@@ -73,6 +75,8 @@ class SubDownSyncTaskTest {
 
     @Before
     fun setUp() {
+        ShadowLog.stream = System.out
+
         UnitTestConfig(this, module).fullSetup()
 
         whenever(remoteDbManagerSpy.getCurrentToken()).thenReturn(Single.just(""))
@@ -289,7 +293,7 @@ class SubDownSyncTaskTest {
 
     private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
-        val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
+        val badFbPersonJson = fbPersonJson.replace("id", "id_wrong")
         return MockResponse().let {
             it.setResponseCode(200)
             it.setBody(badFbPersonJson)

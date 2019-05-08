@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
@@ -23,7 +23,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = FingerprintsComponentBuilder.getComponent(application as Application)
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 

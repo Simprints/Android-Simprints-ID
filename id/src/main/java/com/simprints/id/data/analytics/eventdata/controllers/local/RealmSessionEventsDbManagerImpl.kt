@@ -36,6 +36,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
         initDbIfRequired().toSingle {
             realmConfig?.let {
                 Realm.getInstance(it)
+
             } ?: throw RealmUninitialisedException("No valid realm Config")
         }
 
@@ -47,6 +48,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
                 createAndSaveRealmConfig(localKey)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             return Completable.error(e)
         }
 
@@ -132,7 +134,9 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
 
     private fun createAndSaveRealmConfig(localDbKey: LocalDbKey): Single<RealmConfiguration> =
         Single.just(SessionRealmConfig.get(localDbKey.projectId, localDbKey.value)
-            .also { realmConfig = it })
+            .also {
+                realmConfig = it
+            })
 
     private fun addQueryParamForProjectId(projectId: String?, query: RealmQuery<DbSession>) {
         projectId?.let {

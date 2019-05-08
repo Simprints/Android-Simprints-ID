@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.activities.collect
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
+import com.simprints.core.tools.EncodingUtils
+import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
@@ -10,29 +13,25 @@ import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprin
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.data.domain.person.Fingerprint
+import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.fingerprint.tools.extensions.toResultEvent
-import com.simprints.fingerprint.tools.utils.TimeHelper
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.Person
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.utils.EncodingUtils
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -42,13 +41,13 @@ import kotlin.math.min
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
                                    private val fingerprintRequest: FingerprintRequest,
-                                   private val component: FingerprintsComponent)
+                                   private val component: FingerprintComponent)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var dbManager: FingerprintDbManager
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
+    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
@@ -269,6 +268,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun isRegisteringElseIsMatching() = fingerprintRequest is FingerprintEnrolRequest
 
+    @SuppressLint("CheckResult")
     private fun savePerson(person: Person) {
         dbManager.savePerson(person)
             .subscribeBy(
@@ -297,19 +297,18 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.updateSessionInBackground { sessionEvents ->
-            sessionEvents.addEvent(FingerprintCaptureEvent(
-                sessionEvents.timeRelativeToStartTime(lastCaptureStartedAt),
-                sessionEvents.timeRelativeToStartTime(timeHelper.now()),
-                FingerIdentifier.valueOf(finger.id.name), //StopShip: Fix me
+        sessionEventsManager.addFingerprintCaptureEventInBackground(
+            timeHelper.now(),
+            lastCaptureStartedAt,
+            FingerprintCaptureEvent(
+                finger.id,
                 qualityThreshold,
-                finger.status.toResultEvent(),
+                FingerprintCaptureEvent.buildResult(finger.status),
                 finger.template?.let {
                     FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
                 }
             ))
         }
-    }
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
@@ -349,7 +348,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
     }
 
     companion object {

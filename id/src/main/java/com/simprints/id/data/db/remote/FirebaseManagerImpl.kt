@@ -1,5 +1,6 @@
 package com.simprints.id.data.db.remote
 
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import com.simprints.id.tools.extensions.trace
@@ -16,16 +17,9 @@ open class FirebaseManagerImpl: RemoteDbManager {
     }
 
     override fun signInToRemoteDb(token: String): Completable =
-        Completable.create {
-            firebaseAuth.signInWithCustomToken(token).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Timber.d("Firebase Auth signInWithCustomToken successfully")
-                    it.onComplete()
-                } else {
-                    Timber.d("Firebase Auth signInWithCustomToken failed: ${task.exception}")
-                    it.onError(task.exception as Throwable)
-                }
-            }
+        Completable.fromAction {
+            val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
+            Timber.d(result.user.uid)
         }
 
     override fun signOutOfRemoteDb() {
@@ -34,22 +28,13 @@ open class FirebaseManagerImpl: RemoteDbManager {
 
     override fun isSignedIn(projectId: String, userId: String): Boolean = firebaseAuth.currentUser?.uid == projectId
 
-    override fun getCurrentToken(): Single<String> = Single.create {
-        firebaseAuth.getAccessToken(false).trace("getCurrentToken")
-            .addOnSuccessListener { result ->
-                // Firebase callbacks return on main thread, so the emits
-                // will be in the same thread.
-                doAsync {
-                    val token = result.token
-                    if (token == null) {
-                        it.onError(RemoteDbNotSignedInException())
-                    } else {
-                        it.onSuccess(token)
-                    }
-                }
-            }
-            .addOnFailureListener { e -> it.onError(e) }
-    }
+    override fun getCurrentToken(): Single<String> = Single.fromCallable {
+            val result = Tasks.await(firebaseAuth.getAccessToken(false))
+            result.token?.let {
+                it
+            } ?: throw RemoteDbNotSignedInException()
+        }
+
 
     companion object {
         const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L

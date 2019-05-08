@@ -1,7 +1,7 @@
 apply plugin: 'com.android.dynamic-feature'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
+apply plugin: 'kotlin-android-extensions'
 
 androidExtensions {
     experimental = true
@@ -12,6 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
+        multiDexEnabled true
         versionCode 1
         versionName "2019.1.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -26,9 +27,24 @@ android {
 
     testBuildType "debug"
 
+    sourceSets {
+        String sharedTestDir = 'src/commontesttools/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
     }
 }
 
@@ -57,21 +73,22 @@ repositories {
 }
 
 dependencies {
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Simprints
     implementation project(':id')
     implementation project(':libsimprints')
     implementation project(':fingerprintmatcher')
     implementation project(':fingerprintscanner')
     implementation project(':fingerprintscannermock')
 
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-
-    implementation deps.dagger.core
-    kapt deps.dagger.compiler
-
-    implementation deps.timber.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
+
+    // Android X
     implementation deps.androidx.core
     implementation deps.androidx.multidex
     implementation deps.androidx.appcompat
@@ -83,24 +100,110 @@ dependencies {
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
+    implementation deps.arch_components.work
+
+    // Dagger
+    implementation deps.dagger.core
+    kapt deps.dagger.compiler
+
+    // RxJava
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
+
+    // Timber
+    implementation deps.timber.core
+
+    // Play Services
     implementation deps.playservices.location
 
+    // ######################################################
+    //                      Unit test
+    // ######################################################
+
+    // Simprints
     testImplementation project(':testtools')
     testImplementation(deps.testing.junit) {
         exclude group: "com.android.support"
     }
+
+    // Android X
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.androidx.core
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
+
+    // Dagger
     kaptTest deps.dagger.compiler
-    testImplementation deps.testing.robolectric.core
+
+    // Mockito
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.truth
 
+    // Robolectric
+    testImplementation deps.testing.robolectric.core
+
+    // ######################################################
+    //                      Android test
+    // ######################################################
+
+    // Simprints
+    androidTestImplementation(project(':testtools')) {
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+    }
+
+    // Dagger
+    kaptAndroidTest deps.dagger.compiler
+
+    // Android X
+    androidTestImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestUtil deps.testing.androidx.orchestrator
+
+    // Mockito
+    androidTestImplementation deps.testing.mockito.core
+    androidTestImplementation deps.testing.mockito.android
+    androidTestImplementation deps.testing.mockito.kotlin
+
+    // Espresso
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
+    androidTestImplementation(deps.testing.espresso.barista) {
+        exclude group: "com.android.support"
+        exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
+    }
+
+    // Truth
+    androidTestImplementation deps.testing.truth
+
+    // TODO : Needed for android test since fingerprint depends on id
+
+    androidTestImplementation deps.playservices.safetynet
+
+    // Retrofit
+    testImplementation deps.retrofit.core
+    testImplementation deps.testing.retrofit
+    androidTestImplementation deps.retrofit.core
+    androidTestImplementation deps.testing.retrofit
+    androidTestImplementation deps.retrofit.adapter
+    androidTestImplementation deps.retrofit.convertergson
+
+    // Realm
+    implementation deps.realm.annotations
+    implementation(deps.realm.kotlin) {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    }
+    implementation deps.realm.android
+    kapt deps.realm.annotations_processor
+    compileOnly deps.realm.glassfish_annotation
 }

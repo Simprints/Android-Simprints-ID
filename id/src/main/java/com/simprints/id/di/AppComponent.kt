@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import android.content.Context
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivity
 import com.simprints.id.activities.alert.AlertPresenter
@@ -21,9 +22,18 @@ import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.OrchestratorPresenter
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityModule
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
+import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
+import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -36,12 +46,28 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.utils.SimNetworkUtils
+import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class])
 @Singleton
-@Component(modules = [(AppModule::class), (PreferencesModule::class), (SerializerModule::class)])
 interface AppComponent {
+
+    @Component.Builder interface Builder {
+
+        @BindsInstance
+        fun application(app: Application): Builder
+
+        fun appModule(appModule: AppModule): Builder
+        fun preferencesModule(preferencesModule: PreferencesModule): Builder
+        fun serializerModule(serializerModule: SerializerModule): Builder
+
+        fun build(): AppComponent
+    }
+
     fun inject(app: Application)
     fun inject(guidSelectionService: GuidSelectionService)
     fun inject(alertActivity: AlertActivity)
@@ -77,6 +103,17 @@ interface AppComponent {
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(inputMergeWorker: InputMergeWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
-    fun inject(orchestratorPresenter: OrchestratorPresenter)
 
+    fun getDbManager(): DbManager
+    fun getSessionEventsManager(): SessionEventsManager
+    fun getCrashReportManager(): CrashReportManager
+    fun getTimeHelper(): TimeHelper
+    fun getPreferencesManager(): PreferencesManager
+    fun getAnalyticsManager(): AnalyticsManager
+    fun getSimNetworkUtils(): SimNetworkUtils
+    fun getImprovedSharedPreferences(): ImprovedSharedPreferences
+    fun getRemoteConfigWrapper(): RemoteConfigWrapper
+    fun getContext(): Context
+
+    val orchestratorActivityComponentFactory: OrchestratorActivityComponent.Factory
 }

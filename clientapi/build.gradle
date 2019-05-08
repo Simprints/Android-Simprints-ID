@@ -65,7 +65,11 @@ dependencies {
     testImplementation deps.testing.robolectric.multidex
 
     // Android Tests
-    androidTestImplementation project(':testtools')
+    androidTestImplementation(project(':testtools')){
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+    }
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
