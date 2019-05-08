@@ -3,9 +3,16 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 import android.annotation.SuppressLint
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCallout
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
@@ -19,6 +26,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -39,7 +47,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     private var currentSession: String = ""
-    private lateinit var appRequest: AppRequest
+    internal lateinit var appRequest: AppRequest
 
     init {
         component.inject(this)
@@ -71,10 +79,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     private fun parseAppRequest() {
-            appRequest = view.parseRequest()
+        appRequest = view.parseRequest()
     }
 
-    private fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
+    internal fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
@@ -83,13 +91,25 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
+    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> EnrolRequestEvent(relativeStarTime, request)
-            is AppVerifyRequest -> VerifyRequestEvent(relativeStarTime, request)
-            is AppIdentifyRequest -> IdentifyRequestEvent(relativeStarTime, request)
-            else -> throw Throwable("unrecognised request") //StopShip
+            is AppEnrolRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildEnrolmentCallout())
+            is AppVerifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildVerificationCallout())
+            is AppIdentifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildIdentificationCallout())
+            else -> throw InvalidAppRequest()
         }
+
+    internal fun buildIdentificationCallout(): Callout = with(appRequest) {
+        IdentificationCallout(projectId, userId, moduleId, metadata)
+    }
+
+    internal fun buildVerificationCallout(): Callout = with(appRequest) {
+        VerificationCallout(projectId, userId, moduleId, (this as AppVerifyRequest).verifyGuid, metadata)
+    }
+
+    internal fun buildEnrolmentCallout(): Callout = with(appRequest) {
+        EnrolmentCallout(projectId, userId, moduleId, metadata)
+    }
 
     private fun setLastUser() {
         preferencesManager.lastUserUsed = appRequest.userId

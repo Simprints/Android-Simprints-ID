@@ -60,7 +60,7 @@ fun verifyEventsAfterEnrolment(events: List<Event>, realmForDataEvent: Realm) {
         FingerprintCaptureEvent::class.java,
         FingerprintCaptureEvent::class.java,
         PersonCreationEvent::class.java,
-        EnrollmentEvent::class.java
+        EnrolmentEvent::class.java
 //        CallbackEvent::class.java
     ).map { it.canonicalName }
 

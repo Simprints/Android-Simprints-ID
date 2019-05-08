@@ -1,6 +1,5 @@
 package com.simprints.id.activities.checkLogin
 
-import android.util.Log
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.remote.RemoteDbManager

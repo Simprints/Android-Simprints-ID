@@ -7,13 +7,15 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter
@@ -23,6 +25,8 @@ import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
+
+    abstract val integrationInfo: IntegrationInfo
 
     override val enrollExtractor: EnrollExtractor
         get() = EnrollExtractor(intent)
@@ -62,6 +66,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         else
             routeResponse(data.getParcelableExtra(BUNDLE_KEY))
     }
+
+    override fun getIntentAction() = intent.action ?: ""
+
+    override fun getIntentExtras() = intent?.extras?.toMap()
 
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)

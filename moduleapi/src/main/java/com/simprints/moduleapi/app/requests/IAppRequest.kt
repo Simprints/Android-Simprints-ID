@@ -13,5 +13,5 @@ interface IAppRequest : Parcelable {
     val userId: String
     val moduleId: String
     val metadata: String
-
+    val extra: IExtraRequestInfo
 }

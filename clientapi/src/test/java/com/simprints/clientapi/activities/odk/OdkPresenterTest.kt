@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import com.google.gson.Gson
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
@@ -10,10 +11,9 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
-import com.simprints.clientapi.requestFactories.EnrollRequestFactory
-import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
-import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_INTEGRATION
+import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
@@ -28,8 +28,10 @@ class OdkPresenterTest {
     fun startPresenterForRegister_ShouldRequestRegister() {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, ACTION_REGISTER).apply { start() }
+        OdkPresenter(view, mock(), gsonBuilder, ACTION_REGISTER, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -37,8 +39,10 @@ class OdkPresenterTest {
     fun startPresenterForIdentify_ShouldRequestIdentify() {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, ACTION_IDENTIFY).apply { start() }
+        OdkPresenter(view, mock(), gsonBuilder, ACTION_IDENTIFY, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -46,14 +50,16 @@ class OdkPresenterTest {
     fun startPresenterForVerify_ShouldRequestVerify() {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         whenever(view) { verifyExtractor } thenReturn verifyExractor
+        val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, ACTION_VERIFY).apply { start() }
+        OdkPresenter(view, mock(), gsonBuilder, ACTION_VERIFY, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, "Garbage").apply { start() }
+        OdkPresenter(view, mock(), mock(), "Garbage", mock()).apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -61,7 +67,8 @@ class OdkPresenterTest {
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER).handleEnrollResponse(EnrollResponse(registerId))
+        OdkPresenter(view, mock(), mock(), ACTION_REGISTER, MOCK_INTEGRATION).handleEnrollResponse(EnrollResponse(registerId))
+
         verifyOnce(view) { returnRegistration(registerId) }
     }
 
@@ -71,8 +78,9 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY).handleIdentifyResponse(
+        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY, MOCK_INTEGRATION).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
+
         verifyOnce(view) {
             returnIdentification(
                 idList = "${id1.guidFound} ${id2.guidFound}",
@@ -86,7 +94,8 @@ class OdkPresenterTest {
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        OdkPresenter(view, ACTION_IDENTIFY).handleVerifyResponse(verification)
+        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY, MOCK_INTEGRATION).handleVerifyResponse(verification)
+
         verifyOnce(view) {
             returnVerification(
                 id = verification.matchResult.guidFound,
@@ -97,7 +106,7 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "").handleResponseError()
+        OdkPresenter(view, mock(), mock(), "", MOCK_INTEGRATION).handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -106,7 +115,15 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY).apply { start() }
+        val gsonBuilder = mockGsonBuilder()
+        OdkPresenter(view, mock(), gsonBuilder, ACTION_CONFIRM_IDENTITY, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
+
+    private fun mockGsonBuilder() =
+        mock<GsonBuilder>().apply {
+            val gson = mock<Gson>().apply { whenever(this) { toJson("") } thenReturn "{}" }
+            whenever(this) { build() } thenReturn gson
+        }
 }

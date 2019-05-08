@@ -15,6 +15,8 @@ import com.nhaarman.mockito_kotlin.verify
 import com.simprints.id.Application
 import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppExtraRequestInfo
+import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
@@ -99,7 +101,7 @@ class OrchestratorActivityTest {
     private fun createScenarioForOrchestratorActivity(): ActivityScenario<OrchestratorActivity> =
         ActivityScenario.launch<OrchestratorActivity>(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, OrchestratorActivity::class.qualifiedName!!)
-            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "")
+            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "", AppExtraRequestInfo(AppIntegrationInfo.ODK))
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
         })
 

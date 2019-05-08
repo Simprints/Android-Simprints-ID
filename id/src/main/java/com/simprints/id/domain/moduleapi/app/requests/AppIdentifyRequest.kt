@@ -7,13 +7,16 @@ import kotlinx.android.parcel.Parcelize
 data class AppIdentifyRequest(override val projectId: String,
                               override val userId: String,
                               override val moduleId: String,
-                              override val metadata: String) : AppRequest {
+                              override val metadata: String,
+                              override val extraRequestInfo: AppExtraRequestInfo) : AppRequest {
 
     constructor(appRequest: IAppIdentifyRequest) : this(
         appRequest.projectId,
         appRequest.userId,
         appRequest.moduleId,
-        appRequest.metadata)
+        appRequest.metadata,
+        AppExtraRequestInfo(appRequest.extra)
+    )
 }
 
 fun AppRequest.isIdentifyRequest() = this is AppIdentifyRequest

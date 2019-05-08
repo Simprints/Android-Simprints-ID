@@ -1,6 +1,8 @@
 package com.simprints.clientapi.activities.odk
 
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
@@ -8,10 +10,15 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import com.simprints.clientapi.tools.json.GsonBuilder
 
 
-class OdkPresenter(val view: OdkContract.View,
-                   private val action: String?) : RequestPresenter(view), OdkContract.Presenter {
+class OdkPresenter(private val view: OdkContract.View,
+                   clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                   gsonBuilder: GsonBuilder,
+                   private val action: String?,
+                   integrationInfo: IntegrationInfo)
+    : RequestPresenter(view, clientApiSessionEventsManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
