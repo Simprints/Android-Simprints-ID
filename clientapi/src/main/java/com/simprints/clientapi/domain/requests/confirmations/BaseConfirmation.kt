@@ -1,4 +1,4 @@
-package com.simprints.clientapi.domain.confirmations
+package com.simprints.clientapi.domain.requests.confirmations
 
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
