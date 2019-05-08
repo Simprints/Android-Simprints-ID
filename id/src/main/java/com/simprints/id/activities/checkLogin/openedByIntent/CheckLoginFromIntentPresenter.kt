@@ -1,13 +1,14 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
-import android.util.Log
-import com.google.gson.Gson
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
@@ -46,7 +47,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     private var currentSession: String = ""
-    private lateinit var appRequest: AppRequest
+    internal lateinit var appRequest: AppRequest
 
     init {
         component.inject(this)
@@ -81,7 +82,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         appRequest = view.parseRequest()
     }
 
-    private fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
+    internal fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
                 add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
@@ -90,7 +91,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
+    internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
             is AppEnrolRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildEnrolmentCallout())
             is AppVerifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildVerificationCallout())
@@ -98,15 +99,15 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             else -> throw InvalidAppRequest()
         }
 
-    private fun buildIdentificationCallout(): Callout = with(appRequest) {
+    internal fun buildIdentificationCallout(): Callout = with(appRequest) {
         IdentificationCallout(projectId, userId, moduleId, metadata)
     }
 
-    private fun buildVerificationCallout(): Callout = with(appRequest) {
+    internal fun buildVerificationCallout(): Callout = with(appRequest) {
         VerificationCallout(projectId, userId, moduleId, (this as AppVerifyRequest).verifyGuid, metadata)
     }
 
-    private fun buildEnrolmentCallout(): Callout = with(appRequest) {
+    internal fun buildEnrolmentCallout(): Callout = with(appRequest) {
         EnrolmentCallout(projectId, userId, moduleId, metadata)
     }
 
