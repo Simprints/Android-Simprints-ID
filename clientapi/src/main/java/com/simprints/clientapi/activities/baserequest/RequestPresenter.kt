@@ -79,6 +79,8 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
 
     private fun addInvalidSessionInBackground() {
         clientApiSessionEventsManager
-            .addSessionEvent(InvalidIntentEvent(view.getIntentAction(), view.getIntentExtras()))
+            .addSessionEvent(InvalidIntentEvent(
+                view.getIntentAction(),
+                view.getIntentExtras()))
     }
 }

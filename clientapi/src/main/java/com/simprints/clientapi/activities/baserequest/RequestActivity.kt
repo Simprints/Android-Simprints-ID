@@ -69,7 +69,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun getIntentAction() = intent.action ?: ""
 
-    override fun getIntentExtras() = intent?.extras?.toMap()
+    override fun getIntentExtras() = intent?.extras?.toMap() ?: emptyMap()
 
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
