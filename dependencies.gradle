@@ -5,10 +5,11 @@ def kotlin = [
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
 
-def dagger_version = "2.21"
+def dagger_version = "2.22"
 def dagger = [
     core    : "com.google.dagger:dagger:$dagger_version",
     compiler: "com.google.dagger:dagger-compiler:$dagger_version",
+    javax   : "javax.inject:javax.inject:1@jar"
 ]
 
 def androidx_lifecycle_version = "2.1.0-alpha02"
@@ -52,12 +53,12 @@ def playservices = [
 ]
 
 def firebase = [
-    database : "com.google.firebase:firebase-database:16.0.6",
-    core     : "com.google.firebase:firebase-core:16.0.7",
-    auth     : "com.google.firebase:firebase-auth:16.1.0",
-    config   : "com.google.firebase:firebase-config:16.3.0",
-    perf     : "com.google.firebase:firebase-perf:16.2.3",
-    storage  : "com.google.firebase:firebase-storage:16.0.5"
+    database: "com.google.firebase:firebase-database:16.0.6",
+    core    : "com.google.firebase:firebase-core:16.0.7",
+    auth    : "com.google.firebase:firebase-auth:16.1.0",
+    config  : "com.google.firebase:firebase-config:16.3.0",
+    perf    : "com.google.firebase:firebase-perf:16.2.3",
+    storage : "com.google.firebase:firebase-storage:16.0.5"
 ]
 
 def crashlytics = [
@@ -95,7 +96,7 @@ def rxjava2 = [
 ]
 
 def mockito_version = "2.22.0"
-def espresso_version = "3.1.2-alpha01"
+def espresso_version = "3.2.0-alpha04"
 def roboletric_version = "4.1"
 def testing = [
     junit        : "junit:junit:4.13-beta-2",
@@ -128,10 +129,12 @@ def testing = [
         ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
         core        : "androidx.test:core:1.1.1-alpha01",
         core_testing: "android.arch.core:core-testing:1.1.1",
+        orchestrator: "androidx.test:orchestrator:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
         rules       : "androidx.test:rules:1.1.2-alpha01",
         room        : "androidx.room:room-testing:$androidx_room_version"
-    ]
+    ],
+    rx2_idler    : ['com.squareup.rx.idler:rx2-idler:0.9.1']
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
@@ -147,7 +150,7 @@ def realm = [
 // For Tee-d stream
 def commons_io_version = "2.6"
 def commons_io = [
-        commons_io       : "commons-io:commons-io:$commons_io_version"
+    commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
 ext.deps = [
@@ -165,5 +168,5 @@ ext.deps = [
     rxjava2        : rxjava2,
     testing        : testing,
     realm          : realm,
-    commons_io    : commons_io
+    commons_io     : commons_io
 ]

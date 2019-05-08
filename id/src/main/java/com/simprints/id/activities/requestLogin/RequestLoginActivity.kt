@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.tools.LanguageHelper
+import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.id.tools.extensions.packageVersionName
 import kotlinx.android.synthetic.main.activity_front.*
 import javax.inject.Inject

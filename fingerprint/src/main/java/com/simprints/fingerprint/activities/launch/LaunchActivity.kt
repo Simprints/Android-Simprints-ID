@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.LONG_CONSENT_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
@@ -17,13 +18,12 @@ import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Com
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.Vibrate.vibrate
+import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -50,7 +50,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        val component = FingerprintsComponentBuilder.getComponent(this.application as Application)
+        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }

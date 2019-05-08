@@ -8,6 +8,21 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.CandidateReadEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Result.*
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.PARENTAL
+import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
+import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
@@ -28,24 +43,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.tools.utils.LocationProvider
-import com.simprints.fingerprint.tools.utils.TimeHelper
 import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ScannerConnectionEvent
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -55,18 +55,17 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class LaunchPresenter(component: FingerprintsComponent,
+class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
                       private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var simNetworkUtils: SimNetworkUtils
+    @Inject lateinit var dbManager: FingerprintDbManager
+    @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
     @Inject lateinit var consentDataManager: ConsentDataManager
-    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
+    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
     @Inject lateinit var locationProvider: LocationProvider
 
     private var startConsentEventTime: Long = 0
@@ -96,9 +95,6 @@ class LaunchPresenter(component: FingerprintsComponent,
         view.setLogoVisibility(fingerprintRequest.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
-
-        syncSchedulerHelper.scheduleBackgroundSyncs()
-        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
 
         setTextToConsentTabs()
 
@@ -219,7 +215,7 @@ class LaunchPresenter(component: FingerprintsComponent,
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onSuccess = {
-                    sessionEventsManager.addLocationToSession(it.latitude, it.longitude)
+                    sessionEventsManager.addLocationToSessionInBackground(it.latitude, it.longitude)
                 }, onError = { it.printStackTrace() })
         }
     }
@@ -273,23 +269,18 @@ class LaunchPresenter(component: FingerprintsComponent,
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.updateSessionInBackground {
-            it.addEvent(
-                ConsentEvent(
-                    it.timeRelativeToStartTime(startConsentEventTime),
-                    it.timeRelativeToStartTime(timeHelper.now()),
-                    if (view.isCurrentTabParental()) {
-                        PARENTAL
-                    } else {
-                        INDIVIDUAL
-                    },
-                    result))
-
-            if (result == DECLINED || result == NO_RESPONSE) {
-                it.location = null
-            }
-        }
+        sessionEventsManager.addConsentEventInBackground(
+            timeHelper.now(),
+            startConsentEventTime,
+            ConsentEvent(
+                if (view.isCurrentTabParental()) {
+                    PARENTAL
+                } else {
+                    INDIVIDUAL
+                },
+                result))
     }
+
 
     override fun handleOnDestroy() {
         scannerManager.disconnectScannerIfNeeded()

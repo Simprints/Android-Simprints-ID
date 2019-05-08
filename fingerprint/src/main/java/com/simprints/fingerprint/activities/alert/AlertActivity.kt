@@ -13,7 +13,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
-import com.simprints.fingerprint.di.FingerprintsComponentBuilder
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 
@@ -28,7 +28,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
         val alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)
 
-        val component = FingerprintsComponentBuilder.getComponent(application as Application)
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }

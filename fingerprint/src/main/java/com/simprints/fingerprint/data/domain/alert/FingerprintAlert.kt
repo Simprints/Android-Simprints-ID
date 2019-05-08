@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE
 import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
 import com.simprints.id.domain.Constants
 
@@ -18,7 +19,7 @@ enum class FingerprintAlert(val type: Type,
             title = R.string.verify_guid_not_found_title,
             hintDrawable = null
         ),
-        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE),
+        leftButton = ButtonAction.Close(resultCode = SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE),
         rightButton = ButtonAction.None,
         message = R.string.verify_guid_not_found_online_message
     ),

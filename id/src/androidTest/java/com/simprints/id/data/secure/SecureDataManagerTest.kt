@@ -39,10 +39,10 @@ class SecureDataManagerTest {
         val keystoreManager = KeystoreManagerImpl(app)
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager, RandomGeneratorImpl())
 
-        secureDataManager.setLocalDatabaseKey("project_id1", "legacy_key")
+        secureDataManager.setLocalDatabaseKey("project_id1")
         val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id1")
 
-        secureDataManager.setLocalDatabaseKey("project_id2", "legacy_key")
+        secureDataManager.setLocalDatabaseKey("project_id2")
         val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id2")
 
         assertNotSame(firstLocalDbKey, secondLocalDbKey)
@@ -54,10 +54,10 @@ class SecureDataManagerTest {
         val keystoreManager = KeystoreManagerImpl(app)
         val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
 
-        secureDataManager.setLocalDatabaseKey("project_id3", "legacy_key")
+        secureDataManager.setLocalDatabaseKey("project_id3")
         val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
 
-        secureDataManager.setLocalDatabaseKey("project_id3", "legacy_key")
+        secureDataManager.setLocalDatabaseKey("project_id3")
         val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
 
         assertEquals(firstLocalDbKey, secondLocalDbKey)

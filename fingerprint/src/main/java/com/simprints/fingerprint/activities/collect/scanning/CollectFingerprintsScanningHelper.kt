@@ -12,22 +12,21 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
-import com.simprints.fingerprint.di.FingerprintsComponent
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.data.domain.person.Fingerprint
+import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
-import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.tools.Vibrate
-import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.fingerprint.tools.extensions.Vibrate
+import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -37,10 +36,10 @@ import javax.inject.Inject
 class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter,
-                                        component: FingerprintsComponent) {
+                                        component: FingerprintComponent) {
 
     @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
@@ -50,7 +49,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         }
 
     private val scannerButtonListener = ButtonListener {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.FINGER_CAPTURE, CrashReportTrigger.SCANNER_BUTTON, message = "Scanner button clicked")
+        crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, SCANNER_BUTTON, message = "Scanner button clicked")
         if (presenter.isConfirmDialogShown)
             presenter.handleConfirmFingerprintsAndContinue()
         else if (shouldEnableScanButton())
@@ -248,7 +247,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun parseTemplateAndAddToCurrentFinger(template: ByteArray) =
         try {
             presenter.currentFinger().template =
-                Fingerprint(FingerIdentifier.valueOf(presenter.currentFinger().id.name), template) //StopShip FingerIdentifier from id
+                Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
             // StopShip: Custom Error
             crashReportManager.logExceptionOrThrowable(FingerprintUnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
@@ -280,6 +279,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.FINGER_CAPTURE, CrashReportTrigger.UI, message = message)
+        crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
     }
 }

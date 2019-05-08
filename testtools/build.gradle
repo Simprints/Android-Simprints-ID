@@ -3,6 +3,9 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
 apply plugin: "kotlin-android-extensions"
 
+import io.realm.transformer.RealmTransformer
+android.registerTransform(new RealmTransformer())
+
 android {
     compileSdkVersion 28
 
@@ -67,4 +70,11 @@ dependencies {
     implementation deps.firebase.core
     implementation deps.testing.work
 
+    implementation deps.realm.annotations
+    implementation(deps.realm.kotlin) {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+    }
+    implementation deps.realm.android
+    compileOnly deps.realm.glassfish_annotation
+    kapt deps.realm.annotations_processor
 }
