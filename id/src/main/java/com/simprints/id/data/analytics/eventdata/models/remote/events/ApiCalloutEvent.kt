@@ -1,25 +1,38 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyConfirmationRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.IdentifyRequestEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.VerifyRequestEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
+import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiCalloutEvent.ApiIntegrationInfo.Companion.fromDomainIntegrationInfo
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCallout
 
 @Keep
 class ApiCalloutEvent(val relativeStartTime: Long,
-                      val parameters: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
+                      val integration: ApiIntegrationInfo,
+                      val callout: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
 
-    constructor(enrolRequestEvent: EnrolRequestEvent) :
-        this(enrolRequestEvent.relativeStartTime, ApiCallout(enrolRequestEvent))
+    constructor(calloutEvent: CalloutEvent) :
+        this(calloutEvent.relativeStartTime,
+            fromDomainIntegrationInfo(calloutEvent.integration),
+            fromDomainCallout(calloutEvent.callout))
 
-    constructor(identifyRequestEvent: IdentifyRequestEvent) :
-        this(identifyRequestEvent.relativeStartTime, ApiCallout(identifyRequestEvent))
+    enum class ApiIntegrationInfo {
+        ODK, STANDARD;
 
-    constructor(verifyRequestEvent: VerifyRequestEvent) :
-        this(verifyRequestEvent.relativeStartTime, ApiCallout(verifyRequestEvent))
+        companion object {
+            fun fromDomainIntegrationInfo(integrationInfo: CalloutEvent.IntegrationInfo) =
+                when (integrationInfo) {
+                    CalloutEvent.IntegrationInfo.ODK -> ODK
+                    CalloutEvent.IntegrationInfo.STANDARD -> STANDARD
+                }
+        }
+    }
+}
 
-    constructor(identifyConfirmationRequestEvent: IdentifyConfirmationRequestEvent) :
-        this(identifyConfirmationRequestEvent.relativeStartTime, ApiCallout(identifyConfirmationRequestEvent))
-
+fun fromDomainCallout(callout: Callout): ApiCallout = when(callout) {
+    is EnrolmentCallout -> callout.toApiEnrolmentCallout()
+    is IdentificationCallout -> callout.toApiIdentificationCallout()
+    is ConfirmationCallout -> callout.toApiConfirmationCallout()
+    is VerificationCallout -> callout.toApiVerificationCallout()
+    else -> throw Exception() //Stopship
 }

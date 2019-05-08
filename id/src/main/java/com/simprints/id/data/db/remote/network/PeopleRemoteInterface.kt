@@ -1,8 +1,9 @@
 package com.simprints.id.data.db.remote.network
 
-import com.simprints.id.data.db.remote.models.ApiPerson
+import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.core.network.NetworkConstants
+import com.simprints.id.data.db.remote.models.ApiPostPerson
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -26,12 +27,12 @@ interface PeopleRemoteInterface {
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, List<ApiPerson>>): Single<Result<Void?>>
+                     @Body patientsJson: HashMap<String, List<ApiPostPerson>>): Single<Result<Void?>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String): Single<Response<ApiPerson>>
+        @Path("projectId") projectId: String): Single<Response<ApiGetPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(

@@ -5,10 +5,11 @@ import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.spy
 import com.simprints.testtools.common.syntax.verifyOnce
@@ -97,6 +98,98 @@ class OrchestratorPresenterTest {
         orchestratorPresenter.start()
 
         verifyOnce(orchestratorPresenter.view) { setCancelResultAndFinish() }
+    }
+
+    @Test
+    fun givenOrchestratorPresenter_anAppEnrolResponseHappens_enrolmentCallbackEventShouldBeAdded() {
+        val orchestratorPresenter = spy(createOrchestratorPresenter()).apply {
+            this.timeHelper = mock<TimeHelper>().apply {
+                whenever(this) { now() } thenReturn 10L
+            }
+
+            this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
+
+            this.orchestratorManager = mock<OrchestratorManager>().apply {
+                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppEnrolResponse>())
+                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            }
+
+            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+        }
+
+        orchestratorPresenter.start()
+
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
+        verifyOnce(orchestratorPresenter) { buildEnrolmentCallbackEvent(any()) }
+    }
+
+    @Test
+    fun givenOrchestratorPresenter_anAppEnrolResponseHappens_identifyCallbackEventShouldBeAdded() {
+        val orchestratorPresenter = spy(createOrchestratorPresenter()).apply {
+            this.timeHelper = mock<TimeHelper>().apply {
+                whenever(this) { now() } thenReturn 10L
+            }
+
+            this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
+
+            this.orchestratorManager = mock<OrchestratorManager>().apply {
+                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppIdentifyResponse>())
+                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            }
+
+            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+        }
+
+        orchestratorPresenter.start()
+
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
+        verifyOnce(orchestratorPresenter) { buildIdentificationCallbackEvent(any()) }
+    }
+
+    @Test
+    fun givenOrchestratorPresenter_anAppEnrolResponseHappens_verifyCallbackEventShouldBeAdded() {
+        val orchestratorPresenter = spy(createOrchestratorPresenter()).apply {
+            this.timeHelper = mock<TimeHelper>().apply {
+                whenever(this) { now() } thenReturn 10L
+            }
+
+            this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
+
+            this.orchestratorManager = mock<OrchestratorManager>().apply {
+                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppVerifyResponse>())
+                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            }
+
+            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+        }
+
+        orchestratorPresenter.start()
+
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
+        verifyOnce(orchestratorPresenter) { buildVerificationCallbackEvent(any()) }
+    }
+
+    @Test
+    fun givenOrchestratorPresenter_anAppEnrolResponseHappens_refusalCallbackEventShouldBeAdded() {
+        val orchestratorPresenter = spy(createOrchestratorPresenter()).apply {
+            this.timeHelper = mock<TimeHelper>().apply {
+                whenever(this) { now() } thenReturn 10L
+            }
+
+            this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
+
+            this.orchestratorManager = mock<OrchestratorManager>().apply {
+                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppRefusalFormResponse>())
+                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            }
+
+            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+        }
+
+        orchestratorPresenter.start()
+
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
+        verifyOnce(orchestratorPresenter) { buildRefusalCallbackEvent(any()) }
     }
 
     private fun mockSessionEventsManagerToReturnASessionId() =

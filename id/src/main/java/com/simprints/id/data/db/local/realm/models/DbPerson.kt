@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.local.realm.models
 
+import com.simprints.id.data.db.remote.models.ApiGetPerson
+import com.simprints.id.data.db.remote.models.toDomainFingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.tools.extensions.toRealmList
