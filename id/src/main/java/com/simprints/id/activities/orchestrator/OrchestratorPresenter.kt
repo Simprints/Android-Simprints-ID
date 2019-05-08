@@ -86,7 +86,7 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
         Timber.d(it.message)
     }
 
-    private fun addCallbackEventInSessions(appResponse: AppResponse) {
+    internal fun addCallbackEventInSessions(appResponse: AppResponse) {
         when(appResponse) {
             is AppEnrolResponse -> sessionEventsManager
                 .addSessionEvent(buildEnrolmentCallbackEvent(appResponse))
@@ -99,10 +99,10 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
         }
     }
 
-    private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
+    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
         CallbackEvent(timeHelper.now(), EnrolmentCallback(appResponse.guid))
 
-    private fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
+    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
         CallbackEvent(timeHelper.now(), buildIdentificationCallback(appResponse))
 
     private fun buildIdentificationCallback(appIdentifyResponse: AppIdentifyResponse) =
@@ -111,13 +111,13 @@ class OrchestratorPresenter(val view: OrchestratorContract.View,
                 CallbackComparisonScore(it.guidFound, it.confidence, it.tier)
             })
 
-    private fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
+    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
         CallbackEvent(timeHelper.now(),
             VerificationCallback(appVerifyResponse.matchingResult.let {
                 CallbackComparisonScore(it.guidFound, it.confidence, it.tier)
             }))
 
-    private fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
+    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
         CallbackEvent(timeHelper.now(), RefusalCallback(getAppRefusalResponseReasonOrEmpty(appRefusalResponse),
             appRefusalResponse.answer.optionalText))
 
