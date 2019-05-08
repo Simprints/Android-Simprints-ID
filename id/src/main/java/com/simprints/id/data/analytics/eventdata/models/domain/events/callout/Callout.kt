@@ -3,5 +3,5 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events.callout
 import androidx.annotation.Keep
 
 @Keep
-abstract class Callout(var type: CalloutType)
+abstract class Callout(val type: CalloutType)
 

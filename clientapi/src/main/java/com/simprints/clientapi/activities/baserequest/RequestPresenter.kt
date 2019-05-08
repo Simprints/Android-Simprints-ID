@@ -10,33 +10,34 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
 import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.exceptions.InvalidRequestException
-import javax.inject.Inject
 import com.simprints.clientapi.tools.json.GsonBuilder
 
 
 abstract class RequestPresenter constructor(private val view: RequestContract.RequestView,
                                             private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                                            private var gsonBuilder: GsonBuilder)
+                                            private var gsonBuilder: GsonBuilder,
+                                            private val integrationInfo: IntegrationInfo)
     : RequestContract.Presenter {
 
     override fun processEnrollRequest() = validateAndSendRequest(
-        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
+        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor), integrationInfo)
     )
 
     override fun processIdentifyRequest() = validateAndSendRequest(
-        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
+        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor), integrationInfo)
     )
 
     override fun processVerifyRequest() = validateAndSendRequest(
-        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
+        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor), integrationInfo)
     )
 
     override fun processConfirmIdentifyRequest() = validateAndSendRequest(ConfirmIdentifyBuilder(
-        view.confirmIdentifyExtractor, ConfirmIdentifyValidator(view.confirmIdentifyExtractor)
+        view.confirmIdentifyExtractor, ConfirmIdentifyValidator(view.confirmIdentifyExtractor), integrationInfo
     ))
 
     override fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
@@ -52,23 +53,28 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
-        val extrasKeys = extractExtraKeysAndValuesFromIntent(request)
-        if (extrasKeys.isNotEmpty()) {
-            clientApiSessionEventsManager
-                .addSessionEvent(SuspiciousIntentEvent(extrasKeys))
+        try {
+            val extrasKeys = extractExtraKeysAndValuesFromIntent(request)
+            if (extrasKeys.isNotEmpty()) {
+                clientApiSessionEventsManager
+                    .addSessionEvent(SuspiciousIntentEvent(extrasKeys))
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace() //StopShip: Add crashlytics
         }
     }
 
-    protected fun extractExtraKeysAndValuesFromIntent(request: ClientBase): Map<String, Any?> =
+    private fun extractExtraKeysAndValuesFromIntent(request: ClientBase): Map<String, Any?> =
         with(gsonBuilder.build()) {
             val requestJson = this.toJson(request)
-            val expectedKeysAndValues = this.fromJson<Map<String, String>>(requestJson, object : TypeToken<Map<String, String>>() {}.type)
+            val expectedKeysAndValues = this.fromJson<Map<String, Any>>(requestJson, object : TypeToken<Map<String, Any>>() {}.type)
             val keysAndValuesFromIntent = extractKeysAndValuesFromIntent()
-            keysAndValuesFromIntent?.filterKeys { !expectedKeysAndValues.containsKey(it) } ?: emptyMap()
+            keysAndValuesFromIntent?.filterKeys { !expectedKeysAndValues.containsKey(it) }
+                ?: emptyMap()
         }
 
     private fun extractKeysAndValuesFromIntent() =
-        view.getIntentExtras()?.filter { it.key.isNotEmpty()}
+        view.getIntentExtras()?.filter { it.key.isNotEmpty() }
 
 
     private fun addInvalidSessionInBackground() {

@@ -44,14 +44,14 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         }
     }
 
-    private fun onHandleNonNullIntent(intent: AppIdentityConfirmationRequest) {
-        val projectId = intent.projectId
-        val sessionId = intent.sessionId
-        val selectedGuid = intent.selectedGuid
+    private fun onHandleNonNullIntent(appRequest: AppIdentityConfirmationRequest) {
+        val projectId = appRequest.projectId
+        val sessionId = appRequest.sessionId
+        val selectedGuid = appRequest.selectedGuid
         val callbackSent = try {
             checkProjectId(projectId)
             sessionId.let {
-                addConfirmationCalloutEvent(selectedGuid, sessionId)
+                addConfirmationCalloutEvent(appRequest)
                 sessionEventsManager
                     .addGuidSelectionEventToLastIdentificationIfExists(selectedGuid, sessionId)
                     .subscribeOn(Schedulers.io())
@@ -82,10 +82,10 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
         if (!loginInfoManager.isProjectIdSignedIn(projectId)) throw NotSignedInException()
     }
 
-    private fun addConfirmationCalloutEvent(selectedGuid: String, sessionId: String) {
-        sessionEventsManager.addSessionEvent(getConfirmationCalloutEvent(selectedGuid, sessionId))
+    private fun addConfirmationCalloutEvent(appRequest: AppIdentityConfirmationRequest) {
+        sessionEventsManager.addSessionEvent(getConfirmationCalloutEvent(appRequest))
     }
 
-    private fun getConfirmationCalloutEvent(selectedGuid: String, sessionId: String) =
-        CalloutEvent("", timeHelper.now(), ConfirmationCallout(selectedGuid, sessionId))
+    private fun getConfirmationCalloutEvent(appRequest: AppIdentityConfirmationRequest) =
+        CalloutEvent(appRequest.extraRequestInfo.integration, timeHelper.now(), ConfirmationCallout(appRequest.selectedGuid, appRequest.sessionId))
 }

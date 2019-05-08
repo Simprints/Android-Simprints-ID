@@ -12,13 +12,16 @@ import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
 import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.libsimprints.Constants
+import com.simprints.moduleapi.app.requests.IExtraRequestInfo
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
 import com.simprints.moduleapi.app.requests.confirmations.IAppIdentifyConfirmation
 import com.simprints.testtools.android.tryOnSystemUntilTimeout
@@ -71,7 +74,8 @@ class GuidSelectionServiceAndroidTest {
             AppIdentifyConfirmation(
                 DEFAULT_TEST_CALLOUT_CREDENTIALS.projectId,
                 session.id,
-                "some_guid_confirmed"))
+                "some_guid_confirmed",
+                mock()))
         intent.setPackage(Constants.SIMPRINTS_PACKAGE_NAME)
 
         ApplicationProvider.getApplicationContext<Application>().startService(intent)
@@ -89,6 +93,7 @@ class GuidSelectionServiceAndroidTest {
     data class AppIdentifyConfirmation(
         override val projectId: String,
         override val sessionId: String,
-        override val selectedGuid: String
+        override val selectedGuid: String,
+        override val extra: IExtraRequestInfo
     ) : IAppIdentifyConfirmation
 }

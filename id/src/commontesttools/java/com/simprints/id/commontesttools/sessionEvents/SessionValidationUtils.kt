@@ -50,14 +50,13 @@ fun validateCalloutEventApiModel(json: JsonObject){
     assertThat(json.get("integration").asString).isAnyOf("ODK", "STANDARD")
     assertThat(json.get("relativeStartTime").asString)
     with(json.get("callout").asJsonObject) {
-        val type = CalloutType.valueOf(json.get("type").asString)
+        val type = CalloutType.valueOf(this.get("type").asString)
         when (type) {
-            CalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(json)
-            CalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(json)
-            CalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(json)
-            CalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(json)
+            CalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(this)
+            CalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
+            CalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
+            CalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
         }
-        verifyCalloutVerificationApiModel(this)
     }
     assertThat(json.size()).isEqualTo(4)
 }

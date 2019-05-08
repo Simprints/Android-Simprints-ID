@@ -1,6 +1,8 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import android.util.Log
+import com.google.gson.Gson
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
@@ -23,6 +25,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -89,10 +92,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> CalloutEvent(null, relativeStarTime, buildEnrolmentCallout())
-            is AppVerifyRequest -> CalloutEvent(null, relativeStarTime, buildVerificationCallout())
-            is AppIdentifyRequest -> CalloutEvent(null, relativeStarTime, buildIdentificationCallout())
-            else -> throw Throwable("unrecognised request") //StopShip
+            is AppEnrolRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildEnrolmentCallout())
+            is AppVerifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildVerificationCallout())
+            is AppIdentifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildIdentificationCallout())
+            else -> throw InvalidAppRequest()
         }
 
     private fun buildIdentificationCallout(): Callout = with(appRequest) {

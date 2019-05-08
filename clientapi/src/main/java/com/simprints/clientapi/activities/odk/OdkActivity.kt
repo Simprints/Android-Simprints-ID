@@ -5,10 +5,12 @@ import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
 import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
-import com.simprints.id.Application
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
+
+    override val integrationInfo = IntegrationInfo.ODK
 
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
@@ -20,7 +22,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
     }
 
-    override val action
+    override val action: String?
         get() = intent.action
 
     override lateinit var presenter: OdkContract.Presenter
