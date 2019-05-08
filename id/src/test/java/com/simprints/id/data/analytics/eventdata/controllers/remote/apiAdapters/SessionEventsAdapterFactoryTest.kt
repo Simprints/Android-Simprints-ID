@@ -224,10 +224,11 @@ class SessionEventsAdapterFactoryTest {
         val event = FingerprintCaptureEvent(
             10,
             10,
-            FingerIdentifier.LEFT_3RD_FINGER,
             10,
             FingerprintCaptureEvent.Result.BAD_QUALITY,
-            FingerprintCaptureEvent.Fingerprint(10, "some_template".toByteArray().toString()))
+            FingerprintCaptureEvent.Fingerprint(
+                FingerIdentifier.LEFT_3RD_FINGER,
+                10, "some_template".toByteArray().toString()))
         val apiEvent = ApiFingerprintCaptureEvent(event)
 
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject

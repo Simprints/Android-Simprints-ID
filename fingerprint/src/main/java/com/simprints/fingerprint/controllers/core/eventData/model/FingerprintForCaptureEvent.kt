@@ -11,13 +11,13 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Fingerprin
 
 
 @Keep
-class FingerprintCaptureEvent(val finger: FingerIdentifier,
-                              val qualityThreshold: Int,
+class FingerprintCaptureEvent(val qualityThreshold: Int,
                               val result: Result,
                               val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
 
     @Keep
-    class Fingerprint(val quality: Int, val template: String)
+    class Fingerprint(val finger: FingerIdentifier,
+                      val quality: Int, val template: String)
 
     @Keep
     enum class Result {
@@ -46,13 +46,12 @@ fun FingerprintCaptureEvent.fromDomainToCore(relativeStartTime: Long,
     FingerprintCaptureEventCore(
         relativeStartTime,
         relativeEndTime,
-        finger.fromDomainToCore(),
         qualityThreshold,
         result.fromDomainToCore(),
         fingerprint?.fromDomainToCore())
 
 fun FingerprintCaptureEvent.Fingerprint.fromDomainToCore() =
-    FingerprintCore(quality, template)
+    FingerprintCore(finger.fromDomainToCore(), quality, template)
 
 fun FingerprintCaptureEvent.Result.fromDomainToCore() =
     when (this) {
