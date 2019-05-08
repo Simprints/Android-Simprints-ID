@@ -13,7 +13,7 @@ import com.simprints.id.tools.extensions.isGuid
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ALERT_SCREEN")
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("alert").asString).isIn(Alert.values().valuesAsStrings())
+    assertThat(json.get("alertType").asString).isIn(Alert.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(3)
 }
 
