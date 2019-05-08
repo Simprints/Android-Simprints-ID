@@ -5,7 +5,7 @@ import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtracto
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.domain.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse

@@ -6,6 +6,7 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
@@ -25,7 +26,7 @@ class RequestPresenterTest {
 
     private val enrolIntentFields = mapOf(projectIdField, moduleIdField, userIdField)
     private val enrolIntentFieldsWithExtra = enrolIntentFields.plus(extraField)
-    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second)
+    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, mock())
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
@@ -33,7 +34,7 @@ class RequestPresenterTest {
         val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
         val view = mockViewToReturnIntentFields(enrolIntentFieldsWithExtra)
 
-        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl())
+        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
@@ -50,7 +51,7 @@ class RequestPresenterTest {
         val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
         val view = mockViewToReturnIntentFields(enrolIntentFields.plus("" to ""))
 
-        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl())
+        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
@@ -62,7 +63,7 @@ class RequestPresenterTest {
         val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
         val view = mockViewToReturnIntentFields(enrolIntentFields)
 
-        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl())
+        val presenter = ImplRequestPresenter(view, clientApiSessionEventsManagerMock, GsonBuilderImpl(), mock())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
@@ -81,7 +82,8 @@ class RequestPresenterTest {
 
 class ImplRequestPresenter(view: RequestContract.RequestView,
                            clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                           gsonBuilder: GsonBuilder) : RequestPresenter(view, clientApiSessionEventsManager, gsonBuilder) {
+                           gsonBuilder: GsonBuilder,
+                           integrationInfo: IntegrationInfo) : RequestPresenter(view, clientApiSessionEventsManager, gsonBuilder, integrationInfo) {
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}

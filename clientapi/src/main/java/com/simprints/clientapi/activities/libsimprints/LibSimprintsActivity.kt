@@ -4,17 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
-import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
-import com.simprints.id.Application
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.libsimprints.*
 import javax.inject.Inject
 
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
+    override val integrationInfo = IntegrationInfo.STANDARD
+
     @Inject override lateinit var presenter: LibSimprintsContract.Presenter
 
-    override val action
+    override val action: String?
         get() = intent.action
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -20,5 +20,5 @@ open class LibSimprintsActivityModule {
     fun provideLibSimprintsPresenter(view: LibSimprintsContract.View,
                                      clientApiSessionEventsManager: ClientApiSessionEventsManager,
                                      gsonBuilder: GsonBuilder): LibSimprintsContract.Presenter =
-        LibSimprintsPresenter(view, clientApiSessionEventsManager, gsonBuilder, view.action)
+        LibSimprintsPresenter(view, clientApiSessionEventsManager, gsonBuilder, view.action, view.integrationInfo)
 }

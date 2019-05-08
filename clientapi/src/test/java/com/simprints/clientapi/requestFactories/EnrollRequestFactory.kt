@@ -6,6 +6,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
+import com.simprints.clientapi.domain.requests.ExtraRequestInfo
 import com.simprints.testtools.common.syntax.mock
 
 object EnrollRequestFactory : RequestFactory() {
@@ -14,11 +15,12 @@ object EnrollRequestFactory : RequestFactory() {
         projectId = MOCK_PROJECT_ID,
         moduleId = MOCK_MODULE_ID,
         userId = MOCK_USER_ID,
-        metadata = MOCK_METADATA
+        metadata = MOCK_METADATA,
+        extra = ExtraRequestInfo(MOCK_INTEGRATION)
     )
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrollBuilder =
-        EnrollBuilder(extractor as EnrollExtractor, getValidator(extractor))
+        EnrollBuilder(extractor as EnrollExtractor, getValidator(extractor), mock())
 
     override fun getValidator(extractor: ClientRequestExtractor): EnrollValidator =
         EnrollValidator(extractor as EnrollExtractor)

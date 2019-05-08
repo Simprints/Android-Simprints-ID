@@ -19,5 +19,5 @@ open class OdkActivityModule {
     fun provideLibSimprintsPresenter(view: OdkContract.View,
                                      clientApiSessionEventsManager: ClientApiSessionEventsManager,
                                      gsonBuilder: GsonBuilder): OdkContract.Presenter =
-        OdkPresenter(view, clientApiSessionEventsManager, gsonBuilder, view.action)
+        OdkPresenter(view, clientApiSessionEventsManager, gsonBuilder, view.action, view.integrationInfo)
 }
