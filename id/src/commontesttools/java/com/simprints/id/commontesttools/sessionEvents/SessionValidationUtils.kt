@@ -1,15 +1,14 @@
 package com.simprints.id.commontesttools.sessionEvents
 
 import com.google.common.truth.Truth.assertThat
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutType
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
-import org.junit.Assert.fail
 
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ALERT_SCREEN")
@@ -40,8 +39,49 @@ fun validateAuthenticationEventApiModel(json: JsonObject) {
 }
 
 fun validateCallbackEventApiModel(json: JsonObject) {
-    //TODO()
-    fail()
+    assertThat(json.get("type").asString).isEqualTo("CALLBACK")
+    assertThat(json.get("relativeStartTime").asString)
+    (json.get("callback").asJsonObject).let {
+        val type = CallbackType.valueOf(it.get("type").asString)
+        when (type) {
+            CallbackType.ENROLMENT -> verifyCallbackEnrolmentApiModel(it)
+            CallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(it)
+            CallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(it)
+            CallbackType.REFUSAL -> verifyCallbackRefusalApiModel(it)
+        }
+    }
+
+    assertThat(json.size()).isEqualTo(3)
+}
+
+fun verifyCallbackEnrolmentApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("ENROLMENT")
+    assertThat(json.get("guid").asString)
+}
+
+fun verifyCallbackIdentificationApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("IDENTIFICATION")
+    assertThat(json.get("sessionId").asString)
+    verifyCallbackIdentificationScoresApiModel(json.getAsJsonArray("scores"))
+}
+
+fun verifyCallbackIdentificationScoresApiModel(jsonArray: JsonArray) {
+    assertThat(jsonArray.get(0).asJsonObject.get("guid").asString)
+    assertThat(jsonArray.get(0).asJsonObject.get("confidence").asString)
+    assertThat(jsonArray.get(0).asJsonObject.get("tier").asString)
+}
+
+fun verifyCallbackVerificationApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("VERIFICATION")
+    assertThat(json.get("score").asJsonObject.get("guid").asString)
+    assertThat(json.get("score").asJsonObject.get("confidence").asString)
+    assertThat(json.get("score").asJsonObject.get("tier").asString)
+}
+
+fun verifyCallbackRefusalApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("REFUSAL")
+    assertThat(json.get("reason").asString)
+    assertThat(json.get("extra").asString)
 }
 
 fun validateCalloutEventApiModel(json: JsonObject){
@@ -49,15 +89,14 @@ fun validateCalloutEventApiModel(json: JsonObject){
     assertThat(json.get("type").asString).isEqualTo("CALLOUT")
     assertThat(json.get("integration").asString).isAnyOf("ODK", "STANDARD")
     assertThat(json.get("relativeStartTime").asString)
-    with(json.get("callout").asJsonObject) {
+    (json.get("callout").asJsonObject).let {
         val type = CalloutType.valueOf(json.get("type").asString)
         when (type) {
-            CalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(json)
-            CalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(json)
-            CalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(json)
-            CalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(json)
+            CalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(it)
+            CalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(it)
+            CalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(it)
+            CalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(it)
         }
-        verifyCalloutVerificationApiModel(this)
     }
     assertThat(json.size()).isEqualTo(4)
 }
