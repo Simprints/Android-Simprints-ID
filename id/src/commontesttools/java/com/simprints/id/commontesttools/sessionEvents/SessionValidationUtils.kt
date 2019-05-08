@@ -200,14 +200,14 @@ fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("id").asString)
-    assertThat(json.get("finger").asString).isIn(FingerIdentifier.values().valuesAsStrings())
     assertThat(json.get("qualityThreshold").asNumber)
     assertThat(json.get("result").asString).isIn(FingerprintCaptureEvent.Result.values().valuesAsStrings())
 
     with(json.get("fingerprint").asJsonObject) {
+        assertThat(get("finger").asString).isIn(FingerIdentifier.values().valuesAsStrings())
         assertThat(get("quality").asInt)
         assertThat(get("template").asString).isNotEmpty()
-        assertThat(size()).isEqualTo(2)
+        assertThat(size()).isEqualTo(3)
     }
     assertThat(json.size()).isEqualTo(8)
 }

@@ -301,14 +301,13 @@ class CollectFingerprintsPresenter(private val context: Context,
             timeHelper.now(),
             lastCaptureStartedAt,
             FingerprintCaptureEvent(
-                finger.id,
                 qualityThreshold,
                 FingerprintCaptureEvent.buildResult(finger.status),
                 finger.template?.let {
-                    FingerprintCaptureEvent.Fingerprint(it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
+                    FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
                 }
             ))
-        }
+    }
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
