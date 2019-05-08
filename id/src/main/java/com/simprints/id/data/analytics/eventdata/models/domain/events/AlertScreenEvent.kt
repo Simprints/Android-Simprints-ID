@@ -5,7 +5,7 @@ import com.simprints.id.domain.alert.Alert
 
 @Keep
 class AlertScreenEvent(val relativeStartTime: Long,
-                       val alert: String) : Event(EventType.ALERT_SCREEN) {
+                       val alertType: String) : Event(EventType.ALERT_SCREEN) {
 
     constructor(relativeStartTime: Long, alert: Alert):
         this(relativeStartTime, alert.name)
