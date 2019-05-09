@@ -8,10 +8,8 @@ import com.simprints.id.commontesttools.sessionEvents.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPoolType
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
@@ -23,13 +21,10 @@ import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocati
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
-import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -85,8 +80,11 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForVerificationApiModel() {
-        val calloutVerification = VerificationCallout("projectId", "userId", "moduleId", "verifyGuid", "metadata")
-        val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
+        val calloutEvent = VerificationCalloutEvent(
+            10, CalloutIntegrationInfo.ODK,
+            "projectId", "userId", "moduleId",
+            "verifyGuid", "metadata")
+
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -95,8 +93,10 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForIdentificationApiModel() {
-        val calloutVerification = IdentificationCallout("projectId", "userId", "moduleId", "metadata")
-        val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
+        val calloutEvent = IdentificationCalloutEvent(
+            10, CalloutIntegrationInfo.ODK,
+            "projectId", "userId", "moduleId", "metadata")
+
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -105,8 +105,9 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForConfirmationApiModel() {
-        val calloutVerification = ConfirmationCallout("selectedGuid", "sessionId")
-        val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
+        val calloutEvent = ConfirmationCalloutEvent(
+            10, CalloutIntegrationInfo.ODK,
+            "selectedGuid", "sessionId")
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -115,8 +116,11 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForEnrolmentApiModel() {
-        val calloutVerification = EnrolmentCallout("projectId", "userId", "moduleId", "metadata")
-        val calloutEvent = CalloutEvent(AppIntegrationInfo.STANDARD, 10, calloutVerification)
+        val calloutEvent = EnrolmentCalloutEvent(
+            10, CalloutIntegrationInfo.ODK,
+            "projectId", "userId",
+            "moduleId", "metadata")
+
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -125,8 +129,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForEnrolmentApiModel() {
-        val callbackEnrolment = EnrolmentCallback("guid")
-        val callbackEvent = CallbackEvent(10, callbackEnrolment)
+        val callbackEvent = EnrolmentCallbackEvent(10, "guid")
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -135,8 +138,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForIdentificationApiModel() {
-        val callbackIdentification = IdentificationCallback("sessionId", getListOfCallbackComparisonScores())
-        val callbackEvent = CallbackEvent(10, callbackIdentification)
+        val callbackEvent = IdentificationCallbackEvent(10, "sessionId", getListOfCallbackComparisonScores())
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -145,8 +147,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForVerificationApiModel() {
-        val callbackVerification = VerificationCallback(CallbackComparisonScore("guid", 42, Tier.TIER_1))
-        val callbackEvent = CallbackEvent(10, callbackVerification)
+        val callbackEvent = VerificationCallbackEvent(10, CallbackComparisonScore("guid", 42, Tier.TIER_1))
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -155,8 +156,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForRefusalApiModel() {
-        val callbackRefusal = RefusalCallback("reason", "extra")
-        val callbackEvent = CallbackEvent(10, callbackRefusal)
+        val callbackEvent = RefusalCallbackEvent(10, "reason", "extra")
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
