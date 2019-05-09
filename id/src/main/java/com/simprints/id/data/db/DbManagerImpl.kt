@@ -130,9 +130,16 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }
 
     private fun calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote: List<PeopleCount>,
-                                                         peopleCountsInLocal: List<PeopleCount>) =
-        peopleCountInRemote.mapIndexed { index, downSyncPeople ->
-            downSyncPeople.apply { downSyncPeople.count - peopleCountsInLocal[index].count }
+                                                         peopleCountsInLocal: List<PeopleCount>): List<PeopleCount> =
+        peopleCountInRemote.map { remotePeopleCount ->
+            val localCount = peopleCountsInLocal.find {
+                it.projectId == remotePeopleCount.projectId &&
+                it.userId == remotePeopleCount.userId &&
+                it.moduleId == remotePeopleCount.moduleId &&
+                it.modes?.joinToString() == remotePeopleCount.modes?.joinToString()
+            }?.count ?: 0
+
+            remotePeopleCount.copy(count = remotePeopleCount.count - localCount)
         }
     
     override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =

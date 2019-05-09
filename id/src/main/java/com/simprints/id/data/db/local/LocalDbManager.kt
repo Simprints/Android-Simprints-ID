@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.local
 
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
-import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -22,6 +22,7 @@ interface LocalDbManager {
     fun insertOrUpdatePeopleInLocal(people: List<Person>): Completable
 
     fun getPeopleCountFromLocal(projectId: String? = null,
+                                patientId: String? = null,
                                 userId: String? = null,
                                 moduleId: String? = null,
                                 toSync: Boolean? = null): Single<Int>
@@ -29,12 +30,14 @@ interface LocalDbManager {
     fun loadPersonFromLocal(personId: String): Single<Person>
 
     fun loadPeopleFromLocal(projectId: String? = null,
+                            patientId: String? = null,
                             userId: String? = null,
                             moduleId: String? = null,
                             toSync: Boolean? = null,
                             sortBy: Map<String, Sort>? = null): Single<List<Person>>
 
     fun loadPeopleFromLocalRx(projectId: String? = null,
+                              patientId: String? = null,
                               userId: String? = null,
                               moduleId: String? = null,
                               toSync: Boolean? = null,

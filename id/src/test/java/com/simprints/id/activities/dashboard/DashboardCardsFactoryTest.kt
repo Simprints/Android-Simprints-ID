@@ -197,6 +197,6 @@ class DashboardCardsFactoryTest {
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
-        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
+        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
     }
 }
