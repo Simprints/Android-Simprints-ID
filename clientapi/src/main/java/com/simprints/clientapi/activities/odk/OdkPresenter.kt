@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import android.annotation.SuppressLint
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.IntegrationInfo
@@ -11,10 +12,11 @@ import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.tools.json.GsonBuilder
+import io.reactivex.rxkotlin.subscribeBy
 
 
 class OdkPresenter(private val view: OdkContract.View,
-                   clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                   private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                    gsonBuilder: GsonBuilder,
                    private val action: String?,
                    integrationInfo: IntegrationInfo)
@@ -28,12 +30,19 @@ class OdkPresenter(private val view: OdkContract.View,
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
     }
 
-    override fun start() = when (action) {
-        ACTION_REGISTER -> processEnrollRequest()
-        ACTION_IDENTIFY -> processIdentifyRequest()
-        ACTION_VERIFY -> processVerifyRequest()
-        ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
-        else -> view.returnIntentActionErrorToClient()
+    @SuppressLint("CheckResult")
+    override fun start() {
+        clientApiSessionEventsManager
+            .createSession()
+            .doFinally {
+                when (action) {
+                    ACTION_REGISTER -> processEnrollRequest()
+                    ACTION_IDENTIFY -> processIdentifyRequest()
+                    ACTION_VERIFY -> processVerifyRequest()
+                    ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
+                    else -> view.returnIntentActionErrorToClient()
+                }
+            }.subscribeBy(onError = { it.printStackTrace() })
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) = view.returnRegistration(enroll.guid)
@@ -55,5 +64,4 @@ class OdkPresenter(private val view: OdkContract.View,
         view.returnRefusalForm(refusalForm.reason, refusalForm.extra)
 
     override fun handleResponseError() = view.returnIntentActionErrorToClient()
-
 }

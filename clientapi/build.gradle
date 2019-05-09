@@ -56,6 +56,9 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     implementation deps.gson.core
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.kotlin
 
     //Dagger
     implementation deps.dagger.core
