@@ -8,10 +8,11 @@ import com.simprints.id.commontesttools.sessionEvents.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPoolType
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.CallbackComparisonScore
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.EnrolmentCallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.IdentificationCallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.VerificationCallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
@@ -23,13 +24,10 @@ import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocati
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
-import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -85,7 +83,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForVerificationApiModel() {
-        val calloutVerification = VerificationCallout("projectId", "userId", "moduleId", "verifyGuid", "metadata")
+        val calloutVerification = VerificationCalloutEvent("projectId", "userId", "moduleId", "verifyGuid", "metadata")
         val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -95,7 +93,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForIdentificationApiModel() {
-        val calloutVerification = IdentificationCallout("projectId", "userId", "moduleId", "metadata")
+        val calloutVerification = IdentificationCalloutEvent("projectId", "userId", "moduleId", "metadata")
         val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -105,7 +103,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForConfirmationApiModel() {
-        val calloutVerification = ConfirmationCallout("selectedGuid", "sessionId")
+        val calloutVerification = ConfirmationCalloutEvent("selectedGuid", "sessionId")
         val calloutEvent = CalloutEvent(AppIntegrationInfo.ODK, 10, calloutVerification)
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -115,7 +113,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_calloutEventForEnrolmentApiModel() {
-        val calloutVerification = EnrolmentCallout("projectId", "userId", "moduleId", "metadata")
+        val calloutVerification = EnrolmentCalloutEvent("projectId", "userId", "moduleId", "metadata")
         val calloutEvent = CalloutEvent(AppIntegrationInfo.STANDARD, 10, calloutVerification)
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -125,7 +123,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForEnrolmentApiModel() {
-        val callbackEnrolment = EnrolmentCallback("guid")
+        val callbackEnrolment = EnrolmentCallbackEvent("guid")
         val callbackEvent = CallbackEvent(10, callbackEnrolment)
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -135,7 +133,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForIdentificationApiModel() {
-        val callbackIdentification = IdentificationCallback("sessionId", getListOfCallbackComparisonScores())
+        val callbackIdentification = IdentificationCallbackEvent("sessionId", getListOfCallbackComparisonScores())
         val callbackEvent = CallbackEvent(10, callbackIdentification)
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -145,7 +143,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForVerificationApiModel() {
-        val callbackVerification = VerificationCallback(CallbackComparisonScore("guid", 42, Tier.TIER_1))
+        val callbackVerification = VerificationCallbackEvent(CallbackComparisonScore("guid", 42, Tier.TIER_1))
         val callbackEvent = CallbackEvent(10, callbackVerification)
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
