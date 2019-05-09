@@ -1,8 +1,11 @@
 package com.simprints.id.secure
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.secure.SecureApiInterface.Companion.apiKey
+import com.simprints.id.secure.SecureApiInterface.Companion.baseUrl
 import com.simprints.id.secure.models.AuthenticationData
 import com.simprints.id.secure.models.Nonce
 import com.simprints.id.secure.models.PublicKeyString
@@ -19,10 +22,21 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class AuthenticationDataManagerTest {
 
+    companion object {
+        const val PROJECT_ID = "projectId"
+        const val USER_ID = "userId"
+    }
+
+
     private val nonceFromServer = "nonce_from_server"
     private val publicKeyFromServer = "public_key_from_server"
     private val validAuthenticationJsonResponse = "{\"nonce\":\"$nonceFromServer\", \"publicKey\":\"$publicKeyFromServer\"}"
     private val expectedAuthenticationData = AuthenticationData(Nonce(nonceFromServer), PublicKeyString(publicKeyFromServer))
+    private val expectedUrl = baseUrl + "projects/$PROJECT_ID/users/$USER_ID/authentication-data?key=$apiKey"
+
+    private val validateUrl: (url: String) -> Unit  = {
+        Truth.assertThat(it).isEqualTo(expectedUrl)
+    }
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
@@ -58,7 +72,7 @@ class AuthenticationDataManagerTest {
 
     @Test
     fun receivingAnErrorFromServer_shouldThrowAnException() {
-        apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500))
+        apiClient.okHttpClientConfig.addInterceptor(FakeResponseInterceptor(500, validateUrl = validateUrl))
 
         val testObserver = makeTestRequestForAuthenticationData(apiClient.api)
         testObserver.awaitTerminalEvent()
@@ -67,12 +81,12 @@ class AuthenticationDataManagerTest {
     }
 
     private fun makeTestRequestForAuthenticationData(secureApiInterfaceMock: SecureApiInterface) =
-        AuthenticationDataManager(secureApiInterfaceMock).requestAuthenticationData("projectId", "userId")
+        AuthenticationDataManager(secureApiInterfaceMock).requestAuthenticationData(PROJECT_ID, USER_ID)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .test()
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
-        okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse))
+        okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
     }
 }
