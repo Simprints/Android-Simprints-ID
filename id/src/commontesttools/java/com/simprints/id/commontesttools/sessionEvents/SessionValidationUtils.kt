@@ -5,6 +5,8 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallbackType
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCalloutType
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
@@ -41,12 +43,12 @@ fun validateCallbackEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("CALLBACK")
     assertThat(json.get("relativeStartTime").asString)
     (json.get("callback").asJsonObject).let {
-        val type = CallbackType.valueOf(it.get("type").asString)
+        val type = ApiCallbackType.valueOf(it.get("type").asString)
         when (type) {
-            CallbackType.ENROLMENT -> verifyCallbackEnrolmentApiModel(it)
-            CallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(it)
-            CallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(it)
-            CallbackType.REFUSAL -> verifyCallbackRefusalApiModel(it)
+            ApiCallbackType.ENROLMENT -> verifyCallbackEnrolmentApiModel(it)
+            ApiCallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(it)
+            ApiCallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(it)
+            ApiCallbackType.REFUSAL -> verifyCallbackRefusalApiModel(it)
         }
     }
 
@@ -83,18 +85,18 @@ fun verifyCallbackRefusalApiModel(json: JsonObject) {
     assertThat(json.get("extra").asString)
 }
 
-fun validateCalloutEventApiModel(json: JsonObject){
+fun validateCalloutEventApiModel(json: JsonObject) {
 
     assertThat(json.get("type").asString).isEqualTo("CALLOUT")
     assertThat(json.get("integration").asString).isAnyOf("ODK", "STANDARD")
     assertThat(json.get("relativeStartTime").asString)
     with(json.get("callout").asJsonObject) {
-        val type = CalloutType.valueOf(this.get("type").asString)
+        val type = ApiCalloutType.valueOf(this.get("type").asString)
         when (type) {
-            CalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(this)
-            CalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
-            CalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
-            CalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
+            ApiCalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(this)
+            ApiCalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
+            ApiCalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
+            ApiCalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
         }
     }
     assertThat(json.size()).isEqualTo(4)
@@ -208,7 +210,7 @@ fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
         assertThat(get("template").asString).isNotEmpty()
         assertThat(size()).isEqualTo(3)
     }
-    assertThat(json.size()).isEqualTo(8)
+    assertThat(json.size()).isEqualTo(7)
 }
 
 fun validateGuidSelectionEventApiModel(json: JsonObject) {
@@ -302,7 +304,14 @@ fun validateEvent(json: JsonObject) {
         EventType.ARTIFICIAL_TERMINATION -> validateArtificialTerminationEventApiModel(json)
         EventType.INVALID_INTENT -> validateInvalidEventApiModel(json)
         EventType.SUSPICIOUS_INTENT -> validateSuspiciousIntentEventApiModel(json)
-        EventType.CALLOUT -> validateCalloutEventApiModel(json)
+        EventType.CALLBACK_REFUSAL,
+        EventType.CALLBACK_ENROLMENT,
+        EventType.CALLBACK_IDENTIFICATION,
+        EventType.CALLBACK_VERIFICATION -> validateCallbackEventApiModel(json)
+        EventType.CALLOUT_ENROLMENT,
+        EventType.CALLOUT_CONFIRMATION,
+        EventType.CALLOUT_VERIFICATION,
+        EventType.CALLOUT_IDENTIFICATION -> validateCalloutEventApiModel(json)
     }
 }
 
@@ -346,7 +355,7 @@ fun validateInvalidEventApiModel(json: JsonObject) {
         "com.simprints.id.CONFIRM_IDENTITY",
         "com.simprints.id.UPDATE")
 
-    assertThat(json.size()).isEqualTo(2)
+    assertThat(json.size()).isEqualTo(3)
 }
 
 fun validateSessionEventsApiModel(json: JsonObject) {

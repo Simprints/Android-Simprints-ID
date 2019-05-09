@@ -8,11 +8,14 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.*
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
+
 class CheckLoginFromIntentPresenterTest {
 
     private val view = spy<CheckLoginFromIntentActivity>()
@@ -64,7 +67,9 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) { buildEnrolmentCallout() }
+        verifyOnce(checkLoginFromIntentPresenter) {
+            buildEnrolmentCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
+        }
     }
 
     @Test
@@ -81,7 +86,9 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) { buildIdentificationCallout() }
+        verifyOnce(checkLoginFromIntentPresenter) {
+            buildIdentificationCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
+        }
     }
 
     @Test
@@ -99,6 +106,8 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.buildRequestEvent(10, checkLoginFromIntentPresenter.appRequest)
 
-        verifyOnce(checkLoginFromIntentPresenter) { buildVerificationCallout() }
+        verifyOnce(checkLoginFromIntentPresenter) {
+            buildVerificationCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
+        }
     }
 }

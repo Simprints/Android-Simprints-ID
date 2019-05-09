@@ -99,7 +99,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             else -> throw InvalidAppRequest()
         }
 
-    private fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
+    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
         with(request) {
             IdentificationCalloutEvent(
                 relativeStarTime,
@@ -107,7 +107,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 projectId, userId, moduleId, metadata)
         }
 
-    private fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStarTime: Long) =
+    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStarTime: Long) =
         with(request) {
             VerificationCalloutEvent(
                 relativeStarTime,
@@ -116,7 +116,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
 
 
-    private fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStarTime: Long) =
+    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStarTime: Long) =
         with(request) {
             EnrolmentCalloutEvent(
                 relativeStarTime,
