@@ -24,6 +24,7 @@ import timber.log.Timber
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val deviceId: String,
+                                    private val appVersionName: String,
                                     private val sessionEventsSyncManager: SessionEventsSyncManager,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
@@ -45,7 +46,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             it[0]
         }
 
-    override fun createSession(appVersionName: String): Single<SessionEvents> =
+    override fun createSession(): Single<SessionEvents> =
         createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName).let {
             Timber.d("Created session: ${it.id}")
             sessionEventsSyncManager.scheduleSessionsSync()

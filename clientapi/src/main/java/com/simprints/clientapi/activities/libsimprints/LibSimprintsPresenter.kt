@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import android.annotation.SuppressLint
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.IntegrationInfo
@@ -13,21 +14,29 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
+import io.reactivex.rxkotlin.subscribeBy
 
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
-                            clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                            private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                             gsonBuilder: GsonBuilder,
                             private val action: String?,
                             integrationInfo: IntegrationInfo)
     : RequestPresenter(view, clientApiSessionEventsManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
 
-    override fun start() = when (action) {
-        SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-        SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-        SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-        SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
-        else -> view.returnIntentActionErrorToClient()
+    @SuppressLint("CheckResult")
+    override fun start() {
+        clientApiSessionEventsManager
+            .createSession()
+            .doFinally {
+                when (action) {
+                    SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                    SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                    SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                    SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+                    else -> view.returnIntentActionErrorToClient()
+                }
+            }.subscribeBy(onError = { it.printStackTrace() })
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =

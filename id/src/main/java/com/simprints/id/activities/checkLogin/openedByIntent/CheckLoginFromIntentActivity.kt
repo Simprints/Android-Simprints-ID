@@ -12,7 +12,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.*
 import javax.inject.Inject
@@ -34,7 +33,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val component = (application as Application).component
         component.inject(this)
 
-        viewPresenter = CheckLoginFromIntentPresenter(this, component)
+        viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         viewPresenter.setup()
     }
@@ -44,19 +43,10 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter.start()
     }
 
-    override fun getAppVersionNameFromPackageManager() = packageVersionName
-    override fun getDeviceUniqueId() = deviceId
-
     override fun parseRequest() =
         intent.parseAppRequest() as AppRequest
 
     override fun getCheckCallingApp() = getCallingPackageName()
-
-    override fun checkCallingAppIsFromKnownSource() {
-        if (app.packageManager.isCallingAppFromUnknownSource(getCallingPackageName())) {
-            crashReportManager.logExceptionOrThrowable(CallingAppFromUnknownSourceException())
-        }
-    }
 
     open fun getCallingPackageName(): String {
         return callingPackage ?: ""

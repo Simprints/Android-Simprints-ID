@@ -27,6 +27,7 @@ import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -36,6 +37,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
+                                    val deviceId: String,
                                     component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
 
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
@@ -46,7 +48,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var dbManager: LocalDbManager
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    private var currentSession: String = ""
     internal lateinit var appRequest: AppRequest
 
     init {
@@ -55,27 +56,19 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     @SuppressLint("CheckResult")
     override fun setup() {
-        view.checkCallingAppIsFromKnownSource()
-        sessionEventsManager.createSession(view.getAppVersionNameFromPackageManager()).doFinally {
-            try {
-                parseAppRequest()
-                extractSessionParametersOrThrow()
-                addCalloutAndConnectivityEventsInSession(appRequest)
-                setLastUser()
-                setSessionIdCrashlyticsKey()
-            } catch (t: Throwable) { // STOPSHIP : catch custom exception and display some alert
-                t.printStackTrace()
-                crashReportManager.logExceptionOrThrowable(t)
-                val alert = if (t is InvalidCalloutError) t.alert else Alert.UNEXPECTED_ERROR
-                view.openAlertActivityForError(alert)
-                setupFailed = true
-            }
-        }.subscribeBy(
-            onSuccess = {
-                currentSession = it.id
-            },
-            onError = { it.printStackTrace() }
-        )
+        try {
+            parseAppRequest()
+            extractSessionParametersOrThrow()
+            addCalloutAndConnectivityEventsInSession(appRequest)
+            setLastUser()
+            setSessionIdCrashlyticsKey()
+        } catch (t: Throwable) { // STOPSHIP : catch custom exception and display some alert
+            t.printStackTrace()
+            crashReportManager.logExceptionOrThrowable(t)
+            val alert = if (t is InvalidCalloutError) t.alert else Alert.UNEXPECTED_ERROR
+            view.openAlertActivityForError(alert)
+            setupFailed = true
+        }
     }
 
     private fun parseAppRequest() {
@@ -134,10 +127,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    private fun extractSessionParametersOrThrow() {
-        analyticsManager.logCallout(appRequest)
-        analyticsManager.logUserProperties(appRequest.userId, appRequest.projectId, appRequest.moduleId, view.getDeviceUniqueId())
-    }
+    private fun extractSessionParametersOrThrow() =
+        with(appRequest) {
+            analyticsManager.logCallout(this)
+            analyticsManager.logUserProperties(userId, projectId, moduleId, deviceId)
+        }
 
     override fun handleNotSignedInUser() {
         sessionEventsManager.updateSessionInBackground {
