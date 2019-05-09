@@ -50,7 +50,6 @@ class ProjectAuthenticatorTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var loginInfoManagerMock: LoginInfoManager
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
 
@@ -123,6 +122,15 @@ class ProjectAuthenticatorTest {
 
         testObserver
             .assertError(IOException::class.java)
+    }
+
+    @Test
+    fun getAuthenticationData_invokeAuthenticationDataManagerCorrectly() {
+        val authenticationDataManager = mock<AuthenticationDataManager>()
+        val projectAuthenticator = ProjectAuthenticator(mock(), mock(), mock(), mock(), authenticationDataManager)
+        projectAuthenticator.getAuthenticationData(projectId, userId)
+
+        verifyOnce(authenticationDataManager) { requestAuthenticationData(projectId, userId) }
     }
 
     private fun getMockAttestationManager(): AttestationManager {

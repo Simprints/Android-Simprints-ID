@@ -23,7 +23,8 @@ import javax.inject.Inject
 open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface,
-                                private val attestationManager: AttestationManager = AttestationManager()) {
+                                private val attestationManager: AttestationManager = AttestationManager(),
+                                private val authenticationDataManager:AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
 
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -34,7 +35,6 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val authManager = AuthManager(secureApiClient)
-    private val authenticationDataManager = AuthenticationDataManager(secureApiClient)
 
  	init {
         component.inject(this)
@@ -66,7 +66,7 @@ open class ProjectAuthenticator(component: AppComponent,
         return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
     }
 
-    private fun getAuthenticationData(userId: String, projectId: String) =
+    internal fun getAuthenticationData(projectId: String, userId: String) =
         authenticationDataManager.requestAuthenticationData(projectId, userId)
 
     private fun getEncryptedProjectSecret(projectSecret: String, authenticationDataSingle: Single<AuthenticationData>): Single<String> =
