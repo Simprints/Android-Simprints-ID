@@ -37,7 +37,10 @@ class SessionEventsManagerImplTest {
     private val timeHelper: TimeHelper = TimeHelperImpl()
     private val crashReportManagerMock: CrashReportManager = mock()
     private val sessionsEventsManagerSpy: SessionEventsManager =
-        spy(SessionEventsManagerImpl("deviceID", sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
+        spy(SessionEventsManagerImpl(
+            "deviceID",
+            "com.simprints.id",
+            sessionEventsSyncManagerMock, sessionEventsLocalDbManagerMock, preferencesManagerMock, timeHelper, crashReportManagerMock))
 
     private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
@@ -67,7 +70,7 @@ class SessionEventsManagerImplTest {
     @Test
     fun createSession_shouldCreateASession() {
 
-        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
+        sessionsEventsManagerSpy.createSession().blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
         val createdSession = sessionsInFakeDb.first()
@@ -81,7 +84,7 @@ class SessionEventsManagerImplTest {
         sessionsInFakeDb.add(openSession)
         assertThat(openSession.isOpen()).isTrue()
 
-        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
+        sessionsEventsManagerSpy.createSession().blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(2)
         val newCreatedSession = sessionsInFakeDb.find { it.id != "old_session_id" }
@@ -98,7 +101,7 @@ class SessionEventsManagerImplTest {
     fun closeLastSessionsIfPending_shouldSwallowException() {
         whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.error(Throwable("error_reading_db")))
 
-        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
+        sessionsEventsManagerSpy.createSession().blockingGet()
 
         verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
@@ -106,7 +109,7 @@ class SessionEventsManagerImplTest {
 
     @Test
     fun updateSession_shouldUpdateSession() {
-        sessionsEventsManagerSpy.createSession(appVersionName).blockingGet()
+        sessionsEventsManagerSpy.createSession().blockingGet()
         sessionsEventsManagerSpy.updateSession {
             it.projectId = "new_project"
         }.blockingAwait()

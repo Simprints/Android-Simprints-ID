@@ -23,14 +23,11 @@ class CheckLoginFromIntentPresenterTest {
     @Before
     fun setUp() {
         UnitTestConfig(this).rescheduleRxMainThread()
-
-        whenever(view) { checkCallingAppIsFromKnownSource() }  thenDoNothing {}
-        whenever(view) { getAppVersionNameFromPackageManager() } thenReturn ""
     }
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddCalloutEvent() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view , mock())).apply {
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view , mock(), mock())).apply {
 
             whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
             remoteConfigFetcher = mock()
@@ -43,7 +40,7 @@ class CheckLoginFromIntentPresenterTest {
             }
 
             sessionEventsManager = mock<SessionEventsManager>().apply {
-                whenever(this) { createSession(any()) } thenReturn Single.just(createFakeSession())
+                whenever(this) { createSession() } thenReturn Single.just(createFakeSession())
                 whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
             }
         }
@@ -55,7 +52,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForEnrolment_buildsEnrolmentCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, mock(), mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppEnrolRequest>().apply {
             whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
@@ -74,7 +71,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForIdentification_buildsIdentificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppIdentifyRequest>().apply {
             whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
@@ -93,7 +90,7 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_buildRequestIsCalledForVerification_buildsVerificationCallout() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, mock()))
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, mock(), mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppVerifyRequest>().apply {
             whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
