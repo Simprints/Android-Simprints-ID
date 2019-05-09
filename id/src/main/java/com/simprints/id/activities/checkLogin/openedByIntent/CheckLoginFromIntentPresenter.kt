@@ -6,13 +6,13 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.Result.AUTHORIZED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
-import com.simprints.id.data.analytics.eventdata.models.domain.events.CalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Callout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCallout
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCallout
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutIntegrationInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutIntegrationInfo.Companion.fromAppIntegrationInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
@@ -93,23 +93,36 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     internal fun buildRequestEvent(relativeStarTime: Long, request: AppRequest): Event =
         when (request) {
-            is AppEnrolRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildEnrolmentCallout())
-            is AppVerifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildVerificationCallout())
-            is AppIdentifyRequest -> CalloutEvent(request.extraRequestInfo.integration, relativeStarTime, buildIdentificationCallout())
+            is AppEnrolRequest -> buildEnrolmentCalloutEvent(request, relativeStarTime)
+            is AppVerifyRequest -> buildVerificationCalloutEvent(request, relativeStarTime)
+            is AppIdentifyRequest -> buildIdentificationCalloutEvent(request, relativeStarTime)
             else -> throw InvalidAppRequest()
         }
 
-    internal fun buildIdentificationCallout(): Callout = with(appRequest) {
-        IdentificationCallout(projectId, userId, moduleId, metadata)
-    }
+    internal fun buildIdentificationCalloutEvent(request: AppIdentifyRequest, relativeStarTime: Long) =
+        with(request) {
+            IdentificationCalloutEvent(
+                relativeStarTime,
+                fromAppIntegrationInfo(extraRequestInfo.integration),
+                projectId, userId, moduleId, metadata)
+        }
 
-    internal fun buildVerificationCallout(): Callout = with(appRequest) {
-        VerificationCallout(projectId, userId, moduleId, (this as AppVerifyRequest).verifyGuid, metadata)
-    }
+    internal fun buildVerificationCalloutEvent(request: AppVerifyRequest, relativeStarTime: Long) =
+        with(request) {
+            VerificationCalloutEvent(
+                relativeStarTime,
+                fromAppIntegrationInfo(extraRequestInfo.integration),
+                projectId, userId, moduleId, verifyGuid, metadata)
+        }
 
-    internal fun buildEnrolmentCallout(): Callout = with(appRequest) {
-        EnrolmentCallout(projectId, userId, moduleId, metadata)
-    }
+
+    internal fun buildEnrolmentCalloutEvent(request: AppEnrolRequest, relativeStarTime: Long) =
+        with(request) {
+            EnrolmentCalloutEvent(
+                relativeStarTime,
+                fromAppIntegrationInfo(extraRequestInfo.integration),
+                projectId, userId, moduleId, metadata)
+        }
 
     private fun setLastUser() {
         preferencesManager.lastUserUsed = appRequest.userId
