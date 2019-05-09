@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import com.google.gson.Gson
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -20,6 +21,7 @@ import com.simprints.libsimprints.Tier
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
+import io.reactivex.Completable
 import org.junit.Test
 import java.util.*
 
@@ -33,7 +35,7 @@ class LibSimprintsPresenterTest {
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_REGISTER_INTENT, MOCK_INTEGRATION).apply { start() }
+        LibSimprintsPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, Constants.SIMPRINTS_REGISTER_INTENT, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
@@ -44,7 +46,7 @@ class LibSimprintsPresenterTest {
         whenever(view.identifyExtractor) thenReturn identifyExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_IDENTIFY_INTENT, MOCK_INTEGRATION).apply { start() }
+        LibSimprintsPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, Constants.SIMPRINTS_IDENTIFY_INTENT, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
@@ -55,7 +57,7 @@ class LibSimprintsPresenterTest {
         whenever(view.verifyExtractor) thenReturn verificationExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_VERIFY_INTENT, MOCK_INTEGRATION).apply { start() }
+        LibSimprintsPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, Constants.SIMPRINTS_VERIFY_INTENT, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
@@ -66,14 +68,14 @@ class LibSimprintsPresenterTest {
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
         val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, mock(), gsonBuilder, Constants.SIMPRINTS_SELECT_GUID_INTENT, MOCK_INTEGRATION).apply { start() }
+        LibSimprintsPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, Constants.SIMPRINTS_SELECT_GUID_INTENT, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        LibSimprintsPresenter(view, mock(), mock(), "Garbage", mock()).apply { start() }
+        LibSimprintsPresenter(view, mockSessionManagerToCreateSession(), mock(), "Garbage", mock()).apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -123,6 +125,11 @@ class LibSimprintsPresenterTest {
         LibSimprintsPresenter(view, mock(), mock(), "", mock()).handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
+
+    private fun mockSessionManagerToCreateSession() =
+        mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { createSession() } thenReturn Completable.complete()
+        }
 
     private fun mockGsonBuilder() =
         mock<GsonBuilder>().apply {

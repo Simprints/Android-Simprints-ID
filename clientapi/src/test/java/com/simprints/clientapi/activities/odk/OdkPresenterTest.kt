@@ -5,6 +5,7 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONF
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -17,6 +18,7 @@ import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
+import io.reactivex.Completable
 import org.junit.Test
 import java.util.*
 
@@ -30,7 +32,7 @@ class OdkPresenterTest {
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mock(), gsonBuilder, ACTION_REGISTER, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_REGISTER, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
@@ -41,7 +43,7 @@ class OdkPresenterTest {
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mock(), gsonBuilder, ACTION_IDENTIFY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_IDENTIFY, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
@@ -52,14 +54,19 @@ class OdkPresenterTest {
         whenever(view) { verifyExtractor } thenReturn verifyExractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mock(), gsonBuilder, ACTION_VERIFY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_VERIFY, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
+    private fun mockSessionManagerToCreateSession() =
+        mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { createSession() } thenReturn Completable.complete()
+        }
+
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, mock(), mock(), "Garbage", mock()).apply { start() }
+        OdkPresenter(view, mockSessionManagerToCreateSession(), mock(), "Garbage", mock()).apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -116,7 +123,7 @@ class OdkPresenterTest {
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
         val gsonBuilder = mockGsonBuilder()
-        OdkPresenter(view, mock(), gsonBuilder, ACTION_CONFIRM_IDENTITY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_CONFIRM_IDENTITY, MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
