@@ -40,5 +40,5 @@ interface PeopleRemoteInterface {
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: List<String>?,
-        @Query("modes") modes: List<ApiModes>): Single<Response<List<ApiPeopleCount>>>
+        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
 }

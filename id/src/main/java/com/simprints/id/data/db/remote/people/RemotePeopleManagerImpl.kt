@@ -47,14 +47,12 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
     override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
             peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId,
-                syncScope.moduleIds?.toList(), getApiModes(syncScope.modes))
+                syncScope.moduleIds?.toList())
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
                 .map { apiPeopleCount -> apiPeopleCount.map { it.toDomainPeopleCount() } }
         }
-
-    private fun getApiModes(modes: List<Modes>) = modes.map { ApiModes.valueOf(it.name) }
 
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         remoteDbManager.getCurrentToken()
