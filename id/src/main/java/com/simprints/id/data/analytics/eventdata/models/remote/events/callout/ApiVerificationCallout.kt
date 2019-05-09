@@ -6,5 +6,5 @@ import androidx.annotation.Keep
 class ApiVerificationCallout(val projectId: String,
                              val userId: String,
                              val moduleId: String,
-                             val verifyGuid: String,
-                             val metadata: String): ApiCallout(ApiCalloutType.VERIFICATION)
+                             val metadata: String,
+                             val verifyGuid: String): ApiCallout(ApiCalloutType.VERIFICATION)

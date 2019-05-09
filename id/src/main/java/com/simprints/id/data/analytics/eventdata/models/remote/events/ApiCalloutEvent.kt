@@ -1,38 +1,45 @@
 package com.simprints.id.data.analytics.eventdata.models.remote.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
-import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiCalloutEvent.ApiIntegrationInfo.Companion.fromDomainIntegrationInfo
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCallout
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.*
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCalloutIntegrationInfo.Companion.fromDomainToApi
+import java.lang.IllegalArgumentException
 
 @Keep
 class ApiCalloutEvent(val relativeStartTime: Long,
-                      val integration: ApiIntegrationInfo,
+                      val integration: ApiCalloutIntegrationInfo,
                       val callout: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
 
-    constructor(calloutEvent: CalloutEvent) :
-        this(calloutEvent.relativeStartTime,
-            fromDomainIntegrationInfo(calloutEvent.integration),
-            fromDomainCallout(calloutEvent.callout))
+    constructor(enrolmentCalloutEvent: EnrolmentCalloutEvent) :
+        this(enrolmentCalloutEvent.relativeStartTime,
+            fromDomainToApi(enrolmentCalloutEvent.integration),
+            fromDomainToApiCallout(enrolmentCalloutEvent))
 
-    enum class ApiIntegrationInfo {
-        ODK, STANDARD;
+    constructor(identificationCalloutEvent: IdentificationCalloutEvent) :
+        this(identificationCalloutEvent.relativeStartTime,
+            fromDomainToApi(identificationCalloutEvent.integration),
+            fromDomainToApiCallout(identificationCalloutEvent))
 
-        companion object {
-            fun fromDomainIntegrationInfo(integrationInfo: CalloutEvent.IntegrationInfo) =
-                when (integrationInfo) {
-                    CalloutEvent.IntegrationInfo.ODK -> ODK
-                    CalloutEvent.IntegrationInfo.STANDARD -> STANDARD
-                }
-        }
+    constructor(verificationCalloutEvent: VerificationCalloutEvent) :
+        this(verificationCalloutEvent.relativeStartTime,
+            fromDomainToApi(verificationCalloutEvent.integration),
+            fromDomainToApiCallout(verificationCalloutEvent))
+
+    constructor(confirmationCalloutEvent: ConfirmationCalloutEvent) :
+        this(confirmationCalloutEvent.relativeStartTime,
+            fromDomainToApi(confirmationCalloutEvent.integration),
+            fromDomainToApiCallout(confirmationCalloutEvent))
+}
+
+
+
+fun fromDomainToApiCallout(event: Event): ApiCallout =
+    when(event) {
+        is EnrolmentCalloutEvent -> with(event) { ApiEnrolmentCallout(projectId, userId, moduleId, metadata) }
+        is IdentificationCalloutEvent -> with(event) { ApiIdentificationCallout(projectId, userId, moduleId, metadata) }
+        is ConfirmationCalloutEvent -> with(event) { ApiConfirmationCallout(selectedGuid, sessionId) }
+        is VerificationCalloutEvent -> with(event) { ApiVerificationCallout(projectId, userId, moduleId, metadata, verifyGuid) }
+        else -> throw IllegalArgumentException("Invalid CalloutEvent") //Stopship
     }
-}
-
-fun fromDomainCallout(callout: Callout): ApiCallout = when(callout) {
-    is EnrolmentCallout -> callout.toApiEnrolmentCallout()
-    is IdentificationCallout -> callout.toApiIdentificationCallout()
-    is ConfirmationCallout -> callout.toApiConfirmationCallout()
-    is VerificationCallout -> callout.toApiVerificationCallout()
-    else -> throw Exception() //Stopship
-}
