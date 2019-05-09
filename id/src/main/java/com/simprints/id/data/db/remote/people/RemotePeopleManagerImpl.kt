@@ -3,13 +3,14 @@ package com.simprints.id.data.db.remote.people
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.toApiPostPerson
-import com.simprints.id.data.db.remote.models.toDomainPerson
+import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Person
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
+import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.trace
@@ -43,14 +44,17 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
                 .trace("uploadPatientBatch")
         }
 
-    override fun getNumberOfPatients(projectId: String, userId: String?, moduleId: String?): Single<Int> =
+    override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
-            peopleRemoteInterface.requestPeopleCount(projectId, userId, moduleId)
+            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId,
+                syncScope.moduleIds?.toList(), getApiModes(syncScope.modes))
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
-                .map { it.count }
+                .map { apiPeopleCount -> apiPeopleCount.map { it.toDomainPeopleCount() } }
         }
+
+    private fun getApiModes(modes: List<Modes>) = modes.map { ApiModes.valueOf(it.name) }
 
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         remoteDbManager.getCurrentToken()
