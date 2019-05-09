@@ -24,7 +24,8 @@ interface PeopleRemoteInterface {
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
-        @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?): Single<ResponseBody>
+        @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
+        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -33,12 +34,13 @@ interface PeopleRemoteInterface {
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String): Single<Response<ApiGetPerson>>
+        @Path("projectId") projectId: String,
+        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<ApiGetPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: List<String>?,
-        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
+        @Query("modes") modes: List<ApiModes> = arrayListOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
 }
