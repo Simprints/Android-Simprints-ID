@@ -11,6 +11,7 @@ import retrofit2.Response
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
+@JvmSuppressWildcards
 interface PeopleRemoteInterface {
 
     companion object {
@@ -25,7 +26,7 @@ interface PeopleRemoteInterface {
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
         @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
-        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<ResponseBody>
+        @Query("mode") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -35,12 +36,12 @@ interface PeopleRemoteInterface {
     fun requestPerson(
         @Path("patientId") patientId: String,
         @Path("projectId") projectId: String,
-        @Query("modes") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<ApiGetPerson>>
+        @Query("mode") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<ApiGetPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: List<String>?,
-        @Query("modes") modes: List<ApiModes> = arrayListOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
+        @Query("mode") modes: List<ApiModes> = arrayListOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
 }

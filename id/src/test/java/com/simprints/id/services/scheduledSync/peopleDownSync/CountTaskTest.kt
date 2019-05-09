@@ -65,7 +65,7 @@ class CountTaskTest {
                                                              peopleInLocalDb: Int): TestObserver<List<PeopleCount>> {
 
         whenever(remotePeopleManagerMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
-        whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
+        whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
         whenever(preferencesManagerMock.syncGroup).thenReturn(GROUP.GLOBAL)
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0"))
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")

@@ -75,8 +75,8 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
         flatMap {
-            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt()
-            ).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt())
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
         }
 
     private fun Single<out ResponseBody>.setupJsonReaderFromResponse(): Single<JsonReader> =
@@ -91,26 +91,31 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
     private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiGetPerson> =
         flatMapObservable { jsonReader ->
             Observable.create<ApiGetPerson> { emitter ->
-                while (jsonReader.hasNext()) {
-                    emitter.onNext(JsonHelper.gson.fromJson<ApiGetPerson>(jsonReader, ApiGetPerson::class.java))
+                try {
+                    while (jsonReader.hasNext()) {
+                        emitter.onNext(JsonHelper.gson.fromJson<ApiGetPerson>(jsonReader, ApiGetPerson::class.java))
+                    }
+                    emitter.onComplete()
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    emitter.onError(t)
                 }
-                emitter.onComplete()
             }
         }
 
     private fun Observable<ApiGetPerson>.splitIntoBatches(): Observable<List<ApiGetPerson>> =
         buffer(BATCH_SIZE_FOR_DOWNLOADING)
+            .doOnError { it.printStackTrace() }
 
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
-            Completable.create { emitter ->
+            Completable.fromAction {
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
                 updateLastKnownPatientId(batchOfPeople.last().id)
                 updateDownSyncTimestampOnBatchDownload()
-                emitter.onComplete()
             }
         }
 
