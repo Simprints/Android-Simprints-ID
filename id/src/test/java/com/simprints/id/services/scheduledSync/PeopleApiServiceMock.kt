@@ -1,10 +1,9 @@
 package com.simprints.id.services.scheduledSync
 
-import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.ApiPostPerson
 import com.simprints.id.data.db.remote.models.ApiModes
 import com.simprints.id.data.db.remote.models.ApiPeopleCount
+import com.simprints.id.data.db.remote.models.ApiPostPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -22,11 +21,11 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?): Single<ResponseBody> {
+    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?, modes: List<ApiModes>): Single<ResponseBody> {
         return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun requestPerson(patientId: String, projectId: String): Single<Response<ApiGetPerson>> {
+    override fun requestPerson(patientId: String, projectId: String, modes: List<ApiModes>): Single<Response<ApiGetPerson>> {
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 

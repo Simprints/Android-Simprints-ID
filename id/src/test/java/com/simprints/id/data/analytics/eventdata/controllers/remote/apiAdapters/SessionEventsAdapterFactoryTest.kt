@@ -20,7 +20,6 @@ import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDevice
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocation
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.domain.alert.Alert
-import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -214,7 +213,7 @@ class SessionEventsAdapterFactoryTest {
             10,
             UUID.randomUUID().toString())
 
-        val apiEvent = ApiEnrollmentEvent(event)
+        val apiEvent = ApiEnrolmentEvent(event)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateEnrolmentEventApiModel(json)
     }
