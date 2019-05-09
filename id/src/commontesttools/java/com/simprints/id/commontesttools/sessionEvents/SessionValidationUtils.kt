@@ -3,8 +3,10 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
+import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallbackType
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCalloutType
 import com.simprints.id.domain.alert.Alert
@@ -146,7 +148,7 @@ fun validateAuthorizationEventApiModel(json: JsonObject) {
         assertThat(getString("userId")).isNotEmpty()
         assertThat(size()).isEqualTo(2)
     }
-    assertThat(json.get("result").asString).isIn(AuthorizationEvent.Result.values().valuesAsStrings())
+    assertThat(json.get("result").asString).isAnyOf("AUTHORIZED", "NOT_AUTHORIZED")
     assertThat(json.size()).isEqualTo(4)
 }
 
@@ -156,9 +158,9 @@ fun validateCandidateReadEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("candidateId").asString.isGuid()).isTrue()
-    assertThat(json.get("localResult").asString).isIn(CandidateReadEvent.LocalResult.values().valuesAsStrings())
+    assertThat(json.get("localResult").asString).isAnyOf("FOUND", "NOT_FOUND")
     if (json.has("remoteResult")) {
-        assertThat(json.get("remoteResult").asString).isIn(CandidateReadEvent.RemoteResult.values().valuesAsStrings())
+        assertThat(json.get("remoteResult").asString).isAnyOf("FOUND", "NOT_FOUND")
         assertThat(json.size()).isEqualTo(6)
     } else {
         assertThat(json.size()).isEqualTo(5)
@@ -184,8 +186,8 @@ fun validateConsentEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("CONSENT")
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
-    assertThat(json.get("consentType").asString).isIn(ConsentEvent.Type.values().valuesAsStrings())
-    assertThat(json.get("result").asString).isIn(ConsentEvent.Result.values().valuesAsStrings())
+    assertThat(json.get("consentType").asString).isAnyOf("INDIVIDUAL", "PARENTAL")
+    assertThat(json.get("result").asString).isAnyOf("ACCEPTED", "DECLINED", "NO_RESPONSE")
     assertThat(json.size()).isEqualTo(5)
 }
 
@@ -202,10 +204,10 @@ fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("id").asString)
     assertThat(json.get("qualityThreshold").asNumber)
-    assertThat(json.get("result").asString).isIn(FingerprintCaptureEvent.Result.values().valuesAsStrings())
+    assertThat(json.get("result").asString).isAnyOf("GOOD_SCAN", "BAD_QUALITY", "NO_FINGER_DETECTED", "SKIPPED", "FAILURE_TO_ACQUIRE")
 
     with(json.get("fingerprint").asJsonObject) {
-        assertThat(get("finger").asString).isIn(FingerIdentifier.values().valuesAsStrings())
+        assertThat(get("finger").asString).isAnyOf("LEFT_THUMB", "LEFT_INDEX_FINGER", "LEFT_3RD_FINGER", "LEFT_4TH_FINGER", "LEFT_5TH_FINGER", "RIGHT_THUMB", "RIGHT_INDEX_FINGER", "RIGHT_3RD_FINGER", "RIGHT_4TH_FINGER", "RIGHT_5TH_FINGER")
         assertThat(get("quality").asInt)
         assertThat(get("template").asString).isNotEmpty()
         assertThat(size()).isEqualTo(3)
@@ -231,7 +233,7 @@ fun validateOneToManyMatchEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     with(json.get("pool").asJsonObject) {
-        assertThat(get("type").asString).isIn(OneToManyMatchEvent.MatchPoolType.values().valuesAsStrings())
+        assertThat(get("type").asString).isAnyOf("PROJECT", "MODULE", "USER")
         assertThat(get("count").asInt)
         assertThat(size()).isEqualTo(2)
     }
