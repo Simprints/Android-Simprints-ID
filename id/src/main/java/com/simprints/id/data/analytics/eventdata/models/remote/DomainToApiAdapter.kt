@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.models.remote
 
+import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.EnrolmentCallbackEvent
@@ -12,12 +13,13 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.Id
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.*
 
+@Keep
 fun Event.toApiEvent(): ApiEvent =
     when (this.type) {
         ARTIFICIAL_TERMINATION -> ApiArtificialTerminationEvent(this as ArtificialTerminationEvent)
         REFUSAL -> ApiRefusalEvent(this as RefusalEvent)
         CONSENT -> ApiConsentEvent(this as ConsentEvent)
-        ENROLMENT -> ApiEnrollmentEvent(this as EnrolmentEvent)
+        ENROLMENT -> ApiEnrolmentEvent(this as EnrolmentEvent)
         ALERT_SCREEN ->  ApiAlertScreenEvent(this as AlertScreenEvent)
         CANDIDATE_READ -> ApiCandidateReadEvent(this as CandidateReadEvent)
         AUTHORIZATION -> ApiAuthorizationEvent(this as AuthorizationEvent)
