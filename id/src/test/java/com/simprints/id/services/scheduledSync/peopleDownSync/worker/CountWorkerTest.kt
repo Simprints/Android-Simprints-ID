@@ -9,11 +9,13 @@ import androidx.work.workDataOf
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker.Companion.SUBCOUNT_WORKER_SUB_SCOPE_INPUT
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker.Companion.COUNT_WORKER_SCOPE_INPUT
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -32,7 +34,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class SubCountWorkerTest {
+class CountWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
@@ -44,7 +46,7 @@ class SubCountWorkerTest {
 
     private val countTaskMock: CountTask = mock()
 
-    private lateinit var subCountWorker: SubCountWorker
+    private lateinit var countWorker: CountWorker
     private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
 
     private val module by lazy {
@@ -60,10 +62,10 @@ class SubCountWorkerTest {
         UnitTestConfig(this, module).fullSetup()
 
         MockitoAnnotations.initMocks(this)
-        subCountWorker = SubCountWorker(context, workParams)
+        countWorker = CountWorker(context, workParams)
         whenever(workParams.inputData).thenReturn(
             workDataOf(
-                SUBCOUNT_WORKER_SUB_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(
+                COUNT_WORKER_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(
                     subSyncScope
                 )
             )
@@ -72,8 +74,8 @@ class SubCountWorkerTest {
 
     @Test
     fun testWorkerSuccessAndOutputData_shouldSucceedWithCorrectData() {
-        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(5))
-        val workerResult = subCountWorker.doWork()
+        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(5)))
+        val workerResult = countWorker.doWork()
 
         assert(
             workerResult is ListenableWorker.Result.Success &&
@@ -84,9 +86,12 @@ class SubCountWorkerTest {
     @Test
     fun testWorkerWithCountFailure_shouldLogErrorAndSucceed() {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
-        val workerResult = subCountWorker.doWork()
+        val workerResult = countWorker.doWork()
 
         verifyOnce(crashReportManager) { logExceptionOrThrowable(anyNotNull()) }
         assert(workerResult is ListenableWorker.Result.Success)
     }
+
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 }

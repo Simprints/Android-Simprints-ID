@@ -3,6 +3,8 @@ package com.simprints.id.services.scheduledSync
 import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.ApiPostPerson
+import com.simprints.id.data.db.remote.models.ApiModes
+import com.simprints.id.data.db.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import io.reactivex.Single
 import okhttp3.ResponseBody
@@ -28,8 +30,9 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: String?): Single<Response<PeopleCount>> {
-        return delegate.returning(buildSuccessResponseWith("{\"count\": 10}")).requestPeopleCount(projectId, userId, moduleId)
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: List<String>?, modes: List<ApiModes>): Single<Response<List<ApiPeopleCount>>> {
+        return delegate.returning(buildSuccessResponseWith("[{\"projectId\":\"project-321\",\"moduleId\":\"module1\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3141}, {\"projectId\":\"project-321\",\"moduleId\":\"module2\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3132}]"))
+            .requestPeopleCount(projectId, userId, moduleId, listOf(ApiModes.FINGERPRINT, ApiModes.FACE))
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {
