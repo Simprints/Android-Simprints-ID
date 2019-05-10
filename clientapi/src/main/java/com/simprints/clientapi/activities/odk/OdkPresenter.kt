@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.odk
 
 import android.annotation.SuppressLint
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.EnrollResponse
@@ -17,10 +18,11 @@ import io.reactivex.rxkotlin.subscribeBy
 
 class OdkPresenter(private val view: OdkContract.View,
                    private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                   private val clientApiCrashReportManager: ClientApiCrashReportManager,
                    gsonBuilder: GsonBuilder,
                    private val action: String?,
                    integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiSessionEventsManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
+    : RequestPresenter(view, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -42,7 +44,9 @@ class OdkPresenter(private val view: OdkContract.View,
                     ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
                     else -> view.returnIntentActionErrorToClient()
                 }
-            }.subscribeBy(onError = { it.printStackTrace() })
+            }.subscribeBy(
+                onSuccess = { clientApiCrashReportManager.setSessionIdCrashlyticsKey(it) },
+                onError = { it.printStackTrace() })
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) = view.returnRegistration(enroll.guid)
