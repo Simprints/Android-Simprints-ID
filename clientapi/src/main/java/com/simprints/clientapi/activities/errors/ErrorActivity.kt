@@ -22,6 +22,8 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
         ErrorActivityComponentInjector.inject(this)
 
+        presenter.start()
+
         textView_close_button.setOnClickListener { presenter.handleCloseClick() }
     }
 
