@@ -1,14 +1,17 @@
 package com.simprints.clientapi.controllers.core.eventData
 
-import com.simprints.clientapi.controllers.core.eventData.model.*
+import com.simprints.clientapi.controllers.core.eventData.model.Event
+import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
+import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
+import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import io.reactivex.Completable
+import io.reactivex.Single
 
 class ClientApiSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) :
     ClientApiSessionEventsManager {
 
-    override fun createSession(): Completable =
-        sessionEventsManager.createSession().ignoreElement()
+    override fun createSession(): Single<String> =
+        sessionEventsManager.createSession().map { it.id }
 
     override fun addSessionEvent(sessionEvent: Event) {
         when (sessionEvent) {
