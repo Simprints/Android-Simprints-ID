@@ -1,10 +1,11 @@
 package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.controllers.core.eventData.model.Event
-import io.reactivex.Completable
+import io.reactivex.Single
 
 interface ClientApiSessionEventsManager {
 
-    fun createSession(): Completable
+    fun createSession(): Single<String>
+
     fun addSessionEvent(sessionEvent: Event)
 }

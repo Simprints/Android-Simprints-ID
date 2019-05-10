@@ -3,8 +3,8 @@ package com.simprints.clientapi.activities.odk.di
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.activities.odk.OdkContract
 import com.simprints.clientapi.activities.odk.OdkPresenter
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -18,6 +18,8 @@ open class OdkActivityModule {
     @Provides
     fun provideLibSimprintsPresenter(view: OdkContract.View,
                                      clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                                     clientApiCrashReportManager: ClientApiCrashReportManager,
                                      gsonBuilder: GsonBuilder): OdkContract.Presenter =
-        OdkPresenter(view, clientApiSessionEventsManager, gsonBuilder, view.action, view.integrationInfo)
+        OdkPresenter(view, clientApiSessionEventsManager, clientApiCrashReportManager,
+            gsonBuilder, view.action, view.integrationInfo)
 }
