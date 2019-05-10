@@ -12,12 +12,12 @@ interface ErrorContract {
 
         fun closeActivity()
 
+        fun getErrorMessage(): String
     }
 
     interface Presenter : BasePresenter {
 
         fun handleCloseClick()
-
     }
 
 }

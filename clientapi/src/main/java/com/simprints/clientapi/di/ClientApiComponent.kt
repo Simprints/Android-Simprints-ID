@@ -1,5 +1,6 @@
 package com.simprints.clientapi.di
 
+import com.simprints.clientapi.activities.errors.di.ErrorActivityComponent
 import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsActivityComponent
 import com.simprints.clientapi.activities.odk.di.OdkActivityComponent
 import com.simprints.core.di.FeatureScope
@@ -17,5 +18,6 @@ interface ClientApiComponent {
 
     val libsimprintsActivityComponentFactory: LibSimprintsActivityComponent.Factory
     val odkActivityComponentFactory: OdkActivityComponent.Factory
+    val errorActivityComponentFactory: ErrorActivityComponent.Factory
 
 }
