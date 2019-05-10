@@ -2,7 +2,6 @@ package com.simprints.clientapi.activities.libsimprints.di
 
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsPresenter
-import com.simprints.clientapi.activities.odk.di.OdkActivityComponent
 import com.simprints.clientapi.di.ClientApiComponentBuilder
 import com.simprints.id.Application
 
