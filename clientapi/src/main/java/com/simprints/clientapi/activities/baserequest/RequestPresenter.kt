@@ -6,13 +6,14 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
 import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.exceptions.InvalidRequestException
 import com.simprints.clientapi.tools.json.GsonBuilder
@@ -20,6 +21,7 @@ import com.simprints.clientapi.tools.json.GsonBuilder
 
 abstract class RequestPresenter constructor(private val view: RequestContract.RequestView,
                                             private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                                            private val clientApiCrashReportManager: ClientApiCrashReportManager,
                                             private var gsonBuilder: GsonBuilder,
                                             private val integrationInfo: IntegrationInfo)
     : RequestContract.Presenter {
@@ -60,7 +62,8 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
                     .addSessionEvent(SuspiciousIntentEvent(extrasKeys))
             }
         } catch (t: Throwable) {
-            t.printStackTrace() //StopShip: Add crashlytics
+            clientApiCrashReportManager.logExceptionOrThrowable(t)
+            t.printStackTrace()
         }
     }
 
@@ -69,12 +72,11 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
             val requestJson = this.toJson(request)
             val expectedKeysAndValues = this.fromJson<Map<String, Any>>(requestJson, object : TypeToken<Map<String, Any>>() {}.type)
             val keysAndValuesFromIntent = extractKeysAndValuesFromIntent()
-            keysAndValuesFromIntent?.filterKeys { !expectedKeysAndValues.containsKey(it) }
-                ?: emptyMap()
+            keysAndValuesFromIntent.filterKeys { !expectedKeysAndValues.containsKey(it) }
         }
 
     private fun extractKeysAndValuesFromIntent() =
-        view.getIntentExtras()?.filter { it.key.isNotEmpty() }
+        view.getIntentExtras().filter { it.key.isNotEmpty() }
 
 
     private fun addInvalidSessionInBackground() {
