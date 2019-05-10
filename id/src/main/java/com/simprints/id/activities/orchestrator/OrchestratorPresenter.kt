@@ -6,6 +6,7 @@ import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
@@ -14,6 +15,7 @@ import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -51,31 +53,30 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 subscribeForFinalAppResponse()
             }
         }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    handleNextModalityRequest(it)
-                },
-                onError = {
-                    handleErrorInTheModalitiesFlow(it)
-                })
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeBy(
+            onNext = {
+                handleNextModalityRequest(it)
+            },
+            onError = {
+                handleErrorInTheModalitiesFlow(it)
+            })
 
     @SuppressLint("CheckResult")
     internal fun subscribeForFinalAppResponse() =
         orchestratorManager.getAppResponse()
+            .map {
+                addCallbackEventInSessions(it).blockingGet()
+                it
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    handleAppResponse(it)
+                    view.setResultAndFinish(it)
                 },
                 onError = {
                     handleErrorInTheModalitiesFlow(it)
                 })
-
-    private fun handleAppResponse(appResponse: AppResponse) {
-        addCallbackEventInSessions(appResponse)
-        view.setResultAndFinish(appResponse)
-    }
 
     @SuppressLint("CheckResult")
     internal fun getSessionId(): Single<String> =
@@ -90,42 +91,45 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
         Timber.d(it.message)
     }
 
-    internal fun addCallbackEventInSessions(appResponse: AppResponse) {
-        when (appResponse) {
-            is AppEnrolResponse -> sessionEventsManager
-                .addSessionEvent(buildEnrolmentCallbackEvent(appResponse))
-            is AppIdentifyResponse -> sessionEventsManager
-                .addSessionEvent(buildIdentificationCallbackEvent(appResponse))
-            is AppVerifyResponse -> sessionEventsManager
-                .addSessionEvent(buildVerificationCallbackEvent(appResponse))
-            is AppRefusalFormResponse -> sessionEventsManager
-                .addSessionEvent(buildRefusalCallbackEvent(appResponse))
+    internal fun addCallbackEventInSessions(appResponse: AppResponse) =
+
+        sessionEventsManager.updateSession { session ->
+            val relativeStartTime = session.timeRelativeToStartTime(timeHelper.now())
+
+            when (appResponse) {
+                is AppEnrolResponse -> buildEnrolmentCallbackEvent(appResponse, relativeStartTime)
+                is AppIdentifyResponse -> buildIdentificationCallbackEvent(appResponse, relativeStartTime)
+                is AppVerifyResponse -> buildVerificationCallbackEvent(appResponse, relativeStartTime)
+                is AppRefusalFormResponse -> buildRefusalCallbackEvent(appResponse, relativeStartTime)
+                else -> null
+            }?.let {
+                session.addEvent(it)
+            }
         }
-    }
 
-    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
-        EnrolmentCallbackEvent(timeHelper.now(), appResponse.guid)
+    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse, relativeStartTime: Long) =
+        EnrolmentCallbackEvent(relativeStartTime, appResponse.guid)
 
-    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
+    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse, relativeStartTime: Long) =
         with(appResponse) {
             IdentificationCallbackEvent(
-                timeHelper.now(),
+                relativeStartTime,
                 sessionId,
                 identifications.map {
                     CallbackComparisonScore(it.guidFound, it.confidence, it.tier)
                 })
         }
 
-    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
+    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse, relativeStartTime: Long) =
         with(appVerifyResponse.matchingResult) {
-            VerificationCallbackEvent(timeHelper.now(),
+            VerificationCallbackEvent(relativeStartTime,
                 CallbackComparisonScore(guidFound, confidence, tier))
         }
 
-    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
+    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse, relativeStartTime: Long) =
         with(appRefusalResponse) {
             RefusalCallbackEvent(
-                timeHelper.now(),
+                relativeStartTime,
                 answer.reason?.name ?: "",
                 answer.optionalText)
         }
