@@ -16,6 +16,7 @@ fun mockSessionEventsManager(sessionsEventsManager: SessionEventsLocalDbManager,
     mockSessionEventsMgrInsertOrUpdateSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
     mockSessionEventsMgrToDeleteSessionsToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
     mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
+    mockSessionEventsMgrCountToUseFakeDb(sessionsEventsManager, sessionsInFakeDb)
 }
 
 fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
@@ -24,6 +25,14 @@ fun mockSessionEventsMgrLoadSessionByIdToUseFakeDb(sessionsEventsManager: Sessio
     whenever(sessionsEventsManager) { loadSessionById(anyNotNull()) } thenAnswer { args ->
         val session = sessionsInFakeDb.find { it.id == args.arguments[0] }
         session?.let { Single.just(session) } ?: throw SessionNotFoundException()
+    }
+}
+
+fun mockSessionEventsMgrCountToUseFakeDb(sessionsEventsManager: SessionEventsLocalDbManager,
+                                         sessionsInFakeDb: MutableList<SessionEvents>) {
+
+    whenever(sessionsEventsManager) { getSessionCount(anyNotNull()) } thenAnswer { args ->
+        Single.just(sessionsInFakeDb.count { it.projectId == args.arguments[0] })
     }
 }
 

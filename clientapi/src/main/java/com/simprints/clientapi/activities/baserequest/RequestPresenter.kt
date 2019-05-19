@@ -16,10 +16,12 @@ import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 
 
 abstract class RequestPresenter constructor(private val view: RequestContract.RequestView,
+                                            private val timeHelper: ClientApiTimeHelper,
                                             private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
                                             private val clientApiCrashReportManager: ClientApiCrashReportManager,
                                             private var gsonBuilder: GsonBuilder,
@@ -59,7 +61,7 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
             val extrasKeys = extractExtraKeysAndValuesFromIntent(request)
             if (extrasKeys.isNotEmpty()) {
                 clientApiSessionEventsManager
-                    .addSessionEvent(SuspiciousIntentEvent(extrasKeys))
+                    .addSessionEvent(SuspiciousIntentEvent(timeHelper.now(), extrasKeys))
             }
         } catch (t: Throwable) {
             clientApiCrashReportManager.logExceptionOrThrowable(t)
@@ -82,6 +84,7 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
     private fun addInvalidSessionInBackground() {
         clientApiSessionEventsManager
             .addSessionEvent(InvalidIntentEvent(
+                timeHelper.now(),
                 view.getIntentAction(),
                 view.getIntentExtras()))
     }

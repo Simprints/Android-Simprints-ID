@@ -70,7 +70,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 sessionEventsManager
                     .updateSession {
                         it.addEvent(EnrolmentEvent(
-                            it.timeRelativeToStartTime(timeHelper.now()),
+                            timeHelper.now(),
                             person.patientId
                         ))
                     }

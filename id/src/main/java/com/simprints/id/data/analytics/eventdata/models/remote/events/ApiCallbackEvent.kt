@@ -15,19 +15,19 @@ class ApiCallbackEvent(val relativeStartTime: Long,
                        val callback: ApiCallback) : ApiEvent(ApiEventType.CALLBACK) {
 
     constructor(enrolmentCallbackEvent: EnrolmentCallbackEvent) :
-        this(enrolmentCallbackEvent.relativeStartTime,
+        this(enrolmentCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(enrolmentCallbackEvent))
 
     constructor(identificationCallbackEvent: IdentificationCallbackEvent) :
-        this(identificationCallbackEvent.relativeStartTime,
+        this(identificationCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(identificationCallbackEvent))
 
     constructor(verificationCallbackEvent: VerificationCallbackEvent) :
-        this(verificationCallbackEvent.relativeStartTime,
+        this(verificationCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(verificationCallbackEvent))
 
     constructor(refusalCallbackEvent: RefusalCallbackEvent) :
-        this(refusalCallbackEvent.relativeStartTime,
+        this(refusalCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(refusalCallbackEvent))
 }
 

@@ -8,6 +8,9 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
+import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
@@ -25,7 +28,8 @@ internal class VerificationTask(private val view: MatchingContract.View,
                                 private val dbManager: FingerprintDbManager,
                                 private val sessionEventsManager: FingerprintSessionEventsManager,
                                 private val crashReportManager: FingerprintCrashReportManager,
-                                timeHelper: FingerprintTimeHelper) : MatchTask {
+                                private val timeHelper: FingerprintTimeHelper,
+                                private val preferenceManager: FingerprintPreferencesManager? = null) : MatchTask {
 
     private val matchingVerifyRequest = matchingRequest as MatchingActVerifyRequest
 
@@ -50,10 +54,15 @@ internal class VerificationTask(private val view: MatchingContract.View,
         val score = scores.first()
 
         val verificationResult = MatchEntry(candidate.patientId, score)
+        sessionEventsManager.addEventInBackground(OneToOneMatchEvent(
+            matchStartTime,
+            timeHelper.now(),
+            candidates.first().patientId,
+            verificationResult))
 
-        sessionEventsManager.addOneToOneMatchEventInBackground(candidates.first().patientId, matchStartTime, verificationResult)
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
             MatchingActVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
+
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
     }

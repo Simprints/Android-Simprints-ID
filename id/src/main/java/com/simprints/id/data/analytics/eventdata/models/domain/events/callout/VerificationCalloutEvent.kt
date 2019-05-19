@@ -5,10 +5,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class VerificationCalloutEvent(val relativeStartTime: Long,
+class VerificationCalloutEvent(starTime: Long,
                                val integration: CalloutIntegrationInfo,
                                val projectId: String,
                                val userId: String,
                                val moduleId: String,
                                val verifyGuid: String,
-                               val metadata: String) : Event(EventType.CALLOUT_VERIFICATION)
+                               val metadata: String) : Event(EventType.CALLOUT_VERIFICATION, starTime)

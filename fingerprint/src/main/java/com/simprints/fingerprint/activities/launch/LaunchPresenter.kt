@@ -170,11 +170,13 @@ class LaunchPresenter(component: FingerprintComponent,
                                                               startCandidateSearchTime: Long,
                                                               localResult: CandidateReadEvent.LocalResult,
                                                               remoteResult: CandidateReadEvent.RemoteResult?) {
-        sessionEventsManager.addEventForCandidateReadInBackground(
-            guid,
-            startCandidateSearchTime,
-            localResult,
-            remoteResult)
+        sessionEventsManager.addEventInBackground(
+            CandidateReadEvent(
+                startCandidateSearchTime,
+                timeHelper.now(),
+                guid,
+                localResult,
+                remoteResult))
     }
 
     private fun manageVeroErrors(it: Throwable) {
@@ -269,10 +271,10 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.addConsentEventInBackground(
-            timeHelper.now(),
-            startConsentEventTime,
+        sessionEventsManager.addEventInBackground(
             ConsentEvent(
+                timeHelper.now(),
+                startConsentEventTime,
                 if (view.isCurrentTabParental()) {
                     PARENTAL
                 } else {
@@ -357,10 +359,12 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addBluetoothConnectivityEvent() {
-        sessionEventsManager.addEventForScannerConnectivityInBackground(
-            ScannerConnectionEvent.ScannerInfo(
-                scannerManager.scannerId ?: "",
-                scannerManager.macAddress ?: "",
-                scannerManager.hardwareVersion ?: ""))
+        sessionEventsManager.addEventInBackground(
+            ScannerConnectionEvent(
+                timeHelper.now(),
+                ScannerConnectionEvent.ScannerInfo(
+                    scannerManager.scannerId ?: "",
+                    scannerManager.macAddress ?: "",
+                    scannerManager.hardwareVersion ?: "")))
     }
 }

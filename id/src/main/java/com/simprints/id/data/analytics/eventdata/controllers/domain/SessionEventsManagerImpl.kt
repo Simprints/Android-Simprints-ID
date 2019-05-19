@@ -1,10 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.controllers.domain
 
+import android.annotation.SuppressLint
 import android.os.Build
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
@@ -47,16 +49,21 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
 
     override fun createSession(): Single<SessionEvents> =
-        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName).let {
-            Timber.d("Created session: ${it.id}")
-            sessionEventsSyncManager.scheduleSessionsSync()
+        sessionEventsLocalDbManager.getSessionCount().flatMap {
+            createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName, DatabaseInfo(it)).let {
+                Timber.d("Created session: ${it.id}")
+                sessionEventsSyncManager.scheduleSessionsSync()
 
-            closeLastSessionsIfPending()
-                .andThen(insertOrUpdateSessionEvents(it))
-                .toSingle { it }
+                closeLastSessionsIfPending()
+                    .andThen(insertOrUpdateSessionEvents(it))
+                    .toSingle { it }
+            }
         }
 
-    private fun createSessionWithAvailableInfo(projectId: String, appVersionName: String): SessionEvents =
+
+    private fun createSessionWithAvailableInfo(projectId: String,
+                                               appVersionName: String,
+                                               databaseInfo: DatabaseInfo): SessionEvents =
         SessionEvents(
             projectId,
             appVersionName,
@@ -66,7 +73,8 @@ open class SessionEventsManagerImpl(private val deviceId: String,
                 Build.VERSION.SDK_INT.toString(),
                Build.MANUFACTURER + "_" + Build.MODEL,
                 deviceId),
-            timeHelper.now())
+            timeHelper.now(),
+            databaseInfo)
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable =
         getCurrentSession().flatMapCompletable {
@@ -81,6 +89,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             crashReportManager.logExceptionOrThrowable(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
+    @SuppressLint("CheckResult")
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
         updateSession(block).subscribeBy()
     }
@@ -102,42 +111,11 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
             it.addEvent(GuidSelectionEvent(
-                it.timeRelativeToStartTime(timeHelper.now()),
+                timeHelper.now(),
                 selectedGuid
             ))
             insertOrUpdateSessionEvents(it)
         }
-
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?) {
-        updateSessionInBackground { session ->
-            session.addEvent(OneToOneMatchEvent(
-                session.timeRelativeToStartTime(startTimeVerification),
-                session.timeRelativeToStartTime(timeHelper.now()),
-                patientId,
-                match))
-        }
-    }
-
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int) {
-        updateSessionInBackground { session ->
-            session.addEvent(OneToManyMatchEvent(
-                session.timeRelativeToStartTime(startTimeIdentification),
-                session.timeRelativeToStartTime(timeHelper.now()),
-                OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches))
-        }
-    }
-
-    override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
-        updateSessionInBackground {
-            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
-                it.addEvent(ScannerConnectionEvent(
-                    it.timeRelativeToStartTime(timeHelper.now()),
-                    scannerInfo
-                ))
-            }
-        }
-    }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         updateSessionInBackground { session ->
@@ -155,32 +133,16 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
     }
 
-    override fun addEventForCandidateReadInBackground(guid: String,
-                                                      startCandidateSearchTime: Long,
-                                                      localResult: CandidateReadEvent.LocalResult,
-                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
-        updateSessionInBackground {
-            it.addEvent(CandidateReadEvent(
-                it.timeRelativeToStartTime(startCandidateSearchTime),
-                it.timeRelativeToStartTime(timeHelper.now()),
-                guid,
-                localResult,
-                remoteResult
-            ))
-        }
-    }
-
-    override fun addLocationToSession(latitude: Double, longitude: Double) {
-        this.updateSessionInBackground { sessionEvents ->
-            sessionEvents.location = Location(latitude, longitude)
-        }
-    }
-
-    override fun addSessionEvent(sessionEvent: Event) {
+    override fun addEventInBackground(sessionEvent: Event) {
         updateSessionInBackground {
             it.addEvent(sessionEvent)
         }
     }
+
+    override fun addEvent(sessionEvent: Event): Completable =
+        updateSession {
+            it.addEvent(sessionEvent)
+        }
 
     override fun signOut() {
         deleteSessions()

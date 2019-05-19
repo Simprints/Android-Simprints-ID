@@ -5,6 +5,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
@@ -32,7 +33,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.addAlertEventInBackground(timeHelper.now(), alertType)
+        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertType.name))
     }
 
     private fun initButtons() {

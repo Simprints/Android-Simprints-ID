@@ -23,8 +23,8 @@ class ApiAuthenticationEvent(val relativeStartTime: Long,
     }
 
     constructor(authenticationEventDomain: AuthenticationEvent) :
-        this(authenticationEventDomain.relativeStartTime,
-            authenticationEventDomain.relativeEndTime,
+        this(authenticationEventDomain.relativeStartTime ?: 0,
+            authenticationEventDomain.relativeEndTime ?: 0,
             ApiUserInfo(authenticationEventDomain.userInfo),
             ApiResult.valueOf(authenticationEventDomain.result.toString()))
 }

@@ -9,6 +9,7 @@ import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
@@ -19,12 +20,13 @@ import io.reactivex.rxkotlin.subscribeBy
 
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
+                            private val action: String?,
                             private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                             private val clientApiCrashReportManager: ClientApiCrashReportManager,
+                            clientApiTimeHelper: ClientApiTimeHelper,
                             gsonBuilder: GsonBuilder,
-                            private val action: String?,
                             integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
+    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
 
     @SuppressLint("CheckResult")
     override fun start() {
