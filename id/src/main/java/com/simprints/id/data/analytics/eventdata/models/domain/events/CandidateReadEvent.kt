@@ -3,11 +3,11 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class CandidateReadEvent(override val starTime: Long,
-                         override val endTime: Long,
+class CandidateReadEvent(starTime: Long,
+                         endTime: Long,
                          val candidateId: String,
                          val localResult: LocalResult,
-                         val remoteResult: RemoteResult?) : Event(EventType.CANDIDATE_READ) {
+                         val remoteResult: RemoteResult?) : Event(EventType.CANDIDATE_READ, starTime, endTime) {
 
     @Keep
     enum class LocalResult {

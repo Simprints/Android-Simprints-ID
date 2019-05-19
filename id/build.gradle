@@ -243,7 +243,6 @@ dependencies {
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
     }
-    androidTestCompile project(path: ':libsimprints')
 
     implementation 'io.ashdavies.rx.rxtasks:rx-tasks:+'
 }

@@ -3,9 +3,9 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class AuthorizationEvent(override val starTime: Long,
+class AuthorizationEvent(starTime: Long,
                          val result: Result,
-                         val userInfo: UserInfo?) : Event(EventType.AUTHORIZATION) {
+                         val userInfo: UserInfo?) : Event(EventType.AUTHORIZATION, starTime) {
 
     @Keep
     enum class Result {

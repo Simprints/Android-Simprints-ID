@@ -4,10 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent as CoreRefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent.Answer as CoreRefusalAnswer
 @Keep
-class RefusalEvent(override val starTime: Long,
-                   override val endTime: Long,
+class RefusalEvent(starTime: Long,
+                   endTime: Long,
                    val reason: RefusalAnswer,
-                   val otherText: String) : Event(EventType.REFUSAL)
+                   val otherText: String) : Event(EventType.REFUSAL, starTime, endTime)
 
 @Keep
 enum class RefusalAnswer {

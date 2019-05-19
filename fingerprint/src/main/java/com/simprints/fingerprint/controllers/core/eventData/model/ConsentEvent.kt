@@ -4,10 +4,10 @@ import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent as ConsentEventCore
 
 @Keep
-class ConsentEvent(override val starTime: Long,
-                   override val endTime: Long,
+class ConsentEvent(starTime: Long,
+                   endTime: Long,
                    val consentType: Type,
-                   var result: Result) : Event(EventType.CONSENT) {
+                   var result: Result) : Event(EventType.CONSENT, starTime, endTime) {
 
     @Keep
     enum class Type {
