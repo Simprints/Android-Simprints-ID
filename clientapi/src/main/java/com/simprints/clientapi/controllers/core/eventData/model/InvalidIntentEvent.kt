@@ -6,9 +6,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidInt
 import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent.IntentAction as CoreIntentAction
 
 @Keep
-class InvalidIntentEvent(override val starTime: Long,
+class InvalidIntentEvent(starTime: Long,
                          val action: IntentAction,
-                         val extras: Map<String, Any?>) : Event(EventType.INVALID_INTENT) {
+                         val extras: Map<String, Any?>) : Event(EventType.INVALID_INTENT, starTime) {
 
     constructor(starTime: Long,
                 action: String,

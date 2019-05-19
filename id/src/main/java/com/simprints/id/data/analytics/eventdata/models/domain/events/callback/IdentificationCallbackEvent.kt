@@ -5,6 +5,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class IdentificationCallbackEvent(override val starTime: Long,
+class IdentificationCallbackEvent(starTime: Long,
                                   val sessionId: String,
-                                  val scores: List<CallbackComparisonScore>) : Event(EventType.CALLBACK_IDENTIFICATION)
+                                  val scores: List<CallbackComparisonScore>) : Event(EventType.CALLBACK_IDENTIFICATION, starTime)

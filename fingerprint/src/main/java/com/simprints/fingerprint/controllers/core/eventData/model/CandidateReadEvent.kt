@@ -6,11 +6,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateR
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent.RemoteResult as CoreRemoteResult
 
 @Keep
-class CandidateReadEvent(val relativeStartTime: Long,
-                         val relativeEndTime: Long,
+class CandidateReadEvent(starTime: Long,
+                         endTime: Long,
                          val candidateId: String,
                          val localResult: LocalResult,
-                         val remoteResult: RemoteResult?) : Event(EventType.CANDIDATE_READ) {
+                         val remoteResult: RemoteResult?) : Event(EventType.CANDIDATE_READ, starTime, endTime) {
 
     @Keep
     enum class LocalResult {
@@ -24,7 +24,7 @@ class CandidateReadEvent(val relativeStartTime: Long,
 }
 
 fun CandidateReadEvent.fromDomainToCore() =
-    CoreCandidateReadEvent(relativeStartTime, relativeEndTime, candidateId, localResult.fromDomainToCore(), remoteResult?.fromDomainToCore() )
+    CoreCandidateReadEvent(starTime, endTime, candidateId, localResult.fromDomainToCore(), remoteResult?.fromDomainToCore() )
 
 
 fun CandidateReadEvent.LocalResult.fromDomainToCore() =

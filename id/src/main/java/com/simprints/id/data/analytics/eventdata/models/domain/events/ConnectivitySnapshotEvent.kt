@@ -7,9 +7,9 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep
 class ConnectivitySnapshotEvent(
-    override val starTime: Long,
+    starTime: Long,
     val networkType: String,
-    val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT) {
+    val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT, starTime = starTime) {
 
     companion object {
         fun buildEvent(simNetworkUtils: SimNetworkUtils,

@@ -9,13 +9,12 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Fingerprin
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore
 
-
 @Keep
-class FingerprintCaptureEvent(override val starTime: Long,
-                              override val endTime: Long,
+class FingerprintCaptureEvent(starTime: Long,
+                              endTime: Long,
                               val qualityThreshold: Int,
                               val result: Result,
-                              val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
+                              val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime) {
 
     @Keep
     class Fingerprint(val finger: FingerIdentifier,
@@ -33,11 +32,11 @@ class FingerprintCaptureEvent(override val starTime: Long,
     companion object {
         fun buildResult(status: FingerStatus): Result =
             when (status) {
-                GOOD_SCAN, RESCAN_GOOD_SCAN -> FingerprintCaptureEvent.Result.GOOD_SCAN
-                BAD_SCAN -> FingerprintCaptureEvent.Result.BAD_QUALITY
-                NO_FINGER_DETECTED -> FingerprintCaptureEvent.Result.NO_FINGER_DETECTED
-                FINGER_SKIPPED -> FingerprintCaptureEvent.Result.SKIPPED
-                else -> FingerprintCaptureEvent.Result.FAILURE_TO_ACQUIRE
+                GOOD_SCAN, RESCAN_GOOD_SCAN -> Result.GOOD_SCAN
+                BAD_SCAN -> Result.BAD_QUALITY
+                NO_FINGER_DETECTED -> Result.NO_FINGER_DETECTED
+                FINGER_SKIPPED -> Result.SKIPPED
+                else -> Result.FAILURE_TO_ACQUIRE
             }
 
     }
