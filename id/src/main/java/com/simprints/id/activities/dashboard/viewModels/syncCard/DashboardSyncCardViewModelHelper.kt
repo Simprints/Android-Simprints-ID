@@ -108,11 +108,10 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
         (syncScope?.let { syncScope ->
             dbManager.getPeopleCountToDownSync(syncScope)
                 .map { peopleCounts -> peopleCounts.sumBy { it.count } }
-                .onErrorResumeNext { Single.just(0) }
         } ?: Single.just(0))
-            .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
-            .ignoreElement()
-            .subscribeOn(Schedulers.io())
+        .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
+        .ignoreElement()
+        .subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
         (syncScope?.let { syncScope ->

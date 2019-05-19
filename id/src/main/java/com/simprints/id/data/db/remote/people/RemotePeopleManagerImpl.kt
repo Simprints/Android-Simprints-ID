@@ -5,9 +5,9 @@ import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.*
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.network.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Person
-import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -47,7 +47,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
     override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
             peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId,
-                syncScope.moduleIds?.toList())
+                syncScope.moduleIds?.toTypedArray()?.let { PipeSeparatorWrapperForURLListParam(*it) })
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
