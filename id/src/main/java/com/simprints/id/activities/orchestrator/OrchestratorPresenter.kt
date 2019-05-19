@@ -94,42 +94,41 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
     internal fun addCallbackEventInSessions(appResponse: AppResponse) =
 
         sessionEventsManager.updateSession { session ->
-            val relativeStartTime = session.timeRelativeToStartTime(timeHelper.now())
 
             when (appResponse) {
-                is AppEnrolResponse -> buildEnrolmentCallbackEvent(appResponse, relativeStartTime)
-                is AppIdentifyResponse -> buildIdentificationCallbackEvent(appResponse, relativeStartTime)
-                is AppVerifyResponse -> buildVerificationCallbackEvent(appResponse, relativeStartTime)
-                is AppRefusalFormResponse -> buildRefusalCallbackEvent(appResponse, relativeStartTime)
+                is AppEnrolResponse -> buildEnrolmentCallbackEvent(appResponse)
+                is AppIdentifyResponse -> buildIdentificationCallbackEvent(appResponse)
+                is AppVerifyResponse -> buildVerificationCallbackEvent(appResponse)
+                is AppRefusalFormResponse -> buildRefusalCallbackEvent(appResponse)
                 else -> null
             }?.let {
                 session.addEvent(it)
             }
         }
 
-    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse, relativeStartTime: Long) =
-        EnrolmentCallbackEvent(relativeStartTime, appResponse.guid)
+    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
+        EnrolmentCallbackEvent(timeHelper.now(), appResponse.guid)
 
-    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse, relativeStartTime: Long) =
+    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
         with(appResponse) {
             IdentificationCallbackEvent(
-                relativeStartTime,
+                timeHelper.now(),
                 sessionId,
                 identifications.map {
                     CallbackComparisonScore(it.guidFound, it.confidence, it.tier)
                 })
         }
 
-    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse, relativeStartTime: Long) =
+    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
         with(appVerifyResponse.matchingResult) {
-            VerificationCallbackEvent(relativeStartTime,
+            VerificationCallbackEvent(timeHelper.now(),
                 CallbackComparisonScore(guidFound, confidence, tier))
         }
 
-    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse, relativeStartTime: Long) =
+    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
         with(appRefusalResponse) {
             RefusalCallbackEvent(
-                relativeStartTime,
+                timeHelper.now(),
                 answer.reason?.name ?: "",
                 answer.optionalText)
         }

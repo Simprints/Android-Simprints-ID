@@ -16,7 +16,9 @@ open class SessionEvents(var projectId: String,
                          var language: String,
                          var device: Device,
                          var startTime: Long = 0,
-                         val id: String = UUID.randomUUID().toString()) {
+                         var databaseInfo: DatabaseInfo,
+                         val id: String = UUID.randomUUID().toString(),
+                         val events: ArrayList<Event> = arrayListOf()) {
 
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
@@ -24,10 +26,9 @@ open class SessionEvents(var projectId: String,
         const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
      }
 
-    var events: ArrayList<Event> = ArrayList()
+
     var relativeEndTime: Long = 0
     var relativeUploadTime: Long = 0
-    var databaseInfo: DatabaseInfo? = null
     var location: Location? = null
     var analyticsId: String? = null
 
@@ -57,6 +58,9 @@ open class SessionEvents(var projectId: String,
         if(BuildConfig.DEBUG) {
             Timber.d("Add event: ${GsonBuilder().create().toJson(event)}")
         }
+
+        event.updateRelativeTimes(startTime)
+
         events.add(event)
     }
 }

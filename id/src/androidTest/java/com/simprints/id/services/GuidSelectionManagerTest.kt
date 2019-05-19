@@ -10,13 +10,12 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.state.LoginStateMocker
+import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
-import com.simprints.id.data.analytics.eventdata.models.local.DbSession
-import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -46,21 +45,20 @@ class GuidSelectionManagerTest {
     private val module by lazy {
         TestAppModule(app,
             randomGeneratorRule = DependencyRule.ReplaceRule { mock<RandomGenerator>().apply { setupRandomGeneratorToGenerateKey(this) } },
-            sessionEventsManagerRule = DependencyRule.SpyRule,
+            sessionEventsLocalDbManagerRule = DependencyRule.MockRule,
             crashReportManagerRule = DependencyRule.MockRule,
             secureDataManagerRule = DependencyRule.SpyRule,
             remoteDbManagerRule = DependencyRule.SpyRule)
     }
 
-    private val realmForDataEvent
-        get() = (realmSessionEventsManager as RealmSessionEventsDbManagerImpl).getRealmInstance().blockingGet()
-
-    @Inject lateinit var sessionEventsManagerSpy: SessionEventsManager
+    @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var realmSessionEventsManager: SessionEventsLocalDbManager
+    @Inject lateinit var realmSessionEventsManagerMock: SessionEventsLocalDbManager
     @Inject lateinit var guidSelectionManager: GuidSelectionManager
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
+
+    private var sessionsInFakeDb = mutableListOf<SessionEvents>()
 
     @Before
     fun setUp() {
@@ -77,13 +75,15 @@ class GuidSelectionManagerTest {
                 DEFAULT_PROJECT_ID,
                 DEFAULT_REALM_KEY),
             "token")
+
+        mockSessionEventsManager(realmSessionEventsManagerMock, sessionsInFakeDb)
     }
 
     @Test
     fun testWithStartedService() {
-        var session = sessionEventsManagerSpy.createSession().blockingGet()
+        var session = sessionEventsManager.createSession().blockingGet()
 
-        sessionEventsManagerSpy.updateSession {
+        sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         }.blockingGet()
 
@@ -98,8 +98,7 @@ class GuidSelectionManagerTest {
             .test()
             .awaitAndAssertSuccess()
 
-        realmForDataEvent.refresh()
-        session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
+        session = realmSessionEventsManagerMock.loadSessionById(session.id).blockingGet()
         val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).firstOrNull()
         Assert.assertNotNull(potentialGuidSelectionEvent)
         Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")

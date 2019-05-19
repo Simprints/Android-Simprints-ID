@@ -3,6 +3,7 @@ package com.simprints.id.data.db.remote.network
 import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.ApiModes
+import com.simprints.id.data.db.remote.models.ApiModes.*
 import com.simprints.id.data.db.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.remote.models.ApiPostPerson
 import io.reactivex.Single
@@ -26,7 +27,7 @@ interface PeopleRemoteInterface {
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
         @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
-        @Query("mode") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<ResponseBody>
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -36,12 +37,12 @@ interface PeopleRemoteInterface {
     fun requestPerson(
         @Path("patientId") patientId: String,
         @Path("projectId") projectId: String,
-        @Query("mode") modes: List<ApiModes> = listOf(ApiModes.FINGERPRINT)): Single<Response<ApiGetPerson>>
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<ApiGetPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
-        @Query("moduleId") moduleId: List<String>?,
-        @Query("mode") modes: List<ApiModes> = arrayListOf(ApiModes.FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
+        @Query("moduleId") moduleId: PipeSeparatorWrapperForURLListParam<String>?, //moduleId = module1|module2|
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
 }

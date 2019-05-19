@@ -322,7 +322,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_suspiciousIntentEventApiModel() {
-        val suspiciousIntentEvent = SuspiciousIntentEvent(mapOf("extraFieldKey" to "someUnexpectedField"))
+        val suspiciousIntentEvent = SuspiciousIntentEvent(0, mapOf("extraFieldKey" to "someUnexpectedField"))
         val apiSuspiciousIntentEvent = ApiSuspiciousIntentEvent(suspiciousIntentEvent)
         val json = gsonWithAdapters.toJsonTree(apiSuspiciousIntentEvent).asJsonObject
         validateSuspiciousIntentEventApiModel(json)
@@ -330,7 +330,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_invalidEventApiModel() {
-        val invalidIntentEvent = InvalidIntentEvent(InvalidIntentEvent.IntentAction.ODK_CONFIRM, mapOf("projectId" to "someProject"))
+        val invalidIntentEvent = InvalidIntentEvent(0, InvalidIntentEvent.IntentAction.ODK_CONFIRM, mapOf("projectId" to "someProject"))
         val apiInvalidIntentEvent = ApiInvalidIntentEvent(invalidIntentEvent)
         val json = gsonWithAdapters.toJsonTree(apiInvalidIntentEvent).asJsonObject
         validateInvalidEventApiModel(json)
@@ -344,7 +344,8 @@ class SessionEventsAdapterFactoryTest {
             "libVersionName",
             "en",
             Device("28", "phone", "device_id"),
-            0)
+            0,
+            DatabaseInfo(0, 0))
         session.addEvent(AlertScreenEvent(0, Alert.NOT_PAIRED))
         val apiSession = ApiSessionEvents(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject

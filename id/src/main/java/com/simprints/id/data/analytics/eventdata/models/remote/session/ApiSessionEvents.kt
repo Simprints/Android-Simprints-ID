@@ -16,7 +16,7 @@ open class ApiSessionEvents(var appVersionName: String,
                             var events: Array<ApiEvent> = arrayOf(),
                             var relativeEndTime: Long = 0,
                             var relativeUploadTime: Long = 0,
-                            var databaseInfo: ApiDatabaseInfo? = null,
+                            var databaseInfo: ApiDatabaseInfo,
                             var location: ApiLocation? = null,
                             var analyticsId: String? = null) {
 
@@ -31,7 +31,7 @@ open class ApiSessionEvents(var appVersionName: String,
             sessionDomain.events.map { it.toApiEvent() }.toTypedArray(),
             sessionDomain.relativeEndTime,
             sessionDomain.relativeUploadTime,
-            sessionDomain.databaseInfo?.let { ApiDatabaseInfo(it) },
+            ApiDatabaseInfo(sessionDomain.databaseInfo),
             sessionDomain.location?.let { ApiLocation(it) },
             sessionDomain.analyticsId)
 }

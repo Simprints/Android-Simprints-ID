@@ -46,6 +46,7 @@ import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -54,7 +55,7 @@ import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class DashboardActivityAndroidTest { // TODO : Tests are failing because creating a project remotely is throwing a 404
+class DashboardActivityAndroidTest {
 
     companion object {
         private val modules = setOf("module1", "module2", "module3")
@@ -98,7 +99,10 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+        AndroidTestConfig(this, module, preferencesModule)
+            .initAndInjectComponent()
+            .initRealm()
+            .initModules()
 
         testProject = testProjectRule.testProject
 
@@ -193,7 +197,7 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
         }
 
         onView(withId(R.id.dashboardCardSyncDownloadText))
-            .check(matches(withText("${peopleOnServer.size - peopleInDbForSyncScope(syncScope, false)}")))
+            .check(matches(withText("${peopleOnServer.size - peopleInDbForSyncScope(syncScope, true)}")))
 
         onView(withId(R.id.dashboardCardSyncUploadText))
             .check(matches(withText("${peopleInDbForSyncScope(syncScope, true)}")))
@@ -206,7 +210,7 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
         peopleInDb.count {
             it.toSync == toSync &&
             it.projectId == scope.projectId &&
-            if (scope.userId != null) {  it.userId == scope.userId } else { true } &&
+            if (scope.userId != null) { it.userId == scope.userId } else { true } &&
             if (!scope.moduleIds.isNullOrEmpty()) { scope.moduleIds?.contains(it.moduleId) ?: false } else { true }
         }
 
@@ -232,9 +236,13 @@ class DashboardActivityAndroidTest { // TODO : Tests are failing because creatin
         val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
             remotePeopleManagerSpy.uploadPeople(testProject.id, it).retry(3)
         }
-        Completable.merge(requests).blockingAwait()
+        val t = Completable.merge(requests).blockingGet()
+        t?.let {
+            it.printStackTrace()
+            fail(it.message)
+        }
 
-        peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true, false)))
+        peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true)))
         localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
     }
 

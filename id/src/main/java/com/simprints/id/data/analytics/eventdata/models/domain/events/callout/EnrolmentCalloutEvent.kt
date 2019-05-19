@@ -5,9 +5,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class EnrolmentCalloutEvent(val relativeStartTime: Long,
+class EnrolmentCalloutEvent(starTime: Long,
                             val integration: CalloutIntegrationInfo,
                             val projectId: String,
                             val userId: String,
                             val moduleId: String,
-                            val metadata: String?): Event(EventType.CALLOUT_ENROLMENT)
+                            val metadata: String?): Event(EventType.CALLOUT_ENROLMENT, starTime)

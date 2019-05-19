@@ -23,6 +23,7 @@ import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.id.Application
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
 
@@ -34,6 +35,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
+    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +57,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
             return
         }
 
-        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
+        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, preferencesManager, timeHelper)
     }
 
     override fun onResume() {

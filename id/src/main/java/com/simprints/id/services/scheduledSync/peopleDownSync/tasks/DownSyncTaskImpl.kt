@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
@@ -13,7 +14,6 @@ import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
-import com.simprints.core.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -93,7 +93,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
             Observable.create<ApiGetPerson> { emitter ->
                 try {
                     while (jsonReader.hasNext()) {
-                        emitter.onNext(JsonHelper.gson.fromJson<ApiGetPerson>(jsonReader, ApiGetPerson::class.java))
+                        emitter.onNext(JsonHelper.gson.fromJson(jsonReader, ApiGetPerson::class.java))
                     }
                     emitter.onComplete()
                 } catch (t: Throwable) {

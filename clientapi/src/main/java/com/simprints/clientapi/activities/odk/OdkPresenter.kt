@@ -12,17 +12,19 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 import io.reactivex.rxkotlin.subscribeBy
 
 
 class OdkPresenter(private val view: OdkContract.View,
+                   private val action: String?,
                    private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                    private val clientApiCrashReportManager: ClientApiCrashReportManager,
                    gsonBuilder: GsonBuilder,
-                   private val action: String?,
+                   clientApiTimeHelper: ClientApiTimeHelper,
                    integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
+    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"

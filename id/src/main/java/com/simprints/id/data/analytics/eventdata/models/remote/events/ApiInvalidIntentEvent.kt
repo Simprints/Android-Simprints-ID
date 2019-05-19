@@ -5,11 +5,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidInt
 import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent.IntentAction.*
 
 @Keep
-class ApiInvalidIntentEvent(val action: String,
+class ApiInvalidIntentEvent(val relativeStartTime: Long,
+                            val action: String,
                             val extras: Map<String, Any?>) : ApiEvent(ApiEventType.INVALID_INTENT) {
 
     constructor(invalidIntentEvent: InvalidIntentEvent) :
-        this(invalidIntentEvent.action.fromDomainToApi(), invalidIntentEvent.extras)
+        this(invalidIntentEvent.relativeStartTime ?: 0,
+            invalidIntentEvent.action.fromDomainToApi(),
+            invalidIntentEvent.extras)
 }
 
 fun InvalidIntentEvent.IntentAction.fromDomainToApi(): String =

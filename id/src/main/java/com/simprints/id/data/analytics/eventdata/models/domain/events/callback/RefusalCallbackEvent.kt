@@ -5,6 +5,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class RefusalCallbackEvent(val relativeStartTime: Long,
+class RefusalCallbackEvent(starTime: Long,
                            val reason: String,
-                           val extra: String): Event(EventType.CALLBACK_REFUSAL)
+                           val extra: String): Event(EventType.CALLBACK_REFUSAL, starTime)

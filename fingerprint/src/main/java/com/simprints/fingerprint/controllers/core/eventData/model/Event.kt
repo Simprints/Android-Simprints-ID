@@ -4,4 +4,7 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-abstract class Event(var type: EventType, val id: String = UUID.randomUUID().toString())
+abstract class Event(var type: EventType,
+                     open val starTime: Long,
+                     open val endTime: Long = -1,
+                     val id: String = UUID.randomUUID().toString())

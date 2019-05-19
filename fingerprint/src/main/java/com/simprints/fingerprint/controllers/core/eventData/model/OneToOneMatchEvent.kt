@@ -1,4 +1,4 @@
-package com.simprints.id.data.analytics.eventdata.models.domain.events
+package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
 

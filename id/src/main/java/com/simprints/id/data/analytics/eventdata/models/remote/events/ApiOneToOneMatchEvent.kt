@@ -10,8 +10,8 @@ class ApiOneToOneMatchEvent(val relativeStartTime: Long,
                             val result: ApiMatchEntry?): ApiEvent(ApiEventType.ONE_TO_ONE_MATCH) {
 
     constructor(oneToOneMatchEvent: OneToOneMatchEvent) :
-        this(oneToOneMatchEvent.relativeStartTime,
-            oneToOneMatchEvent.relativeEndTime,
+        this(oneToOneMatchEvent.relativeStartTime ?: 0,
+            oneToOneMatchEvent.relativeEndTime ?: 0,
             oneToOneMatchEvent.candidateId,
             oneToOneMatchEvent.result?.let { ApiMatchEntry(it) })
 }

@@ -12,5 +12,5 @@ class ApiArtificialTerminationEvent(val relativeStartTime: Long,
     }
 
     constructor(alertArtificialTerminationEventDomain: ArtificialTerminationEvent):
-        this(alertArtificialTerminationEventDomain.relativeStartTime, ApiReason.valueOf(alertArtificialTerminationEventDomain.reason.toString()))
+        this(alertArtificialTerminationEventDomain.relativeStartTime ?: 0, ApiReason.valueOf(alertArtificialTerminationEventDomain.reason.toString()))
 }

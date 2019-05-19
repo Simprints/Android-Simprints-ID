@@ -8,5 +8,5 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                           val alertType: String) : ApiEvent(ApiEventType.ALERT_SCREEN) {
 
     constructor(alertScreenEventDomain: AlertScreenEvent) :
-        this(alertScreenEventDomain.relativeStartTime, alertScreenEventDomain.alertType)
+        this(alertScreenEventDomain.relativeStartTime ?: 0, alertScreenEventDomain.alertType)
 }

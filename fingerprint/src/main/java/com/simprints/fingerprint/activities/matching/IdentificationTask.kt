@@ -8,6 +8,8 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
+import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -16,9 +18,8 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentify
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
-import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.id.domain.GROUP
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
@@ -28,7 +29,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
                                   private val dbManager: FingerprintDbManager,
                                   private val sessionEventsManager: FingerprintSessionEventsManager,
                                   private val crashReportManager: FingerprintCrashReportManager,
-                                  timeHelper: FingerprintTimeHelper) : MatchTask {
+                                  private val timeHelper: FingerprintTimeHelper,
+                                  private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
     private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
 
@@ -65,8 +67,13 @@ internal class IdentificationTask(private val view: MatchingContract.View,
                 MatchingResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score))
             }
 
-        sessionEventsManager.addOneToManyEventInBackground(matchStartTime,
-            topCandidates.map { MatchEntry(it.guid, it.confidence.toFloat()) }, candidates.size)
+        sessionEventsManager.addEventInBackground(
+            OneToManyMatchEvent(
+                matchStartTime,
+                timeHelper.now(),
+                OneToManyMatchEvent.MatchPool(preferenceManager.matchPoolType, candidates.size),
+                topCandidates.map { MatchEntry(it.guid, it.confidence.toFloat()) }))
+
 
         val tier1Or2Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_1 || tier == MatchingTier.TIER_2 }
         val tier3Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_3 }
