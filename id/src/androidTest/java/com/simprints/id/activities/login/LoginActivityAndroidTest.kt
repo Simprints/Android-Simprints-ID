@@ -35,8 +35,6 @@ class LoginActivityAndroidTest {
             secureApiInterfaceRule = secureApiInterfaceRule
         )
 
-
-
     @Before
     fun setUp() {
         AndroidTestConfig(this, module).fullSetup()
