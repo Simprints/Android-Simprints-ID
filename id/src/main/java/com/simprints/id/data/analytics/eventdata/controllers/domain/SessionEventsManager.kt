@@ -17,22 +17,13 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
     fun createSession(): Single<SessionEvents>
     fun getCurrentSession(): Single<SessionEvents>
 
+    fun addEvent(sessionEvent: Event): Completable
+    fun addEventInBackground(sessionEvent: Event)
+
     fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit)
 
     fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
-//    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?)
-//    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int)
-//
-   // fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
-    fun addLocationToSession(latitude: Double, longitude: Double)
-//    fun addEventForCandidateReadInBackground(guid: String,
-//                                             startCandidateSearchTime: Long,
-//                                             localResult: CandidateReadEvent.LocalResult,
-//                                             remoteResult: CandidateReadEvent.RemoteResult?)
-
-    fun addEvent(sessionEvent: Event): Completable
-    fun addEventInBackground(sessionEvent: Event)
 }

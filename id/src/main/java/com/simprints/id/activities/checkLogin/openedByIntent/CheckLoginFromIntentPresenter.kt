@@ -209,7 +209,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
-            it.databaseInfo = DatabaseInfo(peopleDbCount, sessionDbCount)
+            it.databaseInfo.recordCount = peopleDbCount
             it.events.apply {
                 addAuthorizationEvent(it, AUTHORIZED)
             }

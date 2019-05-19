@@ -9,8 +9,8 @@ open class DbDatabaseInfo : RealmObject {
     @PrimaryKey
     lateinit var id: String
 
-    var recordCount: Int = 0
     var sessionCount: Int = 0
+    var recordCount: Int? = null
 
     constructor()
 
@@ -21,4 +21,4 @@ open class DbDatabaseInfo : RealmObject {
     }
 }
 
-fun DbDatabaseInfo.toDomainDatabaseInfo(): DatabaseInfo = DatabaseInfo(recordCount, sessionCount, id)
+fun DbDatabaseInfo.toDomainDatabaseInfo(): DatabaseInfo = DatabaseInfo(sessionCount, recordCount, id)

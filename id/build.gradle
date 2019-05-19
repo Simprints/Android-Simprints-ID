@@ -247,6 +247,12 @@ dependencies {
     implementation 'io.ashdavies.rx.rxtasks:rx-tasks:+'
 }
 
+kapt {
+    arguments {
+        arg("realm.ignoreKotlinNullability", true)
+    }
+}
+
 crashlytics {
     enableNdk true
     androidNdkOut "src/main/obj"
