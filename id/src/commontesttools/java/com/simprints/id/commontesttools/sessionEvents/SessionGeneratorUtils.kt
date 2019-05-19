@@ -1,5 +1,6 @@
 package com.simprints.id.commontesttools.sessionEvents
 
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.tools.TimeHelper
@@ -9,6 +10,7 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
                       projectId: String = "some_project",
                       id: String = UUID.randomUUID().toString(),
                       startTime: Long = timeHelper?.now() ?: 0,
+                      databaseInfo: DatabaseInfo = DatabaseInfo(0, 0),
                       fakeRelativeEndTime: Long = 0): SessionEvents =
     SessionEvents(
         id = id,
@@ -17,7 +19,8 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
         libVersionName = "some_version",
         language = "en",
         device = Device(),
-        startTime = startTime).apply {
+        startTime = startTime,
+        databaseInfo = databaseInfo).apply {
         relativeEndTime = fakeRelativeEndTime
     }
 

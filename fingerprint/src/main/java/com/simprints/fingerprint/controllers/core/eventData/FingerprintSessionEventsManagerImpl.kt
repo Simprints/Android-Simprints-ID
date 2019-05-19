@@ -4,6 +4,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.*
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToCore
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import io.reactivex.Completable
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event as CoreEvent
 
@@ -22,7 +23,9 @@ class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: Sess
         sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(hardwareVersion)
 
     override fun addLocationToSessionInBackground(latitude: Double, longitude: Double) =
-        sessionEventsManager.addLocationToSession(latitude, longitude)
+        sessionEventsManager.updateSessionInBackground {
+            it.location = Location(latitude, longitude)
+        }
 
     override fun addPersonCreationEventInBackground(person: Person) =
         sessionEventsManager.addPersonCreationEventInBackground(person.fromDomainToCore())

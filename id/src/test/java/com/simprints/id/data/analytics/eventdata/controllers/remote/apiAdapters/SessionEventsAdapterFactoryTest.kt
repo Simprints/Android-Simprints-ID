@@ -344,7 +344,8 @@ class SessionEventsAdapterFactoryTest {
             "libVersionName",
             "en",
             Device("28", "phone", "device_id"),
-            0)
+            0,
+            DatabaseInfo(0, 0))
         session.addEvent(AlertScreenEvent(0, Alert.NOT_PAIRED))
         val apiSession = ApiSessionEvents(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject

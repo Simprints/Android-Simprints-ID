@@ -5,6 +5,7 @@ import com.simprints.id.data.db.remote.models.ApiModes
 import com.simprints.id.data.db.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.remote.models.ApiPostPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.remote.network.PipeSeparatorWrapperForURLListParam
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -21,17 +22,17 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?, modes: List<ApiModes>): Single<ResponseBody> {
+    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<ResponseBody> {
         return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun requestPerson(patientId: String, projectId: String, modes: List<ApiModes>): Single<Response<ApiGetPerson>> {
+    override fun requestPerson(patientId: String, projectId: String, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<Response<ApiGetPerson>> {
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: List<String>?, modes: List<ApiModes>): Single<Response<List<ApiPeopleCount>>> {
+    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: PipeSeparatorWrapperForURLListParam<String>?, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<Response<List<ApiPeopleCount>>> {
         return delegate.returning(buildSuccessResponseWith("[{\"projectId\":\"project-321\",\"moduleId\":\"module1\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3141}, {\"projectId\":\"project-321\",\"moduleId\":\"module2\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3132}]"))
-            .requestPeopleCount(projectId, userId, moduleId, listOf(ApiModes.FINGERPRINT, ApiModes.FACE))
+            .requestPeopleCount(projectId, userId, moduleId, PipeSeparatorWrapperForURLListParam(ApiModes.FINGERPRINT, ApiModes.FACE))
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

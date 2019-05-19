@@ -16,6 +16,7 @@ open class SessionEvents(var projectId: String,
                          var language: String,
                          var device: Device,
                          var startTime: Long = 0,
+                         var databaseInfo: DatabaseInfo,
                          val id: String = UUID.randomUUID().toString(),
                          val events: ArrayList<Event> = arrayListOf()) {
 
@@ -28,7 +29,6 @@ open class SessionEvents(var projectId: String,
 
     var relativeEndTime: Long = 0
     var relativeUploadTime: Long = 0
-    var databaseInfo: DatabaseInfo? = null
     var location: Location? = null
     var analyticsId: String? = null
 
