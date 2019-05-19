@@ -7,7 +7,7 @@ import java.util.*
 @Keep
 abstract class Event(
     val type: EventType,
-    open val starTime: Long? = null,
+    open val starTime: Long,
     open val endTime: Long? = null,
     val id: String = UUID.randomUUID().toString()) {
 
@@ -15,10 +15,8 @@ abstract class Event(
     var relativeEndTime: Long? = null
 
     fun updateRelativeTimes(sessionStartTime: Long) {
-        starTime?.let {
-            if (relativeStartTime == null) {
-                relativeStartTime = it - sessionStartTime
-            }
+        if (relativeStartTime == null) {
+            relativeStartTime = starTime - sessionStartTime
         }
 
         endTime?.let {

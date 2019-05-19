@@ -1,6 +1,7 @@
 package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
+import com.google.common.reflect.Invokable
 import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -14,6 +15,7 @@ import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.spy
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Before
@@ -197,6 +199,11 @@ class OrchestratorPresenterTest {
             val sessionMock = mock<SessionEvents>()
             whenever(sessionMock) { id } thenReturn ""
             whenever(this) { getCurrentSession() } thenReturn Single.just(sessionMock)
+            whenever(this) { updateSession(any()) } thenAnswer  {
+                val callback = it.arguments[0] as (SessionEvents) -> Unit
+                callback(mock())
+                Completable.complete()
+            }
         }
 
     private fun createOrchestratorPresenter() =

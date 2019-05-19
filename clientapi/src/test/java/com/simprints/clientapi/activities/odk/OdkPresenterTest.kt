@@ -12,13 +12,16 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.*
+import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.EnrollRequestFactory
+import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_INTEGRATION
+import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
-import io.reactivex.Completable
+import io.reactivex.Single
 import org.junit.Test
 import java.util.*
 
@@ -32,7 +35,7 @@ class OdkPresenterTest {
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_REGISTER, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock(), MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
@@ -43,7 +46,7 @@ class OdkPresenterTest {
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_IDENTIFY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock(), MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
@@ -54,19 +57,14 @@ class OdkPresenterTest {
         whenever(view) { verifyExtractor } thenReturn verifyExractor
         val gsonBuilder = mockGsonBuilder()
 
-        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_VERIFY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock(), MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
-    private fun mockSessionManagerToCreateSession() =
-        mock<ClientApiSessionEventsManager>().apply {
-            whenever(this) { createSession() } thenReturn Completable.complete()
-        }
-
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, mockSessionManagerToCreateSession(), mock(), "Garbage", mock()).apply { start() }
+        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock(), mock(), mock()).apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -74,7 +72,7 @@ class OdkPresenterTest {
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, mock(), mock(), ACTION_REGISTER, MOCK_INTEGRATION).handleEnrollResponse(EnrollResponse(registerId))
+        OdkPresenter(view, ACTION_REGISTER, mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleEnrollResponse(EnrollResponse(registerId))
 
         verifyOnce(view) { returnRegistration(registerId) }
     }
@@ -85,7 +83,7 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY, MOCK_INTEGRATION).handleIdentifyResponse(
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verifyOnce(view) {
@@ -101,7 +99,7 @@ class OdkPresenterTest {
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        OdkPresenter(view, mock(), mock(), ACTION_IDENTIFY, MOCK_INTEGRATION).handleVerifyResponse(verification)
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
@@ -113,7 +111,7 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, mock(), mock(), "", MOCK_INTEGRATION).handleResponseError()
+        OdkPresenter(view, "", mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -123,10 +121,16 @@ class OdkPresenterTest {
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
         val gsonBuilder = mockGsonBuilder()
-        OdkPresenter(view, mockSessionManagerToCreateSession(), gsonBuilder, ACTION_CONFIRM_IDENTITY, MOCK_INTEGRATION).apply { start() }
+        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock(), MOCK_INTEGRATION).apply { start() }
 
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
+
+    private fun mockSessionManagerToCreateSession() =
+        mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { createSession() } thenReturn Single.just("session_id")
+        }
+
 
     private fun mockGsonBuilder() =
         mock<GsonBuilder>().apply {

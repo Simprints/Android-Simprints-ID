@@ -129,12 +129,12 @@ class DashboardActivityAndroidTest {
         waitForDownSyncCountAndValidateUI()
     }
 
-//    @Test
-//    fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
-//        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
-//        launchActivity(Intent())
-//        waitForDownSyncCountAndValidateUI()
-//    }
+    @Test
+    fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
+        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
+        launchActivity(Intent())
+        waitForDownSyncCountAndValidateUI()
+    }
 
     @Test
     fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {

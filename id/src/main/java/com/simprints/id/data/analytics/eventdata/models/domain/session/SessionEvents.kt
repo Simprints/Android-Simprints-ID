@@ -59,9 +59,7 @@ open class SessionEvents(var projectId: String,
             Timber.d("Add event: ${GsonBuilder().create().toJson(event)}")
         }
 
-        event.starTime?.let{
-            event.updateRelativeTimes(startTime)
-        }
+        event.updateRelativeTimes(startTime)
 
         events.add(event)
     }

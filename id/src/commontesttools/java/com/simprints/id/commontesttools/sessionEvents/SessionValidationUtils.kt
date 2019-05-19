@@ -338,12 +338,14 @@ fun validateLocationApiModel(json: JsonObject) {
 
 fun validateSuspiciousIntentEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("SUSPICIOUS_INTENT")
+    assertThat(json.get("relativeStartTime").asLong).isNotNull()
     assertThat(json.get("unexpectedExtras").asJsonObject.toString()).isNotNull()
-    assertThat(json.size()).isEqualTo(2)
+    assertThat(json.size()).isEqualTo(3)
 }
 
 fun validateInvalidEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("INVALID_INTENT")
+    assertThat(json.get("relativeStartTime").asLong).isNotNull()
     assertThat(json.get("extras").asJsonObject.toString()).isNotNull()
     assertThat(json.get("action").asString).isAnyOf(
         "com.simprints.simodkadapter.REGISTER",
@@ -357,7 +359,7 @@ fun validateInvalidEventApiModel(json: JsonObject) {
         "com.simprints.id.CONFIRM_IDENTITY",
         "com.simprints.id.UPDATE")
 
-    assertThat(json.size()).isEqualTo(3)
+    assertThat(json.size()).isEqualTo(4)
 }
 
 fun validateSessionEventsApiModel(json: JsonObject) {
