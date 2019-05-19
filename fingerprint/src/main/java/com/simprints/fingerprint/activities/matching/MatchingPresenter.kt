@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.matching
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -30,6 +31,7 @@ class MatchingPresenter(
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val crashReportManager: FingerprintCrashReportManager,
+    private val preferencesManager: FingerprintPreferencesManager,
     private val timeHelper: FingerprintTimeHelper,
     private val libMatcherConstructor: (com.simprints.fingerprintmatcher.Person, List<com.simprints.fingerprintmatcher.Person>,
                                         LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher
@@ -51,8 +53,9 @@ class MatchingPresenter(
                                                       FingerprintDbManager,
                                                       FingerprintSessionEventsManager,
                                                       FingerprintCrashReportManager,
-                                                      FingerprintTimeHelper) -> MatchTask) {
-        val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper)
+                                                      FingerprintTimeHelper,
+                                                      FingerprintPreferencesManager) -> MatchTask) {
+        val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper, preferencesManager)
 
         matchTaskDisposable = matchTask.loadCandidates()
             .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }

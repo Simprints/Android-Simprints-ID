@@ -13,27 +13,7 @@ class JsonHelper {
             val builder = GsonBuilder()
             registerDateAdapter(builder)
             registerFingerIdentifierAdapter(builder)
-            enablePostProcessing(builder)
-            defineCustomStrategyToSkipSerialization(builder)
             builder.create()
-        }
-
-        private fun enablePostProcessing(builder: GsonBuilder) {
-            builder.registerTypeAdapterFactory(PostProcessingEnabler())
-        }
-
-        private fun defineCustomStrategyToSkipSerialization(builder: GsonBuilder) {
-            val exclusionStrategy = object : ExclusionStrategy {
-                override fun shouldSkipField(fieldAttributes: FieldAttributes): Boolean {
-                    return fieldAttributes.getAnnotation(SkipSerialisationProperty::class.java) != null ||
-                        fieldAttributes.getAnnotation(SkipSerialisationField::class.java) != null
-                }
-
-                override fun shouldSkipClass(clazz: Class<*>): Boolean {
-                    return false
-                }
-            }
-            builder.addSerializationExclusionStrategy(exclusionStrategy)
         }
 
         private fun registerFingerIdentifierAdapter(builder: GsonBuilder) {

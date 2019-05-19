@@ -257,6 +257,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             fingerprintRequest.userId,
             fingerprintRequest.moduleId,
             fingerprints)
+
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
         if (isRegisteringElseIsMatching()) {
@@ -297,10 +298,9 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun addCaptureEventInSession(finger: Finger) {
-        sessionEventsManager.addFingerprintCaptureEventInBackground(
-            timeHelper.now(),
-            lastCaptureStartedAt,
-            FingerprintCaptureEvent(
+        sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
+                timeHelper.now(),
+                lastCaptureStartedAt,
                 qualityThreshold,
                 FingerprintCaptureEvent.buildResult(finger.status),
                 finger.template?.let {

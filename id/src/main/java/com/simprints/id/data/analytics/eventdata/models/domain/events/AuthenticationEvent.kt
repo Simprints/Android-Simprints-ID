@@ -3,8 +3,8 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class AuthenticationEvent(val relativeStartTime: Long,
-                          val relativeEndTime: Long,
+class AuthenticationEvent(override val starTime: Long,
+                          override val endTime: Long,
                           val userInfo: UserInfo,
                           val result: Result) : Event(EventType.AUTHENTICATION) {
 

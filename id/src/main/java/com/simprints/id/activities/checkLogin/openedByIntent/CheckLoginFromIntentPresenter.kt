@@ -78,8 +78,8 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     internal fun addCalloutAndConnectivityEventsInSession(appRequest: AppRequest) {
         sessionEventsManager.updateSessionInBackground {
             it.events.apply {
-                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, it, timeHelper))
-                add(buildRequestEvent(it.timeRelativeToStartTime(timeHelper.now()), appRequest))
+                add(ConnectivitySnapshotEvent.buildEvent(simNetworkUtils, timeHelper))
+                add(buildRequestEvent(timeHelper.now(), appRequest))
             }
         }
     }
@@ -217,7 +217,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(
-            session.timeRelativeToStartTime(timeHelper.now()),
+            timeHelper.now(),
             result,
             if (result == AUTHORIZED) {
                 UserInfo(loginInfoManager.getSignedInProjectIdOrEmpty(), loginInfoManager.getSignedInUserIdOrEmpty())

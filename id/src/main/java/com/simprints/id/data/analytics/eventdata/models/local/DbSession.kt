@@ -57,16 +57,16 @@ open class DbSession : RealmObject {
     }
 }
 
-fun DbSession.toDomainSession(): SessionEvents {
+fun DbSession.toDomain(): SessionEvents {
     val session = SessionEvents(id = id,
         projectId = projectId,
         appVersionName = appVersionName,
         libVersionName = libVersionName,
         language = language,
         device = device?.toDomainDevice() ?: Device(),
-        startTime = startTime)
+        startTime = startTime,
+        events = ArrayList(realmEvents.mapNotNull { it.toDomainEvent() }))
 
-    session.events = ArrayList(realmEvents.mapNotNull { it.toDomainEvent() })
     session.relativeEndTime = this.relativeEndTime
     session.relativeUploadTime = this.relativeUploadTime
     session.databaseInfo = this.databaseInfo?.toDomainDatabaseInfo()

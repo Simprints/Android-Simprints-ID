@@ -4,5 +4,5 @@ import androidx.annotation.Keep
 
 // At the end of the sequence of capture, we build a Person object used either for enrolment or verification/identification
 @Keep
-class PersonCreationEvent(val relativeStartTime: Long,
+class PersonCreationEvent(override val starTime: Long,
                           val fingerprintCaptureIds: List<String>) : Event(EventType.PERSON_CREATION)

@@ -5,6 +5,9 @@ import java.util.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event as CoreEvent
 
 @Keep
-abstract class Event(var type: EventType, val id: String = UUID.randomUUID().toString())
+abstract class Event(var type: EventType,
+                     val id: String = UUID.randomUUID().toString(),
+                     open val starTime: Long? = null,
+                     open val endTime: Long? = null)
 
 

@@ -6,11 +6,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidInt
 import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent.IntentAction as CoreIntentAction
 
 @Keep
-class InvalidIntentEvent(val action: IntentAction,
+class InvalidIntentEvent(override val starTime: Long,
+                         val action: IntentAction,
                          val extras: Map<String, Any?>) : Event(EventType.INVALID_INTENT) {
 
-    constructor(action: String, extras: Map<String, Any?>):
-        this(IntentAction.fromDomainToCore(action), extras)
+    constructor(starTime: Long,
+                action: String,
+                extras: Map<String, Any?>):
+        this(starTime, IntentAction.fromDomainToCore(action), extras)
 
     enum class IntentAction {
         ODK_REGISTER,
@@ -52,4 +55,4 @@ fun InvalidIntentEvent.IntentAction.fromDomainToCore() =
     }
 
 fun InvalidIntentEvent.fromDomainToCore() =
-    CoreInvalidIntentEvent(action.fromDomainToCore(), extras)
+    CoreInvalidIntentEvent(starTime, action.fromDomainToCore(), extras)

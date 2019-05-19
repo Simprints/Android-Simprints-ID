@@ -15,8 +15,8 @@ class ClientApiSessionEventsManagerImpl(private val sessionEventsManager: Sessio
 
     override fun addSessionEvent(sessionEvent: Event) {
         when (sessionEvent) {
-            is InvalidIntentEvent -> sessionEventsManager.addSessionEvent(sessionEvent.fromDomainToCore())
-            is SuspiciousIntentEvent -> sessionEventsManager.addSessionEvent(sessionEvent.fromDomainToCore())
+            is InvalidIntentEvent -> sessionEventsManager.addEventInBackground(sessionEvent.fromDomainToCore())
+            is SuspiciousIntentEvent -> sessionEventsManager.addEventInBackground(sessionEvent.fromDomainToCore())
         }
     }
 }

@@ -4,7 +4,9 @@ import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent as ConsentEventCore
 
 @Keep
-class ConsentEvent(val consentType: Type,
+class ConsentEvent(override val starTime: Long,
+                   override val endTime: Long,
+                   val consentType: Type,
                    var result: Result) : Event(EventType.CONSENT) {
 
     @Keep
@@ -18,9 +20,8 @@ class ConsentEvent(val consentType: Type,
     }
 }
 
-fun ConsentEvent.fromDomainToCore(relativeStartTime: Long,
-                                  relativeEndTime: Long) =
-    ConsentEventCore(relativeStartTime, relativeEndTime, consentType.fromDomainToCore(), result.fromDomainToCore())
+fun ConsentEvent.fromDomainToCore() =
+    ConsentEventCore(starTime, endTime, consentType.fromDomainToCore(), result.fromDomainToCore())
 
 fun ConsentEvent.Type.fromDomainToCore() =
     when(this) {

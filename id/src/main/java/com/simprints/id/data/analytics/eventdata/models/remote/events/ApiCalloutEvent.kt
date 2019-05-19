@@ -13,22 +13,22 @@ class ApiCalloutEvent(val relativeStartTime: Long,
                       val callout: ApiCallout) : ApiEvent(ApiEventType.CALLOUT) {
 
     constructor(enrolmentCalloutEvent: EnrolmentCalloutEvent) :
-        this(enrolmentCalloutEvent.relativeStartTime,
+        this(enrolmentCalloutEvent.relativeStartTime ?: 0,
             fromDomainToApi(enrolmentCalloutEvent.integration),
             fromDomainToApiCallout(enrolmentCalloutEvent))
 
     constructor(identificationCalloutEvent: IdentificationCalloutEvent) :
-        this(identificationCalloutEvent.relativeStartTime,
+        this(identificationCalloutEvent.relativeStartTime ?: 0,
             fromDomainToApi(identificationCalloutEvent.integration),
             fromDomainToApiCallout(identificationCalloutEvent))
 
     constructor(verificationCalloutEvent: VerificationCalloutEvent) :
-        this(verificationCalloutEvent.relativeStartTime,
+        this(verificationCalloutEvent.relativeStartTime ?: 0,
             fromDomainToApi(verificationCalloutEvent.integration),
             fromDomainToApiCallout(verificationCalloutEvent))
 
     constructor(confirmationCalloutEvent: ConfirmationCalloutEvent) :
-        this(confirmationCalloutEvent.relativeStartTime,
+        this(confirmationCalloutEvent.relativeStartTime ?: 0,
             fromDomainToApi(confirmationCalloutEvent.integration),
             fromDomainToApiCallout(confirmationCalloutEvent))
 }

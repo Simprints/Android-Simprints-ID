@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class VerificationCalloutEvent(val relativeStartTime: Long,
+class VerificationCalloutEvent(override val starTime: Long,
                                val integration: CalloutIntegrationInfo,
                                val projectId: String,
                                val userId: String,

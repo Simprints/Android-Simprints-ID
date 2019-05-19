@@ -5,5 +5,5 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class VerificationCallbackEvent(val relativeStartTime: Long,
+class VerificationCallbackEvent(override val starTime: Long,
                                 val score: CallbackComparisonScore) : Event(EventType.CALLBACK_VERIFICATION)

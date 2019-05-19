@@ -19,8 +19,8 @@ class ApiConsentEvent(val relativeStartTime: Long,
     }
 
     constructor(consentEvent: ConsentEvent) :
-        this(consentEvent.relativeStartTime,
-            consentEvent.relativeEndTime,
+        this(consentEvent.relativeStartTime ?: 0,
+            consentEvent.relativeEndTime ?: 0,
             ApiType.valueOf(consentEvent.consentType.toString()),
             ApiResult.valueOf(consentEvent.result.toString()))
 }

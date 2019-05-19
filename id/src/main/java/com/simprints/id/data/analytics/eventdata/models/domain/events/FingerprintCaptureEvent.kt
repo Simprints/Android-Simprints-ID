@@ -4,8 +4,8 @@ import androidx.annotation.Keep
 import com.simprints.id.FingerIdentifier
 
 @Keep
-class FingerprintCaptureEvent(val relativeStartTime: Long,
-                              val relativeEndTime: Long,
+class FingerprintCaptureEvent(override val starTime: Long,
+                              override val endTime: Long,
                               val qualityThreshold: Int,
                               val result: Result,
                               val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
