@@ -3,8 +3,8 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class ConsentEvent(val relativeStartTime: Long,
-                   var relativeEndTime: Long,
+class ConsentEvent(override val starTime: Long,
+                   override val endTime: Long,
                    val consentType: Type,
                    var result: Result) : Event(EventType.CONSENT) {
 

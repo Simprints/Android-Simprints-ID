@@ -16,7 +16,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
 import com.simprints.id.data.analytics.eventdata.models.local.DbSession
-import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
+import com.simprints.id.data.analytics.eventdata.models.local.toDomain
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -99,7 +99,7 @@ class GuidSelectionManagerTest {
             .awaitAndAssertSuccess()
 
         realmForDataEvent.refresh()
-        session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomainSession()
+        session = realmForDataEvent.where(DbSession::class.java).equalTo("id", session.id).findFirst()?.toDomain()
         val potentialGuidSelectionEvent = session.events.filterIsInstance(GuidSelectionEvent::class.java).firstOrNull()
         Assert.assertNotNull(potentialGuidSelectionEvent)
         Assert.assertEquals(potentialGuidSelectionEvent?.selectedId, "some_guid_confirmed")

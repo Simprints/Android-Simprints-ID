@@ -7,6 +7,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
@@ -57,11 +58,11 @@ class RefusalPresenter(private val view: RefusalContract.View,
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
         reason.let { refusalReason ->
-            sessionEventsManager.addRefusalEvent(
-                timeHelper.now(),
+            sessionEventsManager.addEvent(RefusalEvent(
                 refusalStartTime,
+                timeHelper.now(),
                 refusalReason.toRefusalAnswerForEvent(),
-                refusalText)
+                refusalText))
         }.subscribeBy(onError = {
             crashReportManager.logExceptionOrThrowable(it)
             view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalActResult(reason, refusalText))

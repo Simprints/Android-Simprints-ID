@@ -44,8 +44,8 @@ class ApiFingerprintCaptureEvent(val id: String,
 
     constructor(fingerprintCaptureEvent: FingerprintCaptureEvent) :
         this(fingerprintCaptureEvent.id,
-            fingerprintCaptureEvent.relativeStartTime,
-            fingerprintCaptureEvent.relativeEndTime,
+            fingerprintCaptureEvent.relativeStartTime ?: 0,
+            fingerprintCaptureEvent.relativeEndTime ?: 0,
             fingerprintCaptureEvent.qualityThreshold,
             ApiResult.valueOf(fingerprintCaptureEvent.result.toString()),
             fingerprintCaptureEvent.fingerprint?.let { ApiFingerprint(fingerprintCaptureEvent.fingerprint) })

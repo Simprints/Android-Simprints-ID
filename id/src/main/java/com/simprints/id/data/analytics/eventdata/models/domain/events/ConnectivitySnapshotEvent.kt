@@ -7,18 +7,17 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 
 @Keep
 class ConnectivitySnapshotEvent(
-    val relativeStartTime: Long,
+    override val starTime: Long,
     val networkType: String,
     val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT) {
 
     companion object {
         fun buildEvent(simNetworkUtils: SimNetworkUtils,
-                       sessionEvents: SessionEvents,
                        timeHelper: TimeHelper): ConnectivitySnapshotEvent {
 
             return simNetworkUtils.let {
                 ConnectivitySnapshotEvent(
-                    sessionEvents.timeRelativeToStartTime(timeHelper.now()),
+                    timeHelper.now(),
                     it.mobileNetworkType ?: "",
                     it.connectionsStates)
             }

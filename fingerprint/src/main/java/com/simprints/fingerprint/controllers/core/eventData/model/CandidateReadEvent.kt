@@ -23,9 +23,9 @@ class CandidateReadEvent(val relativeStartTime: Long,
     }
 }
 
-fun CandidateReadEvent.fromDomainToCore() = {
+fun CandidateReadEvent.fromDomainToCore() =
     CoreCandidateReadEvent(relativeStartTime, relativeEndTime, candidateId, localResult.fromDomainToCore(), remoteResult?.fromDomainToCore() )
-}
+
 
 fun CandidateReadEvent.LocalResult.fromDomainToCore() =
     when(this) {

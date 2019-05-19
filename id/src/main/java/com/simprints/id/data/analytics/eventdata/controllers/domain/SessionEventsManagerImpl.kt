@@ -102,42 +102,42 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
             it.addEvent(GuidSelectionEvent(
-                it.timeRelativeToStartTime(timeHelper.now()),
+                timeHelper.now(),
                 selectedGuid
             ))
             insertOrUpdateSessionEvents(it)
         }
 
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?) {
-        updateSessionInBackground { session ->
-            session.addEvent(OneToOneMatchEvent(
-                session.timeRelativeToStartTime(startTimeVerification),
-                session.timeRelativeToStartTime(timeHelper.now()),
-                patientId,
-                match))
-        }
-    }
-
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int) {
-        updateSessionInBackground { session ->
-            session.addEvent(OneToManyMatchEvent(
-                session.timeRelativeToStartTime(startTimeIdentification),
-                session.timeRelativeToStartTime(timeHelper.now()),
-                OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches))
-        }
-    }
-
-    override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
-        updateSessionInBackground {
-            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
-                it.addEvent(ScannerConnectionEvent(
-                    it.timeRelativeToStartTime(timeHelper.now()),
-                    scannerInfo
-                ))
-            }
-        }
-    }
+//    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?) {
+//        updateSessionInBackground { session ->
+//            session.addEvent(OneToOneMatchEvent(
+//                session.timeRelativeToStartTime(startTimeVerification),
+//                session.timeRelativeToStartTime(timeHelper.now()),
+//                patientId,
+//                match))
+//        }
+//    }
+//
+//    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int) {
+//        updateSessionInBackground { session ->
+//            session.addEvent(OneToManyMatchEvent(
+//                session.timeRelativeToStartTime(startTimeIdentification),
+//                session.timeRelativeToStartTime(timeHelper.now()),
+//                OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
+//                matches))
+//        }
+//    }
+//
+//    override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
+//        updateSessionInBackground {
+//            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
+//                it.addEvent(ScannerConnectionEvent(
+//                    timeHelper.now(),
+//                    scannerInfo
+//                ))
+//            }
+//        }
+//    }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         updateSessionInBackground { session ->
@@ -154,21 +154,21 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             ))
         }
     }
-
-    override fun addEventForCandidateReadInBackground(guid: String,
-                                                      startCandidateSearchTime: Long,
-                                                      localResult: CandidateReadEvent.LocalResult,
-                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
-        updateSessionInBackground {
-            it.addEvent(CandidateReadEvent(
-                it.timeRelativeToStartTime(startCandidateSearchTime),
-                it.timeRelativeToStartTime(timeHelper.now()),
-                guid,
-                localResult,
-                remoteResult
-            ))
-        }
-    }
+//
+//    override fun addEventForCandidateReadInBackground(guid: String,
+//                                                      startCandidateSearchTime: Long,
+//                                                      localResult: CandidateReadEvent.LocalResult,
+//                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
+//        updateSessionInBackground {
+//            it.addEvent(CandidateReadEvent(
+//                it.timeRelativeToStartTime(startCandidateSearchTime),
+//                it.timeRelativeToStartTime(timeHelper.now()),
+//                guid,
+//                localResult,
+//                remoteResult
+//            ))
+//        }
+//    }
 
     override fun addLocationToSession(latitude: Double, longitude: Double) {
         this.updateSessionInBackground { sessionEvents ->
@@ -176,11 +176,16 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
     }
 
-    override fun addSessionEvent(sessionEvent: Event) {
+    override fun addEventInBackground(sessionEvent: Event) {
         updateSessionInBackground {
             it.addEvent(sessionEvent)
         }
     }
+
+    override fun addEvent(sessionEvent: Event): Completable =
+        updateSession {
+            it.addEvent(sessionEvent)
+        }
 
     override fun signOut() {
         deleteSessions()

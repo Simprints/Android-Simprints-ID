@@ -22,15 +22,17 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
 
     fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
-    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?)
-    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int)
-    fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
+//    fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: MatchEntry?)
+//    fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<MatchEntry>, matchSize: Int)
+//
+   // fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
     fun addLocationToSession(latitude: Double, longitude: Double)
-    fun addEventForCandidateReadInBackground(guid: String,
-                                             startCandidateSearchTime: Long,
-                                             localResult: CandidateReadEvent.LocalResult,
-                                             remoteResult: CandidateReadEvent.RemoteResult?)
+//    fun addEventForCandidateReadInBackground(guid: String,
+//                                             startCandidateSearchTime: Long,
+//                                             localResult: CandidateReadEvent.LocalResult,
+//                                             remoteResult: CandidateReadEvent.RemoteResult?)
 
-    fun addSessionEvent(sessionEvent: Event)
+    fun addEvent(sessionEvent: Event): Completable
+    fun addEventInBackground(sessionEvent: Event)
 }

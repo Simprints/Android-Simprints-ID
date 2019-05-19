@@ -11,7 +11,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Fingerprin
 
 
 @Keep
-class FingerprintCaptureEvent(val qualityThreshold: Int,
+class FingerprintCaptureEvent(override val starTime: Long,
+                              override val endTime: Long,
+                              val qualityThreshold: Int,
                               val result: Result,
                               val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
 
@@ -41,11 +43,10 @@ class FingerprintCaptureEvent(val qualityThreshold: Int,
     }
 }
 
-fun FingerprintCaptureEvent.fromDomainToCore(relativeStartTime: Long,
-                                             relativeEndTime: Long) =
+fun FingerprintCaptureEvent.fromDomainToCore() =
     FingerprintCaptureEventCore(
-        relativeStartTime,
-        relativeEndTime,
+        starTime,
+        endTime,
         qualityThreshold,
         result.fromDomainToCore(),
         fingerprint?.fromDomainToCore())

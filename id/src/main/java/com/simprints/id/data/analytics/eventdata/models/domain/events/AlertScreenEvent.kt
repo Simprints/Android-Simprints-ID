@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import com.simprints.id.domain.alert.Alert
 
 @Keep
-class AlertScreenEvent(val relativeStartTime: Long,
+class AlertScreenEvent(override val starTime: Long,
                        val alertType: String) : Event(EventType.ALERT_SCREEN) {
 
     constructor(relativeStartTime: Long, alert: Alert):
