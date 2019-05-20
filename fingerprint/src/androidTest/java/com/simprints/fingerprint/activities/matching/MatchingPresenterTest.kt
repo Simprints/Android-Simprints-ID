@@ -173,7 +173,7 @@ class MatchingPresenterTest {
         matchTaskFinishedFlag.take()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
     @Test
@@ -186,7 +186,7 @@ class MatchingPresenterTest {
         matchTaskFinishedFlag.take()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
     private fun createPresenter(request: MatchingActRequest,
