@@ -40,7 +40,7 @@ class SessionEventsSyncMasterTask(
             createUploadBatchTaskCompletable(it).doOnError { t ->
                 if (t !is NoSessionsFoundException) {
                     Timber.e(t)
-                    crashReportManager.logExceptionOrThrowable(t)
+                    crashReportManager.logExceptionOrSafeException(t)
                 }
             }.onErrorComplete()
         }

@@ -7,14 +7,16 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Fingerprin
 class ApiFingerprintCaptureEvent(val id: String,
                                  val relativeStartTime: Long,
                                  val relativeEndTime: Long,
-                                 val finger: ApiFingerIdentifier,
                                  val qualityThreshold: Int,
                                  val result: ApiResult,
                                  val fingerprint: ApiFingerprint?) : ApiEvent(ApiEventType.FINGERPRINT_CAPTURE) {
 
     @Keep
-    class ApiFingerprint(val quality: Int, val template: String) {
-        constructor(finger: FingerprintCaptureEvent.Fingerprint) : this(finger.quality, finger.template)
+    class ApiFingerprint(val finger: ApiFingerIdentifier, val quality: Int, val template: String) {
+
+        constructor(finger: FingerprintCaptureEvent.Fingerprint) : this(
+            ApiFingerIdentifier.valueOf(finger.finger.toString()),
+            finger.quality, finger.template)
     }
 
     @Keep
@@ -42,9 +44,8 @@ class ApiFingerprintCaptureEvent(val id: String,
 
     constructor(fingerprintCaptureEvent: FingerprintCaptureEvent) :
         this(fingerprintCaptureEvent.id,
-            fingerprintCaptureEvent.relativeStartTime,
-            fingerprintCaptureEvent.relativeEndTime,
-            ApiFingerIdentifier.valueOf(fingerprintCaptureEvent.finger.toString()),
+            fingerprintCaptureEvent.relativeStartTime ?: 0,
+            fingerprintCaptureEvent.relativeEndTime ?: 0,
             fingerprintCaptureEvent.qualityThreshold,
             ApiResult.valueOf(fingerprintCaptureEvent.result.toString()),
             fingerprintCaptureEvent.fingerprint?.let { ApiFingerprint(fingerprintCaptureEvent.fingerprint) })

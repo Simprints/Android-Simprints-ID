@@ -59,7 +59,7 @@ class LongConsentManagerImpl(absolutePath: String,
                 downloadTasks.add(
                     downloadLongConsentWithProgress(language)
                         .ignoreElements()
-                        .doOnError { crashReportManager.logExceptionOrThrowable(it) }
+                        .doOnError { crashReportManager.logExceptionOrSafeException(it) }
                         .onErrorComplete()
                 )
         }

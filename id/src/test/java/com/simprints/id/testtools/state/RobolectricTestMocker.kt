@@ -76,7 +76,7 @@ object RobolectricTestMocker {
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         whenever { localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull()) } thenReturn Completable.complete()
         whenever { localDbManagerSpy.loadPersonFromLocal(anyNotNull()) } thenReturn Single.error(IllegalStateException())
-        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
+        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyOrNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 

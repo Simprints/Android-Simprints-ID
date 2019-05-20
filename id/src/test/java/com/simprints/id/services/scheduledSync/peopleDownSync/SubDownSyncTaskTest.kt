@@ -16,11 +16,11 @@ import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiPerson
-import com.simprints.id.data.db.remote.models.toFirebasePerson
+import com.simprints.id.data.db.remote.models.ApiGetPerson
+import com.simprints.id.data.db.remote.models.toApiGetPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -45,6 +45,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.*
 import org.mockito.Mockito
 import org.robolectric.annotation.Config
+import org.robolectric.shadows.ShadowLog
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.ceil
@@ -73,6 +74,8 @@ class SubDownSyncTaskTest {
 
     @Before
     fun setUp() {
+        ShadowLog.stream = System.out
+
         UnitTestConfig(this, module).fullSetup()
 
         whenever(remoteDbManagerSpy.getCurrentToken()).thenReturn(Single.just(""))
@@ -230,9 +233,9 @@ class SubDownSyncTaskTest {
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
     }
 
-    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiPerson>) {
-        Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
-        Assert.assertEquals(saved.last().patientId, inResponse.last().patientId)
+    private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiGetPerson>) {
+        Assert.assertEquals(saved.last().patientId, inResponse.last().id)
+        Assert.assertEquals(saved.last().patientId, inResponse.last().id)
     }
 
     private fun doReturnScopeFromBuilder(scope: SyncScope) {
@@ -240,7 +243,7 @@ class SubDownSyncTaskTest {
     }
 
     private fun prepareResponseForSubScope(subSyncScope: SubSyncScope, nPeople: Int) =
-        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.toFirebasePerson() }.sortedBy { it.updatedAt }
+        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.toApiGetPerson() }.sortedBy { it.updatedAt }
 
     private fun setupApi() {
         PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
@@ -279,7 +282,7 @@ class SubDownSyncTaskTest {
         whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
     }
 
-    private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiPerson>): MockResponse? {
+    private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiGetPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {
             it.setResponseCode(200)
@@ -287,9 +290,9 @@ class SubDownSyncTaskTest {
         }
     }
 
-    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiPerson>): MockResponse? {
+    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiGetPerson>): MockResponse? {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
-        val badFbPersonJson = fbPersonJson.replace("fingerprints", "fungerprints")
+        val badFbPersonJson = fbPersonJson.replace("id", "id_wrong")
         return MockResponse().let {
             it.setResponseCode(200)
             it.setBody(badFbPersonJson)

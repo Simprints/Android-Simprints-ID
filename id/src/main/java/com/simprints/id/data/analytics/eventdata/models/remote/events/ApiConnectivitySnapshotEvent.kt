@@ -16,7 +16,7 @@ class ApiConnectivitySnapshotEvent(
     }
 
     constructor(connectivitySnapshotEvent: ConnectivitySnapshotEvent) :
-        this(connectivitySnapshotEvent.relativeStartTime,
+        this(connectivitySnapshotEvent.relativeStartTime ?: 0,
             connectivitySnapshotEvent.networkType,
             connectivitySnapshotEvent.connections.map { ApiConnection(it) })
 }

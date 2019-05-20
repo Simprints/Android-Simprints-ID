@@ -25,6 +25,7 @@ class ApiFingerprintTest {
 
         assertTrue(json.has("quality"))
         assertTrue(json.has("template"))
-        assertEquals(json.keySet().size, 2)
+        assertTrue(json.has("finger"))
+        assertEquals(json.keySet().size, 3)
     }
 }

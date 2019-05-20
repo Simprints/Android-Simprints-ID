@@ -170,17 +170,19 @@ class LaunchPresenter(component: FingerprintComponent,
                                                               startCandidateSearchTime: Long,
                                                               localResult: CandidateReadEvent.LocalResult,
                                                               remoteResult: CandidateReadEvent.RemoteResult?) {
-        sessionEventsManager.addEventForCandidateReadInBackground(
-            guid,
-            startCandidateSearchTime,
-            localResult,
-            remoteResult)
+        sessionEventsManager.addEventInBackground(
+            CandidateReadEvent(
+                startCandidateSearchTime,
+                timeHelper.now(),
+                guid,
+                localResult,
+                remoteResult))
     }
 
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
         view.doLaunchAlert(scannerManager.getAlertType(it))
-        crashReportManager.logExceptionOrThrowable(it)
+        crashReportManager.logExceptionOrSafeException(it)
     }
 
     private fun requestPermissionsForLocation(progress: Int): Completable {
@@ -237,7 +239,7 @@ class LaunchPresenter(component: FingerprintComponent,
         val generalConsent = try {
             JsonHelper.gson.fromJson(consentDataManager.generalConsentOptionsJson, GeneralConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
+            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
         return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
@@ -247,7 +249,7 @@ class LaunchPresenter(component: FingerprintComponent,
         val parentalConsent = try {
             JsonHelper.gson.fromJson(consentDataManager.parentalConsentOptionsJson, ParentalConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
+            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
         return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
@@ -269,10 +271,10 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.addConsentEventInBackground(
-            timeHelper.now(),
-            startConsentEventTime,
+        sessionEventsManager.addEventInBackground(
             ConsentEvent(
+                timeHelper.now(),
+                startConsentEventTime,
                 if (view.isCurrentTabParental()) {
                     PARENTAL
                 } else {
@@ -357,10 +359,12 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addBluetoothConnectivityEvent() {
-        sessionEventsManager.addEventForScannerConnectivityInBackground(
-            ScannerConnectionEvent.ScannerInfo(
-                scannerManager.scannerId ?: "",
-                scannerManager.macAddress ?: "",
-                scannerManager.hardwareVersion ?: ""))
+        sessionEventsManager.addEventInBackground(
+            ScannerConnectionEvent(
+                timeHelper.now(),
+                ScannerConnectionEvent.ScannerInfo(
+                    scannerManager.scannerId ?: "",
+                    scannerManager.macAddress ?: "",
+                    scannerManager.hardwareVersion ?: "")))
     }
 }

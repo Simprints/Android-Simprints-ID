@@ -28,6 +28,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -40,8 +41,7 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.InputMergeWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubCountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
@@ -97,16 +97,15 @@ interface AppComponent {
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(countTask: CountTaskImpl)
     fun inject(downSyncTask: DownSyncTaskImpl)
-    fun inject(subCountWorker: SubCountWorker)
+    fun inject(countWorker: CountWorker)
     fun inject(subDownSyncWorker: SubDownSyncWorker)
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
-    fun inject(inputMergeWorker: InputMergeWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
-    fun getCrashReportManager(): CrashReportManager
+    fun getCoreCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager

@@ -1,14 +1,18 @@
 package com.simprints.id.data.db.remote.network
 
-import com.simprints.id.data.db.remote.models.ApiPerson
-import com.simprints.id.data.db.remote.models.PeopleCount
 import com.simprints.core.network.NetworkConstants
+import com.simprints.id.data.db.remote.models.ApiGetPerson
+import com.simprints.id.data.db.remote.models.ApiModes
+import com.simprints.id.data.db.remote.models.ApiModes.*
+import com.simprints.id.data.db.remote.models.ApiPeopleCount
+import com.simprints.id.data.db.remote.models.ApiPostPerson
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.adapter.rxjava2.Result
 import retrofit2.http.*
 
+@JvmSuppressWildcards
 interface PeopleRemoteInterface {
 
     companion object {
@@ -22,20 +26,23 @@ interface PeopleRemoteInterface {
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
-        @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?): Single<ResponseBody>
+        @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<ResponseBody>
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
-                     @Body patientsJson: HashMap<String, List<ApiPerson>>): Single<Result<Void?>>
+                     @Body patientsJson: HashMap<String, List<ApiPostPerson>>): Single<Result<Void?>>
 
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String): Single<Response<ApiPerson>>
+        @Path("projectId") projectId: String,
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<ApiGetPerson>>
 
     @GET("projects/{projectId}/patients/count")
     fun requestPeopleCount(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
-        @Query("moduleId") moduleId: String?): Single<Response<PeopleCount>>
+        @Query("moduleId") moduleId: PipeSeparatorWrapperForURLListParam<String>?, //moduleId = module1|module2|
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
 }

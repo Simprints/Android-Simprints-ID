@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.libsimprints
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -11,6 +12,10 @@ import com.simprints.libsimprints.Tier
 interface LibSimprintsContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
+
+        val integrationInfo: IntegrationInfo
+
+        val action: String?
 
         fun returnRegistration(registration: Registration)
 

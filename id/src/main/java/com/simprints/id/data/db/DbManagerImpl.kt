@@ -1,7 +1,7 @@
 package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrollmentEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -10,8 +10,9 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
-import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -68,8 +69,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
             .doOnComplete {
                 sessionEventsManager
                     .updateSession {
-                        it.addEvent(EnrollmentEvent(
-                            it.timeRelativeToStartTime(timeHelper.now()),
+                        it.addEvent(EnrolmentEvent(
+                            timeHelper.now(),
                             person.patientId
                         ))
                     }
@@ -121,19 +122,37 @@ open class DbManagerImpl(override val local: LocalDbManager,
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 
-    override fun calculateNPatientsToDownSync(projectId: String, userId: String?, moduleId: String?): Single<Int> =
-        remotePeopleManager.getNumberOfPatients(projectId, userId, moduleId).flatMap { nPatientsOnServer ->
-            local.getPeopleCountFromLocal(userId = userId, moduleId = moduleId, toSync = false).map {
-                Math.max(nPatientsOnServer - it, 0)
+    override fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
+        remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
+            getPeopleCountFromLocalForSyncScope(syncScope).map { peopleCountsInLocal ->
+               calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote, peopleCountsInLocal)
             }
         }
 
-    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<Int> =
+    private fun calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote: List<PeopleCount>,
+                                                         peopleCountsInLocal: List<PeopleCount>): List<PeopleCount> =
+        peopleCountInRemote.map { remotePeopleCount ->
+            val localCount = peopleCountsInLocal.find {
+                it.projectId == remotePeopleCount.projectId &&
+                it.userId == remotePeopleCount.userId &&
+                it.moduleId == remotePeopleCount.moduleId &&
+                it.modes?.joinToString() == remotePeopleCount.modes?.joinToString()
+            }?.count ?: 0
+
+            remotePeopleCount.copy(count = remotePeopleCount.count - localCount)
+        }
+    
+    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
-                local.getPeopleCountFromLocal(
-                    userId = it.userId,
-                    moduleId = it.moduleId).blockingGet()
-            }.sum()
+                PeopleCount(it.projectId,
+                    it.userId,
+                    it.moduleId,
+                    syncScope.modes,
+                    local.getPeopleCountFromLocal(
+                        projectId = it.projectId,
+                        userId = it.userId,
+                        moduleId = it.moduleId).blockingGet())
+            }
         )
 }

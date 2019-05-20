@@ -17,8 +17,8 @@ class ApiRefusalEvent(val relativeStartTime: Long,
     }
 
     constructor(refusalEvent: RefusalEvent) :
-        this(refusalEvent.relativeStartTime,
-            refusalEvent.relativeEndTime,
+        this(refusalEvent.relativeStartTime ?: 0,
+            refusalEvent.relativeEndTime ?: 0,
             ApiAnswer.valueOf(refusalEvent.reason.toString()),
             refusalEvent.otherText)
 }

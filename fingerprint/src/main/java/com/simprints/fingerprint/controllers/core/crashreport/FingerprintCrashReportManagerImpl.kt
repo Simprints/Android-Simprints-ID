@@ -1,11 +1,16 @@
 package com.simprints.fingerprint.controllers.core.crashreport
 
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 
-class FingerprintCrashReportManagerImpl(val crashReportManager: CrashReportManager): FingerprintCrashReportManager {
+class FingerprintCrashReportManagerImpl(val crashReportManager: CoreCrashReportManager): FingerprintCrashReportManager {
 
-    override fun logExceptionOrThrowable(throwable: Throwable) =
-        crashReportManager.logExceptionOrThrowable(throwable)
+    override fun logExceptionOrSafeException(throwable: Throwable) =
+        if(throwable is FingerprintSafeException) {
+            crashReportManager.logSafeException(throwable)
+        } else {
+            crashReportManager.logException(throwable)
+        }
 
     override fun logMessageForCrashReport(crashReportTag: FingerprintCrashReportTag,
                                           crashReportTrigger: FingerprintCrashReportTrigger,
@@ -16,4 +21,5 @@ class FingerprintCrashReportManagerImpl(val crashReportManager: CrashReportManag
             crashReportTrigger.fromDomainToCore(),
             crashPriority,
             message)
+
 }

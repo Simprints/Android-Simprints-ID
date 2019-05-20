@@ -23,8 +23,8 @@ class ApiOneToManyMatchEvent(val relativeStartTime: Long,
     }
 
     constructor(oneToManyMatchEvent: OneToManyMatchEvent) :
-        this(oneToManyMatchEvent.relativeStartTime,
-            oneToManyMatchEvent.relativeEndTime,
+        this(oneToManyMatchEvent.relativeStartTime ?: 0,
+            oneToManyMatchEvent.relativeEndTime ?: 0,
             ApiMatchPool(oneToManyMatchEvent.pool),
             oneToManyMatchEvent.result?.map { ApiMatchEntry(it) })
 }

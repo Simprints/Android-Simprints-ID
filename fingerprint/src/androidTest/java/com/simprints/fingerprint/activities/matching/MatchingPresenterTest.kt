@@ -7,8 +7,11 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockito_kotlin.KArgumentCaptor
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.eq
+import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
@@ -22,7 +25,6 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyRe
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.fingerprint.testtools.PeopleGeneratorUtils
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Person
@@ -63,6 +65,9 @@ class MatchingPresenterTest {
     private val timeHelperMock = mock<FingerprintTimeHelper> {
         whenever(it) { now() } thenReturn System.currentTimeMillis()
     }
+    private val mockFingerprintPreferencesManager = mock<FingerprintPreferencesManager> {
+        whenever(it) { matchPoolType } thenReturn MatchPoolType.PROJECT
+    }
 
     private val mockIdentificationLibMatcher: (Person, List<Person>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
@@ -102,7 +107,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(identifyRequest, mockIdentificationLibMatcher)
+        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockIdentificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -117,7 +122,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockVerificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -130,7 +135,7 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidates()
         setupPrefs()
 
-        val presenter = createPresenter(identifyRequest, mockIdentificationLibMatcher)
+        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockIdentificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -150,7 +155,7 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidate()
         setupPrefs()
 
-        val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockVerificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -163,12 +168,12 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidates()
         setupPrefs()
 
-        val presenter = createPresenter(identifyRequest, mockErrorLibMatcher)
+        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockErrorLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
     @Test
@@ -176,18 +181,19 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidate()
         setupPrefs()
 
-        val presenter = createPresenter(verifyRequest, mockErrorLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockErrorLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
-    private fun createPresenter(request: MatchingActRequest, mockLibMatcher: (Person, List<Person>,
-                                                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
+    private fun createPresenter(request: MatchingActRequest,
+                                preferencesManagerMock: FingerprintPreferencesManager,
+                                mockLibMatcher: (Person, List<Person>,LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, request, dbManagerMock,
-            sessionEventsManagerMock, crashReportManagerMock, timeHelperMock, mockLibMatcher)
+            sessionEventsManagerMock, crashReportManagerMock, preferencesManagerMock, timeHelperMock, mockLibMatcher)
 
     private fun setupDbManagerLoadCandidates() {
         val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID).toList()

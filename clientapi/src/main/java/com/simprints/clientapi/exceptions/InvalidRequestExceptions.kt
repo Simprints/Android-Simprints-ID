@@ -1,6 +1,7 @@
 package com.simprints.clientapi.exceptions
 
-sealed class InvalidRequestException(message: String = "") : RuntimeException(message)
+sealed class ClientApiSafeException(message: String = "") : RuntimeException(message)
+sealed class InvalidRequestException(message: String = "") : ClientApiSafeException(message)
 
 class InvalidClientRequestException(message: String = "") : InvalidRequestException(message)
 class InvalidMetadataException(message: String = "") : InvalidRequestException(message)

@@ -105,7 +105,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 Timber.d("reconnect.onError()")
                 view.un20WakeupDialog.dismiss()
                 view.doLaunchAlert(scannerManager.getAlertType(it))
-                crashReportManager.logExceptionOrThrowable(it)
+                crashReportManager.logExceptionOrSafeException(it)
             })
     }
 
@@ -249,8 +249,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             presenter.currentFinger().template =
                 Fingerprint(presenter.currentFinger().id, template)
         } catch (e: IllegalArgumentException) {
-            // StopShip: Custom Error
-            crashReportManager.logExceptionOrThrowable(FingerprintUnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
+            e.printStackTrace()
+            crashReportManager.logExceptionOrSafeException(FingerprintUnexpectedException("IllegalArgumentException in CollectFingerprintsActivity.handleCaptureSuccess()", e))
             resetUIFromError()
         }
 

@@ -6,6 +6,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintIdentifyRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -21,7 +22,7 @@ object FingerprintToDomainRequest {
                 fromFingerprintToDomainVerifyRequest(iFingerprintRequest)
             is IFingerprintIdentifyRequest ->
                 fromFingerprintToDomainIdentifyRequest(iFingerprintRequest)
-            else -> throw IllegalArgumentException("Invalid Fingerprint AppRequest") //StopShip
+            else -> throw InvalidRequestForFingerprintException()
         }
 
     private fun fromFingerprintToDomainIdentifyRequest(iFingerprintRequest: IFingerprintIdentifyRequest): FingerprintIdentifyRequest =

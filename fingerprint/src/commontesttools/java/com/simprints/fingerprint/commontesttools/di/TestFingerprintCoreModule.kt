@@ -6,6 +6,7 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintCoreModule
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -30,7 +31,7 @@ class TestFingerprintCoreModule(private var fingerprintTimeHelperRule: Dependenc
     override fun provideFingerprintSessionEventsManager(coreSessionManager: SessionEventsManager): FingerprintSessionEventsManager =
         fingerprintSessionEventsManagerRule.resolveDependency { super.provideFingerprintSessionEventsManager(coreSessionManager) }
 
-    override fun provideFingerprintCrashReportManager(coreCrashReportManager: CrashReportManager): FingerprintCrashReportManager =
+    override fun provideFingerprintCrashReportManager(coreCrashReportManager: CoreCrashReportManager): FingerprintCrashReportManager =
         fingerprintCrashReportManagerRule.resolveDependency { super.provideFingerprintCrashReportManager(coreCrashReportManager) }
 
     override fun provideSimNetworkUtils(coreSimNetworkUtils: SimNetworkUtils): FingerprintSimNetworkUtils =

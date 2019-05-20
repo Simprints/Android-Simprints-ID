@@ -4,6 +4,7 @@ import com.simprints.face.data.moduleapi.face.requests.FaceEnrolRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceIdentifyRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceVerifyRequest
+import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceEnrolRequest
 import com.simprints.moduleapi.face.requests.IFaceIdentifyRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
@@ -26,6 +27,6 @@ object FaceToDomainRequest {
                 with(faceRequest) {
                     FaceVerifyRequest(projectId, moduleId, userId)
                 }
-            else -> throw InvalidParameterException("Invalid Face AppRequest") //StopShip
+            else -> throw InvalidFaceRequestException()
         }
 }
