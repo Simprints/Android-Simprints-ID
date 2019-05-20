@@ -24,6 +24,7 @@ import com.simprints.id.Application
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
 
@@ -42,7 +43,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
         val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No request in the bundle") //STOPSHIP : Custom error
+            ?: throw InvalidRequestForMatchingActivityException()
 
         LanguageHelper.setLanguage(this, matchingRequest.language)
 
@@ -51,7 +52,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
         val extras = intent.extras
         if (extras == null) {
-            crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Null extras passed to MatchingActivity")) //STOPSHIP : Custom error
+            crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Null extras passed to MatchingActivity"))
             launchAlert()
             finish()
             return
@@ -126,7 +127,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     }
 
     override fun makeToastMatchFailed() {
-        Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show() // STOPSHIP : proper toast message
+        Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
     }
 
     override fun doSetResult(resultCode: Int, resultData: Intent) {

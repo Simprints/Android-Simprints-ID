@@ -33,6 +33,7 @@ import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -60,7 +61,7 @@ class CollectFingerprintsActivity :
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+            ?: throw InvalidRequestForFingerprintException()
 
         configureRightToLeft()
 

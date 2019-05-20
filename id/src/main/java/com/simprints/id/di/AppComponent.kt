@@ -28,6 +28,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
@@ -104,7 +105,7 @@ interface AppComponent {
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
-    fun getCrashReportManager(): CrashReportManager
+    fun getCoreCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager

@@ -103,7 +103,7 @@ class SessionEventsManagerImplTest {
 
         sessionsEventsManagerSpy.createSession().blockingGet()
 
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
     }
 
@@ -122,7 +122,7 @@ class SessionEventsManagerImplTest {
     fun updateSession_shouldSwallowException() {
         val tester = sessionsEventsManagerSpy.updateSession { it.projectId = "new_project" }.test()
         tester.awaitAndAssertSuccess()
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
     @Test

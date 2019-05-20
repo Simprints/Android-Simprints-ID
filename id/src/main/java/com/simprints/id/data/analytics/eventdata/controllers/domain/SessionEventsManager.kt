@@ -14,7 +14,7 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
 
     fun signOut()
 
-    fun createSession(): Single<SessionEvents>
+    fun createSession(libSimprintsVersionName: String): Single<SessionEvents>
     fun getCurrentSession(): Single<SessionEvents>
 
     fun addEvent(sessionEvent: Event): Completable

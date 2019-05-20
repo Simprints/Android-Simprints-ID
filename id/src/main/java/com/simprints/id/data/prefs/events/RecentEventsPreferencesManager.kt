@@ -12,5 +12,4 @@ interface RecentEventsPreferencesManager {
     var lastIdentificationDate: Date?
     var lastEnrolDate: Date?
     var lastVerificationDate: Date?
-
 }

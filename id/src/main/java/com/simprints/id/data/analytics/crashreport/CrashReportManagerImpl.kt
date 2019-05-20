@@ -21,15 +21,19 @@ class CrashReportManagerImpl: CrashReportManager {
 
     private fun getLogMessage(crashReportTrigger: CrashReportTrigger, message: String) = "[${crashReportTrigger.name}] $message"
 
-    override fun logExceptionOrThrowable(throwable: Throwable) {
-        if(throwable is SafeException) { //StopShip: Sort FingerprintSafeException
+    override fun logExceptionOrSafeException(throwable: Throwable) {
+        if(throwable is SafeException) {
             logSafeException(throwable)
         } else {
-            Crashlytics.logException(throwable)
+            logException(throwable)
         }
     }
 
-    private fun logSafeException(throwable: Throwable) {
+    override fun logException(throwable: Throwable) {
+        Crashlytics.logException(throwable)
+    }
+
+    override fun logSafeException(throwable: Throwable) {
         Crashlytics.log(Log.ERROR, CrashReportTag.SAFE_EXCEPTION.name, "$throwable")
     }
 

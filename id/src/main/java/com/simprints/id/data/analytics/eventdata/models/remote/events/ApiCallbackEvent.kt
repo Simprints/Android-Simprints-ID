@@ -38,5 +38,5 @@ fun fromDomainToApiCallback(event: Event): ApiCallback =
         is IdentificationCallbackEvent -> with(event) { ApiIdentificationCallback(sessionId, scores.map { it.fromDomainToApi() }) }
         is VerificationCallbackEvent -> with(event) { ApiVerificationCallback(score.fromDomainToApi()) }
         is RefusalCallbackEvent -> with(event) { ApiRefusalCallback(reason, extra) }
-        else -> throw IllegalArgumentException("Invalid CallbackEvent") //Stopship
+        else -> throw IllegalArgumentException("Invalid CallbackEvent")
     }

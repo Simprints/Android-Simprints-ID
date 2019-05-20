@@ -59,9 +59,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             addCalloutAndConnectivityEventsInSession(appRequest)
             setLastUser()
             setSessionIdCrashlyticsKey()
-        } catch (t: Throwable) { // STOPSHIP : catch custom exception and display some alert
+        } catch (t: Throwable) {
             t.printStackTrace()
-            crashReportManager.logExceptionOrThrowable(t)
+            crashReportManager.logExceptionOrSafeException(t)
             val alert = if (t is InvalidCalloutError) t.alert else Alert.UNEXPECTED_ERROR
             view.openAlertActivityForError(alert)
             setupFailed = true

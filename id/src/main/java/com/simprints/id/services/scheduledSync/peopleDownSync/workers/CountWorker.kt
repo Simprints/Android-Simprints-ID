@@ -54,7 +54,7 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
         } catch (e: Throwable) {
             e.printStackTrace()
             logToAnalyticsAndToastForDebugBuilds(syncScope)
-            crashReportManager.logExceptionOrThrowable(e)
+            crashReportManager.logExceptionOrSafeException(e)
             Result.success()
         }
     }

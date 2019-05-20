@@ -42,7 +42,7 @@ class SessionEventsMasterWorker(context: Context, params: WorkerParameters) : Wo
         } catch (throwable: Throwable) {
             Timber.d("Sessions upload failed")
             Timber.e(throwable)
-            crashReportManager.logExceptionOrThrowable(throwable)
+            crashReportManager.logExceptionOrSafeException(throwable)
             Result.failure()
         }
     }

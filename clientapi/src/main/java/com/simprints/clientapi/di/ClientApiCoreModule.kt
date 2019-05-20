@@ -7,6 +7,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.core.di.FeatureScope
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.tools.TimeHelper
@@ -23,7 +24,7 @@ open class ClientApiCoreModule {
 
     @Provides
     @FeatureScope
-    open fun provideClientApiCrashReportManager(coreCrashReportManager: CrashReportManager): ClientApiCrashReportManager =
+    open fun provideClientApiCrashReportManager(coreCrashReportManager: CoreCrashReportManager): ClientApiCrashReportManager =
         ClientApiCrashReportManagerImpl(coreCrashReportManager)
 
     @Provides

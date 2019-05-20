@@ -10,8 +10,10 @@ import io.reactivex.Single
 class ClientApiSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) :
     ClientApiSessionEventsManager {
 
-    override fun createSession(): Single<String> =
-        sessionEventsManager.createSession().map { it.id }
+    override fun createSession(): Single<String> {
+        val libSimprints = com.simprints.libsimprints.BuildConfig.VERSION_NAME
+        return sessionEventsManager.createSession(libSimprints).map { it.id }
+    }
 
     override fun addSessionEvent(sessionEvent: Event) {
         when (sessionEvent) {

@@ -29,7 +29,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
                                 private val sessionEventsManager: FingerprintSessionEventsManager,
                                 private val crashReportManager: FingerprintCrashReportManager,
                                 private val timeHelper: FingerprintTimeHelper,
-                                private val preferenceManager: FingerprintPreferencesManager? = null) : MatchTask {
+                                private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
     private val matchingVerifyRequest = matchingRequest as MatchingActVerifyRequest
 
@@ -63,6 +63,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
             MatchingActVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
 
+        preferenceManager.lastVerificationDate = Date()
         view.doSetResult(Activity.RESULT_OK, resultData)
         view.doFinish()
     }

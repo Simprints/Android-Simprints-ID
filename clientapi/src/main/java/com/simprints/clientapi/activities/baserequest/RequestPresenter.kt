@@ -64,7 +64,7 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
                     .addSessionEvent(SuspiciousIntentEvent(timeHelper.now(), extrasKeys))
             }
         } catch (t: Throwable) {
-            clientApiCrashReportManager.logExceptionOrThrowable(t)
+            clientApiCrashReportManager.logExceptionOrSafeException(t)
             t.printStackTrace()
         }
     }
@@ -78,7 +78,7 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
         }
 
     private fun extractKeysAndValuesFromIntent() =
-        view.getIntentExtras().filter { it.key.isNotEmpty() }
+        view.getIntentExtras()?.filter { it.key.isNotEmpty() } ?: emptyMap()
 
 
     private fun addInvalidSessionInBackground() {
@@ -86,6 +86,6 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
             .addSessionEvent(InvalidIntentEvent(
                 timeHelper.now(),
                 view.getIntentAction(),
-                view.getIntentExtras()))
+                view.getIntentExtras() ?: emptyMap()))
     }
 }

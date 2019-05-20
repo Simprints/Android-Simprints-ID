@@ -83,7 +83,7 @@ class SubDownSyncWorkerTest {
         val result = subDownSyncWorker.doWork()
 
         verifyOnce(mockDownSyncTask) { execute(anyNotNull()) }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         assert(result is ListenableWorker.Result.Failure)
     }
 }
