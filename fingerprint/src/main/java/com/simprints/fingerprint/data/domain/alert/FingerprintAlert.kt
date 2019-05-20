@@ -99,8 +99,8 @@ enum class FingerprintAlert(val type: Type,
 
     UNEXPECTED_ERROR(
         type = Type.UnexpectedError(),
-        leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        rightButton = ButtonAction.None,
         message = R.string.unforeseen_error_message
     );
 

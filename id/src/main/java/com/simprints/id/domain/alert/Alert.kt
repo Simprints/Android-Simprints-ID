@@ -2,8 +2,8 @@ package com.simprints.id.domain.alert
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.annotation.Keep
+import androidx.annotation.StringRes
 import com.simprints.id.R
 import com.simprints.id.domain.Constants
 import com.simprints.id.tools.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
@@ -209,8 +209,8 @@ enum class Alert(val type: Type,
 
     UNEXPECTED_ERROR(
         type = Type.UnexpectedError(),
-        leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        rightButton = ButtonAction.None,
         message = R.string.unforeseen_error_message
     );
 
