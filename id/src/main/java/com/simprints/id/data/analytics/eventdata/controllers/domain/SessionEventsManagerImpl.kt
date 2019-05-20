@@ -51,7 +51,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         sessionEventsLocalDbManager.getSessionCount().flatMap {
             createSessionWithAvailableInfo(
                 PROJECT_ID_FOR_NOT_SIGNED_IN,
-                libVersionName,
+                libSimprintsVersionName,
                 appVersionName,
                 DatabaseInfo(it)).let {
                 Timber.d("Created session: ${it.id}")

@@ -81,7 +81,7 @@ class GuidSelectionManagerTest {
 
     @Test
     fun testWithStartedService() {
-        var session = sessionEventsManager.createSession().blockingGet()
+        var session = sessionEventsManager.createSession("").blockingGet()
 
         sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
