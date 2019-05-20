@@ -6,6 +6,8 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolTy
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPoolType as CoreMatchPoolType
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool as CoreMatchPool
 
+import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent as CoreOneToManyMatchEvent
+
 @Keep
 class OneToManyMatchEvent(starTime: Long,
                           endTime: Long,
@@ -15,6 +17,9 @@ class OneToManyMatchEvent(starTime: Long,
     @Keep
     class MatchPool(val type: MatchPoolType, val count: Int)
 }
+
+fun OneToManyMatchEvent.fromDomainToCore() =
+    CoreOneToManyMatchEvent(starTime, endTime, pool.fromDomainToCore(), result?.map { it.fromDomainToCore() })
 
 fun MatchPool.fromDomainToCore() =
     CoreMatchPool(type.fromDomainToCore(), count)

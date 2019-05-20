@@ -8,12 +8,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authorizat
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutIntegrationInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutIntegrationInfo.Companion.fromAppIntegrationInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -27,7 +25,6 @@ import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Completable
 import io.reactivex.Single

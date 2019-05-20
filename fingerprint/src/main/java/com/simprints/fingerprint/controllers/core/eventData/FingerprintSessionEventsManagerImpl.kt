@@ -7,6 +7,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import io.reactivex.Completable
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event as CoreEvent
+import com.simprints.fingerprint.controllers.core.eventData.model.EventType.*
 
 class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: SessionEventsManager) : FingerprintSessionEventsManager {
 
@@ -31,12 +32,16 @@ class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: Sess
         sessionEventsManager.addPersonCreationEventInBackground(person.fromDomainToCore())
 
     private fun fromDomainToCore(event: Event): CoreEvent? =
-        when (event) {
-            is CandidateReadEvent -> event.fromDomainToCore()
-            is ConsentEvent -> event.fromDomainToCore()
-            is FingerprintCaptureEvent -> event.fromDomainToCore()
-            is ScannerConnectionEvent -> event.fromDomainToCore()
-            else -> null
+        when (event.type) {
+            CANDIDATE_READ -> (event as CandidateReadEvent).fromDomainToCore()
+            REFUSAL_RESPONSE -> (event as RefusalEvent).fromDomainToCore()
+            CONSENT -> (event as ConsentEvent).fromDomainToCore()
+            FINGERPRINT_CAPTURE -> (event as FingerprintCaptureEvent).fromDomainToCore()
+            ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
+            ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()
+            REFUSAL -> (event as RefusalEvent).fromDomainToCore()
+            PERSON_CREATION -> (event as PersonCreationEvent).fromDomainToCore()
+            SCANNER_CONNECTION -> (event as ScannerConnectionEvent).fromDomainToCore()
+            ALERT_SCREEN -> (event as AlertScreenEvent).fromDomainToCore()
         }
-
 }
