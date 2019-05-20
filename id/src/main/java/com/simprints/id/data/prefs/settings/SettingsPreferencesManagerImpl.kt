@@ -79,7 +79,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
 
-        val MODALITY_DEFAULT = Modality.FACE_FINGER
+        val MODALITY_DEFAULT = Modality.FINGER
         const val MODALITY_KEY = "Modality"
     }
 

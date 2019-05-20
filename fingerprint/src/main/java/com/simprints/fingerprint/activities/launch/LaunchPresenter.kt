@@ -114,8 +114,7 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion
-            ?: "")
+        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion ?: "")
     }
 
     private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
@@ -132,13 +131,16 @@ class LaunchPresenter(component: FingerprintComponent,
         return if (fingerprintRequest is FingerprintVerifyRequest) {
             val guid = fingerprintRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
-            dbManager.loadPerson(fingerprintRequest.projectId, guid).doOnSuccess { personFetchResult ->
-                handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
-            }.doOnError {
-                it.printStackTrace()
-                // For any error, we show the missing guidFound screen.
-                saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
-            }.ignoreElement()
+            dbManager
+                .loadPerson(fingerprintRequest.projectId, guid)
+                .subscribeOn(Schedulers.io())
+                .doOnSuccess { personFetchResult ->
+                    handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
+                }.doOnError {
+                    it.printStackTrace()
+                    // For any error, we show the missing guidFound screen.
+                    saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
+                }.ignoreElement()
         } else {
             Completable.complete()
         }
