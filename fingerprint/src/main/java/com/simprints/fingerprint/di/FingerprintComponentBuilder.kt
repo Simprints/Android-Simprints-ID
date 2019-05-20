@@ -9,7 +9,6 @@ class FingerprintComponentBuilder {
 
         private var component: FingerprintComponent? = null
 
-        //StopShip
         @JvmStatic
         fun getComponent(app: Application): FingerprintComponent =
             component?.let {

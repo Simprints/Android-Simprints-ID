@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
-import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
+import java.util.*
 
 interface FingerprintPreferencesManager {
     var lastScannerUsed: String
     val matchPoolType: MatchPoolType
+    var lastEnrolDate: Date?
+    var lastVerificationDate: Date?
+    var lastIdentificationDate: Date?
 }

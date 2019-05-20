@@ -1,17 +1,22 @@
 package com.simprints.id.data.analytics.crashreport
 
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 
-interface CrashReportManager {
+interface CrashReportManager: CoreCrashReportManager {
+    fun logExceptionOrSafeException(throwable: Throwable)
+}
 
+interface CoreCrashReportManager {
     fun logMessageForCrashReport(crashReportTag: CrashReportTag,
                                  crashReportTrigger: CrashReportTrigger,
                                  crashPriority: Int = Log.INFO,
                                  message: String)
 
-    fun logExceptionOrThrowable(throwable: Throwable)
+    fun logException(throwable: Throwable)
+    fun logSafeException(throwable: Throwable)
 
     fun setProjectIdCrashlyticsKey(projectId: String)
     fun setUserIdCrashlyticsKey(userId: String)

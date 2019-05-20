@@ -32,7 +32,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                 .subscribeBy(onComplete = {
                     Timber.d("Added Guid Selection Event")
                 }, onError = { e ->
-                    crashReportManager.logExceptionOrThrowable(e)
+                    crashReportManager.logExceptionOrSafeException(e)
                 })
         }
     }

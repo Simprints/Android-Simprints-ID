@@ -18,6 +18,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
@@ -48,6 +49,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     @Inject lateinit var dbManager: FingerprintDbManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
+    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
@@ -194,10 +196,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             is FingerprintEnrolRequest -> context.getString(R.string.register_title)
             is FingerprintIdentifyRequest -> context.getString(R.string.identify_title)
             is FingerprintVerifyRequest -> context.getString(R.string.verify_title)
-            else -> {
-                handleException(FingerprintSafeException("CalloutParameters")) //StopShip: Custom Error
-                ""
-            }
+            else -> ""
         }
 
     override fun refreshDisplay() {
@@ -278,7 +277,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun handleSavePersonSuccess(probe: Person) {
-        //preferencesManager.lastEnrolDate = Date() //StopShip
+        preferencesManager.lastEnrolDate = Date()
         view.finishSuccessEnrol(CollectResult.BUNDLE_KEY, CollectResult(probe))
     }
 
@@ -292,7 +291,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun handleException(simprintsException: FingerprintSimprintsException) {
-        crashReportManager.logExceptionOrThrowable(simprintsException)
+        crashReportManager.logExceptionOrSafeException(simprintsException)
         Timber.e(simprintsException)
         view.doLaunchAlert(FingerprintAlert.UNEXPECTED_ERROR)
     }

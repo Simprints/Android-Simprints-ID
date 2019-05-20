@@ -8,7 +8,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
-import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Person
@@ -48,9 +47,13 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             it[0]
         }
 
-    override fun createSession(): Single<SessionEvents> =
+    override fun createSession(libSimprintsVersionName: String): Single<SessionEvents> =
         sessionEventsLocalDbManager.getSessionCount().flatMap {
-            createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN, appVersionName, DatabaseInfo(it)).let {
+            createSessionWithAvailableInfo(
+                PROJECT_ID_FOR_NOT_SIGNED_IN,
+                libVersionName,
+                appVersionName,
+                DatabaseInfo(it)).let {
                 Timber.d("Created session: ${it.id}")
                 sessionEventsSyncManager.scheduleSessionsSync()
 
@@ -62,16 +65,17 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
 
     private fun createSessionWithAvailableInfo(projectId: String,
+                                               libVersionName: String,
                                                appVersionName: String,
                                                databaseInfo: DatabaseInfo): SessionEvents =
         SessionEvents(
             projectId,
             appVersionName,
-            /* preferencesManager.libVersionName */ "", //StopShip: do we need libVersionName?
+            libVersionName,
             preferencesManager.language,
             Device(
                 Build.VERSION.SDK_INT.toString(),
-               Build.MANUFACTURER + "_" + Build.MODEL,
+                Build.MANUFACTURER + "_" + Build.MODEL,
                 deviceId),
             timeHelper.now(),
             databaseInfo)
@@ -86,7 +90,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
         }.doOnError {
             Timber.e(it)
-            crashReportManager.logExceptionOrThrowable(it)
+            crashReportManager.logExceptionOrSafeException(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
     @SuppressLint("CheckResult")
@@ -104,7 +108,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
             Completable.complete()
         }.doOnError {
-            crashReportManager.logExceptionOrThrowable(it)
+            crashReportManager.logExceptionOrSafeException(it)
         }.onErrorComplete()
 
     /** @throws SessionNotFoundException */

@@ -80,7 +80,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //    }
 //
 //    private fun verifyExceptionWasThrownAlongWithNoSessionAndNoRequestException(times: Int) {
-//        verifyExactly(times, crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+//        verifyExactly(times, crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
 //    }
 //
 //    @Test

@@ -23,6 +23,7 @@ import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
@@ -44,7 +45,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+            ?: throw InvalidRequestForFingerprintException()
         fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
 
         setButtonClickListeners()

@@ -79,6 +79,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
         val tier3Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_3 }
         val tier4Matches = topCandidates.count { (_, _, tier) -> tier == MatchingTier.TIER_4 }
 
+        preferenceManager.lastIdentificationDate = Date()
+
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
             MatchingActIdentifyResult(topCandidates))
         view.doSetResult(Activity.RESULT_OK, resultData)

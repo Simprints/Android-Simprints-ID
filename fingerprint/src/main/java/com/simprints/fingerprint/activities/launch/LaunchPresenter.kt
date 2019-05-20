@@ -182,7 +182,7 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
         view.doLaunchAlert(scannerManager.getAlertType(it))
-        crashReportManager.logExceptionOrThrowable(it)
+        crashReportManager.logExceptionOrSafeException(it)
     }
 
     private fun requestPermissionsForLocation(progress: Int): Completable {
@@ -239,7 +239,7 @@ class LaunchPresenter(component: FingerprintComponent,
         val generalConsent = try {
             JsonHelper.gson.fromJson(consentDataManager.generalConsentOptionsJson, GeneralConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed General Consent Text Error", e))
+            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
         return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
@@ -249,7 +249,7 @@ class LaunchPresenter(component: FingerprintComponent,
         val parentalConsent = try {
             JsonHelper.gson.fromJson(consentDataManager.parentalConsentOptionsJson, ParentalConsent::class.java)
         } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrThrowable(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
+            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
         return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)

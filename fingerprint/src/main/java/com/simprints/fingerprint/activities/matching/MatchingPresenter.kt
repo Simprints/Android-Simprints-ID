@@ -9,15 +9,13 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
-import com.simprints.libsimprints.FingerIdentifier
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -62,9 +60,10 @@ class MatchingPresenter(
             .flatMap { matchTask.runMatch(it, matchingRequest.probe) }
             .setMatchingSchedulers()
             .subscribeBy(
-                onSuccess = { matchTask.handleMatchResult(it.candidates, it.scores) },
+                onSuccess = {
+                    matchTask.handleMatchResult(it.candidates, it.scores) },
                 onError = {
-                    crashReportManager.logExceptionOrThrowable(it)
+                    crashReportManager.logExceptionOrSafeException(it)
                     view.makeToastMatchFailed()
                 })
     }
@@ -91,14 +90,14 @@ class MatchingPresenter(
         override fun onMatcherEvent(event: EVENT?) =
             when (event) {
                 EVENT.MATCH_COMPLETED -> emitter.onSuccess(MatchResult(candidates, scores))
-                else -> emitter.onError(FingerprintSimprintsException("Matching Error : $event")) // STOPSHIP : make custom exception
+                else -> emitter.onError(FingerprintSimprintsException("Matching Error : $event"))
             }
     }
 
     private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
     private fun handleUnexpectedCallout() {
-        crashReportManager.logExceptionOrThrowable(FingerprintSimprintsException("Invalid action in MatchingActivity"))// STOPSHIP : make custom exception
+        crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Invalid action in MatchingActivity"))
         view.launchAlert()
     }
 

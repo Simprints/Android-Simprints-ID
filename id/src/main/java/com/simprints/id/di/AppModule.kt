@@ -65,6 +65,7 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.tools.extensions.packageVersionName
@@ -139,6 +140,10 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideCrashManager(): CrashReportManager = CrashReportManagerImpl()
+
+    @Provides
+    @Singleton
+    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager = crashReportManager
 
     @Provides
     @Singleton

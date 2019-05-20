@@ -41,5 +41,5 @@ fun fromDomainToApiCallout(event: Event): ApiCallout =
         is IdentificationCalloutEvent -> with(event) { ApiIdentificationCallout(projectId, userId, moduleId, metadata) }
         is ConfirmationCalloutEvent -> with(event) { ApiConfirmationCallout(selectedGuid, sessionId) }
         is VerificationCalloutEvent -> with(event) { ApiVerificationCallout(projectId, userId, moduleId, metadata, verifyGuid) }
-        else -> throw IllegalArgumentException("Invalid CalloutEvent") //Stopship
+        else -> throw IllegalArgumentException("Invalid CalloutEvent")
     }

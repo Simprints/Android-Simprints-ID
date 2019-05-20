@@ -88,7 +88,7 @@ class CountWorkerTest {
         whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
         val workerResult = countWorker.doWork()
 
-        verifyOnce(crashReportManager) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManager) { logExceptionOrSafeException(anyNotNull()) }
         assert(workerResult is ListenableWorker.Result.Success)
     }
 
