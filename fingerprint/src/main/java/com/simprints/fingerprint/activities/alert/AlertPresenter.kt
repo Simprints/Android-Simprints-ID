@@ -56,7 +56,9 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun handleButtonClick(buttonAction: FingerprintAlert.ButtonAction) {
-        buttonAction.resultCode?.let { view.setResult(it) }
+        buttonAction.resultCode?.let {
+            view.setResult(it)
+        }
         when (buttonAction) {
             is FingerprintAlert.ButtonAction.None -> Unit
             is FingerprintAlert.ButtonAction.WifiSettings -> view.openWifiSettings()

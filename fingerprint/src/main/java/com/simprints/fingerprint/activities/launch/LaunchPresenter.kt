@@ -134,6 +134,7 @@ class LaunchPresenter(component: FingerprintComponent,
             dbManager
                 .loadPerson(fingerprintRequest.projectId, guid)
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess { personFetchResult ->
                     handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
                 }.doOnError {
