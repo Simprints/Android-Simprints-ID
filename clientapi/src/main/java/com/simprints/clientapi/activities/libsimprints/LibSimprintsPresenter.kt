@@ -1,26 +1,48 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import android.annotation.SuppressLint
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
+import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.RefusalFormResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
+import io.reactivex.rxkotlin.subscribeBy
 
 
-class LibSimprintsPresenter(val view: LibSimprintsContract.View, val action: String?)
-    : RequestPresenter(view), LibSimprintsContract.Presenter {
+class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
+                            private val action: String?,
+                            private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                            private val clientApiCrashReportManager: ClientApiCrashReportManager,
+                            clientApiTimeHelper: ClientApiTimeHelper,
+                            gsonBuilder: GsonBuilder,
+                            integrationInfo: IntegrationInfo)
+    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
 
-    override fun start() = when (action) {
-        SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-        SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-        SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-        SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
-        else -> view.returnIntentActionErrorToClient()
+    @SuppressLint("CheckResult")
+    override fun start() {
+        clientApiSessionEventsManager
+            .createSession()
+            .doFinally {
+                when (action) {
+                    SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                    SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                    SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                    SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+                    else -> view.returnIntentActionErrorToClient()
+                }
+            }.subscribeBy(
+                onSuccess = { clientApiCrashReportManager.setSessionIdCrashlyticsKey(it) },
+                onError = { it.printStackTrace() })
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =

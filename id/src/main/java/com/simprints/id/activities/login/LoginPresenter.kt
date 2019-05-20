@@ -102,8 +102,8 @@ class LoginPresenter(val view: LoginContract.View,
             }
 
             it.addEvent(AuthenticationEvent(
-                it.timeRelativeToStartTime(startTimeLogin),
-                it.timeRelativeToStartTime(timeHelper.now()),
+                startTimeLogin,
+                timeHelper.now(),
                 UserInfo(suppliedProjectId, suppliedUserId),
                 result))
         }
@@ -129,7 +129,7 @@ class LoginPresenter(val view: LoginContract.View,
     private fun logSignInError(e: Throwable) {
         when (e) {
             is IOException -> Timber.d("Attempted login offline")
-            else -> crashReportManager.logExceptionOrThrowable(e)
+            else -> crashReportManager.logExceptionOrSafeException(e)
         }
     }
 

@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.eventdata.controllers.local
 import android.content.Context
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.local.DbSession
-import com.simprints.id.data.analytics.eventdata.models.local.toDomainSession
+import com.simprints.id.data.analytics.eventdata.models.local.toDomain
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
@@ -73,7 +73,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
 
                 this.sort(RealmSessionEventsDbManagerImpl.START_TIME, Sort.DESCENDING)
             }
-            ArrayList(it.copyFromRealm(query.findAll()).map { session -> session.toDomainSession() })
+            ArrayList(it.copyFromRealm(query.findAll()).map { session -> session.toDomain() })
         }
 
     /** @throws SessionNotFoundException */
@@ -82,7 +82,7 @@ open class RealmSessionEventsDbManagerImpl(private val appContext: Context,
             val query = it.where(DbSession::class.java).apply {
                 equalTo(RealmSessionEventsDbManagerImpl.SESSION_ID, sessionId)
             }
-            query.findFirst()?.toDomainSession() ?: throw SessionNotFoundException()
+            query.findFirst()?.toDomain() ?: throw SessionNotFoundException()
         }
 
     override fun getSessionCount(projectId: String?): Single<Int> =

@@ -8,14 +8,10 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 interface CheckLoginFromIntentContract {
 
     interface View : BaseView<Presenter>, CheckLoginContract.View {
-        fun getAppVersionNameFromPackageManager(): String
-        fun getDeviceUniqueId(): String
-
         fun openLoginActivity(appRequest: AppRequest)
         fun openOrchestratorActivity(appRequest: AppRequest)
 
         fun getCheckCallingApp(): String
-        fun checkCallingAppIsFromKnownSource()
         fun parseRequest(): AppRequest
         fun finishCheckLoginFromIntentActivity()
     }

@@ -18,7 +18,7 @@ fun DbFingerprint.toDomainFingerprint(): Fingerprint =
 
 fun Fingerprint.toRealmFingerprint(): DbFingerprint =
     DbFingerprint(
-        fingerId = fingerId.ordinal,
+        fingerId = finger.ordinal,
         qualityScore = qualityScore,
         template = templateBytes
     )

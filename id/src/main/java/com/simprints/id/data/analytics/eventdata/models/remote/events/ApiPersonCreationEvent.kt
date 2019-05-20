@@ -9,6 +9,6 @@ class ApiPersonCreationEvent(val relativeStartTime: Long,
                           val fingerprintCaptureIds: List<String>): ApiEvent(ApiEventType.PERSON_CREATION) {
 
     constructor(personCreationEvent: PersonCreationEvent) :
-        this(personCreationEvent.relativeStartTime, personCreationEvent.fingerprintCaptureIds)
+        this(personCreationEvent.relativeStartTime ?: 0, personCreationEvent.fingerprintCaptureIds)
 }
 

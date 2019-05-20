@@ -1,9 +1,9 @@
 package com.simprints.id.data.db.local.realm.models
 
-import com.simprints.id.data.db.remote.models.ApiPerson
+import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.toDomainFingerprint
+import com.simprints.id.domain.Person
 import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.fingerprint.Person
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList
 import io.realm.RealmObject
@@ -32,17 +32,7 @@ open class DbPerson(
 
     @Required
     var fingerprints: RealmList<DbFingerprint> = RealmList()
-) : RealmObject() {
-
-    constructor(person: ApiPerson, toSync: Boolean = person.updatedAt == null || person.createdAt == null):
-     this(person.patientId, person.projectId, person.userId, person.moduleId, person.createdAt, person.updatedAt, toSync,
-         person.fingerprintsAsList
-             .map { it.toDomainFingerprint().toRealmFingerprint() }
-             .filter { it.template != null}
-             .toRealmList()
-         )
-
-}
+) : RealmObject()
 
 fun DbPerson.toDomainPerson(): Person =
     Person(

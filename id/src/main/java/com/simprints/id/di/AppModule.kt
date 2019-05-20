@@ -65,8 +65,10 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
+import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
@@ -141,6 +143,10 @@ open class AppModule {
 
     @Provides
     @Singleton
+    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager = crashReportManager
+
+    @Provides
+    @Singleton
     open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
 
     @Provides
@@ -186,7 +192,7 @@ open class AppModule {
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
                                          crashReportManager: CrashReportManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
+        SessionEventsManagerImpl(ctx.deviceId, ctx.packageVersionName, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
 
 
     @Provides

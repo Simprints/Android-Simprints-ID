@@ -21,7 +21,7 @@ class ApiAuthorizationEvent(val relativeStartTime: Long,
     }
 
     constructor(authorizationEventDomain: AuthorizationEvent) :
-        this(authorizationEventDomain.relativeStartTime,
+        this(authorizationEventDomain.relativeStartTime ?: 0,
             ApiResult.valueOf(authorizationEventDomain.result.toString()),
             authorizationEventDomain.userInfo?.let { ApiUserInfo(it) })
 }

@@ -10,8 +10,6 @@ import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
 
-// Duplicated from id/commontestttools
-
 object LoginStateMocker {
 
     fun setupLoginStateFullyToBeSignedIn(sharedPrefs: SharedPreferences,

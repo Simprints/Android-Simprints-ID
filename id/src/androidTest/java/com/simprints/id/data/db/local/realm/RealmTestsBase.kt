@@ -5,7 +5,7 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.db.local.realm.models.DbPerson
 import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.domain.fingerprint.Person
+import com.simprints.id.domain.Person
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

@@ -9,17 +9,6 @@ import kotlinx.android.parcel.Parcelize
 
 object DomainToFingerprintResponse {
 
-    fun fromDomainToFingerprintResponse(fingerprintResponse: FingerprintResponse): IFingerprintResponse =
-        when (fingerprintResponse) {
-            is FingerprintEnrolResponse ->
-                fromDomainToFingerprintEnrolResponse(fingerprintResponse)
-            is FingerprintVerifyResponse ->
-                fromDomainToFingerprintVerifyResponse(fingerprintResponse)
-            is FingerprintIdentifyResponse ->
-                fromDomainToFingerprintIdentifyResponse(fingerprintResponse)
-            else -> throw IllegalArgumentException("Invalid Fingerprint Response") //StopShip
-        }
-
     fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
 
     fun fromDomainToFingerprintVerifyResponse(verify: FingerprintVerifyResponse): IFingerprintVerifyResponse {

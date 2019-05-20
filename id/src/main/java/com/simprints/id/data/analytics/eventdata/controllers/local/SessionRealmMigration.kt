@@ -7,13 +7,14 @@ import io.realm.RealmMigration
 import io.realm.RealmSchema
 import io.realm.annotations.RealmModule
 
+//TODO: Delete it - not required. We delete the db if migration is needed.
 internal class SessionRealmMigration : RealmMigration {
 
     @RealmModule(classes = [DbDatabaseInfo::class, DbDevice::class, DbLocation::class, DbEvent::class, DbSession::class])
     class SessionModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 4
+        const val REALM_SCHEMA_VERSION: Long = 5
         const val DB_INFO_TABLE = "DbDatabaseInfo"
         const val DB_DEVICE_TABLE = "DbDevice"
         const val DB_LOCATION_TABLE = "DbLocation"

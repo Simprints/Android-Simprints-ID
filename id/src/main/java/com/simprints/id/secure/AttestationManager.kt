@@ -9,7 +9,6 @@ import com.google.android.gms.tasks.Tasks
 import com.simprints.id.BuildConfig
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
-import io.ashdavies.rx.rxtasks.toSingle
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.lang.IllegalArgumentException

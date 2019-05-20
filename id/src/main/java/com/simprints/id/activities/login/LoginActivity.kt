@@ -12,6 +12,7 @@ import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.Alert
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
@@ -27,7 +28,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         const val QR_REQUEST_CODE: Int = 0
         const val QR_RESULT_KEY = "SCAN_RESULT"
         const val GOOGLE_PLAY_LINK_FOR_QR_APP =
-            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android" //StopShip: Check if it still exists on the market
+            "https://play.google.com/store/apps/details?id=com.google.zxing.client.android"
     }
 
     override lateinit var viewPresenter: LoginContract.Presenter
@@ -45,7 +46,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         loginActRequest = this.intent.extras?.getParcelable(LoginActivityRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No AppRequest in the bundle") //STOPSHIP
+            ?: throw InvalidAppRequest()
 
         val component = (application as Application).component
         component.inject(this)

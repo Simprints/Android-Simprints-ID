@@ -10,8 +10,8 @@ import java.nio.ByteOrder
 
 
 @Parcelize
-class Fingerprint(val fingerId: FingerIdentifier,
-                  val template: ByteBuffer) : Parcelable {
+class Fingerprint(val finger: FingerIdentifier,
+                  private val template: ByteBuffer) : Parcelable {
 
     /**
      * @return A newly allocated byte array containing the ISO 2005 template of
@@ -63,7 +63,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
         private const val FIRST_QUALITY = 26         // BYTE
 
         override fun Fingerprint.write(parcel: Parcel, flags: Int) {
-            parcel.writeInt(fingerId.ordinal)
+            parcel.writeInt(finger.ordinal)
             val bytes = this.templateBytes
             parcel.writeInt(bytes.size)
             parcel.writeByteArray(bytes)

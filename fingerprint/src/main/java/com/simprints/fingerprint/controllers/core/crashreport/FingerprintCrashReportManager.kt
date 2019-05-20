@@ -9,6 +9,6 @@ interface FingerprintCrashReportManager {
                                  crashPriority: Int = Log.INFO,
                                  message: String)
 
-    fun logExceptionOrThrowable(throwable: Throwable)
+    fun logExceptionOrSafeException(throwable: Throwable)
 
 }

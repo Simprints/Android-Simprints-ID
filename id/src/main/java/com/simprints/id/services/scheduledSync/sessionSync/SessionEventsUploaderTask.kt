@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
@@ -94,7 +95,9 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
                 isResponseAnErrorThatIsWorthToRetry(response.code()) ->
                     continueWithRetryException(Throwable("Sessions upload response code: ${response.code()}"))
                 else ->
-                    continueWithNoRetryException()
+                    continueWithNoRetryException().also {
+                        Timber.d(response.message())
+                    }
             }
         }.retry { counter, t ->
             counter < NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS && t !is SessionUploadFailureException

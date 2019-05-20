@@ -14,6 +14,6 @@ class ApiScannerConnectionEvent(val relativeStartTime: Long,
     }
 
     constructor(scannerConnectionEvent: ScannerConnectionEvent) :
-        this(scannerConnectionEvent.relativeStartTime,
+        this(scannerConnectionEvent.relativeStartTime ?: 0,
             ApiScannerInfo(scannerConnectionEvent.scannerInfo))
 }

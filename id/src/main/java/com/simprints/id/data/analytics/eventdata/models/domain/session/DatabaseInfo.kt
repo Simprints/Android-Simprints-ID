@@ -4,6 +4,6 @@ import androidx.annotation.Keep
 import java.util.*
 
 @Keep
-open class DatabaseInfo(var recordCount: Int = 0,
-                        var sessionCount: Int = 0,
+open class DatabaseInfo(val sessionCount: Int,
+                        var recordCount: Int? = null,
                         var id: String = UUID.randomUUID().toString())

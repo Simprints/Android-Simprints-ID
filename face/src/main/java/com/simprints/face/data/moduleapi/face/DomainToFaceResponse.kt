@@ -8,6 +8,7 @@ import com.simprints.face.data.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchingResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier.*
+import com.simprints.face.exceptions.InvalidFaceResponseException
 import com.simprints.moduleapi.face.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -21,7 +22,7 @@ object DomainToFaceResponse {
                 fromDomainToFaceVerifyResponse(fingerprintResponse)
             is FaceIdentifyResponse ->
                 fromDomainToFaceIdentifyResponse(fingerprintResponse)
-            else -> throw IllegalArgumentException("Invalid Face Response") //StopShip
+            else -> throw InvalidFaceResponseException()
         }
     
     private fun fromDomainToFaceEnrolResponse(enrol: FaceEnrolResponse): IFaceEnrolResponse = IFaceEnrolResponseImpl(enrol.guid)

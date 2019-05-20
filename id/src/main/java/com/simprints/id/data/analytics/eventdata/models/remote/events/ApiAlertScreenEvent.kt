@@ -5,8 +5,8 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScree
 
 @Keep
 class ApiAlertScreenEvent(val relativeStartTime: Long,
-                          val alert: String) : ApiEvent(ApiEventType.ALERT_SCREEN) {
+                          val alertType: String) : ApiEvent(ApiEventType.ALERT_SCREEN) {
 
     constructor(alertScreenEventDomain: AlertScreenEvent) :
-        this(alertScreenEventDomain.relativeStartTime, alertScreenEventDomain.alert)
+        this(alertScreenEventDomain.relativeStartTime ?: 0, alertScreenEventDomain.alertType)
 }

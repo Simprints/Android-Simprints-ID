@@ -19,6 +19,7 @@ import com.simprints.face.data.moduleapi.face.responses.FaceResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchingResult
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier
+import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import kotlinx.android.synthetic.main.activity_face_capture.*
@@ -33,7 +34,7 @@ class FaceCaptureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_face_capture)
 
         val iFaceRequest: IFaceRequest = this.intent.extras?.getParcelable(IFaceRequest.BUNDLE_KEY)
-            ?: throw IllegalArgumentException("No IFaceRequest in the bundle") //STOPSHIP
+            ?: throw InvalidFaceRequestException()
         faceRequest = fromFaceToDomainRequest(iFaceRequest)
 
         val handler = Handler()

@@ -82,7 +82,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
         }
 
         fun fromCoreToDomain(fingerprint: FingerprintCore) =
-            Fingerprint(FingerIdentifier.fromCoreToDomain(fingerprint.fingerId), fingerprint.template)
+            Fingerprint(FingerIdentifier.fromCoreToDomain(fingerprint.finger), fingerprint.templateBytes)
     }
 }
 

@@ -3,17 +3,8 @@ package com.simprints.id.services
 import android.annotation.SuppressLint
 import android.app.IntentService
 import android.content.Intent
-import com.google.gson.Gson
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
-import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
-import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppConfirmation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -41,7 +32,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                 .subscribeBy(onComplete = {
                     Timber.d("Added Guid Selection Event")
                 }, onError = { e ->
-                    crashReportManager.logExceptionOrThrowable(e)
+                    crashReportManager.logExceptionOrSafeException(e)
                 })
         }
     }

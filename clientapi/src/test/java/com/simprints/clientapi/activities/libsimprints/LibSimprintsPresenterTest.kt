@@ -1,5 +1,7 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import com.google.gson.Gson
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
@@ -9,7 +11,9 @@ import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
 import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
+import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_INTEGRATION
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
+import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
@@ -17,6 +21,8 @@ import com.simprints.libsimprints.Tier
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
+import io.reactivex.Completable
+import io.reactivex.Single
 import org.junit.Test
 import java.util.*
 
@@ -28,8 +34,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForRegister_ShouldRequestRegister() {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -37,8 +45,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForIdentify_ShouldRequestIdentify() {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view.identifyExtractor) thenReturn identifyExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -46,8 +56,10 @@ class LibSimprintsPresenterTest {
     fun startPresenterForVerify_ShouldRequestVerify() {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         whenever(view.verifyExtractor) thenReturn verificationExtractor
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
     }
 
@@ -55,14 +67,16 @@ class LibSimprintsPresenterTest {
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val gsonBuilder = mockGsonBuilder()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder, MOCK_INTEGRATION).apply { start() }
+
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        LibSimprintsPresenter(view, "Garbage").apply { start() }
+        LibSimprintsPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock(), mock(), mock()).apply { start() }
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
 
@@ -70,7 +84,7 @@ class LibSimprintsPresenterTest {
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT)
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mock(), mock(), mock(), mock(), mock())
             .handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(Registration(registerId)) }
     }
@@ -82,8 +96,9 @@ class LibSimprintsPresenterTest {
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT).handleIdentifyResponse(
+        LibSimprintsPresenter(view,  Constants.SIMPRINTS_IDENTIFY_INTENT, mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
+
         verifyOnce(view) {
             returnIdentification(
                 ArrayList(idList.map {
@@ -96,7 +111,7 @@ class LibSimprintsPresenterTest {
     fun handleVerification_ShouldReturnValidVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT).handleVerifyResponse(verification)
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
@@ -108,7 +123,18 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        LibSimprintsPresenter(view, "").handleResponseError()
+        LibSimprintsPresenter(view, "", mock(), mock(), mock(), mock(), mock()).handleResponseError()
         verifyOnce(view) { returnIntentActionErrorToClient() }
     }
+
+    private fun mockSessionManagerToCreateSession() =
+        mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { createSession() } thenReturn Single.just("session_id")
+        }
+
+    private fun mockGsonBuilder() =
+        mock<GsonBuilder>().apply {
+            val gson = mock<Gson>().apply { whenever(this) { toJson("") } thenReturn "{}" }
+            whenever(this) { build() } thenReturn gson
+        }
 }

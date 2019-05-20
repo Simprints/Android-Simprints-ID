@@ -1,11 +1,12 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
-import com.simprints.id.data.db.remote.models.ApiPerson
+import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -13,7 +14,6 @@ import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
-import com.simprints.core.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -75,8 +75,8 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
         flatMap {
-            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt()
-            ).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt())
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
         }
 
     private fun Single<out ResponseBody>.setupJsonReaderFromResponse(): Single<JsonReader> =
@@ -88,29 +88,34 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                 }
         }
 
-    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiPerson> =
+    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiGetPerson> =
         flatMapObservable { jsonReader ->
-            Observable.create<ApiPerson> { emitter ->
-                while (jsonReader.hasNext()) {
-                    emitter.onNext(JsonHelper.gson.fromJson<ApiPerson>(jsonReader, ApiPerson::class.java))
+            Observable.create<ApiGetPerson> { emitter ->
+                try {
+                    while (jsonReader.hasNext()) {
+                        emitter.onNext(JsonHelper.gson.fromJson(jsonReader, ApiGetPerson::class.java))
+                    }
+                    emitter.onComplete()
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    emitter.onError(t)
                 }
-                emitter.onComplete()
             }
         }
 
-    private fun Observable<ApiPerson>.splitIntoBatches(): Observable<List<ApiPerson>> =
+    private fun Observable<ApiGetPerson>.splitIntoBatches(): Observable<List<ApiGetPerson>> =
         buffer(BATCH_SIZE_FOR_DOWNLOADING)
+            .doOnError { it.printStackTrace() }
 
-    private fun Observable<List<ApiPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
+    private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
-            Completable.create { emitter ->
+            Completable.fromAction {
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
-                updateLastKnownPatientId(batchOfPeople.last().patientId)
+                updateLastKnownPatientId(batchOfPeople.last().id)
                 updateDownSyncTimestampOnBatchDownload()
-                emitter.onComplete()
             }
         }
 
