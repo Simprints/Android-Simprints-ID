@@ -138,5 +138,5 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
     }
 
     override fun fromDomainToAppResponse(response: AppResponse?): IAppResponse? =
-        DomainToAppResponse.fromDomainToAppResponse(response)
+        response?.let { DomainToAppResponse.fromDomainToAppResponse(it) }
 }

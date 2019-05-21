@@ -5,9 +5,20 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.*
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 object DomainToFingerprintResponse {
+
+    fun fromDomainToFingerprintErrorResponse(error: FingerprintErrorResponse): IFingerprintErrorResponse =
+        when (error.error) {
+            FingerprintErrorType.UNEXPECTED_ERROR -> IFingerprintErrorType.UNEXPECTED_ERROR
+            FingerprintErrorType.BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorType.BLUETOOTH_NOT_SUPPORTED
+            FingerprintErrorType.SCANNER_LOW_BATTERY -> IFingerprintErrorType.SCANNER_LOW_BATTERY
+            FingerprintErrorType.UNKNOWN_BLUETOOTH_ISSUE -> IFingerprintErrorType.UNKNOWN_BLUETOOTH_ISSUE
+        }.let {
+            IFingerprintErrorResponseImpl(it)
+        }
 
     fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
 
@@ -36,19 +47,32 @@ object DomainToFingerprintResponse {
 }
 
 @Parcelize
-private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse
+private class IFingerprintErrorResponseImpl(override val error: IFingerprintErrorType) : IFingerprintErrorResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ERROR
+}
+
+@Parcelize
+private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ENROL
+}
 
 @Parcelize
 private class IFingerprintIdentifyResponseImpl(
-    override val identifications: List<IMatchingResult>) : IFingerprintIdentifyResponse
+    override val identifications: List<IMatchingResult>) : IFingerprintIdentifyResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.IDENTIFY
+}
 
 @Parcelize
 private class IFingerprintRefusalFormResponseImpl(
     override val reason: String,
-    override val extra: String) : IFingerprintRefusalFormResponse
+    override val extra: String) : IFingerprintRefusalFormResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.REFUSAL
+}
 
 @Parcelize
-private class IFingerprintVerifyResponseImpl(override val matchingResult: IMatchingResult) : IFingerprintVerifyResponse
+private class IFingerprintVerifyResponseImpl(override val matchingResult: IMatchingResult) : IFingerprintVerifyResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.VERIFY
+}
 
 @Parcelize
 private data class IMatchingResultImpl(
