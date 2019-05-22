@@ -16,12 +16,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.NewAlert
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
-import com.simprints.id.exceptions.safe.callout.InvalidCalloutError
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -62,8 +61,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         } catch (t: Throwable) {
             t.printStackTrace()
             crashReportManager.logExceptionOrSafeException(t)
-            val alert = if (t is InvalidCalloutError) t.alert else Alert.UNEXPECTED_ERROR
-            view.openAlertActivityForError(alert)
+            view.openAlertActivityForError(NewAlert.UNEXPECTED_ERROR)
             setupFailed = true
         }
     }

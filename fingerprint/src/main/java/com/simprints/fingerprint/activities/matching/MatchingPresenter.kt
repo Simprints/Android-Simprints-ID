@@ -98,7 +98,7 @@ class MatchingPresenter(
 
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Invalid action in MatchingActivity"))
-        view.launchAlert()
+        view.launchAlertActivity()
     }
 
     override fun dispose() {

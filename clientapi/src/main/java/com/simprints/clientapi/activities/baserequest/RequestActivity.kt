@@ -3,23 +3,21 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
-import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IntegrationInfo
-import com.simprints.clientapi.domain.responses.EnrollResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
-import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
+import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromAlertTypeToDomain
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
-import com.simprints.clientapi.routers.ClientRequestErrorRouter
-import com.simprints.libsimprints.Constants
+import com.simprints.clientapi.routers.ClientRequestErrorRouter.extractPotentialAlertScreenResponse
+import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
 import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
 
@@ -48,23 +46,30 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finishAffinity()
     }
 
-    override fun handleClientRequestError(exception: InvalidRequestException) {
-        ClientRequestErrorRouter.routeClientRequestError(this, exception)
-        finish()
+    override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
+        launchAlert(this, clientApiAlert)
     }
 
-    override fun returnIntentActionErrorToClient() {
-        setResult(Constants.SIMPRINTS_INVALID_INTENT_ACTION, intent)
+    override fun returnErrorToClient(resultCode: Int?, intent: Intent?) {
+        resultCode?.let {
+            setResult(it, intent)
+        } ?: setResult(Activity.RESULT_CANCELED)
+
         finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (resultCode != Activity.RESULT_OK || data == null)
-            setResult(resultCode, data).also { finish() }
-        else
-            routeResponse(data.getParcelableExtra(BUNDLE_KEY))
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            presenter.handleResponseError(ErrorResponse(fromAlertTypeToDomain(potentialAlertScreenResponse.clientApiAlert)))
+        } else {
+            if (resultCode != Activity.RESULT_OK || data == null)
+                setResult(resultCode, data).also { finish() }
+            else
+                routeResponse(data.getParcelableExtra(BUNDLE_KEY))
+        }
     }
 
     override fun getIntentAction() = intent.action ?: ""
@@ -77,12 +82,12 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     private fun routeResponse(response: IAppResponse) =
-        when (response) {
-            is IAppEnrolResponse -> presenter.handleEnrollResponse(EnrollResponse(response))
-            is IAppIdentifyResponse -> presenter.handleIdentifyResponse(IdentifyResponse(response))
-            is IAppVerifyResponse -> presenter.handleVerifyResponse(VerifyResponse(response))
-            is IAppRefusalFormResponse -> presenter.handleRefusalResponse(RefusalFormResponse(response))
-            else -> presenter.handleResponseError()
+        when (response.type) {
+            IAppResponseType.ENROL -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
+            IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
+            IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
+            IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
+            IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
         }
 
 }

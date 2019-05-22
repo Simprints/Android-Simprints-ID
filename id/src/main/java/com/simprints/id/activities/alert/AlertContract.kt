@@ -5,30 +5,29 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertViewModel
 
 interface AlertContract {
 
     interface View : BaseView<Presenter> {
-        @ColorInt fun getColorForColorRes(colorRes: Int): Int
+        @ColorInt
+        fun getColorForColorRes(colorRes: Int): Int
+
         fun setLayoutBackgroundColor(@ColorInt color: Int)
         fun setLeftButtonBackgroundColor(@ColorInt color: Int)
         fun setRightButtonBackgroundColor(@ColorInt color: Int)
         fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
         fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
         fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
-        fun initLeftButton(leftButtonAction: Alert.ButtonAction)
-        fun initRightButton(rightButtonAction: Alert.ButtonAction)
+        fun initLeftButton(leftButtonAction: AlertViewModel.ButtonAction)
+        fun initRightButton(rightButtonAction: AlertViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun setResult(resultCode: Int)
-        fun openBluetoothSettings()
-        fun openWifiSettings()
-        fun closeActivity()
-        fun closeAllActivities()
+        fun closeActivityAfterCloseButton()
     }
 
     interface Presenter : BasePresenter {
-        fun handleButtonClick(buttonAction: Alert.ButtonAction)
+        fun handleButtonClick(buttonAction: AlertViewModel.ButtonAction)
         fun handleBackButton()
     }
 }

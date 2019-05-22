@@ -9,11 +9,10 @@ import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.IntentKeys
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
@@ -55,7 +54,7 @@ class AlertActivityTest {
 
     @Test
     fun anUnexpectedErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = Alert.UNEXPECTED_ERROR
+        val alertType = AlertActivityViewModel.UNEXPECTED_ERROR
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -65,7 +64,7 @@ class AlertActivityTest {
 
     @Test
     fun anBluetoothErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = Alert.BLUETOOTH_NOT_ENABLED
+        val alertType = AlertActivityViewModel.BLUETOOTH_NOT_ENABLED
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -79,7 +78,7 @@ class AlertActivityTest {
 
     @Test
     fun anOfflineError_shouldShowTheRightAlertView() {
-        val alertType = Alert.GUID_NOT_FOUND_OFFLINE
+        val alertType = AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE
         val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
         val activity = controller.get() as AlertActivity
         controller.visible()
@@ -94,11 +93,11 @@ class AlertActivityTest {
     private fun createRoboAlertActivity(intent: Intent) =
         createActivity<AlertActivity>(intent)
 
-    private fun createIntentForAlertType(alert: Alert) = Intent().apply {
-        putExtra(IntentKeys.alertActivityAlertTypeKey, alert)
+    private fun createIntentForAlertType(alertActivity: AlertActivityViewModel) = Intent().apply {
+        putExtra(IntentKeys.alertActivityAlertTypeKey, alertActivity)
     }
 
-    private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: Alert) {
+    private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: AlertActivityViewModel) {
         assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alert.backgroundColor))
 
         if (alert.isTwoButton()) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alert.backgroundColor))
@@ -124,6 +123,6 @@ class AlertActivityTest {
 
     private fun getColorWithColorRes(colorRes: Int, resources: Resources = app.resources) = ResourcesCompat.getColor(resources, colorRes, null)
 
-    private fun Alert.isTwoButton() =
-        leftButton != Alert.ButtonAction.None || rightButton != Alert.ButtonAction.None
+    private fun AlertActivityViewModel.isTwoButton() =
+        leftButton != AlertActivityViewModel.ButtonAction.None || rightButton != AlertActivityViewModel.ButtonAction.None
 }

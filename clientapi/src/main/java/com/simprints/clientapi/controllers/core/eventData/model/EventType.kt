@@ -5,5 +5,6 @@ import androidx.annotation.Keep
 @Keep
 enum class EventType {
     SUSPICIOUS_INTENT,
-    INVALID_INTENT
+    INVALID_INTENT,
+    ALERT_SCREEN
 }

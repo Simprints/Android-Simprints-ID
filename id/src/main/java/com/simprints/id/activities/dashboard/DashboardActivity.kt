@@ -16,8 +16,8 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
 import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.id.domain.alert.NewAlert
 import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
@@ -122,6 +122,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             viewPresenter.logout()
         }
@@ -136,7 +137,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         return getString(stringRes, currentValue, maxValue)
     }
 
-    override fun launchAlertView(error: Alert) {
+    override fun launchAlertView(error: NewAlert) {
         this.launchAlert(error)
     }
 

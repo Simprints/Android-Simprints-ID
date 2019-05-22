@@ -3,6 +3,7 @@ package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.*
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -11,14 +12,7 @@ import kotlinx.android.parcel.Parcelize
 object DomainToFingerprintResponse {
 
     fun fromDomainToFingerprintErrorResponse(error: FingerprintErrorResponse): IFingerprintErrorResponse =
-        when (error.error) {
-            FingerprintErrorType.UNEXPECTED_ERROR -> IFingerprintErrorType.UNEXPECTED_ERROR
-            FingerprintErrorType.BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorType.BLUETOOTH_NOT_SUPPORTED
-            FingerprintErrorType.SCANNER_LOW_BATTERY -> IFingerprintErrorType.SCANNER_LOW_BATTERY
-            FingerprintErrorType.UNKNOWN_BLUETOOTH_ISSUE -> IFingerprintErrorType.UNKNOWN_BLUETOOTH_ISSUE
-        }.let {
-            IFingerprintErrorResponseImpl(it)
-        }
+        IFingerprintErrorResponseImpl(fromFingerprintErrorReasonToErrorResponse(error.reason))
 
     fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
 
@@ -44,10 +38,21 @@ object DomainToFingerprintResponse {
             MatchingTier.TIER_4 -> IFingerprintResponseTier.TIER_4
             MatchingTier.TIER_5 -> IFingerprintResponseTier.TIER_5
         }
+
+    private fun fromFingerprintErrorReasonToErrorResponse(reason: FingerprintErrorReason) =
+        when (reason) {
+            UNEXPECTED_ERROR -> IFingerprintErrorReason.UNEXPECTED_ERROR
+            BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
+            SCANNER_LOW_BATTERY -> IFingerprintErrorReason.SCANNER_LOW_BATTERY
+            UNKNOWN_BLUETOOTH_ISSUE -> IFingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE
+            GUID_NOT_FOUND_ONLINE -> IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE
+            GUID_NOT_FOUND_OFFLINE -> IFingerprintErrorReason.GUID_NOT_FOUND_OFFLINE
+        }
+
 }
 
 @Parcelize
-private class IFingerprintErrorResponseImpl(override val error: IFingerprintErrorType) : IFingerprintErrorResponse {
+private class IFingerprintErrorResponseImpl(override val error: IFingerprintErrorReason) : IFingerprintErrorResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ERROR
 }
 

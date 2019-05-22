@@ -3,14 +3,14 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.NewAlert
 
 interface DashboardContract {
 
     interface View : BaseView<Presenter> {
         fun updateCardViews()
         fun stopRequestIfRequired()
-        fun launchAlertView(error: Alert)
+        fun launchAlertView(error: NewAlert)
         fun notifyCardViewChanged(position: Int)
         fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
         fun showToastForUserOffline()

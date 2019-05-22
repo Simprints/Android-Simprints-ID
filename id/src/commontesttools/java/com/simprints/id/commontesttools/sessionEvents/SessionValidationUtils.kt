@@ -9,14 +9,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallbackType
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCalloutType
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ALERT_SCREEN")
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("alertType").asString).isIn(Alert.values().valuesAsStrings())
+    assertThat(json.get("alertTypeType").asString).isIn(AlertActivityViewModel.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(3)
 }
 

@@ -60,7 +60,7 @@ open class Application : MultiDexApplication() {
     private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
-    // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#error-handling
+    // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#reason-handling
     // It can happen when an observable throws an exception, but the
     // chain has already terminated. E.g. given `chain = zip(network_call1, network_call2)`, when
     // phone goes offline network_calls1 fails and it stops `chain`. But even network_call2 will throw a
