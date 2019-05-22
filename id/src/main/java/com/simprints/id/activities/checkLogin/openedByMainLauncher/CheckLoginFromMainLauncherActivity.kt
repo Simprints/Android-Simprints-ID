@@ -7,7 +7,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.NewAlert
 import com.simprints.id.tools.extensions.launchAlert
 import org.jetbrains.anko.startActivity
 
@@ -31,7 +31,7 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
         viewPresenter.start()
     }
 
-    override fun openAlertActivityForError(alert: Alert) {
+    override fun openAlertActivityForError(alert: NewAlert) {
         launchAlert(alert)
     }
 

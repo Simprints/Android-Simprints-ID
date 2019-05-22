@@ -7,7 +7,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.NewAlert.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
@@ -41,13 +41,13 @@ abstract class CheckLoginPresenter(
 
             syncSchedulerHelper.cancelAllWorkers()
             when (e) {
-                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(Alert.INVALID_PROJECT_ID)
-                is DifferentUserIdSignedInException -> view.openAlertActivityForError(Alert.INVALID_USER_ID)
+                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
+                is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
                     e.printStackTrace()
                     crashReportManager.logExceptionOrSafeException(e)
-                    view.openAlertActivityForError(Alert.UNEXPECTED_ERROR)
+                    view.openAlertActivityForError(UNEXPECTED_ERROR)
                 }
             }
         }

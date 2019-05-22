@@ -11,12 +11,12 @@ interface ErrorContract {
         fun setErrorMessageText(message: String)
 
         fun closeActivity()
-
-        fun getErrorMessage(): String
+        fun getStringFromResources(res: Int): String
     }
 
     interface Presenter : BasePresenter {
 
+        fun start(clientApiAlert: ClientApiAlert)
         fun handleCloseClick()
     }
 

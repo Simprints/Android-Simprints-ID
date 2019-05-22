@@ -10,7 +10,7 @@ import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.NewAlert
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.*
@@ -52,7 +52,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         return callingPackage ?: ""
     }
 
-    override fun openAlertActivityForError(alert: Alert) {
+    override fun openAlertActivityForError(alert: NewAlert) {
         launchAlert(alert)
     }
 

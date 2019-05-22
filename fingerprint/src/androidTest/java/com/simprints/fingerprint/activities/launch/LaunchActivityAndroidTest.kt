@@ -5,7 +5,6 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
@@ -27,7 +26,7 @@ import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 import com.simprints.testtools.android.waitOnUi
@@ -87,7 +86,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(ScannerNotPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.NOT_PAIRED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
@@ -95,7 +94,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(MultipleScannersPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.MULTIPLE_PAIRED_SCANNERS.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS.title)))
     }
 
     @Test
@@ -105,7 +104,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.BLUETOOTH_NOT_ENABLED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED.title)))
     }
 
     @Test
@@ -115,7 +114,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.BLUETOOTH_NOT_SUPPORTED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED.title)))
     }
 
     @Test
@@ -125,7 +124,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.NOT_PAIRED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
@@ -135,7 +134,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
 
     @Test
@@ -146,7 +145,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
 
     @Test
@@ -158,7 +157,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(ScannerLowBatteryException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.LOW_BATTERY.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.LOW_BATTERY.title)))
     }
 
     @Test
@@ -170,7 +169,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.DISCONNECTED.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
 
     @Test
@@ -183,7 +182,7 @@ class LaunchActivityAndroidTest {
         launchActivityRule.launchActivity(verifyRequest.toIntent())
 
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.GUID_NOT_FOUND_OFFLINE.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE.title)))
     }
 
     @Test
@@ -198,7 +197,7 @@ class LaunchActivityAndroidTest {
 
         launchActivityRule.launchActivity(verifyRequest.toIntent())
         waitOnUi(1000)
-        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(Alert.GUID_NOT_FOUND_ONLINE.title)))
+        onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_ONLINE.title)))
     }
 
     @Test

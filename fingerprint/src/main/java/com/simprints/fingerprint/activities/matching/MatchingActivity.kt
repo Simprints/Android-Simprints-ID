@@ -9,22 +9,22 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
+import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.alert.AlertActivity
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.id.Application
-import com.simprints.core.tools.json.LanguageHelper
-import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
+import com.simprints.id.Application
+import com.simprints.id.activities.alert.AlertActivityHelper
 import kotlinx.android.synthetic.main.activity_matching.*
 import javax.inject.Inject
 
@@ -53,8 +53,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val extras = intent.extras
         if (extras == null) {
             crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Null extras passed to MatchingActivity"))
-            launchAlert()
-            finish()
+            launchAlertActivity()
             return
         }
 
@@ -120,10 +119,17 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
             handler.postDelayed({ finish() }, matchingEndWaitTimeMillis.toLong())
         }
 
-    override fun launchAlert() {
-        val intent = Intent(this, AlertActivity::class.java)
-        intent.putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(FingerprintAlert.UNEXPECTED_ERROR))
-        startActivityForResult(intent, ALERT_ACTIVITY_REQUEST_CODE)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            setResult(resultCode, data)
+            finish()
+        }
+    }
+
+    override fun launchAlertActivity() {
+        launchAlert(this, FingerprintAlert.UNEXPECTED_ERROR)
     }
 
     override fun makeToastMatchFailed() {
@@ -141,9 +147,5 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     override fun onDestroy() {
         viewPresenter.dispose()
         super.onDestroy()
-    }
-
-    companion object {
-        private const val ALERT_ACTIVITY_REQUEST_CODE = 0
     }
 }

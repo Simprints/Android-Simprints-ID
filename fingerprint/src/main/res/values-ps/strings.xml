@@ -97,7 +97,7 @@
     <string name="tier4_matches_other">سره ورته دي %d</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">په بلوتوت کې تیروتنه</string>
     <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>

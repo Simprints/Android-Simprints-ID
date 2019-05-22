@@ -8,18 +8,22 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertViewModel
+import com.simprints.id.domain.alert.NewAlert
+import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     val alert: Alert) : AlertContract.Presenter {
+                     val alertType:  NewAlert) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
+
+    private val alertViewModel = AlertViewModel.fromAlertToAlertViewModel(alertType)
 
     init {
         component.inject(this)
@@ -33,37 +37,34 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(timeHelper.now(), alert))
+            it.addEvent(AlertScreenEvent(timeHelper.now(), alertType.fromAlertToAlertTypeEvent()))
         }
     }
 
     private fun initButtons() {
-        view.initLeftButton(alert.leftButton)
-        view.initRightButton(alert.rightButton)
+        view.initLeftButton(alertViewModel.leftButton)
+        view.initRightButton(alertViewModel.rightButton)
     }
 
     private fun initColours() {
-        val color = view.getColorForColorRes(alert.backgroundColor)
+        val color = view.getColorForColorRes(alertViewModel.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
         view.setRightButtonBackgroundColor(color)
     }
 
     private fun initTextAndDrawables() {
-        view.setAlertTitleWithStringRes(alert.title)
-        view.setAlertImageWithDrawableId(alert.mainDrawable)
-        view.setAlertHintImageWithDrawableId(alert.hintDrawable)
-        view.setAlertMessageWithStringRes(alert.message)
+        view.setAlertTitleWithStringRes(alertViewModel.title)
+        view.setAlertImageWithDrawableId(alertViewModel.mainDrawable)
+        view.setAlertHintImageWithDrawableId(alertViewModel.hintDrawable)
+        view.setAlertMessageWithStringRes(alertViewModel.message)
     }
 
-    override fun handleButtonClick(buttonAction: Alert.ButtonAction) {
+    override fun handleButtonClick(buttonAction: AlertViewModel.ButtonAction) {
         buttonAction.resultCode?.let { view.setResult(it) }
         when (buttonAction) {
-            is Alert.ButtonAction.None -> Unit
-            is Alert.ButtonAction.WifiSettings -> view.openWifiSettings()
-            is Alert.ButtonAction.BluetoothSettings -> view.openBluetoothSettings()
-            is Alert.ButtonAction.TryAgain -> view.closeActivity()
-            is Alert.ButtonAction.Close -> view.closeAllActivities()
+            is AlertViewModel.ButtonAction.None -> Unit
+            is AlertViewModel.ButtonAction.Close -> view.closeActivity()
         }
     }
 
@@ -72,6 +73,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alert.name)
+        crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertViewModel.name)
     }
 }

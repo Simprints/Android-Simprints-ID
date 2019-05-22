@@ -5,6 +5,7 @@ import com.simprints.clientapi.activities.errors.ErrorContract
 import com.simprints.clientapi.activities.errors.ErrorPresenter
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.tools.ClientApiTimeHelper
 import dagger.Module
 import dagger.Provides
 
@@ -17,6 +18,6 @@ open class ErrorActivityModule {
     @Provides
     fun providesErrorPresenter(view: ErrorContract.View,
                                clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                               clientApiCrashReportManager: ClientApiCrashReportManager): ErrorContract.Presenter =
-        ErrorPresenter(view, clientApiSessionEventsManager, clientApiCrashReportManager)
+                               clientApiTimeHelper: ClientApiTimeHelper): ErrorContract.Presenter =
+        ErrorPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager)
 }

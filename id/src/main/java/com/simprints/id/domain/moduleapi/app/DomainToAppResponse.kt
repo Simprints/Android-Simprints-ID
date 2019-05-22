@@ -2,7 +2,7 @@ package com.simprints.id.domain.moduleapi.app
 
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorType.*
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
@@ -21,18 +21,19 @@ object DomainToAppResponse {
             ERROR -> fromDomainToAppErrorResponse(response as AppErrorResponse)
         }
 
-    private fun fromDomainToAppErrorResponse(response: AppErrorResponse): IAppResponse =
-        when (response.error) {
-            DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorType.DIFFERENT_PROJECT_ID_SIGNED_IN
-            DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorType.DIFFERENT_USER_ID_SIGNED_IN
-            GUID_NOT_FOUND_ONLINE -> IAppErrorType.GUID_NOT_FOUND_ONLINE
-            GUID_NOT_FOUND_OFFLINE ->IAppErrorType.GUID_NOT_FOUND_OFFLINE
-            UNEXPECTED_ERROR -> IAppErrorType.UNEXPECTED_ERROR
-            BLUETOOTH_NOT_SUPPORTED -> IAppErrorType.BLUETOOTH_NOT_SUPPORTED
-            SCANNER_LOW_BATTERY -> IAppErrorType.SCANNER_LOW_BATTERY
-            UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorType.UNKNOWN_BLUETOOTH_ISSUE
-        }.let {
-            IAppErrorResponseImpl(it)
+    fun fromDomainToAppErrorResponse(response: AppErrorResponse): IAppErrorResponse =
+        IAppErrorResponseImpl(fromDomainToAppErrorReason(response.reason))
+
+    private fun fromDomainToAppErrorReason(reason: AppErrorReason): IAppErrorReason =
+        when (reason) {
+            DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
+            DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN
+            GUID_NOT_FOUND_ONLINE -> IAppErrorReason.GUID_NOT_FOUND_ONLINE
+            GUID_NOT_FOUND_OFFLINE ->IAppErrorReason.GUID_NOT_FOUND_OFFLINE
+            UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
+            BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
+            SCANNER_LOW_BATTERY -> IAppErrorReason.SCANNER_LOW_BATTERY
+            UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
@@ -67,7 +68,7 @@ private class IAppEnrolResponseImpl(override val guid: String) : IAppEnrolRespon
 }
 
 @Parcelize
-private class IAppErrorResponseImpl(override val error: IAppErrorType) : IAppErrorResponse {
+private class IAppErrorResponseImpl(override val reason: IAppErrorReason) : IAppErrorResponse {
     @IgnoredOnParcel override val type: IAppResponseType = IAppResponseType.ERROR
 }
 
