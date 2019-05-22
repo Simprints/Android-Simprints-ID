@@ -5,7 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
-import com.simprints.id.domain.alert.AlertViewModel
+import com.simprints.id.domain.alert.AlertActivityViewModel
 
 interface AlertContract {
 
@@ -19,15 +19,14 @@ interface AlertContract {
         fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
         fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
         fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
-        fun initLeftButton(leftButtonAction: AlertViewModel.ButtonAction)
-        fun initRightButton(rightButtonAction: AlertViewModel.ButtonAction)
+        fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction)
+        fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
-        fun setResult(resultCode: Int)
         fun closeActivityAfterCloseButton()
     }
 
     interface Presenter : BasePresenter {
-        fun handleButtonClick(buttonAction: AlertViewModel.ButtonAction)
+        fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
         fun handleBackButton()
     }
 }

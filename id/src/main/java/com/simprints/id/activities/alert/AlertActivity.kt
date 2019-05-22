@@ -15,15 +15,14 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
-import com.simprints.id.domain.alert.AlertViewModel
-import com.simprints.id.domain.alert.AlertViewModel.Companion.fromAlertToAlertViewModel
-import com.simprints.id.domain.alert.NewAlert
+import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.alert.AlertType
 import kotlinx.android.synthetic.main.activity_alert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
-    private lateinit var alertType: NewAlert
+    private lateinit var alertTypeType: AlertType
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,11 +30,11 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
 
-        alertType = intent.extras?.let {
-            it.get(AlertActRequest.BUNDLE_KEY) as NewAlert
-        } ?: NewAlert.UNEXPECTED_ERROR
+        alertTypeType = intent.extras?.let {
+            it.get(AlertActRequest.BUNDLE_KEY) as AlertActRequest
+        }?.alertType ?: AlertType.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.component, alertType)
+        viewPresenter = AlertPresenter(this, app.component, alertTypeType)
         viewPresenter.start()
     }
 
@@ -55,8 +54,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
 
-    override fun initLeftButton(leftButtonAction: AlertViewModel.ButtonAction) {
-        if (leftButtonAction !is AlertViewModel.ButtonAction.None) {
+    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             left_button.setText(leftButtonAction.buttonText)
             left_button.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
@@ -64,8 +63,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun initRightButton(rightButtonAction: AlertViewModel.ButtonAction) {
-        if (rightButtonAction !is AlertViewModel.ButtonAction.None) {
+    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             right_button.setText(rightButtonAction.buttonText)
             right_button.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
@@ -80,7 +79,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertType))
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType))
         })
 
         finish()

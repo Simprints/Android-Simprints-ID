@@ -6,9 +6,11 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
+import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -16,9 +18,6 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.core.tools.json.LanguageHelper
-import com.simprints.id.domain.alert.NewAlert
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -123,7 +122,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
+        if (resultCode == AlertActResponse.ALERT_SCREEN_RESPONSE_CODE_OK) {
+            finish()
+        } else if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             viewPresenter.logout()
         }
     }
@@ -135,10 +136,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun getStringWithParams(stringRes: Int, currentValue: Int, maxValue: Int): String {
         return getString(stringRes, currentValue, maxValue)
-    }
-
-    override fun launchAlertView(error: NewAlert) {
-        this.launchAlert(error)
     }
 
     override fun showToastForUserOffline() {

@@ -1,6 +1,7 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import android.annotation.SuppressLint
+import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginPresenter
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent
@@ -16,11 +17,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEv
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.NewAlert
+import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.DomainToAppResponse.fromDomainToAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -61,7 +65,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         } catch (t: Throwable) {
             t.printStackTrace()
             crashReportManager.logExceptionOrSafeException(t)
-            view.openAlertActivityForError(NewAlert.UNEXPECTED_ERROR)
+            view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
         }
     }
@@ -117,9 +121,18 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun start() {
+        checkSignedInStateIfPossible()
+    }
+
+    override fun checkSignedInStateIfPossible() {
         if (!setupFailed) {
             checkSignedInStateAndMoveOn()
         }
+    }
+
+    override fun onAlertScreenReturn(alertActResponse: AlertActResponse) {
+        val domainErrorResponse = AppErrorResponse(AppErrorReason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
+        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(domainErrorResponse))
     }
 
     private fun extractSessionParametersOrThrow() =
@@ -190,7 +203,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                 fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
                 return@zip Triple(gaId, peopleDbCount, sessionDbCount)
             }.flatMapCompletable { (gaId, peopleDbCount, sessionDbCount) ->
-                populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount, sessionDbCount)
+                populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount)
             }.subscribeBy(onError = { it.printStackTrace() })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -200,7 +213,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
     private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
-    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int, sessionDbCount: Int): Completable =
+    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int): Completable =
         sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
