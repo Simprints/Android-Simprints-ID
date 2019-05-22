@@ -8,22 +8,22 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.AlertViewModel
-import com.simprints.id.domain.alert.NewAlert
+import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     val alertType:  NewAlert) : AlertContract.Presenter {
+                     private val alertTypeType:  AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    private val alertViewModel = AlertViewModel.fromAlertToAlertViewModel(alertType)
+    private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertTypeType)
 
     init {
         component.inject(this)
@@ -37,7 +37,7 @@ class AlertPresenter(val view: AlertContract.View,
         initTextAndDrawables()
 
         sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(timeHelper.now(), alertType.fromAlertToAlertTypeEvent()))
+            it.addEvent(AlertScreenEvent(timeHelper.now(), alertTypeType.fromAlertToAlertTypeEvent()))
         }
     }
 
@@ -60,16 +60,15 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertMessageWithStringRes(alertViewModel.message)
     }
 
-    override fun handleButtonClick(buttonAction: AlertViewModel.ButtonAction) {
-        buttonAction.resultCode?.let { view.setResult(it) }
+    override fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction) {
         when (buttonAction) {
-            is AlertViewModel.ButtonAction.None -> Unit
-            is AlertViewModel.ButtonAction.Close -> view.closeActivity()
+            is AlertActivityViewModel.ButtonAction.None -> Unit
+            is AlertActivityViewModel.ButtonAction.Close -> view.closeActivityAfterCloseButton()
         }
     }
 
     override fun handleBackButton() {
-        view.setResult(RESULT_CANCELED)
+        view.closeActivityAfterCloseButton()
     }
 
     private fun logToCrashReport() {
