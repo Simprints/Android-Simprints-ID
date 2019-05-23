@@ -10,10 +10,7 @@ import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswe
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -29,6 +26,9 @@ class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
 
         if (fingerResponse is FingerprintRefusalFormResponse)
             return buildAppRefusalFormResponse(fingerResponse)
+
+        if (fingerResponse is FingerprintErrorResponse)
+            return buildAppErrorResponse(fingerResponse)
 
         return when (appRequest) {
             is AppEnrolRequest -> buildAppEnrolResponse(fingerResponse as FingerprintEnrolResponse, faceResponse as FaceEnrolResponse)
@@ -46,6 +46,9 @@ class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
             fingerprintRefusalFormResponse.reason?.toAppRefusalFormReason(),
             fingerprintRefusalFormResponse.optionalText))
     }
+
+    private fun buildAppErrorResponse(fingerResponse: FingerprintErrorResponse): AppResponse =
+        AppErrorResponse(fingerResponse.fingerprintErrorReason.toAppErrorReason())
 
     //TODO: Ignoring face response for now.
     private fun buildAppIdentifyResponse(fingerprintResponse: FingerprintIdentifyResponse,

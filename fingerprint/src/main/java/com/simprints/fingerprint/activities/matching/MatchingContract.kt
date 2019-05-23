@@ -22,7 +22,7 @@ interface MatchingContract {
 
         fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int)
 
-        fun launchAlert()
+        fun launchAlertActivity()
 
         fun makeToastMatchFailed()
 

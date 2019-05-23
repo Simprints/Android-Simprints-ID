@@ -1,12 +1,14 @@
 package com.simprints.clientapi.activities.odk
 
 import com.google.gson.Gson
+import com.nhaarman.mockito_kotlin.any
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
@@ -18,6 +20,7 @@ import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_INTEGRATION
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.json.GsonBuilder
+import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
@@ -65,7 +68,7 @@ class OdkPresenterTest {
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
         OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock(), mock(), mock()).apply { start() }
-        verifyOnce(view) { returnIntentActionErrorToClient() }
+        verifyOnce(view) { handleClientRequestError(any()) }
     }
 
     @Test
@@ -111,8 +114,8 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "", mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleResponseError()
-        verifyOnce(view) { returnIntentActionErrorToClient() }
+        OdkPresenter(view, "", mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+        verifyOnce(view) { returnErrorToClient(anyOrNull(), anyOrNull()) }
     }
 
     @Test

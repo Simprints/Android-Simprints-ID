@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.baserequest
 
 import com.google.gson.reflect.TypeToken
+import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
@@ -14,8 +15,8 @@ import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
-import com.simprints.clientapi.exceptions.InvalidClientRequestException
-import com.simprints.clientapi.exceptions.InvalidRequestException
+import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 
@@ -53,7 +54,28 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {
-        addInvalidSessionInBackground().also { view.handleClientRequestError(exception) }
+        addInvalidSessionInBackground()
+        handleInvalidRequest(exception)
+    }
+
+    private fun handleInvalidRequest(exception: InvalidRequestException) {
+        when (exception) {
+            is InvalidClientRequestException -> INVALID_CLIENT_REQUEST
+            is InvalidMetadataException -> INVALID_METADATA
+            is InvalidModuleIdException -> INVALID_MODULE_ID
+            is InvalidProjectIdException -> INVALID_PROJECT_ID
+            is InvalidSelectedIdException -> INVALID_SELECTED_ID
+            is InvalidSessionIdException -> INVALID_SESSION_ID
+            is InvalidUserIdException -> INVALID_USER_ID
+            is InvalidVerifyIdException -> INVALID_VERIFY_ID
+        }.also {
+            view.handleClientRequestError(it)
+        }
+    }
+
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        val clientResponse = mapDomainToLibSimprintErrorResponse[errorResponse.reason]
+        view.returnErrorToClient(clientResponse?.first, clientResponse?.second)
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

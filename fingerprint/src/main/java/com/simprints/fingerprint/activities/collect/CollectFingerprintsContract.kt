@@ -1,13 +1,15 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
@@ -24,13 +26,14 @@ interface CollectFingerprintsContract {
 
         // Lifecycle
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
-        fun doLaunchAlert(alert: FingerprintAlert)
+        fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
         fun finishSuccessEnrol(bundleKey: String, result: CollectResult)
         fun finishSuccessAndStartMatching(bundleKey: String, result: CollectResult)
         fun cancelAndFinish()
 
         fun showSplashScreen()
+        fun setResultAndFinish(resultCode: Int, intent: Intent)
 
         // Fingers
         var pageAdapter: FingerPageAdapter
@@ -79,5 +82,6 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
+        fun onAlertScreenReturn(alertActResponse: AlertActResponse, intent: Intent)
     }
 }

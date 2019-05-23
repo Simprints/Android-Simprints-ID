@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.controllers.scanner
 
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprintscanner.Scanner
 import io.reactivex.Completable
 

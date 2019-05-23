@@ -1,17 +1,14 @@
-package com.simprints.fingerprint.data.domain.alert
+package com.simprints.fingerprint.activities.alert
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE
-import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
-import com.simprints.id.domain.Constants
 
-enum class FingerprintAlert(val type: Type,
-                            val leftButton: ButtonAction,
-                            val rightButton: ButtonAction,
-                            @StringRes val message: Int) {
+enum class AlertActivityViewModel(val type: Type,
+                                  val leftButton: ButtonAction,
+                                  val rightButton: ButtonAction,
+                                  @StringRes val message: Int) {
 
     // Data errors
     GUID_NOT_FOUND_ONLINE(
@@ -19,7 +16,7 @@ enum class FingerprintAlert(val type: Type,
             title = R.string.verify_guid_not_found_title,
             hintDrawable = null
         ),
-        leftButton = ButtonAction.Close(resultCode = SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE),
+        leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = R.string.verify_guid_not_found_online_message
     ),
@@ -35,13 +32,12 @@ enum class FingerprintAlert(val type: Type,
     ),
 
     // Bluetooth errors
-
     BLUETOOTH_NOT_SUPPORTED(
         type = Type.BluetoothError(
             backgroundColor = R.color.simprints_yellow,
             hintDrawable = R.drawable.bt_not_enabled
         ),
-        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        leftButton = ButtonAction.Close,
         rightButton = ButtonAction.BluetoothSettings,
         message = R.string.bluetooth_not_supported_message
     ),
@@ -74,7 +70,6 @@ enum class FingerprintAlert(val type: Type,
     ),
 
     // Scanner errors
-
     DISCONNECTED(
         type = Type.ScannerError(
             title = R.string.disconnected_title,
@@ -90,19 +85,33 @@ enum class FingerprintAlert(val type: Type,
             title = R.string.low_battery_title,
             hintDrawable = R.drawable.low_battery_icon
         ),
-        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = R.string.low_battery_message
     ),
 
     //Unexpected errors
-
     UNEXPECTED_ERROR(
         type = Type.UnexpectedError(),
-        leftButton = ButtonAction.Close(resultCode = Constants.SIMPRINTS_CANCELLED),
+        leftButton = ButtonAction.Close,
         rightButton = ButtonAction.None,
         message = R.string.unforeseen_error_message
     );
+
+    companion object {
+        fun fromAlertToAlertViewModel(alertType: FingerprintAlert): AlertActivityViewModel =
+            when(alertType) {
+                FingerprintAlert.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_OFFLINE
+                FingerprintAlert.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
+                FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+                FingerprintAlert.BLUETOOTH_NOT_ENABLED -> BLUETOOTH_NOT_ENABLED
+                FingerprintAlert.NOT_PAIRED -> NOT_PAIRED
+                FingerprintAlert.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
+                FingerprintAlert.DISCONNECTED -> DISCONNECTED
+                FingerprintAlert.LOW_BATTERY -> LOW_BATTERY
+                FingerprintAlert.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+            }
+    }
 
     @StringRes val title: Int = type.title
     @ColorRes val backgroundColor: Int = type.backgroundColor
@@ -139,12 +148,11 @@ enum class FingerprintAlert(val type: Type,
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
     }
 
-    sealed class ButtonAction(@StringRes val buttonText: Int = R.string.empty,
-                              val resultCode: Int? = null) {
+    sealed class ButtonAction(@StringRes val buttonText: Int = R.string.empty) {
         object None : ButtonAction()
         object WifiSettings : ButtonAction(R.string.settings_label)
         object BluetoothSettings : ButtonAction(R.string.settings_label)
-        object TryAgain : ButtonAction(R.string.try_again_label, ALERT_TRY_AGAIN_RESULT)
-        class Close(resultCode: Int) : ButtonAction(R.string.close, resultCode)
+        object TryAgain : ButtonAction(R.string.try_again_label)
+        object Close : ButtonAction(R.string.close)
     }
 }

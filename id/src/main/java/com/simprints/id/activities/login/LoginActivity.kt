@@ -8,15 +8,16 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.tools.SimProgressDialog
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_login.*
@@ -94,7 +95,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == QR_REQUEST_CODE) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            setResult(resultCode, data)
+            finish()
+        } else if (requestCode == QR_REQUEST_CODE) {
             data?.let {
                 handleScannerAppResult(resultCode, it)
             }
@@ -161,6 +168,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleSignInFailedUnknownReason() {
         progressDialog.dismiss()
-        launchAlert(Alert.UNEXPECTED_ERROR)
+        launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
 }

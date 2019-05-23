@@ -3,27 +3,28 @@ package com.simprints.id.commontesttools.sessionEvents
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
+import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiAlertScreenEvent
+import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiArtificialTerminationEvent
+import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiAuthenticationEvent
+import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiRefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallbackType
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callout.ApiCalloutType
-import com.simprints.id.domain.alert.Alert
 import com.simprints.id.tools.extensions.getString
 import com.simprints.id.tools.extensions.isGuid
 
 fun validateAlertScreenEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ALERT_SCREEN")
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("alertType").asString).isIn(Alert.values().valuesAsStrings())
+    assertThat(json.get("alertType").asString).isIn(ApiAlertScreenEvent.ApiAlertScreenEvent.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(3)
 }
 
 fun validateArtificialTerminationEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ARTIFICIAL_TERMINATION")
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("reason").asString).isIn(ArtificialTerminationEvent.Reason.values().valuesAsStrings())
+    assertThat(json.get("reason").asString).isIn(ApiArtificialTerminationEvent.ApiReason.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(3)
 }
 
@@ -37,7 +38,7 @@ fun validateAuthenticationEventApiModel(json: JsonObject) {
         assertThat(getString("userId")).isNotEmpty()
         assertThat(size()).isEqualTo(2)
     }
-    assertThat(json.get("result").asString).isIn(AuthenticationEvent.Result.values().valuesAsStrings())
+    assertThat(json.get("result").asString).isIn(ApiAuthenticationEvent.ApiResult.values().valuesAsStrings())
     assertThat(json.size()).isEqualTo(5)
 }
 
@@ -269,7 +270,7 @@ fun validateRefusalEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("REFUSAL")
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
-    assertThat(json.get("reason").asString).isIn(RefusalEvent.Answer.values().valuesAsStrings())
+    assertThat(json.get("reason").asString).isIn(ApiRefusalEvent.ApiAnswer.values().valuesAsStrings())
     assertThat(json.get("otherText").asString)
     assertThat(json.size()).isEqualTo(5)
 }

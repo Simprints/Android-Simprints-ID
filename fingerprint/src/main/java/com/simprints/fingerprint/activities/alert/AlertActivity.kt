@@ -1,7 +1,9 @@
 package com.simprints.fingerprint.activities.alert
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.ColorInt
@@ -10,23 +12,27 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
+import com.simprints.fingerprint.activities.alert.request.AlertActRequest
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse.CloseButtonAction.*
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
-   override lateinit var viewPresenter: AlertContract.Presenter
+    override lateinit var viewPresenter: AlertContract.Presenter
+    private lateinit var alertType: FingerprintAlert
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fingerprint_alert)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)
+        alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
+            ?: FingerprintAlert.UNEXPECTED_ERROR
 
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
@@ -49,8 +55,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
 
-    override fun initLeftButton(leftButtonAction: FingerprintAlert.ButtonAction) {
-        if (leftButtonAction !is FingerprintAlert.ButtonAction.None) {
+    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             left_button.setText(leftButtonAction.buttonText)
             left_button.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
@@ -58,8 +64,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun initRightButton(rightButtonAction: FingerprintAlert.ButtonAction) {
-        if (rightButtonAction !is FingerprintAlert.ButtonAction.None) {
+    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             right_button.setText(rightButtonAction.buttonText)
             right_button.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
@@ -84,6 +90,19 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         startActivity(intent)
     }
 
-    override fun closeActivity() = finish()
-    override fun closeAllActivities() = finishAffinity()
+    override fun closeActivityAfterTryAgainButton() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertType, TRY_AGAIN))
+        })
+
+        finish()
+    }
+
+    override fun closeActivityAfterCloseButton() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertType, CLOSE))
+        })
+
+        finish()
+    }
 }

@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.controllers.core.eventData
 
 import com.simprints.fingerprint.controllers.core.eventData.model.*
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.person.Person
 import io.reactivex.Completable
 

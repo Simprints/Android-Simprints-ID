@@ -4,15 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityModule
+import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason.Companion.fromDomainAlertTypeToAppErrorType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
-import javax.inject.Named
 
 open class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
 
@@ -36,7 +36,11 @@ open class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewPresenter.handleResult(requestCode, resultCode, data)
+
+        val potentialAppAlertScreenResult = data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)
+        potentialAppAlertScreenResult?.let {
+            setResultAndFinish(AppErrorResponse(fromDomainAlertTypeToAppErrorType(it.alertType)))
+        } ?: viewPresenter.handleResult(requestCode, resultCode, data)
     }
 
     override fun setCancelResultAndFinish() {

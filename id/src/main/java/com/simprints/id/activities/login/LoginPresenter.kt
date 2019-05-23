@@ -122,7 +122,7 @@ class LoginPresenter(val view: LoginContract.View,
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
-        logMessageForCrashReportWithNetworkTrigger("Sign in error - $reason")
+        logMessageForCrashReportWithNetworkTrigger("Sign in reason - $reason")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 

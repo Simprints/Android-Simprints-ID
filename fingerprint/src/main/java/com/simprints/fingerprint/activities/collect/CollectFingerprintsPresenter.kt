@@ -1,12 +1,16 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
@@ -21,7 +25,6 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
@@ -31,7 +34,6 @@ import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
@@ -347,6 +349,13 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
+    }
+
+    override fun onAlertScreenReturn(alertActResponse: AlertActResponse, intent: Intent) {
+        when (alertActResponse.closeButtonAction) {
+            AlertActResponse.CloseButtonAction.CLOSE -> view.setResultAndFinish(Activity.RESULT_OK, intent)
+            AlertActResponse.CloseButtonAction.TRY_AGAIN -> handleTryAgainFromDifferentActivity()
+        }
     }
 
     companion object {

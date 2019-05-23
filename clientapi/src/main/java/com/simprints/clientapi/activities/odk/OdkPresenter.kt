@@ -1,19 +1,19 @@
 package com.simprints.clientapi.activities.odk
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
+import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.IntegrationInfo
-import com.simprints.clientapi.domain.responses.EnrollResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
+import com.simprints.libsimprints.Constants
 import io.reactivex.rxkotlin.subscribeBy
 
 
@@ -25,6 +25,9 @@ class OdkPresenter(private val view: OdkContract.View,
                    clientApiTimeHelper: ClientApiTimeHelper,
                    integrationInfo: IntegrationInfo)
     : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
+
+    override val mapDomainToLibSimprintErrorResponse: Map<ErrorResponse.Reason, Pair<Int, Intent?>>
+        get() = emptyMap() //We return CANCEL for any ErrorResponse.Reason
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -44,7 +47,7 @@ class OdkPresenter(private val view: OdkContract.View,
                     ACTION_IDENTIFY -> processIdentifyRequest()
                     ACTION_VERIFY -> processVerifyRequest()
                     ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
-                    else -> view.returnIntentActionErrorToClient()
+                    else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
                 }
             }.subscribeBy(
                 onSuccess = { clientApiCrashReportManager.setSessionIdCrashlyticsKey(it) },
@@ -68,6 +71,4 @@ class OdkPresenter(private val view: OdkContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForm(refusalForm.reason, refusalForm.extra)
-
-    override fun handleResponseError() = view.returnIntentActionErrorToClient()
 }

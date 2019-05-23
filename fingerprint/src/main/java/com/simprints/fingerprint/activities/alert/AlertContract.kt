@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 
 interface AlertContract {
 
@@ -17,18 +16,18 @@ interface AlertContract {
         fun setAlertTitleWithStringRes(@StringRes stringRes: Int)
         fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int)
         fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?)
-        fun initLeftButton(leftButtonAction: FingerprintAlert.ButtonAction)
-        fun initRightButton(rightButtonAction: FingerprintAlert.ButtonAction)
+        fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction)
+        fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun setResult(resultCode: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
-        fun closeActivity()
-        fun closeAllActivities()
+        fun closeActivityAfterTryAgainButton()
+        fun closeActivityAfterCloseButton()
     }
 
     interface Presenter : BasePresenter {
-        fun handleButtonClick(buttonAction: FingerprintAlert.ButtonAction)
+        fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
         fun handleBackButton()
     }
 }
