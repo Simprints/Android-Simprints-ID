@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
-import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiAlertScreenEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.ApiAuthenticationEvent
@@ -77,9 +76,11 @@ fun verifyCallbackIdentificationScoresApiModel(jsonArray: JsonArray) {
 
 fun verifyCallbackVerificationApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("VERIFICATION")
-    assertThat(json.get("score").asJsonObject.get("guid").asString)
-    assertThat(json.get("score").asJsonObject.get("confidence").asString)
-    assertThat(json.get("score").asJsonObject.get("tier").asString)
+    with(json.get("score").asJsonObject) {
+        assertThat(get("guid").asString)
+        assertThat(get("confidence").asString)
+    assertThat(get("tier").asString)
+    }
 }
 
 fun verifyCallbackRefusalApiModel(json: JsonObject) {
