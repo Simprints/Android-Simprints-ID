@@ -3,7 +3,8 @@ package com.simprints.fingerprint.activities.launch
 import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
@@ -21,7 +22,7 @@ interface LaunchContract {
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
-        fun doLaunchAlert(alert: FingerprintAlert)
+        fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun doVibrate()
 
         fun setTextToGeneralConsent(generalConsentText: String)
@@ -32,8 +33,6 @@ interface LaunchContract {
 
     interface Presenter : BasePresenter {
 
-        fun tryAgainFromErrorScreen()
-
         fun handleOnDestroy()
         fun handleOnResume()
         fun handleOnPause()
@@ -42,5 +41,6 @@ interface LaunchContract {
         fun confirmConsentAndContinueToNextActivity()
         fun handleDeclinePressed()
         fun handleOnBackPressed()
+        fun tryAgainFromErrorScreen(alertActResponse: AlertActResponse, intent: Intent?)
     }
 }

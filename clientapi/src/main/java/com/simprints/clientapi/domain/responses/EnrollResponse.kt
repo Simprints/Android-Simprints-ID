@@ -5,6 +5,6 @@ import com.simprints.moduleapi.app.responses.IAppEnrolResponse
 
 data class EnrollResponse(val guid: String) {
 
-    constructor(request: IAppEnrolResponse) : this(request.guid)
+    constructor(response: IAppEnrolResponse) : this(response.guid)
 
 }

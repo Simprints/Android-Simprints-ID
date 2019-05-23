@@ -1,19 +1,24 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
+import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.*
+import com.simprints.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
@@ -23,8 +28,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
-
-    private val app: Application by lazy { application as Application }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +39,25 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         viewPresenter.setup()
+        viewPresenter.start()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewPresenter.start()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
+        } else {
+            viewPresenter.checkSignedInStateIfPossible()
+        }
+    }
+
+    override fun setResultErrorAndFinish(appResponse: IAppErrorResponse) {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(IAppResponse.BUNDLE_KEY, appResponse)
+        })
+        finish()
     }
 
     override fun parseRequest() =
@@ -52,8 +69,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         return callingPackage ?: ""
     }
 
-    override fun openAlertActivityForError(alert: Alert) {
-        launchAlert(alert)
+    override fun openAlertActivityForError(alertType: AlertType) {
+        launchAlert(this, alertType)
     }
 
     override fun openLoginActivity(appRequest: AppRequest) {

@@ -19,7 +19,7 @@ import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDataba
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDevice
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocation
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -37,7 +37,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_alertScreenEventApiModel() {
-        val event = AlertScreenEvent(0, Alert.NOT_PAIRED)
+        val event = AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID)
         val apiEvent = ApiAlertScreenEvent(event)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateAlertScreenEventApiModel(json)
@@ -346,7 +346,7 @@ class SessionEventsAdapterFactoryTest {
             Device("28", "phone", "device_id"),
             0,
             DatabaseInfo(0, 0))
-        session.addEvent(AlertScreenEvent(0, Alert.NOT_PAIRED))
+        session.addEvent(AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID))
         val apiSession = ApiSessionEvents(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)

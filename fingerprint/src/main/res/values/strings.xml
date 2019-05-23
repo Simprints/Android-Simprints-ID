@@ -146,7 +146,7 @@
     <string name="tier4_matches_other">%d matches</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">Bluetooth Error</string>
     <string name="configuration_error_title">Configuration Error</string>

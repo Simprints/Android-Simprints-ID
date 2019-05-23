@@ -99,7 +99,7 @@
     <string name="tier4_matches_other"> در مطابقت است %d</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">خطا در بلوتوت</string>
     <string name="configuration_error_title">خطا در تنظیمات</string>

@@ -8,10 +8,8 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
@@ -80,10 +78,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun enableRefusalText() {
         refusalText.isEnabled = true
-    }
-
-    override fun doLaunchAlert(alert: FingerprintAlert) {
-        launchAlert(alert)
     }
 
     override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {

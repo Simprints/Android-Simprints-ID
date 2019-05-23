@@ -13,13 +13,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
@@ -28,12 +28,11 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.tools.extensions.launchAlert
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.id.Application
-import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -191,32 +190,40 @@ class CollectFingerprintsActivity :
         viewPresenter.handleOnBackPressed()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
-        when (requestCode) {
-            ALERT_ACTIVITY_REQUEST ->
-                if (resultCode == ALERT_TRY_AGAIN_RESULT)
-                    viewPresenter.handleTryAgainFromDifferentActivity()
-                else setResult(Activity.RESULT_CANCELED)
-            MATCHING_ACTIVITY_REQUEST -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    val matchingResult = data?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
-                    resultIntent.putExtra(MatchingActResult.BUNDLE_KEY, matchingResult)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse, intent)
+        } else {
+            when (requestCode) {
+                MATCHING_ACTIVITY_REQUEST -> {
+                    if (resultCode == Activity.RESULT_OK) {
+                        val matchingResult = data?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
+                        resultIntent.putExtra(MatchingActResult.BUNDLE_KEY, matchingResult)
+                    }
+                    setResult(resultCode, resultIntent)
                 }
-                setResult(resultCode, resultIntent)
-            }
-            REFUSAL_ACTIVITY_REQUEST -> {
-                setResult(resultCode, data)
-            }
-            else -> throw IllegalArgumentException("Invalid request Code")
-        }.also { finish() }
+                REFUSAL_ACTIVITY_REQUEST -> {
+                    setResult(resultCode, data)
+                }
+                else -> throw IllegalArgumentException("Invalid request Code")
+            }.also { finish() }
+        }
+    }
 
     override fun onPause() {
         super.onPause()
         viewPresenter.handleOnPause()
     }
 
-    override fun doLaunchAlert(alert: FingerprintAlert) {
-        launchAlert(alert)
+    override fun doLaunchAlert(fingerprintAlert: FingerprintAlert) {
+        launchAlert(this, fingerprintAlert)
+    }
+
+    override fun setResultAndFinish(resultCode: Int, intent: Intent) {
+        setResult(resultCode, intent)
+        finish()
     }
 
     override fun showSplashScreen() {

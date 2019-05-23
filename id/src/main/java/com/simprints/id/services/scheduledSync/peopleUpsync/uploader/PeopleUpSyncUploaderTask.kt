@@ -26,7 +26,7 @@ class PeopleUpSyncUploaderTask (
 ) {
 
     /**
-     * @throws TransientSyncFailureException if a temporary network / backend error caused
+     * @throws TransientSyncFailureException if a temporary network / backend reason caused
      * the sync to fail.
      */
 

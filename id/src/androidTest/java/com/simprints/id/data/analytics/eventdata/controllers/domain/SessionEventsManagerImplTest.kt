@@ -202,7 +202,7 @@
 //    fun anerrorwithevents_shouldbeswallowed() {
 //        realmsessioneventsmanager.deletesessions()
 //
-//        // there is not activesession open or pending in the db. so it should fail, but it swallows the error
+//        // there is not activesession open or pending in the db. so it should fail, but it swallows the reason
 //        sessioneventsmanagerspy.updatesession {
 //            it.location = null
 //        }.test().awaitandassertsuccess()

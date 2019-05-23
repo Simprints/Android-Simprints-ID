@@ -7,10 +7,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -25,6 +22,9 @@ class AppResponseBuilderForFinger : AppResponseBuilderForModal {
         if (fingerResponse is FingerprintRefusalFormResponse)
             return buildAppRefusalFormResponse(fingerResponse)
 
+        if (fingerResponse is FingerprintErrorResponse)
+            return buildAppErrorResponse(fingerResponse)
+
         return when (appRequest) {
             is AppEnrolRequest -> buildAppEnrolResponse(fingerResponse as FingerprintEnrolResponse)
             is AppIdentifyRequest -> {
@@ -35,6 +35,9 @@ class AppResponseBuilderForFinger : AppResponseBuilderForModal {
             else -> throw InvalidAppRequest()
         }
     }
+
+    private fun buildAppErrorResponse(fingerResponse: FingerprintErrorResponse): AppResponse =
+        AppErrorResponse(fingerResponse.fingerprintErrorReason.toAppErrorReason())
 
     private fun buildAppRefusalFormResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse): AppRefusalFormResponse {
         return AppRefusalFormResponse(RefusalFormAnswer(

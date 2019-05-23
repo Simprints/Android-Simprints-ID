@@ -8,6 +8,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -23,7 +25,6 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.collect.CollectResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
@@ -31,6 +32,7 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentify
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
@@ -38,10 +40,8 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.Companion.fromFingerprintAlertToErrorResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
@@ -50,6 +50,7 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -58,6 +59,8 @@ import javax.inject.Inject
 class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
                       private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
+
+    private lateinit var setupFlow: Disposable
 
     @Inject lateinit var dbManager: FingerprintDbManager
     @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
@@ -98,11 +101,11 @@ class LaunchPresenter(component: FingerprintComponent,
 
         setTextToConsentTabs()
 
-        startSetup()
+        setupFlow = startSetup()
     }
 
     @SuppressLint("CheckResult")
-    private fun startSetup() {
+    private fun startSetup() =
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
             .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()))
@@ -111,10 +114,11 @@ class LaunchPresenter(component: FingerprintComponent,
             .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
             .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
-    }
+
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion ?: "")
+        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion
+            ?: "")
     }
 
     private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
@@ -139,7 +143,7 @@ class LaunchPresenter(component: FingerprintComponent,
                     handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
                 }.doOnError {
                     it.printStackTrace()
-                    // For any error, we show the missing guidFound screen.
+                    // For any reason, we show the missing guidFound screen.
                     saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
                 }.ignoreElement()
         } else {
@@ -270,6 +274,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun handleOnBackOrDeclinePressed() {
         launchOutOfFocus = true
+        setupFlow.dispose()
         view.goToRefusalActivity()
     }
 
@@ -291,8 +296,11 @@ class LaunchPresenter(component: FingerprintComponent,
         scannerManager.disconnectScannerIfNeeded()
     }
 
-    override fun tryAgainFromErrorScreen() {
-        startSetup()
+    override fun tryAgainFromErrorScreen(alertActResponse: AlertActResponse, intent: Intent?) {
+        when (alertActResponse.closeButtonAction) {
+            AlertActResponse.CloseButtonAction.CLOSE -> view.setResultAndFinish(Activity.RESULT_OK, Intent().also { prepareErrorResponse(it, alertActResponse) })
+            AlertActResponse.CloseButtonAction.TRY_AGAIN -> startSetup()
+        }
     }
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
@@ -316,6 +324,12 @@ class LaunchPresenter(component: FingerprintComponent,
         }
 
         view.setResultAndFinish(resultCode, returnIntent)
+    }
+
+    private fun prepareErrorResponse(resultData: Intent, alertActResponse: AlertActResponse) {
+        val fingerprintErrorResponse = fromFingerprintAlertToErrorResponse(alertActResponse.alert)
+        resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
+            fromDomainToFingerprintErrorResponse(fingerprintErrorResponse))
     }
 
     private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {

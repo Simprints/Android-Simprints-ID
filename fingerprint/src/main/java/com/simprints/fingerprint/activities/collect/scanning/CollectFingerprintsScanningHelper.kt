@@ -119,7 +119,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                 cancelCaptureUI()
                 reconnect()
             }
-            UN20_SDK_ERROR -> // The UN20 throws an SDK error if it doesn't detect a finger
+            UN20_SDK_ERROR -> // The UN20 throws an SDK reason if it doesn't detect a finger
                 handleNoFingerTemplateDetected()
             else -> {
                 cancelCaptureUI()

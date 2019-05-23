@@ -218,7 +218,7 @@ class SessionEventsUploaderTaskTest {
     private fun createFailureUploadResponse(code: Int = 500) =
         Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
             .code(code)
-            .message("AppResponse.error()")
+            .message("AppResponse.reason()")
             .protocol(Protocol.HTTP_1_1)
             .request(Request.Builder().url("http://localhost/").build())
             .build()))

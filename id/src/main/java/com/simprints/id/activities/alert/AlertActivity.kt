@@ -1,5 +1,6 @@
 package com.simprints.id.activities.alert
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -12,13 +13,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.activities.alert.request.AlertActRequest
+import com.simprints.id.activities.alert.response.AlertActResponse
+import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.alert.AlertType
 import kotlinx.android.synthetic.main.activity_alert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
+    private lateinit var alertTypeType: AlertType
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,11 +30,11 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
 
-        val alertType = intent.extras?.let {
-            it.get(IntentKeys.alertActivityAlertTypeKey) as Alert
-        } ?: Alert.UNEXPECTED_ERROR
+        alertTypeType = intent.extras?.let {
+            it.get(AlertActRequest.BUNDLE_KEY) as AlertActRequest
+        }?.alertType ?: AlertType.UNEXPECTED_ERROR
 
-        viewPresenter = AlertPresenter(this, app.component, alertType)
+        viewPresenter = AlertPresenter(this, app.component, alertTypeType)
         viewPresenter.start()
     }
 
@@ -50,8 +54,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
 
-    override fun initLeftButton(leftButtonAction: Alert.ButtonAction) {
-        if (leftButtonAction !is Alert.ButtonAction.None) {
+    override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             left_button.setText(leftButtonAction.buttonText)
             left_button.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
@@ -59,8 +63,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun initRightButton(rightButtonAction: Alert.ButtonAction) {
-        if (rightButtonAction !is Alert.ButtonAction.None) {
+    override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
+        if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             right_button.setText(rightButtonAction.buttonText)
             right_button.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
@@ -73,18 +77,11 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         super.onBackPressed()
     }
 
-    override fun openBluetoothSettings() {
-        val intent = Intent()
-        intent.action = android.provider.Settings.ACTION_BLUETOOTH_SETTINGS
-        startActivity(intent)
-    }
+    override fun closeActivityAfterCloseButton() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType))
+        })
 
-    override fun openWifiSettings() {
-        val intent = Intent()
-        intent.action = android.provider.Settings.ACTION_WIFI_SETTINGS
-        startActivity(intent)
+        finish()
     }
-
-    override fun closeActivity() = finish()
-    override fun closeAllActivities() = finishAffinity()
 }

@@ -1,31 +1,39 @@
 package com.simprints.id.activities.alert
 
-import android.content.Context
+import android.app.Activity
+import android.app.Instrumentation
 import android.content.Intent
-import android.content.res.Resources
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.view.View
-import androidx.core.content.res.ResourcesCompat
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.IntentKeys
-import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.google.common.truth.Truth
+import com.nhaarman.mockito_kotlin.any
+import com.simprints.id.Application
+import com.simprints.id.R
+import com.simprints.id.activities.alert.request.AlertActRequest
+import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.domain.alert.Alert
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
+import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.testtools.state.RobolectricTestMocker.setupSessionEventsManagerToAvoidRealmCall
+import com.simprints.testtools.android.hasImage
+import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.testtools.unit.robolectric.createActivity
-import com.simprints.testtools.unit.robolectric.showOnScreen
-import kotlinx.android.synthetic.main.activity_alert.*
-import org.junit.Assert.assertEquals
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import javax.inject.Inject
 
@@ -33,97 +41,90 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class AlertActivityTest {
 
-    private val app = ApplicationProvider.getApplicationContext<Context>() as TestApplication
+    private val app = ApplicationProvider.getApplicationContext<Application>()
 
-    @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
+    @Inject lateinit var sessionEventManagerMock: SessionEventsManager
 
     private val module by lazy {
-        TestAppModule(app,
-            remoteDbManagerRule = MockRule,
-            localDbManagerRule = MockRule,
-            crashReportManagerRule = MockRule,
-            secureDataManagerRule = MockRule,
-            sessionEventsLocalDbManagerRule = MockRule)
+        TestAppModule(
+            app,
+            sessionEventsManagerRule = DependencyRule.MockRule,
+            crashReportManagerRule = DependencyRule.MockRule)
     }
 
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-
-        setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManager)
+        Intents.init()
     }
 
     @Test
-    fun anUnexpectedErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = Alert.UNEXPECTED_ERROR
-        val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
-        val activity = controller.get() as AlertActivity
-        controller.visible()
+    fun noParamForAlertActivity_theRightAlertShouldAppear() {
+        launchAlertActivity()
+        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        checkAlertIsShownCorrectly(activity, alertType)
+        verifyOnce(sessionEventManagerMock) { addEventInBackground(any<AlertScreenEvent>()) }
     }
 
     @Test
-    fun anBluetoothErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = Alert.BLUETOOTH_NOT_ENABLED
-        val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
-        val activity = controller.get() as AlertActivity
-        controller.visible()
-        activity.right_button.performClick()
-
-        val intent = Shadows.shadowOf(activity).nextStartedActivity
-        assertEquals(intent.action, "android.settings.BLUETOOTH_SETTINGS")
-
-        checkAlertIsShownCorrectly(activity, alertType)
+    fun differentProjectId_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN))
+        ensureAlertScreenLaunched(AlertActivityViewModel.DIFFERENT_PROJECT_ID)
     }
 
     @Test
-    fun anOfflineError_shouldShowTheRightAlertView() {
-        val alertType = Alert.GUID_NOT_FOUND_OFFLINE
-        val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
-        val activity = controller.get() as AlertActivity
-        controller.visible()
-        activity.right_button.performClick()
-
-        val intent = Shadows.shadowOf(activity).nextStartedActivity
-        assertEquals(intent.action, "android.settings.WIFI_SETTINGS")
-
-        checkAlertIsShownCorrectly(activity, alertType)
+    fun differentUserId_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.DIFFERENT_USER_ID_SIGNED_IN))
+        ensureAlertScreenLaunched(AlertActivityViewModel.DIFFERENT_USER_ID)
     }
 
-    private fun createRoboAlertActivity(intent: Intent) =
-        createActivity<AlertActivity>(intent)
-
-    private fun createIntentForAlertType(alert: Alert) = Intent().apply {
-        putExtra(IntentKeys.alertActivityAlertTypeKey, alert)
+    @Test
+    fun differentUnexpected_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.UNEXPECTED_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
     }
 
-    private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: Alert) {
-        assertEquals(getBackgroundColor(alertActivity.alertLayout), getColorWithColorRes(alert.backgroundColor))
+    @Test
+    fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.UNEXPECTED_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        if (alert.isTwoButton()) assertEquals(getBackgroundColor(alertActivity.left_button), getColorWithColorRes(alert.backgroundColor))
-        assertEquals(getBackgroundColor(alertActivity.right_button), getColorWithColorRes(alert.backgroundColor))
+        onView(withId(R.id.left_button)).perform(click())
 
-        assertEquals(alertActivity.alert_title.text, alertActivity.resources.getString(alert.title))
-
-        val alertImageDrawableShown = Shadows.shadowOf(alertActivity.alert_image.drawable).createdFromResId
-        assertEquals(alertImageDrawableShown, alert.mainDrawable)
-
-        assertEquals(alertActivity.message.text, alertActivity.resources.getString(alert.message))
-
-        if (alert.isTwoButton()) assertEquals(alertActivity.left_button.text, alertActivity.resources.getString(alert.leftButton.buttonText))
-        assertEquals(alertActivity.right_button.text, alertActivity.resources.getString(alert.rightButton.buttonText))
+        verifyIntentReturned(scenario.result, AlertType.UNEXPECTED_ERROR)
     }
 
-    private fun getBackgroundColor(view: View): Int =
-        if (view.background is ColorDrawable) {
-            (view.background as ColorDrawable).color
-        } else {
-            Color.TRANSPARENT
-        }
+    private fun launchAlertActivity(request: AlertActRequest? = null): ActivityScenario<AlertActivity> =
+        ActivityScenario.launch<AlertActivity>(Intent().apply {
+            setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, AlertActivity::class.qualifiedName!!)
+            request?.let {
+                putExtra(AlertActRequest.BUNDLE_KEY, request)
+            }
+        })
 
-    private fun getColorWithColorRes(colorRes: Int, resources: Resources = app.resources) = ResourcesCompat.getColor(resources, colorRes, null)
 
-    private fun Alert.isTwoButton() =
-        leftButton != Alert.ButtonAction.None || rightButton != Alert.ButtonAction.None
+    private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
+        onView(withId(R.id.alert_title))
+            .check(matches(withText(alertActivityViewModel.title)))
+
+        onView(withId(R.id.message))
+            .check(matches(withText(alertActivityViewModel.message)))
+
+        onView(withId(R.id.alert_image)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
+    }
+
+    private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
+                                     alert: AlertType) {
+        Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
+
+        result.resultData.setExtrasClassLoader(AlertActResponse::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)
+        Truth.assertThat(response).isEqualTo(AlertActResponse(alert))
+    }
+
+    @After
+    fun tearDown() {
+        Intents.release()
+    }
 }
+

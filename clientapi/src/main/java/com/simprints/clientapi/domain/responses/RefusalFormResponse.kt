@@ -6,6 +6,6 @@ import com.simprints.moduleapi.app.responses.IAppRefusalFormResponse
 data class RefusalFormResponse(val reason: String,
                                val extra: String) {
 
-    constructor(request: IAppRefusalFormResponse) : this(request.reason, request.extra)
+    constructor(response: IAppRefusalFormResponse) : this(response.reason, response.extra)
 
 }

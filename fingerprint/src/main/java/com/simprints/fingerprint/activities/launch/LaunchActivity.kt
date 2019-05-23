@@ -10,19 +10,19 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.ALERT_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.LONG_CONSENT_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.InternalConstants.ResultIntents.Companion.ALERT_TRY_AGAIN_RESULT
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.tools.extensions.launchAlert
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper
+import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -97,13 +97,17 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
-            ALERT_ACTIVITY_REQUEST,
-            REFUSAL_ACTIVITY_REQUEST ->
-                whenReturningFromAnotherActivity(resultCode, data)
-        }
         super.onActivityResult(requestCode, resultCode, data)
+
+        AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)?.let {
+            viewPresenter.tryAgainFromErrorScreen(it, data)
+        } ?: run {
+            when (requestCode) {
+                COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
+                REFUSAL_ACTIVITY_REQUEST ->
+                    viewPresenter.tearDownAppWithResult(resultCode, data)
+            }
+        }
     }
 
     override fun initConsentTabs() {
@@ -124,13 +128,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun addParentalConsentTabWithText(parentalConsentText: String) {
         tabHost.addTab(parentalConsentTab)
         parentalConsentTextView.text = parentalConsentText
-    }
-
-    private fun whenReturningFromAnotherActivity(resultCode: Int, data: Intent?) {
-        when (resultCode) {
-            ALERT_TRY_AGAIN_RESULT -> viewPresenter.tryAgainFromErrorScreen()
-            else -> viewPresenter.tearDownAppWithResult(resultCode, data)
-        }
     }
 
     override fun requestPermissions(permissions: ArrayList<String>): Observable<Permission> =
@@ -165,8 +162,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         finish()
     }
 
-    override fun doLaunchAlert(alert: FingerprintAlert) {
-        launchAlert(alert)
+    override fun doLaunchAlert(fingerprintAlert: FingerprintAlert) {
+        launchAlert(this, fingerprintAlert)
     }
 
     override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1

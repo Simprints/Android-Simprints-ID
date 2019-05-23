@@ -7,16 +7,15 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.alert.request.AlertActRequest
 import com.simprints.fingerprint.di.FingerprintComponent
 import javax.inject.Inject
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintComponent,
-                     alertActRequest: AlertActRequest?) : AlertContract.Presenter {
+                     private val alertType: FingerprintAlert) : AlertContract.Presenter {
 
-    private val alertType = alertActRequest?.alert ?: FingerprintAlert.UNEXPECTED_ERROR
+    private val alertViewModel =  AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var sessionManager: FingerprintSessionEventsManager
@@ -33,38 +32,35 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertType.name))
+        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertType))
     }
 
     private fun initButtons() {
-        view.initLeftButton(alertType.leftButton)
-        view.initRightButton(alertType.rightButton)
+        view.initLeftButton(alertViewModel.leftButton)
+        view.initRightButton(alertViewModel.rightButton)
     }
 
     private fun initColours() {
-        val color = view.getColorForColorRes(alertType.backgroundColor)
+        val color = view.getColorForColorRes(alertViewModel.backgroundColor)
         view.setLayoutBackgroundColor(color)
         view.setLeftButtonBackgroundColor(color)
         view.setRightButtonBackgroundColor(color)
     }
 
     private fun initTextAndDrawables() {
-        view.setAlertTitleWithStringRes(alertType.title)
-        view.setAlertImageWithDrawableId(alertType.mainDrawable)
-        view.setAlertHintImageWithDrawableId(alertType.hintDrawable)
-        view.setAlertMessageWithStringRes(alertType.message)
+        view.setAlertTitleWithStringRes(alertViewModel.title)
+        view.setAlertImageWithDrawableId(alertViewModel.mainDrawable)
+        view.setAlertHintImageWithDrawableId(alertViewModel.hintDrawable)
+        view.setAlertMessageWithStringRes(alertViewModel.message)
     }
 
-    override fun handleButtonClick(buttonAction: FingerprintAlert.ButtonAction) {
-        buttonAction.resultCode?.let {
-            view.setResult(it)
-        }
+    override fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction) {
         when (buttonAction) {
-            is FingerprintAlert.ButtonAction.None -> Unit
-            is FingerprintAlert.ButtonAction.WifiSettings -> view.openWifiSettings()
-            is FingerprintAlert.ButtonAction.BluetoothSettings -> view.openBluetoothSettings()
-            is FingerprintAlert.ButtonAction.TryAgain -> view.closeActivity()
-            is FingerprintAlert.ButtonAction.Close -> view.closeAllActivities()
+            is None -> Unit
+            is WifiSettings -> view.openWifiSettings()
+            is BluetoothSettings -> view.openBluetoothSettings()
+            is TryAgain -> view.closeActivityAfterTryAgainButton()
+            is Close -> view.closeActivityAfterCloseButton()
         }
     }
 
@@ -73,6 +69,6 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     private fun logToCrashReport() {
-        crashReportManager.logMessageForCrashReport(ALERT, UI, message = alertType.name)
+        crashReportManager.logMessageForCrashReport(ALERT, UI, message = alertViewModel.name)
     }
 }

@@ -96,7 +96,7 @@
     <string name="tier4_matches_zero">"%d मिल्ने व्यक्ति भेटिए "</string>
 
 
-    <!-- AlertActivity : the Simprints ID error message screen -->
+    <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
     <string name="bluetooth_error_title">ब्लुटुथमा गल्ती देखियो  </string>
     <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
