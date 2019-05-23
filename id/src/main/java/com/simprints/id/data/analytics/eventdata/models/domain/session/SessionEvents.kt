@@ -48,7 +48,7 @@ open class SessionEvents(var projectId: String,
         }
     }
 
-    private fun timeRelativeToStartTime(time: Long): Long = time - startTime
+    fun timeRelativeToStartTime(time: Long): Long = time - startTime
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
