@@ -186,7 +186,7 @@ class DashboardActivityAndroidTest {
     }
 
     private fun launchActivity(intent: Intent) =
-        ActivityScenario.launch<LoginActivity>(intent.apply {
+        ActivityScenario.launch<DashboardActivity>(intent.apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, DashboardActivity::class.qualifiedName!!)
         })
 

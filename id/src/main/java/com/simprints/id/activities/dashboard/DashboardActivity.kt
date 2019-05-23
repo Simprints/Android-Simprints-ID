@@ -122,7 +122,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AlertActResponse.ALERT_SCREEN_RESPONSE_CODE_OK) {
+        if (resultCode == AlertActResponse.ALERT_SCREEN_RESPONSE_CODE_OK) { //StopShip: Check data
             finish()
         } else if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             viewPresenter.logout()

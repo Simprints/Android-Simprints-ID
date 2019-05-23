@@ -127,7 +127,7 @@ def testing = [
     androidx     : [
         monitor     : "androidx.test:monitor:1.1.2-alpha01",
         ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
-        core        : "androidx.test:core:1.1.1-alpha01",
+        core        : "androidx.test:core:1.2.0-beta01",
         core_testing: "android.arch.core:core-testing:1.1.1",
         orchestrator: "androidx.test:orchestrator:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
