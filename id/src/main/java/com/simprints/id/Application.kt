@@ -39,6 +39,7 @@ open class Application : MultiDexApplication() {
         if (Timber.treeCount() <= 0) {
             if (isReleaseWithLogfileVariant()) {
                 Timber.plant(FileLoggingTree())
+                Timber.d("Release with log file set up.")
             } else if (BuildConfig.DEBUG) {
                 Timber.plant(Timber.DebugTree())
             }
@@ -72,7 +73,9 @@ open class Application : MultiDexApplication() {
                 exceptionToPrint = e.cause
             }
             Timber.d("Undeliverable exception received", exceptionToPrint)
+
             exceptionToPrint.printStackTrace()
+            component.getCoreCrashReportManager().logException(e)
         }
     }
 }
