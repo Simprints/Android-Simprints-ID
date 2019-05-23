@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.session
 
-import com.google.gson.GsonBuilder
 import androidx.annotation.Keep
+import com.google.gson.GsonBuilder
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
@@ -38,7 +38,7 @@ open class SessionEvents(var projectId: String,
 
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
         if (isOpen()) {
-            addEvent(ArtificialTerminationEvent(timeRelativeToStartTime(timeHelper.now()), reason))
+            addEvent(ArtificialTerminationEvent(timeHelper.now(), reason))
         }
     }
 
@@ -48,7 +48,7 @@ open class SessionEvents(var projectId: String,
         }
     }
 
-    fun timeRelativeToStartTime(time: Long): Long = time - startTime
+    private fun timeRelativeToStartTime(time: Long): Long = time - startTime
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
