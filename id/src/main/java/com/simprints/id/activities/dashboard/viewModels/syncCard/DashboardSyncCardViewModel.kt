@@ -1,6 +1,6 @@
 package com.simprints.id.activities.dashboard.viewModels.syncCard
 
-import android.os.Looper
+import android.content.Context
 import androidx.lifecycle.*
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
@@ -8,6 +8,8 @@ import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
+import org.jetbrains.anko.runOnUiThread
+import javax.inject.Inject
 
 class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  override val position: Int,
@@ -17,6 +19,8 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                                  private val syncState: LiveData<SyncState>,
                                  defaultState: DashboardSyncCardViewModelState = DashboardSyncCardViewModelState()) : CardViewModel(type, position), LifecycleOwner {
 
+    @Inject
+    lateinit var context: Context
 
     var helper: DashboardSyncCardViewModelHelper? = null
     val viewModelStateLiveData: MutableLiveData<DashboardSyncCardViewModelState> = MutableLiveData()
@@ -26,6 +30,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
     private var lastSyncState: SyncState = SyncState.NOT_RUNNING
 
     init {
+        component.inject(this)
         viewModelState = defaultState
         registerObserverForDownSyncWorkerState()
         lifecycleRegistry.markState(Lifecycle.State.STARTED)
@@ -68,6 +73,7 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
                     syncCardState: SyncCardState? = null,
                     lastSyncTime: String? = null,
                     emitState: Boolean = false) {
+        val oldViewModelState = viewModelState
         viewModelState = viewModelState.let {
             it.copy(
                 peopleToUpload = peopleToUpload ?: it.peopleToUpload,
@@ -78,16 +84,14 @@ class DashboardSyncCardViewModel(override val type: DashboardCardType,
             )
         }
 
-        if (emitState) {
+        if (emitState && oldViewModelState != viewModelState) {
             emitState()
         }
     }
 
     private fun emitState() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+        context.runOnUiThread {
             viewModelStateLiveData.value = viewModelState
-        } else {
-            viewModelStateLiveData.postValue(viewModelState)
         }
     }
 
