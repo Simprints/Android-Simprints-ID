@@ -36,9 +36,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.updateSessionInBackground {
-            it.addEvent(AlertScreenEvent(timeHelper.now(), alertTypeType.fromAlertToAlertTypeEvent()))
-        }
+        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertTypeType.fromAlertToAlertTypeEvent()))
     }
 
     private fun initButtons() {

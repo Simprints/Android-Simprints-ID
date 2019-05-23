@@ -66,7 +66,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID -> INVALID_SELECTED_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
-                    AlertScreenEvent.AlertScreenEventType.INVALID_VERIFIY_ID -> INVALID_VERIFY_GUID
+                    AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_GUID
                 }
         }
     }

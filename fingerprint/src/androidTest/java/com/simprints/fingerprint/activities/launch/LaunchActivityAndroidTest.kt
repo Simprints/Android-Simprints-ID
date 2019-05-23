@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
@@ -26,7 +27,6 @@ import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
-import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 import com.simprints.testtools.android.waitOnUi
@@ -85,7 +85,6 @@ class LaunchActivityAndroidTest {
     fun notScannerFromInitVeroStep_shouldAnErrorAlert() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(ScannerNotPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
-        waitOnUi(1000)
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
