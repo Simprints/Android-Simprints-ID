@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -25,7 +25,7 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
@@ -60,7 +60,7 @@ class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
                       private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
 
-    private lateinit var setupFlow: Disposable
+    private var setupFlow: Disposable? = null
 
     @Inject lateinit var dbManager: FingerprintDbManager
     @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
@@ -101,6 +101,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
         setTextToConsentTabs()
 
+        setupFlow?.dispose()
         setupFlow = startSetup()
     }
 
@@ -164,11 +165,11 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
         if (simNetworkUtils.isConnected()) {
             // We've synced with the online dbManager and they're not in the dbManager
-            view.doLaunchAlert(FingerprintAlert.GUID_NOT_FOUND_ONLINE)
+            launchAlert(FingerprintAlert.GUID_NOT_FOUND_ONLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
         } else {
             // We're offline but might find the person if we sync
-            view.doLaunchAlert(FingerprintAlert.GUID_NOT_FOUND_OFFLINE)
+            launchAlert(FingerprintAlert.GUID_NOT_FOUND_OFFLINE)
             saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
         }
     }
@@ -188,7 +189,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
-        view.doLaunchAlert(scannerManager.getAlertType(it))
+        launchAlert(scannerManager.getAlertType(it))
         crashReportManager.logExceptionOrSafeException(it)
     }
 
@@ -274,7 +275,6 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun handleOnBackOrDeclinePressed() {
         launchOutOfFocus = true
-        setupFlow.dispose()
         view.goToRefusalActivity()
     }
 
@@ -296,11 +296,8 @@ class LaunchPresenter(component: FingerprintComponent,
         scannerManager.disconnectScannerIfNeeded()
     }
 
-    override fun tryAgainFromErrorScreen(alertActResponse: AlertActResponse, intent: Intent?) {
-        when (alertActResponse.closeButtonAction) {
-            AlertActResponse.CloseButtonAction.CLOSE -> view.setResultAndFinish(Activity.RESULT_OK, Intent().also { prepareErrorResponse(it, alertActResponse) })
-            AlertActResponse.CloseButtonAction.TRY_AGAIN -> startSetup()
-        }
+    override fun tryAgainFromErrorScreen() {
+        startSetup()
     }
 
     override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
@@ -309,7 +306,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
         if (resultCode == Activity.RESULT_OK) {
             val possibleMatchResult = resultData?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
-            val possibleCollectResult = resultData?.getParcelableExtra<CollectResult>(CollectResult.BUNDLE_KEY)
+            val possibleCollectResult = resultData?.getParcelableExtra<CollectFingerprintsActResult>(CollectFingerprintsActResult.BUNDLE_KEY)
             val possibleRefusalForm = resultData?.getParcelableExtra<RefusalActResult>(RefusalActResult.BUNDLE_KEY)
 
             if (possibleRefusalForm != null) {
@@ -326,14 +323,17 @@ class LaunchPresenter(component: FingerprintComponent,
         view.setResultAndFinish(resultCode, returnIntent)
     }
 
-    private fun prepareErrorResponse(resultData: Intent, alertActResponse: AlertActResponse) {
-        val fingerprintErrorResponse = fromFingerprintAlertToErrorResponse(alertActResponse.alert)
+    private fun prepareErrorResponse(resultData: Intent, alertActResult: AlertActResult) {
+        val fingerprintErrorResponse = fromFingerprintAlertToErrorResponse(alertActResult.alert)
         resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
             fromDomainToFingerprintErrorResponse(fingerprintErrorResponse))
     }
 
     private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
-        val fingerprintResult = FingerprintRefusalFormResponse(possibleRefusalForm.reason.toString(), possibleRefusalForm.optionalText)
+        val fingerprintResult = FingerprintRefusalFormResponse(
+            possibleRefusalForm.answer?.reason.toString(),
+            possibleRefusalForm.answer?.optionalText.toString())
+
         resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
             fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
     }
@@ -354,8 +354,8 @@ class LaunchPresenter(component: FingerprintComponent,
         }
     }
 
-    private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectResult: CollectResult?) {
-        possibleCollectResult?.let {
+    private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectFingerprintsActResult: CollectFingerprintsActResult?) {
+        possibleCollectFingerprintsActResult?.let {
             val fingerprintResult = FingerprintEnrolResponse(it.probe.patientId)
             resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintEnrolResponse(fingerprintResult))
         }
@@ -367,12 +367,19 @@ class LaunchPresenter(component: FingerprintComponent,
         view.continueToNextActivity()
     }
 
+    private fun launchAlert(alert: FingerprintAlert) {
+        if (!launchOutOfFocus) {
+            view.doLaunchAlert(alert)
+        }
+    }
+
     override fun handleOnResume() {
         launchOutOfFocus = false
     }
 
     override fun handleOnPause() {
         launchOutOfFocus = true
+        setupFlow?.dispose()
     }
 
     private fun addBluetoothConnectivityEvent() {

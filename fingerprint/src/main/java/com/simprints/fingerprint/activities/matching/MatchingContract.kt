@@ -26,7 +26,7 @@ interface MatchingContract {
 
         fun makeToastMatchFailed()
 
-        fun doSetResult(resultCode: Int, resultData: Intent)
+        fun doSetResult(resultCode: Int, resultData: Intent?)
 
         fun doFinish()
     }

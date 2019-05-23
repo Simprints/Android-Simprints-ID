@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.launch
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -19,10 +20,11 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.core.tools.json.LanguageHelper
-import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.LAUNCH
+import com.simprints.fingerprint.activities.orchestrator.Orchestrator
+import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -30,8 +32,13 @@ import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
+import javax.inject.Inject
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View {
+class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratedActivity {
+
+    override val activity = LAUNCH
+    override val context: Context by lazy { this }
+    @Inject lateinit var orchestrator: Orchestrator
 
     override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
@@ -43,6 +50,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
+        component.inject(this)
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForFingerprintException()
@@ -51,7 +60,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }
@@ -98,15 +106,14 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        orchestrator.onActivityResult(this, requestCode, resultCode, data)
+    }
 
-        AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)?.let {
-            viewPresenter.tryAgainFromErrorScreen(it, data)
-        } ?: run {
-            when (requestCode) {
-                COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
-                REFUSAL_ACTIVITY_REQUEST ->
-                    viewPresenter.tearDownAppWithResult(resultCode, data)
-            }
+    override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
+    override fun handleResult(resultCode: Int?, data: Intent?) {}
+    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
+        resultCode?.let {
+            setResultAndFinish(it, data)
         }
     }
 

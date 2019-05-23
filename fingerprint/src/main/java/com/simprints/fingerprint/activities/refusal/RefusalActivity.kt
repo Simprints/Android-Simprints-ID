@@ -8,6 +8,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application

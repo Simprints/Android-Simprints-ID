@@ -63,17 +63,24 @@ class RefusalPresenter(private val view: RefusalContract.View,
                 timeHelper.now(),
                 refusalReason.toRefusalAnswerForEvent(),
                 refusalText))
+        }.doFinally {
+
+            view.setResultAndFinish(
+                Activity.RESULT_OK,
+                RefusalActResult(
+                    RefusalActResult.Action.SUBMIT,
+                    RefusalActResult.Answer(reason, refusalText)))
+
         }.subscribeBy(onError = {
             crashReportManager.logExceptionOrSafeException(it)
-            view.setResultAndFinish(Activity.RESULT_CANCELED, RefusalActResult(reason, refusalText))
-        }, onComplete = {
-            view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason, refusalText))
         })
     }
 
     override fun handleScanFingerprintsClick() {
         logMessageForCrashReport("Scan fingerprints button clicked")
-        view.setResultAndFinish(Activity.RESULT_OK, RefusalActResult(reason))
+        view.setResultAndFinish(Activity.RESULT_OK,
+            RefusalActResult(
+                RefusalActResult.Action.SCAN_FINGERPRINTS))
     }
 
     override fun handleLayoutChange() {

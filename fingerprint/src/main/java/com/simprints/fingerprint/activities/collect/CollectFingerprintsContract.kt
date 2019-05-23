@@ -8,9 +8,9 @@ import android.widget.ProgressBar
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
@@ -28,12 +28,12 @@ interface CollectFingerprintsContract {
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
-        fun finishSuccessEnrol(bundleKey: String, result: CollectResult)
-        fun finishSuccessAndStartMatching(bundleKey: String, result: CollectResult)
+        fun finishSuccessEnrol(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
+        fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
         fun cancelAndFinish()
 
         fun showSplashScreen()
-        fun setResultAndFinish(resultCode: Int, intent: Intent)
+        fun setResultDataAndFinish(resultCode: Int?, data: Intent?)
 
         // Fingers
         var pageAdapter: FingerPageAdapter
@@ -82,6 +82,5 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
-        fun onAlertScreenReturn(alertActResponse: AlertActResponse, intent: Intent)
     }
 }

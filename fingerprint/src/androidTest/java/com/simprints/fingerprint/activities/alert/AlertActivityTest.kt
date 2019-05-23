@@ -19,7 +19,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
@@ -82,7 +82,7 @@ class AlertActivityTest {
         onView(withId(R.id.left_button)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            BLUETOOTH_NOT_ENABLED, AlertActResponse.CloseButtonAction.TRY_AGAIN)
+            BLUETOOTH_NOT_ENABLED, AlertActResult.CloseButtonAction.TRY_AGAIN)
     }
 
     @Test
@@ -93,7 +93,7 @@ class AlertActivityTest {
         onView(withId(R.id.left_button)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            UNEXPECTED_ERROR, AlertActResponse.CloseButtonAction.CLOSE)
+            UNEXPECTED_ERROR, AlertActResult.CloseButtonAction.CLOSE)
     }
 
     @Test
@@ -155,18 +155,16 @@ class AlertActivityTest {
 
         onView(withId(R.id.message))
             .check(matches(withText(alertActivityViewModel.message)))
-
-        onView(withId(R.id.alert_image)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
     }
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
                                      fingerprintAlert: FingerprintAlert,
-                                     buttonAction: AlertActResponse.CloseButtonAction) {
+                                     buttonAction: AlertActResult.CloseButtonAction) {
         Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
-        result.resultData.setExtrasClassLoader(AlertActResponse::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)
-        Truth.assertThat(response).isEqualTo(AlertActResponse(fingerprintAlert, buttonAction))
+        result.resultData.setExtrasClassLoader(AlertActResult::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<AlertActResult>(AlertActResult.BUNDLE_KEY)
+        Truth.assertThat(response).isEqualTo(AlertActResult(fingerprintAlert, buttonAction))
     }
 
     @After

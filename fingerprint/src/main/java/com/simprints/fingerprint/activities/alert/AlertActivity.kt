@@ -3,7 +3,6 @@ package com.simprints.fingerprint.activities.alert
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.ColorInt
@@ -12,14 +11,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse.CloseButtonAction.*
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
@@ -32,7 +31,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
-            ?: FingerprintAlert.UNEXPECTED_ERROR
+            ?: UNEXPECTED_ERROR
 
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
@@ -74,9 +73,23 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     }
 
     override fun onBackPressed() {
-        viewPresenter.handleBackButton()
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, handleBackButton(alertType)))
+        })
+
+        finish()
         super.onBackPressed()
     }
+
+    private fun handleBackButton(alertType: FingerprintAlert): AlertActResult.CloseButtonAction =
+        when(alertType) {
+            GUID_NOT_FOUND_ONLINE,
+            BLUETOOTH_NOT_ENABLED,
+            NOT_PAIRED,
+            MULTIPLE_PAIRED_SCANNERS,
+            DISCONNECTED -> TRY_AGAIN
+            else -> CLOSE
+        }
 
     override fun openBluetoothSettings() {
         val intent = Intent()
@@ -92,7 +105,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun closeActivityAfterTryAgainButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertType, TRY_AGAIN))
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, TRY_AGAIN))
         })
 
         finish()
@@ -100,7 +113,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertType, CLOSE))
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, CLOSE))
         })
 
         finish()

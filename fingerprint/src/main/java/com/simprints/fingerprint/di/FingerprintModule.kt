@@ -3,6 +3,8 @@ package com.simprints.fingerprint.di
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.simprints.core.di.FeatureScope
+import com.simprints.fingerprint.activities.orchestrator.Orchestrator
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorImpl
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManagerImpl
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
@@ -45,4 +47,10 @@ open class FingerprintModule {
     @FeatureScope
     open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
         AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
+
+    @Provides
+    @FeatureScope
+    open fun provideFingerprintOrchestrator(): Orchestrator =
+        OrchestratorImpl()
+
 }

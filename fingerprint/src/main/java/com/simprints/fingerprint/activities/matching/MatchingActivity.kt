@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.matching
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -14,6 +15,9 @@ import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.orchestrator.Orchestrator
+import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
+import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -24,12 +28,14 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
 import com.simprints.id.Application
-import com.simprints.id.activities.alert.AlertActivityHelper
 import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MatchingActivity : AppCompatActivity(), MatchingContract.View {
+class MatchingActivity : AppCompatActivity(), MatchingContract.View, OrchestratedActivity {
+
+    override val activity = MATCHING
+    override val context: Context by lazy { this }
 
     override lateinit var viewPresenter: MatchingContract.Presenter
 
@@ -38,6 +44,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
+    @Inject lateinit var orchestrator: Orchestrator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,11 +129,16 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
-        if (potentialAlertScreenResponse != null) {
-            setResult(resultCode, data)
-            doFinish()
+        orchestrator.onActivityResult(this, requestCode, resultCode, data)
+    }
+
+    override fun tryAgain() {}
+    override fun handleResult(resultCode: Int?, data: Intent?) {}
+    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
+        resultCode?.let {
+            doSetResult(it, data)
         }
+        doFinish()
     }
 
     override fun launchAlertActivity() {
@@ -137,7 +149,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
     }
 
-    override fun doSetResult(resultCode: Int, resultData: Intent) {
+    override fun doSetResult(resultCode: Int, resultData: Intent?) {
         setResult(resultCode, resultData)
     }
 
