@@ -6,6 +6,7 @@ import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
 import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
 import com.simprints.clientapi.domain.requests.IntegrationInfo
+import javax.inject.Inject
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
@@ -25,7 +26,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override val action: String?
         get() = intent.action
 
-    override lateinit var presenter: OdkContract.Presenter
+    @Inject override lateinit var presenter: OdkContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

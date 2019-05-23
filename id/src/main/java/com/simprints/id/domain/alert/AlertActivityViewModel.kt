@@ -5,10 +5,9 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import com.simprints.id.R
-import com.simprints.id.domain.Constants
 
 //TODO: originally in the pro-guard. Do we really need it unobfuscated?
-@Keep //StopShip: this class should be used only by AlertAct
+@Keep
 enum class AlertActivityViewModel(val type: Type,
                                   val leftButton: ButtonAction,
                                   val rightButton: ButtonAction,

@@ -52,6 +52,14 @@
 
 # For Realm
 -keepnames public class * extends io.realm.RealmObject
+-keep @io.realm.annotations.RealmModule class *
+-keepattributes Annotation
+-dontwarn javax.**
+-dontwarn io.realm.**
+-keep class io.realm.annotations.RealmModule
+-keep @interface io.realm.annotations.RealmModule { *; }
+-keep class io.realm.annotations.RealmModule { *; }
+
 
 # These contain serialised models
 -keep class com.simprints.libsimprints.** { *; }
