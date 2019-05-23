@@ -5,10 +5,9 @@ import com.simprints.id.domain.alert.AlertType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class AlertActResponse(val alertType: AlertType): Parcelable {
+data class AlertActResponse(val alertType: AlertType): Parcelable {
 
     companion object {
-        const val ALERT_SCREEN_RESPONSE_CODE_OK = 201
         const val BUNDLE_KEY = "AlertActResponseBundleKey"
     }
 }

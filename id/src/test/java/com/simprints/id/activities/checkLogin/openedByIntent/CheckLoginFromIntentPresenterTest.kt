@@ -40,7 +40,7 @@ class CheckLoginFromIntentPresenterTest {
             }
 
             sessionEventsManager = mock<SessionEventsManager>().apply {
-                whenever(this) { createSession() } thenReturn Single.just(createFakeSession())
+                whenever(this) { createSession("") } thenReturn Single.just(createFakeSession())
                 whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
             }
         }

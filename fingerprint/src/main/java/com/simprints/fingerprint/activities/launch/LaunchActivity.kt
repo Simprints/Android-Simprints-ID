@@ -22,6 +22,7 @@ import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.response.AlertActResponse
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -98,10 +99,9 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
-        if (potentialAlertScreenResponse != null) {
-            viewPresenter.tryAgainFromErrorScreen(potentialAlertScreenResponse, data)
-        } else {
+        AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)?.let {
+            viewPresenter.tryAgainFromErrorScreen(it, data)
+        } ?: run {
             when (requestCode) {
                 COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE,
                 REFUSAL_ACTIVITY_REQUEST ->

@@ -14,27 +14,40 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
+import com.nhaarman.mockito_kotlin.any
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.id.Application
 import com.simprints.testtools.android.hasImage
+import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.verifyOnce
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 import com.simprints.id.R as idR
 
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest {
 
+    @Inject lateinit var sessionEventManagerMock: FingerprintSessionEventsManager
+
+    private val fingerprintModule by lazy {
+        TestFingerprintCoreModule(
+            fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
+    }
+
     @Before
     fun setUp() {
-        AndroidTestConfig(this).fullSetup()
+        AndroidTestConfig(this, fingerprintCoreModule = fingerprintModule).fullSetup()
         Intents.init()
     }
 
@@ -42,6 +55,8 @@ class AlertActivityTest {
     fun noParamForAlertActivity_theRightAlertShouldAppear() {
         launchAlertActivity()
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
+
+        verifyOnce(sessionEventManagerMock) { addEventInBackground(any<AlertScreenEvent>()) }
     }
 
     @Test
@@ -71,7 +86,6 @@ class AlertActivityTest {
     }
 
     @Test
-    @SmallTest
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)

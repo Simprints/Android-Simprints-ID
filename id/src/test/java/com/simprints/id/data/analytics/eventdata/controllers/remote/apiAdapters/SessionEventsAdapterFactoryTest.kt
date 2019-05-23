@@ -37,7 +37,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_alertScreenEventApiModel() {
-        val event = AlertScreenEvent(0, AlertActivityViewModel.NOT_PAIRED)
+        val event = AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID)
         val apiEvent = ApiAlertScreenEvent(event)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateAlertScreenEventApiModel(json)
@@ -346,7 +346,7 @@ class SessionEventsAdapterFactoryTest {
             Device("28", "phone", "device_id"),
             0,
             DatabaseInfo(0, 0))
-        session.addEvent(AlertScreenEvent(0, AlertActivityViewModel.NOT_PAIRED))
+        session.addEvent(AlertScreenEvent(0, AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID))
         val apiSession = ApiSessionEvents(session)
         val json = gsonWithAdapters.toJsonTree(apiSession).asJsonObject
         validateSessionEventsApiModel(json)

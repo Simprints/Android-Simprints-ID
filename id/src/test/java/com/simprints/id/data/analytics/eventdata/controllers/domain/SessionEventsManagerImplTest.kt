@@ -70,7 +70,7 @@ class SessionEventsManagerImplTest {
     @Test
     fun createSession_shouldCreateASession() {
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession("").blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
         val createdSession = sessionsInFakeDb.first()
@@ -84,7 +84,7 @@ class SessionEventsManagerImplTest {
         sessionsInFakeDb.add(openSession)
         assertThat(openSession.isOpen()).isTrue()
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession("").blockingGet()
 
         assertThat(sessionsInFakeDb.size).isEqualTo(2)
         val newCreatedSession = sessionsInFakeDb.find { it.id != "old_session_id" }
@@ -101,7 +101,7 @@ class SessionEventsManagerImplTest {
     fun closeLastSessionsIfPending_shouldSwallowException() {
         whenever(sessionEventsLocalDbManagerMock.loadSessions(anyOrNull(), anyOrNull())).thenReturn(Single.error(Throwable("error_reading_db")))
 
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession("").blockingGet()
 
         verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         assertThat(sessionsInFakeDb.size).isEqualTo(1)
@@ -109,7 +109,7 @@ class SessionEventsManagerImplTest {
 
     @Test
     fun updateSession_shouldUpdateSession() {
-        sessionsEventsManagerSpy.createSession().blockingGet()
+        sessionsEventsManagerSpy.createSession("").blockingGet()
         sessionsEventsManagerSpy.updateSession {
             it.projectId = "new_project"
         }.blockingAwait()

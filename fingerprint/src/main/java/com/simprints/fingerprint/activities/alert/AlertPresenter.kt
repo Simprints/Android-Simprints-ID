@@ -13,7 +13,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonA
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintComponent,
-                     val alertType: FingerprintAlert) : AlertContract.Presenter {
+                     private val alertType: FingerprintAlert) : AlertContract.Presenter {
 
     private val alertViewModel =  AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 

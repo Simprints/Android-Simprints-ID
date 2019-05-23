@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.any
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
@@ -19,10 +20,7 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import org.junit.Test
 import java.util.*
@@ -124,8 +122,8 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        LibSimprintsPresenter(view, "", mock(), mock(), mock(), mock(), mock()).handleResponseError(mock())
-        verifyOnce(view) { returnErrorToClient(anyNotNull(), any()) }
+        LibSimprintsPresenter(view, "", mock(), mock(), mock(), mock(), mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+        verifyOnce(view) { returnErrorToClient(anyNotNull(), anyOrNull()) }
     }
 
     private fun mockSessionManagerToCreateSession() =

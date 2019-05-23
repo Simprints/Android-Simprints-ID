@@ -10,6 +10,7 @@ import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.debug.DebugActivity
@@ -122,9 +123,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AlertActResponse.ALERT_SCREEN_RESPONSE_CODE_OK) { //StopShip: Check data
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
             finish()
-        } else if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
+        }
+
+        if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             viewPresenter.logout()
         }
     }
