@@ -20,6 +20,7 @@ import com.simprints.clientapi.routers.ClientRequestErrorRouter.extractPotential
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
 import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
+import timber.log.Timber
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
@@ -60,6 +61,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Timber.d("RequestActivity: onActivityResult")
 
         val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
         if (potentialAlertScreenResponse != null) {
