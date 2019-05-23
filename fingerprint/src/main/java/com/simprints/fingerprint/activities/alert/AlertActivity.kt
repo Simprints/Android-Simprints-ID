@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.alert
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.annotation.ColorInt
@@ -11,6 +12,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResponse.CloseButtonAction.*
@@ -22,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
-    lateinit var alertType: FingerprintAlert
+    private lateinit var alertType: FingerprintAlert
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

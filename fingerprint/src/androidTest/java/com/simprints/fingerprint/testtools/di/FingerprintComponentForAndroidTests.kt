@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.testtools.di
 
 import com.simprints.core.di.FeatureScope
+import com.simprints.fingerprint.activities.alert.AlertActivityTest
 import com.simprints.fingerprint.activities.launch.LaunchActivityAndroidTest
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.di.FingerprintCoreModule
@@ -25,4 +26,5 @@ interface FingerprintComponentForAndroidTests: FingerprintComponent {
 
     fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
     fun inject(collectFingerprintsActivityTest: CollectFingerprintsActivityTest)
+    fun inject(alertActivityTest: AlertActivityTest)
 }

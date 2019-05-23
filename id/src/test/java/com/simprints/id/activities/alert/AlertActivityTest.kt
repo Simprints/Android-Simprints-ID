@@ -62,39 +62,12 @@ class AlertActivityTest {
         checkAlertIsShownCorrectly(activity, alertType)
     }
 
-    @Test
-    fun anBluetoothErrorOccurs_shouldShowTheRightAlertView() {
-        val alertType = AlertActivityViewModel.BLUETOOTH_NOT_ENABLED
-        val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
-        val activity = controller.get() as AlertActivity
-        controller.visible()
-        activity.right_button.performClick()
-
-        val intent = Shadows.shadowOf(activity).nextStartedActivity
-        assertEquals(intent.action, "android.settings.BLUETOOTH_SETTINGS")
-
-        checkAlertIsShownCorrectly(activity, alertType)
-    }
-
-    @Test
-    fun anOfflineError_shouldShowTheRightAlertView() {
-        val alertType = AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE
-        val controller = createRoboAlertActivity(createIntentForAlertType(alertType)).showOnScreen()
-        val activity = controller.get() as AlertActivity
-        controller.visible()
-        activity.right_button.performClick()
-
-        val intent = Shadows.shadowOf(activity).nextStartedActivity
-        assertEquals(intent.action, "android.settings.WIFI_SETTINGS")
-
-        checkAlertIsShownCorrectly(activity, alertType)
-    }
-
     private fun createRoboAlertActivity(intent: Intent) =
         createActivity<AlertActivity>(intent)
 
     private fun createIntentForAlertType(alertActivity: AlertActivityViewModel) = Intent().apply {
-        putExtra(IntentKeys.alertActivityAlertTypeKey, alertActivity)
+        //putExtra(IntentKeys.alertActivityAlertTypeKey, alertActivity)//StopShip
+
     }
 
     private fun checkAlertIsShownCorrectly(alertActivity: AlertActivity, alert: AlertActivityViewModel) {

@@ -5,7 +5,7 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class AlertActResponse(val alert: FingerprintAlert,
+data class AlertActResponse(val alert: FingerprintAlert,
                        val closeButtonAction: CloseButtonAction): Parcelable {
 
     companion object {
