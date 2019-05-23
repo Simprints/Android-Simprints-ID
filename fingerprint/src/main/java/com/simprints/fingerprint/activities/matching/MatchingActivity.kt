@@ -26,6 +26,7 @@ import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatching
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityHelper
 import kotlinx.android.synthetic.main.activity_matching.*
+import timber.log.Timber
 import javax.inject.Inject
 
 class MatchingActivity : AppCompatActivity(), MatchingContract.View {
@@ -124,7 +125,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
         if (potentialAlertScreenResponse != null) {
             setResult(resultCode, data)
-            finish()
+            doFinish()
         }
     }
 
@@ -141,6 +142,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
     }
 
     override fun doFinish() {
+        Timber.d("MatchingAct: done")
         finish()
     }
 

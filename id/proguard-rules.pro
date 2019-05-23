@@ -61,8 +61,10 @@
 -keep class io.realm.annotations.RealmModule { *; }
 
 
-# These contain serialised models
+# These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
+-keep class com.simprints.fingerprintmatcher.** { *; }
+-dontwarn com.simprints.fingerprintmatcher.**
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports
