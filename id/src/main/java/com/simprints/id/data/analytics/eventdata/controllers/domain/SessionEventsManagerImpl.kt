@@ -131,7 +131,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
     override fun addPersonCreationEventInBackground(person: Person) {
         updateSessionInBackground { session ->
             session.addEvent(PersonCreationEvent(
-                session.timeRelativeToStartTime(timeHelper.now()),
+                timeHelper.now(),
                 extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
