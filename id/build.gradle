@@ -170,7 +170,7 @@ dependencies {
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
     api deps.gson.core
-    implementation deps.timber.core
+    api deps.timber.core
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
