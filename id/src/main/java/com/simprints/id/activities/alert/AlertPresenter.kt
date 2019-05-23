@@ -1,6 +1,5 @@
 package com.simprints.id.activities.alert
 
-import android.app.Activity.RESULT_CANCELED
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger

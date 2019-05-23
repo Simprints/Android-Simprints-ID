@@ -64,10 +64,6 @@ class AlertPresenter(val view: AlertContract.View,
         }
     }
 
-    override fun handleBackButton() {
-        view.setResult(RESULT_CANCELED)
-    }
-
     private fun logToCrashReport() {
         crashReportManager.logMessageForCrashReport(ALERT, UI, message = alertViewModel.name)
     }

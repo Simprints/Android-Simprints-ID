@@ -19,7 +19,6 @@ interface AlertContract {
         fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction)
         fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
-        fun setResult(resultCode: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
         fun closeActivityAfterTryAgainButton()
@@ -28,6 +27,5 @@ interface AlertContract {
 
     interface Presenter : BasePresenter {
         fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
-        fun handleBackButton()
     }
 }

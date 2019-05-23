@@ -10,7 +10,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
@@ -25,7 +25,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.collect.CollectResult
+import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
@@ -280,7 +280,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun handleSavePersonSuccess(probe: Person) {
         preferencesManager.lastEnrolDate = Date()
-        view.finishSuccessEnrol(CollectResult.BUNDLE_KEY, CollectResult(probe))
+        view.finishSuccessEnrol(CollectFingerprintsActResult.BUNDLE_KEY, CollectFingerprintsActResult(probe))
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
@@ -289,7 +289,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        view.finishSuccessAndStartMatching(CollectResult.BUNDLE_KEY, CollectResult(person))
+        view.finishSuccessAndStartMatching(CollectFingerprintsActResult.BUNDLE_KEY, CollectFingerprintsActResult(person))
     }
 
     override fun handleException(simprintsException: FingerprintSimprintsException) {
@@ -349,13 +349,6 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
-    }
-
-    override fun onAlertScreenReturn(alertActResponse: AlertActResponse, intent: Intent) {
-        when (alertActResponse.closeButtonAction) {
-            AlertActResponse.CloseButtonAction.CLOSE -> view.setResultAndFinish(Activity.RESULT_OK, intent)
-            AlertActResponse.CloseButtonAction.TRY_AGAIN -> handleTryAgainFromDifferentActivity()
-        }
     }
 
     companion object {

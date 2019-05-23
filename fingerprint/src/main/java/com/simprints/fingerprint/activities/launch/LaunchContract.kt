@@ -4,7 +4,7 @@ import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResponse
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
@@ -41,6 +41,6 @@ interface LaunchContract {
         fun confirmConsentAndContinueToNextActivity()
         fun handleDeclinePressed()
         fun handleOnBackPressed()
-        fun tryAgainFromErrorScreen(alertActResponse: AlertActResponse, intent: Intent?)
+        fun tryAgainFromErrorScreen()
     }
 }
