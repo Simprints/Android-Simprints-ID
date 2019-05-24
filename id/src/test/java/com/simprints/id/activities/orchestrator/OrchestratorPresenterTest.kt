@@ -1,7 +1,6 @@
 package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
-import com.google.common.reflect.Invokable
 import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -75,7 +74,7 @@ class OrchestratorPresenterTest {
 
     @Test
     fun givenOrchestratorPresenter_anAppResponseIsReceived_presenterShouldReturnIt() {
-        val mockAppResponse = mock<AppResponse>()
+        val mockAppResponse = createAppEnrolResponse()
         val orchestratorPresenter = createOrchestratorPresenter()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
@@ -112,7 +111,7 @@ class OrchestratorPresenterTest {
             this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
-                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppEnrolResponse>())
+                whenever(this) { getAppResponse() } thenReturn Single.just(createAppEnrolResponse())
                 whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
             }
 
@@ -135,7 +134,7 @@ class OrchestratorPresenterTest {
             this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
-                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppIdentifyResponse>())
+                whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppIdentifyResponse>(AppResponseType.IDENTIFY))
                 whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
             }
 
@@ -158,7 +157,7 @@ class OrchestratorPresenterTest {
             this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
-                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppVerifyResponse>())
+                whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppVerifyResponse>(AppResponseType.VERIFY))
                 whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
             }
 
@@ -181,7 +180,7 @@ class OrchestratorPresenterTest {
             this.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
-                whenever(this) { getAppResponse() } thenReturn Single.just(mock<AppRefusalFormResponse>())
+                whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppRefusalFormResponse>(AppResponseType.REFUSAL))
                 whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
             }
 
@@ -199,12 +198,21 @@ class OrchestratorPresenterTest {
             val sessionMock = mock<SessionEvents>()
             whenever(sessionMock) { id } thenReturn ""
             whenever(this) { getCurrentSession() } thenReturn Single.just(sessionMock)
-            whenever(this) { updateSession(any()) } thenAnswer  {
+            whenever(this) { updateSession(any()) } thenAnswer {
                 val callback = it.arguments[0] as (SessionEvents) -> Unit
                 callback(mock())
                 Completable.complete()
             }
         }
+
+    private inline fun <reified T: AppResponse> createMockFoAppResponse(type: AppResponseType): T =
+        mock<T>().apply { whenever(this) { this.type } thenReturn type }
+
+    private fun createAppEnrolResponse(): AppEnrolResponse =
+        createMockFoAppResponse<AppEnrolResponse>(AppResponseType.ENROL).apply {
+            whenever(this) { guid } thenReturn ""
+        }
+
 
     private fun createOrchestratorPresenter() =
         OrchestratorPresenter().apply {
