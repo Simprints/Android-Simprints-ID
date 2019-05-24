@@ -5,27 +5,28 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class AppErrorResponse(val reason: AppErrorReason) : AppResponse {
+data class AppErrorResponse(val reason: Reason) : AppResponse {
 
     @IgnoredOnParcel override val type: AppResponseType = AppResponseType.ERROR
-}
 
-enum class AppErrorReason {
-    DIFFERENT_PROJECT_ID_SIGNED_IN,
-    DIFFERENT_USER_ID_SIGNED_IN,
-    GUID_NOT_FOUND_ONLINE,
-    GUID_NOT_FOUND_OFFLINE,
-    UNEXPECTED_ERROR,
-    BLUETOOTH_NOT_SUPPORTED,
-    SCANNER_LOW_BATTERY,
-    UNKNOWN_BLUETOOTH_ISSUE;
+    enum class Reason {
+        DIFFERENT_PROJECT_ID_SIGNED_IN,
+        DIFFERENT_USER_ID_SIGNED_IN,
+        GUID_NOT_FOUND_ONLINE,
+        GUID_NOT_FOUND_OFFLINE,
+        UNEXPECTED_ERROR,
+        BLUETOOTH_NOT_SUPPORTED,
+        SCANNER_LOW_BATTERY,
+        UNKNOWN_BLUETOOTH_ISSUE;
 
-    companion object {
-        fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
-            when (alertType) {
-                AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
-                AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
-                AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-            }
+        companion object {
+            fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
+                when (alertType) {
+                    AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
+                    AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
+                    AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                }
+        }
     }
 }
+

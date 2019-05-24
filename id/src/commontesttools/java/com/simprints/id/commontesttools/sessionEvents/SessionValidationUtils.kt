@@ -51,6 +51,7 @@ fun validateCallbackEventApiModel(json: JsonObject) {
             ApiCallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(it)
             ApiCallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(it)
             ApiCallbackType.REFUSAL -> verifyCallbackRefusalApiModel(it)
+            ApiCallbackType.ERROR -> verifyCallbackErrorApiModel(it)
         }
     }
 
@@ -87,6 +88,11 @@ fun verifyCallbackRefusalApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("REFUSAL")
     assertThat(json.get("reason").asString)
     assertThat(json.get("extra").asString)
+}
+
+fun verifyCallbackErrorApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("ERROR")
+    assertThat(json.get("reason").asString)
 }
 
 fun validateCalloutEventApiModel(json: JsonObject) {

@@ -3,15 +3,13 @@ package com.simprints.id.data.analytics.eventdata.models.remote
 import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.EnrolmentCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.IdentificationCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.RefusalCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.VerificationCallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.*
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
 
 @Keep
 fun Event.toApiEvent(): ApiEvent =
@@ -41,4 +39,5 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_ENROLMENT -> ApiCallbackEvent(this as EnrolmentCallbackEvent)
         CALLBACK_REFUSAL -> ApiCallbackEvent(this as RefusalCallbackEvent)
         CALLBACK_VERIFICATION -> ApiCallbackEvent(this as VerificationCallbackEvent)
+        CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
     }

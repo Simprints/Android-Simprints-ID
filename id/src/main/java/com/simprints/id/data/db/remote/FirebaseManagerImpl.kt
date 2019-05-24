@@ -26,7 +26,7 @@ open class FirebaseManagerImpl: RemoteDbManager {
         firebaseAuth.signOut()
     }
 
-    override fun isSignedIn(projectId: String, userId: String): Boolean = firebaseAuth.currentUser?.uid == projectId
+    override fun isSignedIn(projectId: String, userId: String): Boolean = firebaseAuth.currentUser?.uid?.startsWith(projectId) ?: false
 
     override fun getCurrentToken(): Single<String> = Single.fromCallable {
             val result = Tasks.await(firebaseAuth.getAccessToken(false))

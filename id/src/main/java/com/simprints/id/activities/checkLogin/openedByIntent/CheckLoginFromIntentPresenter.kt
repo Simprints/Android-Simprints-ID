@@ -24,7 +24,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -131,7 +131,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     override fun onAlertScreenReturn(alertActResponse: AlertActResponse) {
-        val domainErrorResponse = AppErrorResponse(AppErrorReason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
+        val domainErrorResponse = AppErrorResponse(Reason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
         view.setResultErrorAndFinish(fromDomainToAppErrorResponse(domainErrorResponse))
     }
 
