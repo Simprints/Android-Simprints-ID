@@ -83,7 +83,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     private fun handleBackButton(alertType: FingerprintAlert): AlertActResult.CloseButtonAction =
         when(alertType) {
-            GUID_NOT_FOUND_ONLINE,
+            GUID_NOT_FOUND_OFFLINE,
             BLUETOOTH_NOT_ENABLED,
             NOT_PAIRED,
             MULTIPLE_PAIRED_SCANNERS,
