@@ -8,19 +8,23 @@ import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.di.ErrorActivityComponentInjector
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
+import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import kotlinx.android.synthetic.main.activity_error.*
 import javax.inject.Inject
 
 class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
     @Inject override lateinit var presenter: ErrorContract.Presenter
+    @Inject lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+
     private lateinit var clientApiAlertType: ClientApiAlert
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_error)
 
-        ErrorActivityComponentInjector.inject(this)
+
         clientApiAlertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
             ?: ClientApiAlert.INVALID_CLIENT_REQUEST
 

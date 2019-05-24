@@ -74,8 +74,8 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        val clientResponse = mapDomainToLibSimprintErrorResponse[errorResponse.reason]
-        view.returnErrorToClient(clientResponse?.first, clientResponse?.second)
+        val resultErrorCode = domainErrorToCallingAppResultCode[errorResponse.reason]
+        view.returnErrorToClient(resultErrorCode)
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

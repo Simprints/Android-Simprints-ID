@@ -87,7 +87,7 @@ class ImplRequestPresenter(view: RequestContract.RequestView,
                            clientApiCrashReportManager: ClientApiCrashReportManager,
                            gsonBuilder: GsonBuilder,
                            integrationInfo: IntegrationInfo,
-                           override val mapDomainToLibSimprintErrorResponse: Map<ErrorResponse.Reason, Pair<Int, Intent?>>) :
+                           override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>) :
     RequestPresenter(
         view,
         timeHelper,

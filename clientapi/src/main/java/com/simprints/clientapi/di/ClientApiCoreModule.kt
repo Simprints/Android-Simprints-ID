@@ -22,6 +22,7 @@ open class ClientApiCoreModule {
     open fun provideClientApiSessionEventsManager(coreSessionManager: SessionEventsManager): ClientApiSessionEventsManager =
         ClientApiSessionEventsManagerImpl(coreSessionManager)
 
+
     @Provides
     @FeatureScope
     open fun provideClientApiCrashReportManager(coreCrashReportManager: CoreCrashReportManager): ClientApiCrashReportManager =

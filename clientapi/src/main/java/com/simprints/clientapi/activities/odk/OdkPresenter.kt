@@ -26,7 +26,7 @@ class OdkPresenter(private val view: OdkContract.View,
                    integrationInfo: IntegrationInfo)
     : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
 
-    override val mapDomainToLibSimprintErrorResponse: Map<ErrorResponse.Reason, Pair<Int, Intent?>>
+    override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = emptyMap() //We return CANCEL for any ErrorResponse.Reason
 
     companion object {
