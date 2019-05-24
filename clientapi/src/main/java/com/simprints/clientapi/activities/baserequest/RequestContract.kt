@@ -32,7 +32,7 @@ interface RequestContract {
 
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
-        fun returnErrorToClient(resultCode: Int?, intent: Intent?)
+        fun returnErrorToClient(resultCode: Int?)
 
         fun getIntentAction(): String
 
@@ -41,7 +41,7 @@ interface RequestContract {
 
     interface Presenter {
 
-        val mapDomainToLibSimprintErrorResponse: Map<ErrorResponse.Reason, Pair<Int, Intent?>>
+        val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
 
         fun processEnrollRequest()
 

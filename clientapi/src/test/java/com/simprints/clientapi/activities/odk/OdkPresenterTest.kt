@@ -115,7 +115,7 @@ class OdkPresenterTest {
     @Test
     fun handleResponseError_ShouldCallActionError() {
         OdkPresenter(view, "", mock(), mock(), mock(), mock(), MOCK_INTEGRATION).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
-        verifyOnce(view) { returnErrorToClient(anyOrNull(), anyOrNull()) }
+        verifyOnce(view) { returnErrorToClient(anyOrNull()) }
     }
 
     @Test

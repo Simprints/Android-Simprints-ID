@@ -71,8 +71,7 @@ class OrchestratorImpl : Orchestrator {
         extractRefusalActResult(data)?.let {
             when (it.action) {
                 SUBMIT -> receiver.setResultDataAndFinish(resultCode, prepareRefusalForm(it))
-                SCAN_FINGERPRINTS -> { /* Do Nothing */
-                }
+                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
             }
             return
         }

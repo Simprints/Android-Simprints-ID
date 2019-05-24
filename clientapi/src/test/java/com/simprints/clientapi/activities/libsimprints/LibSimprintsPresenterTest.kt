@@ -123,7 +123,7 @@ class LibSimprintsPresenterTest {
     @Test
     fun handleResponseError_ShouldCallActionError() {
         LibSimprintsPresenter(view, "", mock(), mock(), mock(), mock(), mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
-        verifyOnce(view) { returnErrorToClient(anyNotNull(), anyOrNull()) }
+        verifyOnce(view) { returnErrorToClient(anyNotNull()) }
     }
 
     private fun mockSessionManagerToCreateSession() =
