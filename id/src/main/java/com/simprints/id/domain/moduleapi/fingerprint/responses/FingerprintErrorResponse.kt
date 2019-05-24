@@ -1,6 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses
 
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -19,12 +20,12 @@ enum class FingerprintErrorReason {
     GUID_NOT_FOUND_OFFLINE
 }
 
-fun FingerprintErrorReason.toAppErrorReason(): AppErrorReason =
+fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason =
     when(this) {
-        FingerprintErrorReason.UNEXPECTED_ERROR -> AppErrorReason.UNEXPECTED_ERROR
-        FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> AppErrorReason.BLUETOOTH_NOT_SUPPORTED
-        FingerprintErrorReason.SCANNER_LOW_BATTERY -> AppErrorReason.SCANNER_LOW_BATTERY
-        FingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE -> AppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
-        FingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> AppErrorReason.GUID_NOT_FOUND_ONLINE
-        FingerprintErrorReason.GUID_NOT_FOUND_OFFLINE -> AppErrorReason.GUID_NOT_FOUND_OFFLINE
+        FingerprintErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+        FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+        FingerprintErrorReason.SCANNER_LOW_BATTERY -> SCANNER_LOW_BATTERY
+        FingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
+        FingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+        FingerprintErrorReason.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
     }

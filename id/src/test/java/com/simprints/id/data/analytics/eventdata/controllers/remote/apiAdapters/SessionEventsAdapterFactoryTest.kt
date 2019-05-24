@@ -15,11 +15,14 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.remote.events.*
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.fromDomainToApi
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDevice
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocation
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -129,6 +132,15 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_callbackEventForEnrolmentApiModel() {
         val callbackEvent = EnrolmentCallbackEvent(10, "guid")
+        val apiEvent = ApiCallbackEvent(callbackEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCallbackEventApiModel(json)
+    }
+
+    @Test
+    fun validate_callbackEventForErrorApiModel() {
+        val callbackEvent = ErrorCallbackEvent(10, AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED)
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 

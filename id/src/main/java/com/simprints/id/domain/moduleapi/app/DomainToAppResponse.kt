@@ -2,7 +2,7 @@ package com.simprints.id.domain.moduleapi.app
 
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
-import com.simprints.id.domain.moduleapi.app.responses.AppErrorReason.*
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
@@ -24,7 +24,7 @@ object DomainToAppResponse {
     fun fromDomainToAppErrorResponse(response: AppErrorResponse): IAppErrorResponse =
         IAppErrorResponseImpl(fromDomainToAppErrorReason(response.reason))
 
-    private fun fromDomainToAppErrorReason(reason: AppErrorReason): IAppErrorReason =
+    private fun fromDomainToAppErrorReason(reason: AppErrorResponse.Reason): IAppErrorReason =
         when (reason) {
             DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
             DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN

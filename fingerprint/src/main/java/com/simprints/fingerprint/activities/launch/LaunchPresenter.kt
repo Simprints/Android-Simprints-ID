@@ -379,7 +379,6 @@ class LaunchPresenter(component: FingerprintComponent,
 
     override fun handleOnPause() {
         launchOutOfFocus = true
-        setupFlow?.dispose()
     }
 
     private fun addBluetoothConnectivityEvent() {

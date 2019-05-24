@@ -7,5 +7,6 @@ enum class ApiCallbackType {
     ENROLMENT,
     IDENTIFICATION,
     REFUSAL,
-    VERIFICATION
+    VERIFICATION,
+    ERROR
 }

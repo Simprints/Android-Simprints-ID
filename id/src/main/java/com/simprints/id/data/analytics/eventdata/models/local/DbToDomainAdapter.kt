@@ -2,10 +2,7 @@ package com.simprints.id.data.analytics.eventdata.models.local
 
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.EnrolmentCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.IdentificationCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.RefusalCallbackEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.VerificationCallbackEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
@@ -39,6 +36,7 @@ fun DbEvent.toDomainEvent(): Event? =
             EventType.CALLBACK_ENROLMENT -> JsonHelper.gson.fromJson(it, EnrolmentCallbackEvent::class.java)
             EventType.CALLBACK_VERIFICATION -> JsonHelper.gson.fromJson(it, VerificationCallbackEvent::class.java)
             EventType.CALLBACK_REFUSAL -> JsonHelper.gson.fromJson(it, RefusalCallbackEvent::class.java)
+            EventType.CALLBACK_ERROR -> JsonHelper.gson.fromJson(it, ErrorCallbackEvent::class.java)
             null -> null
         }
     }

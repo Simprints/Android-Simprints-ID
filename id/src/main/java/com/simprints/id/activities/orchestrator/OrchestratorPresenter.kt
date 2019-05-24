@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
@@ -15,7 +13,6 @@ import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -95,13 +92,13 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
 
         sessionEventsManager.updateSession { session ->
 
-            when (appResponse) {
-                is AppEnrolResponse -> buildEnrolmentCallbackEvent(appResponse)
-                is AppIdentifyResponse -> buildIdentificationCallbackEvent(appResponse)
-                is AppVerifyResponse -> buildVerificationCallbackEvent(appResponse)
-                is AppRefusalFormResponse -> buildRefusalCallbackEvent(appResponse)
-                else -> null
-            }?.let {
+            when (appResponse.type) {
+                AppResponseType.ENROL -> buildEnrolmentCallbackEvent(appResponse as AppEnrolResponse)
+                AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
+                AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
+                AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
+                AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
+            }.let {
                 session.addEvent(it)
             }
         }
@@ -132,6 +129,9 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 answer.reason?.name ?: "",
                 answer.optionalText)
         }
+
+    internal fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
+        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
 
     override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
         orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
