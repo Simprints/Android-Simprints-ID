@@ -211,6 +211,7 @@ fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
     assertThat(json.get("relativeStartTime").asLong)
     assertThat(json.get("relativeEndTime").asLong)
     assertThat(json.get("id").asString)
+    assertThat(json.get("finger").asString).isAnyOf("LEFT_THUMB", "LEFT_INDEX_FINGER", "LEFT_3RD_FINGER", "LEFT_4TH_FINGER", "LEFT_5TH_FINGER", "RIGHT_THUMB", "RIGHT_INDEX_FINGER", "RIGHT_3RD_FINGER", "RIGHT_4TH_FINGER", "RIGHT_5TH_FINGER")
     assertThat(json.get("qualityThreshold").asNumber)
     assertThat(json.get("result").asString).isAnyOf("GOOD_SCAN", "BAD_QUALITY", "NO_FINGER_DETECTED", "SKIPPED", "FAILURE_TO_ACQUIRE")
 
@@ -220,7 +221,7 @@ fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
         assertThat(get("template").asString).isNotEmpty()
         assertThat(size()).isEqualTo(3)
     }
-    assertThat(json.size()).isEqualTo(7)
+    assertThat(json.size()).isEqualTo(8)
 }
 
 fun validateGuidSelectionEventApiModel(json: JsonObject) {

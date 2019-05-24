@@ -8,6 +8,7 @@ class ApiFingerprintCaptureEvent(val id: String,
                                  val relativeStartTime: Long,
                                  val relativeEndTime: Long,
                                  val qualityThreshold: Int,
+                                 val finger: ApiFingerIdentifier,
                                  val result: ApiResult,
                                  val fingerprint: ApiFingerprint?) : ApiEvent(ApiEventType.FINGERPRINT_CAPTURE) {
 
@@ -17,20 +18,6 @@ class ApiFingerprintCaptureEvent(val id: String,
         constructor(finger: FingerprintCaptureEvent.Fingerprint) : this(
             ApiFingerIdentifier.valueOf(finger.finger.toString()),
             finger.quality, finger.template)
-    }
-
-    @Keep
-    enum class ApiFingerIdentifier {
-        RIGHT_5TH_FINGER,
-        RIGHT_4TH_FINGER,
-        RIGHT_3RD_FINGER,
-        RIGHT_INDEX_FINGER,
-        RIGHT_THUMB,
-        LEFT_THUMB,
-        LEFT_INDEX_FINGER,
-        LEFT_3RD_FINGER,
-        LEFT_4TH_FINGER,
-        LEFT_5TH_FINGER
     }
 
     @Keep
@@ -47,6 +34,7 @@ class ApiFingerprintCaptureEvent(val id: String,
             fingerprintCaptureEvent.relativeStartTime ?: 0,
             fingerprintCaptureEvent.relativeEndTime ?: 0,
             fingerprintCaptureEvent.qualityThreshold,
+            fingerprintCaptureEvent.finger.toApiFingerIdentifier(),
             ApiResult.valueOf(fingerprintCaptureEvent.result.toString()),
             fingerprintCaptureEvent.fingerprint?.let { ApiFingerprint(fingerprintCaptureEvent.fingerprint) })
 }

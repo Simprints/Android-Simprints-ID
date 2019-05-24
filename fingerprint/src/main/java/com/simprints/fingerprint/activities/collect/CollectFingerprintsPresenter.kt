@@ -1,16 +1,13 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
@@ -302,6 +299,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
                 timeHelper.now(),
                 lastCaptureStartedAt,
+                finger.id,
                 qualityThreshold,
                 FingerprintCaptureEvent.buildResult(finger.status),
                 finger.template?.let {
