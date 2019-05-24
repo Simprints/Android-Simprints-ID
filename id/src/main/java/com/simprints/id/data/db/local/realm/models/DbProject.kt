@@ -3,6 +3,7 @@ package com.simprints.id.data.db.local.realm.models
 import com.simprints.id.domain.Project
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
+import io.realm.annotations.Required
 
 
 open class DbProject : RealmObject() {
@@ -12,12 +13,11 @@ open class DbProject : RealmObject() {
     }
 
     @PrimaryKey
-    var id: String = ""
-
-    var name: String = ""
-    var description: String = ""
-    var creator: String = ""
-    var updatedAt: String = ""
+    @Required var id: String = ""
+    @Required var name: String = ""
+    @Required var description: String = ""
+    @Required var creator: String = ""
+    @Required var updatedAt: String = ""
 }
 
 

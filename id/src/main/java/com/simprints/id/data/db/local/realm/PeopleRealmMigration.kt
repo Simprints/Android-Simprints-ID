@@ -149,10 +149,12 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
     }
 
     private fun migrateTo6(schema: RealmSchema) {
-        schema.get(PeopleSchemaV5.PERSON_TABLE)?.className = PERSON_TABLE
-        schema.get(PeopleSchemaV5.FINGERPRINT_TABLE)?.className = FINGERPRINT_TABLE
-        schema.get(PeopleSchemaV5.PROJECT_TABLE)?.className = PROJECT_TABLE
-        schema.get(PeopleSchemaV5.SYNC_INFO_TABLE)?.className = SYNC_INFO_TABLE
+        schema.rename(PeopleSchemaV5.PERSON_TABLE, PERSON_TABLE)
+        schema.rename(PeopleSchemaV5.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
+        schema.rename(PeopleSchemaV5.PROJECT_TABLE, PROJECT_TABLE)
+        schema.get(PROJECT_TABLE)?.removeField("legacyId")
+
+        schema.rename(PeopleSchemaV5.SYNC_INFO_TABLE, SYNC_INFO_TABLE)
     }
 
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
