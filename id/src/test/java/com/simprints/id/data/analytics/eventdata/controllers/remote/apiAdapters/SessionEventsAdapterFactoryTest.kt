@@ -15,13 +15,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.remote.events.*
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.fromDomainToApi
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiDevice
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiLocation
 import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
-import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.testtools.TestApplication
@@ -235,6 +232,7 @@ class SessionEventsAdapterFactoryTest {
         val event = FingerprintCaptureEvent(
             10,
             10,
+            FingerIdentifier.LEFT_3RD_FINGER,
             10,
             FingerprintCaptureEvent.Result.BAD_QUALITY,
             FingerprintCaptureEvent.Fingerprint(

@@ -6,6 +6,7 @@ import com.simprints.id.FingerIdentifier
 @Keep
 class FingerprintCaptureEvent(starTime: Long,
                               endTime: Long,
+                              val finger: FingerIdentifier,
                               val qualityThreshold: Int,
                               val result: Result,
                               val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime) {
