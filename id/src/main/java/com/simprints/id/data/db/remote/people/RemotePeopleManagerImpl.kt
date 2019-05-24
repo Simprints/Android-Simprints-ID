@@ -40,6 +40,7 @@ open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager)
         getPeopleApiClient().flatMapCompletable {
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toApiPostPerson)))
                 .retry(::retryCriteria)
+                .trace("uploadPatientBatch")
                 .handleResult(::defaultResponseErrorHandling)
                 .trace("uploadPatientBatch")
         }

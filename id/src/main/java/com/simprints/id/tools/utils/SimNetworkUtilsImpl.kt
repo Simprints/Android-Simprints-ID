@@ -18,6 +18,7 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
         false
     }
 
+
     override var connectionsStates: List<Connection> =
         arrayListOf<Connection>().apply {
             try {
