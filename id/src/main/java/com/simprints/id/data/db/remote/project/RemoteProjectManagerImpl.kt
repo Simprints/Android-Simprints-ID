@@ -20,6 +20,7 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         getProjectApiClient().flatMap {
             it.requestProject(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProject")
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("requestProject")
         }
@@ -28,6 +29,7 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         getProjectApiClient().flatMap {
             it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProjectConfig")
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("requestProjectConfig")
         }
