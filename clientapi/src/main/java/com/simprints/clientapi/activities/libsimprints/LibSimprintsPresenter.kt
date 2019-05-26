@@ -1,28 +1,35 @@
 package com.simprints.clientapi.activities.libsimprints
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.libsimprints.*
 import com.simprints.libsimprints.Constants.*
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.RefusalForm
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Tier
 import io.reactivex.rxkotlin.subscribeBy
-import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
+
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                             private val clientApiCrashReportManager: ClientApiCrashReportManager,
                             clientApiTimeHelper: ClientApiTimeHelper,
-                            gsonBuilder: GsonBuilder,
-                            integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
+                            gsonBuilder: GsonBuilder) :
+    RequestPresenter(view,
+        clientApiTimeHelper,
+        clientApiSessionEventsManager,
+        clientApiCrashReportManager,
+        gsonBuilder,
+        view.integrationInfo
+    ), LibSimprintsContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = mapOf(
@@ -78,5 +85,6 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
+
 }
 

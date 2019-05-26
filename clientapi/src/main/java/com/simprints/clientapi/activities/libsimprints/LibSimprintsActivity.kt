@@ -3,24 +3,27 @@ package com.simprints.clientapi.activities.libsimprints
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
+import com.simprints.clientapi.di.koinModule
 import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.libsimprints.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.parameter.parametersOf
 
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override val integrationInfo = IntegrationInfo.STANDARD
 
-    @Inject override lateinit var presenter: LibSimprintsContract.Presenter
-
     override val action: String?
         get() = intent.action
 
+    override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        LibSimprintsComponentInjector.inject(this)
+        loadKoinModules(koinModule)
 
         presenter.start()
     }
@@ -49,6 +52,6 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
-        LibSimprintsComponentInjector.setComponent(null)
+        unloadKoinModules(koinModule)
     }
 }
