@@ -11,6 +11,7 @@ data class EnrollRequest(
     override val moduleId: String,
     override val userId: String,
     override val metadata: String,
+    override val unknownExtras: Map<String, Any?>,
     override val extra: ExtraRequestInfo
 ) : BaseRequest {
 
@@ -26,6 +27,7 @@ data class EnrollRequest(
         override val metadata: String,
         override val extra: IExtraRequestInfo
     ) : IAppEnrollRequest
+
 }
 
 

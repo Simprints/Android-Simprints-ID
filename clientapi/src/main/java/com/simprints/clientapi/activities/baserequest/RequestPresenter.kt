@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.google.gson.reflect.TypeToken
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
@@ -23,8 +22,8 @@ import com.simprints.clientapi.tools.json.GsonBuilder
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val timeHelper: ClientApiTimeHelper,
-                                private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                                private val clientApiCrashReportManager: ClientApiCrashReportManager,
+                                private var eventsManager: ClientApiSessionEventsManager,
+                                private val crashReportManager: ClientApiCrashReportManager,
                                 private var gsonBuilder: GsonBuilder,
                                 private val integrationInfo: IntegrationInfo)
     : RequestContract.Presenter {
@@ -41,9 +40,13 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor), integrationInfo)
     )
 
-    override fun processConfirmIdentifyRequest() = validateAndSendRequest(ConfirmIdentifyBuilder(
-        view.confirmIdentifyExtractor, ConfirmIdentifyValidator(view.confirmIdentifyExtractor), integrationInfo
-    ))
+    override fun processConfirmIdentifyRequest() = validateAndSendRequest(
+        ConfirmIdentifyBuilder(
+            view.confirmIdentifyExtractor,
+            ConfirmIdentifyValidator(view.confirmIdentifyExtractor),
+            integrationInfo
+        )
+    )
 
     override fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
@@ -79,36 +82,15 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
-        try {
-            val extrasKeys = extractExtraKeysAndValuesFromIntent(request)
-            if (extrasKeys.isNotEmpty()) {
-                clientApiSessionEventsManager
-                    .addSessionEvent(SuspiciousIntentEvent(timeHelper.now(), extrasKeys))
-            }
-        } catch (t: Throwable) {
-            clientApiCrashReportManager.logExceptionOrSafeException(t)
-            t.printStackTrace()
+        if (request.unknownExtras.isNotEmpty()) {
+            eventsManager
+                .addSessionEvent(SuspiciousIntentEvent(timeHelper.now(), request.unknownExtras))
         }
     }
 
-    private fun extractExtraKeysAndValuesFromIntent(request: ClientBase): Map<String, Any?> =
-        with(gsonBuilder.build()) {
-            val requestJson = this.toJson(request)
-            val expectedKeysAndValues = this.fromJson<Map<String, Any>>(requestJson, object : TypeToken<Map<String, Any>>() {}.type)
-            val keysAndValuesFromIntent = extractKeysAndValuesFromIntent()
-            keysAndValuesFromIntent.filterKeys { !expectedKeysAndValues.containsKey(it) }
-        }
-
-    private fun extractKeysAndValuesFromIntent() =
-        view.getIntentExtras()?.filter { it.key.isNotEmpty() } ?: emptyMap()
-
-
     private fun addInvalidSessionInBackground() {
-        clientApiSessionEventsManager
-            .addSessionEvent(InvalidIntentEvent(
-                timeHelper.now(),
-                view.getIntentAction(),
-                view.getIntentExtras() ?: emptyMap()))
+        eventsManager.addSessionEvent(InvalidIntentEvent(timeHelper.now(), view.getIntentAction(),
+            view.getIntentExtras() ?: emptyMap()))
     }
 
 }

@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.content.Intent
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -37,6 +36,7 @@ interface RequestContract {
         fun getIntentAction(): String
 
         fun getIntentExtras(): Map<String, Any?>?
+
     }
 
     interface Presenter {

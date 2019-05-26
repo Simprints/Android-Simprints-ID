@@ -18,6 +18,7 @@ class IdentifyBuilder(val extractor: IdentifyExtractor,
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),
         metadata = extractor.getMetatdata(),
+        unknownExtras = extractor.getUnknownExtras(),
         extra = ExtraRequestInfo(integrationInfo)
     )
 }

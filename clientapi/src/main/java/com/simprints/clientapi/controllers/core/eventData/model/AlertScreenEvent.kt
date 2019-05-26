@@ -5,9 +5,11 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent as CoreAlertScreenEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
+
 @Keep
 class AlertScreenEvent(starTime: Long,
-                       val clientApiAlertType: ClientApiAlert) : Event(EventType.ALERT_SCREEN, starTime) {}
+                       val clientApiAlertType: ClientApiAlert)
+    : Event(EventType.ALERT_SCREEN, starTime)
 
 fun AlertScreenEvent.fromDomainToCore() =
     CoreAlertScreenEvent(starTime, clientApiAlertType.fromAlertToAlertTypeEvent())
