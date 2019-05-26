@@ -153,6 +153,12 @@ def commons_io = [
     commons_io: "commons-io:commons-io:$commons_io_version"
 ]
 
+// Koin, Service Location
+def koin_version = "2.0.0"
+def koin = [
+    core: "org.koin:koin-android:$koin_version"
+]
+
 ext.deps = [
     kotlin         : kotlin,
     dagger         : dagger,
@@ -168,5 +174,6 @@ ext.deps = [
     rxjava2        : rxjava2,
     testing        : testing,
     realm          : realm,
-    commons_io     : commons_io
+    commons_io     : commons_io,
+    koin           : koin
 ]
