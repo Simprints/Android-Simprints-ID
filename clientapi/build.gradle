@@ -63,11 +63,6 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.kotlin
 
-    //Dagger
-    implementation deps.dagger.core
-    kapt deps.dagger.compiler
-    implementation deps.dagger.javax
-
     // Unit Tests
     testImplementation project(':testtools')
     testImplementation deps.testing.junit
