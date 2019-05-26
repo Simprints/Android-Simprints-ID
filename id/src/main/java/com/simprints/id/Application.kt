@@ -75,7 +75,7 @@ open class Application : MultiDexApplication() {
             Timber.d("Undeliverable exception received", exceptionToPrint)
 
             exceptionToPrint.printStackTrace()
-            component.getCoreCrashReportManager().logException(e)
+            component.getCrashReportManager().logException(e)
         }
     }
 }
