@@ -7,17 +7,19 @@ import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.ExtraRequestInfo
 import com.simprints.clientapi.domain.requests.IdentifyRequest
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.testtools.common.syntax.mock
 
 object IdentifyRequestFactory : RequestFactory() {
 
-    override fun getValidSimprintsRequest(): BaseRequest = IdentifyRequest(
-        projectId = MOCK_PROJECT_ID,
-        moduleId = MOCK_MODULE_ID,
-        userId = MOCK_USER_ID,
-        metadata = MOCK_METADATA,
-        extra = ExtraRequestInfo(MOCK_INTEGRATION)
-    )
+    override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
+        IdentifyRequest(
+            projectId = MOCK_PROJECT_ID,
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA,
+            extra = ExtraRequestInfo(integrationInfo)
+        )
 
     override fun getValidator(extractor: ClientRequestExtractor): IdentifyValidator =
         IdentifyValidator(extractor as IdentifyExtractor)

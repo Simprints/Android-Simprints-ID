@@ -7,17 +7,19 @@ import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.ExtraRequestInfo
+import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.testtools.common.syntax.mock
 
 object EnrollRequestFactory : RequestFactory() {
 
-    override fun getValidSimprintsRequest(): BaseRequest = EnrollRequest(
-        projectId = MOCK_PROJECT_ID,
-        moduleId = MOCK_MODULE_ID,
-        userId = MOCK_USER_ID,
-        metadata = MOCK_METADATA,
-        extra = ExtraRequestInfo(MOCK_INTEGRATION)
-    )
+    override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
+        EnrollRequest(
+            projectId = MOCK_PROJECT_ID,
+            moduleId = MOCK_MODULE_ID,
+            userId = MOCK_USER_ID,
+            metadata = MOCK_METADATA,
+            extra = ExtraRequestInfo(integrationInfo)
+        )
 
     override fun getBuilder(extractor: ClientRequestExtractor): EnrollBuilder =
         EnrollBuilder(extractor as EnrollExtractor, getValidator(extractor), mock())
