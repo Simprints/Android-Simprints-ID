@@ -1,5 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.controllers.domain
 
+import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
@@ -26,4 +27,9 @@ interface SessionEventsManager: SessionEventsLocalDbManager {
     fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
+
+    companion object {
+        fun build(app: Application): SessionEventsManager =
+            app.component.getSessionEventsManager()
+    }
 }
