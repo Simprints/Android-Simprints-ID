@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.errors.di.ErrorActivityComponentInjector
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.di.koinModule
@@ -56,7 +55,7 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
-        ErrorActivityComponentInjector.setComponent(null)
+        // TODO: If we use scope properly we don't need this
         unloadKoinModules(koinModule)
     }
 
