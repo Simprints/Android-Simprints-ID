@@ -5,6 +5,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent as CoreInvalidIntentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.InvalidIntentEvent.IntentAction as CoreIntentAction
 
+
 @Keep
 class InvalidIntentEvent(starTime: Long,
                          val action: IntentAction,

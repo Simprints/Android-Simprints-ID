@@ -7,6 +7,7 @@ import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import io.reactivex.Single
 
+
 class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: SessionEventsManager) :
     ClientApiSessionEventsManager {
 
@@ -17,8 +18,11 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
 
     override fun addSessionEvent(sessionEvent: Event) {
         when (sessionEvent) {
-            is InvalidIntentEvent -> coreSessionEventsManager.addEventInBackground(sessionEvent.fromDomainToCore())
-            is SuspiciousIntentEvent -> coreSessionEventsManager.addEventInBackground(sessionEvent.fromDomainToCore())
+            is InvalidIntentEvent -> coreSessionEventsManager
+                .addEventInBackground(sessionEvent.fromDomainToCore())
+            is SuspiciousIntentEvent -> coreSessionEventsManager
+                .addEventInBackground(sessionEvent.fromDomainToCore())
         }
     }
+
 }

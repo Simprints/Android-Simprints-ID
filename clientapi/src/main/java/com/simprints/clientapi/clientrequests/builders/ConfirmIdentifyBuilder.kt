@@ -17,6 +17,7 @@ class ConfirmIdentifyBuilder(val extractor: ConfirmIdentifyExtractor,
         projectId = extractor.getProjectId(),
         sessionId = extractor.getSessionId(),
         selectedGuid = extractor.getSelectedGuid(),
+        unknownExtras = extractor.getUnknownExtras(),
         extra = ExtraRequestInfo(integrationInfo)
     )
 }

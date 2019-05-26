@@ -19,6 +19,7 @@ class VerifyBuilder(private val extractor: VerifyExtractor,
         moduleId = extractor.getModuleId(),
         metadata = extractor.getMetatdata(),
         verifyGuid = extractor.getVerifyGuid(),
+        unknownExtras = extractor.getUnknownExtras(),
         extra = ExtraRequestInfo(integrationInfo)
     )
 

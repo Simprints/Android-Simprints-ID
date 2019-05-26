@@ -7,19 +7,21 @@ import kotlinx.android.parcel.Parcelize
 
 
 enum class IntegrationInfo {
-    ODK, STANDARD;
 
-    fun toAppIntegrationInfo(): IIntegrationInfo =
-        when (this) {
-            ODK -> OdkIntegrationInfo()
-            STANDARD -> StandardIntegrationInfo()
-        }
+    ODK,
+    STANDARD;
+
+    fun toAppIntegrationInfo(): IIntegrationInfo = when (this) {
+        ODK -> OdkIntegrationInfo()
+        STANDARD -> StandardIntegrationInfo()
+    }
 
     @Parcelize
     private class OdkIntegrationInfo : IOdkIntegrationInfo
 
     @Parcelize
     private class StandardIntegrationInfo : IStandardIntegrationInfo
+
 }
 
 

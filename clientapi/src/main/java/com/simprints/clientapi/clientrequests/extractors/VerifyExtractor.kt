@@ -8,4 +8,7 @@ class VerifyExtractor(val intent: Intent) : ClientRequestExtractor(intent) {
 
     fun getVerifyGuid(): String = intent.extractString(Constants.SIMPRINTS_VERIFY_GUID)
 
+    override val expectedKeys: List<String>
+        get() = super.expectedKeys + listOf(Constants.SIMPRINTS_VERIFY_GUID)
+
 }

@@ -18,6 +18,7 @@ class EnrollBuilder(private val extractor: EnrollExtractor,
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),
         metadata = extractor.getMetatdata(),
+        unknownExtras = extractor.getUnknownExtras(),
         extra = ExtraRequestInfo(integrationInfo)
     )
 }

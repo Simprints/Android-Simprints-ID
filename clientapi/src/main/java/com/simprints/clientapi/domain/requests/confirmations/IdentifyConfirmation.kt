@@ -11,6 +11,7 @@ data class IdentifyConfirmation(
     override val projectId: String,
     override val sessionId: String,
     override val selectedGuid: String,
+    override val unknownExtras: Map<String, Any?>,
     override val extra: ExtraRequestInfo) : BaseConfirmation {
 
     override fun convertToAppRequest(): IAppConfirmation = AppIdentifyConfirmation(
