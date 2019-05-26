@@ -21,12 +21,12 @@ import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 
 
-abstract class RequestPresenter constructor(private val view: RequestContract.RequestView,
-                                            private val timeHelper: ClientApiTimeHelper,
-                                            private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                                            private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                                            private var gsonBuilder: GsonBuilder,
-                                            private val integrationInfo: IntegrationInfo)
+abstract class RequestPresenter(private val view: RequestContract.RequestView,
+                                private val timeHelper: ClientApiTimeHelper,
+                                private var clientApiSessionEventsManager: ClientApiSessionEventsManager,
+                                private val clientApiCrashReportManager: ClientApiCrashReportManager,
+                                private var gsonBuilder: GsonBuilder,
+                                private val integrationInfo: IntegrationInfo)
     : RequestContract.Presenter {
 
     override fun processEnrollRequest() = validateAndSendRequest(
@@ -110,4 +110,5 @@ abstract class RequestPresenter constructor(private val view: RequestContract.Re
                 view.getIntentAction(),
                 view.getIntentExtras() ?: emptyMap()))
     }
+
 }

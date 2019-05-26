@@ -18,4 +18,5 @@ object ClientRequestErrorRouter {
 
     fun extractPotentialAlertScreenResponse(requestCode: Int, resultCode: Int, data: Intent?): AlertActResponse? =
         data?.getParcelableExtra(AlertActResponse.BUNDLE_KEY)
+
 }
