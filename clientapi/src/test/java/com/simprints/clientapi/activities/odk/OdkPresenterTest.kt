@@ -7,6 +7,7 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDEN
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.domain.requests.IntegrationInfo.ODK
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
@@ -29,7 +30,9 @@ import java.util.*
 
 class OdkPresenterTest {
 
-    private val view = mock<OdkActivity>()
+    private val view = mock<OdkActivity>().also {
+        whenever(it) { integrationInfo } thenReturn ODK
+    }
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
@@ -39,7 +42,7 @@ class OdkPresenterTest {
 
         OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock()).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
@@ -50,7 +53,7 @@ class OdkPresenterTest {
 
         OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock()).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
@@ -61,7 +64,7 @@ class OdkPresenterTest {
 
         OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock()).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
@@ -125,7 +128,7 @@ class OdkPresenterTest {
         val gsonBuilder = mockGsonBuilder()
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), gsonBuilder, mock()).apply { start() }
 
-        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() =

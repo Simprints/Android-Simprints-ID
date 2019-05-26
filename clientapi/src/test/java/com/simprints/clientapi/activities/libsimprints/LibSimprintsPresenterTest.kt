@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.libsimprints
 
 import com.google.gson.Gson
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.domain.requests.IntegrationInfo.STANDARD
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
@@ -18,14 +19,19 @@ import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
 import org.junit.Test
 import java.util.*
 
 class LibSimprintsPresenterTest {
 
-    private val view = mock<LibSimprintsActivity>()
+    private val view = mock<LibSimprintsActivity>().also {
+        whenever(it) { integrationInfo } thenReturn STANDARD
+    }
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
@@ -35,7 +41,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -46,7 +52,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -57,7 +63,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder).apply { start() }
 
-        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -68,7 +74,7 @@ class LibSimprintsPresenterTest {
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock(), mock(), gsonBuilder).apply { start() }
 
-        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest()) }
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
