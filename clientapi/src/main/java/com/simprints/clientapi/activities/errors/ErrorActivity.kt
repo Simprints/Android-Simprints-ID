@@ -8,24 +8,31 @@ import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.di.ErrorActivityComponentInjector
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.clientapi.di.koinModule
 import kotlinx.android.synthetic.main.activity_error.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.parameter.parametersOf
+
 
 class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
-    @Inject override lateinit var presenter: ErrorContract.Presenter
-    @Inject lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+    // TODO: if we go with koin replace base lateinit var with val
+    override lateinit var presenter: ErrorContract.Presenter
+    private val pres: ErrorContract.Presenter by inject { parametersOf(this) }
 
     private lateinit var clientApiAlertType: ClientApiAlert
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loadKoinModules(koinModule)
         setContentView(R.layout.activity_error)
 
+        presenter = pres
 
-        clientApiAlertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
+        clientApiAlertType = intent
+            .extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
             ?: ClientApiAlert.INVALID_CLIENT_REQUEST
 
         presenter.start(clientApiAlertType)
@@ -50,5 +57,7 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
     override fun onDestroy() {
         super.onDestroy()
         ErrorActivityComponentInjector.setComponent(null)
+        unloadKoinModules(koinModule)
     }
+
 }
