@@ -23,5 +23,5 @@ open class OdkActivityModule {
                                      clientApiCrashReportManager: ClientApiCrashReportManager,
                                      gsonBuilder: GsonBuilder): OdkContract.Presenter =
         OdkPresenter(view, view.action, clientApiSessionEventsManager, clientApiCrashReportManager,
-            gsonBuilder, clientApiTimeHelper, view.integrationInfo)
+            gsonBuilder, clientApiTimeHelper)
 }

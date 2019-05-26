@@ -1,19 +1,16 @@
 package com.simprints.clientapi.activities.odk
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.libsimprints.Constants
 import io.reactivex.rxkotlin.subscribeBy
 
 
@@ -22,9 +19,13 @@ class OdkPresenter(private val view: OdkContract.View,
                    private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                    private val clientApiCrashReportManager: ClientApiCrashReportManager,
                    gsonBuilder: GsonBuilder,
-                   clientApiTimeHelper: ClientApiTimeHelper,
-                   integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), OdkContract.Presenter {
+                   clientApiTimeHelper: ClientApiTimeHelper)
+    : RequestPresenter(view,
+    clientApiTimeHelper,
+    clientApiSessionEventsManager,
+    clientApiCrashReportManager,
+    gsonBuilder,
+    view.integrationInfo), OdkContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = emptyMap() //We return CANCEL for any ErrorResponse.Reason

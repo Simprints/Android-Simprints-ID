@@ -28,6 +28,5 @@ open class LibSimprintsActivityModule {
             clientApiSessionEventsManager,
             clientApiCrashReportManager,
             timeHelper,
-            gsonBuilder,
-            view.integrationInfo)
+            gsonBuilder)
 }
