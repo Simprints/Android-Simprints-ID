@@ -5,6 +5,7 @@ import com.simprints.moduleapi.app.requests.IOdkIntegrationInfo
 import com.simprints.moduleapi.app.requests.IStandardIntegrationInfo
 import kotlinx.android.parcel.Parcelize
 
+
 enum class IntegrationInfo {
     ODK, STANDARD;
 
