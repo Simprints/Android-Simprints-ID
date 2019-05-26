@@ -49,6 +49,9 @@ dependencies {
     // LibSimprints
     implementation 'com.simprints:libsimprints:2018.2.0'
 
+    // Service Location
+    implementation deps.koin.core
+
     // Support
     implementation deps.androidx.appcompat
     implementation deps.androidx.ui.constraintlayout
@@ -75,7 +78,7 @@ dependencies {
     testImplementation deps.testing.mockito.kotlin
 
     // Android Tests
-    androidTestImplementation(project(':testtools')){
+    androidTestImplementation(project(':testtools')) {
         exclude group: 'org.apache.maven'
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
