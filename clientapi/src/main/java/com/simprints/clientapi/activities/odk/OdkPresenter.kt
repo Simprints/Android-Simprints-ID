@@ -10,7 +10,6 @@ import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
 import io.reactivex.rxkotlin.subscribeBy
 
 
@@ -18,13 +17,10 @@ class OdkPresenter(private val view: OdkContract.View,
                    private val action: String?,
                    private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                    private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                   gsonBuilder: GsonBuilder,
                    clientApiTimeHelper: ClientApiTimeHelper)
     : RequestPresenter(view,
     clientApiTimeHelper,
     clientApiSessionEventsManager,
-    clientApiCrashReportManager,
-    gsonBuilder,
     view.integrationInfo), OdkContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>

@@ -33,17 +33,16 @@ val koinModule = module {
     factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get()) }
     factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
     factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-    factory<GsonBuilder> { GsonBuilderImpl() }
 
     // Presenters
     factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
         ErrorPresenter(view, get(), get())
     }
     factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
-        LibSimprintsPresenter(view, action, get(), get(), get(), get())
+        LibSimprintsPresenter(view, action, get(), get(), get())
     }
     factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
-        OdkPresenter(view, action, get(), get(), get(), get())
+        OdkPresenter(view, action, get(), get(), get())
     }
 
 }

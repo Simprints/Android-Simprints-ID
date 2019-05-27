@@ -8,7 +8,6 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -21,13 +20,10 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
                             private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                            clientApiTimeHelper: ClientApiTimeHelper,
-                            gsonBuilder: GsonBuilder) :
+                            clientApiTimeHelper: ClientApiTimeHelper) :
     RequestPresenter(view,
         clientApiTimeHelper,
         clientApiSessionEventsManager,
-        clientApiCrashReportManager,
-        gsonBuilder,
         view.integrationInfo
     ), LibSimprintsContract.Presenter {
 
