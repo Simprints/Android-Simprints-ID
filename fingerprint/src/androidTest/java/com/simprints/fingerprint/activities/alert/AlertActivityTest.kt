@@ -16,7 +16,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.any
-import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
@@ -25,7 +24,6 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.id.Application
-import com.simprints.testtools.android.hasImage
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.verifyOnce
 import org.junit.After
@@ -34,6 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 import com.simprints.id.R as idR
+import com.simprints.fingerprint.R
 
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest {
@@ -67,11 +66,19 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotEnabled_userClicksOpenSettings_settingsShouldAppear() {
-        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        val bluetoothSettingsAction = android.provider.Settings.ACTION_BLUETOOTH_SETTINGS
+        val bluetoothSettingsIntent = Intent(bluetoothSettingsAction)
+        val app = ApplicationProvider.getApplicationContext<Application>()
+        val activities = app.packageManager.queryIntentActivities(bluetoothSettingsIntent, 0)
 
-        onView(withId(R.id.right_button)).perform(click())
+        //In some emulators ACTION_BLUETOOTH_SETTINGS may be missing
+        if (activities.size > 0) {
+            launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
 
-        intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
+            onView(withId(R.id.right_button)).perform(click())
+
+            intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
+        }
     }
 
     @Test
