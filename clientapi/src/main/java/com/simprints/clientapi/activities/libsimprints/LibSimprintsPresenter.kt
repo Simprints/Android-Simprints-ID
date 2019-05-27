@@ -12,9 +12,6 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
@@ -43,18 +40,16 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
             INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
 
-    override fun start() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+    override suspend fun start() {
+        val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
+        crashReportManager.setSessionIdCrashlyticsKey(sessionId)
 
-            when (action) {
-                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+        when (action) {
+            SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+            SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+            SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
 
@@ -68,7 +63,9 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         }), identify.sessionId)
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.confidence, Tier.valueOf(verify.matchResult.tier.name), verify.matchResult.guidFound
+        verify.matchResult.confidence,
+        Tier.valueOf(verify.matchResult.tier.name),
+        verify.matchResult.guidFound
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
@@ -11,11 +12,9 @@ import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromAlertTypeToDomain
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
-import com.simprints.clientapi.routers.ClientRequestErrorRouter.extractPotentialAlertScreenResponse
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
 import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
@@ -26,6 +25,9 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override val action: String?
         get() = intent.action
+
+    override val extras: Map<String, Any?>?
+        get() = intent?.extras?.toMap()
 
     override val enrollExtractor: EnrollExtractor
         get() = EnrollExtractor(intent)
@@ -63,31 +65,28 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         super.onActivityResult(requestCode, resultCode, data)
         Timber.d("RequestActivity: onActivityResult")
 
-        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
-        if (potentialAlertScreenResponse != null) {
-            presenter.handleResponseError(ErrorResponse(fromAlertTypeToDomain(potentialAlertScreenResponse.clientApiAlert)))
-        } else {
-            if (resultCode != Activity.RESULT_OK || data == null)
-                setResult(resultCode, data).also { finish() }
-            else
-                routeResponse(data.getParcelableExtra(BUNDLE_KEY))
+        if (resultCode != Activity.RESULT_OK || data == null)
+            setResult(resultCode, data).also { finish() }
+        else {
+            // TODO: Clean this flow up more
+            data.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
+                presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
+            } ?: routeAppResponse(data.getParcelableExtra(BUNDLE_KEY))
         }
-    }
 
-    override fun getIntentExtras() = intent?.extras?.toMap()
+    }
 
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
-    private fun routeResponse(response: IAppResponse) =
-        when (response.type) {
-            IAppResponseType.ENROL -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
-            IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
-            IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
-            IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
-            IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
-        }
+    private fun routeAppResponse(response: IAppResponse) = when (response.type) {
+        IAppResponseType.ENROL -> presenter.handleEnrollResponse(EnrollResponse(response as IAppEnrolResponse))
+        IAppResponseType.IDENTIFY -> presenter.handleIdentifyResponse(IdentifyResponse(response as IAppIdentifyResponse))
+        IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
+        IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
+        IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+    }
 
 }

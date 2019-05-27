@@ -42,6 +42,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     override fun validateAndSendRequest(builder: ClientRequestBuilder) = try {
         val request = builder.build()
         addSuspiciousEventIfRequired(request)
+
         when (request) {
             is BaseRequest -> view.sendSimprintsRequest(request)
             is BaseConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
@@ -80,8 +81,8 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun logInvalidSessionInBackground() {
         eventsManager.addInvalidIntentEvent(
-            IntentAction.parse(view.action ?: ""),
-            view.getIntentExtras() ?: emptyMap()).inBackground()
+            IntentAction.parse(view.action ?: ""), view.extras ?: emptyMap()
+        ).inBackground()
     }
 
 }
