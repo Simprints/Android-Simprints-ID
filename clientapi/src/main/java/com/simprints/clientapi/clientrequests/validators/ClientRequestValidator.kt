@@ -35,14 +35,14 @@ abstract class ClientRequestValidator(private val extractor: ClientRequestExtrac
     }
 
     protected open fun validateMetadata() {
-        if (!extractor.getMetatdata().isBlank())
+        if (!extractor.getMetadata().isBlank())
             if (!hasValidMetadata())
                 throw InvalidMetadataException("Invalid Metadata")
     }
 
     // TODO: inject gson dependency
     private fun hasValidMetadata(): Boolean = try {
-        Gson().fromJson(extractor.getMetatdata(), Any::class.java)
+        Gson().fromJson(extractor.getMetadata(), Any::class.java)
         true
     } catch (ex: com.google.gson.JsonSyntaxException) {
         false

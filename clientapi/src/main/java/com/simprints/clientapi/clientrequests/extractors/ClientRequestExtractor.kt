@@ -20,7 +20,7 @@ abstract class ClientRequestExtractor(private val intent: Intent) {
 
     open fun getModuleId(): String = intent.extractString(Constants.SIMPRINTS_MODULE_ID)
 
-    open fun getMetatdata(): String = intent.extractString(Constants.SIMPRINTS_METADATA)
+    open fun getMetadata(): String = intent.extractString(Constants.SIMPRINTS_METADATA)
 
     protected open fun Intent.extractString(key: String): String = this.getStringExtra(key) ?: ""
 

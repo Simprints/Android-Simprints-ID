@@ -57,7 +57,7 @@ abstract class AppRequestValidatorTest(private val mockFactory: RequestFactory) 
     @Test
     open fun validateClientRequest_shouldSucceedOnEmptyMetadata() {
         val extractor = mockFactory.getMockExtractor()
-        whenever(extractor) { getMetatdata() } thenReturn ""
+        whenever(extractor) { getMetadata() } thenReturn ""
 
         try {
             mockFactory.getValidator(extractor).validateClientRequest()

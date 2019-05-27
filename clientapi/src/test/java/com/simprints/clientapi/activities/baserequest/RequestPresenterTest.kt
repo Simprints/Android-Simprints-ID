@@ -4,15 +4,12 @@ import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.argThat
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.clientapi.tools.json.GsonBuilderImpl
 import com.simprints.testtools.common.syntax.*
 import org.junit.Test
 
@@ -86,7 +83,7 @@ class RequestPresenterTest {
             whenever(this) { getUserId() } thenReturn "user_id"
             whenever(this) { getModuleId() } thenReturn "module_id"
             whenever(this) { getUnknownExtras() } thenReturn mapOf(extraField)
-            whenever(this) { getMetatdata() } thenReturn "metadata"
+            whenever(this) { getMetadata() } thenReturn "metadata"
         }
 }
 
