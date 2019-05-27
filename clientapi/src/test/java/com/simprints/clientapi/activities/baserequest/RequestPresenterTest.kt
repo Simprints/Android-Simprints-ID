@@ -1,13 +1,11 @@
 package com.simprints.clientapi.activities.baserequest
 
-import com.google.gson.Gson
+import com.google.common.truth.Truth
 import com.nhaarman.mockito_kotlin.argThat
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.requests.EnrollRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.testtools.common.syntax.*
@@ -32,13 +30,15 @@ class RequestPresenterTest {
             whenever(this) { enrollExtractor } thenReturn enrolExtractorMock
         }
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), emptyMap())
+        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.processEnrollRequest()
 
         verifyOnce(clientApiSessionEventsManagerMock) {
-            addSessionEvent(argThat {
-                this is SuspiciousIntentEvent &&
-                    with(Gson()) { toJson(unexpectedExtras) == toJson(mapOf(extraField)) }
+            addSuspiciousIntentEvent(argThat {
+                try {
+                    Truth.assertThat(this).isEqualTo(extraField);
+                    true
+                } catch(t: Throwable) { false }
             })
         }
     }
@@ -49,10 +49,10 @@ class RequestPresenterTest {
         val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
         val view = mockViewToReturnIntentFields(enrolIntentFields.plus("" to ""))
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), emptyMap())
+        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.validateAndSendRequest(requestBuilder)
 
-        verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
+        verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
     }
 
     @Test
@@ -61,10 +61,10 @@ class RequestPresenterTest {
         val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
         val view = mockViewToReturnIntentFields(enrolIntentFields)
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), emptyMap())
+        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.validateAndSendRequest(requestBuilder)
 
-        verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
+        verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
     }
 
     private fun mockViewToReturnIntentFields(intentFields: Map<String, String>): RequestContract.RequestView =
@@ -90,11 +90,9 @@ class RequestPresenterTest {
 class ImplRequestPresenter(view: RequestContract.RequestView,
                            timeHelper: ClientApiTimeHelper,
                            clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                           integrationInfo: IntegrationInfo,
                            override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>) :
     RequestPresenter(
         view,
-        timeHelper,
         clientApiSessionEventsManager
     ) {
 

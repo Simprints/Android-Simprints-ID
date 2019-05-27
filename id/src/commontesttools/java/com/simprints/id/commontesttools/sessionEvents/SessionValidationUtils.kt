@@ -27,6 +27,12 @@ fun validateArtificialTerminationEventApiModel(json: JsonObject) {
     assertThat(json.size()).isEqualTo(3)
 }
 
+fun validateIntentParsingEventApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("INTENT_PARSING")
+    assertThat(json.get("relativeStartTime").asLong)
+    assertThat(json.get("integration").asString).isIn(listOf("STANDARD", "ODK"))
+    assertThat(json.size()).isEqualTo(3)
+}
 
 fun validateAuthenticationEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("AUTHENTICATION")
@@ -98,18 +104,16 @@ fun verifyCallbackErrorApiModel(json: JsonObject) {
 fun validateCalloutEventApiModel(json: JsonObject) {
 
     assertThat(json.get("type").asString).isEqualTo("CALLOUT")
-    assertThat(json.get("integration").asString).isAnyOf("ODK", "STANDARD")
     assertThat(json.get("relativeStartTime").asString)
     with(json.get("callout").asJsonObject) {
-        val type = ApiCalloutType.valueOf(this.get("type").asString)
-        when (type) {
+        when (ApiCalloutType.valueOf(this.get("type").asString)) {
             ApiCalloutType.CONFIRMATION -> verifyCalloutConfirmationApiModel(this)
             ApiCalloutType.ENROLMENT -> verifyCalloutEnrolmentApiModel(this)
             ApiCalloutType.IDENTIFICATION -> verifyCalloutIdentificationApiModel(this)
             ApiCalloutType.VERIFICATION -> verifyCalloutVerificationApiModel(this)
         }
     }
-    assertThat(json.size()).isEqualTo(4)
+    assertThat(json.size()).isEqualTo(3)
 }
 
 fun verifyCalloutVerificationApiModel(json: JsonObject) {

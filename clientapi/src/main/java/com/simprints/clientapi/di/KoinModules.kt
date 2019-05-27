@@ -30,19 +30,19 @@ val koinModule = module {
     factory { TimeHelper.build(androidApplication() as Application) }
 
     // Domain
-    factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get()) }
+    factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
     factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
     factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
 
     // Presenters
     factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
-        ErrorPresenter(view, get(), get())
+        ErrorPresenter(view, get())
     }
     factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
-        LibSimprintsPresenter(view, action, get(), get(), get())
+        LibSimprintsPresenter(view, action, get(), get())
     }
     factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
-        OdkPresenter(view, action, get(), get(), get())
+        OdkPresenter(view, action, get(), get())
     }
 
 }

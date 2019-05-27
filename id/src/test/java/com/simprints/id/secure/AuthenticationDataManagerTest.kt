@@ -14,9 +14,11 @@ import com.simprints.testtools.common.retrofit.FakeResponseInterceptor
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
@@ -88,5 +90,10 @@ class AuthenticationDataManagerTest {
 
     private fun forceOkHttpToReturnSuccessfulResponse(okHttpClientConfig: OkHttpClient.Builder) {
         okHttpClientConfig.addInterceptor(FakeResponseInterceptor(200, validAuthenticationJsonResponse, validateUrl = validateUrl))
+    }
+
+    @After
+    fun tearDown() {
+        stopKoin()
     }
 }

@@ -6,7 +6,7 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.testtools.common.syntax.mock
 
 object EnrollRequestFactory : RequestFactory() {

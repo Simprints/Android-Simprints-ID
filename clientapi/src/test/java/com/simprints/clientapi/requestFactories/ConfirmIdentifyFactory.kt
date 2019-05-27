@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
-import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.requests.confirmations.IdentifyConfirmation
 import com.simprints.testtools.common.syntax.mock

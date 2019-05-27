@@ -7,7 +7,7 @@ import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDEN
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_VERIFY
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.requests.IntegrationInfo.ODK
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo.ODK
 import com.simprints.clientapi.domain.responses.EnrollResponse
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.domain.responses.IdentifyResponse
@@ -20,10 +20,7 @@ import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
 import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import org.junit.Test
 import java.util.*
@@ -37,7 +34,7 @@ class OdkPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), mock()).apply { start() }
+        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock()).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(ODK)) }
     }
@@ -47,7 +44,7 @@ class OdkPresenterTest {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
 
-        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply { start() }
+        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock()).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
@@ -57,14 +54,14 @@ class OdkPresenterTest {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         whenever(view) { verifyExtractor } thenReturn verifyExractor
 
-        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply { start() }
+        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock()).apply { start() }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock()).apply { start() }
+        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply { start() }
         verifyOnce(view) { handleClientRequestError(any()) }
     }
 
@@ -72,7 +69,7 @@ class OdkPresenterTest {
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER, mock(), mock(), mock()).handleEnrollResponse(EnrollResponse(registerId))
+        OdkPresenter(view, ACTION_REGISTER, mock(), mock()).handleEnrollResponse(EnrollResponse(registerId))
 
         verifyOnce(view) { returnRegistration(registerId) }
     }
@@ -83,7 +80,7 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock()).handleIdentifyResponse(
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verifyOnce(view) {
@@ -99,7 +96,7 @@ class OdkPresenterTest {
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock()).handleVerifyResponse(verification)
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
@@ -111,7 +108,7 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "", mock(), mock(), mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+        OdkPresenter(view, "", mock(), mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
         verifyOnce(view) { returnErrorToClient(anyOrNull()) }
     }
 
@@ -120,14 +117,14 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
         whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mock()).apply { start() }
+        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply { start() }
 
         verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() =
         mock<ClientApiSessionEventsManager>().apply {
-            whenever(this) { createSession() } thenReturn Single.just("session_id")
+            whenever(this) { createSession(anyNotNull()) } thenReturn Single.just("session_id")
         }
 
 
