@@ -48,7 +48,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
     @SuppressLint("CheckResult")
     override fun start() {
         sessionEventsManager
-            .createSession(IntegrationInfo.ODK)
+            .createSession(IntegrationInfo.STANDARD)
             .doFinally {
                 when (action) {
                     SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
