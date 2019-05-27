@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.content.Intent
 import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.argThat
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
@@ -13,7 +12,6 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.clientapi.tools.json.GsonBuilderImpl
-import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.*
 import org.junit.Test
 
@@ -27,7 +25,7 @@ class RequestPresenterTest {
 
     private val enrolIntentFields = mapOf(projectIdField, moduleIdField, userIdField)
     private val enrolIntentFieldsWithExtra = enrolIntentFields.plus(extraField)
-    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, mock())
+    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, emptyMap(), mock())
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
