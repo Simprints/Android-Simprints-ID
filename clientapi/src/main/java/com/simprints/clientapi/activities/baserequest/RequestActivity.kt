@@ -9,7 +9,6 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromAlertTypeToDomain
@@ -24,8 +23,6 @@ import timber.log.Timber
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
-
-    abstract val integrationInfo: IntegrationInfo
 
     override val enrollExtractor: EnrollExtractor
         get() = EnrollExtractor(intent)

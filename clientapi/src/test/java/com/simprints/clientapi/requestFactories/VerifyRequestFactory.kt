@@ -5,7 +5,6 @@ import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.ExtraRequestInfo
 import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.requests.VerifyRequest
 import com.simprints.testtools.common.syntax.mock
@@ -20,12 +19,11 @@ object VerifyRequestFactory : RequestFactory() {
             userId = MOCK_USER_ID,
             metadata = MOCK_METADATA,
             verifyGuid = MOCK_VERIFY_GUID,
-            unknownExtras = emptyMap(),
-            extra = ExtraRequestInfo(integrationInfo)
+            unknownExtras = emptyMap()
         )
 
     override fun getBuilder(extractor: ClientRequestExtractor): VerifyBuilder =
-        VerifyBuilder(extractor as VerifyExtractor, getValidator(extractor), mock())
+        VerifyBuilder(extractor as VerifyExtractor, getValidator(extractor))
 
     override fun getValidator(extractor: ClientRequestExtractor): VerifyValidator =
         VerifyValidator(extractor as VerifyExtractor)

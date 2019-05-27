@@ -30,9 +30,7 @@ import java.util.*
 
 class OdkPresenterTest {
 
-    private val view = mock<OdkActivity>().also {
-        whenever(it) { integrationInfo } thenReturn ODK
-    }
+    private val view = mock<OdkActivity>()
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {

@@ -4,7 +4,6 @@ import android.os.Parcelable
 
 interface AppBaseRequest {
     val projectId: String
-    val extraRequestInfo: AppExtraRequestInfo
 }
 
 interface AppRequestParamAction {

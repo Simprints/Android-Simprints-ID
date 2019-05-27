@@ -3,14 +3,10 @@ package com.simprints.clientapi.activities.odk
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
-import com.simprints.clientapi.domain.requests.IntegrationInfo
-
 
 interface OdkContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
-
-        val integrationInfo: IntegrationInfo
 
         val action: String?
 

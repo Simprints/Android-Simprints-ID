@@ -7,13 +7,11 @@ import kotlinx.android.parcel.Parcelize
 data class AppEnrolRequest(override val projectId: String,
                            override val userId: String,
                            override val moduleId: String,
-                           override val metadata: String,
-                           override val extraRequestInfo: AppExtraRequestInfo) : AppRequest {
+                           override val metadata: String) : AppRequest {
 
     constructor(appRequest: IAppEnrollRequest) :
         this(appRequest.projectId,
             appRequest.userId,
             appRequest.moduleId,
-            appRequest.metadata,
-            AppExtraRequestInfo(appRequest.extra))
+            appRequest.metadata)
 }

@@ -1,8 +1,6 @@
 package com.simprints.moduleapi.app.requests.confirmations
 
 import android.os.Parcelable
-import com.simprints.moduleapi.app.requests.IExtraRequestInfo
-
 
 interface IAppConfirmation : Parcelable {
 
@@ -11,5 +9,4 @@ interface IAppConfirmation : Parcelable {
     }
 
     val projectId: String
-    val extra: IExtraRequestInfo
 }

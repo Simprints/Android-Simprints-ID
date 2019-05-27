@@ -4,13 +4,10 @@ import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.EnrollRequest
-import com.simprints.clientapi.domain.requests.ExtraRequestInfo
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 
 
 class EnrollBuilder(private val extractor: EnrollExtractor,
-                    validator: EnrollValidator,
-                    private val integrationInfo: IntegrationInfo)
+                    validator: EnrollValidator)
     : ClientRequestBuilder(validator) {
 
     override fun buildAppRequest(): ClientBase = EnrollRequest(
@@ -18,7 +15,6 @@ class EnrollBuilder(private val extractor: EnrollExtractor,
         userId = extractor.getUserId(),
         moduleId = extractor.getModuleId(),
         metadata = extractor.getMetadata(),
-        unknownExtras = extractor.getUnknownExtras(),
-        extra = ExtraRequestInfo(integrationInfo)
+        unknownExtras = extractor.getUnknownExtras()
     )
 }
