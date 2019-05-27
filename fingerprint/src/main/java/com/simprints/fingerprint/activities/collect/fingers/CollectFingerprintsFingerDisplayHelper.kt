@@ -4,13 +4,9 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.FingerPageAdapter
+import com.simprints.fingerprint.activities.collect.models.DefaultScanConfig
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.activities.collect.models.FingerConfig.OPTIONAL
-import com.simprints.fingerprint.activities.collect.models.FingerConfig.REQUIRED
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier.*
-import com.simprints.fingerprint.activities.collect.models.ScanConfig
-import com.simprints.fingerprint.activities.collect.models.ScanConfigFingerEntry
 import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
@@ -147,19 +143,6 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
 
         const val TRY_DIFFERENT_FINGER_SPLASH_DELAY: Long = 2000
 
-        private val defaultScanConfig = ScanConfig().apply {
-            with(fingerConfigs) {
-                plus(Pair(LEFT_THUMB, ScanConfigFingerEntry(REQUIRED, 0, 0)))
-                plus(Pair(LEFT_INDEX_FINGER, ScanConfigFingerEntry(REQUIRED, 1, 1)))
-                plus(Pair(LEFT_3RD_FINGER, ScanConfigFingerEntry(OPTIONAL, 4, 2)))
-                plus(Pair(LEFT_4TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 6, 3)))
-                plus(Pair(LEFT_5TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 8, 4)))
-                plus(Pair(RIGHT_THUMB, ScanConfigFingerEntry(OPTIONAL, 2, 5)))
-                plus(Pair(RIGHT_INDEX_FINGER, ScanConfigFingerEntry(OPTIONAL, 3, 6)))
-                plus(Pair(RIGHT_3RD_FINGER, ScanConfigFingerEntry(OPTIONAL, 5, 7)))
-                plus(Pair(RIGHT_4TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 7, 8)))
-                plus(Pair(RIGHT_5TH_FINGER, ScanConfigFingerEntry(OPTIONAL, 9, 9)))
-            }
-        }
+        private val defaultScanConfig = DefaultScanConfig()
     }
 }
