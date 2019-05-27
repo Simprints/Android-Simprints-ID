@@ -18,6 +18,7 @@ object IdentifyRequestFactory : RequestFactory() {
             moduleId = MOCK_MODULE_ID,
             userId = MOCK_USER_ID,
             metadata = MOCK_METADATA,
+            unknownExtras = emptyMap(),
             extra = ExtraRequestInfo(integrationInfo)
         )
 

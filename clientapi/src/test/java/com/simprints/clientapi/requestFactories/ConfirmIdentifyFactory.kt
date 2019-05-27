@@ -18,6 +18,7 @@ object ConfirmIdentifyFactory : RequestFactory() {
             projectId = MOCK_PROJECT_ID,
             sessionId = MOCK_SESSION_ID,
             selectedGuid = MOCK_SELECTED_GUID,
+            unknownExtras = emptyMap(),
             extra = ExtraRequestInfo(integrationInfo)
         )
 

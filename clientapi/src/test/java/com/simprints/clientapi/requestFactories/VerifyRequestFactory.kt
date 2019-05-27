@@ -20,6 +20,7 @@ object VerifyRequestFactory : RequestFactory() {
             userId = MOCK_USER_ID,
             metadata = MOCK_METADATA,
             verifyGuid = MOCK_VERIFY_GUID,
+            unknownExtras = emptyMap(),
             extra = ExtraRequestInfo(integrationInfo)
         )
 
