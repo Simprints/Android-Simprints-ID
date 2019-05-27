@@ -1,5 +1,7 @@
 package com.simprints.clientapi.di
 
+import com.simprints.clientapi.activities.commcare.CommCareContract
+import com.simprints.clientapi.activities.commcare.CommCarePresenter
 import com.simprints.clientapi.activities.errors.ErrorContract
 import com.simprints.clientapi.activities.errors.ErrorPresenter
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsContract
@@ -12,8 +14,6 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManagerImpl
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
-import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.clientapi.tools.json.GsonBuilderImpl
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -43,6 +43,9 @@ val koinModule = module {
     }
     factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
         OdkPresenter(view, action, get(), get())
+    }
+    factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
+        CommCarePresenter(view, action, get(), get())
     }
 
 }
