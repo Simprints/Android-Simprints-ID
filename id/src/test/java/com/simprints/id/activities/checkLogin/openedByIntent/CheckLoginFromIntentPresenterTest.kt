@@ -55,7 +55,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppEnrolRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"
@@ -74,7 +73,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppIdentifyRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"
@@ -93,7 +91,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppVerifyRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"

@@ -12,7 +12,7 @@ class ErrorPresenterTest {
 
     @Test
     fun start_shouldSetCorrectErrorMessage() {
-        ErrorPresenter(view, mock(), mock()).apply {
+        ErrorPresenter(view, mock()).apply {
             start(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
         verifyOnce(view) { setErrorMessageText(anyNotNull()) }
@@ -20,7 +20,7 @@ class ErrorPresenterTest {
 
     @Test
     fun handleCloseClick_ShouldTellTheViewToClose() {
-        ErrorPresenter(view, mock(), mock()).apply { start(); handleCloseClick() }
+        ErrorPresenter(view, mock()).apply { start(); handleCloseClick() }
         verifyOnce(view) { closeActivity() }
     }
 }

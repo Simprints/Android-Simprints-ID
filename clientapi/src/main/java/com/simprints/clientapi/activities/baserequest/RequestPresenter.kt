@@ -7,18 +7,16 @@ import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
-import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
+import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
-import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.clientapi.extensions.inBackground
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
-                                private val timeHelper: ClientApiTimeHelper,
                                 private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {
 
@@ -76,14 +74,14 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
-            eventsManager
-                .addSessionEvent(SuspiciousIntentEvent(timeHelper.now(), request.unknownExtras))
+            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).inBackground()
         }
     }
 
     private fun addInvalidSessionInBackground() {
-        eventsManager.addSessionEvent(InvalidIntentEvent(timeHelper.now(), view.getIntentAction(),
-            view.getIntentExtras() ?: emptyMap()))
+        eventsManager.addInvalidIntentEvent(
+            IntentAction.parse(view.getIntentAction()),
+            view.getIntentExtras() ?: emptyMap()).inBackground()
     }
 
 }

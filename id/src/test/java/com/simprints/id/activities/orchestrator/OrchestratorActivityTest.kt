@@ -26,6 +26,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorActivityTest {
@@ -98,7 +99,7 @@ class OrchestratorActivityTest {
     private fun createScenarioForOrchestratorActivity(): ActivityScenario<OrchestratorActivity> =
         ActivityScenario.launch<OrchestratorActivity>(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, OrchestratorActivity::class.qualifiedName!!)
-            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "", AppExtraRequestInfo(AppIntegrationInfo.ODK))
+            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "")
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
         })
 
@@ -116,6 +117,7 @@ class OrchestratorActivityTest {
 
     @After
     fun tearDown() {
+        stopKoin()
         Intents.release()
     }
 }

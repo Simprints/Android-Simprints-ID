@@ -1,17 +1,15 @@
 package com.simprints.clientapi.activities.errors
 
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.AlertScreenEvent
-import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.clientapi.extensions.inBackground
 import com.simprints.id.R as Rid
 
 class ErrorPresenter(val view: ErrorContract.View,
-                     private val timeHelper: ClientApiTimeHelper,
                      private val sessionEventsManager: ClientApiSessionEventsManager)
     : ErrorContract.Presenter {
 
     override fun start(clientApiAlert: ClientApiAlert) {
-        sessionEventsManager.addSessionEvent(AlertScreenEvent(timeHelper.now(), clientApiAlert))
+        sessionEventsManager.addAlertScreenEvent(clientApiAlert).inBackground()
         view.setErrorMessageText(getErrorMessage(clientApiAlert))
     }
 

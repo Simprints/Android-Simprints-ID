@@ -4,7 +4,7 @@ import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
 import com.simprints.clientapi.clientrequests.validators.ClientRequestValidator
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.testtools.common.syntax.whenever
 
 abstract class RequestFactory {

@@ -6,7 +6,7 @@ import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.testtools.common.syntax.mock
 
 object IdentifyRequestFactory : RequestFactory() {

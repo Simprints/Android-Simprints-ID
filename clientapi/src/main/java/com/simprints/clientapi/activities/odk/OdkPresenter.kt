@@ -5,22 +5,20 @@ import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-import com.simprints.clientapi.tools.ClientApiTimeHelper
 import io.reactivex.rxkotlin.subscribeBy
 
 
 class OdkPresenter(private val view: OdkContract.View,
                    private val action: String?,
-                   private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                   private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                   clientApiTimeHelper: ClientApiTimeHelper)
+                   private val sessionEventsManager: ClientApiSessionEventsManager,
+                   private val clientApiCrashReportManager: ClientApiCrashReportManager)
     : RequestPresenter(view,
-    clientApiTimeHelper,
-    clientApiSessionEventsManager
+    sessionEventsManager
 ), OdkContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
@@ -36,8 +34,8 @@ class OdkPresenter(private val view: OdkContract.View,
 
     @SuppressLint("CheckResult")
     override fun start() {
-        clientApiSessionEventsManager
-            .createSession()
+        sessionEventsManager
+            .createSession(IntegrationInfo.ODK)
             .doFinally {
                 when (action) {
                     ACTION_REGISTER -> processEnrollRequest()

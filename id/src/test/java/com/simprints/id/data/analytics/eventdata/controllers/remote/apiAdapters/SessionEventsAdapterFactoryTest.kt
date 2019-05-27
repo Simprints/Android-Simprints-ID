@@ -53,6 +53,15 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
+    fun validate_IntentParsingEventApiModel() {
+        val event = IntentParsingEvent(0, IntentParsingEvent.IntegrationInfo.STANDARD)
+        val apiEvent = ApiIntentParsingEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateIntentParsingEventApiModel(json)
+    }
+
+    @Test
     fun validate_authenticationEventApiModel() {
         val event = AuthenticationEvent(
             0,
@@ -80,7 +89,7 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_calloutEventForVerificationApiModel() {
         val calloutEvent = VerificationCalloutEvent(
-            10, CalloutIntegrationInfo.ODK,
+            10,
             "projectId", "userId", "moduleId",
             "verifyGuid", "metadata")
 
@@ -93,7 +102,7 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_calloutEventForIdentificationApiModel() {
         val calloutEvent = IdentificationCalloutEvent(
-            10, CalloutIntegrationInfo.ODK,
+            10,
             "projectId", "userId", "moduleId", "metadata")
 
         val apiEvent = ApiCalloutEvent(calloutEvent)
@@ -105,7 +114,7 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_calloutEventForConfirmationApiModel() {
         val calloutEvent = ConfirmationCalloutEvent(
-            10, CalloutIntegrationInfo.ODK,
+            10,
             "selectedGuid", "sessionId")
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
@@ -116,9 +125,8 @@ class SessionEventsAdapterFactoryTest {
     @Test
     fun validate_calloutEventForEnrolmentApiModel() {
         val calloutEvent = EnrolmentCalloutEvent(
-            10, CalloutIntegrationInfo.ODK,
-            "projectId", "userId",
-            "moduleId", "metadata")
+            10,
+            "projectId", "userId", "moduleId", "metadata")
 
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject

@@ -5,9 +5,9 @@ import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
-import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -18,12 +18,10 @@ import io.reactivex.rxkotlin.subscribeBy
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
-                            private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                            private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                            clientApiTimeHelper: ClientApiTimeHelper) :
+                            private val sessionEventsManager: ClientApiSessionEventsManager,
+                            private val clientApiCrashReportManager: ClientApiCrashReportManager) :
     RequestPresenter(view,
-        clientApiTimeHelper,
-        clientApiSessionEventsManager
+        sessionEventsManager
     ), LibSimprintsContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
@@ -49,8 +47,8 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
 
     @SuppressLint("CheckResult")
     override fun start() {
-        clientApiSessionEventsManager
-            .createSession()
+        sessionEventsManager
+            .createSession(IntegrationInfo.ODK)
             .doFinally {
                 when (action) {
                     SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
@@ -65,6 +63,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                     it.printStackTrace()
                 })
     }
+
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))
