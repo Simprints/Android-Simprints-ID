@@ -9,9 +9,6 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class OdkPresenter(private val view: OdkContract.View,
@@ -31,18 +28,16 @@ class OdkPresenter(private val view: OdkContract.View,
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
     }
 
-    override fun start() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
-            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+    override suspend fun start() {
+        val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
+        crashReportManager.setSessionIdCrashlyticsKey(sessionId)
 
-            when (action) {
-                ACTION_REGISTER -> processEnrollRequest()
-                ACTION_IDENTIFY -> processIdentifyRequest()
-                ACTION_VERIFY -> processVerifyRequest()
-                ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
-                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-            }
+        when (action) {
+            ACTION_REGISTER -> processEnrollRequest()
+            ACTION_IDENTIFY -> processIdentifyRequest()
+            ACTION_VERIFY -> processVerifyRequest()
+            ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
+            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
 

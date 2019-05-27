@@ -8,6 +8,7 @@ import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
 
+
 interface LibSimprintsContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {

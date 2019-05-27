@@ -17,6 +17,8 @@ interface RequestContract {
 
         val action: String?
 
+        val extras: Map<String, Any?>?
+
         val presenter: Presenter
 
         val enrollExtractor: EnrollExtractor
@@ -34,8 +36,6 @@ interface RequestContract {
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
         fun returnErrorToClient(resultCode: Int?)
-
-        fun getIntentExtras(): Map<String, Any?>?
 
     }
 

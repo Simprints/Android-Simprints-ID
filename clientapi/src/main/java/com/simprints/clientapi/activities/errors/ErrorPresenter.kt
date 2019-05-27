@@ -27,7 +27,7 @@ class ErrorPresenter(val view: ErrorContract.View,
             view.getStringFromResources(it)
         }
 
-    override fun start() {}
+    override suspend fun start() {}
 
     override fun handleCloseClick() = view.closeActivity()
 
