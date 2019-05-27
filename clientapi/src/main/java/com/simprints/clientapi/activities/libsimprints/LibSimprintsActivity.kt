@@ -13,9 +13,6 @@ import org.koin.core.parameter.parametersOf
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
-    override val action: String?
-        get() = intent.action
-
     override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

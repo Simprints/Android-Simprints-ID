@@ -15,6 +15,8 @@ interface RequestContract {
 
     interface RequestView {
 
+        val action: String?
+
         val presenter: Presenter
 
         val enrollExtractor: EnrollExtractor
@@ -32,8 +34,6 @@ interface RequestContract {
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
         fun returnErrorToClient(resultCode: Int?)
-
-        fun getIntentAction(): String
 
         fun getIntentExtras(): Map<String, Any?>?
 
