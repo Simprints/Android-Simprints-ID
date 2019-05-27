@@ -31,6 +31,6 @@ abstract class RequestFactory {
         whenever(mockExtractor) { getProjectId() } thenReturn MOCK_PROJECT_ID
         whenever(mockExtractor) { getUserId() } thenReturn MOCK_USER_ID
         whenever(mockExtractor) { getModuleId() } thenReturn MOCK_MODULE_ID
-        whenever(mockExtractor) { getMetatdata() } thenReturn MOCK_METADATA
+        whenever(mockExtractor) { getMetadata() } thenReturn MOCK_METADATA
     }
 }
