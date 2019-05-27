@@ -11,7 +11,7 @@ class ConfirmIdentifyExtractor(val intent: Intent) : ClientRequestExtractor(inte
 
     fun getSelectedGuid(): String = intent.extractString(SIMPRINTS_SELECTED_GUID)
 
-    override val expectedKeys: List<String>
-        get() = super.expectedKeys + listOf(SIMPRINTS_SESSION_ID, SIMPRINTS_SELECTED_GUID)
+    override val expectedKeys: List<String> =
+        super.keys + listOf(SIMPRINTS_SESSION_ID, SIMPRINTS_SELECTED_GUID)
 
 }
