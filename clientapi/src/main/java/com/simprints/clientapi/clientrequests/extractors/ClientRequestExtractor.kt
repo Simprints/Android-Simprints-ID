@@ -9,7 +9,7 @@ abstract class ClientRequestExtractor(private val intent: Intent) {
 
     abstract val expectedKeys: List<String>
 
-    protected val keys: List<String> = listOf(
+    protected val keys = listOf(
         Constants.SIMPRINTS_PROJECT_ID,
         Constants.SIMPRINTS_USER_ID,
         Constants.SIMPRINTS_MODULE_ID,
