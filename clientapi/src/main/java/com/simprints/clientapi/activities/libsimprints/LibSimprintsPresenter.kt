@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import android.annotation.SuppressLint
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
@@ -13,16 +12,16 @@ import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
 import com.simprints.libsimprints.Tier
-import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val sessionEventsManager: ClientApiSessionEventsManager,
-                            private val clientApiCrashReportManager: ClientApiCrashReportManager) :
-    RequestPresenter(view,
-        sessionEventsManager
-    ), LibSimprintsContract.Presenter {
+                            private val crashReportManager: ClientApiCrashReportManager) :
+    RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = mapOf(
@@ -44,24 +43,19 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
             INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
 
-
-    @SuppressLint("CheckResult")
     override fun start() {
-        sessionEventsManager
-            .createSession(IntegrationInfo.STANDARD)
-            .doFinally {
-                when (action) {
-                    SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-                    SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-                    SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-                    SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
-                    else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-                }
-            }.subscribeBy(
-                onSuccess = { clientApiCrashReportManager.setSessionIdCrashlyticsKey(it) },
-                onError = {
-                    it.printStackTrace()
-                })
+        CoroutineScope(Dispatchers.Main).launch {
+            val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
+            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+
+            when (action) {
+                SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+                SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+                SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+                SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+                else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+            }
+        }
     }
 
 

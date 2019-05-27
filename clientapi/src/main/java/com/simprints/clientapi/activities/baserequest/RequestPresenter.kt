@@ -48,7 +48,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {
-        addInvalidSessionInBackground()
+        logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }
 
@@ -78,9 +78,9 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         }
     }
 
-    private fun addInvalidSessionInBackground() {
+    private fun logInvalidSessionInBackground() {
         eventsManager.addInvalidIntentEvent(
-            IntentAction.parse(view.getIntentAction()),
+            IntentAction.parse(view.action ?: ""),
             view.getIntentExtras() ?: emptyMap()).inBackground()
     }
 

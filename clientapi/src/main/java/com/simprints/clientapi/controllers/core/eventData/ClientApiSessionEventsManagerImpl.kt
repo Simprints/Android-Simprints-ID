@@ -1,53 +1,56 @@
 package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
-import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.libsimprints.BuildConfig.VERSION_NAME
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
+
 
 class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: SessionEventsManager,
                                         private val timeHelper: ClientApiTimeHelper) :
     ClientApiSessionEventsManager {
 
-    override fun createSession(integration: IntegrationInfo): Single<String> =
-        coreSessionEventsManager.createSession(VERSION_NAME).flatMap {
-            addIntentParsingEvent(IntegrationInfo.ODK).toSingleDefault(it.id)
+    override suspend fun createSession(integration: IntegrationInfo): String =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.createSession(VERSION_NAME).flatMap {
+                    addIntentParsingEvent(integration).toSingleDefault(it.id)
+                }.subscribeBy(
+                    onSuccess = { cont.resume(it) },
+                    onError = { cont.resumeWithException(it) }
+                )
+            }
         }
 
+    private fun addIntentParsingEvent(integration: IntegrationInfo): Completable = addEvent(
+        IntentParsingEvent(timeHelper.now(), integration.fromDomainToCore())
+    )
 
-    private fun addIntentParsingEvent(integration: IntegrationInfo): Completable =
-        addEvent(
-            IntentParsingEvent(
-                timeHelper.now(),
-                integration.fromDomainToCore()))
-
-    override fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable =
-        addEvent(
-            AlertScreenEvent(
-                timeHelper.now(),
-                clientApiAlertType.fromAlertToAlertTypeEvent()))
+    override fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable = addEvent(
+        AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())
+    )
 
     override fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable =
-        addEvent(
-            SuspiciousIntentEvent(
-                timeHelper.now(),
-                unexpectedExtras))
+        addEvent(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
 
     override fun addInvalidIntentEvent(action: IntentAction, extras: Map<String, Any?>): Completable =
-        addEvent(
-            InvalidIntentEvent(
-                timeHelper.now(),
-                action.fromDomainToCore(),
-                extras))
+        addEvent(InvalidIntentEvent(timeHelper.now(), action.fromDomainToCore(), extras))
 
     private fun addEvent(event: Event): Completable = coreSessionEventsManager.addEvent(event)
+
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =

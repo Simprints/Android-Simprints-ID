@@ -24,6 +24,9 @@ import timber.log.Timber
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
 
+    override val action: String?
+        get() = intent.action
+
     override val enrollExtractor: EnrollExtractor
         get() = EnrollExtractor(intent)
 
@@ -70,8 +73,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
                 routeResponse(data.getParcelableExtra(BUNDLE_KEY))
         }
     }
-
-    override fun getIntentAction() = intent.action ?: ""
 
     override fun getIntentExtras() = intent?.extras?.toMap()
 

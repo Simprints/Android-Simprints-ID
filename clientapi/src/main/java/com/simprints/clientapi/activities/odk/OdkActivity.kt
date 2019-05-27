@@ -22,9 +22,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
     }
 
-    override val action: String?
-        get() = intent.action
-
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

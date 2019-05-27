@@ -1,15 +1,14 @@
 package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
-import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import io.reactivex.Completable
-import io.reactivex.Single
 
 
 interface ClientApiSessionEventsManager {
 
-    fun createSession(integration: IntegrationInfo): Single<String>
+    suspend fun createSession(integration: IntegrationInfo): String
 
     fun addInvalidIntentEvent(action: IntentAction, extras: Map<String, Any?>): Completable
 
