@@ -23,8 +23,6 @@ import com.simprints.clientapi.tools.json.GsonBuilder
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val timeHelper: ClientApiTimeHelper,
                                 private var eventsManager: ClientApiSessionEventsManager,
-                                private val crashReportManager: ClientApiCrashReportManager,
-                                private var gsonBuilder: GsonBuilder,
                                 private val integrationInfo: IntegrationInfo)
     : RequestContract.Presenter {
 
