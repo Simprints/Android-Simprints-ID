@@ -23,8 +23,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             clientApiTimeHelper: ClientApiTimeHelper) :
     RequestPresenter(view,
         clientApiTimeHelper,
-        clientApiSessionEventsManager,
-        view.integrationInfo
+        clientApiSessionEventsManager
     ), LibSimprintsContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>

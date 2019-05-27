@@ -6,43 +6,38 @@ import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidato
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.InvalidIntentEvent
 import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private val timeHelper: ClientApiTimeHelper,
-                                private var eventsManager: ClientApiSessionEventsManager,
-                                private val integrationInfo: IntegrationInfo)
+                                private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {
 
     override fun processEnrollRequest() = validateAndSendRequest(
-        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor), integrationInfo)
+        EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 
     override fun processIdentifyRequest() = validateAndSendRequest(
-        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor), integrationInfo)
+        IdentifyBuilder(view.identifyExtractor, IdentifyValidator(view.identifyExtractor))
     )
 
     override fun processVerifyRequest() = validateAndSendRequest(
-        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor), integrationInfo)
+        VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
     )
 
     override fun processConfirmIdentifyRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
             view.confirmIdentifyExtractor,
-            ConfirmIdentifyValidator(view.confirmIdentifyExtractor),
-            integrationInfo
+            ConfirmIdentifyValidator(view.confirmIdentifyExtractor)
         )
     )
 

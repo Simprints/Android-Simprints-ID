@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authorizat
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthorizationEvent.UserInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConnectivitySnapshotEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.CalloutIntegrationInfo.Companion.fromAppIntegrationInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
@@ -95,7 +94,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         with(request) {
             IdentificationCalloutEvent(
                 relativeStarTime,
-                fromAppIntegrationInfo(extraRequestInfo.integration),
                 projectId, userId, moduleId, metadata)
         }
 
@@ -103,7 +101,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         with(request) {
             VerificationCalloutEvent(
                 relativeStarTime,
-                fromAppIntegrationInfo(extraRequestInfo.integration),
                 projectId, userId, moduleId, verifyGuid, metadata)
         }
 
@@ -112,7 +109,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         with(request) {
             EnrolmentCalloutEvent(
                 relativeStarTime,
-                fromAppIntegrationInfo(extraRequestInfo.integration),
                 projectId, userId, moduleId, metadata)
         }
 

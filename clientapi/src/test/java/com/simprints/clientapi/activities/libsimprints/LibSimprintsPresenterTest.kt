@@ -29,9 +29,7 @@ import java.util.*
 
 class LibSimprintsPresenterTest {
 
-    private val view = mock<LibSimprintsActivity>().also {
-        whenever(it) { integrationInfo } thenReturn STANDARD
-    }
+    private val view = mock<LibSimprintsActivity>()
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {

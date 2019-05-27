@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.libsimprints.*
 import org.koin.android.ext.android.inject
 import org.koin.core.context.loadKoinModules
@@ -13,8 +12,6 @@ import org.koin.core.parameter.parametersOf
 
 
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
-
-    override val integrationInfo = IntegrationInfo.STANDARD
 
     override val action: String?
         get() = intent.action

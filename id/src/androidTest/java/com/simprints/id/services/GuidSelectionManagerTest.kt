@@ -21,9 +21,7 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.moduleapi.app.requests.AppExtraRequestInfo
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.di.DependencyRule

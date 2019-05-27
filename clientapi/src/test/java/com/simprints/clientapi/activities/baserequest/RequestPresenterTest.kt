@@ -22,7 +22,7 @@ class RequestPresenterTest {
     private val extraField = Pair("extraField", "someExtraField")
 
     private val enrolIntentFields = mapOf(projectIdField, moduleIdField, userIdField)
-    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, emptyMap(), mock())
+    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, emptyMap())
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
@@ -95,8 +95,8 @@ class ImplRequestPresenter(view: RequestContract.RequestView,
     RequestPresenter(
         view,
         timeHelper,
-        clientApiSessionEventsManager,
-        integrationInfo) {
+        clientApiSessionEventsManager
+    ) {
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
