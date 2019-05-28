@@ -1,6 +1,7 @@
 package com.simprints.id.services
 
 import com.simprints.id.data.analytics.AnalyticsManager
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
@@ -10,12 +11,16 @@ import io.reactivex.Completable
 class GuidSelectionManagerImpl(val deviceId: String,
                                val loginInfoManager: LoginInfoManager,
                                val analyticsManager: AnalyticsManager,
+                               val crashReportManager: CrashReportManager,
                                val sessionEventsManager: SessionEventsManager) : GuidSelectionManager {
 
     override fun saveGUIDSelection(request: AppIdentityConfirmationRequest): Completable =
         checkRequest(request)
             .andThen(saveGuidSelectionEvent(request))
-            .doOnError { reportToAnalytics(request, false) }
+            .doOnError {
+                crashReportManager.logExceptionOrSafeException(it)
+                reportToAnalytics(request, false)
+            }
             .doOnComplete { reportToAnalytics(request, true) }
 
     private fun checkRequest(request: AppIdentityConfirmationRequest): Completable = Completable.fromCallable {
@@ -24,7 +29,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
 
     private fun saveGuidSelectionEvent(request: AppIdentityConfirmationRequest): Completable =
         sessionEventsManager
-            .addGuidSelectionEventToLastIdentificationIfExists(request.selectedGuid, request.sessionId)
+            .addGuidSelectionEvent(request.selectedGuid, request.sessionId)
 
     private fun reportToAnalytics(request: AppIdentityConfirmationRequest, callbackSent: Boolean) =
         analyticsManager.logGuidSelectionService(
