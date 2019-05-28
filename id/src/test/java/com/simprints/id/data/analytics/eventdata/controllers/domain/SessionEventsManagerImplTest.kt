@@ -134,8 +134,4 @@ class SessionEventsManagerImplTest {
         tester.awaitTerminalEvent()
         assertThat(tester.errorCount()).isEqualTo(1)
     }
-
-    companion object {
-        private const val appVersionName = "app_version_name"
-    }
 }
