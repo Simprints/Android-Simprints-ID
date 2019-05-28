@@ -1,5 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync
 
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
@@ -172,7 +173,7 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSyncStatusModel() {
-        whenever(upSyncDao.insertLastUpSyncTime(anyNotNull())).then { }
+        whenever(upSyncDao.insertLastUpSyncTime(any())).then { }
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
