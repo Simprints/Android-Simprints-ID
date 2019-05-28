@@ -245,7 +245,7 @@ dependencies {
         exclude group: 'org.robolectric'
     }
 
-    implementation 'io.ashdavies.rx.rxtasks:rx-tasks:+'
+    implementation deps.rxjava2.tasks
 }
 
 kapt {
