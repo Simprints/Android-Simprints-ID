@@ -1,94 +1,65 @@
 package com.simprints.clientapi.activities.baserequest
 
 import com.google.common.truth.Truth
-import com.nhaarman.mockito_kotlin.argThat
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.reactivex.Completable
+import org.junit.Before
 import org.junit.Test
 
 class RequestPresenterTest {
 
-    private val projectIdField = Pair("projectId", "someProjectId")
-    private val moduleIdField = Pair("moduleId", "someModuleId")
-    private val userIdField = Pair("userId", "someUserId")
-    private val metadataField = Pair("metadata", "someMetadata")
-    private val extraField = Pair("extraField", "someExtraField")
+    private val projectIdField = "some_project_id"
+    private val moduleIdField = "some_module_id"
+    private val userIdField = "some_user_id"
+    private val metadataField = "some_metadata"
+    private val extraField = mapOf("extraField" to "someExtraField")
 
-    private val enrolIntentFields = mapOf(projectIdField, moduleIdField, userIdField)
-    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, emptyMap())
+    @Before
+    fun setUp(){
+        BaseUnitTestConfig()
+            .rescheduleRxMainThread()
+            .coroutinesMainThread()
+    }
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
-        val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val enrolExtractorMock = mockEnrolExtractorToHaveAnExtraField()
-        val view = mock<RequestContract.RequestView>().apply {
-            whenever(this) { enrollExtractor } thenReturn enrolExtractorMock
+        val clientApiSessionEventsManagerMock = mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { addSuspiciousIntentEvent(anyNotNull()) } thenReturn Completable.complete()
+        }
+        val requestBuilder = mock<ClientRequestBuilder>().apply {
+            whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
         }
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
-        presenter.processEnrollRequest()
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
+        presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
             addSuspiciousIntentEvent(argThat {
-                try {
-                    Truth.assertThat(this).isEqualTo(extraField);
-                    true
-                } catch(t: Throwable) { false }
+                Truth.assertThat(it).isEqualTo(extraField)
             })
         }
     }
 
     @Test
-    fun givenAnIntentWithExtraEmptyKeyAndValue_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
-        val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
-        val view = mockViewToReturnIntentFields(enrolIntentFields.plus("" to ""))
-
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
-        presenter.validateAndSendRequest(requestBuilder)
-
-        verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
-    }
-
-    @Test
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
-        val view = mockViewToReturnIntentFields(enrolIntentFields)
+        val requestBuilder = mock<ClientRequestBuilder>().apply {
+            whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
+        }
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, emptyMap())
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
     }
-
-    private fun mockViewToReturnIntentFields(intentFields: Map<String, String>): RequestContract.RequestView =
-        mock<RequestContract.RequestView>().apply {
-            whenever(this) { getIntentExtras() } thenReturn intentFields
-        }
-
-    private fun mockClientBuilderToReturnAnEnrolRequest(): ClientRequestBuilder =
-        mock<ClientRequestBuilder>().apply {
-            whenever(this) { build() } thenReturn enrolRequest
-        }
-
-    private fun mockEnrolExtractorToHaveAnExtraField(): EnrollExtractor =
-        mock<EnrollExtractor>().apply {
-            whenever(this) { getProjectId() } thenReturn "project_id"
-            whenever(this) { getUserId() } thenReturn "user_id"
-            whenever(this) { getModuleId() } thenReturn "module_id"
-            whenever(this) { getUnknownExtras() } thenReturn mapOf(extraField)
-            whenever(this) { getMetadata() } thenReturn "metadata"
-        }
 }
 
 class ImplRequestPresenter(view: RequestContract.RequestView,
-                           timeHelper: ClientApiTimeHelper,
                            clientApiSessionEventsManager: ClientApiSessionEventsManager,
                            override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>) :
     RequestPresenter(

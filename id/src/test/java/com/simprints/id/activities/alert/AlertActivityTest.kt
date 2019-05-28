@@ -13,13 +13,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent
 import com.simprints.id.domain.alert.AlertActivityViewModel

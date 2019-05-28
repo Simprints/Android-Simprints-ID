@@ -11,7 +11,7 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.Application
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest

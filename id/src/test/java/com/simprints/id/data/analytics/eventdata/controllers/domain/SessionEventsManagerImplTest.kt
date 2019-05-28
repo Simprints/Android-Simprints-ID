@@ -2,8 +2,6 @@ package com.simprints.id.data.analytics.eventdata.controllers.domain
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.anyOrNull
-import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.state.mockSessionEventsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
