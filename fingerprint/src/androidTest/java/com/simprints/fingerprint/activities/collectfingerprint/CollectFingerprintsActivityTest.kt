@@ -20,7 +20,10 @@ import com.simprints.fingerprintscannermock.MockFinger
 import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
-import org.junit.*
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
@@ -91,14 +94,12 @@ class CollectFingerprintsActivityTest {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
             MockFinger.NO_FINGER,
             MockFinger.NO_FINGER,
-            MockFinger.NO_FINGER,
             MockFinger.NO_FINGER)))
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(enrolRequestTwoFingers.toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
 
-        collectFingerprintsPressScan()
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
