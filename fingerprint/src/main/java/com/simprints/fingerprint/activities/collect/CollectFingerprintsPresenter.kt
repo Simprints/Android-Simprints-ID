@@ -97,19 +97,6 @@ class CollectFingerprintsPresenter(private val context: Context,
             logMessageForCrashReport("Scan button clicked")
             startCapturing()
         }
-        view.scanButton.setOnLongClickListener {
-            logMessageForCrashReport("Scan button long clicked")
-            resetFingerState()
-        }
-    }
-
-    private fun resetFingerState(): Boolean {
-        if (!isScanning()) {
-            currentFinger().isNotCollected
-            currentFinger().template = null
-            refreshDisplay()
-        }
-        return true
     }
 
     override fun initIndicators() {
