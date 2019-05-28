@@ -74,11 +74,11 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     }
 
     internal fun loadScannerVersionInPreference(preference: Preference) {
-        preference.summary = recentEventsManager.lastMacAddress
+        preference.summary = recentEventsManager.lastScannerVersion
     }
 
     internal fun loadDeviceIdInPreference(preference: Preference) {
-        preference.summary = recentEventsManager.lastScannerId
+        preference.summary = recentEventsManager.lastScannerUsed
     }
 
     private fun handleLogoutPreferenceClicked() {

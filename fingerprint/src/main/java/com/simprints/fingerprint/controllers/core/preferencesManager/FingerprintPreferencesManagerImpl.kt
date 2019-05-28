@@ -5,7 +5,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import java.util.*
 
 class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager,
-                                        override var lastScannerUsed: String = prefs.lastScannerUsed,
                                         override val matchPoolType: MatchPoolType = fromConstantGroup(prefs.matchGroup)): FingerprintPreferencesManager {
 
     override var lastEnrolDate: Date? = prefs.lastEnrolDate
@@ -24,5 +23,17 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager,
         set(value) {
             field = value
             prefs.lastIdentificationDate = field
+        }
+
+    override var lastScannerUsed: String = prefs.lastScannerUsed
+        set(value) {
+            field = value
+            prefs.lastScannerUsed = field
+        }
+
+    override var lastScannerVersion: String = prefs.lastScannerVersion
+        set(value) {
+            field = value
+            prefs.lastScannerVersion = field
         }
 }
