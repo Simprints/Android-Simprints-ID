@@ -21,7 +21,7 @@ interface SessionEventsManager : SessionEventsLocalDbManager {
     fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit)
 
-    fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable
+    fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable
     fun addPersonCreationEventInBackground(person: Person)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 
