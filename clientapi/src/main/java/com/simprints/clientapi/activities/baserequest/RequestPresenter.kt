@@ -7,7 +7,6 @@ import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import com.simprints.clientapi.domain.ClientBase
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
@@ -75,14 +74,13 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
-            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).inBackground()
+            eventsManager.addSuspiciousIntentEvent(request.unknownExtras)
+                .inBackground()
         }
     }
 
     private fun logInvalidSessionInBackground() {
-        eventsManager.addInvalidIntentEvent(
-            IntentAction.parse(view.action ?: ""), view.extras ?: emptyMap()
-        ).inBackground()
+        eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
+            .inBackground()
     }
-
 }
