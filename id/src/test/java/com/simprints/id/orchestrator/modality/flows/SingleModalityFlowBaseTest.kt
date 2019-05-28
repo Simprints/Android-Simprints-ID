@@ -2,7 +2,6 @@ package com.simprints.id.orchestrator.modality.flows
 
 import android.app.Activity
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
@@ -40,7 +39,7 @@ class SingleModalityFlowBaseTest {
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW, Activity.RESULT_OK, mock())
 
-            verifyOnce(this) { completeWithValidResponse(any()) }
+            verifyOnce(this) { completeWithValidResponse(anyNotNull()) }
         }
     }
 
@@ -52,7 +51,7 @@ class SingleModalityFlowBaseTest {
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW + 1, Activity.RESULT_OK, mock())
 
-            verifyNever(this) { completeWithValidResponse(any()) }
+            verifyNever(this) { completeWithValidResponse(anyNotNull()) }
         }
     }
 
@@ -61,14 +60,14 @@ class SingleModalityFlowBaseTest {
         with(spy(SingleModalityFlowBaseImpl())) {
             whenever(this) { intentRequestCode } thenReturn REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW
             whenever(this) { getModalityStepRequests() } thenReturn mock()
-            whenever(this) { extractModalityResponse(any(), any(), any()) } thenThrow RuntimeException("Malformed data")
+            whenever(this) { extractModalityResponse(anyNotNull(), anyNotNull(), anyOrNull()) } thenThrow RuntimeException("Malformed data")
             responsesEmitter = mock()
             nextIntentEmitter = mock()
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW, Activity.RESULT_OK, Intent())
 
-            verifyNever(this) { completeWithValidResponse(any()) }
-            verifyOnce(this) { completeWithAnError(any()) }
+            verifyNever(this) { completeWithValidResponse(anyNotNull()) }
+            verifyOnce(this) { completeWithAnError(anyNotNull()) }
         }
     }
 

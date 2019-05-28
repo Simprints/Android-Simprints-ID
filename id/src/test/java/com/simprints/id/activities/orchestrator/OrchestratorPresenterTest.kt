@@ -1,7 +1,6 @@
 package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.any
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
@@ -10,10 +9,7 @@ import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.spy
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -50,7 +46,7 @@ class OrchestratorPresenterTest {
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.never()
-            whenever(this) { startFlow(any(), any()) } thenReturn Observable.just(modalityRequest)
+            whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.just(modalityRequest)
         }
 
         orchestratorPresenter.start()
@@ -64,7 +60,7 @@ class OrchestratorPresenterTest {
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.never()
-            whenever(this) { startFlow(any(), any()) } thenReturn Observable.error(Throwable("Error trying to generate the next ModalityRequest"))
+            whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.error(Throwable("Error trying to generate the next ModalityRequest"))
         }
 
         orchestratorPresenter.start()
@@ -79,7 +75,7 @@ class OrchestratorPresenterTest {
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.just(mockAppResponse)
-            whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
         }
 
         orchestratorPresenter.start()
@@ -93,7 +89,7 @@ class OrchestratorPresenterTest {
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
             whenever(this) { getAppResponse() } thenReturn Single.error(Throwable("Error trying to generate App Response"))
-            whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+            whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
         }
 
         orchestratorPresenter.start()
@@ -112,16 +108,16 @@ class OrchestratorPresenterTest {
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
                 whenever(this) { getAppResponse() } thenReturn Single.just(createAppEnrolResponse())
-                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+                whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
             }
 
-            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+            whenever(this) { buildEnrolmentCallbackEvent(anyNotNull()) } thenReturn mock()
         }
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
-        verifyOnce(orchestratorPresenter) { buildEnrolmentCallbackEvent(any()) }
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(anyNotNull()) }
+        verifyOnce(orchestratorPresenter) { buildEnrolmentCallbackEvent(anyNotNull()) }
     }
 
     @Test
@@ -135,16 +131,16 @@ class OrchestratorPresenterTest {
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
                 whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppIdentifyResponse>(AppResponseType.IDENTIFY))
-                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+                whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
             }
 
-            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+            whenever(this) { buildEnrolmentCallbackEvent(anyNotNull()) } thenReturn mock()
         }
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
-        verifyOnce(orchestratorPresenter) { buildIdentificationCallbackEvent(any()) }
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(anyNotNull()) }
+        verifyOnce(orchestratorPresenter) { buildIdentificationCallbackEvent(anyNotNull()) }
     }
 
     @Test
@@ -158,16 +154,16 @@ class OrchestratorPresenterTest {
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
                 whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppVerifyResponse>(AppResponseType.VERIFY))
-                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+                whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
             }
 
-            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+            whenever(this) { buildEnrolmentCallbackEvent(anyNotNull()) } thenReturn mock()
         }
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
-        verifyOnce(orchestratorPresenter) { buildVerificationCallbackEvent(any()) }
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(anyNotNull()) }
+        verifyOnce(orchestratorPresenter) { buildVerificationCallbackEvent(anyNotNull()) }
     }
 
     @Test
@@ -181,16 +177,16 @@ class OrchestratorPresenterTest {
 
             this.orchestratorManager = mock<OrchestratorManager>().apply {
                 whenever(this) { getAppResponse() } thenReturn Single.just(createMockFoAppResponse<AppRefusalFormResponse>(AppResponseType.REFUSAL))
-                whenever(this) { startFlow(any(), any()) } thenReturn Observable.never()
+                whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
             }
 
-            whenever(this) { buildEnrolmentCallbackEvent(any()) } thenReturn mock()
+            whenever(this) { buildEnrolmentCallbackEvent(anyNotNull()) } thenReturn mock()
         }
 
         orchestratorPresenter.start()
 
-        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(any()) }
-        verifyOnce(orchestratorPresenter) { buildRefusalCallbackEvent(any()) }
+        verifyOnce(orchestratorPresenter) { addCallbackEventInSessions(anyNotNull()) }
+        verifyOnce(orchestratorPresenter) { buildRefusalCallbackEvent(anyNotNull()) }
     }
 
     private fun mockSessionEventsManagerToReturnASessionId() =
@@ -198,7 +194,7 @@ class OrchestratorPresenterTest {
             val sessionMock = mock<SessionEvents>()
             whenever(sessionMock) { id } thenReturn ""
             whenever(this) { getCurrentSession() } thenReturn Single.just(sessionMock)
-            whenever(this) { updateSession(any()) } thenAnswer {
+            whenever(this) { updateSession(anyNotNull()) } thenAnswer {
                 val callback = it.arguments[0] as (SessionEvents) -> Unit
                 callback(mock())
                 Completable.complete()
