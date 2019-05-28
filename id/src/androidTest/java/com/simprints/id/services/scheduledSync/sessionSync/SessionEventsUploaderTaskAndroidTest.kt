@@ -3,7 +3,6 @@ package com.simprints.id.services.scheduledSync.sessionSync
 import android.net.NetworkInfo
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
 import com.simprints.id.Application
@@ -30,8 +29,6 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormReason
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
@@ -53,7 +50,6 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class SessionEventsUploaderTaskAndroidTest {
 
     companion object {
@@ -146,6 +142,7 @@ class SessionEventsUploaderTaskAndroidTest {
         }.also {
             realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
+
 
         val testObserver = executeUpload()
         testObserver.awaitAndAssertSuccess()
