@@ -2,12 +2,16 @@ package com.simprints.id.orchestrator.modality.flows
 
 import android.app.Activity
 import android.content.Intent
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
 import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
 
 class SingleModalityFlowBaseTest {
 
@@ -60,7 +64,7 @@ class SingleModalityFlowBaseTest {
         with(spy(SingleModalityFlowBaseImpl())) {
             whenever(this) { intentRequestCode } thenReturn REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW
             whenever(this) { getModalityStepRequests() } thenReturn mock()
-            whenever(this) { extractModalityResponse(anyNotNull(), anyNotNull(), anyOrNull()) } thenThrow RuntimeException("Malformed data")
+            whenever(this) { extractModalityResponse(any(), any(), any()) } thenThrow RuntimeException("Malformed data")
             responsesEmitter = mock()
             nextIntentEmitter = mock()
 
