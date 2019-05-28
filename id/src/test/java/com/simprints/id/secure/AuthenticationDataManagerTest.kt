@@ -44,7 +44,7 @@ class AuthenticationDataManagerTest {
 
     @Before
     fun setUp() {
-        apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
+        apiClient = SimApiClient(SecureApiInterface::class.java, baseUrl)
     }
 
     @Test
