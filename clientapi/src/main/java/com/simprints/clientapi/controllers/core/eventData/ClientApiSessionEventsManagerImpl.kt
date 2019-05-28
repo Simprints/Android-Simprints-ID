@@ -48,7 +48,8 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     override fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable =
         addEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
 
-    private fun addEvent(event: Event): Completable = coreSessionEventsManager.addEvent(event)
+    private fun addEvent(event: Event): Completable =
+        coreSessionEventsManager.addEvent(event)
 
 }
 
