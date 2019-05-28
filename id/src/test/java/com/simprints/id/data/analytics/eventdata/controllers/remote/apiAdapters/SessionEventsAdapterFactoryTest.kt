@@ -348,7 +348,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_invalidEventApiModel() {
-        val invalidIntentEvent = InvalidIntentEvent(0, InvalidIntentEvent.IntentAction.ODK_CONFIRM, mapOf("projectId" to "someProject"))
+        val invalidIntentEvent = InvalidIntentEvent(0, "some_action", mapOf("projectId" to "someProject"))
         val apiInvalidIntentEvent = ApiInvalidIntentEvent(invalidIntentEvent)
         val json = gsonWithAdapters.toJsonTree(apiInvalidIntentEvent).asJsonObject
         validateInvalidEventApiModel(json)

@@ -2,7 +2,6 @@ package com.simprints.clientapi.controllers.core.eventData
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
-import com.simprints.clientapi.controllers.core.eventData.model.IntentAction
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -46,8 +45,8 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     override fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable =
         addEvent(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
 
-    override fun addInvalidIntentEvent(action: IntentAction, extras: Map<String, Any?>): Completable =
-        addEvent(InvalidIntentEvent(timeHelper.now(), action.fromDomainToCore(), extras))
+    override fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable =
+        addEvent(InvalidIntentEvent(timeHelper.now(), action, extras))
 
     private fun addEvent(event: Event): Completable = coreSessionEventsManager.addEvent(event)
 

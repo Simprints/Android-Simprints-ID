@@ -360,18 +360,7 @@ fun validateInvalidEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("INVALID_INTENT")
     assertThat(json.get("relativeStartTime").asLong).isNotNull()
     assertThat(json.get("extras").asJsonObject.toString()).isNotNull()
-    assertThat(json.get("action").asString).isAnyOf(
-        "com.simprints.simodkadapter.REGISTER",
-        "com.simprints.simodkadapter.IDENTIFY",
-        "com.simprints.simodkadapter.VERIFY",
-        "com.simprints.simodkadapter.CONFIRM_IDENTITY",
-        "com.simprints.simodkadapter.UPDATE",
-        "com.simprints.id.REGISTER",
-        "com.simprints.id.IDENTIFY",
-        "com.simprints.id.VERIFY",
-        "com.simprints.id.CONFIRM_IDENTITY",
-        "com.simprints.id.UPDATE")
-
+    assertThat(json.get("action").asString).isNotNull()
     assertThat(json.size()).isEqualTo(4)
 }
 
