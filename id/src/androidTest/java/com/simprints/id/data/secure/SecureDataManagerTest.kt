@@ -21,7 +21,6 @@ import org.mockito.Mockito.spy
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class SecureDataManagerTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()

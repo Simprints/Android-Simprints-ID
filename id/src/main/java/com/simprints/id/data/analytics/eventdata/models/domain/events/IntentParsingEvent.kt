@@ -14,5 +14,4 @@ class IntentParsingEvent(starTime: Long,
         STANDARD,
         COMMCARE
     }
-
 }

@@ -87,7 +87,6 @@ class GuidSelectionManagerTest {
 
         val request = AppIdentityConfirmationRequest(
             DEFAULT_PROJECT_ID,
-            AppExtraRequestInfo(AppIntegrationInfo.STANDARD),
             session.id,
             "some_guid_confirmed")
 
