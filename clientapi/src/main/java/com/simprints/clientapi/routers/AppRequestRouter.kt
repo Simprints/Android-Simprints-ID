@@ -38,7 +38,7 @@ object AppRequestRouter {
     fun routeSimprintsConfirmation(act: Activity,
                                    request: BaseConfirmation) {
         when (request) {
-            // Regular Requests //StopShip: Change startService for Android O
+            // Regular Requests
             is IdentifyConfirmation ->
                 act.routeService(request.convertToAppRequest().toIntent(SELECT_GUID_INTENT))
 
