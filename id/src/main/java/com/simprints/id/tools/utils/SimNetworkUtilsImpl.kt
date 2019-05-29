@@ -25,12 +25,16 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     connectivityManager.allNetworks?.map { network ->
                         connectivityManager.getNetworkInfo(network).let {
-                            add(SimNetworkUtils.Connection(it.typeName, it.detailedState))
+                            if(it.typeName != null && it.detailedState != null) {
+                                add(Connection(it.typeName, it.detailedState))
+                            }
                         }
                     }
                 } else {
                     connectivityManager.allNetworkInfo.map {
-                        add(Connection(it.typeName, it.detailedState))
+                        if(it.typeName != null && it.detailedState != null) {
+                            add(Connection(it.typeName, it.detailedState))
+                        }
                     }
                 }
             } catch (e: Exception) { }
