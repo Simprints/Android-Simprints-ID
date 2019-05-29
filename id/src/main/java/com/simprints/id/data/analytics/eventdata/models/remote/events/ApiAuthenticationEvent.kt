@@ -15,6 +15,7 @@ class ApiAuthenticationEvent(val relativeStartTime: Long,
             this(userInfoDomain.projectId, userInfoDomain.userId)
     }
 
+    @Keep
     enum class ApiResult {
         AUTHENTICATED,
         BAD_CREDENTIALS,
