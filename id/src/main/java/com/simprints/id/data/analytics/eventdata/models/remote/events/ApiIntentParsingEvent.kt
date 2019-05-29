@@ -24,7 +24,7 @@ class ApiIntentParsingEvent(val relativeStartTime: Long,
                 when(integration) {
                     IntentParsingEvent.IntegrationInfo.ODK -> ODK
                     IntentParsingEvent.IntegrationInfo.STANDARD -> STANDARD
-                    IntentParsingEvent.IntegrationInfo.COMMCARE -> STANDARD //StopShip: Change it when it's added on the server
+                    IntentParsingEvent.IntegrationInfo.COMMCARE -> COMMCARE
                 }
         }
     }
