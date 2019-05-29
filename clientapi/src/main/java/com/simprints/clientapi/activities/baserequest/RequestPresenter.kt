@@ -74,8 +74,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
-            eventsManager.addSuspiciousIntentEvent(request.unknownExtras)
-                .inBackground()
+            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).inBackground()
         }
     }
 

@@ -21,6 +21,8 @@ interface CommCareContract {
 
         fun returnRefusalForms(refusalForm: RefusalForm)
 
+        fun injectSessionIdIntoIntent(sessionId: String)
+
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter

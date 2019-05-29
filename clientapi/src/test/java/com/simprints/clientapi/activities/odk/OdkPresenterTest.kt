@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.odk
 
-import com.google.gson.Gson
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
@@ -18,7 +17,6 @@ import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
-import com.simprints.clientapi.tools.json.GsonBuilder
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.BaseUnitTestConfig
 import kotlinx.coroutines.runBlocking
@@ -26,59 +24,59 @@ import org.junit.Before
 import org.junit.Test
 import java.util.*
 
+
 class OdkPresenterTest {
 
     private val view = mock<OdkActivity>()
 
     @Before
     fun setup() {
-        BaseUnitTestConfig()
-            .rescheduleRxMainThread()
-            .coroutinesMainThread()
+        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
     }
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        runBlocking {
-            val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-            whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-            OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock()).apply { start() }
+        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
+        whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-            verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(ODK)) }
+        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
-        runBlocking {
-            val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
-            whenever(view) { identifyExtractor } thenReturn identificationExtractor
+        val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
+        whenever(view) { identifyExtractor } thenReturn identificationExtractor
 
-            OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock()).apply { start() }
-
-            verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(ODK)) }
+        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
     fun startPresenterForVerify_ShouldRequestVerify() {
-        runBlocking {
-            val verifyExractor = VerifyRequestFactory.getMockExtractor()
-            whenever(view) { verifyExtractor } thenReturn verifyExractor
+        val verifyExractor = VerifyRequestFactory.getMockExtractor()
+        whenever(view) { verifyExtractor } thenReturn verifyExractor
 
-            OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock()).apply { start() }
-
-            verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(ODK)) }
+        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(ODK)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        runBlocking {
-            OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply { start() }
-            verifyOnce(view) { handleClientRequestError(anyNotNull()) }
+        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+        verifyOnce(view) { handleClientRequestError(anyNotNull()) }
     }
 
     @Test
@@ -124,31 +122,25 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "", mock(), mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+        OdkPresenter(view, "", mock(), mock())
+            .handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
         verifyOnce(view) { returnErrorToClient(anyOrNull()) }
     }
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        runBlocking {
-            val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-            whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
+        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-            OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply { start() }
-
-            verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
+        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
     }
 
-    private fun mockSessionManagerToCreateSession() =
-        mock<ClientApiSessionEventsManager>().apply {
-            wheneverOnSuspend(this) { createSession(anyNotNull()) } thenOnBlockingReturn "session_id"
-        }
+    private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {
+        wheneverOnSuspend(this) { createSession(anyNotNull()) } thenOnBlockingReturn "session_id"
+    }
 
-
-    private fun mockGsonBuilder() =
-        mock<GsonBuilder>().apply {
-            val gson = mock<Gson>().apply { whenever(this) { toJson("") } thenReturn "{}" }
-            whenever(this) { build() } thenReturn gson
-        }
 }
