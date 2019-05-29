@@ -14,6 +14,7 @@ data class AlertActResult(val alert: FingerprintAlert,
 
     enum class CloseButtonAction {
         CLOSE,
-        TRY_AGAIN
+        TRY_AGAIN,
+        BACK
     }
 }
