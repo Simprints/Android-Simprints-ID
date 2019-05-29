@@ -27,23 +27,24 @@ class OrchestratorImpl : Orchestrator {
             if (receiver is LaunchActivity) {
                 handleAlertScreenResultInLaunchAct(it, receiver)
             } else {
-                handleAlertScreenResult(it, receiver, requestCode, data)
+                handleAlertScreenResult(it, receiver, resultCode, data)
             }
         } ?: run {
             when (receiver) {
-                is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, requestCode, data)
-                is LaunchActivity -> handleResultInLaunchActivity(receiver, requestCode, data)
-                is MatchingActivity -> { handleResultInMatchingActivity(receiver, requestCode, data) }
+                is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
+                is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
+                is MatchingActivity -> { handleResultInMatchingActivity(receiver, resultCode, data) }
             }
         }
     }
 
     private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
-                                        receiver: OrchestratorCallback) {
+                                                   receiver: OrchestratorCallback) {
         when (alertActResult.closeButtonAction) {
             CLOSE -> {
                 receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(alertActResult))
-            } BACK -> {
+            }
+            BACK -> {
                 receiver.setResultDataAndFinish(Activity.RESULT_CANCELED, null)
             }
             TRY_AGAIN -> receiver.tryAgain()
@@ -71,7 +72,8 @@ class OrchestratorImpl : Orchestrator {
     }
 
     private fun handleResultInCollectActivity(receiver: OrchestratorCallback,
-                                              resultCode: Int?, data: Intent?) {
+                                              resultCode: Int?,
+                                              data: Intent?) {
 
         extractRefusalActResult(data)?.let {
             when (it.action) {
@@ -92,7 +94,7 @@ class OrchestratorImpl : Orchestrator {
         extractRefusalActResult(data)?.let {
             when (it.action) {
                 SUBMIT -> receiver.setResultDataAndFinish(resultCode, prepareRefusalForm(it))
-                SCAN_FINGERPRINTS -> { receiver.tryAgain() }
+                SCAN_FINGERPRINTS -> receiver.tryAgain()
             }
             return
         }
