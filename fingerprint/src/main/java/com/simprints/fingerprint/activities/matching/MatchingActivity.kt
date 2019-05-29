@@ -16,8 +16,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.MATCHING
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -32,9 +31,8 @@ import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MatchingActivity : AppCompatActivity(), MatchingContract.View, OrchestratedActivity {
+class MatchingActivity : AppCompatActivity(), MatchingContract.View, OrchestratorCallback {
 
-    override val activity = MATCHING
     override val context: Context by lazy { this }
 
     override lateinit var viewPresenter: MatchingContract.Presenter
@@ -133,7 +131,8 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrate
     }
 
     override fun tryAgain() {}
-    override fun handleResult(resultCode: Int?, data: Intent?) {}
+    override fun onActivityResultReceived() {}
+    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
             doSetResult(it, data)
