@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.content.Intent
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -15,6 +14,10 @@ import com.simprints.clientapi.domain.responses.*
 interface RequestContract {
 
     interface RequestView {
+
+        val action: String?
+
+        val extras: Map<String, Any?>?
 
         val presenter: Presenter
 
@@ -34,9 +37,6 @@ interface RequestContract {
 
         fun returnErrorToClient(resultCode: Int?)
 
-        fun getIntentAction(): String
-
-        fun getIntentExtras(): Map<String, Any?>?
     }
 
     interface Presenter {

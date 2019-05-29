@@ -105,7 +105,7 @@ interface AppComponent {
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
-    fun getCoreCrashReportManager(): CoreCrashReportManager
+    fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager

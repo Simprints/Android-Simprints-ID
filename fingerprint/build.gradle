@@ -135,6 +135,9 @@ dependencies {
     testImplementation deps.testing.androidx.core_testing
     testImplementation deps.testing.androidx.runner
 
+    // Kotlin
+    testImplementation deps.testing.coroutines_test
+
     // Dagger
     kaptTest deps.dagger.compiler
 
@@ -154,6 +157,7 @@ dependencies {
         exclude group: 'org.apache.maven'
         exclude group: 'org.mockito'
         exclude group: 'org.robolectric'
+        exclude group: 'org.jetbrains.kotlinx'
     }
 
     // Dagger

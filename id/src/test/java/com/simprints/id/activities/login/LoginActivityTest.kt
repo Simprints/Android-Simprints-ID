@@ -11,9 +11,6 @@ import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.domain.moduleapi.app.requests.AppExtraRequestInfo
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

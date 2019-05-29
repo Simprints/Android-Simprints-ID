@@ -9,11 +9,12 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.domain.session.hasIdentificationCallback
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
-import com.simprints.id.exceptions.unexpected.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
@@ -111,14 +112,14 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             crashReportManager.logExceptionOrSafeException(it)
         }.onErrorComplete()
 
-    /** @throws SessionNotFoundException */
-    override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
-        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
-            it.addEvent(GuidSelectionEvent(
-                timeHelper.now(),
-                selectedGuid
-            ))
-            insertOrUpdateSessionEvents(it)
+    override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
+        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable { session ->
+            if (session.hasIdentificationCallback() && session.isOpen()) {
+                session.addEvent(GuidSelectionEvent(timeHelper.now(), selectedGuid))
+                insertOrUpdateSessionEvents(session)
+            } else {
+                Completable.error(InvalidSessionForGuidSelectionEvent("open: ${session.isOpen()}"))
+            }
         }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {

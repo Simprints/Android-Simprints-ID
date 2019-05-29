@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.En
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.remote.events.*
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
 
 @Keep
 fun Event.toApiEvent(): ApiEvent =
@@ -40,4 +39,5 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_REFUSAL -> ApiCallbackEvent(this as RefusalCallbackEvent)
         CALLBACK_VERIFICATION -> ApiCallbackEvent(this as VerificationCallbackEvent)
         CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
+        INTENT_PARSING -> ApiIntentParsingEvent(this as IntentParsingEvent)
     }

@@ -1,28 +1,24 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.domain.requests.IntegrationInfo
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.libsimprints.*
-import com.simprints.libsimprints.Constants.*
-import io.reactivex.rxkotlin.subscribeBy
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
+import com.simprints.libsimprints.Constants.*
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.RefusalForm
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Tier
+
 
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
-                            private val clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                            private val clientApiCrashReportManager: ClientApiCrashReportManager,
-                            clientApiTimeHelper: ClientApiTimeHelper,
-                            gsonBuilder: GsonBuilder,
-                            integrationInfo: IntegrationInfo)
-    : RequestPresenter(view, clientApiTimeHelper, clientApiSessionEventsManager, clientApiCrashReportManager, gsonBuilder, integrationInfo), LibSimprintsContract.Presenter {
+                            private val sessionEventsManager: ClientApiSessionEventsManager,
+                            private val crashReportManager: ClientApiCrashReportManager) :
+    RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
 
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = mapOf(
@@ -44,25 +40,19 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
             INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
 
+    override suspend fun start() {
+        val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
+        crashReportManager.setSessionIdCrashlyticsKey(sessionId)
 
-    @SuppressLint("CheckResult")
-    override fun start() {
-        clientApiSessionEventsManager
-            .createSession()
-            .doFinally {
-                when (action) {
-                    SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
-                    SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
-                    SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-                    SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
-                    else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
-                }
-            }.subscribeBy(
-                onSuccess = { clientApiCrashReportManager.setSessionIdCrashlyticsKey(it) },
-                onError = {
-                    it.printStackTrace()
-                })
+        when (action) {
+            SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
+            SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
+            SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
+            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+            else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
+        }
     }
+
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))
@@ -73,10 +63,13 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         }), identify.sessionId)
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.confidence, Tier.valueOf(verify.matchResult.tier.name), verify.matchResult.guidFound
+        verify.matchResult.confidence,
+        Tier.valueOf(verify.matchResult.tier.name),
+        verify.matchResult.guidFound
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
+
 }
 

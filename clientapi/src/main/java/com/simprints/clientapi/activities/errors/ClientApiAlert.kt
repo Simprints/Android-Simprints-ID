@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.errors
 
+
 enum class ClientApiAlert {
     INVALID_CLIENT_REQUEST,
     INVALID_METADATA,

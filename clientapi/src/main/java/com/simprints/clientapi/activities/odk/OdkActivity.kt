@@ -3,15 +3,17 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.activities.libsimprints.di.LibSimprintsComponentInjector
-import com.simprints.clientapi.activities.odk.di.OdkComponentInjector
-import com.simprints.clientapi.domain.requests.IntegrationInfo
-import javax.inject.Inject
+import com.simprints.clientapi.di.koinModule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.parameter.parametersOf
 
 
 class OdkActivity : RequestActivity(), OdkContract.View {
-
-    override val integrationInfo = IntegrationInfo.ODK
 
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
@@ -23,16 +25,12 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
     }
 
-    override val action: String?
-        get() = intent.action
-
-    @Inject override lateinit var presenter: OdkContract.Presenter
+    override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        OdkComponentInjector.inject(this)
-
-        presenter.start()
+        loadKoinModules(koinModule)
+        CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
     override fun returnRegistration(registrationId: String) = Intent().let {
@@ -66,6 +64,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
-        LibSimprintsComponentInjector.setComponent(null)
+        unloadKoinModules(koinModule)
     }
+
 }

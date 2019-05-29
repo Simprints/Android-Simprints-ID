@@ -14,8 +14,10 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.testtools.common.syntax.*
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
 @RunWith(AndroidJUnit4::class)
 class CrashReportManagerImplTest {
@@ -160,5 +162,10 @@ class CrashReportManagerImplTest {
         crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncTriggers)
 
         verifyOnce(crashlyticsInstanceMock) { setString(PEOPLE_DOWN_SYNC_TRIGGERS, testDownSyncTriggers.toString()) }
+    }
+
+    @After
+    fun tearDown() {
+        stopKoin()
     }
 }

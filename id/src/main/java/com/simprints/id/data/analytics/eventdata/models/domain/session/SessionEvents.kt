@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import java.util.*
@@ -64,3 +65,6 @@ open class SessionEvents(var projectId: String,
         events.add(event)
     }
 }
+
+fun SessionEvents.hasIdentificationCallback() =
+    events.any { it.type == EventType.CALLBACK_IDENTIFICATION }

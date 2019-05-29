@@ -1,100 +1,71 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.content.Intent
-import com.google.gson.Gson
-import com.nhaarman.mockito_kotlin.argThat
+import com.google.common.truth.Truth
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.SuspiciousIntentEvent
 import com.simprints.clientapi.domain.requests.EnrollRequest
-import com.simprints.clientapi.domain.requests.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.tools.ClientApiTimeHelper
-import com.simprints.clientapi.tools.json.GsonBuilder
-import com.simprints.clientapi.tools.json.GsonBuilderImpl
-import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.BaseUnitTestConfig
+import io.reactivex.Completable
+import org.junit.Before
 import org.junit.Test
 
 class RequestPresenterTest {
 
-    private val projectIdField = Pair("projectId", "someProjectId")
-    private val moduleIdField = Pair("moduleId", "someModuleId")
-    private val userIdField = Pair("userId", "someUserId")
-    private val metadataField = Pair("metadata", "someMetadata")
-    private val extraField = Pair("extraField", "someExtraField")
+    private val projectIdField = "some_project_id"
+    private val moduleIdField = "some_module_id"
+    private val userIdField = "some_user_id"
+    private val metadataField = "some_metadata"
+    private val extraField = mapOf("extraField" to "someExtraField")
 
-    private val enrolIntentFields = mapOf(projectIdField, moduleIdField, userIdField)
-    private val enrolIntentFieldsWithExtra = enrolIntentFields.plus(extraField)
-    private val enrolRequest = EnrollRequest(projectIdField.second, moduleIdField.second, userIdField.second, metadataField.second, mock())
+    @Before
+    fun setUp(){
+        BaseUnitTestConfig()
+            .rescheduleRxMainThread()
+            .coroutinesMainThread()
+    }
 
     @Test
     fun givenAnIntentWithExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldBeAdded() {
-        val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
-        val view = mockViewToReturnIntentFields(enrolIntentFieldsWithExtra)
+        val clientApiSessionEventsManagerMock = mock<ClientApiSessionEventsManager>().apply {
+            whenever(this) { addSuspiciousIntentEvent(anyNotNull()) } thenReturn Completable.complete()
+        }
+        val requestBuilder = mock<ClientRequestBuilder>().apply {
+            whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
+        }
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), GsonBuilderImpl(), mock(), emptyMap())
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
-            addSessionEvent(argThat {
-                this is SuspiciousIntentEvent &&
-                    with(Gson()) { toJson(unexpectedExtras) == toJson(mapOf(extraField)) }
+            addSuspiciousIntentEvent(argThat {
+                Truth.assertThat(it).isEqualTo(extraField)
             })
         }
     }
 
     @Test
-    fun givenAnIntentWithExtraEmptyKeyAndValue_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
-        val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
-        val view = mockViewToReturnIntentFields(enrolIntentFields.plus("" to ""))
-
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), GsonBuilderImpl(), mock(), emptyMap())
-        presenter.validateAndSendRequest(requestBuilder)
-
-        verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
-    }
-
-    @Test
     fun givenAnIntentWithNoExtraKeys_validateAndSendRequest_suspiciousIntentEventShouldNotBeAdded() {
         val clientApiSessionEventsManagerMock: ClientApiSessionEventsManager = mock()
-        val requestBuilder = mockClientBuilderToReturnAnEnrolRequest()
-        val view = mockViewToReturnIntentFields(enrolIntentFields)
+        val requestBuilder = mock<ClientRequestBuilder>().apply {
+            whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
+        }
 
-        val presenter = ImplRequestPresenter(view, mock(), clientApiSessionEventsManagerMock, mock(), GsonBuilderImpl(), mock(), emptyMap())
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
         presenter.validateAndSendRequest(requestBuilder)
 
-        verifyNever(clientApiSessionEventsManagerMock) { addSessionEvent(anyNotNull()) }
+        verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
     }
-
-    private fun mockViewToReturnIntentFields(intentFields: Map<String, String>): RequestContract.RequestView =
-        mock<RequestContract.RequestView>().apply {
-            whenever(this) { getIntentExtras() } thenReturn intentFields
-        }
-
-    private fun mockClientBuilderToReturnAnEnrolRequest(): ClientRequestBuilder =
-        mock<ClientRequestBuilder>().apply {
-            whenever(this) { build() } thenReturn enrolRequest
-        }
 }
 
 class ImplRequestPresenter(view: RequestContract.RequestView,
-                           timeHelper: ClientApiTimeHelper,
                            clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                           clientApiCrashReportManager: ClientApiCrashReportManager,
-                           gsonBuilder: GsonBuilder,
-                           integrationInfo: IntegrationInfo,
                            override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>) :
     RequestPresenter(
         view,
-        timeHelper,
-        clientApiSessionEventsManager,
-        clientApiCrashReportManager,
-        gsonBuilder,
-        integrationInfo) {
+        clientApiSessionEventsManager
+    ) {
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}

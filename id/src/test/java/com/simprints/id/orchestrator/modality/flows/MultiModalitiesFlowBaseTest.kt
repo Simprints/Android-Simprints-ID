@@ -2,9 +2,13 @@ package com.simprints.id.orchestrator.modality.flows
 
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Observable
@@ -20,9 +24,10 @@ class MultiModalitiesFlowBaseTest {
 
     @Test
     fun givenMultiModalitiesFlow_itShouldGenerateMultipleModalityStepRequests() {
-        val singleModality: ModalityFlow = mock()
-        whenever { singleModality.modalityResponses } thenReturn Observable.just(mock())
-        whenever { singleModality.modalityStepRequests } thenReturn Observable.just(mock())
+        val singleModality = mock<ModalityFlow>().apply {
+            whenever { modalityResponses } thenReturn Observable.just(mock<ModalityResponse>())
+            whenever { modalityStepRequests } thenReturn Observable.just(mock<ModalityStepRequest>())
+        }
         val multiModalitiesFlow = MultiModalitiesFlowBase(listOf(singleModality, singleModality))
 
         val testObserver = multiModalitiesFlow.modalityStepRequests.test()
@@ -34,9 +39,10 @@ class MultiModalitiesFlowBaseTest {
 
     @Test
     fun givenMultiModalitiesFlow_itShouldGenerateMultipleModalityResponses() {
-        val singleModality: ModalityFlow = mock()
-        whenever { singleModality.modalityResponses } thenReturn Observable.just(mock())
-        whenever { singleModality.modalityStepRequests } thenReturn Observable.just(mock())
+        val singleModality = mock<ModalityFlow>().apply {
+            whenever { modalityResponses } thenReturn Observable.just(mock())
+            whenever { modalityStepRequests } thenReturn Observable.just(mock())
+        }
         val multiModalitiesFlow = MultiModalitiesFlowBase(listOf(singleModality, singleModality))
 
         val testObserver = multiModalitiesFlow.modalityResponses.test()
@@ -47,9 +53,10 @@ class MultiModalitiesFlowBaseTest {
 
     @Test
     fun givenMultiModalitiesFlow_itShouldForwardIntentResultsToSingleModalities() {
-        val singleModality: ModalityFlow = mock()
-        whenever { singleModality.modalityResponses } thenReturn Observable.just(mock())
-        whenever { singleModality.modalityStepRequests } thenReturn Observable.just(mock())
+        val singleModality = mock<ModalityFlow>().apply {
+            whenever { modalityResponses } thenReturn Observable.just(mock())
+            whenever { modalityStepRequests } thenReturn Observable.just(mock())
+        }
         whenever { singleModality.handleIntentResponse(any(), any(), any()) } thenReturn true
         val multiModalitiesFlow = MultiModalitiesFlowBase(listOf(singleModality, singleModality))
 

@@ -67,6 +67,33 @@
         </activity>
 
         <activity
+            android:name=".activities.commcare.CommCareActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
+            <intent-filter>
+                <action android:name="com.simprints.commcare.REGISTER" />
+                <action android:name="com.simprints.commcare.IDENTIFY" />
+                <action android:name="com.simprints.commcare.UPDATE" />
+                <action android:name="com.simprints.commcare.VERIFY" />
+                <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.commcare.REGISTER" />
+                <action android:name="com.simprints.commcare.IDENTIFY" />
+                <action android:name="com.simprints.commcare.UPDATE" />
+                <action android:name="com.simprints.commcare.VERIFY" />
+                <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".activities.errors.ErrorActivity"
             android:theme="@style/ClientApiTheme.NoActionBar" />
 

@@ -1,16 +1,11 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.spy
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.*
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
@@ -36,7 +31,7 @@ class CheckLoginFromIntentPresenterTest {
             preferencesManager = mock()
 
             crashReportManager = mock<CrashReportManager>().apply {
-                whenever(this) { setSessionIdCrashlyticsKey(any()) } thenDoNothing {}
+                whenever(this) { setSessionIdCrashlyticsKey(anyNotNull()) } thenDoNothing {}
             }
 
             sessionEventsManager = mock<SessionEventsManager>().apply {
@@ -47,7 +42,7 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.setup()
 
-        verifyOnce(checkLoginFromIntentPresenter) { addCalloutAndConnectivityEventsInSession(any()) }
+        verifyOnce(checkLoginFromIntentPresenter) { addCalloutAndConnectivityEventsInSession(anyNotNull()) }
     }
 
     @Test
@@ -55,7 +50,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppEnrolRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"
@@ -74,7 +68,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppIdentifyRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"
@@ -93,7 +86,6 @@ class CheckLoginFromIntentPresenterTest {
         val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock()))
 
         checkLoginFromIntentPresenter.appRequest = mock<AppVerifyRequest>().apply {
-            whenever(this) { extraRequestInfo } thenReturn AppExtraRequestInfo(AppIntegrationInfo.ODK)
             whenever(this) { projectId } thenReturn "projectId"
             whenever(this) { userId } thenReturn "userId"
             whenever(this) { moduleId } thenReturn "moduleId"

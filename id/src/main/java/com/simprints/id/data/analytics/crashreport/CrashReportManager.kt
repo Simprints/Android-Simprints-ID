@@ -1,6 +1,7 @@
 package com.simprints.id.data.analytics.crashreport
 
 import android.util.Log
+import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 
@@ -23,4 +24,9 @@ interface CoreCrashReportManager {
     fun setDownSyncTriggersCrashlyticsKey(peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>)
     fun setSessionIdCrashlyticsKey(sessionId: String)
     fun setFingersSelectedCrashlyticsKey(fingersSelected: Map<FingerIdentifier, Boolean>)
+
+    companion object {
+        fun build(app: Application): CoreCrashReportManager =
+            app.component.getCrashReportManager()
+    }
 }

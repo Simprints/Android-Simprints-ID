@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
