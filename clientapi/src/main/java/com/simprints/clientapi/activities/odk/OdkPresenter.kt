@@ -29,8 +29,10 @@ class OdkPresenter(private val view: OdkContract.View,
     }
 
     override suspend fun start() {
-        val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
-        crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+        if(action != ACTION_CONFIRM_IDENTITY) {
+            val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
+            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+        }
 
         when (action) {
             ACTION_REGISTER -> processEnrollRequest()
