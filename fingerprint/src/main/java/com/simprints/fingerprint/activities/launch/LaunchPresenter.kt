@@ -158,8 +158,8 @@ class LaunchPresenter(component: FingerprintComponent,
         saveEventForCandidateReadInBackgroundNotFound(
             guid,
             startCandidateSearchTime,
-            if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.NOT_FOUND else CandidateReadEvent.LocalResult.FOUND,
-            if (isPersonFromLocalDb) CandidateReadEvent.RemoteResult.FOUND else CandidateReadEvent.RemoteResult.NOT_FOUND)
+            if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.FOUND else CandidateReadEvent.LocalResult.NOT_FOUND,
+            if (isPersonFromLocalDb) null else CandidateReadEvent.RemoteResult.FOUND)
     }
 
     private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
