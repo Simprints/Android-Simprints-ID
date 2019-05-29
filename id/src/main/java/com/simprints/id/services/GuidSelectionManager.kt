@@ -4,5 +4,5 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationReq
 import io.reactivex.Completable
 
 interface GuidSelectionManager {
-    fun saveGUIDSelection(request: AppIdentityConfirmationRequest): Completable
+    fun handleIdentityConfirmationRequest(request: AppIdentityConfirmationRequest): Completable
 }

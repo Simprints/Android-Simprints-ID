@@ -91,7 +91,7 @@ import javax.inject.Inject
 //            "some_guid_confirmed")
 //
 //        guidSelectionManager
-//            .saveGUIDSelection(request)
+//            .handleIdentityConfirmationRequest(request)
 //            .test()
 //            .awaitAndAssertSuccess()
 //

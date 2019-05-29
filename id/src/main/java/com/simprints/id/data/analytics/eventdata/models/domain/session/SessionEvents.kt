@@ -64,7 +64,8 @@ open class SessionEvents(var projectId: String,
 
         events.add(event)
     }
-}
 
-fun SessionEvents.hasIdentificationCallback() =
-    events.any { it.type == EventType.CALLBACK_IDENTIFICATION }
+    fun hasEvent(eventType: EventType) =
+        events.any { it.type == eventType }
+
+}

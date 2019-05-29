@@ -6,10 +6,7 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
-import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.analytics.eventdata.models.domain.session.hasIdentificationCallback
+import com.simprints.id.data.analytics.eventdata.models.domain.session.*
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
@@ -23,6 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.*
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val deviceId: String,
@@ -114,7 +112,11 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
         sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable { session ->
-            if (session.hasIdentificationCallback() && session.isOpen()) {
+
+            if (session.isOpen() &&
+                !session.hasEvent(GUID_SELECTION) &&
+                session.hasEvent(CALLBACK_IDENTIFICATION)) {
+
                 session.addEvent(GuidSelectionEvent(timeHelper.now(), selectedGuid))
                 insertOrUpdateSessionEvents(session)
             } else {
