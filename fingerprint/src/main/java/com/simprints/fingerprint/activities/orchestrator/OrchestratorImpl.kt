@@ -25,9 +25,9 @@ class OrchestratorImpl : Orchestrator {
 
         extractAlertActivityResult(data)?.let {
             if (receiver is LaunchActivity) {
-                handleAlertScreenResult(it, receiver, requestCode, data)
-            } else {
                 handleAlertScreenResultInLaunchAct(it, receiver)
+            } else {
+                handleAlertScreenResult(it, receiver, requestCode, data)
             }
         } ?: run {
             when (receiver) {
