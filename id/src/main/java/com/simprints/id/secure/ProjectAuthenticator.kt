@@ -23,7 +23,8 @@ import javax.inject.Inject
 open class ProjectAuthenticator(component: AppComponent,
                                 private val safetyNetClient: SafetyNetClient,
                                 secureApiClient: SecureApiInterface,
-                                private val attestationManager: AttestationManager = AttestationManager()) {
+                                private val attestationManager: AttestationManager = AttestationManager(),
+                                private val authenticationDataManager:AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
 
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
@@ -33,8 +34,6 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var preferencesManager: PreferencesManager
 
     private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
-    private val publicKeyManager = PublicKeyManager(secureApiClient)
-    private val nonceManager = NonceManager(secureApiClient)
     private val authManager = AuthManager(secureApiClient)
 
  	init {
@@ -48,31 +47,37 @@ open class ProjectAuthenticator(component: AppComponent,
      * @throws SimprintsInternalServerException
      */
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
-        prepareAuthRequestParameters(nonceScope, projectSecret)
+        createLocalDbKeyForProject(nonceScope.projectId)
+            .prepareAuthRequestParameters(nonceScope, projectSecret)
             .makeAuthRequest()
             .signIn(nonceScope.projectId, nonceScope.userId)
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
-            .observeOn(AndroidSchedulers.mainThread())
 
-    private fun prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
-        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, nonceScope)
-        val googleAttestation = getGoogleAttestation(safetyNetClient, nonceScope)
+    private fun Completable.prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
+        andThen(buildAuthRequestParameters(nonceScope, projectSecret))
+
+    private fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> {
+        val authenticationData = getAuthenticationData(nonceScope.projectId, nonceScope.userId)
+        val encryptedProjectSecret = getEncryptedProjectSecret(projectSecret, authenticationData)
+        val googleAttestation = getGoogleAttestation(safetyNetClient, authenticationData)
+
         return zipAuthRequestParameters(encryptedProjectSecret, googleAttestation, nonceScope)
     }
 
-    private fun getEncryptedProjectSecret(projectSecret: String, noneScope: NonceScope): Single<String> =
-        publicKeyManager.requestPublicKey(noneScope.projectId, noneScope.userId)
-            .flatMap { publicKey ->
-                Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, publicKey))
-            }
+    internal fun getAuthenticationData(projectId: String, userId: String) =
+        authenticationDataManager.requestAuthenticationData(projectId, userId)
 
-    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, noneScope: NonceScope): Single<AttestToken> =
-        nonceManager.requestNonce(noneScope)
-            .flatMap { nonce ->
-                attestationManager.requestAttestation(safetyNetClient, nonce)
-            }
+    private fun getEncryptedProjectSecret(projectSecret: String, authenticationDataSingle: Single<AuthenticationData>): Single<String> =
+        authenticationDataSingle.flatMap {
+            Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, it.publicKeyString))
+        }
+
+    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
+        authenticationDataSingle.flatMap {
+            attestationManager.requestAttestation(safetyNetClient, it.nonce)
+        }
 
     private fun zipAuthRequestParameters(encryptedProjectSecretSingle: Single<String>,
                                          googleAttestationSingle: Single<AttestToken>,
@@ -82,15 +87,19 @@ open class ProjectAuthenticator(component: AppComponent,
             AuthRequest(nonceScope.projectId, nonceScope.userId, AuthRequestBody(encryptedProjectSecret, googleAttestation.value))
         }
 
-    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Tokens> =
+    private fun Single<out AuthRequest>.makeAuthRequest(): Single<Token> =
         flatMap { authRequest ->
             authManager.requestAuthToken(authRequest)
         }
 
-    private fun Single<out Tokens>.signIn(projectId: String, userId: String): Completable =
+    private fun Single<out Token>.signIn(projectId: String, userId: String): Completable =
         flatMapCompletable { tokens ->
             dbManager.signIn(projectId, userId, tokens)
         }
+
+    private fun createLocalDbKeyForProject(projectId: String) = Completable.fromAction {
+        secureDataManager.setLocalDatabaseKey(projectId)
+    }
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(

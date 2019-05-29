@@ -22,13 +22,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name=".activities.launch.LaunchActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
+            android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
@@ -39,31 +33,32 @@
         </activity>
 
         <activity
-            android:name="com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
+            android:name=".activities.orchestrator.OrchestratorActivity"
+            android:label="@string/title_activity_orchestrator"
+            android:launchMode="standard"
+            android:screenOrientation="portrait"/>
+
+        <activity
+            android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:label="@string/title_activity_front"
             android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="com.simprints.id.REGISTER" />
-                <action android:name="com.simprints.id.IDENTIFY" />
-                <action android:name="com.simprints.id.UPDATE" />
-                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.clientapp.REGISTER" />
+                <action android:name="com.simprints.clientapp.IDENTIFY" />
+                <action android:name="com.simprints.clientapp.VERIFY" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.simprints.id.REGISTER" />
-                <action android:name="com.simprints.id.IDENTIFY" />
-                <action android:name="com.simprints.id.UPDATE" />
-                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.legacy.REGISTER" />
+                <action android:name="com.simprints.legacy.IDENTIFY" />
+                <action android:name="com.simprints.legacy.VERIFY" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <data android:mimeType="*/*" />
             </intent-filter>
-
         </activity>
 
         <activity
@@ -71,17 +66,6 @@
             android:label="@string/alert_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.collectFingerprints.CollectFingerprintsActivity"
-            android:label="Main"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.matching.MatchingActivity"
-            android:label="Matching"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar" />
         <activity
             android:name=".activities.login.LoginActivity"
             android:label="@string/login_title"
@@ -111,12 +95,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
 
-        <activity
-            android:name=".activities.refusal.RefusalActivity"
-            android:label="@string/refusal_label"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:label="@string/dashboard_label"
@@ -127,21 +106,16 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.collectFingerprints.SplashScreenActivity"
-            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
-
         <service
             android:name=".services.GuidSelectionService"
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
+                <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
             </intent-filter>
         </service>
 
-        <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activities.collectFingerprints.CollectFingerprintsActivity" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="897ed2ef7a2d43e09bcd42998f2533acbb9657e7" />

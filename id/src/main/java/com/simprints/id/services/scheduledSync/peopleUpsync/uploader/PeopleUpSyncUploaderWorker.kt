@@ -54,7 +54,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             logMessageForCrashReport("PeopleUpSyncUploaderWorker - failure")
-            crashReportManager.logExceptionOrThrowable(throwable)
+            crashReportManager.logExceptionOrSafeException(throwable)
             Result.failure()
         }
     }

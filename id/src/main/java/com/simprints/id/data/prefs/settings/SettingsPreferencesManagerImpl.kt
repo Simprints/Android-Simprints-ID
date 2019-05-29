@@ -1,6 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
+import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
@@ -8,20 +9,18 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigCompl
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigComplexPreference
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.OverridableRemoteConfigPrimitivePreference
-import com.simprints.id.domain.Constants
-import com.simprints.id.domain.consent.GeneralConsent
-import com.simprints.id.domain.consent.ParentalConsent
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
-import com.simprints.id.tools.json.JsonHelper
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libsimprints.FingerIdentifier
 
 
 open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                          groupSerializer: Serializer<Constants.GROUP>,
+                                          groupSerializer: Serializer<GROUP>,
+                                          modalitySerializer: Serializer<Modality>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
@@ -45,10 +44,10 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val SELECTED_MODULES_DEFAULT = setOf<String>()
 
         const val SYNC_GROUP_KEY = "SyncGroup"
-        val SYNC_GROUP_DEFAULT = Constants.GROUP.USER
+        val SYNC_GROUP_DEFAULT = GROUP.USER
 
         const val MATCH_GROUP_KEY = "MatchGroup"
-        val MATCH_GROUP_DEFAULT = Constants.GROUP.USER
+        val MATCH_GROUP_DEFAULT = GROUP.USER
 
         const val FINGER_STATUS_KEY = "FingerStatus"
         val FINGER_STATUS_DEFAULT = mapOf(
@@ -73,21 +72,15 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
 
-        const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
-        const val PARENTAL_CONSENT_EXISTS_DEFAULT = false
-
-        const val GENERAL_CONSENT_OPTIONS_JSON_KEY = "ConsentGeneralOptions"
-        val GENERAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(GeneralConsent())
-
-        const val PARENTAL_CONSENT_OPTIONS_JSON_KEY = "ConsentParentalOptions"
-        val PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT: String = JsonHelper.toJson(ParentalConsent())
-
         const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
         val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
             PeopleDownSyncTrigger.MANUAL to true,
             PeopleDownSyncTrigger.PERIODIC_BACKGROUND to true,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
+
+        val MODALITY_DEFAULT = Modality.FINGER
+        const val MODALITY_KEY = "Modality"
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -111,11 +104,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
 
     // Sync group. Default is user
-    override var syncGroup: Constants.GROUP
+    override var syncGroup: GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
 
     // Match group. Default is user
-    override var matchGroup: Constants.GROUP
+    override var matchGroup: GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MATCH_GROUP_KEY, MATCH_GROUP_DEFAULT, groupSerializer)
 
     // The map of default fingers
@@ -134,15 +127,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
 
-    // Whether the parental consent should be shown
-    override var parentalConsentExists: Boolean
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_EXISTS_KEY, PARENTAL_CONSENT_EXISTS_DEFAULT)
-    // The options of the general consent as a JSON string of booleans
-    override var generalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, GENERAL_CONSENT_OPTIONS_JSON_KEY, GENERAL_CONSENT_OPTIONS_JSON_DEFAULT)
-    // The options of the parental consent as a JSON string of booleans
-    override var parentalConsentOptionsJson: String
-        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, PARENTAL_CONSENT_OPTIONS_JSON_KEY, PARENTAL_CONSENT_OPTIONS_JSON_DEFAULT)
+    override var modality: Modality
+        by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
+
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)

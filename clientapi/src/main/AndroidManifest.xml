@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.simprints.clientapi">
+
+    <dist:module
+        dist:instant="false"
+        dist:onDemand="false"
+        dist:title="@string/dynamic_module_title_clientapi">
+        <dist:fusing dist:include="true" />
+    </dist:module>
+
+    <application tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
+
+        <activity
+            android:name=".activities.odk.OdkActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
+            <intent-filter>
+                <action android:name="com.simprints.simodkadapter.REGISTER" />
+                <action android:name="com.simprints.simodkadapter.IDENTIFY" />
+                <action android:name="com.simprints.simodkadapter.UPDATE" />
+                <action android:name="com.simprints.simodkadapter.VERIFY" />
+                <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.simodkadapter.REGISTER" />
+                <action android:name="com.simprints.simodkadapter.IDENTIFY" />
+                <action android:name="com.simprints.simodkadapter.UPDATE" />
+                <action android:name="com.simprints.simodkadapter.VERIFY" />
+                <action android:name="com.simprints.simodkadapter.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.libsimprints.LibSimprintsActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
+            <intent-filter>
+                <action android:name="com.simprints.id.REGISTER" />
+                <action android:name="com.simprints.id.IDENTIFY" />
+                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.id.REGISTER" />
+                <action android:name="com.simprints.id.IDENTIFY" />
+                <action android:name="com.simprints.id.UPDATE" />
+                <action android:name="com.simprints.id.VERIFY" />
+                <action android:name="com.simprints.id.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.commcare.CommCareActivity"
+            android:theme="@style/ClientApiTheme.Launcher">
+            <intent-filter>
+                <action android:name="com.simprints.commcare.REGISTER" />
+                <action android:name="com.simprints.commcare.IDENTIFY" />
+                <action android:name="com.simprints.commcare.UPDATE" />
+                <action android:name="com.simprints.commcare.VERIFY" />
+                <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.simprints.commcare.REGISTER" />
+                <action android:name="com.simprints.commcare.IDENTIFY" />
+                <action android:name="com.simprints.commcare.UPDATE" />
+                <action android:name="com.simprints.commcare.VERIFY" />
+                <action android:name="com.simprints.commcare.CONFIRM_IDENTITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.errors.ErrorActivity"
+            android:theme="@style/ClientApiTheme.NoActionBar" />
+
+    </application>
+
+</manifest>

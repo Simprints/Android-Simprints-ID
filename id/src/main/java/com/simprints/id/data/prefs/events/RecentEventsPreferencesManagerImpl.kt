@@ -15,6 +15,9 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
         private const val LAST_SCANNER_USED_KEY = "LastScannerUsed"
         private const val LAST_SCANNER_USED_DEFAULT: String = ""
 
+        private const val LAST_MAC_ADDRESS_KEY = "LastMacAddress"
+        private const val LAST_MAC_ADDRESS_DEFAULT: String = ""
+
         private const val LAST_ENROL_EVENT_KEY = "LastEnrolEvent"
         private val LAST_ENROL_EVENT_DEFAULT = null
 
@@ -27,6 +30,9 @@ class RecentEventsPreferencesManagerImpl(prefs: ImprovedSharedPreferences)
 
     override var lastScannerUsed: String
         by PrimitivePreference(prefs, LAST_SCANNER_USED_KEY, LAST_SCANNER_USED_DEFAULT)
+
+    override var lastScannerVersion: String
+        by PrimitivePreference(prefs, LAST_MAC_ADDRESS_KEY, LAST_MAC_ADDRESS_DEFAULT)
 
     override var lastUserUsed: String
         by PrimitivePreference(prefs, LAST_USER, LAST_USER_DEFAULT)

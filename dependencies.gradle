@@ -1,22 +1,23 @@
-def kotlin_version = "1.3.20"
+def kotlin_version = "1.3.21"
 def kotlin = [
-    reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TOOD: remove it when we drop the legacy code around Firebase,
-    stdlib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+    reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TODO: remove it when we drop the legacy code around Firebase,
+    stdlib : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
     anko   : "org.jetbrains.anko:anko:0.10.8"
 ]
 
-def dagger_version = "2.21"
+def dagger_version = "2.22"
 def dagger = [
     core    : "com.google.dagger:dagger:$dagger_version",
-    compiler: "com.google.dagger:dagger-compiler:$dagger_version"
+    compiler: "com.google.dagger:dagger-compiler:$dagger_version",
+    javax   : "javax.inject:javax.inject:1@jar"
 ]
 
 def androidx_lifecycle_version = "2.1.0-alpha02"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
-    core     : "androidx.core:core-ktx:1.1.0-alpha04",
+    core     : "androidx.core:core-ktx:1.0.2",
     multidex : "androidx.multidex:multidex:2.0.1",
-    appcompat: "androidx.appcompat:appcompat:1.1.0-alpha02",
+    appcompat: "androidx.appcompat:appcompat:1.0.2",
     legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
     room     : [
         core    : "androidx.room:room-runtime:$androidx_room_version",
@@ -28,7 +29,7 @@ def androidx = [
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version"
     ],
     ui       : [
-        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-alpha3",
+        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta1",
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
@@ -52,13 +53,12 @@ def playservices = [
 ]
 
 def firebase = [
-    database : "com.google.firebase:firebase-database:16.0.6",
-    firestore: "com.google.firebase:firebase-firestore:17.1.5",
-    core     : "com.google.firebase:firebase-core:16.0.7",
-    auth     : "com.google.firebase:firebase-auth:16.1.0",
-    config   : "com.google.firebase:firebase-config:16.3.0",
-    perf     : "com.google.firebase:firebase-perf:16.2.3",
-    storage  : "com.google.firebase:firebase-storage:16.0.5"
+    database: "com.google.firebase:firebase-database:16.0.6",
+    core    : "com.google.firebase:firebase-core:16.0.7",
+    auth    : "com.google.firebase:firebase-auth:16.1.0",
+    config  : "com.google.firebase:firebase-config:16.3.0",
+    perf    : "com.google.firebase:firebase-perf:16.2.3",
+    storage : "com.google.firebase:firebase-storage:16.0.5"
 ]
 
 def crashlytics = [
@@ -92,52 +92,52 @@ def rxjava2 = [
     android    : "io.reactivex.rxjava2:rxandroid:2.1.0",
     kotlin     : "io.reactivex.rxjava2:rxkotlin:2.3.0",
     permissions: "com.github.tbruyelle:rxpermissions:2.x.v0.9.3",
-    location   : "pl.charmas.android:android-reactive-location2:2.1@aar"
+    location   : "pl.charmas.android:android-reactive-location2:2.1@aar",
+    tasks      : "io.ashdavies.rx:rx-tasks:2.2.0"
 ]
 
-def simprints = [
-    libscanner : "com.simprints:libscanner:2018.4.0",
-    libmatcher : "com.simprints:libmatcher:1.3.2",
-    mockscanner: "com.simprints:mockscanner:2018.3.0"
-]
-
-def mockito_version = "2.22.0"
-def espresso_version = "3.1.2-alpha01"
+def mockito_version = "2.23.0"
+def espresso_version = "3.2.0-alpha04"
 def roboletric_version = "4.1"
 def testing = [
-    junit        : "junit:junit:4.13-beta-2",
-    robolectric  : [
+    junit          : "junit:junit:4.13-beta-2",
+    robolectric    : [
         core    : "org.robolectric:robolectric:$roboletric_version",
         multidex: "org.robolectric:multidex:3.4.2"
     ],
-    truth        : "com.google.truth:truth:0.42",
-    mockito      : [
+    truth          : "com.google.truth:truth:0.42",
+    mockito        : [
         core   : "org.mockito:mockito-core:$mockito_version",
         inline : "org.mockito:mockito-inline:$mockito_version", //Required to mock final classes
         android: "org.mockito:mockito-android:$mockito_version", //Required to use Mock in AndroidTests
-        kotlin : "com.nhaarman:mockito-kotlin:1.6.0",
+        kotlin : "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     ],
-    mockwebserver: "com.squareup.okhttp3:mockwebserver:3.10.0",
-    espresso     : [
+    mockwebserver  : "com.squareup.okhttp3:mockwebserver:3.10.0",
+    espresso       : [
         core   : "androidx.test.espresso:espresso-core:$espresso_version",
         intents: "androidx.test.espresso:espresso-intents:$espresso_version",
+        contrib: "androidx.test.espresso:espresso-contrib:$espresso_version",
         barista: "com.schibsted.spain:barista:2.7.1" //Used to grant permissions in AndroidTests
     ],
-    dagger       : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
-    dagger_kotlin: "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
-    work         : "android.arch.work:work-testing:$work_version",
-    retrofit     : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
+    dagger         : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
+    dagger_kotlin  : "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
+    work           : "android.arch.work:work-testing:$work_version",
+    retrofit       : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
 
     //https://developer.android.com/jetpack/androidx/releases/test
-    androidx     : [
+    androidx       : [
         monitor     : "androidx.test:monitor:1.1.2-alpha01",
         ext_junit   : "androidx.test.ext:junit:1.1.1-alpha01",
-        core        : "androidx.test:core:1.1.1-alpha01",
+        core        : "androidx.test:core:1.2.0-beta01",
         core_testing: "android.arch.core:core-testing:1.1.1",
+        orchestrator: "androidx.test:orchestrator:1.1.1",
         runner      : "androidx.test:runner:1.1.2-alpha01",
         rules       : "androidx.test:rules:1.1.2-alpha01",
         room        : "androidx.room:room-testing:$androidx_room_version"
-    ]
+    ],
+    rx2_idler      : 'com.squareup.rx.idler:rx2-idler:0.9.1',
+    coroutines_core: 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1',
+    coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1'
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
@@ -148,6 +148,18 @@ def realm = [
     kotlin               : "io.realm:realm-android-kotlin-extensions:$realm_version",
     android              : "io.realm:realm-android-library:$realm_version",
     glassfish_annotation : "org.glassfish:javax.annotation:10.0-b28"
+]
+
+// For Tee-d stream
+def commons_io_version = "2.6"
+def commons_io = [
+    commons_io: "commons-io:commons-io:$commons_io_version"
+]
+
+// Koin, Service Location
+def koin_version = "2.0.0"
+def koin = [
+    core: "org.koin:koin-android:$koin_version"
 ]
 
 ext.deps = [
@@ -163,7 +175,8 @@ ext.deps = [
     gson           : gson,
     timber         : timber,
     rxjava2        : rxjava2,
-    simprints      : simprints,
     testing        : testing,
-    realm          : realm
+    realm          : realm,
+    commons_io     : commons_io,
+    koin           : koin
 ]

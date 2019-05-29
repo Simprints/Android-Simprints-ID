@@ -3,19 +3,17 @@ package com.simprints.id.data.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
-import com.simprints.id.data.prefs.sessionState.SessionStatePreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 
 
-class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
-                             settings: SettingsPreferencesManager,
+class PreferencesManagerImpl(settings: SettingsPreferencesManager,
                              lastEvents: RecentEventsPreferencesManager,
                              context: Context)
     : PreferencesManager,
-    SessionStatePreferencesManager by sessionState,
     SettingsPreferencesManager by settings,
     RecentEventsPreferencesManager by lastEvents {
+
     companion object {
         const val PREF_FILE_NAME = "b3f0cf9b-4f3f-4c5b-bf85-7b1f44eddd7a"
         const val PREF_MODE = Context.MODE_PRIVATE
@@ -48,5 +46,4 @@ class PreferencesManagerImpl(sessionState: SessionStatePreferencesManager,
 
     private fun containsRealmKey(it: Map.Entry<String, Any?>) =
         it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
-            || it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY_IDENTIFIER)
 }

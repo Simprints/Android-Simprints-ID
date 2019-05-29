@@ -7,7 +7,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import androidx.test.core.app.ApplicationProvider
-import junit.framework.TestCase
+import org.junit.Assert.assertEquals
 import org.robolectric.Robolectric
 import org.robolectric.Shadows
 import org.robolectric.android.controller.ActivityController
@@ -29,7 +29,21 @@ fun assertActivityStarted(clazz: Class<out Activity>, shadowActivity: ShadowActi
 }
 
 fun assertActivityStarted(clazz: Class<out Activity>, intent: Intent) {
-    TestCase.assertEquals(intent.component?.className, clazz.name)
+    assertActivityStarted(clazz.name, intent)
+}
+
+fun assertActivityStarted(clazzName: String, activity: Activity) {
+    val shadowActivity = Shadows.shadowOf(activity)
+    assertActivityStarted(clazzName, shadowActivity)
+}
+
+fun assertActivityStarted(clazzName: String, shadowActivity: ShadowActivity) {
+    val startedIntent = shadowActivity.nextStartedActivity
+    assertActivityStarted(clazzName, startedIntent)
+}
+
+fun assertActivityStarted(clazzName: String, intent: Intent) {
+    assertEquals(clazzName, intent.component?.className)
 }
 
 fun <T : Activity> ActivityController<T>.showOnScreen(): ActivityController<T> = this.start().resume().visible()

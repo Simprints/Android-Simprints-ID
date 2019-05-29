@@ -13,7 +13,7 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
-import com.simprints.id.tools.utils.AndroidResourcesHelper
+import com.simprints.core.tools.AndroidResourcesHelper
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 

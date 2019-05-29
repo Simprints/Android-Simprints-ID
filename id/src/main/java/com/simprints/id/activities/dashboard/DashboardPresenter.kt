@@ -26,7 +26,6 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase

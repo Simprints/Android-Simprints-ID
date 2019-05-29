@@ -75,7 +75,7 @@ class SessionEventsMasterTaskTest {
             val testObserver = this.execute().test()
         testObserver.awaitAndAssertSuccess()
 
-            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         }
     }
 
@@ -109,7 +109,7 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+            verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         }
     }
 
@@ -124,12 +124,12 @@ class SessionEventsMasterTaskTest {
                     .test()
 
             testObserver.awaitAndAssertSuccess()
-            verifyNever(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+            verifyNever(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         }
     }
 
 
-    private fun mockOneSucceedingAndOneFailingUploadTask(masterTaskSpy: SessionEventsSyncMasterTask, t: Throwable = IOException("network error")) {
+    private fun mockOneSucceedingAndOneFailingUploadTask(masterTaskSpy: SessionEventsSyncMasterTask, t: Throwable = IOException("network reason")) {
         Mockito.doAnswer(AdditionalAnswers.returnsElementsOf<Completable>(
             mutableListOf(Completable.complete(), Completable.error(t))
         )).`when`(masterTaskSpy).createUploadBatchTaskCompletable(anyNotNull())

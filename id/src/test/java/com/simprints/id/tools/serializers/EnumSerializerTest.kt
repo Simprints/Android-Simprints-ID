@@ -1,6 +1,6 @@
 package com.simprints.id.tools.serializers
 
-import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.id.FingerIdentifier
 import org.junit.Assert
 import org.junit.Test
 

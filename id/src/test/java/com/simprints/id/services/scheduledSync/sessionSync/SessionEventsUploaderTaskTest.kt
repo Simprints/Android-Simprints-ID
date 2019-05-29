@@ -2,17 +2,16 @@ package com.simprints.id.services.scheduledSync.sessionSync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSession
 import com.simprints.id.commontesttools.sessionEvents.createFakeOpenSessionButExpired
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters.SessionEventsApiAdapterFactory
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
@@ -48,15 +47,16 @@ class SessionEventsUploaderTaskTest {
 
     @Before
     fun setUp() {
-        UnitTestConfig(this).rescheduleRxMainThread()
+        UnitTestConfig(this)
+            .rescheduleRxMainThread()
+            .setupFirebase()
 
         ShadowLog.stream = System.out
 
         sessionsRemoteInterfaceSpy = spy(SimApiClient(
             SessionsRemoteInterface::class.java,
             SessionsRemoteInterface.baseUrl,
-            "",
-            SessionEventsApiAdapterFactory().gson).api)
+            "").api)
 
         whenever(sessionsEventsManagerMock.deleteSessions(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
         whenever(sessionsEventsManagerMock.insertOrUpdateSessionEvents(anyNotNull())).thenReturn(Completable.complete())
@@ -218,7 +218,7 @@ class SessionEventsUploaderTaskTest {
     private fun createFailureUploadResponse(code: Int = 500) =
         Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
             .code(code)
-            .message("Response.error()")
+            .message("AppResponse.reason()")
             .protocol(Protocol.HTTP_1_1)
             .request(Request.Builder().url("http://localhost/").build())
             .build()))
