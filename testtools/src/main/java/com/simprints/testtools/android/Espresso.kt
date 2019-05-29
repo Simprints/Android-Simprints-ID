@@ -10,6 +10,25 @@ import androidx.test.espresso.matcher.BoundedMatcher
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import java.util.*
+import android.graphics.drawable.ColorDrawable
+
+
+private fun hasBackgroundColor(expectedObject: Matcher<Int>): Matcher<Any> {
+
+    return object : BoundedMatcher<Any, View>(View::class.java) {
+
+        var color: Int = -1
+
+        public override fun matchesSafely(actualObject: View): Boolean {
+            color = (actualObject.background as ColorDrawable).color
+            return expectedObject.matches(color)
+        }
+
+        override fun describeTo(description: Description) {
+            description.appendText("Color did not match $color")
+        }
+    }
+}
 
 
 fun hasImage(drawableId: Int): Matcher<View> {

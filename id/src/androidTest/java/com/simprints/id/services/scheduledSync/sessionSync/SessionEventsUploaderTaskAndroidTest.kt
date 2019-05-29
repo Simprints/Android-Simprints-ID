@@ -219,9 +219,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addInvalidIntentEvent() {
-        InvalidIntentEvent.IntentAction.values().forEach {
-            addEvent(InvalidIntentEvent(0, it, emptyMap()))
-        }
+        addEvent(InvalidIntentEvent(0, "some_action", emptyMap()))
     }
 
     private fun SessionEvents.addOneToManyMatchEvent() {
