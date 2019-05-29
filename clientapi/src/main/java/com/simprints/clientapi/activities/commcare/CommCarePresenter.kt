@@ -29,8 +29,10 @@ class CommCarePresenter(private val view: CommCareContract.View,
         get() = emptyMap()
 
     override suspend fun start() {
-        val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
-        crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+        if(action != ACTION_CONFIRM_IDENTITY) {
+            val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
+            crashReportManager.setSessionIdCrashlyticsKey(sessionId)
+        }
 
         when (action) {
             ACTION_REGISTER -> processEnrollRequest()

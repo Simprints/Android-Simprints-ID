@@ -18,6 +18,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
         checkRequest(request)
             .andThen(saveGuidSelectionEvent(request))
             .doOnError {
+                it.printStackTrace()
                 crashReportManager.logExceptionOrSafeException(it)
                 reportToAnalytics(request, false)
             }
