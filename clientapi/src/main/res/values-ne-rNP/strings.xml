@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
+    <string name="configuration_error_message">कन्फिगरेसन त्रुटि फेला परेको छ (%1$s), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
+</resources>

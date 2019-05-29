@@ -1,17 +1,25 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.session
 
+import androidx.annotation.Keep
+import com.google.gson.GsonBuilder
+import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 import java.util.*
 
+@Keep
 open class SessionEvents(var projectId: String,
                          var appVersionName: String,
-                         var libVersionName: String,
+                         var libVersionName: String = "",
                          var language: String,
                          var device: Device,
                          var startTime: Long = 0,
-                         val id: String = UUID.randomUUID().toString()) {
+                         var databaseInfo: DatabaseInfo,
+                         val id: String = UUID.randomUUID().toString(),
+                         val events: ArrayList<Event> = arrayListOf()) {
 
     companion object {
         // When the sync starts, any open activeSession started GRACE_PERIOD ms
@@ -19,10 +27,9 @@ open class SessionEvents(var projectId: String,
         const val GRACE_PERIOD: Long = 1000 * 60 * 5 // 5 minutes
      }
 
-    var events: ArrayList<Event> = ArrayList()
+
     var relativeEndTime: Long = 0
     var relativeUploadTime: Long = 0
-    var databaseInfo: DatabaseInfo? = null
     var location: Location? = null
     var analyticsId: String? = null
 
@@ -32,19 +39,32 @@ open class SessionEvents(var projectId: String,
 
     fun addArtificialTerminationIfRequired(timeHelper: TimeHelper, reason: ArtificialTerminationEvent.Reason) {
         if (isOpen()) {
-            events.add(ArtificialTerminationEvent(nowRelativeToStartTime(timeHelper), reason))
+            addEvent(ArtificialTerminationEvent(timeHelper.now(), reason))
         }
     }
 
     fun closeIfRequired(timeHelper: TimeHelper) {
         if (!isClosed()) {
-            relativeEndTime = nowRelativeToStartTime(timeHelper)
+            relativeEndTime = timeRelativeToStartTime(timeHelper.now())
         }
     }
 
     fun timeRelativeToStartTime(time: Long): Long = time - startTime
-    fun nowRelativeToStartTime(timeHelper: TimeHelper): Long = timeRelativeToStartTime(timeHelper.now())
 
     fun isPossiblyInProgress(timeHelper: TimeHelper): Boolean =
         timeHelper.msBetweenNowAndTime(startTime) < GRACE_PERIOD
+
+
+    fun addEvent(event: Event) {
+        if(BuildConfig.DEBUG) {
+            Timber.d("Add event: ${GsonBuilder().create().toJson(event)}")
+        }
+
+        event.updateRelativeTimes(startTime)
+
+        events.add(event)
+    }
 }
+
+fun SessionEvents.hasIdentificationCallback() =
+    events.any { it.type == EventType.CALLBACK_IDENTIFICATION }

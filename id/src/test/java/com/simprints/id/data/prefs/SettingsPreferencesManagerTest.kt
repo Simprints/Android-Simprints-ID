@@ -3,19 +3,19 @@ package com.simprints.id.data.prefs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.JsonSyntaxException
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.id.FingerIdentifier
+import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.domain.Constants
-import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.id.domain.GROUP
 import com.simprints.id.testtools.TestApplication
-import com.simprints.libsimprints.FingerIdentifier
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.verifyExactly
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -43,16 +43,16 @@ class SettingsPreferencesManagerTest {
 
     @Test
     fun fetchingRemoteConfigPrimitive_worksAndDoesNotGetOverridden() {
-        val originalValue = settingsPreferencesManager.parentalConsentExists
-        Assert.assertEquals(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_DEFAULT, originalValue)
+        val originalValue = settingsPreferencesManager.logoExists
+        Assert.assertEquals(SettingsPreferencesManagerImpl.LOGO_EXISTS_DEFAULT, originalValue)
 
-        settingsPreferencesManager.parentalConsentExists = !originalValue
+        settingsPreferencesManager.logoExists = !originalValue
 
-        val newValue = settingsPreferencesManager.parentalConsentExists
+        val newValue = settingsPreferencesManager.logoExists
 
         Assert.assertEquals(originalValue, newValue)
 
-        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.PARENTAL_CONSENT_EXISTS_KEY) }
+        verifyExactly(2, remoteConfigSpy) { getBoolean(SettingsPreferencesManagerImpl.LOGO_EXISTS_KEY) }
     }
 
     @Test
@@ -74,7 +74,7 @@ class SettingsPreferencesManagerTest {
         val oldMatchGroup = settingsPreferencesManager.matchGroup
         Assert.assertEquals(SettingsPreferencesManagerImpl.MATCH_GROUP_DEFAULT, oldMatchGroup)
 
-        settingsPreferencesManager.matchGroup = Constants.GROUP.MODULE
+        settingsPreferencesManager.matchGroup = GROUP.MODULE
 
         val newMatchGroup = settingsPreferencesManager.matchGroup
 

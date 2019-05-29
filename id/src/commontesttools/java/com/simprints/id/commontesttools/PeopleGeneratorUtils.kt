@@ -1,6 +1,6 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.domain.Fingerprint
+import com.simprints.id.domain.fingerprint.Fingerprint
 import com.simprints.id.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -60,7 +60,7 @@ object PeopleGeneratorUtils {
                         toSync: Boolean = false,
                         createdAt: Date = getRandomTime(),
                         updateAt: Date = getRandomTime(),
-                        fingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
+                        idFingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
         Person(
             patientId = patientId,
             projectId = projectId,
@@ -69,13 +69,13 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
-            fingerprints = fingerprints.toList()
+            fingerprints = idFingerprints.toList()
         )
 
 
     fun getRandomFingerprint(): Fingerprint {
-        val commonFingerprint = com.simprints.libcommon.Fingerprint.generateRandomFingerprint()
-        return Fingerprint(commonFingerprint.fingerId.ordinal, commonFingerprint.templateBytes, 50)
+        val commonFingerprint = FingerprintGeneratorUtils.generateRandomFingerprint()
+        return Fingerprint(commonFingerprint.finger, commonFingerprint.templateBytes)
     }
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {

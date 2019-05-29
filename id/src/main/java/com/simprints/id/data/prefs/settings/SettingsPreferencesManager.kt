@@ -1,10 +1,11 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.domain.Constants
+import com.simprints.id.FingerIdentifier
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
-import com.simprints.libsimprints.FingerIdentifier
 
 
 interface SettingsPreferencesManager {
@@ -14,8 +15,8 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
-    var syncGroup: Constants.GROUP
-    var matchGroup: Constants.GROUP
+    var syncGroup: GROUP
+    var matchGroup: GROUP
     /** @throws JsonSyntaxException */
     var fingerStatus: Map<FingerIdentifier, Boolean>
 
@@ -23,10 +24,8 @@ interface SettingsPreferencesManager {
     var organizationName: String
 
     var logoExists: Boolean
-    var parentalConsentExists: Boolean
-    var generalConsentOptionsJson: String
-    var parentalConsentOptionsJson: String
 
+    var modality: Modality
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 
     fun getRemoteConfigStringPreference(key: String): String

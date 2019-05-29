@@ -1,8 +1,9 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class OneToOneMatchEvent(val relativeStartTime: Long,
-                         val relativeEndTime: Long,
+@Keep
+class OneToOneMatchEvent(starTime: Long,
+                         endTime: Long,
                          val candidateId: String,
-                         val result: MatchEntry?) : Event(EventType.ONE_TO_ONE_MATCH)
+                         val result: MatchEntry?) : Event(EventType.ONE_TO_ONE_MATCH, starTime, endTime)

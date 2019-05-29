@@ -1,10 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class ArtificialTerminationEvent(val relativeStartTime: Long,
-                                 val reason: Reason) : Event(EventType.ARTIFICIAL_TERMINATION) {
+@Keep
+class ArtificialTerminationEvent(starTime: Long,
+                                 val reason: Reason) : Event(EventType.ARTIFICIAL_TERMINATION, starTime) {
 
+    @Keep
     enum class Reason {
         TIMED_OUT, NEW_SESSION
     }

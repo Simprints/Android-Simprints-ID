@@ -1,19 +1,19 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
-import com.simprints.id.data.db.remote.models.fb_Person
+import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.exceptions.safe.data.db.NoSuchRlSessionInfoException
+import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.json.JsonHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -75,8 +75,8 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
 
     private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
         flatMap {
-            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt()
-            ).retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
+            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt())
+                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
         }
 
     private fun Single<out ResponseBody>.setupJsonReaderFromResponse(): Single<JsonReader> =
@@ -88,29 +88,34 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                 }
         }
 
-    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<fb_Person> =
+    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiGetPerson> =
         flatMapObservable { jsonReader ->
-            Observable.create<fb_Person> { emitter ->
-                while (jsonReader.hasNext()) {
-                    emitter.onNext(JsonHelper.gson.fromJson<fb_Person>(jsonReader, fb_Person::class.java))
+            Observable.create<ApiGetPerson> { emitter ->
+                try {
+                    while (jsonReader.hasNext()) {
+                        emitter.onNext(JsonHelper.gson.fromJson(jsonReader, ApiGetPerson::class.java))
+                    }
+                    emitter.onComplete()
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    emitter.onError(t)
                 }
-                emitter.onComplete()
             }
         }
 
-    private fun Observable<fb_Person>.splitIntoBatches(): Observable<List<fb_Person>> =
+    private fun Observable<ApiGetPerson>.splitIntoBatches(): Observable<List<ApiGetPerson>> =
         buffer(BATCH_SIZE_FOR_DOWNLOADING)
+            .doOnError { it.printStackTrace() }
 
-    private fun Observable<List<fb_Person>>.saveBatchAndUpdateDownSyncStatus(): Completable =
+    private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
-            Completable.create { emitter ->
+            Completable.fromAction {
                 localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
-                updateLastKnownPatientId(batchOfPeople.last().patientId)
+                updateLastKnownPatientId(batchOfPeople.last().id)
                 updateDownSyncTimestampOnBatchDownload()
-                emitter.onComplete()
             }
         }
 
@@ -129,25 +134,25 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         downSyncDao.getDownSyncStatusForId(getDownSyncId())?.lastPatientUpdatedAt
             ?: getLastPatientUpdatedAtFromRealmAndMigrateIt()
 
-    private fun getLastPatientIdFromRealmAndMigrateIt(): String? = fetchRlSessionInfoFromRealmAndMigrateIt()?.lastPatientId
-    private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchRlSessionInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
-    private fun fetchRlSessionInfoFromRealmAndMigrateIt(): DownSyncStatus? {
+    private fun getLastPatientIdFromRealmAndMigrateIt(): String? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientId
+    private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
+    private fun fetchDbSyncInfoFromRealmAndMigrateIt(): DownSyncStatus? {
         return try {
-            val rlSyncInfo = localDbManager.getRlSyncInfo(subSyncScope).blockingGet()
+            val dbSyncInfo = localDbManager.getDbSyncInfo(subSyncScope).blockingGet()
             val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
 
             val newDownSyncStatus =
                 currentDownSyncStatus?.copy(
-                    lastPatientId = rlSyncInfo.lastKnownPatientId,
-                    lastPatientUpdatedAt = rlSyncInfo.lastKnownPatientUpdatedAt.time)
-                    ?: DownSyncStatus(subSyncScope, rlSyncInfo.lastKnownPatientId, rlSyncInfo.lastKnownPatientUpdatedAt.time)
+                    lastPatientId = dbSyncInfo.lastKnownPatientId,
+                    lastPatientUpdatedAt = dbSyncInfo.lastKnownPatientUpdatedAt.time)
+                    ?: DownSyncStatus(subSyncScope, dbSyncInfo.lastKnownPatientId, dbSyncInfo.lastKnownPatientUpdatedAt.time)
 
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
             localDbManager.deleteSyncInfo(subSyncScope)
             newDownSyncStatus
         } catch (t: Throwable) {
-            if (t is NoSuchRlSessionInfoException) {
-                Timber.e("No such realm session info")
+            if (t is NoSuchDbSyncInfoException) {
+                Timber.e("No such realm sync info")
             } else {
                 Timber.e(t)
             }

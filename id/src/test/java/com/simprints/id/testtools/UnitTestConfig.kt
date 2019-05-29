@@ -9,27 +9,43 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
-import com.simprints.testtools.common.dagger.injectClassFromComponent
+import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.injectClassFromComponent
+import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.fabric.sdk.android.Fabric
 
 class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null
-) {
+): BaseUnitTestConfig() {
 
-    private val app = ApplicationProvider.getApplicationContext() as TestApplication
+    private val defaultAppModuleWithoutRealm by lazy {
+        TestAppModule(app,
+            localDbManagerRule = DependencyRule.MockRule,
+            sessionEventsLocalDbManagerRule = DependencyRule.MockRule)
+    }
+
+    private val app by lazy {
+        ApplicationProvider.getApplicationContext() as TestApplication
+    }
+
     private lateinit var testAppComponent: AppComponentForTests
 
     fun fullSetup() =
         rescheduleRxMainThread()
+            .coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
             .setupCrashlytics()
             .initAndInjectComponent()
 
-    fun rescheduleRxMainThread() = also {
-        com.simprints.testtools.unit.reactive.rescheduleRxMainThread()
+    override fun rescheduleRxMainThread() = also {
+        super.rescheduleRxMainThread()
+    }
+
+    override fun coroutinesMainThread() = also {
+        super.coroutinesMainThread()
     }
 
     fun setupFirebase() = also {
@@ -54,7 +70,8 @@ class UnitTestConfig<T : Any>(
     private fun initComponent() = also {
 
         testAppComponent = DaggerAppComponentForTests.builder()
-            .appModule(appModule ?: TestAppModule(app))
+            .application(app)
+            .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .build()
 

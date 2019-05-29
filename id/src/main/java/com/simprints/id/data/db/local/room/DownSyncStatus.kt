@@ -3,9 +3,11 @@ package com.simprints.id.data.db.local.room
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import androidx.annotation.Keep
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 
 @Entity(tableName = "DownSyncStatus")
+@Keep
 data class DownSyncStatus(
     @PrimaryKey var id: String,
     var projectId: String,

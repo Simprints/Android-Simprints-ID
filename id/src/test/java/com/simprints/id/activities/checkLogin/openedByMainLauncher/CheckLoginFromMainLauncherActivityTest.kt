@@ -6,9 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
@@ -35,11 +34,7 @@ class CheckLoginFromMainLauncherActivityTest {
 
     private lateinit var editor: SharedPreferences.Editor
 
-    @Inject
-    lateinit var remoteDbManagerMock: RemoteDbManager
-
-    @Inject
-    lateinit var dbManager: DbManager
+    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 
     private val module by lazy {
         TestAppModule(app,
@@ -51,7 +46,6 @@ class CheckLoginFromMainLauncherActivityTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-        dbManager.initialiseDb()
 
         val sharedPrefs = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
         editor = sharedPrefs.edit()

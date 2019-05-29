@@ -5,9 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -16,9 +14,12 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.mock
@@ -46,7 +47,6 @@ class DashboardCardsFactoryTest {
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private val module by lazy {
@@ -61,8 +61,6 @@ class DashboardCardsFactoryTest {
     @Before
     fun setUp() {
         UnitTestConfig(this, module).fullSetup()
-
-        dbManager.initialiseDb()
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
@@ -157,7 +155,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -172,7 +170,7 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, 0)
+        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
         mockNLocalPeople(localDbManagerMock, 0)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
@@ -191,11 +189,14 @@ class DashboardCardsFactoryTest {
         }
     }
 
-    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, count: Int) {
-        whenever(remotePeopleManager.getNumberOfPatients(anyNotNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(count))
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+
+    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, peopleCounts: List<PeopleCount>) {
+        whenever(remotePeopleManager.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
-        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
+        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
     }
 }

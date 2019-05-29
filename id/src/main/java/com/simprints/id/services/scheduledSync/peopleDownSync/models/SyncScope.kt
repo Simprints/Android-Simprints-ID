@@ -1,10 +1,14 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.models
 
-import com.simprints.id.domain.Constants
+import androidx.annotation.Keep
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modes
 
+@Keep
 data class SyncScope(val projectId: String,
                      val userId: String?, //TODO - Discuss: Domain and Real Classes save userId as ""
-                     val moduleIds: Set<String>?) {
+                     val moduleIds: Set<String>?,
+                     val modes: List<Modes> = listOf(Modes.FINGERPRINT)) {
 
     val uniqueKey: String = "${projectId}_${userId ?: ""}${moduleIds?.fold("") { acc, s -> "${acc}_$s"} ?: "_"}"
 
@@ -15,10 +19,10 @@ data class SyncScope(val projectId: String,
             }
         } ?: listOf(SubSyncScope(projectId, userId, null))
 
-    val group: Constants.GROUP
+    val group: GROUP
         get() = when {
-            moduleIds != null -> Constants.GROUP.MODULE
-            userId != null -> Constants.GROUP.USER
-            else -> Constants.GROUP.GLOBAL
+            moduleIds != null -> GROUP.MODULE
+            userId != null -> GROUP.USER
+            else -> GROUP.GLOBAL
         }
 }

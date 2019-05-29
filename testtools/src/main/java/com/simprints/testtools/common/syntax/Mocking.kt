@@ -1,5 +1,6 @@
 package com.simprints.testtools.common.syntax
 
+import com.nhaarman.mockitokotlin2.stub
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -14,6 +15,10 @@ inline fun <reified T> spy(): T =
 fun <T> spy(t: T): T =
     Mockito.spy(t)
 
+inline fun <reified T> mock(setup: (T) -> Unit): T = mock<T>().apply(setup)
+inline fun <reified T> spy(setup: (T) -> Unit): T = spy<T>().apply(setup)
+inline fun <T> spy(t: T, setup: (T) -> Unit): T = spy(t).apply(setup)
+
 /** For mocks only */
 fun <T> whenever(methodCall: T): InfixOngoingStubbing<T> =
     InfixOngoingStubbing(Mockito.`when`(methodCall))
@@ -25,6 +30,18 @@ fun <T> whenever(methodCall: () -> T): InfixOngoingStubbing<T> =
 /** For both mocks and spies */
 fun <T, R> whenever(mock: T, methodCall: T.() -> R): InfixStubber<T, R> =
     InfixStubber(mock, methodCall)
+
+fun <T : Any, R> wheneverOnSuspend(mock: T, methodCall: suspend T.() -> R): InfixStubberOnSuspend<T, R> =
+    InfixStubberOnSuspend(mock, methodCall)
+
+
+class InfixStubberOnSuspend<T : Any, R>(private val obj: T, private val methodCall: suspend T.() -> R) {
+
+    infix fun thenOnBlockingReturn(value: R) =
+        obj.stub {
+            this.onBlocking(methodCall).thenReturn(value)
+        }
+}
 
 /**
  * This class is for re-arranging and infix-ing the "doReturn ... when ..." family of methods

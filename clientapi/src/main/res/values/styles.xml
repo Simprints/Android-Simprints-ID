@@ -1,0 +1,23 @@
+<resources>
+
+    <style name="ClientApiTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/simprints_blue</item>
+        <item name="colorPrimaryDark">@color/simprints_blue_dark</item>
+    </style>
+
+    <style name="ClientApiTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ClientApiTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="ClientApiTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="ClientApiTheme.Launcher">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/launch_screen</item>
+    </style>
+
+</resources>

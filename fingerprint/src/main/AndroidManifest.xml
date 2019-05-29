@@ -1,0 +1,58 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.simprints.fingerprint">
+
+    <dist:module
+        dist:instant="false"
+        dist:onDemand="false"
+        dist:title="@string/title_fingerprint">
+        <dist:fusing dist:include="true" />
+    </dist:module>
+
+    <application tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name="com.simprints.fingerprint.activities.matching.MatchingActivity"
+            android:label="Matching"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.ActionBar" />
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
+            android:label="Main"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.alert.AlertActivity"
+            android:label="Main"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.launch.LaunchActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.refusal.RefusalActivity"
+            android:label="@string/refusal_label"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity" />
+
+
+    </application>
+</manifest>
+
