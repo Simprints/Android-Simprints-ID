@@ -12,20 +12,38 @@ class ApiCandidateReadEvent(val relativeStartTime: Long,
 
     @Keep
     enum class ApiLocalResult {
-        FOUND, NOT_FOUND
+        FOUND, NOT_FOUND;
+
+        companion object {
+            fun fromDomainToApi(localResult: CandidateReadEvent.LocalResult) =
+                when (localResult) {
+                    CandidateReadEvent.LocalResult.FOUND -> FOUND
+                    CandidateReadEvent.LocalResult.NOT_FOUND -> NOT_FOUND
+                }
+        }
     }
 
     @Keep
     enum class ApiRemoteResult {
-        FOUND, NOT_FOUND
+        FOUND, NOT_FOUND;
+
+        companion object {
+            fun fromDomainToApi(remoteResult: CandidateReadEvent.RemoteResult?) =
+                when (remoteResult) {
+                    CandidateReadEvent.RemoteResult.FOUND -> FOUND
+                    CandidateReadEvent.RemoteResult.NOT_FOUND -> NOT_FOUND
+                    else -> null
+                }
+        }
     }
 
     constructor(candidateReadEvent: CandidateReadEvent) :
         this(candidateReadEvent.relativeStartTime ?: 0,
             candidateReadEvent.relativeEndTime ?: 0,
             candidateReadEvent.candidateId,
-            ApiLocalResult.valueOf(candidateReadEvent.localResult.toString()),
-            ApiRemoteResult.valueOf(candidateReadEvent.remoteResult.toString()))
+            ApiLocalResult.fromDomainToApi(candidateReadEvent.localResult),
+            ApiRemoteResult.fromDomainToApi(candidateReadEvent.remoteResult))
 }
+
 
 
