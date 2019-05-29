@@ -3,9 +3,10 @@ package com.simprints.fingerprint.activities.orchestrator
 import android.app.Activity
 import android.content.Intent
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.CLOSE
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.TRY_AGAIN
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.*
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
+import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.launch.LaunchActivity
+import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
@@ -19,44 +20,63 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorImpl : Orchestrator {
 
-    override fun onActivityResult(receiver: OrchestratedActivity, requestCode: Int, resultCode: Int?, data: Intent?) {
+    override fun onActivityResult(receiver: OrchestratorCallback, requestCode: Int, resultCode: Int?, data: Intent?) {
+        receiver.onActivityResultReceived()
 
-        extractAlertActivityResponse(data)?.let {
-            when (it.closeButtonAction) {
-                CLOSE -> {
-                    // LaunchAct returns a FingerprintResponse to the AppModule, otherwise any Act forward back the result.
-                    if (receiver.activity == LAUNCH) {
-                        receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(it))
-                    } else {
-                        receiver.setResultDataAndFinish(resultCode, data)
-                    }
-                }
-                TRY_AGAIN -> receiver.tryAgain()
+        extractAlertActivityResult(data)?.let {
+            if (receiver is LaunchActivity) {
+                handleAlertScreenResult(it, receiver, requestCode, data)
+            } else {
+                handleAlertScreenResultInLaunchAct(it, receiver)
             }
         } ?: run {
-            when (receiver.activity) {
-                COLLECT -> handleResultForCollectActivity(receiver, requestCode, resultCode, data)
-                LAUNCH -> handleResultForLaunchActivity(receiver, requestCode, resultCode, data)
-                MATCHING -> { handleResultForMatchingActivity(receiver, requestCode, resultCode, data) }
+            when (receiver) {
+                is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, requestCode, data)
+                is LaunchActivity -> handleResultInLaunchActivity(receiver, requestCode, data)
+                is MatchingActivity -> { handleResultInMatchingActivity(receiver, requestCode, data) }
             }
         }
     }
 
-    private fun handleResultForMatchingActivity(receiver: OrchestratedActivity,
-                                                requestCode: Int, resultCode: Int?, data: Intent?) {
+    private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
+                                        receiver: OrchestratorCallback) {
+        when (alertActResult.closeButtonAction) {
+            CLOSE -> {
+                receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(alertActResult))
+            } BACK -> {
+                receiver.setResultDataAndFinish(Activity.RESULT_CANCELED, null)
+            }
+            TRY_AGAIN -> receiver.tryAgain()
+        }
+    }
+
+    private fun handleAlertScreenResult(alertActResult: AlertActResult,
+                                        receiver: OrchestratorCallback,
+                                        resultCode: Int?,
+                                        data: Intent?) {
+
+        when (alertActResult.closeButtonAction) {
+            CLOSE, BACK -> {
+                forwardResultBack(receiver, resultCode, data)
+            }
+            TRY_AGAIN -> receiver.tryAgain()
+        }
+    }
+
+    private fun handleResultInMatchingActivity(receiver: OrchestratorCallback,
+                                               resultCode: Int?, data: Intent?) {
 
         //Default behavior - E.g. RESULT_CANCEL (backButton)
         forwardResultBack(receiver, resultCode, data)
     }
 
-    private fun handleResultForCollectActivity(receiver: OrchestratedActivity,
-                                               requestCode: Int, resultCode: Int?, data: Intent?) {
+    private fun handleResultInCollectActivity(receiver: OrchestratorCallback,
+                                              resultCode: Int?, data: Intent?) {
 
         extractRefusalActResult(data)?.let {
             when (it.action) {
                 SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
-                SCAN_FINGERPRINTS -> { /* Do Nothing */
-                }
+                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
             }
             return
         }
@@ -65,13 +85,14 @@ class OrchestratorImpl : Orchestrator {
         forwardResultBack(receiver, resultCode, data)
     }
 
-    private fun handleResultForLaunchActivity(receiver: OrchestratedActivity,
-                                              requestCode: Int, resultCode: Int?, data: Intent?) {
+    private fun handleResultInLaunchActivity(receiver: OrchestratorCallback,
+                                             resultCode: Int?,
+                                             data: Intent?) {
 
         extractRefusalActResult(data)?.let {
             when (it.action) {
                 SUBMIT -> receiver.setResultDataAndFinish(resultCode, prepareRefusalForm(it))
-                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+                SCAN_FINGERPRINTS -> { receiver.tryAgain() }
             }
             return
         }
@@ -98,7 +119,7 @@ class OrchestratorImpl : Orchestrator {
         forwardResultBack(receiver, resultCode, data)
     }
 
-    private fun forwardResultBack(receiver: OrchestratedActivity, resultCode: Int?, data: Intent?) {
+    private fun forwardResultBack(receiver: OrchestratorCallback, resultCode: Int?, data: Intent? = null) {
         receiver.setResultDataAndFinish(resultCode, data)
     }
 
@@ -143,7 +164,7 @@ class OrchestratorImpl : Orchestrator {
             putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(fingerprintResult))
         }
 
-    private fun extractAlertActivityResponse(data: Intent?): AlertActResult? =
+    private fun extractAlertActivityResult(data: Intent?): AlertActResult? =
         data?.getParcelableExtra(AlertActResult.BUNDLE_KEY)
 
     private fun extractRefusalActResult(data: Intent?): RefusalActResult? =
