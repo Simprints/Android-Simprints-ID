@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.commcare
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
 import com.simprints.libsimprints.*
@@ -19,8 +20,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         loadKoinModules(koinModule)
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
