@@ -108,7 +108,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun onActivityResultReceived() {}
+    override fun onActivityResultReceived() { viewPresenter.onActivityResult() }
     override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {

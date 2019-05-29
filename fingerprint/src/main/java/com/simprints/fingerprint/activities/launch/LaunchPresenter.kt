@@ -373,6 +373,10 @@ class LaunchPresenter(component: FingerprintComponent,
         }
     }
 
+    override fun onActivityResult() {
+        launchOutOfFocus = false
+    }
+
     override fun handleOnResume() {
         launchOutOfFocus = false
     }
