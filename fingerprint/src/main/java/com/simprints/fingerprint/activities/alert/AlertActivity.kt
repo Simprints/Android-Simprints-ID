@@ -74,22 +74,12 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, handleBackButton(alertType)))
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, BACK))
         })
 
         finish()
         super.onBackPressed()
     }
-
-    private fun handleBackButton(alertType: FingerprintAlert): AlertActResult.CloseButtonAction =
-        when(alertType) {
-            GUID_NOT_FOUND_OFFLINE,
-            BLUETOOTH_NOT_ENABLED,
-            NOT_PAIRED,
-            MULTIPLE_PAIRED_SCANNERS,
-            DISCONNECTED -> TRY_AGAIN
-            else -> CLOSE
-        }
 
     override fun openBluetoothSettings() {
         val intent = Intent()

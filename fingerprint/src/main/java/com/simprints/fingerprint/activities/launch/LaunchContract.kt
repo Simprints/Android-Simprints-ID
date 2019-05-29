@@ -42,5 +42,6 @@ interface LaunchContract {
         fun handleDeclinePressed()
         fun handleOnBackPressed()
         fun tryAgainFromErrorScreen()
+        fun onActivityResult()
     }
 }

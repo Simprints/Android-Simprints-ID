@@ -22,9 +22,8 @@ import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.LAUNCH
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
@@ -34,9 +33,8 @@ import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
 import javax.inject.Inject
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratedActivity {
+class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCallback {
 
-    override val activity = LAUNCH
     override val context: Context by lazy { this }
     @Inject lateinit var orchestrator: Orchestrator
 
@@ -110,7 +108,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratedAct
     }
 
     override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun handleResult(resultCode: Int?, data: Intent?) {}
+    override fun onActivityResultReceived() {}
+    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
             setResultAndFinish(it, data)

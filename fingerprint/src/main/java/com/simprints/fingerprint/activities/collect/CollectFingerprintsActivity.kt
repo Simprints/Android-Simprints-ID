@@ -18,9 +18,8 @@ import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAler
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity.ActivityName.COLLECT
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratedActivity
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -41,9 +40,8 @@ import javax.inject.Inject
 class CollectFingerprintsActivity :
     AppCompatActivity(),
     CollectFingerprintsContract.View,
-    OrchestratedActivity {
+    OrchestratorCallback {
 
-    override val activity = COLLECT
     override val context: Context by lazy { this }
     @Inject lateinit var orchestrator: Orchestrator
 
@@ -204,7 +202,8 @@ class CollectFingerprintsActivity :
     }
 
     override fun tryAgain() { }
-    override fun handleResult(resultCode: Int?, data: Intent?) {}
+    override fun onActivityResultReceived() {}
+    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
             setResult(it, data)
