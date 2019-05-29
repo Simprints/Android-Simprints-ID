@@ -24,71 +24,64 @@ import org.junit.Before
 import org.junit.Test
 import java.util.*
 
+
 class LibSimprintsPresenterTest {
 
     private val view = mock<LibSimprintsActivity>()
 
     @Before
     fun setup() {
-        BaseUnitTestConfig()
-            .rescheduleRxMainThread()
-            .coroutinesMainThread()
+        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
     }
 
     @Test
     fun startPresenterForRegister_ShouldRequestRegister() {
-        runBlocking {
-            val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
-            whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
+        val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
+        whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-            LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mockSessionManagerToCreateSession(), mock()).apply { start() }
-
-            verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterForIdentify_ShouldRequestIdentify() {
-        runBlocking {
-            val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
-            whenever(view.identifyExtractor) thenReturn identifyExtractor
+        val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
+        whenever(view.identifyExtractor) thenReturn identifyExtractor
 
-            LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply { start() }
-
-            verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply {
+            runBlocking { start() }
         }
+
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterForVerify_ShouldRequestVerify() {
-        runBlocking {
-            val verificationExtractor = VerifyRequestFactory.getMockExtractor()
-            whenever(view.verifyExtractor) thenReturn verificationExtractor
+        val verificationExtractor = VerifyRequestFactory.getMockExtractor()
+        whenever(view.verifyExtractor) thenReturn verificationExtractor
 
-            LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
 
-            verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
-        }
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        runBlocking {
-            val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-            whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
+        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
 
-            LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock()).apply { start() }
+        LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
 
-            verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(STANDARD)) }
-        }
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        runBlocking {
-            LibSimprintsPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply { start() }
-            verifyOnce(view) { handleClientRequestError(anyNotNull()) }
-        }
+        LibSimprintsPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
+        verifyOnce(view) { handleClientRequestError(anyNotNull()) }
     }
 
     @Test
@@ -138,8 +131,8 @@ class LibSimprintsPresenterTest {
         verifyOnce(view) { returnErrorToClient(anyNotNull()) }
     }
 
-    private fun mockSessionManagerToCreateSession() =
-        mock<ClientApiSessionEventsManager>().apply {
-            wheneverOnSuspend(this) { createSession(anyNotNull()) } thenOnBlockingReturn "session_id"
-        }
+    private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {
+        wheneverOnSuspend(this) { createSession(anyNotNull()) } thenOnBlockingReturn "session_id"
+    }
+
 }

@@ -12,6 +12,8 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManagerImpl
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManagerImpl
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.id.Application
@@ -19,6 +21,7 @@ import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.tools.TimeHelper
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 
@@ -33,6 +36,7 @@ val koinModule = module {
     factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
     factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
     factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
+    factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
 
     // Presenters
     factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
@@ -45,7 +49,7 @@ val koinModule = module {
         OdkPresenter(view, action, get(), get())
     }
     factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
-        CommCarePresenter(view, action, get(), get())
+        CommCarePresenter(view, action, get(), get(), get())
     }
 
 }
