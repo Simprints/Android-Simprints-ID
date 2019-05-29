@@ -1,25 +1,20 @@
 package com.simprints.clientapi.activities.errors
 
-import com.simprints.id.R as Rid
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.controllers.core.eventData.model.AlertScreenEvent
-import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.clientapi.extensions.inBackground
+import com.simprints.id.R as Rid
 
 class ErrorPresenter(val view: ErrorContract.View,
-                     private val clientApiTimeHelper: ClientApiTimeHelper,
-                     private val clientApiSessionEventsManager: ClientApiSessionEventsManager)
+                     private val sessionEventsManager: ClientApiSessionEventsManager)
     : ErrorContract.Presenter {
 
     override fun start(clientApiAlert: ClientApiAlert) {
-
-        clientApiSessionEventsManager.addSessionEvent(AlertScreenEvent(clientApiTimeHelper.now(), clientApiAlert))
-
-        val errorMessage = getErrorMessage(clientApiAlert)
-        view.setErrorMessageText(errorMessage)
+        sessionEventsManager.addAlertScreenEvent(clientApiAlert).inBackground()
+        view.setErrorMessageText(getErrorMessage(clientApiAlert))
     }
 
     private fun getErrorMessage(clientApiAlert: ClientApiAlert): String =
-        when(clientApiAlert) {
+        when (clientApiAlert) {
             ClientApiAlert.INVALID_CLIENT_REQUEST -> Rid.string.invalid_intentAction_message
             ClientApiAlert.INVALID_METADATA -> Rid.string.invalid_metadata_message
             ClientApiAlert.INVALID_MODULE_ID -> Rid.string.invalid_moduleId_message
@@ -32,7 +27,8 @@ class ErrorPresenter(val view: ErrorContract.View,
             view.getStringFromResources(it)
         }
 
-    override fun start() {}
+    override suspend fun start() {}
 
     override fun handleCloseClick() = view.closeActivity()
+
 }

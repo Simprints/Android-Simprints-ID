@@ -29,7 +29,7 @@ buildscript {
         classpath "io.realm:realm-transformer:4.3.4"
         classpath "com.google.firebase:firebase-plugins:1.1.5"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.fabric.tools:gradle:1.27.1"
+        classpath "io.fabric.tools:gradle:1.28.0"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
 
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'

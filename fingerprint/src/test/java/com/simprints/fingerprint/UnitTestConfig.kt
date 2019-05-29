@@ -10,22 +10,28 @@ import com.simprints.fingerprint.testtools.di.DaggerFingerprintComponentForTests
 import com.simprints.fingerprint.testtools.di.FingerprintComponentForTests
 import com.simprints.id.Application
 import com.simprints.testtools.common.di.injectClassFromComponent
+import com.simprints.testtools.unit.BaseUnitTestConfig
 
 class UnitTestConfig<T : Any>(
     private val test: T,
     private val fingerprintModule: FingerprintModule? = null,
     private val fingerprintCoreModule: FingerprintCoreModule? = null
-) {
+) : BaseUnitTestConfig() {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private lateinit var testAppComponent: FingerprintComponentForTests
 
     fun fullSetup() =
         rescheduleRxMainThread()
+            .coroutinesMainThread()
             .initAndInjectComponent()
 
-    fun rescheduleRxMainThread() = also {
-        com.simprints.testtools.unit.reactive.rescheduleRxMainThread()
+    override fun rescheduleRxMainThread() = also {
+        super.rescheduleRxMainThread()
+    }
+
+    override fun coroutinesMainThread() = also {
+        super.coroutinesMainThread()
     }
 
     fun initAndInjectComponent() =

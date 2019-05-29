@@ -31,8 +31,6 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(onComplete = {
                     Timber.d("Added Guid Selection Event")
-                }, onError = { e ->
-                    crashReportManager.logExceptionOrSafeException(e)
                 })
         }
     }

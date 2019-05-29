@@ -1,11 +1,18 @@
 package com.simprints.clientapi.controllers.core.eventData
 
-import com.simprints.clientapi.controllers.core.eventData.model.Event
-import io.reactivex.Single
+import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
+import io.reactivex.Completable
+
 
 interface ClientApiSessionEventsManager {
 
-    fun createSession(): Single<String>
+    suspend fun createSession(integration: IntegrationInfo): String
 
-    fun addSessionEvent(sessionEvent: Event)
+    fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable
+
+    fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable
+
+    fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable
+
 }

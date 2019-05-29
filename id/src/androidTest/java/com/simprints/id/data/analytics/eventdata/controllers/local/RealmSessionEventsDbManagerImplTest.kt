@@ -34,7 +34,6 @@ import javax.inject.Inject
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because creating a project remotely is throwing a 404
 
     private lateinit var realmSessionEventsManager: SessionEventsLocalDbManager

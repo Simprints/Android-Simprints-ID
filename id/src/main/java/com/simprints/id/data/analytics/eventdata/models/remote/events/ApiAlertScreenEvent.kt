@@ -11,38 +11,28 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
     constructor(alertScreenEventDomain: AlertScreenEvent) :
         this(alertScreenEventDomain.relativeStartTime ?: 0, fromDomainToApi(alertScreenEventDomain.alertType))
 
+
     enum class ApiAlertScreenEvent {
-        INVALID_API_KEY,
-        INVALID_PROJECT_ID,
-        INVALID_INTENT_ACTION,
-        INVALID_METADATA,
-        INVALID_USER_ID,
-        INVALID_MODULE_ID,
-        INVALID_UPDATE_GUID,
-        INVALID_VERIFY_GUID,
-        INVALID_RESULT_FORMAT,
-        INVALID_CALLING_PACKAGE,
-        MISSING_PROJECT_ID_OR_API_KEY,
         DIFFERENT_PROJECT_ID,
         DIFFERENT_USER_ID,
-        MISSING_USER_ID,
-        MISSING_MODULE_ID,
-        MISSING_UPDATE_GUID,
-        MISSING_VERIFY_GUID,
-        UNEXPECTED_PARAMETER,
-        UNVERIFIED_API_KEY,
         GUID_NOT_FOUND_ONLINE,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
-        BLUETOOTH_NOT_ENABLED,
-        NOT_PAIRED,
-        MULTIPLE_PAIRED_SCANNERS,
-        DISCONNECTED,
         LOW_BATTERY,
-        INVALID_SESSION_ID, //StopShip: to add on the server
-        INVALID_SELECTED_ID, //StopShip: to add on the server
-        UNKNOWN_BLUETOOTH_ISSUE, //StopShip: to add on the server
-        UNEXPECTED_ERROR;
+        UNKNOWN_BLUETOOTH_ISSUE,
+        UNEXPECTED_ERROR,
+        DISCONNECTED,
+        MULTIPLE_PAIRED_SCANNERS,
+        NOT_PAIRED,
+        BLUETOOTH_NOT_ENABLED,
+        INVALID_INTENT_ACTION,
+        INVALID_METADATA,
+        INVALID_MODULE_ID,
+        INVALID_PROJECT_ID,
+        INVALID_SELECTED_ID,
+        INVALID_SESSION_ID,
+        INVALID_USER_ID,
+        INVALID_VERIFY_ID;
 
         companion object {
             fun fromDomainToApi(type: AlertScreenEvent.AlertScreenEventType): ApiAlertScreenEvent =
@@ -66,7 +56,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.INVALID_SELECTED_ID -> INVALID_SELECTED_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
-                    AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_GUID
+                    AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
                 }
         }
     }

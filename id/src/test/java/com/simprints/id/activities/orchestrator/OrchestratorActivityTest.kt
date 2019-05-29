@@ -11,12 +11,9 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppExtraRequestInfo
-import com.simprints.id.domain.moduleapi.app.requests.AppIntegrationInfo
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.moduleapi.app.responses.IAppEnrolResponse
@@ -29,6 +26,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorActivityTest {
@@ -101,7 +99,7 @@ class OrchestratorActivityTest {
     private fun createScenarioForOrchestratorActivity(): ActivityScenario<OrchestratorActivity> =
         ActivityScenario.launch<OrchestratorActivity>(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, OrchestratorActivity::class.qualifiedName!!)
-            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "", AppExtraRequestInfo(AppIntegrationInfo.ODK))
+            val appRequest = AppEnrolRequest("project_id", "user_id", "module_id", "")
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
         })
 
@@ -119,6 +117,7 @@ class OrchestratorActivityTest {
 
     @After
     fun tearDown() {
+        stopKoin()
         Intents.release()
     }
 }

@@ -1,10 +1,8 @@
 package com.simprints.id.orchestrator
 
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.KArgumentCaptor
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.spy
+import com.nhaarman.mockitokotlin2.KArgumentCaptor
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.exceptions.unexpected.UnexpectedErrorInModalFlow
@@ -12,9 +10,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlowFactory
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import org.junit.Before
@@ -58,7 +54,7 @@ class OrchestratorManagerImplTest {
     @Test
     fun flowModalStarted_modalFlowEmitsAnError_orchestratorShouldHandleIt() {
         val modalFlowMock = mock<ModalityFlow>()
-        whenever { modalitiesFlowFactoryMock.buildModalityFlow(any(), any()) } thenReturn modalFlowMock
+        whenever { modalitiesFlowFactoryMock.buildModalityFlow(anyNotNull(), anyNotNull()) } thenReturn modalFlowMock
         whenever { modalFlowMock.modalityResponses } thenReturn Observable.error(UnexpectedErrorInModalFlow())
         val orchestrator = spy(OrchestratorManagerImpl(FACE, modalitiesFlowFactoryMock, mock())
             .apply { appRequest = mock() })
@@ -90,7 +86,7 @@ class OrchestratorManagerImplTest {
                                              mockModalityResponses: List<ModalityResponse> = emptyList()): OrchestratorManagerImpl {
 
         val modalFlowMock = mock<ModalityFlow>()
-        whenever { modalitiesFlowFactoryMock.buildModalityFlow(any(), any()) } thenReturn modalFlowMock
+        whenever { modalitiesFlowFactoryMock.buildModalityFlow(anyNotNull(), anyNotNull()) } thenReturn modalFlowMock
         whenever { modalFlowMock.modalityStepRequests } thenReturn Observable.fromIterable(mockModalityRequests)
         whenever { modalFlowMock.modalityResponses } thenReturn Observable.fromIterable(mockModalityResponses)
         return OrchestratorManagerImpl(FACE, modalitiesFlowFactoryMock, mock())

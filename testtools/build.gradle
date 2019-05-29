@@ -69,6 +69,7 @@ dependencies {
     implementation deps.retrofit.core
     implementation deps.firebase.core
     implementation deps.testing.work
+    implementation deps.testing.coroutines_test
 
     implementation deps.realm.annotations
     implementation(deps.realm.kotlin) {

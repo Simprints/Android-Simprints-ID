@@ -8,6 +8,9 @@ import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 import timber.log.Timber
 
 open class Application : MultiDexApplication() {
@@ -32,6 +35,7 @@ open class Application : MultiDexApplication() {
     open fun initApplication() {
         createComponent()
         this.initModules()
+        initServiceLocation()
     }
 
     open fun initModules() {
@@ -75,7 +79,16 @@ open class Application : MultiDexApplication() {
             Timber.d("Undeliverable exception received", exceptionToPrint)
 
             exceptionToPrint.printStackTrace()
-            component.getCoreCrashReportManager().logException(e)
+            component.getCrashReportManager().logException(e)
         }
     }
+
+    private fun initServiceLocation() {
+        startKoin {
+            androidLogger()
+            androidContext(this@Application)
+            modules()
+        }
+    }
+
 }

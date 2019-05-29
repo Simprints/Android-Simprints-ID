@@ -270,6 +270,6 @@ open class AppModule {
                                          crashReportManager: CrashReportManager,
                                          sessionEventsManager: SessionEventsManager): GuidSelectionManager =
         GuidSelectionManagerImpl(
-            context.deviceId, loginInfoManager, analyticsManager, sessionEventsManager)
+            context.deviceId, loginInfoManager, analyticsManager, crashReportManager, sessionEventsManager)
 }
 

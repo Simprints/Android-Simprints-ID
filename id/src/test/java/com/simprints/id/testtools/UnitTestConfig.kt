@@ -11,13 +11,14 @@ import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.injectClassFromComponent
+import com.simprints.testtools.unit.BaseUnitTestConfig
 import io.fabric.sdk.android.Fabric
 
 class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null
-) {
+): BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
@@ -33,13 +34,18 @@ class UnitTestConfig<T : Any>(
 
     fun fullSetup() =
         rescheduleRxMainThread()
+            .coroutinesMainThread()
             .setupFirebase()
             .setupWorkManager()
             .setupCrashlytics()
             .initAndInjectComponent()
 
-    fun rescheduleRxMainThread() = also {
-        com.simprints.testtools.unit.reactive.rescheduleRxMainThread()
+    override fun rescheduleRxMainThread() = also {
+        super.rescheduleRxMainThread()
+    }
+
+    override fun coroutinesMainThread() = also {
+        super.coroutinesMainThread()
     }
 
     fun setupFirebase() = also {

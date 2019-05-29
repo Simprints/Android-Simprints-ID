@@ -2,13 +2,16 @@ package com.simprints.id.orchestrator.modality.flows
 
 import android.app.Activity
 import android.content.Intent
-import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
 import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
 
 class SingleModalityFlowBaseTest {
 
@@ -40,7 +43,7 @@ class SingleModalityFlowBaseTest {
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW, Activity.RESULT_OK, mock())
 
-            verifyOnce(this) { completeWithValidResponse(any()) }
+            verifyOnce(this) { completeWithValidResponse(anyNotNull()) }
         }
     }
 
@@ -52,7 +55,7 @@ class SingleModalityFlowBaseTest {
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW + 1, Activity.RESULT_OK, mock())
 
-            verifyNever(this) { completeWithValidResponse(any()) }
+            verifyNever(this) { completeWithValidResponse(anyNotNull()) }
         }
     }
 
@@ -67,8 +70,8 @@ class SingleModalityFlowBaseTest {
 
             handleIntentResponse(REQUEST_CODE_FOR_SINGLE_MODALITY_FLOW, Activity.RESULT_OK, Intent())
 
-            verifyNever(this) { completeWithValidResponse(any()) }
-            verifyOnce(this) { completeWithAnError(any()) }
+            verifyNever(this) { completeWithValidResponse(anyNotNull()) }
+            verifyOnce(this) { completeWithAnError(anyNotNull()) }
         }
     }
 

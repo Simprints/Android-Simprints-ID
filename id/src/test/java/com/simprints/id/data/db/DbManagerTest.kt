@@ -2,7 +2,7 @@ package com.simprints.id.data.db
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
@@ -43,7 +43,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import java.io.IOException
-import java.util.*
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)

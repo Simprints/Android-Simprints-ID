@@ -5,18 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
-import com.simprints.clientapi.activities.errors.di.ErrorActivityComponentInjector
 import com.simprints.clientapi.activities.errors.request.AlertActRequest
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import kotlinx.android.synthetic.main.activity_error.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
+
 
 class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
-    @Inject override lateinit var presenter: ErrorContract.Presenter
-    @Inject lateinit var clientApiSessionEventsManager: ClientApiSessionEventsManager
+    override val presenter: ErrorContract.Presenter by inject { parametersOf(this) }
 
     private lateinit var clientApiAlertType: ClientApiAlert
 
@@ -24,8 +22,8 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_error)
 
-
-        clientApiAlertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
+        clientApiAlertType = intent
+            .extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.clientApiAlert
             ?: ClientApiAlert.INVALID_CLIENT_REQUEST
 
         presenter.start(clientApiAlertType)
@@ -47,8 +45,4 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
     override fun getStringFromResources(res: Int): String = getString(res)
 
-    override fun onDestroy() {
-        super.onDestroy()
-        ErrorActivityComponentInjector.setComponent(null)
-    }
 }

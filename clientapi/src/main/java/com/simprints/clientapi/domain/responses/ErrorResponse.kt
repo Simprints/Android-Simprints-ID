@@ -2,15 +2,19 @@ package com.simprints.clientapi.domain.responses
 
 import android.os.Parcelable
 import com.simprints.clientapi.activities.errors.ClientApiAlert
+import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromAlertTypeToDomain
 import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.fromModuleApiToDomain
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import kotlinx.android.parcel.Parcelize
 
+
 @Parcelize
 data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: IAppErrorResponse) : this(fromModuleApiToDomain(response.reason))
+
+    constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
 
     enum class Reason {
         INVALID_CLIENT_REQUEST,
