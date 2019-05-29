@@ -26,7 +26,7 @@ class GuidSelectionService : IntentService("GuidSelectionService") {
     override fun onHandleIntent(intent: Intent?) {
         if (intent != null) {
             val request = intent.parseAppConfirmation()
-            guidSelectionManager.saveGUIDSelection(request)
+            guidSelectionManager.handleIdentityConfirmationRequest(request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(onComplete = {
