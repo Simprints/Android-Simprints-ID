@@ -63,6 +63,9 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.kotlin
 
+    // Kotlin
+    implementation deps.androidx.core
+
     // Unit Tests
     testImplementation project(':testtools')
     testImplementation deps.testing.junit

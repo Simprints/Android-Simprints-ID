@@ -9,6 +9,7 @@ import com.simprints.clientapi.domain.requests.IdentifyRequest
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.testtools.common.syntax.mock
 
+
 object IdentifyRequestFactory : RequestFactory() {
 
     override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseRequest =
@@ -31,4 +32,5 @@ object IdentifyRequestFactory : RequestFactory() {
         setMockDefaultExtractor(mockIdentifyExtractor)
         return mockIdentifyExtractor
     }
+
 }

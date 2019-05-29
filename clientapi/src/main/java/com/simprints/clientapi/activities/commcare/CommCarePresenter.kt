@@ -5,17 +5,16 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
+import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.RefusalForm
-import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
+import com.simprints.libsimprints.*
 
 
 class CommCarePresenter(private val view: CommCareContract.View,
                         private val action: String?,
                         private val sessionEventsManager: ClientApiSessionEventsManager,
-                        private val crashReportManager: ClientApiCrashReportManager)
+                        private val crashReportManager: ClientApiCrashReportManager,
+                        private val sharedPreferencesManager: SharedPreferencesManager)
     : RequestPresenter(view, sessionEventsManager), CommCareContract.Presenter {
 
     companion object {
@@ -30,14 +29,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
         get() = emptyMap()
 
     override suspend fun start() {
-        val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
+        val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
         crashReportManager.setSessionIdCrashlyticsKey(sessionId)
 
         when (action) {
             ACTION_REGISTER -> processEnrollRequest()
             ACTION_IDENTIFY -> processIdentifyRequest()
             ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
+            ACTION_CONFIRM_IDENTITY -> checkAndProcessSessionId()
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
@@ -45,10 +44,12 @@ class CommCarePresenter(private val view: CommCareContract.View,
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))
 
-    override fun handleIdentifyResponse(identify: IdentifyResponse) =
+    override fun handleIdentifyResponse(identify: IdentifyResponse) {
+        sharedPreferencesManager.stashSessionId(identify.sessionId)
         view.returnIdentification(ArrayList(identify.identifications.map {
             Identification(it.guidFound, it.confidence, Tier.valueOf(it.tier.name))
         }), identify.sessionId)
+    }
 
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
         verify.matchResult.confidence,
@@ -58,5 +59,15 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
+
+    private fun checkAndProcessSessionId() {
+        if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence).isBlank()) {
+            if (sharedPreferencesManager.peekSessionId().isNotBlank()) {
+                view.injectSessionIdIntoIntent(sharedPreferencesManager.popSessionId())
+            }
+        }
+
+        processConfirmIdentifyRequest()
+    }
 
 }
