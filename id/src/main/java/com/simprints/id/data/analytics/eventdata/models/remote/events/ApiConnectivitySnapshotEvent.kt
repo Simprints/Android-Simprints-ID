@@ -10,6 +10,7 @@ class ApiConnectivitySnapshotEvent(
     val networkType: String,
     val connections: List<ApiConnection>) : ApiEvent(ApiEventType.CONNECTIVITY_SNAPSHOT) {
 
+    @Keep
     class ApiConnection(val type: String, val state: String) {
         constructor(connection: SimNetworkUtils.Connection)
             : this(connection.type, connection.state.toString())

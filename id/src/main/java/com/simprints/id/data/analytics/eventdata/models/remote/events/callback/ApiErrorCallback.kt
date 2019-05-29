@@ -7,6 +7,7 @@ import io.realm.internal.Keep
 @Keep
 class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERROR) {
 
+    @Keep
     enum class ApiReason {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
