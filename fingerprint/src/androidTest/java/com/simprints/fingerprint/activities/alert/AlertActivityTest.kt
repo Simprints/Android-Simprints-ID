@@ -15,7 +15,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
