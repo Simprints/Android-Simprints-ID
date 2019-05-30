@@ -130,7 +130,7 @@
     <string name="matching_fingerprints">Matching fingerprints…</string>
     <string name="returning_results">Returning results…</string>
     <string name="returned_results_quantity_key" translatable="false">returned_results</string>
-    <string name="returned_results_one">Returned %d fingerprintsActResult.</string>
+    <string name="returned_results_one">Returned %d results.</string>
     <string name="returned_results_other">Returned %d results.</string>
     <string name="tier1or2_matches_quantity_key" translatable="false">tier1or2_matches</string>
     <string name="tier1or2_matches_zero">No very good matches</string>
