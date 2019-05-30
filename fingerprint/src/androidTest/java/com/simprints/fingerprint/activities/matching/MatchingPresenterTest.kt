@@ -43,7 +43,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class MatchingPresenterTest {
 
     @get:Rule val rxSchedulerRule = RxSchedulerRule()
