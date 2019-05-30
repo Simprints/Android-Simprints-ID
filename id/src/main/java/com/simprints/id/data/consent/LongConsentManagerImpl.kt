@@ -11,7 +11,8 @@ import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
 import android.os.Looper
-
+import com.google.android.gms.tasks.Tasks
+import timber.log.Timber
 
 
 class LongConsentManagerImpl(absolutePath: String,
@@ -59,7 +60,9 @@ class LongConsentManagerImpl(absolutePath: String,
                 downloadTasks.add(
                     downloadLongConsentWithProgress(language)
                         .ignoreElements()
-                        .doOnError { crashReportManager.logExceptionOrSafeException(it) }
+                        .doOnError {
+                            Timber.e(it)
+                            crashReportManager.logExceptionOrSafeException(it) }
                         .onErrorComplete()
                 )
         }
@@ -70,20 +73,13 @@ class LongConsentManagerImpl(absolutePath: String,
         { emitter ->
             firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
             val file = createFileForLanguage(filePathForProject, language)
-            val handler = Handler(Looper.myLooper())
             getFileDownloadTask(language, file)
                 .addOnSuccessListener {
-                    handler.post {
-                        emitter.onComplete()
-                    }
+                    emitter.onComplete()
                 }.addOnFailureListener {
-                    handler.post {
-                        emitter.onError(it)
-                    }
+                    emitter.onError(it)
                 }.addOnProgressListener {
-                    handler.post {
-                        emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
-                    }
+                    emitter.onNext(((it.bytesTransferred.toDouble() / it.totalByteCount.toDouble()) * 100).toInt())
                 }
         }, BackpressureStrategy.BUFFER)
 
