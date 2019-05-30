@@ -19,12 +19,8 @@ class TestFingerprintModule( private var scannerManagerRule: DependencyRule = Re
                              private var locationProviderRule: DependencyRule = RealRule,
                              private var bluetoothComponentAdapter: DependencyRule = RealRule): FingerprintModule() {
 
-    override fun provideScannerManager(
-        preferencesManager: FingerprintPreferencesManager,
-        analyticsManager: FingerprintAnalyticsManager,
-        crashReportManager: FingerprintCrashReportManager,
-        bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        scannerManagerRule.resolveDependency { super.provideScannerManager(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter) }
+    override fun provideScannerManager(bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
+        scannerManagerRule.resolveDependency { super.provideScannerManager(bluetoothComponentAdapter) }
 
     override fun provideConsentDataManager(prefs: ImprovedSharedPreferences,
                                   remoteConfigWrapper: RemoteConfigWrapper): ConsentDataManager =

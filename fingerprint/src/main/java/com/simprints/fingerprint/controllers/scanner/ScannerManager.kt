@@ -8,8 +8,6 @@ interface ScannerManager {
 
     var scanner: Scanner?
     var macAddress: String?
-    var scannerId: String?
-    var hardwareVersion: String?
 
     fun start(): Completable
     fun disconnectVero(): Completable

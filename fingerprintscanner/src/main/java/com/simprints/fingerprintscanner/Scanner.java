@@ -787,6 +787,10 @@ public class Scanner {
         return un20Version;
     }
 
+    public String getMacAddress() {
+        return macAddress;
+    }
+
     public short getBatteryLevel1() {
         return batteryLevel1;
     }
