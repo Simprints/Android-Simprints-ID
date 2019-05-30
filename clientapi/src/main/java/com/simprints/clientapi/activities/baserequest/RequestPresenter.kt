@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.baserequest
 
+import android.util.Log
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
