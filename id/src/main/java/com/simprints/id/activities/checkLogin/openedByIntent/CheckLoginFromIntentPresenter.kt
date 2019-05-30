@@ -32,6 +32,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -62,7 +63,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             setLastUser()
             setSessionIdCrashlyticsKey()
         } catch (t: Throwable) {
-            t.printStackTrace()
+            Timber.d(t)
             crashReportManager.logExceptionOrSafeException(t)
             view.openAlertActivityForError(AlertType.UNEXPECTED_ERROR)
             setupFailed = true
