@@ -13,6 +13,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
@@ -36,17 +37,17 @@ abstract class CheckLoginPresenter(
         try {
             checkSignedInOrThrow()
             handleSignedInUser()
-        } catch (e: Throwable) {
-            e.printStackTrace()
+        } catch (t: Throwable) {
+            Timber.e(t)
 
             syncSchedulerHelper.cancelAllWorkers()
-            when (e) {
+            when (t) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
-                    e.printStackTrace()
-                    crashReportManager.logExceptionOrSafeException(e)
+                    Timber.e(t)
+                    crashReportManager.logExceptionOrSafeException(t)
                     view.openAlertActivityForError(UNEXPECTED_ERROR)
                 }
             }
