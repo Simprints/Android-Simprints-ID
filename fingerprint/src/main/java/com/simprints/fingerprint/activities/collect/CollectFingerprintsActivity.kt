@@ -201,7 +201,10 @@ class CollectFingerprintsActivity :
         orchestrator.onActivityResult(this, requestCode, resultCode, data)
     }
 
-    override fun tryAgain() { }
+    override fun tryAgain() {
+        viewPresenter.handleTryAgainFromDifferentActivity()
+    }
+
     override fun onActivityResultReceived() {}
     override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
