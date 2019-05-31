@@ -10,6 +10,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 
@@ -17,6 +18,7 @@ import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
     override lateinit var packageVersionName: String
+    override lateinit var deviceId: String
     override lateinit var viewPresenter: SettingsAboutContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,6 +28,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
         val component = (activity.application as Application).component
         packageVersionName = activity.packageVersionName
+        deviceId = activity.deviceId
 
         viewPresenter = SettingsAboutPresenter(this, component)
         viewPresenter.start()

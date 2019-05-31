@@ -78,7 +78,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     }
 
     internal fun loadDeviceIdInPreference(preference: Preference) {
-        preference.summary = recentEventsManager.lastScannerUsed
+        preference.summary = view.deviceId
     }
 
     private fun handleLogoutPreferenceClicked() {
