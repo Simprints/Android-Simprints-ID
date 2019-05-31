@@ -15,6 +15,7 @@ import com.simprints.id.data.db.local.realm.models.toRealmPerson
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
+import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.models.ApiGetPerson
 import com.simprints.id.data.db.remote.models.toApiGetPerson
@@ -62,7 +63,7 @@ class SubDownSyncTaskTest {
 
     @Inject lateinit var syncScopeBuilderSpy: SyncScopesBuilder
 
-    private val remoteDbManagerSpy: RemoteDbManager = spy()
+    private val remoteDbManagerSpy: RemoteDbManager = spy(FirebaseManagerImpl(mock()))
     private val remotePeopleManagerSpy: RemotePeopleManager = spy()
     private val downSyncDao: DownSyncDao = mock()
 
