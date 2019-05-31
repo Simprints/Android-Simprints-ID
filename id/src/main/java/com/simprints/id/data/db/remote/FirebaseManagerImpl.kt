@@ -1,10 +1,9 @@
 package com.simprints.id.data.db.remote
 
-import com.auth0.jwt.JWT
+import com.auth0.android.jwt.JWT
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
-import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -28,7 +27,7 @@ open class FirebaseManagerImpl : RemoteDbManager {
     }
 
     override fun isSignedIn(projectId: String, userId: String): Boolean =
-        (JWT.decode(getCurrentToken()
+        (JWT(getCurrentToken()
             .subscribeOn(Schedulers.io())
             .blockingGet())
             .claims[projectIdClaim]?.asString() == projectId)
