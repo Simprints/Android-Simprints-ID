@@ -815,6 +815,7 @@ public class Scanner {
         return latestImageQuality;
     }
 
+    @Nullable
     public byte[] getTemplate() {
         return latestTemplate;
     }
