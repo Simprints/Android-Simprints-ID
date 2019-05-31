@@ -38,6 +38,7 @@
 
         <activity
             android:name="com.simprints.fingerprint.activities.collect.SplashScreenActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
 
         <activity
