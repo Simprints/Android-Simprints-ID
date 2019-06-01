@@ -4,11 +4,14 @@ import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchR
 import com.simprints.fingerprint.data.domain.person.Person
 import io.reactivex.Completable
 import io.reactivex.Single
-import com.simprints.fingerprint.data.domain.matching.MatchGroup
 
 interface FingerprintDbManager {
 
-    fun loadPeople(group: MatchGroup): Single<List<Person>>
+    fun loadPeople(projectId: String,
+                   userId: String? = null,
+                   moduleId: String? = null): Single<List<Person>>
+
     fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult>
+
     fun savePerson(person: Person): Completable
 }
