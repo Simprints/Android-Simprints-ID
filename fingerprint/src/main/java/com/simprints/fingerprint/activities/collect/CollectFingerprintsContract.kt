@@ -11,6 +11,7 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
@@ -82,5 +83,7 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
+
+        fun getExtraForMatchingActivity(fingerprintsActResult: CollectFingerprintsActResult): MatchingActRequest
     }
 }

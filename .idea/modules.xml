@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Android-Simprints-ID.iml" filepath="$PROJECT_DIR$/Android-Simprints-ID.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Android-Simprints-ID.iml" filepath="$PROJECT_DIR$/.idea/Android-Simprints-ID.iml" />
       <module fileurl="file://$PROJECT_DIR$/clientapi/clientapi.iml" filepath="$PROJECT_DIR$/clientapi/clientapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />

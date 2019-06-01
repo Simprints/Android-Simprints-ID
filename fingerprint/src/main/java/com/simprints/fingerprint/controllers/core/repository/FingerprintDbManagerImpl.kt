@@ -1,8 +1,6 @@
 package com.simprints.fingerprint.controllers.core.repository
 
-import com.simprints.fingerprint.data.domain.matching.MatchGroup
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.data.domain.matching.fromDomainToCore
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToCore
 import com.simprints.id.data.db.DbManager
@@ -19,8 +17,10 @@ class FingerprintDbManagerImpl(private val dbManager: DbManager): FingerprintDbM
     override fun savePerson(person: Person): Completable =
         dbManager.savePerson(person.fromDomainToCore())
 
-    override fun loadPeople(group: MatchGroup): Single<List<Person>> =
-        dbManager.loadPeople(group.fromDomainToCore()).map {
-            it.map { corePerson -> Person.fromCoreToDomain(corePerson) }
+    override fun loadPeople(projectId: String,
+                            userId: String?,
+                            moduleId: String?): Single<List<Person>> =
+        dbManager.loadPeople(projectId, userId, moduleId).map { corePersonList ->
+            corePersonList.map { Person.fromCoreToDomain(it) }
         }
 }

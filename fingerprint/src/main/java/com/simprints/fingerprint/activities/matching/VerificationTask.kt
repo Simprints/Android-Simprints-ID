@@ -36,7 +36,9 @@ internal class VerificationTask(private val view: MatchingContract.View,
     override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(): Single<List<Person>> =
-        dbManager.loadPerson(matchingVerifyRequest.projectId, matchingVerifyRequest.verifyGuid).map { listOf(it.person) }
+        with(matchingVerifyRequest) {
+            dbManager.loadPerson(this.queryForVerifyPool.projectId, this.verifyGuid).map { listOf(it.person) }
+        }
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
