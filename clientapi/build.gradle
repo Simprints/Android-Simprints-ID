@@ -63,6 +63,7 @@ dependencies {
     implementation deps.rxjava2.core
     implementation deps.rxjava2.android
     implementation deps.rxjava2.kotlin
+    implementation deps.koin.android
 
     // Kotlin
     implementation deps.androidx.core
