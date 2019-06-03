@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import com.google.android.gms.location.LocationRequest
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
@@ -45,8 +44,11 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.Companion.fromFingerprintAlertToErrorResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
@@ -119,6 +121,7 @@ class LaunchPresenter(component: FingerprintComponent,
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
             .andThen(disconnectVero())
+            .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
             .andThen(connectToVero())
             .andThen(resetVeroUI())
@@ -130,6 +133,11 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun disconnectVero() =
         veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
             logMessageForCrashReport("ScannerManager: disconnect")
+        }
+
+    private fun checkIfBluetoothIsEnabled() =
+        veroTask(37, R.string.launch_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
+            logMessageForCrashReport("ScannerManager: bluetooth is enabled")
         }
 
     private fun initVero() =
