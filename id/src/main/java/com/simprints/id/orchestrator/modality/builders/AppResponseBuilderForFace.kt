@@ -1,6 +1,5 @@
 package com.simprints.id.orchestrator.modality.builders
 
-import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -14,11 +13,12 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.toAppMatchResult
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 
 class AppResponseBuilderForFace : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
-                               modalityRespons: List<ModalityResponse>,
+                               modalityRespons: List<ModalityFlow.Response>,
                                sessionId: String): AppResponse {
 
         val faceResponse = modalityRespons.first()

@@ -1,19 +1,28 @@
 package com.simprints.id.orchestrator.modality.flows.interfaces
 
 import android.content.Intent
-import com.simprints.id.domain.modality.ModalityResponse
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
-import io.reactivex.Observable
 
 /**
  * Representation of a modality flow for a specific modality.
  */
 interface ModalityFlow {
 
-    val modalityStepRequests: Observable<ModalityStepRequest>
-    val modalityResponses: Observable<ModalityResponse>
-    fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean
+    val steps: Map<Int, Step?>
+
+    val nextRequest: Request?
+
+    fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Response?
+
+    data class Step(val request: Request,
+                    var response: Response? = null)
+
+    data class Request(val requestCode: Int,
+                       val intent: Intent,
+                       var launched: Boolean = false)
+
+    interface Response
 }
+
 
 /**
  * Represents a single Modality Flow
@@ -27,3 +36,5 @@ interface SingleModalityFlow: ModalityFlow
  * @see com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
  */
 interface MultiModalitiesFlow: ModalityFlow
+
+

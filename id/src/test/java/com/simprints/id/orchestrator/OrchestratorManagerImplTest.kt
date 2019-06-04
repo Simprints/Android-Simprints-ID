@@ -4,10 +4,9 @@ import android.content.Intent
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.simprints.id.domain.modality.Modality.FACE
-import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.orchestrator.modality.flows.ModalityResponse
 import com.simprints.id.exceptions.unexpected.UnexpectedErrorInModalFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
@@ -74,7 +73,7 @@ class OrchestratorManagerImplTest {
 
         val intentReceived = Intent()
         orchestrator.onModalStepRequestDone(0, 0, intentReceived)
-        verifyOnce(orchestrator.modalitiesFlow) { handleIntentResponse(0, 0, intentReceived) }
+        verifyOnce(orchestrator.modalitiesFlow) { handleIntentResult(0, 0, intentReceived) }
     }
 
     private fun startFlowModal(orchestrator: OrchestratorManagerImpl): TestObserver<ModalityStepRequest> =

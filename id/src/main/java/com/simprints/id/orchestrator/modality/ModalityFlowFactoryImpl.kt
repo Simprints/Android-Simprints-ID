@@ -28,7 +28,7 @@ class ModalityFlowFactoryImpl(private val prefs: PreferencesManager,
                 buildFingerprintModality(appRequest, packageName)))
         }
 
-    internal fun buildModalityFlow(steps: List<ModalityFlow>): ModalityFlow =
+    private fun buildModalityFlow(steps: List<ModalityFlow>): ModalityFlow =
         MultiModalitiesFlowBase(steps)
 
     internal fun buildFingerprintModality(appRequest: AppRequest, packageName: String) =

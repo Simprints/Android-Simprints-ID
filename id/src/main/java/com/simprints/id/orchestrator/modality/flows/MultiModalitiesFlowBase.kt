@@ -1,26 +1,43 @@
 package com.simprints.id.orchestrator.modality.flows
 
 import android.content.Intent
-import com.simprints.id.domain.modality.ModalityResponse
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.*
 import com.simprints.id.orchestrator.modality.flows.interfaces.MultiModalitiesFlow
-import io.reactivex.Observable
+import timber.log.Timber
+import java.lang.IllegalArgumentException
 
 /**
  * Concatenates multi modalities for more complicate flows.
  * @param steps list of ModalFlows to concatenate
  */
-class MultiModalitiesFlowBase(private val steps: List<ModalityFlow>) : MultiModalitiesFlow {
+class MultiModalitiesFlowBase(private val modalitiesFlows: List<ModalityFlow>) : MultiModalitiesFlow {
 
-    override val modalityResponses: Observable<ModalityResponse> =
-        Observable.concat(steps.map { it.modalityResponses })
+    override val steps: Map<Int, Step?>
+        get() = linkedMapOf<Int, Step?>().apply {
+            modalitiesFlows.forEach {
+                this.putAll(it.steps)
+            }
+        }
 
-    override val modalityStepRequests: Observable<ModalityStepRequest> =
-        Observable.concat(steps.map { it.modalityStepRequests })
+    override val nextRequest: Request?
+        get() =
+            modalitiesFlows.firstOrNull {
+                it.nextRequest != null
+            }?.nextRequest.also {
+                Timber.d("TEST_TEST: next Intent: $it")
+            }
 
-    override fun handleIntentResponse(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        val stepHandler = steps.firstOrNull { it.handleIntentResponse(requestCode, resultCode, data) }
-        return stepHandler != null
+
+    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Response {
+        return try {
+            modalitiesFlows.mapNotNull {
+                it.handleIntentResult(requestCode, resultCode, data)
+            }.first()
+
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            throw IllegalArgumentException("Impossbile to process response") //StopShip:
+        }
     }
 }
