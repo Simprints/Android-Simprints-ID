@@ -39,6 +39,7 @@
                 android:id="@+id/rbRefused"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:text="@string/beneficiary_refused"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
@@ -47,6 +48,7 @@
                 android:id="@+id/rbScannerNotWorking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:text="@string/scanner_not_working"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
@@ -55,6 +57,7 @@
                 android:id="@+id/rb_other"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="10dp"
                 android:text="@string/other"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
