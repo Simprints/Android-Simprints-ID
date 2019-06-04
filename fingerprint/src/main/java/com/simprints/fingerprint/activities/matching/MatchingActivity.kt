@@ -11,7 +11,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
-import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
