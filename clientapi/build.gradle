@@ -16,7 +16,8 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -62,6 +63,7 @@ dependencies {
     implementation deps.rxjava2.core
     implementation deps.rxjava2.android
     implementation deps.rxjava2.kotlin
+    implementation deps.koin.android
 
     // Kotlin
     implementation deps.androidx.core
