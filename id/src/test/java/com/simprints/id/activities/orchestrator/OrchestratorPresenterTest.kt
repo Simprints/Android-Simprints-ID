@@ -6,7 +6,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.*

@@ -3,14 +3,13 @@ package com.simprints.id.orchestrator
 import android.annotation.SuppressLint
 import android.content.Intent
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.Request
+import timber.log.Timber
 
 open class OrchestratorManagerImpl(private val modality: Modality,
                                    private val flowModalityFactory: ModalityFlowFactory,
@@ -23,29 +22,32 @@ open class OrchestratorManagerImpl(private val modality: Modality,
         flowModalityFactory.buildModalityFlow(appRequest, modality)
     }
 
-    @SuppressLint("CheckResult")
-    override fun startFlow(appRequest: AppRequest,
-                           sessionId: String): Observable<ModalityStepRequest> {
-
+    override suspend fun initOrchestrator(appRequest: AppRequest, sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
-
-        return modalitiesFlow.modalityStepRequests
     }
 
+    override suspend fun getNextIntent(): Request? =
+        modalitiesFlow.nextRequest.also {
+            Timber.d("TEST_TEST: next Intent: $it")
+        }
+
     @SuppressLint("CheckResult")
-    override fun getAppResponse(): Single<AppResponse> =
-        modalitiesFlow.modalityResponses
-            .toList()
-            .map {
-                buildAndEmitFinalResult(it)
+    override suspend fun getAppResponse(): AppResponse? =
+        try {
+            buildAndEmitFinalResult(modalitiesFlow.steps.values.toList().filterNotNull()).also {
+                Timber.d("TEST_TEST: response: $it")
             }
 
-    internal fun buildAndEmitFinalResult(stepsResults: List<ModalityResponse>) =
-        appResponseFactory.buildAppResponse(modality, appRequest, stepsResults, sessionId)
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            null
+        }
 
-    @SuppressLint("CheckResult")
-    override fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
-        modalitiesFlow.handleIntentResponse(requestCode, resultCode, data)
+    override suspend fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
+        modalitiesFlow.handleIntentResult(requestCode, resultCode, data)
     }
+
+    private fun buildAndEmitFinalResult(stepsResults: List<ModalityFlow.Step>) =
+        appResponseFactory.buildAppResponse(modality, appRequest, stepsResults, sessionId)
 }

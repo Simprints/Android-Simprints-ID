@@ -5,13 +5,10 @@ import android.content.Intent
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
-import com.simprints.id.domain.modality.ModalityResponse
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyInt
 
 class SingleModalityFlowBaseTest {
 

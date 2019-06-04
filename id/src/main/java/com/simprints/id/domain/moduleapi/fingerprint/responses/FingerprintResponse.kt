@@ -1,9 +1,9 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses
 
 import android.os.Parcelable
-import com.simprints.id.domain.modality.ModalityResponse
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 
-interface FingerprintResponse: Parcelable, ModalityResponse {
+interface FingerprintResponse: Parcelable, ModalityFlow.Response {
     val type: FingerprintTypeResponse
 
     companion object {

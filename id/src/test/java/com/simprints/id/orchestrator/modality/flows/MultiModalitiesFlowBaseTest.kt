@@ -3,12 +3,8 @@ package com.simprints.id.orchestrator.modality.flows
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.simprints.id.domain.modality.ModalityResponse
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Observable
@@ -57,10 +53,10 @@ class MultiModalitiesFlowBaseTest {
             whenever { modalityResponses } thenReturn Observable.just(mock())
             whenever { modalityStepRequests } thenReturn Observable.just(mock())
         }
-        whenever { singleModality.handleIntentResponse(any(), any(), any()) } thenReturn true
+        whenever { singleModality.handleIntentResult(any(), any(), any()) } thenReturn true
         val multiModalitiesFlow = MultiModalitiesFlowBase(listOf(singleModality, singleModality))
 
-        val resultHandled = multiModalitiesFlow.handleIntentResponse(0, 0, Intent())
+        val resultHandled = multiModalitiesFlow.handleIntentResult(0, 0, Intent())
         assertThat(resultHandled).isTrue()
     }
 }

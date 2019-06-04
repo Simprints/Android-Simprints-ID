@@ -1,14 +1,14 @@
 package com.simprints.id.orchestrator.modality.builders
 
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 
 interface AppResponseFactory {
 
     fun buildAppResponse(modality: Modality,
                          appRequest: AppRequest,
-                         modalityResponses: List<ModalityResponse>,
+                         modalityResponses: List<ModalityFlow.Step>,
                          sessionId: String): AppResponse
 }
