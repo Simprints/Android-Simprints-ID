@@ -87,6 +87,7 @@ open class Application : MultiDexApplication() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
+            modules()
         }
     }
 

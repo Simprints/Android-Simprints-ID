@@ -97,15 +97,6 @@ def rxjava2 = [
     tasks      : "io.ashdavies.rx:rx-tasks:2.2.0"
 ]
 
-// Koin, Service Location
-def koin_version = "2.0.1"
-def koin = [
-    core: "org.koin:koin-core:$koin_version",
-    core_ext: "org.koin:koin-core-ext:$koin_version",
-    android: "org.koin:koin-android:$koin_version"
-]
-
-
 def mockito_version = "2.23.0"
 def espresso_version = "3.2.0-alpha04"
 def roboletric_version = "4.1"
@@ -147,8 +138,7 @@ def testing = [
     ],
     rx2_idler      : 'com.squareup.rx.idler:rx2-idler:0.9.1',
     coroutines_core: 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1',
-    coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1',
-    koin           : "org.koin:koin-test:$koin_version"
+    coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1'
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
@@ -165,6 +155,12 @@ def realm = [
 def commons_io_version = "2.6"
 def commons_io = [
     commons_io: "commons-io:commons-io:$commons_io_version"
+]
+
+// Koin, Service Location
+def koin_version = "2.0.0"
+def koin = [
+    core: "org.koin:koin-android:$koin_version"
 ]
 
 ext.deps = [
