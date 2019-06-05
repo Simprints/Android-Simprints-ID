@@ -1,18 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Simprints ID</string>
-    <string name="launch_consent_accept_button">Fudhadheera</string>
-    <string name="launch_consent_decline_button">Hin fudhanne</string>
-    <string name="consent_enrol">%1$s keessatti sigalmeessuu fi gara fula duraatti ragaa kee adda sibaasuuf mallattoon qubaakee na barbaachisa.&#160;</string>
-    <string name="consent_parental_enrol">%1$s keessatti daa\’ima kee galmeessuu fi gara fula duraatti odeeffanno daa\’ima kee adda baasuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
-    <string name="consent_id_verify">Odeeffannoo kee %1$s keessaa barbaadee argachuuf mallattoon qubaakee na barbaachisa.&#160;</string>
-    <string name="consent_parental_id_verify">Odeeffannoo daa\’ima kee %1$s keessaa barbaadee argachuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
-    <string name="consent_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \‘UK-based nonprofit\’ qofatu fayyadama.&#160;</string>
-    <string name="consent_parental_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \'UK-based nonprofit\' qofatu fayyadama.&#160;</string>
-    <string name="consent_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
-    <string name="consent_parental_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan daa\’ima kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
-    <string name="consent_confirmation">Mallattoo qubakee fayyadamuu nadanda’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin dabalataa qaba\".</string>
-    <string name="consent_general_title">Waliigaltee</string>
-    <string name="consent_parental_title">Waliigaltee maatii</string>
-    <string name="consent_parental_confirmation">Mallattoo qubaa mucaa kee fayyadamuu nadanda\’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin qaba\”.</string>
 </resources>
