@@ -1,17 +1,3 @@
-#built application files
-**/*.apk
-**/*.aab
-
-# files for the dex VM
-*.dex
-
-# Java class files
-*.class
-
-# generated files
-bin/
-gen/
-
 # Local configuration file (sdk path, etc)
 local.properties
 
@@ -30,7 +16,6 @@ Thumbs.db
 .idea/
 .gradle
 build/
-**/output.json
 projectFilesBackup/
 
 # PyCharm
@@ -38,7 +23,6 @@ testing/__pycache__/
 __pycache__/
 
 #NDK
-obj/
 .externalNativeBuild/
 app/profiling_apk_add_dir/
 
