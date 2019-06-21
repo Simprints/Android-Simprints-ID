@@ -19,7 +19,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/whySkipFingerprintingText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -35,26 +35,74 @@
             android:layout_marginBottom="15dp">
 
             <RadioButton
-                android:id="@+id/rbRefused"
+                android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/beneficiary_refused"
+                android:text="Religious concerns"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp"/>
+
+            <RadioButton
+                android:id="@+id/rbDataConcerns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Data concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbScannerNotWorking"
+                android:id="@+id/rbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/scanner_not_working"
+                android:text="Too young (infant)"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rb_other"
+                android:id="@+id/rbSick"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/other"
+                android:text="Sick"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbPregnant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pregnant"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbDoesNotHavePermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Does not have permission"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbFearOfTech"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fear of technology"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbAppNotWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="App not working"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Other"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 

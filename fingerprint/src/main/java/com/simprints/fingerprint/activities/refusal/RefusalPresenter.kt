@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.refusal
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import com.simprints.fingerprint.R
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -35,23 +34,59 @@ class RefusalPresenter(private val view: RefusalContract.View,
     override fun start() {
     }
 
-    override fun handleRadioOptionClicked(optionIdentifier: Int) {
+    override fun handleRadioOptionCheckedChange() {
+        enableSubmitButtonAndRefusalText()
+    }
+
+    override fun handleReligiousConcernsRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Religious concerns")
+    }
+
+    override fun handleDataConcernsRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Data concerns")
+    }
+
+    override fun handleTooYoungRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Too young")
+    }
+
+    override fun handleSickRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Sick")
+    }
+
+    override fun handlePregnantRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Pregnant")
+    }
+
+    override fun handleDoesNotHavePermissionRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Does not have permission")
+    }
+
+    override fun handleFearOfTechRadioClick() {
+        reason = REFUSED
+        logRadioOptionForCrashReport("Fear of technology")
+    }
+
+    override fun handleAppNotWorkingRadioClick() {
+        reason = SCANNER_NOT_WORKING
+        logRadioOptionForCrashReport("App not working")
+    }
+
+    override fun handleOtherRadioOptionClick() {
+        reason = OTHER
+        view.setFocusOnExitReason()
+        logRadioOptionForCrashReport("Other")
+    }
+
+    private fun enableSubmitButtonAndRefusalText() {
         view.enableSubmitButton()
         view.enableRefusalText()
-        when (optionIdentifier) {
-            R.id.rbScannerNotWorking -> {
-                reason = SCANNER_NOT_WORKING
-                logMessageForCrashReport("Radio option $SCANNER_NOT_WORKING Clicked")
-            }
-            R.id.rbRefused -> {
-                reason = REFUSED
-                logMessageForCrashReport("Radio option $REFUSED Clicked")
-            }
-            R.id.rb_other -> {
-                reason = OTHER
-                logMessageForCrashReport("Radio option $OTHER Clicked")
-            }
-        }
     }
 
     @SuppressLint("CheckResult")
@@ -89,6 +124,10 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleChangesInRefusalText(refusalText: String) {
         view.enableSubmitButton()
+    }
+
+    private fun logRadioOptionForCrashReport(option: String) {
+        logMessageForCrashReport("Radio option $option clicked")
     }
 
     private fun logMessageForCrashReport(message: String) {
