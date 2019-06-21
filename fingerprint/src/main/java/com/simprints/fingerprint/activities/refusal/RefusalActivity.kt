@@ -2,17 +2,19 @@ package com.simprints.fingerprint.activities.refusal
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
+import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
+
 
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
@@ -28,7 +30,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
-        setTextChangeListenerToRefusalText()
         setLayoutChangeListeners()
         setRadioGroupListener()
     }
@@ -36,20 +37,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     private fun setButtonClickListeners() {
         btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
         btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
-    }
-
-    private fun setTextChangeListenerToRefusalText() {
-        refusalText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                viewPresenter.handleChangesInRefusalText(getRefusalText())
-            }
-
-            override fun afterTextChanged(s: Editable) {
-            }
-        })
     }
 
     //Changes in the layout occur when the keyboard shows up
@@ -62,7 +49,22 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     private fun setRadioGroupListener() {
         refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            viewPresenter.handleRadioOptionClicked(optionIdentifier)
+            viewPresenter.handleRadioOptionCheckedChange()
+            handleRadioOptionIdentifierClick(optionIdentifier)
+        }
+    }
+
+    private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
+        when (optionIdentifier) {
+            R.id.rbReligiousConcerns -> viewPresenter.handleReligiousConcernsRadioClick()
+            R.id.rbDataConcerns -> viewPresenter.handleDataConcernsRadioClick()
+            R.id.rbTooYoung -> viewPresenter.handleTooYoungRadioClick()
+            R.id.rbSick -> viewPresenter.handleSickRadioClick()
+            R.id.rbPregnant -> viewPresenter.handlePregnantRadioClick()
+            R.id.rbDoesNotHavePermission -> viewPresenter.handleDoesNotHavePermissionRadioClick()
+            R.id.rbFearOfTech -> viewPresenter.handleFearOfTechRadioClick()
+            R.id.rbAppNotWorking -> viewPresenter.handleAppNotWorkingRadioClick()
+            R.id.rbOther -> viewPresenter.handleOtherRadioOptionClick()
         }
     }
 
@@ -80,6 +82,11 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
+    override fun setFocusOnExitReason() {
+        refusalText.requestFocus()
+        inputMethodManager.showSoftInput(refusalText, SHOW_IMPLICIT)
+    }
+
     override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {
         setResult(activityResult, getIntentForResultData(refusalResult))
         finish()
@@ -91,4 +98,8 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
             refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()
+
+    override fun onBackPressed() {
+        showToast(R.string.refusal_toast)
+    }
 }

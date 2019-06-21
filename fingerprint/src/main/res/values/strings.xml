@@ -244,6 +244,7 @@
     <string name="other">Other</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
+    <string name="refusal_toast">Please select an option and press \"Submit\" to exit the app</string>
 
 
     <!-- Long Consent Activity : the screen where the user can find the long consent form -->
