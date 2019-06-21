@@ -68,11 +68,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
         logRadioOptionForCrashReport("Does not have permission")
     }
 
-    override fun handleFearOfTechRadioClick() {
-        reason = REFUSED
-        logRadioOptionForCrashReport("Fear of technology")
-    }
-
     override fun handleAppNotWorkingRadioClick() {
         reason = SCANNER_NOT_WORKING
         logRadioOptionForCrashReport("App not working")
@@ -123,9 +118,20 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleChangesInRefusalText(refusalText: String) {
-        view.enableSubmitButton()
+        if (refusalText.isNotBlank()) {
+            view.enableSubmitButton()
+        } else {
+            view.disableSubmitButton()
+        }
     }
 
+    override fun handleOnBackPressed() {
+        if (view.isSubmitButtonEnabled()) {
+            view.showToastForFormSubmit()
+        } else {
+            view.showToastForSelectOptionAndSubmit()
+        }
+    }
     private fun logRadioOptionForCrashReport(option: String) {
         logMessageForCrashReport("Radio option $option clicked")
     }

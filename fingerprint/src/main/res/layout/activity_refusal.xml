@@ -51,6 +51,22 @@
                 android:textSize="20sp" />
 
             <RadioButton
+                android:id="@+id/rbDoesNotHavePermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Does not have permission"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbAppNotWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="App not working"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
                 android:id="@+id/rbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,30 +87,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Pregnant"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
-
-            <RadioButton
-                android:id="@+id/rbDoesNotHavePermission"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Does not have permission"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
-
-            <RadioButton
-                android:id="@+id/rbFearOfTech"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Fear of technology"
-                android:textColor="@color/simprints_white"
-                android:textSize="20sp" />
-
-            <RadioButton
-                android:id="@+id/rbAppNotWorking"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="App not working"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
