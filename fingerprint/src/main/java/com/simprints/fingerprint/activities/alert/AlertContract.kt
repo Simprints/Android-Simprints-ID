@@ -23,9 +23,12 @@ interface AlertContract {
         fun openWifiSettings()
         fun closeActivityAfterTryAgainButton()
         fun closeActivityAfterCloseButton()
+        fun startExitFormActivity()
+        fun finishActivity()
     }
 
     interface Presenter : BasePresenter {
         fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
+        fun handleBackPressed()
     }
 }
