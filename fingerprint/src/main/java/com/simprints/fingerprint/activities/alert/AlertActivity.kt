@@ -12,13 +12,16 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.CLOSE
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.TRY_AGAIN
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
@@ -73,12 +76,19 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     }
 
     override fun onBackPressed() {
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, BACK))
-        })
+        viewPresenter.handleBackPressed()
+    }
 
-        finish()
-        super.onBackPressed()
+    override fun startExitFormActivity() {
+        startActivityForResult(Intent(this, RefusalActivity::class.java),
+            InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST)
+    }
+
+    override fun finishActivity() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, AlertActResult.CloseButtonAction.BACK))
+            finish()
+        })
     }
 
     override fun openBluetoothSettings() {
