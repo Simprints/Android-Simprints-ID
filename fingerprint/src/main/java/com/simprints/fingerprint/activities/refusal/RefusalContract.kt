@@ -17,6 +17,14 @@ interface RefusalContract {
         fun enableRefusalText()
 
         fun setFocusOnExitReason()
+
+        fun isSubmitButtonEnabled(): Boolean
+
+        fun showToastForFormSubmit()
+
+        fun showToastForSelectOptionAndSubmit()
+
+        fun disableSubmitButton()
     }
 
     interface Presenter : BasePresenter {
@@ -35,9 +43,10 @@ interface RefusalContract {
         fun handleSickRadioClick()
         fun handlePregnantRadioClick()
         fun handleDoesNotHavePermissionRadioClick()
-        fun handleFearOfTechRadioClick()
         fun handleAppNotWorkingRadioClick()
         fun handleOtherRadioOptionClick()
         fun handleRadioOptionCheckedChange()
+
+        fun handleOnBackPressed()
     }
 }
