@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -17,26 +18,34 @@ import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.CLOSE
 import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.TRY_AGAIN
+import com.simprints.fingerprint.activities.orchestrator.Orchestrator
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
+import javax.inject.Inject
 
-class AlertActivity : AppCompatActivity(), AlertContract.View {
+class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallback {
 
+    @Inject lateinit var orchestrator: Orchestrator
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
+
+    override val context: Context by lazy { this }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fingerprint_alert)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
+        component.inject(this)
+
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
@@ -116,6 +125,26 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
             putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, CLOSE))
         })
 
+        finish()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        orchestrator.onActivityResult(this, requestCode, resultCode, data)
+    }
+
+    override fun tryAgain() {}
+    override fun onActivityResultReceived() {}
+    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
+
+    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
+        resultCode?.let {
+            setResultAndFinish(it, data)
+        }
+    }
+
+    private fun setResultAndFinish(resultCode: Int, resultData: Intent?) {
+        setResult(resultCode, resultData)
         finish()
     }
 }
