@@ -19,7 +19,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {
 
-    override fun processEnrollRequest() = validateAndSendRequest(
+   override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 
@@ -68,8 +68,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        val resultErrorCode = domainErrorToCallingAppResultCode[errorResponse.reason]
-        view.returnErrorToClient(resultErrorCode)
+        view.returnErrorToClient(errorResponse)
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

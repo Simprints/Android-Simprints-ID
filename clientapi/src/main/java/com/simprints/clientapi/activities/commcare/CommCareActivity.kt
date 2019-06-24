@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,13 @@ import org.koin.core.parameter.parametersOf
 
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
+    companion object {
+        const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
+
+        const val SKIP_CHECK_KEY = "skipCheck"
+        const val REGISTRATION_GUID_KEY = "guid"
+    }
+
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,8 +32,13 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
+
     override fun returnRegistration(registration: Registration) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_REGISTRATION, registration)
+        val responseForCommCare = Bundle()
+        responseForCommCare.putBoolean(SKIP_CHECK_KEY, true)
+        responseForCommCare.putString(REGISTRATION_GUID_KEY, registration.guid)
+
+        it.putExtra(COMMCARE_BUNDLE_KEY, responseForCommCare)
         sendOkResult(it)
     }
 
@@ -43,6 +56,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
+        sendOkResult(it)
+    }
+
+    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
+        it.putExtra(SKIP_CHECK_KEY, presenter.isAnErrorToSkipCheck(errorResponse))
         sendOkResult(it)
     }
 

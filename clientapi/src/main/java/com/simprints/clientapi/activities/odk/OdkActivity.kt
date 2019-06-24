@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         private const val ODK_GUIDS_KEY = "odk-guids"
+        private const val ODK_SKIP_CHECK_KEY = "odk-skip-check"
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
         private const val ODK_TIERS_KEY = "odk-tiers"
         private const val ODK_SESSION_ID = "odk-session-id"
@@ -59,6 +61,11 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnRefusalForm(reason: String, extra: String) = Intent().let {
         it.putExtra(ODK_REFUSAL_REASON, reason)
         it.putExtra(ODK_REFUSAL_EXTRA, extra)
+        sendOkResult(it)
+    }
+
+    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
+        it.putExtra(ODK_SKIP_CHECK_KEY, presenter.isSimprintsSkipped(errorResponse))
         sendOkResult(it)
     }
 
