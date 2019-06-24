@@ -39,32 +39,32 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleReligiousConcernsRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_RELIGION
         logRadioOptionForCrashReport("Religious concerns")
     }
 
     override fun handleDataConcernsRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_DATA_CONCERNS
         logRadioOptionForCrashReport("Data concerns")
     }
 
     override fun handleTooYoungRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_YOUNG
         logRadioOptionForCrashReport("Too young")
     }
 
     override fun handleSickRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_SICK
         logRadioOptionForCrashReport("Sick")
     }
 
     override fun handlePregnantRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_PREGNANT
         logRadioOptionForCrashReport("Pregnant")
     }
 
     override fun handleDoesNotHavePermissionRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_PERMISSION
         logRadioOptionForCrashReport("Does not have permission")
     }
 
