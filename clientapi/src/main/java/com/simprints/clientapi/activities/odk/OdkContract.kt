@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.odk
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
+import com.simprints.clientapi.domain.responses.ErrorResponse
 
 interface OdkContract {
 
@@ -18,6 +19,10 @@ interface OdkContract {
 
     }
 
-    interface Presenter : BasePresenter, RequestContract.Presenter
+    interface Presenter : BasePresenter, RequestContract.Presenter {
+
+        fun isSimprintsSkipped(errorResponse: ErrorResponse): Boolean
+
+    }
 
 }

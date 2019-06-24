@@ -7,6 +7,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.libsimprints.*
 
 
@@ -25,9 +26,6 @@ class CommCarePresenter(private val view: CommCareContract.View,
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
     }
 
-    override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
-        get() = emptyMap()
-
     override suspend fun start() {
         if(action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
@@ -42,6 +40,22 @@ class CommCarePresenter(private val view: CommCareContract.View,
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
+
+    override fun isAnErrorToSkipCheck(errorResponse: ErrorResponse): Boolean =
+        when (errorResponse.reason) {
+            UNEXPECTED_ERROR,
+            DIFFERENT_PROJECT_ID_SIGNED_IN,
+            DIFFERENT_USER_ID_SIGNED_IN,
+            INVALID_CLIENT_REQUEST,
+            INVALID_METADATA,
+            INVALID_MODULE_ID,
+            INVALID_PROJECT_ID,
+            INVALID_SELECTED_ID,
+            INVALID_SESSION_ID,
+            INVALID_USER_ID,
+            INVALID_VERIFY_ID -> true
+            else -> false
+        }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))

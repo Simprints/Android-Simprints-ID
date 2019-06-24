@@ -23,7 +23,6 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
     override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
         get() = mapOf(
             DIFFERENT_PROJECT_ID_SIGNED_IN to SIMPRINTS_INVALID_PROJECT_ID,
-            DIFFERENT_PROJECT_ID_SIGNED_IN to SIMPRINTS_INVALID_PROJECT_ID,
             DIFFERENT_USER_ID_SIGNED_IN to SIMPRINTS_INVALID_USER_ID,
             GUID_NOT_FOUND_ONLINE to SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE,
             GUID_NOT_FOUND_OFFLINE to SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE,
@@ -55,6 +54,9 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         }
     }
 
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        view.returnErrorToClient(errorResponse)
+    }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))

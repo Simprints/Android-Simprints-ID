@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.libsimprints
 import com.simprints.clientapi.activities.BasePresenter
 import com.simprints.clientapi.activities.BaseView
 import com.simprints.clientapi.activities.baserequest.RequestContract
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
@@ -23,6 +24,7 @@ interface LibSimprintsContract {
 
     }
 
-    interface Presenter : BasePresenter, RequestContract.Presenter
-
+    interface Presenter : BasePresenter, RequestContract.Presenter {
+        val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
+    }
 }

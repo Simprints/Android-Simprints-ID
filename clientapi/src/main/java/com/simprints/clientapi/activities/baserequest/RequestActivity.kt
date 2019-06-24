@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -53,13 +54,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun returnErrorToClient(resultCode: Int?) {
-        resultCode?.let {
-            setResult(it, intent)
-        } ?: setResult(Activity.RESULT_CANCELED)
-
-        finish()
-    }
+    override fun returnErrorToClient(errorResponse: ErrorResponse) = sendCancelResult()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -74,6 +69,11 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
             } ?: routeAppResponse(data.getParcelableExtra(BUNDLE_KEY))
         }
 
+    }
+
+    private fun sendCancelResult() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     protected fun sendOkResult(intent: Intent) {

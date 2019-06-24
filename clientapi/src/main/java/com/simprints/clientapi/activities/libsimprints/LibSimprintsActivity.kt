@@ -1,9 +1,11 @@
 package com.simprints.clientapi.activities.libsimprints
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,12 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
         sendOkResult(it)
+    }
+
+    override fun returnErrorToClient(errorResponse: ErrorResponse) {
+        val resultCode = presenter.domainErrorToCallingAppResultCode[errorResponse.reason]
+        setResult(resultCode ?: Activity.RESULT_CANCELED)
+        finish()
     }
 
     override fun onDestroy() {
