@@ -40,16 +40,6 @@ class OrchestratorImpl : Orchestrator {
         }
     }
 
-    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
-        extractRefusalActResult(data)?.let {
-            when (it.action) {
-                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
-                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
-            }
-            return
-        }
-    }
-
     private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
                                                    receiver: OrchestratorCallback) {
         when (alertActResult.closeButtonAction) {
@@ -131,6 +121,16 @@ class OrchestratorImpl : Orchestrator {
 
         //Default behavior - E.g. RESULT_CANCEL (backButton)
         forwardResultBack(receiver, resultCode, data)
+    }
+
+    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
+        extractRefusalActResult(data)?.let {
+            when (it.action) {
+                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
+                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+            }
+            return
+        }
     }
 
     private fun forwardResultBack(receiver: OrchestratorCallback, resultCode: Int?, data: Intent? = null) {

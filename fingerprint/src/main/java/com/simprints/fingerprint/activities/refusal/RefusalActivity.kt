@@ -99,14 +99,14 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    override fun setFocusOnExitReason() {
+    override fun setFocusOnRefusalReason() {
         btSubmitRefusalForm.isEnabled = false
         refusalText.requestFocus()
-        setTextChangeListenerOnExitText()
+        setTextChangeListenerOnRefusalText()
         inputMethodManager.showSoftInput(refusalText, SHOW_IMPLICIT)
     }
 
-    private fun setTextChangeListenerOnExitText() {
+    private fun setTextChangeListenerOnRefusalText() {
         refusalText.addTextChangedListener(textWatcher)
     }
 
@@ -129,10 +129,10 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun isSubmitButtonEnabled() = btSubmitRefusalForm.isEnabled
 
     override fun showToastForFormSubmit() {
-        showToast(R.string.exit_toast_submit)
+        showToast(R.string.refusal_toast_submit)
     }
 
     override fun showToastForSelectOptionAndSubmit() {
-        showToast(R.string.exit_toast_select_option_submit)
+        showToast(R.string.refusal_toast_select_option_submit)
     }
 }

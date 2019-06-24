@@ -244,8 +244,8 @@
     <string name="other">Other</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
-    <string name="exit_toast_select_option_submit">Please select an option and submit</string>
-    <string name="exit_toast_submit">Please submit form</string>
+    <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
+    <string name="refusal_toast_submit">Please submit form</string>
 
 
     <!-- Long Consent Activity : the screen where the user can find the long consent form -->

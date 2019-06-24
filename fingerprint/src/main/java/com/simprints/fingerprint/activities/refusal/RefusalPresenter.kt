@@ -75,7 +75,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleOtherRadioOptionClick() {
         reason = OTHER
-        view.setFocusOnExitReason()
+        view.setFocusOnRefusalReason()
         logRadioOptionForCrashReport("Other")
     }
 

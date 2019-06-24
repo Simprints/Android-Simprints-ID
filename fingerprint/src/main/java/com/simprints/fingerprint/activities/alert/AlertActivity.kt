@@ -88,7 +88,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         viewPresenter.handleBackPressed()
     }
 
-    override fun startExitFormActivity() {
+    override fun startRefusalActivity() {
         startActivityForResult(Intent(this, RefusalActivity::class.java),
             InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST)
     }

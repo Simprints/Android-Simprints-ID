@@ -23,7 +23,7 @@ interface AlertContract {
         fun openWifiSettings()
         fun closeActivityAfterTryAgainButton()
         fun closeActivityAfterCloseButton()
-        fun startExitFormActivity()
+        fun startRefusalActivity()
         fun finishActivity()
     }
 
