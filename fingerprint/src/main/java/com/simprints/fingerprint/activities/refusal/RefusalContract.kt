@@ -16,7 +16,7 @@ interface RefusalContract {
 
         fun enableRefusalText()
 
-        fun setFocusOnExitReason()
+        fun setFocusOnRefusalReason()
 
         fun isSubmitButtonEnabled(): Boolean
 

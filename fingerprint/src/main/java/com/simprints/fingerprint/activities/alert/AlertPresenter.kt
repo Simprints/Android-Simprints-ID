@@ -69,7 +69,7 @@ class AlertPresenter(val view: AlertContract.View,
         if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
             view.finishActivity()
         } else {
-            view.startExitFormActivity()
+            view.startRefusalActivity()
         }
     }
 
