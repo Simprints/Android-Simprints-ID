@@ -49,6 +49,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {
+        exception.printStackTrace()
         logInvalidSessionInBackground()
         handleInvalidRequest(exception)
     }
