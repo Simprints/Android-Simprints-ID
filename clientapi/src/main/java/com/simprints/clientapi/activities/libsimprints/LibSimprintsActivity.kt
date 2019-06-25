@@ -4,15 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.di.koinModule
+import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.unloadKoinModules
 import org.koin.core.parameter.parametersOf
 
 
@@ -22,7 +21,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadKoinModules(koinModule)
+        loadClientApiKoinModules()
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
@@ -56,7 +55,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
-        unloadKoinModules(koinModule)
+        unloadClientApiKoinModules()
     }
 
 }
