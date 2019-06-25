@@ -121,16 +121,17 @@ dependencies {
     androidTestImplementation deps.testing.androidx.core
     androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
+    androidTestUtil deps.testing.androidx.orchestrator
+
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
 
-    androidTestImplementation deps.koin.core
     androidTestImplementation deps.koin.core_ext
-    androidTestImplementation deps.koin.android
     androidTestImplementation deps.testing.koin
 
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
+    androidTestCompile deps.testing.mockito.mockito_inline_androidtests
 }
