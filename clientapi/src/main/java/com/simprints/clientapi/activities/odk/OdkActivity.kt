@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
+import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
@@ -72,7 +73,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(ODK_SKIP_CHECK_KEY, presenter.isSimprintsSkipped(errorResponse))
+        it.putExtra(CommCareActivity.SKIP_CHECK_KEY, errorResponse.isAnErrorToSkipCheck())
         sendOkResult(it)
     }
 

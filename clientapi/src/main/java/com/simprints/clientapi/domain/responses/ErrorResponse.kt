@@ -8,13 +8,28 @@ import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: IAppErrorResponse) : this(fromModuleApiToDomain(response.reason))
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
+
+    fun isAnErrorToSkipCheck(): Boolean =
+        when (reason) {
+            Reason.UNEXPECTED_ERROR,
+            Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            Reason.DIFFERENT_USER_ID_SIGNED_IN,
+            Reason.INVALID_CLIENT_REQUEST,
+            Reason.INVALID_METADATA,
+            Reason.INVALID_MODULE_ID,
+            Reason.INVALID_PROJECT_ID,
+            Reason.INVALID_SELECTED_ID,
+            Reason.INVALID_SESSION_ID,
+            Reason.INVALID_USER_ID,
+            Reason.INVALID_VERIFY_ID -> true
+            else -> false
+        }
 
     enum class Reason {
         INVALID_CLIENT_REQUEST,
