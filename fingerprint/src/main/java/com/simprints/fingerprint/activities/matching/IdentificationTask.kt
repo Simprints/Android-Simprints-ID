@@ -10,6 +10,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
@@ -41,8 +42,13 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     override val matchStartTime = timeHelper.now()
 
     override fun loadCandidates(): Single<List<Person>> =
-        Completable.fromAction { view.setIdentificationProgressLoadingStart() }
-            .andThen(dbManager.loadPeople(matchingIdentifyRequest.matchGroup))
+        Completable.fromAction {
+            view.setIdentificationProgressLoadingStart()
+        }.andThen(
+            with(matchingIdentifyRequest.queryForIdentifyPool) {
+                dbManager.loadPeople(this.projectId, this.userId, this.moduleId)
+            }
+        )
 
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
@@ -71,7 +77,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
             OneToManyMatchEvent(
                 matchStartTime,
                 timeHelper.now(),
-                OneToManyMatchEvent.MatchPool(preferenceManager.matchPoolType, candidates.size),
+                OneToManyMatchEvent.MatchPool(MatchPoolType.fromQueryForIdentifyPool(matchingIdentifyRequest.queryForIdentifyPool), candidates.size),
                 topCandidates.map { MatchEntry(it.guid, it.confidence.toFloat()) }))
 
 

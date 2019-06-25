@@ -64,7 +64,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
 
     private fun checkAndProcessSessionId() {
-        if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence).isBlank()) {
+        if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {
             if (sharedPreferencesManager.peekSessionId().isNotBlank()) {
                 view.injectSessionIdIntoIntent(sharedPreferencesManager.popSessionId())
             }

@@ -26,12 +26,8 @@ open class FingerprintModule {
 
     @Provides
     @FeatureScope
-    open fun provideScannerManager(
-        preferencesManager: FingerprintPreferencesManager,
-        analyticsManager: FingerprintAnalyticsManager,
-        crashReportManager: FingerprintCrashReportManager,
-        bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        ScannerManagerImpl(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter)
+    open fun provideScannerManager(bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
+        ScannerManagerImpl(bluetoothComponentAdapter)
 
     @Provides
     @FeatureScope

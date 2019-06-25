@@ -6,7 +6,9 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class LongConsentPresenter(val view: LongConsentContract.View,
@@ -34,6 +36,8 @@ class LongConsentPresenter(val view: LongConsentContract.View,
         view.setDownloadInProgress(true)
         logMessageForCrashReportWithNetworkTrigger("Starting download for long consent")
         longConsentManager.downloadLongConsentWithProgress(preferences.language)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onNext = {
                     view.setDownloadProgress(it)

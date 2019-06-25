@@ -11,7 +11,10 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
+import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.CandidateReadEvent
 import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent
@@ -19,6 +22,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.R
 import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.PARENTAL
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
@@ -40,12 +44,17 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.Companion.fromFingerprintAlertToErrorResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
+import com.simprints.fingerprint.tools.extensions.getUcVersionString
 import com.simprints.fingerprintscanner.ButtonListener
+import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
@@ -70,6 +79,8 @@ class LaunchPresenter(component: FingerprintComponent,
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
     @Inject lateinit var locationProvider: LocationProvider
+    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
+    @Inject lateinit var analyticsManager: FingerprintAnalyticsManager
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -109,17 +120,44 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun startSetup() =
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
-            .andThen(veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()))
-            .andThen(veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()))
-            .andThen(veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() })
-            .andThen(veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()))
-            .andThen(veroTask(90, R.string.launch_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() })
-            .subscribeBy(onError = { it.printStackTrace() }, onComplete = { handleSetupFinished() })
+            .andThen(disconnectVero())
+            .andThen(initVero())
+            .andThen(connectToVero())
+            .andThen(resetVeroUI())
+            .andThen(wakeUpVero())
+            .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
+                handleSetupFinished()
+            })
 
+    private fun disconnectVero() =
+        veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
+            logMessageForCrashReport("ScannerManager: disconnect")
+        }
+
+    private fun initVero() =
+        veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()).doOnComplete {
+            logMessageForCrashReport("ScannerManager: init vero")
+        }
+
+    private fun connectToVero() =
+        veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() }.doOnComplete {
+            logMessageForCrashReport("ScannerManager: connectToVero")
+        }
+
+    private fun resetVeroUI() =
+        veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()).doOnComplete {
+            logMessageForCrashReport("ScannerManager: resetVeroUI")
+        }
+
+    private fun wakeUpVero() =
+        veroTask(90, R.string.launch_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() }.doOnComplete {
+            logMessageForCrashReport("ScannerManager: wakeUpVero")
+        }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
-        sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(scannerManager.hardwareVersion
-            ?: "")
+        scannerManager.scanner?.let {
+            sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.getUcVersionString())
+        }
     }
 
     private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
@@ -231,6 +269,11 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun handleSetupFinished() {
+        scannerManager.scanner?.let {
+            preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)
+            preferencesManager.lastScannerVersion = it.hardwareVersion.toString()
+            analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId?: "")
+        }
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
         view.doVibrate()
@@ -386,12 +429,20 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     private fun addBluetoothConnectivityEvent() {
-        sessionEventsManager.addEventInBackground(
-            ScannerConnectionEvent(
-                timeHelper.now(),
-                ScannerConnectionEvent.ScannerInfo(
-                    scannerManager.scannerId ?: "",
-                    scannerManager.macAddress ?: "",
-                    scannerManager.hardwareVersion ?: "")))
+        scannerManager.scanner?.let {
+            sessionEventsManager.addEventInBackground(
+                ScannerConnectionEvent(
+                    timeHelper.now(),
+                    ScannerConnectionEvent.ScannerInfo(
+                        it.scannerId ?: "",
+                        it.macAddress,
+                        it.getUcVersionString())))
+        }
+    }
+
+    private fun logMessageForCrashReport(message: String) {
+        crashReportManager.logMessageForCrashReport(
+            FingerprintCrashReportTag.SCANNER_SETUP,
+            FingerprintCrashReportTrigger.SCANNER, message = message)
     }
 }

@@ -5,6 +5,7 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
@@ -82,14 +83,14 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun notScannerFromInitVeroStep_shouldAnErrorAlert() {
+    fun notScannerFromInitVeroStep_shouldShowAnErrorAlert() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(ScannerNotPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         onView(withId(R.id.alert_title)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
-    fun multiScannersPairedFromInitVeroStep_shouldAnErrorAlert() {
+    fun multiScannersPairedFromInitVeroStep_shouldShowAnErrorAlert() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(MultipleScannersPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
@@ -97,7 +98,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun bluetoothOffFromConnectVeroStep_shouldAnErrorAlert() {
+    fun bluetoothOffFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
@@ -107,7 +108,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun bluetoothNotSupportedFromConnectVeroStep_shouldAnErrorAlert() {
+    fun bluetoothNotSupportedFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
@@ -117,7 +118,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun bluetoothNotPairedFromConnectVeroStep_shouldAnErrorAlert() {
+    fun bluetoothNotPairedFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
@@ -127,7 +128,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun unknownBluetoothIssueFromConnectVeroStep_shouldAnErrorAlert() {
+    fun unknownBluetoothIssueFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
@@ -137,7 +138,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun unknownBluetoothIssueFromResetUIVeroStep_shouldAnErrorAlert() {
+    fun unknownBluetoothIssueFromResetUIVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
 
@@ -148,7 +149,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun lowBatteryFromWakingUpVeroStep_shouldAnErrorAlert() {
+    fun lowBatteryFromWakingUpVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
@@ -160,7 +161,8 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun unknownBluetoothIssueFromWakingUpVeroStep_shouldAnErrorAlert() {
+    @MediumTest
+    fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
@@ -172,7 +174,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun guidForVerificationNotAvailableLocallyAndPhoneIsOffline_shouldAnErrorAlert() {
+    fun guidForVerificationNotAvailableLocallyAndPhoneIsOffline_shouldShowAnErrorAlert() {
         makeSetupVeroSucceeding()
 
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
@@ -185,7 +187,7 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun guidForVerificationNotAvailableLocallyAndPhoneIsOnline_shouldAnErrorAlert() {
+    fun guidForVerificationNotAvailableLocallyAndPhoneIsOnline_shouldShowAnErrorAlert() {
         makeSetupVeroSucceeding()
 
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
