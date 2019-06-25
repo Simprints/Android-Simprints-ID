@@ -42,22 +42,6 @@ class CommCarePresenter(private val view: CommCareContract.View,
         }
     }
 
-    override fun isAnErrorToSkipCheck(errorResponse: ErrorResponse): Boolean =
-        when (errorResponse.reason) {
-            UNEXPECTED_ERROR,
-            DIFFERENT_PROJECT_ID_SIGNED_IN,
-            DIFFERENT_USER_ID_SIGNED_IN,
-            INVALID_CLIENT_REQUEST,
-            INVALID_METADATA,
-            INVALID_MODULE_ID,
-            INVALID_PROJECT_ID,
-            INVALID_SELECTED_ID,
-            INVALID_SESSION_ID,
-            INVALID_USER_ID,
-            INVALID_VERIFY_ID -> true
-            else -> false
-        }
-
     override fun handleEnrollResponse(enroll: EnrollResponse) =
         view.returnRegistration(Registration(enroll.guid))
 

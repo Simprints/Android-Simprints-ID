@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.libsimprints
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
@@ -48,8 +47,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) {
-        val resultCode = presenter.errorResponseReasonToResultCode[errorResponse.reason]
-        setResult(resultCode ?: Activity.RESULT_CANCELED)
+        setResult(errorResponse.reason.libSimprintsResultCode())
         finish()
     }
 

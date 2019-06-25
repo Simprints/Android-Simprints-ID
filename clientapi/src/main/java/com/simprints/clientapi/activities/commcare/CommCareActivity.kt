@@ -76,12 +76,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(SKIP_CHECK_KEY, presenter.isAnErrorToSkipCheck(errorResponse))
+        it.putExtra(SKIP_CHECK_KEY, errorResponse.isAnErrorToSkipCheck())
         sendOkResult(it)
     }
 
     override fun injectSessionIdIntoIntent(sessionId: String) {
-        intent.putExtra(com.simprints.id.domain.Constants.SIMPRINTS_SESSION_ID, sessionId)
+        intent.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
     }
 
     override fun onDestroy() {

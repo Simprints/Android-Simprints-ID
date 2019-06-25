@@ -6,7 +6,6 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -19,25 +18,6 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val sessionEventsManager: ClientApiSessionEventsManager,
                             private val crashReportManager: ClientApiCrashReportManager) :
     RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
-
-    override val errorResponseReasonToResultCode: Map<ErrorResponse.Reason, Int>
-        get() = mapOf(
-            DIFFERENT_PROJECT_ID_SIGNED_IN to SIMPRINTS_INVALID_PROJECT_ID,
-            DIFFERENT_USER_ID_SIGNED_IN to SIMPRINTS_INVALID_USER_ID,
-            GUID_NOT_FOUND_ONLINE to SIMPRINTS_VERIFY_GUID_NOT_FOUND_ONLINE,
-            GUID_NOT_FOUND_OFFLINE to SIMPRINTS_VERIFY_GUID_NOT_FOUND_OFFLINE,
-            UNEXPECTED_ERROR to SIMPRINTS_CANCELLED, //TODO: should we update LibSimpprints with the missing errors?,
-            BLUETOOTH_NOT_SUPPORTED to SIMPRINTS_CANCELLED,
-            SCANNER_LOW_BATTERY to SIMPRINTS_CANCELLED,
-            UNKNOWN_BLUETOOTH_ISSUE to SIMPRINTS_CANCELLED,
-            INVALID_CLIENT_REQUEST to SIMPRINTS_INVALID_INTENT_ACTION,
-            INVALID_METADATA to SIMPRINTS_INVALID_METADATA,
-            INVALID_MODULE_ID to SIMPRINTS_INVALID_MODULE_ID,
-            INVALID_PROJECT_ID to SIMPRINTS_INVALID_PROJECT_ID,
-            INVALID_SELECTED_ID to SIMPRINTS_CANCELLED,
-            INVALID_SESSION_ID to SIMPRINTS_CANCELLED,
-            INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
-            INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
 
     override suspend fun start() {
         if(action != SIMPRINTS_SELECT_GUID_INTENT) {
