@@ -39,8 +39,21 @@ object FingerprintToDomainResponse {
     private fun fromFingerprintToDomainMatchingResult(matchingResult: IMatchingResult): FingerprintMatchingResult =
         FingerprintMatchingResult(matchingResult.guid, matchingResult.confidence, fromFingerprintToDomainTier(matchingResult.tier))
 
-    private fun fromFingerprintToDomainRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse =
-        FingerprintRefusalFormResponse(FingerprintRefusalFormReason.valueOf(fingerprintResponse.reason), fingerprintResponse.extra)
+    private fun fromFingerprintToDomainRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse {
+
+        val reason = when(fingerprintResponse.reason) {
+            IFingerprintRefusalReason.REFUSED_RELIGION -> FingerprintRefusalFormReason.REFUSED_RELIGION
+            IFingerprintRefusalReason.REFUSED_DATA_CONCERNS -> FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS
+            IFingerprintRefusalReason.REFUSED_PERMISSION -> FingerprintRefusalFormReason.REFUSED_PERMISSION
+            IFingerprintRefusalReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
+            IFingerprintRefusalReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
+            IFingerprintRefusalReason.REFUSED_SICK -> FingerprintRefusalFormReason.REFUSED_SICK
+            IFingerprintRefusalReason.REFUSED_PREGNANT -> FingerprintRefusalFormReason.REFUSED_PREGNANT
+            IFingerprintRefusalReason.OTHER -> FingerprintRefusalFormReason.OTHER
+        }
+
+        return FingerprintRefusalFormResponse(reason, fingerprintResponse.extra)
+    }
 
     private fun fromFingerprintToDomainError(error: IFingerprintErrorReason): FingerprintErrorReason =
         when(error) {

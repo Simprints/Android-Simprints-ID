@@ -110,7 +110,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
         logMessageForCrashReport("Scan fingerprints button clicked")
         view.setResultAndFinish(Activity.RESULT_OK,
             RefusalActResult(
-                RefusalActResult.Action.SCAN_FINGERPRINTS))
+                RefusalActResult.Action.SCAN_FINGERPRINTS, RefusalActResult.Answer()))
     }
 
     override fun handleLayoutChange() {

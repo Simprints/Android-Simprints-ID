@@ -50,6 +50,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
@@ -374,13 +375,13 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
         val fingerprintResult = FingerprintRefusalFormResponse(
-            possibleRefusalForm.answer?.reason.toString(),
-            possibleRefusalForm.answer?.optionalText.toString())
+            possibleRefusalForm.answer.reason.toFingerprintRefusalFormReason(),
+            possibleRefusalForm.answer.optionalText)
 
         resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
             fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
     }
-
+    
     private fun prepareVerifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActVerifyResult?) {
         possibleMatchResult?.let {
             val fingerprintResult = FingerprintVerifyResponse(it.guid, it.confidence, it.tier)
