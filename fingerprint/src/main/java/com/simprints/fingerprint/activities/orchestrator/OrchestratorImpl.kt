@@ -17,6 +17,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SCAN_FINGERPRINTS
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SUBMIT
+import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorImpl : Orchestrator {
@@ -147,8 +148,8 @@ class OrchestratorImpl : Orchestrator {
     private fun prepareRefusalForm(refusalForm: RefusalActResult) =
         Intent().apply {
             val fingerprintResult = FingerprintRefusalFormResponse(
-                refusalForm.answer?.reason.toString(),
-                refusalForm.answer?.optionalText.toString())
+                refusalForm.answer.reason.toFingerprintRefusalFormReason(),
+                refusalForm.answer.optionalText)
 
             putExtra(IFingerprintResponse.BUNDLE_KEY,
                 DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
