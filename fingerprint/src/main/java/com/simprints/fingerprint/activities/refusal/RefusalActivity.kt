@@ -99,7 +99,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    override fun setFocusOnRefusalReason() {
+    override fun setFocusOnRefusalReasonAndDisableSubmit() {
         btSubmitRefusalForm.isEnabled = false
         refusalText.requestFocus()
         setTextChangeListenerOnRefusalText()
