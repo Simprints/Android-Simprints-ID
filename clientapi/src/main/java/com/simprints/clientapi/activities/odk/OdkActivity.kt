@@ -37,6 +37,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun returnRegistration(registrationId: String) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
+        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+
         sendOkResult(it)
     }
 
@@ -48,6 +50,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
+        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+
         sendOkResult(it)
     }
 
@@ -55,12 +59,16 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
+        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+
         sendOkResult(it)
     }
 
     override fun returnRefusalForm(reason: String, extra: String) = Intent().let {
         it.putExtra(ODK_REFUSAL_REASON, reason)
         it.putExtra(ODK_REFUSAL_EXTRA, extra)
+        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+
         sendOkResult(it)
     }
 

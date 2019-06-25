@@ -20,7 +20,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val crashReportManager: ClientApiCrashReportManager) :
     RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
 
-    override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
+    override val errorResponseReasonToResultCode: Map<ErrorResponse.Reason, Int>
         get() = mapOf(
             DIFFERENT_PROJECT_ID_SIGNED_IN to SIMPRINTS_INVALID_PROJECT_ID,
             DIFFERENT_USER_ID_SIGNED_IN to SIMPRINTS_INVALID_USER_ID,

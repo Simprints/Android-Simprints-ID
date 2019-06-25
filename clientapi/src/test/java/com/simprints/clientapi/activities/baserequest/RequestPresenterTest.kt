@@ -35,7 +35,7 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, extraField)
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyOnce(clientApiSessionEventsManagerMock) {
@@ -52,7 +52,7 @@ class RequestPresenterTest {
             whenever(this) { build() } thenReturn EnrollRequest(projectIdField, moduleIdField, userIdField, metadataField, emptyMap())
         }
 
-        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock, emptyMap())
+        val presenter = ImplRequestPresenter(mock(), clientApiSessionEventsManagerMock)
         presenter.validateAndSendRequest(requestBuilder)
 
         verifyNever(clientApiSessionEventsManagerMock) { addSuspiciousIntentEvent(anyNotNull()) }
@@ -60,8 +60,7 @@ class RequestPresenterTest {
 }
 
 class ImplRequestPresenter(view: RequestContract.RequestView,
-                           clientApiSessionEventsManager: ClientApiSessionEventsManager,
-                           override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>) :
+                           clientApiSessionEventsManager: ClientApiSessionEventsManager) :
     RequestPresenter(
         view,
         clientApiSessionEventsManager

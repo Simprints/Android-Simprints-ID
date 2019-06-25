@@ -49,7 +49,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) {
-        val resultCode = presenter.domainErrorToCallingAppResultCode[errorResponse.reason]
+        val resultCode = presenter.errorResponseReasonToResultCode[errorResponse.reason]
         setResult(resultCode ?: Activity.RESULT_CANCELED)
         finish()
     }

@@ -25,6 +25,6 @@ interface LibSimprintsContract {
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter {
-        val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
+        val errorResponseReasonToResultCode: Map<ErrorResponse.Reason, Int>
     }
 }
