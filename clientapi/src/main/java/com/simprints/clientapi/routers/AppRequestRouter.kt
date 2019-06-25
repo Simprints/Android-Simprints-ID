@@ -1,8 +1,6 @@
 package com.simprints.clientapi.routers
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Build
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
