@@ -22,6 +22,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
         const val SKIP_CHECK_KEY = "skipCheck"
         const val REGISTRATION_GUID_KEY = "guid"
+        const val VERIFICATION_CONFIDENCE_KEY = "confidence"
+        const val VERIFICATION_TIER_KEY = "tier"
+        const val VERIFICATION_GUID_KEY = "guid"
+        const val REFUSAL_REASON = "reason"
+        const val REFUSAL_EXTRA = "extra"
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
@@ -34,11 +39,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
 
     override fun returnRegistration(registration: Registration) = Intent().let {
-        val responseForCommCare = Bundle()
-        responseForCommCare.putBoolean(SKIP_CHECK_KEY, true)
-        responseForCommCare.putString(REGISTRATION_GUID_KEY, registration.guid)
+        val data = Bundle()
+        data.putBoolean(SKIP_CHECK_KEY, true)
+        data.putString(REGISTRATION_GUID_KEY, registration.guid)
 
-        it.putExtra(COMMCARE_BUNDLE_KEY, responseForCommCare)
+        it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)
     }
 
@@ -50,12 +55,22 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override fun returnVerification(confidence: Int, tier: Tier, guid: String) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_VERIFICATION, Verification(confidence, tier, guid))
+        val data = Bundle()
+        data.putBoolean(SKIP_CHECK_KEY, true)
+        data.putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
+        data.putString(VERIFICATION_TIER_KEY, tier.name)
+        data.putString(VERIFICATION_GUID_KEY, guid)
+
+        it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)
     }
 
     override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
+        val data = Bundle()
+        data.putBoolean(SKIP_CHECK_KEY, true)
+        data.putString(REFUSAL_REASON, refusalForm.reason)
+        data.putString(REFUSAL_EXTRA, refusalForm.extra)
+
         sendOkResult(it)
     }
 
