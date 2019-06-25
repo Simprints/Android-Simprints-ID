@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 154
-        versionName "2019.1.2"
+        versionName "2019.2.0-rc6"
+        versionCode 164
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -151,6 +151,7 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
+    implementation deps.firebase.jwt
     api deps.firebase.database
     api deps.firebase.core
     api deps.firebase.auth

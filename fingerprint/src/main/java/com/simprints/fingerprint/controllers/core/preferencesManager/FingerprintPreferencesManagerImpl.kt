@@ -1,11 +1,9 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
-import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType.Companion.fromConstantGroup
 import com.simprints.id.data.prefs.PreferencesManager
 import java.util.*
 
-class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager,
-                                        override val matchPoolType: MatchPoolType = fromConstantGroup(prefs.matchGroup)): FingerprintPreferencesManager {
+class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): FingerprintPreferencesManager {
 
     override var lastEnrolDate: Date? = prefs.lastEnrolDate
         set(value) {

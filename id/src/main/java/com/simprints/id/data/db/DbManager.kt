@@ -28,7 +28,7 @@ interface DbManager {
 
     fun loadPerson(projectId:String, guid: String): Single<PersonFetchResult>
 
-    fun loadPeople(group: GROUP): Single<List<Person>>
+    fun loadPeople(projectId:String, userId: String?, moduleId: String?): Single<List<Person>>
 
     fun loadProject(projectId: String): Single<Project>
 

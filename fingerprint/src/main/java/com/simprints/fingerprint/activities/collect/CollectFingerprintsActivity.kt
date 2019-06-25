@@ -22,13 +22,8 @@ import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
@@ -157,7 +152,7 @@ class CollectFingerprintsActivity :
 
     override fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) =
         setCollectResultInIntent(bundleKey, fingerprintsActResult).also {
-            startMatchingActivity(fingerprintsActResult.probe)
+            startMatchingActivity(viewPresenter.getExtraForMatchingActivity(fingerprintsActResult))
         }
 
     private fun setCollectResultInIntent(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) {
@@ -166,25 +161,9 @@ class CollectFingerprintsActivity :
 
     override fun startRefusalActivity() = launchRefusalActivity()
 
-    private fun startMatchingActivity(probe: Person) {
+    private fun startMatchingActivity(extra: MatchingActRequest) {
         val matchingIntent = Intent(this, MatchingActivity::class.java)
-        with(fingerprintRequest) {
-            val extra = when {
-                this is FingerprintVerifyRequest -> MatchingActVerifyRequest(
-                        language,
-                        probe,
-                        projectId,
-                        this.verifyGuid)
-                this is FingerprintIdentifyRequest -> MatchingActIdentifyRequest(
-                        language,
-                        probe,
-                        matchGroup,
-                        returnIdCount)
-                else -> null
-            }
-            matchingIntent.putExtra(MatchingActRequest.BUNDLE_KEY, extra)
-        }
-
+        matchingIntent.putExtra(MatchingActRequest.BUNDLE_KEY, extra)
         startActivityForResult(matchingIntent, MATCHING_ACTIVITY_REQUEST)
     }
 
@@ -201,7 +180,10 @@ class CollectFingerprintsActivity :
         orchestrator.onActivityResult(this, requestCode, resultCode, data)
     }
 
-    override fun tryAgain() { }
+    override fun tryAgain() {
+        viewPresenter.handleTryAgainFromDifferentActivity()
+    }
+
     override fun onActivityResultReceived() {}
     override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {

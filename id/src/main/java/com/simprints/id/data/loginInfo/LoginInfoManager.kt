@@ -5,6 +5,9 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 
 interface LoginInfoManager: ProjectIdProvider {
 
+    var projectIdTokenClaim: String?
+    var userIdTokenClaim: String?
+
     var encryptedProjectSecret: String
     var signedInProjectId: String
     var signedInUserId: String
@@ -15,5 +18,6 @@ interface LoginInfoManager: ProjectIdProvider {
     fun getSignedInUserIdOrEmpty(): String
     fun isProjectIdSignedIn(possibleProjectId: String): Boolean
     fun cleanCredentials()
+    fun clearCachedTokenClaims()
     fun storeCredentials(projectId: String, userId: String)
 }

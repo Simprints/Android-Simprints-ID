@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -15,6 +16,7 @@ import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
+import com.simprints.fingerprintmatcher.Person as MatcherPerson
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -31,7 +33,7 @@ class MatchingPresenter(
     private val crashReportManager: FingerprintCrashReportManager,
     private val preferencesManager: FingerprintPreferencesManager,
     private val timeHelper: FingerprintTimeHelper,
-    private val libMatcherConstructor: (com.simprints.fingerprintmatcher.Person, List<com.simprints.fingerprintmatcher.Person>,
+    private val libMatcherConstructor: (MatcherPerson, List<MatcherPerson>,
                                         LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher
 ) : MatchingContract.Presenter {
 
@@ -56,7 +58,9 @@ class MatchingPresenter(
         val matchTask = matchTaskConstructor(view, matchingRequest, dbManager, sessionEventsManager, crashReportManager, timeHelper, preferencesManager)
 
         matchTaskDisposable = matchTask.loadCandidates()
-            .doOnSuccess { matchTask.handlesCandidatesLoaded(it) }
+            .doOnSuccess {
+                matchTask.handlesCandidatesLoaded(it)
+            }
             .flatMap { matchTask.runMatch(it, matchingRequest.probe) }
             .setMatchingSchedulers()
             .subscribeBy(

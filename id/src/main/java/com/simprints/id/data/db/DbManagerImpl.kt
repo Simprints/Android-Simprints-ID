@@ -98,14 +98,8 @@ open class DbManagerImpl(override val local: LocalDbManager,
                     }
             }
 
-    override fun loadPeople(group: GROUP): Single<List<Person>> =
-        when (group) {
-            GROUP.GLOBAL -> local.loadPeopleFromLocal()
-            GROUP.USER -> local.loadPeopleFromLocal(userId = loginInfoManager.getSignedInUserIdOrEmpty())
-            GROUP.MODULE -> Single.concat(preferencesManager.selectedModules.map { moduleId ->
-                local.loadPeopleFromLocal(moduleId = moduleId)
-            }).reduce { a, b -> a + b }.toSingle(emptyList())
-        }
+    override fun loadPeople(projectId: String, userId: String?, moduleId: String?): Single<List<Person>> =
+        local.loadPeopleFromLocal(projectId, userId = userId, moduleId = moduleId)
 
     override fun loadProject(projectId: String): Single<Project> =
         local.loadProjectFromLocal(projectId)

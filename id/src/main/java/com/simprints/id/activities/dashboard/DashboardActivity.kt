@@ -6,12 +6,11 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
-import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -33,8 +32,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
-        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
-
         private const val LOGOUT_RESULT_CODE = 1
 
     }
@@ -113,7 +110,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
             val id = menuItem.itemId
             when (id) {
-                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
+                R.id.menuPrivacyNotice -> startActivity(Intent(this, LongConsentActivity::class.java))
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }

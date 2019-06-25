@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
@@ -23,10 +23,11 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
@@ -116,6 +117,34 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun handleScannerButtonPressed() {
         startCapturing()
     }
+
+    override fun getExtraForMatchingActivity(fingerprintsActResult: CollectFingerprintsActResult): MatchingActRequest =
+        when (fingerprintRequest) {
+            is FingerprintVerifyRequest ->
+
+                MatchingActVerifyRequest(
+                    fingerprintRequest.language,
+                    fingerprintsActResult.probe,
+                    MatchingActVerifyRequest.QueryForVerifyPool(fingerprintRequest.projectId),
+                    fingerprintRequest.verifyGuid)
+
+            is FingerprintIdentifyRequest ->
+
+                MatchingActIdentifyRequest(
+                    fingerprintRequest.language,
+                    fingerprintsActResult.probe,
+                    buildQueryForIdentifyPool(fingerprintRequest),
+                    fingerprintRequest.returnIdCount)
+
+            else -> throw IllegalArgumentException("Request different from FingerprintVerifyRequest or FingerprintIdentifyRequest")
+        }
+
+    private fun buildQueryForIdentifyPool(request: FingerprintIdentifyRequest): QueryForIdentifyPool =
+        when(request.matchGroup) {
+            MatchGroup.GLOBAL -> QueryForIdentifyPool(request.projectId)
+            MatchGroup.USER -> QueryForIdentifyPool(request.projectId, userId = request.userId)
+            MatchGroup.MODULE -> QueryForIdentifyPool(request.projectId, moduleId = request.moduleId)
+        }
 
     private fun stopCapturing() {
         scanningHelper.toggleContinuousCapture()
@@ -284,15 +313,15 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun addCaptureEventInSession(finger: Finger) {
         sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
-                timeHelper.now(),
-                lastCaptureStartedAt,
-                finger.id,
-                qualityThreshold,
-                FingerprintCaptureEvent.buildResult(finger.status),
-                finger.template?.let {
-                    FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
-                }
-            ))
+            timeHelper.now(),
+            lastCaptureStartedAt,
+            finger.id,
+            qualityThreshold,
+            FingerprintCaptureEvent.buildResult(finger.status),
+            finger.template?.let {
+                FingerprintCaptureEvent.Fingerprint(finger.id, it.qualityScore, EncodingUtils.byteArrayToBase64(it.templateBytes))
+            }
+        ))
     }
 
     private fun createMapAndShowDialog() {

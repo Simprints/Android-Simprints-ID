@@ -10,24 +10,21 @@ import com.nhaarman.mockitokotlin2.eq
 import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.MatchGroup
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
-import com.simprints.fingerprintmatcher.Person
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.id.data.prefs.PreferencesManager
@@ -41,6 +38,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.random.Random
+import com.simprints.fingerprintmatcher.Person as LibPerson
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
@@ -62,28 +60,24 @@ class MatchingPresenterTest {
     private val preferencesManagerMock = mock<PreferencesManager>()
     private val sessionEventsManagerMock = mock<FingerprintSessionEventsManager>()
     private val crashReportManagerMock = mock<FingerprintCrashReportManager>()
-    private val timeHelperMock = mock<FingerprintTimeHelper> {
-        whenever(it) { now() } thenReturn System.currentTimeMillis()
-    }
-    private val mockFingerprintPreferencesManager = mock<FingerprintPreferencesManager> {
-        whenever(it) { matchPoolType } thenReturn MatchPoolType.PROJECT
-    }
 
-    private val mockIdentificationLibMatcher: (Person, List<Person>,
+    private val mockIdentificationLibMatcher: (LibPerson, List<LibPerson>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
-        { _, candidates, _, scores, callback, _ ->
+        { probe, candidates, _, scores, callback, _ ->
             mock {
                 whenever(it) { start() } then {
                     IDENTIFY_PROGRESS_RANGE.forEach { n -> callback.onMatcherProgress(Progress(n)) }
-                    repeat(candidates.size) { scores.add(Random.nextFloat() * 100f) }
+                    scores.addAll(candidates.map {
+                        (if (it.guid == probe.guid) { 1L } else { 0L }).toFloat()
+                    })
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
                 }
             }
         }
 
-    private val mockVerificationLibMatcher: (Person, List<Person>,
+    private val mockVerificationLibMatcher: (LibPerson, List<LibPerson>,
                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
-        { _, _, _, scores, callback, _ ->
+        { probe, candidates, _, scores, callback, _ ->
             mock {
                 whenever(it) { start() } then {
                     callback.onMatcherProgress(Progress(0))
@@ -93,7 +87,7 @@ class MatchingPresenterTest {
             }
         }
 
-    private val mockErrorLibMatcher: (Person, List<Person>,
+    private val mockErrorLibMatcher: (LibPerson, List<LibPerson>,
                                       LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, _, callback, _ ->
             mock {
@@ -102,18 +96,49 @@ class MatchingPresenterTest {
         }
 
     @Test
-    fun identificationRequest_startedAndAwaited_finishesWithCorrectResult() {
-        setupDbManagerLoadCandidates()
-        setupPrefs()
-        val result = captureMatchingResult()
+    @MediumTest
+    fun identificationRequestWithinProjectGroup_startedAndAwaited_finishesWithProbeInMatchResult() {
+        testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID))
+        verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, null, null) }
+    }
 
-        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockIdentificationLibMatcher)
-        presenter.start()
-        matchTaskFinishedFlag.take()
+    @Test
+    fun identificationRequestWithinUserGroup_startedAndAwaited_finishesWithProbeInMatchResult() {
+        testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID, DEFAULT_USER_ID))
+        verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null) }
+    }
 
-        val identifyResponse = result.firstValue.getParcelableExtra<MatchingActIdentifyResult>(MatchingActResult.BUNDLE_KEY)!!
-        val identifications = identifyResponse.identifications
-        Assert.assertEquals(NUMBER_OF_ID_RETURNS, identifications.size)
+    @Test
+    fun identificationRequestWithinUserGroupAndProbeEnroledByDifferentUser_startedAndAwaited_finishesWithoutProbeInMatchResult() {
+        val probe = PeopleGeneratorUtils.getRandomPerson(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = "${DEFAULT_USER_ID}_different_user",
+            moduleId = DEFAULT_MODULE_ID
+        )
+
+        testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null), false)
+
+        verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null) }
+    }
+
+    @Test
+    fun identificationRequestWithinModuleGroup_startedAndAwaited_finishesWithProbeInMatchResult() {
+        testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID, null, DEFAULT_MODULE_ID))
+        verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, null, DEFAULT_MODULE_ID) }
+    }
+
+    @Test
+    fun identificationRequestWithinModuleGroupAndProbeNoInTheGroup_startedAndAwaited_finishesWithoutProbeInMatchResult() {
+
+        val probe = PeopleGeneratorUtils.getRandomPerson(
+            projectId = DEFAULT_PROJECT_ID,
+            userId = DEFAULT_USER_ID,
+            moduleId = "${DEFAULT_MODULE_ID}_different_module"
+        )
+
+        testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID, null, DEFAULT_MODULE_ID), false)
+
+        verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, null, DEFAULT_MODULE_ID) }
     }
 
     @Test
@@ -122,7 +147,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockVerificationLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -131,11 +156,13 @@ class MatchingPresenterTest {
     }
 
     @Test
-    fun identificationRequest_startedAndAwaited_updatesViewCorrectly() {
-        setupDbManagerLoadCandidates()
+    fun identificationRequestWithinModule_startedAndAwaited_updatesViewCorrectly() {
+        val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID).toList()
+
+        setupDbManagerLoadCandidates(candidates)
         setupPrefs()
 
-        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockIdentificationLibMatcher)
+        val presenter = createPresenter(identifyRequestWithinProjectGroup, mockIdentificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -155,7 +182,7 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidate()
         setupPrefs()
 
-        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockVerificationLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -165,10 +192,11 @@ class MatchingPresenterTest {
 
     @Test
     fun identifyRequest_matchFailsToComplete_showsToastAndLogsError() {
-        setupDbManagerLoadCandidates()
+        val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID).toList()
+        setupDbManagerLoadCandidates(candidates)
         setupPrefs()
 
-        val presenter = createPresenter(identifyRequest, mockFingerprintPreferencesManager, mockErrorLibMatcher)
+        val presenter = createPresenter(identifyRequestWithinProjectGroup, mockErrorLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -181,7 +209,7 @@ class MatchingPresenterTest {
         setupDbManagerLoadCandidate()
         setupPrefs()
 
-        val presenter = createPresenter(verifyRequest, mockFingerprintPreferencesManager, mockErrorLibMatcher)
+        val presenter = createPresenter(verifyRequest, mockErrorLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
 
@@ -189,16 +217,57 @@ class MatchingPresenterTest {
         verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
     }
 
+    private fun testIdentification(personToIdentify: Person,
+                                   queryForIdentifyPool: QueryForIdentifyPool,
+                                   shouldProbeInMatchingResult: Boolean = true) {
+
+        val rightCandidates: List<Person>
+        val extraCandidates: List<Person>
+
+        //Create people for the local db
+        if(!queryForIdentifyPool.moduleId.isNullOrEmpty()) {
+            rightCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, moduleId = DEFAULT_MODULE_ID).toList()
+            extraCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "${DEFAULT_MODULE_ID}_other_module").toList()
+        } else if(!queryForIdentifyPool.userId.isNullOrEmpty()) {
+            rightCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, moduleId = DEFAULT_MODULE_ID).toList()
+            extraCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "${DEFAULT_MODULE_ID}_other_module").toList()
+        } else {
+            rightCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID).toList()
+            extraCandidates = emptyList()
+        }
+
+        setupDbManagerLoadCandidates(rightCandidates + extraCandidates + personToIdentify)
+        setupPrefs()
+        val result = captureMatchingResult()
+
+        runIdentification(MatchingActIdentifyRequest(
+            DEFAULT_LANGUAGE,
+            probe,
+            queryForIdentifyPool,
+            10))
+
+        verifyIdentificationResult(result, personToIdentify, shouldProbeInMatchingResult)
+    }
+
+    private fun verifyIdentificationResult(result: KArgumentCaptor<Intent>, probe: Person, shouldProbeInMatchingResult: Boolean = true) {
+        val identifyResponse = result.firstValue.getParcelableExtra<MatchingActIdentifyResult>(MatchingActResult.BUNDLE_KEY)!!
+        val identificationsResult = identifyResponse.identifications
+        Assert.assertEquals(NUMBER_OF_ID_RETURNS, identificationsResult.size)
+        if(shouldProbeInMatchingResult) {
+            val highestScoreCandidate = identificationsResult.sortedByDescending { it.confidence }.first().guid
+            assertThat(highestScoreCandidate).isEqualTo(probe.patientId)
+        } else {
+            assertThat(identificationsResult).doesNotContain(probe.patientId)
+        }
+    }
+
     private fun createPresenter(request: MatchingActRequest,
-                                preferencesManagerMock: FingerprintPreferencesManager,
-                                mockLibMatcher: (Person, List<Person>,LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
+                                mockLibMatcher: (LibPerson, List<LibPerson>, LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, request, dbManagerMock,
-            sessionEventsManagerMock, crashReportManagerMock, preferencesManagerMock, timeHelperMock, mockLibMatcher)
+            sessionEventsManagerMock, crashReportManagerMock, mock(), mock(), mockLibMatcher)
 
-    private fun setupDbManagerLoadCandidates() {
-        val candidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID).toList()
-
-        whenever(dbManagerMock) { loadPeople(anyNotNull()) } thenReturn Single.just(candidates)
+    private fun setupDbManagerLoadCandidates(candidates: List<Person>) {
+        whenever(dbManagerMock) { loadPeople(anyNotNull(), anyOrNull(), anyOrNull()) } thenReturn Single.just(candidates)
     }
 
     private fun setupDbManagerLoadCandidate(verifyGuid: String = VERIFY_GUID) {
@@ -217,6 +286,13 @@ class MatchingPresenterTest {
         return result
     }
 
+    private fun runIdentification(identifyRequest: MatchingActIdentifyRequest) {
+        val presenter = createPresenter(identifyRequest, mockIdentificationLibMatcher)
+        presenter.start()
+        matchTaskFinishedFlag.take()
+    }
+
+
     companion object {
 
         private const val NUMBER_OF_ID_RETURNS = 10
@@ -225,24 +301,23 @@ class MatchingPresenterTest {
 
         private const val VERIFY_GUID = "33eda6d0-22bb-475e-b439-3464433e5a87"
         private const val DEFAULT_LANGUAGE = "en"
-        private val DEFAULT_MATCH_GROUP = MatchGroup.GLOBAL
 
         private val probe = PeopleGeneratorUtils.getRandomPerson(
             projectId = DEFAULT_PROJECT_ID,
             userId = DEFAULT_USER_ID,
-            moduleId = DEFAULT_USER_ID
+            moduleId = DEFAULT_MODULE_ID
         )
 
-        private val identifyRequest = MatchingActIdentifyRequest(
+        private val identifyRequestWithinProjectGroup = MatchingActIdentifyRequest(
             DEFAULT_LANGUAGE,
             probe,
-            DEFAULT_MATCH_GROUP,
+            QueryForIdentifyPool(DEFAULT_PROJECT_ID),
             10)
 
         private val verifyRequest = MatchingActVerifyRequest(
             DEFAULT_LANGUAGE,
             probe,
-            DEFAULT_PROJECT_ID,
+            MatchingActVerifyRequest.QueryForVerifyPool(DEFAULT_PROJECT_ID),
             VERIFY_GUID)
     }
 }

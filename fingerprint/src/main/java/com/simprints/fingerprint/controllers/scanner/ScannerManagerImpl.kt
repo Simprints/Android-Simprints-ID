@@ -24,15 +24,10 @@ import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
-open class ScannerManagerImpl(private val preferencesManager: FingerprintPreferencesManager,
-                              private val analyticsManager: FingerprintAnalyticsManager,
-                              private val crashReportManager: FingerprintCrashReportManager,
-                              private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
+open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
     override var macAddress: String? = null
-    override var scannerId: String? = null
-    override var hardwareVersion: String? = null
 
     @SuppressLint("CheckResult")
     override fun start(): Completable =
@@ -63,13 +58,8 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
             pairedScanners.size > 1 -> it.onError(MultipleScannersPairedException())
             else -> {
                 val macAddress = pairedScanners[0]
-                this.macAddress = macAddress
-
                 scanner = Scanner(macAddress, bluetoothAdapter)
-                preferencesManager.lastScannerUsed = convertAddressToSerial(macAddress)
-                preferencesManager.lastScannerVersion = scanner?.hardwareVersion.toString()
-
-                logMessageForCrashReport("ScannerManager: Scanner initialized")
+                this.macAddress = macAddress
                 it.onComplete()
             }
         }
@@ -81,9 +71,6 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
             result.onError(NullScannerException())
         } else {
             scanner?.connect(WrapperScannerCallback({
-                logMessageForCrashReport("ScannerManager: Connected to Vero")
-                scannerId = scanner?.scannerId ?: ""
-                analyticsManager.logScannerProperties(macAddress ?: "", scannerId?: "")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
@@ -105,9 +92,6 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
             result.onError(NullScannerException())
         } else {
             scanner?.un20Wakeup(WrapperScannerCallback({
-                logMessageForCrashReport("ScannerManager: UN20 ready")
-                hardwareVersion = scanner?.ucVersion?.toString() ?: "unknown"
-
                 result.onComplete()
             }, { scannerError ->
 
@@ -130,9 +114,6 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
             result.onError(NullScannerException())
         } else {
             scanner?.un20Shutdown(WrapperScannerCallback({
-                logMessageForCrashReport("ScannerManager: UN20 off")
-                hardwareVersion = scanner?.ucVersion?.toString() ?: "unknown"
-
                 result.onComplete()
             }, {
                 result.onError(UnknownBluetoothIssueException())
@@ -146,7 +127,6 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
             result.onError(NullScannerException())
         } else {
             scanner?.resetUI(WrapperScannerCallback({
-                logMessageForCrashReport("ScannerManager: UI reset")
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
@@ -182,11 +162,5 @@ open class ScannerManagerImpl(private val preferencesManager: FingerprintPrefere
         override fun onFailure(error: SCANNER_ERROR?) {
             failure(error)
         }
-    }
-
-    private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(
-            FingerprintCrashReportTag.SCANNER_SETUP,
-            FingerprintCrashReportTrigger.SCANNER, message = message)
     }
 }

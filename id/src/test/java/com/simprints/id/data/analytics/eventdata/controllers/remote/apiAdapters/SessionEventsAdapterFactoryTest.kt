@@ -9,7 +9,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPoolType
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
-import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.EnrolmentCalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
@@ -115,7 +118,7 @@ class SessionEventsAdapterFactoryTest {
     fun validate_calloutEventForConfirmationApiModel() {
         val calloutEvent = ConfirmationCalloutEvent(
             10,
-            "selectedGuid", "sessionId")
+            "projectId", "selectedGuid", "sessionId")
         val apiEvent = ApiCalloutEvent(calloutEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
