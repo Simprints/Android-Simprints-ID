@@ -427,4 +427,9 @@
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
 
+    <!-- region GUID selection -->
+    <string name="data_sent">Data sent</string>
+    <string name="result_sent">Result sent</string>
+    <!-- endregion -->
+
 </resources>
