@@ -17,9 +17,14 @@ enum class RefusalFormReason {
 
 fun RefusalFormReason.toRefusalAnswerForEvent(): RefusalAnswer =
     when(this){
+        RefusalFormReason.REFUSED_RELIGION -> RefusalAnswer.REFUSED_RELIGION
+        RefusalFormReason.REFUSED_DATA_CONCERNS -> RefusalAnswer.REFUSED_DATA_CONCERNS
+        RefusalFormReason.REFUSED_PERMISSION -> RefusalAnswer.REFUSED_PERMISSION
         RefusalFormReason.SCANNER_NOT_WORKING -> RefusalAnswer.SCANNER_NOT_WORKING
+        RefusalFormReason.REFUSED_YOUNG -> RefusalAnswer.REFUSED_YOUNG
+        RefusalFormReason.REFUSED_SICK -> RefusalAnswer.REFUSED_SICK
+        RefusalFormReason.REFUSED_PREGNANT -> RefusalAnswer.REFUSED_PREGNANT
         RefusalFormReason.OTHER -> RefusalAnswer.OTHER
-        else -> RefusalAnswer.BENEFICIARY_REFUSED
     }
 
 fun RefusalFormReason.toFingerprintRefusalFormReason(): FingerprintRefusalFormReason =
