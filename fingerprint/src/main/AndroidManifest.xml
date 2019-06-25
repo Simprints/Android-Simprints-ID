@@ -11,6 +11,14 @@
     </dist:module>
 
     <application tools:ignore="GoogleAppIndexingWarning">
+
+        <!-- TODO : Consider label -->
+        <activity
+            android:name="com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
+            android:label="Fingerprint Orchestrator"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name="com.simprints.fingerprint.activities.matching.MatchingActivity"
             android:label="Matching"

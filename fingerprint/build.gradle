@@ -106,6 +106,10 @@ dependencies {
     implementation deps.dagger.core
     kapt deps.dagger.compiler
 
+    // Koin
+    implementation deps.koin.core
+    implementation deps.koin.viewmodel
+
     // RxJava
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location
