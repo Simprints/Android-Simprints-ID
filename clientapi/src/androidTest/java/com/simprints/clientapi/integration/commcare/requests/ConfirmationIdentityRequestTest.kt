@@ -1,6 +1,6 @@
 package com.simprints.clientapi.integration.commcare.requests
 
-//Uncomment when the GUID confirmation Service is replaced with an Activity
+//Uncomment it when the GUID confirmation Service gets replaced with an Activity
 //@RunWith(AndroidJUnit4::class)
 //class ConfirmationIdentityRequestTest : KoinTest {
 //
