@@ -10,8 +10,13 @@ class RefusalEvent(starTime: Long,
 
     @Keep
     enum class Answer {
-        BENEFICIARY_REFUSED,
+        REFUSED_RELIGION,
+        REFUSED_DATA_CONCERNS,
+        REFUSED_PERMISSION,
         SCANNER_NOT_WORKING,
-        OTHER;
+        REFUSED_YOUNG,
+        REFUSED_SICK,
+        REFUSED_PREGNANT,
+        OTHER
     }
 }

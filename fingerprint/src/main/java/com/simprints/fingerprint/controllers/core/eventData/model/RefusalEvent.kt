@@ -11,9 +11,14 @@ class RefusalEvent(starTime: Long,
 
 @Keep
 enum class RefusalAnswer {
-    BENEFICIARY_REFUSED,
+    REFUSED_RELIGION,
+    REFUSED_DATA_CONCERNS,
+    REFUSED_PERMISSION,
     SCANNER_NOT_WORKING,
-    OTHER;
+    REFUSED_YOUNG,
+    REFUSED_SICK,
+    REFUSED_PREGNANT,
+    OTHER
 }
 
 fun RefusalEvent.fromDomainToCore() =
@@ -21,7 +26,12 @@ fun RefusalEvent.fromDomainToCore() =
 
 fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
     when(this) {
-        RefusalAnswer.BENEFICIARY_REFUSED -> CoreRefusalAnswer.BENEFICIARY_REFUSED
+        RefusalAnswer.REFUSED_RELIGION -> CoreRefusalAnswer.REFUSED_RELIGION
+        RefusalAnswer.REFUSED_DATA_CONCERNS -> CoreRefusalAnswer.REFUSED_DATA_CONCERNS
+        RefusalAnswer.REFUSED_PERMISSION -> CoreRefusalAnswer.REFUSED_PERMISSION
         RefusalAnswer.SCANNER_NOT_WORKING -> CoreRefusalAnswer.SCANNER_NOT_WORKING
+        RefusalAnswer.REFUSED_YOUNG -> CoreRefusalAnswer.REFUSED_YOUNG
+        RefusalAnswer.REFUSED_SICK -> CoreRefusalAnswer.REFUSED_YOUNG
+        RefusalAnswer.REFUSED_PREGNANT -> CoreRefusalAnswer.REFUSED_PREGNANT
         RefusalAnswer.OTHER -> CoreRefusalAnswer.OTHER
     }
