@@ -81,9 +81,8 @@ android {
         test {
             java.srcDir sharedTestDir
         }
-        androidTest {
-            java.srcDir sharedTestDir
-        }
+        androidTest.java.srcDir sharedTestDir
+        androidTest.java.srcDir 'src/androidTest/java'
     }
 
     testOptions {
@@ -185,7 +184,7 @@ dependencies {
     api deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
-    implementation deps.koin.core
+    implementation deps.koin.android
 
     // Test
     testImplementation project(':fingerprintscannermock')
