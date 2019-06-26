@@ -50,7 +50,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation) {
         routeSimprintsConfirmation(this, request)
         guidSelectionNotifier.showMessage()
-        // TODO: refactor
         finishAffinity()
     }
 
