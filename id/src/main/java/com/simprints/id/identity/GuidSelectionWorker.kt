@@ -17,12 +17,12 @@ class GuidSelectionWorker(context: Context, params: WorkerParameters) : Worker(c
     @Inject lateinit var guidSelectionManager: GuidSelectionManager
 
     override fun doWork(): Result {
-        handleIdentityConfirmationRequest()
+        handleGuidSelectionRequest()
         return Result.success()
     }
 
     @SuppressLint("CheckResult")
-    private fun handleIdentityConfirmationRequest() {
+    private fun handleGuidSelectionRequest() {
         val request = inputData.parseAppConfirmation()
         guidSelectionManager.handleIdentityConfirmationRequest(request)
             .subscribeOn(Schedulers.io())
