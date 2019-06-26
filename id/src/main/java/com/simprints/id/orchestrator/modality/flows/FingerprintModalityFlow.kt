@@ -17,7 +17,7 @@ class FingerprintModalityFlow(private val appRequest: AppRequest,
                               private val prefs: PreferencesManager) : SingleModalityFlowBase() {
 
     companion object {
-        const val fingerprintActivityClassName = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+        const val fingerprintActivityClassName = "com.simprints.fingerprint.activities.orchestrator.Orchestrator"
         const val REQUEST_CODE_FINGERPRINT = 2
     }
 
