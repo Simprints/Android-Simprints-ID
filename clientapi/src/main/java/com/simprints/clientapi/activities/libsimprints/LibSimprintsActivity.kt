@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.koinModule
+import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +18,8 @@ import org.koin.core.parameter.parametersOf
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
+
+    override val guidSelectionNotifier = DefaultGuidSelectionNotifier(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
