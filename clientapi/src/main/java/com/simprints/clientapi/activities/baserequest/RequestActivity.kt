@@ -13,6 +13,7 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
+import com.simprints.clientapi.identity.GuidSelectionNotifier
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
@@ -22,6 +23,8 @@ import timber.log.Timber
 
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
+
+    abstract val guidSelectionNotifier: GuidSelectionNotifier
 
     override val action: String?
         get() = intent.action
@@ -46,6 +49,8 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     override fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation) {
         routeSimprintsConfirmation(this, request)
+        guidSelectionNotifier.showMessage()
+        // TODO: refactor
         finishAffinity()
     }
 
