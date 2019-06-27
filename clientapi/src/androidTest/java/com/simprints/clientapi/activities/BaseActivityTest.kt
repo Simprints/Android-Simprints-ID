@@ -10,7 +10,7 @@ import org.junit.Before
 import org.junit.Rule
 import kotlin.reflect.KClass
 
-class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
+open class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
                                              private val autoLaunch: Boolean = true) {
 
     @Rule
@@ -41,9 +41,9 @@ class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
         rule.launchActivity(intent)
     }
 
-    private companion object {
-        const val INITIAL_TOUCH_MODE = true
-        const val LAUNCH_ACTIVITY = false
+    companion object {
+        private const val INITIAL_TOUCH_MODE = true
+        private const val LAUNCH_ACTIVITY = false
     }
 
 }
