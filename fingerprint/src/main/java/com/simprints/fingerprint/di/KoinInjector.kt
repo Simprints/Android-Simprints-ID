@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 object KoinInjector {
 
-    var koinModule: Module? = null
+    private var koinModule: Module? = null
 
     fun loadFingerprintKoinModules() {
         if (koinModule == null) {
@@ -22,6 +22,7 @@ object KoinInjector {
     fun unloadFingerprintKoinModules() {
         koinModule?.let {
             unloadKoinModules(it)
+            koinModule = null
         }
     }
 
