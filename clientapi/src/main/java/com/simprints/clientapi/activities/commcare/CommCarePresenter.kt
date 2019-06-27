@@ -1,15 +1,18 @@
 package com.simprints.clientapi.activities.commcare
 
-import android.util.Log
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
-import com.simprints.libsimprints.*
+import com.simprints.clientapi.domain.responses.EnrollResponse
+import com.simprints.clientapi.domain.responses.IdentifyResponse
+import com.simprints.clientapi.domain.responses.RefusalFormResponse
+import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.libsimprints.Constants
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Tier
 
 
 class CommCarePresenter(private val view: CommCareContract.View,
@@ -43,7 +46,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) =
-        view.returnRegistration(Registration(enroll.guid))
+        view.returnRegistration(enroll.guid, false)
 
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
@@ -55,11 +58,12 @@ class CommCarePresenter(private val view: CommCareContract.View,
     override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
         verify.matchResult.confidence,
         Tier.valueOf(verify.matchResult.tier.name),
-        verify.matchResult.guidFound
+        verify.matchResult.guidFound,
+        false
     )
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
-        view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
+        view.returnRefusalForms(refusalForm.reason, refusalForm.extra, false)
 
     private fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {

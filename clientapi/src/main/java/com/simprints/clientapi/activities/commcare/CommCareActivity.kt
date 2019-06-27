@@ -6,7 +6,9 @@ import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
-import com.simprints.libsimprints.*
+import com.simprints.libsimprints.Constants
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,11 +40,10 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         }
     }
 
-
-    override fun returnRegistration(registration: Registration) = Intent().let {
+    override fun returnRegistration(guid: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, true)
-        data.putString(REGISTRATION_GUID_KEY, registration.guid)
+        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
+        data.putString(REGISTRATION_GUID_KEY, guid)
 
         it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)
@@ -55,9 +56,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String) = Intent().let {
+    override fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, true)
+        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
         data.putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
         data.putString(VERIFICATION_TIER_KEY, tier.name)
         data.putString(VERIFICATION_GUID_KEY, guid)
@@ -66,11 +67,11 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
+    override fun returnRefusalForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle()
         data.putBoolean(SKIP_CHECK_KEY, true)
-        data.putString(REFUSAL_REASON, refusalForm.reason)
-        data.putString(REFUSAL_EXTRA, refusalForm.extra)
+        data.putString(REFUSAL_REASON, reason)
+        data.putString(REFUSAL_EXTRA, extra)
 
         sendOkResult(it)
     }
