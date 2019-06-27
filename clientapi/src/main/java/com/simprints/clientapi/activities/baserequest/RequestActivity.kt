@@ -3,7 +3,6 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -61,7 +60,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         Timber.d("RequestActivity: onActivityResult")
 
         if (resultCode != Activity.RESULT_OK || data == null)
-            setResult(resultCode, data).also { finish() }
+            sendCancelResult()
         else {
             // TODO: Clean this flow up more
             data.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {

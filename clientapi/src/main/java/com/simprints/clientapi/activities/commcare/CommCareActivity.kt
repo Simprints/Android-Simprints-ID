@@ -5,11 +5,10 @@ import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
-import com.simprints.libsimprints.*
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Tier
 import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.Tier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +53,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
                                       sessionId: String) = Intent().let {
         it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
         it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+
         sendOkResult(it)
     }
 
@@ -70,15 +70,19 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, true)
+        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
         data.putString(EXIT_REASON, reason)
         data.putString(EXIT_EXTRA, extra)
 
+        it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(SKIP_CHECK_KEY, errorResponse.canErrorBeSkipped())
+        val data = Bundle()
+        data.putBoolean(SKIP_CHECK_KEY, errorResponse.canErrorBeSkipped())
+
+        it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)
     }
 

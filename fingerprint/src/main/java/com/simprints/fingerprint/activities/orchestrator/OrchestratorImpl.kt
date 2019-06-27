@@ -41,11 +41,8 @@ class OrchestratorImpl : Orchestrator {
     private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
                                                    receiver: OrchestratorCallback) {
         when (alertActResult.closeButtonAction) {
-            CLOSE -> {
+            CLOSE, BACK -> {
                 receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(alertActResult))
-            }
-            BACK -> {
-                receiver.setResultDataAndFinish(Activity.RESULT_CANCELED, null)
             }
             TRY_AGAIN -> receiver.tryAgain()
         }

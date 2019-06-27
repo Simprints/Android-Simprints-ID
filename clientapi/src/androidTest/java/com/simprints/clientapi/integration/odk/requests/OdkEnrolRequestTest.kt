@@ -1,4 +1,4 @@
-package com.simprints.clientapi.integration.commcare.requests
+package com.simprints.clientapi.integration.odk.requests
 
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
@@ -10,7 +10,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.simprints.clientapi.activities.commcare.CommCareActivity
+import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.di.KoinInjector
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.moduleapi.app.requests.IAppRequest
@@ -27,7 +27,7 @@ import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-class EnrolRequestTest : KoinTest {
+class OdkEnrolRequestTest : KoinTest {
 
     private val intentResultOk = ActivityResult(Activity.RESULT_OK, null)
 
@@ -44,7 +44,7 @@ class EnrolRequestTest : KoinTest {
 
     @Test
     fun anEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<OdkActivity>(baseIntentRequest.apply { action = odkEnrolAction })
 
         val expectedAppRequest = AppEnrollRequest(
             projectIdField.value(),
@@ -58,13 +58,13 @@ class EnrolRequestTest : KoinTest {
 
     @Test
     fun aSuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(suspiciousIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<OdkActivity>(suspiciousIntentRequest.apply { action = odkEnrolAction })
         intended(hasAction(appEnrolAction))
     }
 
     @Test
     fun anInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(invalidIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<OdkActivity>(invalidIntentRequest.apply { action = odkEnrolAction })
         intended(not(hasAction(appEnrolAction)), times(2))
     }
 
