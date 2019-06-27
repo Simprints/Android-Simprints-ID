@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.alert
 import android.app.Activity
 import android.app.Instrumentation
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
@@ -32,6 +33,7 @@ import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.verifyOnce
+import junit.framework.Assert.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -49,6 +51,8 @@ class AlertActivityTest {
         TestFingerprintCoreModule(
             fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
     }
+
+    private val context: Context = ApplicationProvider.getApplicationContext<AlertActivity>()
 
     @Before
     fun setUp() {
@@ -159,8 +163,8 @@ class AlertActivityTest {
         Espresso.pressBackUnconditionally()
 
         getCurrentActivity()?.let {
-            intended(hasComponent(ComponentName(it.applicationContext, RefusalActivity::class.java)))
-        }
+            intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
+        } ?: fail("No activity present")
     }
 
     @Test
