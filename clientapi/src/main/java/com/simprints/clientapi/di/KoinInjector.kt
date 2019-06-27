@@ -1,6 +1,5 @@
 package com.simprints.clientapi.di
 
-import android.util.Log
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
 import com.simprints.clientapi.activities.errors.ErrorContract
@@ -50,32 +49,37 @@ class KoinInjector {
 
         private fun buildKoinModule() =
             module(override=true) {
-
-                // Core Builders
-                factory { SessionEventsManager.build(androidApplication() as Application) }
-                factory { CoreCrashReportManager.build(androidApplication() as Application) }
-                factory { TimeHelper.build(androidApplication() as Application) }
-
-                // Domain
-                factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
-                factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
-                factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-                factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
-
-                // Presenters
-                factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
-                    ErrorPresenter(view, get())
-                }
-                factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
-                    LibSimprintsPresenter(view, action, get(), get())
-                }
-                factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
-                    OdkPresenter(view, action, get(), get())
-                }
-                factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
-                    CommCarePresenter(view, action, get(), get(), get())
-                }
-
+                defineBuildersForCoreManagers()
+                defineBuildersForDomainManagers()
+                defineBuildersForPresenters()
             }
+
+        private fun Module.defineBuildersForPresenters() {
+            factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
+                ErrorPresenter(view, get())
+            }
+            factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
+                LibSimprintsPresenter(view, action, get(), get())
+            }
+            factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
+                OdkPresenter(view, action, get(), get())
+            }
+            factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
+                CommCarePresenter(view, action, get(), get(), get())
+            }
+        }
+
+        private fun Module.defineBuildersForDomainManagers() {
+            factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
+            factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
+            factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
+            factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
+        }
+
+        private fun Module.defineBuildersForCoreManagers() {
+            factory { SessionEventsManager.build(androidApplication() as Application) }
+            factory { CoreCrashReportManager.build(androidApplication() as Application) }
+            factory { TimeHelper.build(androidApplication() as Application) }
+        }
     }
 }
