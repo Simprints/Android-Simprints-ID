@@ -15,7 +15,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
 
-    fun isAnErrorToSkipCheck(): Boolean =
+    fun canErrorBeSkipped(): Boolean =
         when (reason) {
             Reason.UNEXPECTED_ERROR,
             Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,

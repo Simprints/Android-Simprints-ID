@@ -6,10 +6,12 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OdkPresenter(private val view: OdkContract.View,
                    private val action: String?,
@@ -41,40 +43,53 @@ class OdkPresenter(private val view: OdkContract.View,
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        view.returnErrorToClient(errorResponse)
+        CoroutineScope(Dispatchers.Main).launch {
+            sessionEventsManager.addSkipCheckEvent(errorResponse.canErrorBeSkipped())
+            view.returnErrorToClient(errorResponse)
+        }
     }
 
-    override fun isSimprintsSkipped(errorResponse: ErrorResponse): Boolean =
-        when (errorResponse.reason) {
-            UNEXPECTED_ERROR,
-            DIFFERENT_PROJECT_ID_SIGNED_IN,
-            DIFFERENT_USER_ID_SIGNED_IN,
-            INVALID_CLIENT_REQUEST,
-            INVALID_METADATA,
-            INVALID_MODULE_ID,
-            INVALID_PROJECT_ID,
-            INVALID_SELECTED_ID,
-            INVALID_SESSION_ID,
-            INVALID_USER_ID,
-            INVALID_VERIFY_ID -> true
-            else -> false
+    override fun handleEnrollResponse(enroll: EnrollResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnRegistration(enroll.guid, skipCheck)
         }
+    }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) = view.returnRegistration(enroll.guid)
+    override fun handleIdentifyResponse(identify: IdentifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnIdentification(
+                identify.identifications.getIdsString(),
+                identify.identifications.getConfidencesString(),
+                identify.identifications.getTiersString(),
+                identify.sessionId,
+                skipCheck
+            )
+        }
+    }
 
-    override fun handleIdentifyResponse(identify: IdentifyResponse) = view.returnIdentification(
-        identify.identifications.getIdsString(),
-        identify.identifications.getConfidencesString(),
-        identify.identifications.getTiersString(),
-        identify.sessionId
-    )
+    override fun handleVerifyResponse(verify: VerifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnVerification(
+                verify.matchResult.guidFound,
+                verify.matchResult.confidence.toString(),
+                verify.matchResult.tier.toString(),
+                skipCheck
+            )
+        }
+    }
 
-    override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.guidFound,
-        verify.matchResult.confidence.toString(),
-        verify.matchResult.tier.toString()
-    )
 
-    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
-        view.returnRefusalForm(refusalForm.reason, refusalForm.extra)
+    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, skipCheck)
+        }
+    }
 }

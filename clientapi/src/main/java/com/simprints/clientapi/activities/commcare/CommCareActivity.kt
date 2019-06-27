@@ -26,8 +26,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         const val VERIFICATION_CONFIDENCE_KEY = "confidence"
         const val VERIFICATION_TIER_KEY = "tier"
         const val VERIFICATION_GUID_KEY = "guid"
-        const val REFUSAL_REASON = "reason"
-        const val REFUSAL_EXTRA = "extra"
+        const val EXIT_REASON = "reason"
+        const val EXIT_EXTRA = "extra"
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
@@ -67,17 +67,17 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnRefusalForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
+    override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle()
         data.putBoolean(SKIP_CHECK_KEY, true)
-        data.putString(REFUSAL_REASON, reason)
-        data.putString(REFUSAL_EXTRA, extra)
+        data.putString(EXIT_REASON, reason)
+        data.putString(EXIT_EXTRA, extra)
 
         sendOkResult(it)
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(SKIP_CHECK_KEY, errorResponse.isAnErrorToSkipCheck())
+        it.putExtra(SKIP_CHECK_KEY, errorResponse.canErrorBeSkipped())
         sendOkResult(it)
     }
 

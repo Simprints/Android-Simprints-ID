@@ -23,8 +23,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
         private const val ODK_TIERS_KEY = "odk-tiers"
         private const val ODK_SESSION_ID = "odk-session-id"
-        private const val ODK_REFUSAL_REASON = "odk-refusal-reason"
-        private const val ODK_REFUSAL_EXTRA = "odk-refusal-extra"
+        private const val ODK_EXIT_REASON = "odk-exit-reason"
+        private const val ODK_EXIT_EXTRA = "odk-exit-extra"
     }
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
@@ -65,16 +65,16 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnRefusalForm(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
-        it.putExtra(ODK_REFUSAL_REASON, reason)
-        it.putExtra(ODK_REFUSAL_EXTRA, extra)
+    override fun returnExitForm(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
+        it.putExtra(ODK_EXIT_REASON, reason)
+        it.putExtra(ODK_EXIT_EXTRA, extra)
         it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
         sendOkResult(it)
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(CommCareActivity.SKIP_CHECK_KEY, errorResponse.isAnErrorToSkipCheck())
+        it.putExtra(CommCareActivity.SKIP_CHECK_KEY, errorResponse.canErrorBeSkipped())
         sendOkResult(it)
     }
 

@@ -6,13 +6,13 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
-import com.simprints.clientapi.domain.responses.EnrollResponse
-import com.simprints.clientapi.domain.responses.IdentifyResponse
-import com.simprints.clientapi.domain.responses.RefusalFormResponse
-import com.simprints.clientapi.domain.responses.VerifyResponse
+import com.simprints.clientapi.domain.responses.*
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class CommCarePresenter(private val view: CommCareContract.View,
@@ -45,8 +45,13 @@ class CommCarePresenter(private val view: CommCareContract.View,
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) =
-        view.returnRegistration(enroll.guid, false)
+    override fun handleEnrollResponse(enroll: EnrollResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnRegistration(enroll.guid, skipCheck)
+        }
+    }
 
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
@@ -55,15 +60,33 @@ class CommCarePresenter(private val view: CommCareContract.View,
         }), identify.sessionId)
     }
 
-    override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.confidence,
-        Tier.valueOf(verify.matchResult.tier.name),
-        verify.matchResult.guidFound,
-        false
-    )
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            sessionEventsManager.addSkipCheckEvent(errorResponse.canErrorBeSkipped())
+            view.returnErrorToClient(errorResponse)
+        }
+    }
 
-    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
-        view.returnRefusalForms(refusalForm.reason, refusalForm.extra, false)
+    override fun handleVerifyResponse(verify: VerifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnVerification(
+                verify.matchResult.confidence,
+                Tier.valueOf(verify.matchResult.tier.name),
+                verify.matchResult.guidFound,
+                skipCheck
+            )
+        }
+    }
+
+    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = false
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
+        }
+    }
 
     private fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {

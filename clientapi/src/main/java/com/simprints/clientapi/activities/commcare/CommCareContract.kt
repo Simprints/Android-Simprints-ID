@@ -17,7 +17,7 @@ interface CommCareContract {
 
         fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean)
 
-        fun returnRefusalForms(reason: String, extra: String, skipCheck: Boolean)
+        fun returnExitForms(reason: String, extra: String, skipCheck: Boolean)
 
         fun injectSessionIdIntoIntent(sessionId: String)
 

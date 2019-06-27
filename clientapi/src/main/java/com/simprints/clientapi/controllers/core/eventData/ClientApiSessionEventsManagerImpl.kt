@@ -42,6 +42,15 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
         AlertScreenEvent(timeHelper.now(), clientApiAlertType.fromAlertToAlertTypeEvent())
     )
 
+    override suspend fun addSkipCheckEvent(skipValue: Boolean) = suspendCancellableCoroutine<Unit> { cont ->
+        try {
+            addEvent(SkipCheckEvent(timeHelper.now(), skipValue)).blockingAwait()
+            cont.resume(Unit)
+        } catch (t: Throwable) {
+            cont.resumeWithException(t)
+        }
+    }
+
     override fun addSuspiciousIntentEvent(unexpectedExtras: Map<String, Any?>): Completable =
         addEvent(SuspiciousIntentEvent(timeHelper.now(), unexpectedExtras))
 

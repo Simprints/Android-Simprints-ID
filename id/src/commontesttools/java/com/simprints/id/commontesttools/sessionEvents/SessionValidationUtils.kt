@@ -210,6 +210,13 @@ fun validateEnrolmentEventApiModel(json: JsonObject) {
     assertThat(json.size()).isEqualTo(3)
 }
 
+fun validateSkipCheckEventApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("ENROLMENT")
+    assertThat(json.get("relativeStartTime").asLong)
+    assertThat(json.get("skipValue").asBoolean).isTrue()
+    assertThat(json.size()).isEqualTo(3)
+}
+
 fun validateFingerprintCaptureEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("FINGERPRINT_CAPTURE")
     assertThat(json.get("relativeStartTime").asLong)
