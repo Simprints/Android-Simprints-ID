@@ -1,20 +1,20 @@
-package com.simprints.clientapi.integration.commcare.requests
+package com.simprints.clientapi.integration.odk.requests
 
 import android.app.Activity
 import android.app.Instrumentation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.Intents.times
 import androidx.test.espresso.intent.matcher.BundleMatchers.hasEntry
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.clientapi.activities.commcare.CommCareActivity
+import com.simprints.clientapi.activities.odk.OdkActivity
+import com.simprints.clientapi.di.KoinInjector
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
+import com.simprints.testtools.common.syntax.key
 import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
 import org.junit.After
@@ -25,14 +25,14 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class IdentifyRequestTest : KoinTest {
+class OdkVerifyRequestTest : KoinTest {
 
     private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
 
     @Before
     fun setUp() {
         Intents.init()
-        Intents.intending(hasAction(appIdentifyAction)).respondWith(intentResultOk)
+        Intents.intending(hasAction(appVerifyAction)).respondWith(intentResultOk)
 
         loadClientApiKoinModules()
         declare {
@@ -41,34 +41,46 @@ class IdentifyRequestTest : KoinTest {
     }
 
     @Test
-    fun anIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply { action = commcareIdentifyAction })
+    fun aVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<OdkActivity>(baseIntentRequest.apply {
+            action = odkVerifyAction
+            putExtra(verifyGuidField.key(), verifyGuidField.value())
+        })
 
-        val expectedAppRequest = AppIdentifyRequest(
+        val expectedAppRequest = AppVerifyRequest(
             projectIdField.value(),
             userIdField.value(),
             moduleIdField.value(),
-            metadataField.value())
+            metadataField.value(),
+            verifyGuidField.value())
 
-        intended(hasAction(appIdentifyAction))
+        intended(hasAction(appVerifyAction))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test
-    fun aSuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(suspiciousIntentRequest.apply { action = commcareIdentifyAction })
-        intended(hasAction(appIdentifyAction))
+    fun aSuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<OdkActivity>(suspiciousIntentRequest.apply {
+            action = odkVerifyAction
+            putExtra(verifyGuidField.key(), verifyGuidField.value()) 
+        })
+        
+        intended(hasAction(appVerifyAction))
     }
 
     @Test
-    fun anInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(invalidIntentRequest.apply { action = commcareIdentifyAction })
-        intended(CoreMatchers.not(hasAction(appIdentifyAction)), times(2))
+    fun anInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<OdkActivity>(invalidIntentRequest.apply {
+            action = odkVerifyAction
+            putExtra(verifyGuidField.key(), verifyGuidField.value())
+        })
+        
+        intended(CoreMatchers.not(hasAction(appVerifyAction)), Intents.times(2))
     }
 
     @After
     fun tearDown() {
         Intents.release()
-        unloadClientApiKoinModules()
+        KoinInjector.unloadClientApiKoinModules()
     }
 }

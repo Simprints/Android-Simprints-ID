@@ -25,7 +25,7 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class VerifyRequestTest : KoinTest {
+class CommCareVerifyRequestTest : KoinTest {
 
     private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
 
