@@ -74,8 +74,6 @@ android {
         }
     }
 
-    testBuildType "debug"
-
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'
         test {
