@@ -3,12 +3,13 @@ package com.simprints.clientapi.activities.commcare
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.libsimprints.*
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.libsimprints.Constants
-import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
+import com.simprints.libsimprints.Identification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
