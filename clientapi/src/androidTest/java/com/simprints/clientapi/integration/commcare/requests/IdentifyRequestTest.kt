@@ -1,5 +1,7 @@
 package com.simprints.clientapi.integration.commcare.requests
 
+import android.app.Activity
+import android.app.Instrumentation
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
@@ -24,9 +26,12 @@ import org.koin.test.mock.declare
 @RunWith(AndroidJUnit4::class)
 class IdentifyRequestTest : KoinTest {
 
+    private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+
     @Before
     fun setUp() {
         Intents.init()
+        Intents.intending(hasAction(appIdentifyAction)).respondWith(intentResultOk)
 
         loadClientApiKoinModules()
         declare {

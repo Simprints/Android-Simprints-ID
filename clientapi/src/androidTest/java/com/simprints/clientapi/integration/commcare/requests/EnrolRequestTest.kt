@@ -1,9 +1,10 @@
 package com.simprints.clientapi.integration.commcare.requests
 
+import android.app.Activity
+import android.app.Instrumentation.ActivityResult
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.Intents.times
+import androidx.test.espresso.intent.Intents.*
 import androidx.test.espresso.intent.matcher.BundleMatchers.hasEntry
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
@@ -22,13 +23,17 @@ import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
+
 @RunWith(AndroidJUnit4::class)
 @MediumTest
 class EnrolRequestTest : KoinTest {
 
+    private val intentResultOk = ActivityResult(Activity.RESULT_OK, null)
+
     @Before
     fun setUp() {
         Intents.init()
+        intending(hasAction(appEnrolAction)).respondWith(intentResultOk)
 
         loadClientApiKoinModules()
         declare {
