@@ -21,7 +21,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForFingerprintException()
-        viewModel.fingerprintRequest = FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
+        val fingerprintRequest = FingerprintToDomainRequest.fromFingerprintToDomainRequest(iFingerprintRequest)
 
         viewModel.finishedResult.observe(this, Observer {
             setResult(it.resultCode, it.resultData)
@@ -32,12 +32,12 @@ class OrchestratorActivity : AppCompatActivity() {
             startActivityForResult(it.toIntent(this), it.resultCode)
         })
 
-        viewModel.start()
+        viewModel.start(fingerprintRequest)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.finishedResult.postValue(FinishedResult(resultCode, data))
+        viewModel.handleActivityResult(ActivityResult(resultCode, data))
     }
 
     override fun onDestroy() {
