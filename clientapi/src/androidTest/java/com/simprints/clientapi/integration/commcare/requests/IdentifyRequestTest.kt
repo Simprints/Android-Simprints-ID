@@ -11,7 +11,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -68,5 +69,6 @@ class IdentifyRequestTest : KoinTest {
     @After
     fun tearDown() {
         Intents.release()
+        unloadClientApiKoinModules()
     }
 }
