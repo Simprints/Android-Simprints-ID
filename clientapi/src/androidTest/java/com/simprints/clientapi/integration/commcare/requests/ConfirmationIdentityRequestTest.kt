@@ -4,10 +4,13 @@ package com.simprints.clientapi.integration.commcare.requests
 //@RunWith(AndroidJUnit4::class)
 //class ConfirmationIdentityRequestTest : KoinTest {
 //
-//    @Before
-//    fun setUp() {
-//        Intents.init()
-//
+//private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+
+//@Before
+//fun setUp() {
+//    Intents.init()
+//    Intents.intending(IntentMatchers.hasAction(appConfirmIdentityAction)).respondWith(intentResultOk)
+////
 //        KoinInjector.loadClientApiKoinModules()
 //        declare {
 //            factory { buildDummySessionEventsManagerMock() }
