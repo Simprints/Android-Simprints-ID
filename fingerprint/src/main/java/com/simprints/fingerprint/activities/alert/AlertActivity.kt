@@ -16,8 +16,6 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.CLOSE
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.TRY_AGAIN
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -93,13 +91,6 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
             InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST)
     }
 
-    override fun finishActivity() {
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, AlertActResult.CloseButtonAction.BACK))
-            finish()
-        })
-    }
-
     override fun openBluetoothSettings() {
         val intent = Intent()
         intent.action = android.provider.Settings.ACTION_BLUETOOTH_SETTINGS
@@ -112,17 +103,9 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         startActivity(intent)
     }
 
-    override fun closeActivityAfterTryAgainButton() {
+    override fun closeActivityAfterButtonAction(buttonAction: AlertActResult.CloseButtonAction) {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, TRY_AGAIN))
-        })
-
-        finish()
-    }
-
-    override fun closeActivityAfterCloseButton() {
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, CLOSE))
+            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
         })
 
         finish()
@@ -139,12 +122,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
 
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
-            setResultAndFinish(it, data)
+            setResult(it, data)
         }
-    }
-
-    private fun setResultAndFinish(resultCode: Int, resultData: Intent?) {
-        setResult(resultCode, resultData)
         finish()
     }
 }
