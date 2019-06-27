@@ -5,8 +5,8 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.tools.extensions.parseAppConfirmation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -25,7 +25,7 @@ class GuidSelectionWorker(context: Context, params: WorkerParameters) : Worker(c
 
     @SuppressLint("CheckResult")
     private fun handleGuidSelectionRequest() {
-        val request = inputData.parseAppConfirmation()
+        val request = AppIdentityConfirmationRequest.fromMap(inputData.keyValueMap)
         guidSelectionManager.handleIdentityConfirmationRequest(request)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
