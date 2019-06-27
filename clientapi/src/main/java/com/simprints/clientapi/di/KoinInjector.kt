@@ -31,7 +31,7 @@ class KoinInjector {
 
     companion object {
 
-        var koinModule: Module? = null
+        private var koinModule: Module? = null
 
         fun loadClientApiKoinModules() {
             if(koinModule == null){

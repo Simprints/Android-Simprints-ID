@@ -35,9 +35,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
-    override fun returnRegistration(registrationId: String) = Intent().let {
+    override fun returnRegistration(registrationId: String, skipCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
-        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
         sendOkResult(it)
     }
@@ -45,29 +45,30 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun returnIdentification(idList: String,
                                       confidenceList: String,
                                       tierList: String,
-                                      sessionId: String) = Intent().let {
+                                      sessionId: String,
+                                      skipCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, idList)
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
         sendOkResult(it)
     }
 
-    override fun returnVerification(id: String, confidence: String, tier: String) = Intent().let {
+    override fun returnVerification(id: String, confidence: String, tier: String, skipCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
-        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
         sendOkResult(it)
     }
 
-    override fun returnRefusalForm(reason: String, extra: String) = Intent().let {
+    override fun returnRefusalForm(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REFUSAL_REASON, reason)
         it.putExtra(ODK_REFUSAL_EXTRA, extra)
-        it.putExtra(ODK_SKIP_CHECK_KEY, false)
+        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
         sendOkResult(it)
     }
