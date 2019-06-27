@@ -27,59 +27,58 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-class KoinInjector {
+object KoinInjector {
 
-    companion object {
+    private var koinModule: Module? = null
 
-        private var koinModule: Module? = null
-
-        fun loadClientApiKoinModules() {
-            if(koinModule == null){
-                val module = buildKoinModule()
-                loadKoinModules(module)
-                koinModule = module
-            }
-        }
-
-        fun unloadClientApiKoinModules(){
-            koinModule?.let{
-                unloadKoinModules(it)
-            }
-        }
-
-        private fun buildKoinModule() =
-            module(override=true) {
-                defineBuildersForCoreManagers()
-                defineBuildersForDomainManagers()
-                defineBuildersForPresenters()
-            }
-
-        private fun Module.defineBuildersForPresenters() {
-            factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
-                ErrorPresenter(view, get())
-            }
-            factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
-                LibSimprintsPresenter(view, action, get(), get())
-            }
-            factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
-                OdkPresenter(view, action, get(), get())
-            }
-            factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
-                CommCarePresenter(view, action, get(), get(), get())
-            }
-        }
-
-        private fun Module.defineBuildersForDomainManagers() {
-            factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
-            factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
-            factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-            factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
-        }
-
-        private fun Module.defineBuildersForCoreManagers() {
-            factory { SessionEventsManager.build(androidApplication() as Application) }
-            factory { CoreCrashReportManager.build(androidApplication() as Application) }
-            factory { TimeHelper.build(androidApplication() as Application) }
+    fun loadClientApiKoinModules() {
+        if (koinModule == null) {
+            val module = buildKoinModule()
+            loadKoinModules(module)
+            koinModule = module
         }
     }
+
+    fun unloadClientApiKoinModules() {
+        koinModule?.let {
+            unloadKoinModules(it)
+            koinModule = null
+        }
+    }
+
+    private fun buildKoinModule() =
+        module(override = true) {
+            defineBuildersForCoreManagers()
+            defineBuildersForDomainManagers()
+            defineBuildersForPresenters()
+        }
+
+    private fun Module.defineBuildersForPresenters() {
+        factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
+            ErrorPresenter(view, get())
+        }
+        factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
+            LibSimprintsPresenter(view, action, get(), get())
+        }
+        factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
+            OdkPresenter(view, action, get(), get())
+        }
+        factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
+            CommCarePresenter(view, action, get(), get(), get())
+        }
+    }
+
+    private fun Module.defineBuildersForDomainManagers() {
+        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
+        factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
+        factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
+        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
+    }
+
+    private fun Module.defineBuildersForCoreManagers() {
+        factory { SessionEventsManager.build(androidApplication() as Application) }
+        factory { CoreCrashReportManager.build(androidApplication() as Application) }
+        factory { TimeHelper.build(androidApplication() as Application) }
+    }
 }
+
