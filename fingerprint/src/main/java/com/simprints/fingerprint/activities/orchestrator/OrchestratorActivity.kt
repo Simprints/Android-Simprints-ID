@@ -5,12 +5,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest
-import com.simprints.fingerprint.di.koinModule
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import org.koin.android.viewmodel.ext.android.viewModel
-import org.koin.core.context.loadKoinModules
-import org.koin.core.context.unloadKoinModules
 
 class OrchestratorActivity : AppCompatActivity() {
 
@@ -18,7 +17,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadKoinModules(koinModule)
+        loadFingerprintKoinModules()
 
         val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForFingerprintException()
@@ -43,6 +42,6 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unloadKoinModules(koinModule)
+        unloadFingerprintKoinModules()
     }
 }
