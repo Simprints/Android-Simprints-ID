@@ -8,7 +8,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.identity.GuidSelectionWorker
 import com.simprints.id.tools.extensions.parseAppConfirmation
-import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
 
 class GuidSelectionActivity : AppCompatActivity() {
 
@@ -31,8 +30,8 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun prepareInputData(): Data {
-        val requestJson = intent.parseAppConfirmation().toJson()
-        return Data.Builder().putString(IAppConfirmation.BUNDLE_KEY, requestJson).build()
+        val request = intent.parseAppConfirmation().toMap()
+        return Data.Builder().putAll(request).build()
     }
 
 }
