@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
     android:fitsSystemWindows="true"
-    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.simprints.fingerprint.activities.refusal.RefusalActivity">
 
     <LinearLayout
@@ -19,7 +19,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/whySkipFingerprintingText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
@@ -35,23 +35,63 @@
             android:layout_marginBottom="15dp">
 
             <RadioButton
-                android:id="@+id/rbRefused"
+                android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/beneficiary_refused"
+                android:text="@string/religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbScannerNotWorking"
+                android:id="@+id/rbDataConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/scanner_not_working"
+                android:text="@string/data_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rb_other"
+                android:id="@+id/rbDoesNotHavePermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/does_not_have_permission"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbAppNotWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/app_not_working"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbTooYoung"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/too_young_infant"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbSick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sick"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbPregnant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pregnant"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/other"
@@ -64,8 +104,8 @@
             android:id="@+id/refusalText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:background="@color/simprints_white"
             android:enabled="false"
             android:gravity="top|start"
@@ -73,8 +113,8 @@
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:maxLength="100"
-            android:minHeight="100dp"
             android:maxLines="4"
+            android:minHeight="100dp"
             android:padding="4dp" />
 
         <LinearLayout

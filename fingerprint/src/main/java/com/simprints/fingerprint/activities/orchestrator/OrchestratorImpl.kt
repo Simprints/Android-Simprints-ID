@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.orchestrator
 
 import android.app.Activity
 import android.content.Intent
+import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
@@ -34,6 +35,7 @@ class OrchestratorImpl : Orchestrator {
                 is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
                 is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
                 is MatchingActivity -> { handleResultInMatchingActivity(receiver, resultCode, data) }
+                is AlertActivity -> { handleResultInAlertActivity(receiver, resultCode, data) }
             }
         }
     }
@@ -119,6 +121,16 @@ class OrchestratorImpl : Orchestrator {
 
         //Default behavior - E.g. RESULT_CANCEL (backButton)
         forwardResultBack(receiver, resultCode, data)
+    }
+
+    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
+        extractRefusalActResult(data)?.let {
+            when (it.action) {
+                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
+                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+            }
+            return
+        }
     }
 
     private fun forwardResultBack(receiver: OrchestratorCallback, resultCode: Int?, data: Intent? = null) {
