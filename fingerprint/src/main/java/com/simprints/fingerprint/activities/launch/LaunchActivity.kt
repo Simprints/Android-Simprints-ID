@@ -18,14 +18,12 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
@@ -50,9 +48,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
         val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         component.inject(this)
 
-        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
+        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForFingerprintException()
-        fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
