@@ -30,10 +30,8 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.id.Application
-import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.verifyOnce
-import junit.framework.Assert.fail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -52,7 +50,7 @@ class AlertActivityTest {
             fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
     }
 
-    private val context: Context = ApplicationProvider.getApplicationContext<AlertActivity>()
+
 
     @Before
     fun setUp() {
@@ -159,12 +157,11 @@ class AlertActivityTest {
 
     @Test
     fun pressBackButtonOnBluetoothError_shouldStartRefusalActivity() {
+        val context: Context = ApplicationProvider.getApplicationContext()
         launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
         Espresso.pressBackUnconditionally()
 
-        getCurrentActivity()?.let {
-            intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
-        } ?: fail("No activity present")
+        intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
     }
 
     @Test
