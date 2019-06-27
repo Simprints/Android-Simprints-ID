@@ -70,6 +70,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleAppNotWorkingRadioClick() {
         reason = SCANNER_NOT_WORKING
+        view.setFocusOnRefusalReason()
         logRadioOptionForCrashReport("App not working")
     }
 
@@ -87,23 +88,36 @@ class RefusalPresenter(private val view: RefusalContract.View,
     @SuppressLint("CheckResult")
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
-        reason.let { refusalReason ->
-            sessionEventsManager.addEvent(RefusalEvent(
-                refusalStartTime,
-                timeHelper.now(),
-                refusalReason.toRefusalAnswerForEvent(),
-                refusalText))
-        }.doFinally {
 
-            view.setResultAndFinish(
-                Activity.RESULT_OK,
-                RefusalActResult(
-                    RefusalActResult.Action.SUBMIT,
-                    RefusalActResult.Answer(reason, refusalText)))
+        logAsMalfunctionInCrashReportIfAppNotWorking(refusalText)
 
+        addRefusalEventInSession(reason, refusalText).doFinally {
+            setResultAndFinishInView(refusalText)
         }.subscribeBy(onError = {
             crashReportManager.logExceptionOrSafeException(it)
         })
+    }
+
+    private fun addRefusalEventInSession(refusalReason: RefusalFormReason, refusalText: String) =
+        sessionEventsManager.addEvent(RefusalEvent(
+            refusalStartTime,
+            timeHelper.now(),
+            refusalReason.toRefusalAnswerForEvent(),
+            refusalText))
+
+
+    private fun setResultAndFinishInView(refusalText: String) {
+        view.setResultAndFinish(
+            Activity.RESULT_OK,
+            RefusalActResult(
+                RefusalActResult.Action.SUBMIT,
+                RefusalActResult.Answer(reason, refusalText)))
+    }
+
+    private fun logAsMalfunctionInCrashReportIfAppNotWorking(refusalText: String) {
+        if(reason == SCANNER_NOT_WORKING) {
+            crashReportManager.logMalfunction(refusalText)
+        }
     }
 
     override fun handleScanFingerprintsClick() {
