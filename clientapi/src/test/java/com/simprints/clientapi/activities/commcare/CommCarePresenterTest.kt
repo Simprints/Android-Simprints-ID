@@ -97,7 +97,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mock(), mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
-        verifyOnce(view) { returnRegistration(com.simprints.libsimprints.Registration(registerId)) }
+        verifyOnce(view) { returnRegistration(registerId, false) }
     }
 
     @Test
@@ -128,7 +128,8 @@ class CommCarePresenterTest {
             returnVerification(
                 verification.matchResult.confidence,
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
-                verification.matchResult.guidFound)
+                verification.matchResult.guidFound,
+                false)
         }
     }
 
