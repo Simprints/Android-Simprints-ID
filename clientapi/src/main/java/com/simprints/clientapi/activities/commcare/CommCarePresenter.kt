@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
+import android.util.Log
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
