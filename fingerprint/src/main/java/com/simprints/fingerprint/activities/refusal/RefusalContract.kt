@@ -38,13 +38,21 @@ interface RefusalContract {
         fun handleChangesInRefusalText(refusalText: String)
 
         fun handleReligiousConcernsRadioClick()
+
         fun handleDataConcernsRadioClick()
+
         fun handleTooYoungRadioClick()
+
         fun handleSickRadioClick()
+
         fun handlePregnantRadioClick()
+
         fun handleDoesNotHavePermissionRadioClick()
+
         fun handleAppNotWorkingRadioClick()
+
         fun handleOtherRadioOptionClick()
+
         fun handleRadioOptionCheckedChange()
 
         fun handleOnBackPressed()
