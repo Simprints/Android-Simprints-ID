@@ -11,7 +11,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -70,5 +71,6 @@ class EnrolRequestTest : KoinTest {
     @After
     fun tearDown() {
         Intents.release()
+        KoinInjector.unloadClientApiKoinModules()
     }
 }
