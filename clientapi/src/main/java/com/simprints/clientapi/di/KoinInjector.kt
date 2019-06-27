@@ -44,7 +44,8 @@ class KoinInjector {
         fun unloadClientApiKoinModules(){
             koinModule?.let{
                 unloadKoinModules(it)
-            }
+            koinModule = null
+        }
         }
 
         private fun buildKoinModule() =
