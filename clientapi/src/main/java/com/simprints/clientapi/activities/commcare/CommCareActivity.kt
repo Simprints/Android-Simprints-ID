@@ -2,16 +2,14 @@ package com.simprints.clientapi.activities.commcare
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.core.context.unloadKoinModules
 import org.koin.core.parameter.parametersOf
 
 
