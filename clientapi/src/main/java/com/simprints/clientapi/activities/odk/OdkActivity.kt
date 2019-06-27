@@ -3,8 +3,8 @@ package com.simprints.clientapi.activities.odk
 import android.content.Intent
 import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
-import com.simprints.clientapi.di.KoinInjector.Companion.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.Companion.unloadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,7 +64,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     override fun onDestroy() {
         super.onDestroy()
         unloadClientApiKoinModules()
-
     }
 
 }
