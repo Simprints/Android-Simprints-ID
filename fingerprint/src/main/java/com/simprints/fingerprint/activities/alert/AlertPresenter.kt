@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.alert
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.GUID_NOT_FOUND_ONLINE
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -60,14 +61,14 @@ class AlertPresenter(val view: AlertContract.View,
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
             is BluetoothSettings -> view.openBluetoothSettings()
-            is TryAgain -> view.closeActivityAfterTryAgainButton()
-            is Close -> view.closeActivityAfterCloseButton()
+            is TryAgain -> view.closeActivityAfterButtonAction(TRY_AGAIN)
+            is Close -> view.closeActivityAfterButtonAction(CLOSE)
         }
     }
 
     override fun handleBackPressed() {
         if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
-            view.finishActivity()
+            view.closeActivityAfterButtonAction(BACK)
         } else {
             view.startRefusalActivity()
         }

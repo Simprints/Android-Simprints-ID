@@ -25,8 +25,8 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            viewPresenter.handleChangesInRefusalText(getRefusalText())
+        override fun onTextChanged(refusalTextCharSequence: CharSequence, start: Int, before: Int, count: Int) {
+            viewPresenter.handleChangesInRefusalText(refusalTextCharSequence.toString())
         }
 
         override fun afterTextChanged(s: Editable) {
@@ -99,7 +99,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.isEnabled = true
     }
 
-    override fun setFocusOnRefusalReason() {
+    override fun setFocusOnRefusalReasonAndDisableSubmit() {
         btSubmitRefusalForm.isEnabled = false
         refusalText.requestFocus()
         setTextChangeListenerOnRefusalText()
