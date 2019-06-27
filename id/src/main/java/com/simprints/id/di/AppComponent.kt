@@ -21,27 +21,24 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
-import com.simprints.id.activities.orchestrator.OrchestratorPresenter
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityModule
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.identity.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.services.GuidSelectionService
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
@@ -69,7 +66,7 @@ interface AppComponent {
     }
 
     fun inject(app: Application)
-    fun inject(guidSelectionService: GuidSelectionService)
+    fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
     fun inject(longConsentActivity: LongConsentActivity)
