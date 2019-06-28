@@ -32,6 +32,7 @@ object DomainToFingerprintResponse {
             FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintRefusalReason.REFUSED_DATA_CONCERNS
             FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintRefusalReason.REFUSED_PERMISSION
             FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintRefusalReason.SCANNER_NOT_WORKING
+            FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintRefusalReason.REFUSED_NOT_PRESENT
             FingerprintRefusalFormReason.REFUSED_YOUNG -> IFingerprintRefusalReason.REFUSED_YOUNG
             FingerprintRefusalFormReason.REFUSED_SICK -> IFingerprintRefusalReason.REFUSED_SICK
             FingerprintRefusalFormReason.REFUSED_PREGNANT -> IFingerprintRefusalReason.REFUSED_PREGNANT

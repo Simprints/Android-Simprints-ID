@@ -49,6 +49,8 @@ interface RefusalContract {
 
         fun handleDoesNotHavePermissionRadioClick()
 
+        fun handlePersonNotPresentRadioClick()
+
         fun handleAppNotWorkingRadioClick()
 
         fun handleOtherRadioOptionClick()

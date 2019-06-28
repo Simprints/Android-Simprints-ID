@@ -46,6 +46,7 @@ object FingerprintToDomainResponse {
             IFingerprintRefusalReason.REFUSED_DATA_CONCERNS -> FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS
             IFingerprintRefusalReason.REFUSED_PERMISSION -> FingerprintRefusalFormReason.REFUSED_PERMISSION
             IFingerprintRefusalReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
+            IFingerprintRefusalReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
             IFingerprintRefusalReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
             IFingerprintRefusalReason.REFUSED_SICK -> FingerprintRefusalFormReason.REFUSED_SICK
             IFingerprintRefusalReason.REFUSED_PREGNANT -> FingerprintRefusalFormReason.REFUSED_PREGNANT

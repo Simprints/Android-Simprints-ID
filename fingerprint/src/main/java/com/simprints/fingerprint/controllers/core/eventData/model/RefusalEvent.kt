@@ -15,6 +15,7 @@ enum class RefusalAnswer {
     REFUSED_DATA_CONCERNS,
     REFUSED_PERMISSION,
     SCANNER_NOT_WORKING,
+    REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
     REFUSED_SICK,
     REFUSED_PREGNANT,
@@ -30,6 +31,7 @@ fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
         RefusalAnswer.REFUSED_DATA_CONCERNS -> CoreRefusalAnswer.REFUSED_DATA_CONCERNS
         RefusalAnswer.REFUSED_PERMISSION -> CoreRefusalAnswer.REFUSED_PERMISSION
         RefusalAnswer.SCANNER_NOT_WORKING -> CoreRefusalAnswer.SCANNER_NOT_WORKING
+        RefusalAnswer.REFUSED_NOT_PRESENT -> CoreRefusalAnswer.REFUSED_NOT_PRESENT
         RefusalAnswer.REFUSED_YOUNG -> CoreRefusalAnswer.REFUSED_YOUNG
         RefusalAnswer.REFUSED_SICK -> CoreRefusalAnswer.REFUSED_YOUNG
         RefusalAnswer.REFUSED_PREGNANT -> CoreRefusalAnswer.REFUSED_PREGNANT

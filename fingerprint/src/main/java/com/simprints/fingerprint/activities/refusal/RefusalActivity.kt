@@ -72,6 +72,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         when (optionIdentifier) {
             R.id.rbReligiousConcerns -> viewPresenter.handleReligiousConcernsRadioClick()
             R.id.rbDataConcerns -> viewPresenter.handleDataConcernsRadioClick()
+            R.id.rbPersonNotPresent -> viewPresenter.handlePersonNotPresentRadioClick()
             R.id.rbTooYoung -> viewPresenter.handleTooYoungRadioClick()
             R.id.rbSick -> viewPresenter.handleSickRadioClick()
             R.id.rbPregnant -> viewPresenter.handlePregnantRadioClick()
