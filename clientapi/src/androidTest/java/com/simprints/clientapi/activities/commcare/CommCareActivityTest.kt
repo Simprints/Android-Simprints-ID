@@ -7,6 +7,7 @@ import com.simprints.clientapi.activities.BaseActivityTest
 import com.simprints.clientapi.activities.robots.commCare
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.libsimprints.Constants.*
+import com.simprints.testtools.common.syntax.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -16,7 +17,7 @@ import org.mockito.Mock
 class CommCareActivityTest : BaseActivityTest<CommCareActivity>(CommCareActivity::class) {
 
     @Mock
-    private lateinit var request: AppIdentityConfirmationRequest
+    private val request: AppIdentityConfirmationRequest = mock()
 
     @Test
     fun withConfirmIdentityIntent_shouldDisplayCorrectToastMessage() {
