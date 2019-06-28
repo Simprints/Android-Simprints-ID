@@ -22,11 +22,11 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person

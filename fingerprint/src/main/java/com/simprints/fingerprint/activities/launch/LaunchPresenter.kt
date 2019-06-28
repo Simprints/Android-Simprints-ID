@@ -29,12 +29,12 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
@@ -49,7 +49,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString

@@ -1,15 +1,14 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException

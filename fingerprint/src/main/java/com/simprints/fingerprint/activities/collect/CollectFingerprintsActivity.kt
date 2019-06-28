@@ -21,8 +21,8 @@ import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException

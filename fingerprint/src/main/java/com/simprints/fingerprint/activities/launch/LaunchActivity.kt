@@ -12,11 +12,9 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
@@ -150,9 +148,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun continueToNextActivity() {
-        val intent = Intent(this, CollectFingerprintsActivity::class.java)
-            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
-        startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
+//        val intent = Intent(this, CollectFingerprintsActivity::class.java)
+//            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
+//        startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
+        setResultAndFinish(0, null)
     }
 
     override fun goToRefusalActivity() {

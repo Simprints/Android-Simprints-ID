@@ -9,7 +9,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.data.domain.refusal.toRefusalAnswerForEvent
