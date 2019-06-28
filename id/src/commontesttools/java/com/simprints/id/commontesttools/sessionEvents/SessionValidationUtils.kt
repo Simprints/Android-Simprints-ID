@@ -92,7 +92,7 @@ fun verifyCallbackVerificationApiModel(json: JsonObject) {
 
 fun verifyCallbackRefusalApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("REFUSAL")
-    assertThat(json.get("reason").asString).isAnyOf("REFUSED_RELIGION", "REFUSED_DATA_CONCERNS", "REFUSED_PERMISSION", "SCANNER_NOT_WORKING", "REFUSED_YOUNG", "REFUSED_SICK", "REFUSED_PREGNANT", "OTHER")
+    assertThat(json.get("reason").asString).isAnyOf("REFUSED_RELIGION", "REFUSED_DATA_CONCERNS", "REFUSED_PERMISSION", "SCANNER_NOT_WORKING", "REFUSED_NOT_PRESENT", "REFUSED_YOUNG", "REFUSED_SICK", "REFUSED_PREGNANT", "OTHER")
     assertThat(json.get("extra").asString)
 }
 
