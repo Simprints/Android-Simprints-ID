@@ -70,7 +70,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
 
     override fun handleAppNotWorkingRadioClick() {
         reason = SCANNER_NOT_WORKING
-        view.setFocusOnRefusalReason()
+        view.setFocusOnRefusalReasonAndDisableSubmit()
         logRadioOptionForCrashReport("App not working")
     }
 
