@@ -67,10 +67,18 @@
                 android:textSize="20sp" />
 
             <RadioButton
+                android:id="@+id/rbPersonNotPresent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/person_not_present"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
                 android:id="@+id/rbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/too_young_infant"
+                android:text="@string/too_young"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 

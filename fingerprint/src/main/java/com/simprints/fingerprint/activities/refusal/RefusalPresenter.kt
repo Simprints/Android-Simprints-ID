@@ -53,6 +53,11 @@ class RefusalPresenter(private val view: RefusalContract.View,
         logRadioOptionForCrashReport("Too young")
     }
 
+    override fun handlePersonNotPresentRadioClick() {
+        reason = REFUSED_NOT_PRESENT
+        logRadioOptionForCrashReport("Person not present")
+    }
+
     override fun handleSickRadioClick() {
         reason = REFUSED_SICK
         logRadioOptionForCrashReport("Sick")
