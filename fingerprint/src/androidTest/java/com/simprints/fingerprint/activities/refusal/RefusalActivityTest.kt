@@ -92,6 +92,15 @@ class RefusalActivityTest {
             RefusalFormReason.REFUSED_RELIGION, refusalReasonText)
     }
 
+    @Test
+    fun pressScanFingerprint_shouldFinishWithRightResultWithDefaultRefusalFormReason() {
+        val scenario = launchRefusalActivity()
+
+        onView(withId(R.id.btScanFingerprints)).perform(click())
+
+        verifyIntentReturned(scenario.result, RefusalActResult.Action.SCAN_FINGERPRINTS, RefusalFormReason.OTHER, "")
+    }
+
     private fun launchRefusalActivity(): ActivityScenario<RefusalActivity> =
         ActivityScenario.launch<RefusalActivity>(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, RefusalActivity::class.qualifiedName!!)
