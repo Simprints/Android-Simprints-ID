@@ -7,15 +7,15 @@ import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseB
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SCAN_FINGERPRINTS
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SUBMIT
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult.Action.SCAN_FINGERPRINTS
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult.Action.SUBMIT
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorImpl : Orchestrator {

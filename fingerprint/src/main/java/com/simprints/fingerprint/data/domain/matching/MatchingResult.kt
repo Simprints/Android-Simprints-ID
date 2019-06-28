@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.data.domain.matching.result
+package com.simprints.fingerprint.data.domain.matching
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

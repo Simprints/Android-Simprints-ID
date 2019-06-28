@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.data.domain.matching.result
+package com.simprints.fingerprint.data.domain.matching
 
 enum class MatchingTier {
     TIER_1,

@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import android.os.Parcelable
-import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
+import com.simprints.fingerprint.data.domain.matching.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.moduleapi.fingerprint.responses.*

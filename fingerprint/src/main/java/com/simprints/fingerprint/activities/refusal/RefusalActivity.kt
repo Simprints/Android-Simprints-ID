@@ -8,7 +8,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*

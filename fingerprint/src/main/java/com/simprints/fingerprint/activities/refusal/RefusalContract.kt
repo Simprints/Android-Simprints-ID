@@ -2,8 +2,7 @@ package com.simprints.fingerprint.activities.refusal
 
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 
 interface RefusalContract {
 
