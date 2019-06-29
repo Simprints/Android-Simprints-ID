@@ -161,7 +161,6 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    @MediumTest
     fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()

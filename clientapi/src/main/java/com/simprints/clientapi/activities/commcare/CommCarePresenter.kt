@@ -62,7 +62,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            sessionEventsManager.addSkipCheckEvent(errorResponse.canErrorBeSkipped())
+            sessionEventsManager.addSkipCheckEvent(errorResponse.didUserSkip())
             view.returnErrorToClient(errorResponse)
         }
     }

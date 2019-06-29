@@ -13,6 +13,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
+import com.simprints.clientapi.integration.odk.odkIdentifyAction
+import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
+import com.simprints.clientapi.integration.odk.odkSuspiciousIntentRequest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -42,7 +47,7 @@ class OdkIdentifyRequestTest : KoinTest {
 
     @Test
     fun anIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(baseIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkIdentifyAction })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -56,13 +61,13 @@ class OdkIdentifyRequestTest : KoinTest {
 
     @Test
     fun aSuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(suspiciousIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = odkIdentifyAction })
         intended(hasAction(appIdentifyAction))
     }
 
     @Test
     fun anInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(invalidIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = odkIdentifyAction })
         intended(CoreMatchers.not(hasAction(appIdentifyAction)), times(2))
     }
 

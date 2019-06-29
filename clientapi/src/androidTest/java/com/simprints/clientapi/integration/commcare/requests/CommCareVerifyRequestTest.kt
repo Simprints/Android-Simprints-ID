@@ -12,6 +12,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.di.KoinInjector
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
+import com.simprints.clientapi.integration.commcare.commCareInvalidIntentRequest
+import com.simprints.clientapi.integration.commcare.commCareSuspiciousIntentRequest
+import com.simprints.clientapi.integration.commcare.commcareVerifyAction
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
@@ -42,7 +47,7 @@ class CommCareVerifyRequestTest : KoinTest {
 
     @Test
     fun aVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply {
+        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
             action = commcareVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -60,7 +65,7 @@ class CommCareVerifyRequestTest : KoinTest {
 
     @Test
     fun aSuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(suspiciousIntentRequest.apply {
+        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply {
             action = commcareVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value()) 
         })
@@ -70,7 +75,7 @@ class CommCareVerifyRequestTest : KoinTest {
 
     @Test
     fun anInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(invalidIntentRequest.apply {
+        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply {
             action = commcareVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

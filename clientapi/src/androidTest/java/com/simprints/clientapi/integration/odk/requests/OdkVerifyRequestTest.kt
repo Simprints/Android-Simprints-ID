@@ -12,6 +12,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.di.KoinInjector
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
+import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
+import com.simprints.clientapi.integration.odk.odkSuspiciousIntentRequest
+import com.simprints.clientapi.integration.odk.odkVerifyAction
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
@@ -42,7 +47,7 @@ class OdkVerifyRequestTest : KoinTest {
 
     @Test
     fun aVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(baseIntentRequest.apply {
+        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
             action = odkVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
@@ -60,9 +65,9 @@ class OdkVerifyRequestTest : KoinTest {
 
     @Test
     fun aSuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(suspiciousIntentRequest.apply {
+        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply {
             action = odkVerifyAction
-            putExtra(verifyGuidField.key(), verifyGuidField.value()) 
+            putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         
         intended(hasAction(appVerifyAction))
@@ -70,7 +75,7 @@ class OdkVerifyRequestTest : KoinTest {
 
     @Test
     fun anInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<OdkActivity>(invalidIntentRequest.apply {
+        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply {
             action = odkVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

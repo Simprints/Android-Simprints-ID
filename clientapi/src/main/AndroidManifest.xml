@@ -11,7 +11,8 @@
         <dist:fusing dist:include="true" />
     </dist:module>
 
-    <application tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
+    <application
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning,MissingApplicationIcon">
 
         <activity
             android:name=".activities.odk.OdkActivity"
