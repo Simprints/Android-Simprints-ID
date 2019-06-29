@@ -10,8 +10,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.di.KoinInjector
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
@@ -22,31 +20,22 @@ import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
 import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class OdkVerifyRequestTest : KoinTest {
-
-    private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+class OdkVerifyRequestTest : BaseClientApiTest() {
 
     @Before
-    fun setUp() {
-        Intents.init()
-        Intents.intending(hasAction(appVerifyAction)).respondWith(intentResultOk)
-
-        loadClientApiKoinModules()
-        declare {
-            factory { buildDummySessionEventsManagerMock() }
-        }
+    override fun setUp() {
+        super.setUp()
+        val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+        Intents.intending(hasAction(appEnrolAction)).respondWith(intentResultOk)
     }
 
     @Test
-    fun aVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+    fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
             action = odkVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
@@ -64,7 +53,7 @@ class OdkVerifyRequestTest : KoinTest {
     }
 
     @Test
-    fun aSuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+    fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply {
             action = odkVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
@@ -74,18 +63,12 @@ class OdkVerifyRequestTest : KoinTest {
     }
 
     @Test
-    fun anInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
+    fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply {
             action = odkVerifyAction
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         
         intended(CoreMatchers.not(hasAction(appVerifyAction)), Intents.times(2))
-    }
-
-    @After
-    fun tearDown() {
-        Intents.release()
-        KoinInjector.unloadClientApiKoinModules()
     }
 }
