@@ -13,6 +13,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
+import com.simprints.clientapi.integration.commcare.commCareInvalidIntentRequest
+import com.simprints.clientapi.integration.commcare.commCareSuspiciousIntentRequest
+import com.simprints.clientapi.integration.commcare.commcareIdentifyAction
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -42,7 +47,7 @@ class CommCareIdentifyRequestTest : KoinTest {
 
     @Test
     fun anIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -56,13 +61,13 @@ class CommCareIdentifyRequestTest : KoinTest {
 
     @Test
     fun aSuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(suspiciousIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = commcareIdentifyAction })
         intended(hasAction(appIdentifyAction))
     }
 
     @Test
     fun anInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(invalidIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = commcareIdentifyAction })
         intended(CoreMatchers.not(hasAction(appIdentifyAction)), times(2))
     }
 

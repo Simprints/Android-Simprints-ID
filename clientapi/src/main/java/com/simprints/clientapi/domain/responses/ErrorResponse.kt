@@ -15,7 +15,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
 
-    fun canErrorBeSkipped(): Boolean =
+    fun didUserSkip(): Boolean =
         when (reason) {
             Reason.UNEXPECTED_ERROR,
             Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
@@ -27,8 +27,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
             Reason.INVALID_SELECTED_ID,
             Reason.INVALID_SESSION_ID,
             Reason.INVALID_USER_ID,
-            Reason.INVALID_VERIFY_ID -> true
-            else -> false
+            Reason.INVALID_VERIFY_ID -> false
+            else -> true
         }
 
     enum class Reason {
