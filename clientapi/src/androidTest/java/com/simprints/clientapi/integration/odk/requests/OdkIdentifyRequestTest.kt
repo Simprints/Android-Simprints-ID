@@ -11,8 +11,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
-import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkIdentifyAction
@@ -22,31 +20,23 @@ import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class OdkIdentifyRequestTest : KoinTest {
+class OdkIdentifyRequestTest : BaseClientApiTest() {
 
-    private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
 
     @Before
-    fun setUp() {
-        Intents.init()
-        Intents.intending(hasAction(appIdentifyAction)).respondWith(intentResultOk)
-
-        loadClientApiKoinModules()
-        declare {
-            factory { buildDummySessionEventsManagerMock() }
-        }
+    override fun setUp() {
+        super.setUp()
+        val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+        Intents.intending(hasAction(appEnrolAction)).respondWith(intentResultOk)
     }
 
     @Test
-    fun anIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
+    fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkIdentifyAction })
 
         val expectedAppRequest = AppIdentifyRequest(
@@ -60,20 +50,14 @@ class OdkIdentifyRequestTest : KoinTest {
     }
 
     @Test
-    fun aSuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
+    fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = odkIdentifyAction })
         intended(hasAction(appIdentifyAction))
     }
 
     @Test
-    fun anInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
+    fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = odkIdentifyAction })
         intended(CoreMatchers.not(hasAction(appIdentifyAction)), times(2))
-    }
-
-    @After
-    fun tearDown() {
-        Intents.release()
-        unloadClientApiKoinModules()
     }
 }
