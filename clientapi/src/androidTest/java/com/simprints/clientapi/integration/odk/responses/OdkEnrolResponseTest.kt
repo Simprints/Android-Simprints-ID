@@ -20,7 +20,7 @@ class OdkEnrolResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnEnrolAppResponse_shouldReturnAOdkEnrolResponse() {
         val appEnrolResponse = AppEnrolResponse(UUID.randomUUID().toString())
-        mockAppModulResponse(appEnrolResponse, appEnrolAction)
+        mockAppModuleResponse(appEnrolResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkEnrolAction })

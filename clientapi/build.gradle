@@ -94,6 +94,9 @@ dependencies {
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.koin.core_ext
+    testImplementation deps.testing.koin
 
     // Android Tests
     androidTestImplementation(project(':testtools')) {

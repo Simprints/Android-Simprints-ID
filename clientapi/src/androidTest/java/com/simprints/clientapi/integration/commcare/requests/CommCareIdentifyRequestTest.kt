@@ -10,6 +10,7 @@ import androidx.test.espresso.intent.matcher.BundleMatchers.hasEntry
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
@@ -35,6 +36,7 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
     }
 
     @Test
+    @MediumTest
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })
 

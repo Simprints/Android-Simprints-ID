@@ -19,7 +19,7 @@ class CommCareExitResponseTest: BaseClientApiTest() {
     @Test
     fun appModuleSendsAnExitAppResponse_shouldReturnACommCareExitResponse() {
         val appExitResponse = AppRefusalResponse("some_reason", "some_extra")
-        mockAppModulResponse(appExitResponse, appEnrolAction)
+        mockAppModuleResponse(appExitResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareEnrolAction })

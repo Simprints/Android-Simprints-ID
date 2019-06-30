@@ -20,7 +20,7 @@ class CommCareEnrolResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnEnrolAppResponse_shouldReturnACommCareEnrolResponse() {
         val appEnrolResponse = AppEnrolResponse(UUID.randomUUID().toString())
-        mockAppModulResponse(appEnrolResponse, appEnrolAction)
+        mockAppModuleResponse(appEnrolResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareEnrolAction })
