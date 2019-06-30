@@ -25,7 +25,7 @@ class OdkIdentifyResponseTest : BaseClientApiTest() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         ), "session_id")
-        mockAppModulResponse(appIdentifyResponse, appIdentifyAction)
+        mockAppModuleResponse(appIdentifyResponse, appIdentifyAction)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkIdentifyAction })

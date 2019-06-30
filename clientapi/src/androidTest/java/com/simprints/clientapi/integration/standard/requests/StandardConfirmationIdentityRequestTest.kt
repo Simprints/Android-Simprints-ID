@@ -20,7 +20,7 @@ package com.simprints.clientapi.integration.standard.requests
 //    @Test
 //    fun aConfirmIdentityRequest_shouldGenerateAnAppConfirmIdentityRequest() {
 //        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply {
-//            action = commcareConfirmIdentityAction
+//            action = standardConfirmIdentityAction
 //            putExtra(sessionIdField.key(), sessionIdField.value())
 //            putExtra(selectedGuidField.key(), selectedGuidField.value())
 //        })

@@ -19,7 +19,7 @@ class OdkExitResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnExitAppResponse_shouldReturnAOdkExitResponse() {
         val appExitResponse = AppRefusalResponse("some_reason", "some_extra")
-        mockAppModulResponse(appExitResponse, appEnrolAction)
+        mockAppModuleResponse(appExitResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkEnrolAction })

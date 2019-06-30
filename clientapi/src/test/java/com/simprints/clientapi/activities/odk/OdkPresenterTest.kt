@@ -85,7 +85,7 @@ class OdkPresenterTest {
 
         OdkPresenter(view, ACTION_REGISTER, mock(), mock()).handleEnrollResponse(EnrollResponse(registerId))
 
-        verifyOnce(view) { returnRegistration(registerId) }
+        verifyOnce(view) { returnRegistration(registerId, false) }
     }
 
     @Test
@@ -102,7 +102,8 @@ class OdkPresenterTest {
                 idList = "${id1.guidFound} ${id2.guidFound}",
                 confidenceList = "${id1.confidence} ${id2.confidence}",
                 tierList = "${id1.tier} ${id2.tier}",
-                sessionId = sessionId)
+                sessionId = sessionId,
+                skipCheck = false)
         }
     }
 
@@ -116,7 +117,8 @@ class OdkPresenterTest {
             returnVerification(
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
-                tier = verification.matchResult.tier.toString())
+                tier = verification.matchResult.tier.toString(),
+                skipCheck = false)
         }
     }
 

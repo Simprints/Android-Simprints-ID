@@ -1,17 +1,17 @@
-package com.simprints.clientapi.integration.commcare.responses
+package com.simprints.clientapi.integration.standard.responses
 
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import com.simprints.clientapi.activities.commcare.CommCareActivity
+import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.appIdentifyAction
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareIdentifyAction
+import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
+import com.simprints.clientapi.integration.standard.standardIdentifyAction
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -21,23 +21,22 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class CommCareIdentifyResponseTest: BaseClientApiTest() {
-
+class StandardIdentifyResponseTest: BaseClientApiTest() {
 
     @Test
-    fun appModuleSendsAnIdentifyAppResponse_shouldReturnACommCareIdentifyResponse() {
+    fun appModuleSendsAnIdentifyAppResponse_shouldReturnAStandardIdentifyResponse() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         ), "session_id")
         mockAppModuleResponse(appIdentifyResponse, appIdentifyAction)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardIdentifyAction })
 
-        assertCommCareIdentifyResponse(scenario, appIdentifyResponse)
+        assertStandardIdentifyResponse(scenario, appIdentifyResponse)
     }
 
-    private fun assertCommCareIdentifyResponse(scenario: ActivityScenario<CommCareActivity>,
+    private fun assertStandardIdentifyResponse(scenario: ActivityScenario<LibSimprintsActivity>,
                                                appIdentifyResponse: AppIdentifyResponse) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
@@ -48,7 +47,6 @@ class CommCareIdentifyResponseTest: BaseClientApiTest() {
                 ?: throw Throwable("No identifications returned")
 
             assertEqualIdentification(identificationsReturned[0], appIdentifyResponse.identifications[0])
-            assertThat(it.getBoolean("skipCheck")).isEqualTo(false)
         } ?: throw Exception("No bundle found")
     }
 

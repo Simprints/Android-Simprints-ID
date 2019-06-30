@@ -31,7 +31,7 @@ class CommCareVerifyRequestTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
-        Intents.intending(hasAction(appEnrolAction)).respondWith(intentResultOk)
+        Intents.intending(hasAction(appVerifyAction)).respondWith(intentResultOk)
     }
 
     @Test

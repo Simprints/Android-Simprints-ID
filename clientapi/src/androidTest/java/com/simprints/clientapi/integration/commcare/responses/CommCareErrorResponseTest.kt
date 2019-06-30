@@ -20,7 +20,7 @@ class CommCareErrorResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnErrorAppResponse_shouldReturnACommCareErrorResponse() {
         val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        mockAppModulResponse(appErrorResponse, appEnrolAction)
+        mockAppModuleResponse(appErrorResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareEnrolAction })

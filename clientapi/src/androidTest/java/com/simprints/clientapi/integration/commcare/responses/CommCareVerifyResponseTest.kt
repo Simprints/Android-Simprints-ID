@@ -23,7 +23,7 @@ class CommCareVerifyResponseTest : BaseClientApiTest() {
         val appVerifyResponse = AppVerifyResponse(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         )
-        mockAppModulResponse(appVerifyResponse, appVerifyAction)
+        mockAppModuleResponse(appVerifyResponse, appVerifyAction)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {

@@ -24,8 +24,8 @@ abstract class BaseClientApiTest : KoinTest {
         }
     }
 
-    protected fun mockAppModulResponse(appResponse: IAppResponse,
-                                              action: String) {
+    protected fun mockAppModuleResponse(appResponse: IAppResponse,
+                                        action: String) {
 
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, Intent().apply {
             this.putExtra(IAppResponse.BUNDLE_KEY, appResponse)

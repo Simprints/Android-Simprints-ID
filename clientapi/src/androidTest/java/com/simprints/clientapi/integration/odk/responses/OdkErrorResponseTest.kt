@@ -25,7 +25,7 @@ class OdkErrorResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnErrorAppResponse_shouldReturnAOdkErrorResponse() {
         val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        mockAppModulResponse(appErrorResponse, appEnrolAction)
+        mockAppModuleResponse(appErrorResponse, appEnrolAction)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkEnrolAction })
