@@ -12,13 +12,13 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
@@ -27,16 +27,25 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_fingerprint_alert)
+
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
+        if(isBluetoothAlert(alertType)) {
+           setContentView(R.layout.activity_fingerprint_bluetooth_alert)
+        } else {
+            setContentView(R.layout.activity_fingerprint_alert)
+        }
+
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
+
+    private fun isBluetoothAlert(alertType: FingerprintAlert) =
+        (alertType == DISCONNECTED || alertType == NOT_PAIRED)
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
@@ -46,9 +55,9 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alert_image.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
-            hintGraphic.setImageResource(alertHintDrawableId)
+            hintGraphic?.setImageResource(alertHintDrawableId)
         } else {
-            hintGraphic.visibility = View.GONE
+            hintGraphic?.visibility = View.GONE
         }
     }
 
