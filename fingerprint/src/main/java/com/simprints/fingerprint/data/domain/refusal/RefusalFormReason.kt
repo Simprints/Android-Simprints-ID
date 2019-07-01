@@ -38,7 +38,7 @@ fun RefusalFormReason.toFingerprintRefusalFormReason(): FingerprintRefusalFormRe
         RefusalFormReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
         RefusalFormReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
         RefusalFormReason.REFUSED_SICK -> FingerprintRefusalFormReason.REFUSED_SICK
-        RefusalFormReason.REFUSED_PREGNANT -> FingerprintRefusalFormReason.REFUSED_SICK
+        RefusalFormReason.REFUSED_PREGNANT -> FingerprintRefusalFormReason.REFUSED_PREGNANT
         RefusalFormReason.OTHER -> FingerprintRefusalFormReason.OTHER
     }
 
