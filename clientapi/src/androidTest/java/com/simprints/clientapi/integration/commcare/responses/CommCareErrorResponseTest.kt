@@ -32,7 +32,7 @@ class CommCareErrorResponseTest : BaseClientApiTest() {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.getBundle("odk_intent_bundle")?.let {
-            assertThat(it.getBoolean("skipCheck")).isEqualTo(false)
+            assertThat(it.getBoolean("skipCheck")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 }

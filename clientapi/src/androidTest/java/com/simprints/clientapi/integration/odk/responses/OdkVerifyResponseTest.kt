@@ -2,7 +2,6 @@ package com.simprints.clientapi.integration.odk.responses
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.*
@@ -41,7 +40,7 @@ class OdkVerifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("odk-guids")).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString("odk-confidences")).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
             assertThat(it.getString("odk-tiers")).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getBoolean("odk-skip-check")).isFalse()
+            assertThat(it.getBoolean("odk-skip-check")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 }

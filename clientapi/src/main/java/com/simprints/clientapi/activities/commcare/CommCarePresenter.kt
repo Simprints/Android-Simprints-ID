@@ -47,7 +47,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = false
+            val skipCheck = true
             sessionEventsManager.addSkipCheckEvent(skipCheck)
             view.returnRegistration(enroll.guid, skipCheck)
         }
@@ -62,14 +62,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            sessionEventsManager.addSkipCheckEvent(errorResponse.didUserSkip())
+            sessionEventsManager.addSkipCheckEvent(errorResponse.skipCheckAfterError())
             view.returnErrorToClient(errorResponse)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = false
+            val skipCheck = true
             sessionEventsManager.addSkipCheckEvent(skipCheck)
             view.returnVerification(
                 verify.matchResult.confidence,
@@ -82,7 +82,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = false
+            val skipCheck = true
             sessionEventsManager.addSkipCheckEvent(skipCheck)
             view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
         }

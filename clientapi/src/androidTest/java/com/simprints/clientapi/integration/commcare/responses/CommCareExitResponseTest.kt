@@ -33,7 +33,7 @@ class CommCareExitResponseTest: BaseClientApiTest() {
         result.resultData.extras?.getBundle("odk_intent_bundle")?.let {
             assertThat(it.getString("reason")).isEqualTo(appExitResponse.reason)
             assertThat(it.getString("extra")).isEqualTo(appExitResponse.extra)
-            assertThat(it.getBoolean("skipCheck")).isEqualTo(false)
+            assertThat(it.getBoolean("skipCheck")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 }

@@ -33,7 +33,7 @@ class OdkExitResponseTest : BaseClientApiTest() {
         result.resultData.extras?.let {
             assertThat(it.getString("odk-exit-reason")).isEqualTo(appExitResponse.reason)
             assertThat(it.getString("odk-exit-extra")).isEqualTo(appExitResponse.extra)
-            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(false)
+            assertThat(it.getBoolean("odk-skip-check")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 }

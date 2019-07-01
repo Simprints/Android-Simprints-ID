@@ -33,7 +33,8 @@ class OdkEnrolResponseTest : BaseClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString("odk-registration-id")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(false)
+            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+
         } ?: throw Exception("No bundle found")
     }
 }
