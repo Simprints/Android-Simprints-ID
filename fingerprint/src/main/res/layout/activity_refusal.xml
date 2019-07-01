@@ -38,7 +38,7 @@
                 android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/religious_concerns"
+                android:text="@string/refusal_religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -46,7 +46,7 @@
                 android:id="@+id/rbDataConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/data_concerns"
+                android:text="@string/refusal_data_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -54,7 +54,7 @@
                 android:id="@+id/rbDoesNotHavePermission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/does_not_have_permission"
+                android:text="@string/refusal_does_not_have_permission"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -62,7 +62,7 @@
                 android:id="@+id/rbAppNotWorking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/app_not_working"
+                android:text="@string/refusal_app_not_working"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -70,7 +70,7 @@
                 android:id="@+id/rbPersonNotPresent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/person_not_present"
+                android:text="@string/refusal_person_not_present"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -78,7 +78,7 @@
                 android:id="@+id/rbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/too_young"
+                android:text="@string/refusal_too_young"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -86,7 +86,7 @@
                 android:id="@+id/rbSick"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sick"
+                android:text="@string/refusal_sick"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -94,7 +94,7 @@
                 android:id="@+id/rbPregnant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pregnant"
+                android:text="@string/refusal_pregnant"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -102,7 +102,7 @@
                 android:id="@+id/rbOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/other"
+                android:text="@string/refusal_other"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
