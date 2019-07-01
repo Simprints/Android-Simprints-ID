@@ -42,7 +42,7 @@ class OdkIdentifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("odk-confidences")).isEqualTo(confidenceScoresInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString("odk-tiers")).isEqualTo(tiersInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString("odk-session-id")).isEqualTo(appIdentifyResponse.sessionId)
-            assertThat(it.getBoolean("odk-skip-check")).isFalse()
+            assertThat(it.getBoolean("odk-skip-check")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 

@@ -7,6 +7,7 @@ import com.simprints.clientapi.domain.responses.ErrorResponse.Reason.Companion.f
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import kotlinx.android.parcel.Parcelize
+import timber.log.Timber
 
 @Parcelize
 data class ErrorResponse(val reason: Reason) : Parcelable {
@@ -15,7 +16,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
 
-    fun didUserSkip(): Boolean =
+    fun skipCheckAfterError(): Boolean =
         when (reason) {
             Reason.UNEXPECTED_ERROR,
             Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
@@ -27,8 +28,10 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
             Reason.INVALID_SELECTED_ID,
             Reason.INVALID_SESSION_ID,
             Reason.INVALID_USER_ID,
-            Reason.INVALID_VERIFY_ID -> false
-            else -> true
+            Reason.INVALID_VERIFY_ID -> true
+            else -> false
+        }.also {
+            Timber.d("TEST_TEST: $reason")
         }
 
     enum class Reason {

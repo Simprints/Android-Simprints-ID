@@ -33,7 +33,7 @@ class CommCareEnrolResponseTest : BaseClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.getBundle("odk_intent_bundle")?.let {
             assertThat(it.getString("guid")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean("skipCheck")).isEqualTo(false)
+            assertThat(it.getBoolean("skipCheck")).isTrue()
         } ?: throw Exception("No bundle found")
     }
 }
