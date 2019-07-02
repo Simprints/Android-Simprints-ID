@@ -239,16 +239,13 @@
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
     <!-- Refusal Selection Points -->
-    <string name="beneficiary_refused">Beneficiary refused</string>
-    <string name="scanner_not_working">Scanner not working</string>
-    <string name="religious_concerns">Religious concerns</string>
-    <string name="data_concerns">Data concerns</string>
-    <string name="does_not_have_permission">Does not have permission</string>
-    <string name="app_not_working">App not working</string>
-    <string name="too_young_infant">Too young (infant)</string>
-    <string name="sick">Sick</string>
-    <string name="pregnant">Pregnant</string>
-    <string name="other">Other</string>
+    <string name="refusal_religious_concerns">Religious concerns</string>
+    <string name="refusal_data_concerns">Does not want to give data</string>
+    <string name="refusal_does_not_have_permission">Does not have permission</string>
+    <string name="refusal_app_not_working">App not working</string>
+    <string name="refusal_person_not_present">Person not present</string>
+    <string name="refusal_too_young">Too young</string>
+    <string name="refusal_other">Other</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>

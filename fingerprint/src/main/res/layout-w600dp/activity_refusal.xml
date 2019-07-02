@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/religious_concerns"
+                android:text="@string/refusal_religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/data_concerns"
+                android:text="@string/refusal_data_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/does_not_have_permission"
+                android:text="@string/refusal_does_not_have_permission"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
@@ -68,7 +68,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/app_not_working"
+                android:text="@string/refusal_app_not_working"
+                android:textColor="@color/simprints_white"
+                android:textSize="24sp" />
+
+            <RadioButton
+                android:id="@+id/rbPersonNotPresent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/refusal_person_not_present"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
@@ -77,25 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/too_young_infant"
-                android:textColor="@color/simprints_white"
-                android:textSize="24sp" />
-
-            <RadioButton
-                android:id="@+id/rbSick"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/sick"
-                android:textColor="@color/simprints_white"
-                android:textSize="24sp" />
-
-            <RadioButton
-                android:id="@+id/rbPregnant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/pregnant"
+                android:text="@string/refusal_too_young"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
@@ -104,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/other"
+                android:text="@string/refusal_other"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 

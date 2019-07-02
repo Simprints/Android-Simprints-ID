@@ -39,37 +39,33 @@ class RefusalPresenter(private val view: RefusalContract.View,
     }
 
     override fun handleReligiousConcernsRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_RELIGION
         logRadioOptionForCrashReport("Religious concerns")
     }
 
     override fun handleDataConcernsRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_DATA_CONCERNS
         logRadioOptionForCrashReport("Data concerns")
     }
 
     override fun handleTooYoungRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_YOUNG
         logRadioOptionForCrashReport("Too young")
     }
 
-    override fun handleSickRadioClick() {
-        reason = REFUSED
-        logRadioOptionForCrashReport("Sick")
-    }
-
-    override fun handlePregnantRadioClick() {
-        reason = REFUSED
-        logRadioOptionForCrashReport("Pregnant")
+    override fun handlePersonNotPresentRadioClick() {
+        reason = REFUSED_NOT_PRESENT
+        logRadioOptionForCrashReport("Person not present")
     }
 
     override fun handleDoesNotHavePermissionRadioClick() {
-        reason = REFUSED
+        reason = REFUSED_PERMISSION
         logRadioOptionForCrashReport("Does not have permission")
     }
 
     override fun handleAppNotWorkingRadioClick() {
         reason = SCANNER_NOT_WORKING
+        view.setFocusOnRefusalReasonAndDisableSubmit()
         logRadioOptionForCrashReport("App not working")
     }
 
@@ -87,30 +83,43 @@ class RefusalPresenter(private val view: RefusalContract.View,
     @SuppressLint("CheckResult")
     override fun handleSubmitButtonClick(refusalText: String) {
         logMessageForCrashReport("Submit button clicked")
-        reason.let { refusalReason ->
-            sessionEventsManager.addEvent(RefusalEvent(
-                refusalStartTime,
-                timeHelper.now(),
-                refusalReason.toRefusalAnswerForEvent(),
-                refusalText))
-        }.doFinally {
 
-            view.setResultAndFinish(
-                Activity.RESULT_OK,
-                RefusalActResult(
-                    RefusalActResult.Action.SUBMIT,
-                    RefusalActResult.Answer(reason, refusalText)))
+        logAsMalfunctionInCrashReportIfAppNotWorking(refusalText)
 
+        addRefusalEventInSession(reason, refusalText).doFinally {
+            setResultAndFinishInView(refusalText)
         }.subscribeBy(onError = {
             crashReportManager.logExceptionOrSafeException(it)
         })
+    }
+
+    private fun addRefusalEventInSession(refusalReason: RefusalFormReason, refusalText: String) =
+        sessionEventsManager.addEvent(RefusalEvent(
+            refusalStartTime,
+            timeHelper.now(),
+            refusalReason.toRefusalAnswerForEvent(),
+            refusalText))
+
+
+    private fun setResultAndFinishInView(refusalText: String) {
+        view.setResultAndFinish(
+            Activity.RESULT_OK,
+            RefusalActResult(
+                RefusalActResult.Action.SUBMIT,
+                RefusalActResult.Answer(reason, refusalText)))
+    }
+
+    private fun logAsMalfunctionInCrashReportIfAppNotWorking(refusalText: String) {
+        if(reason == SCANNER_NOT_WORKING) {
+            crashReportManager.logMalfunction(refusalText)
+        }
     }
 
     override fun handleScanFingerprintsClick() {
         logMessageForCrashReport("Scan fingerprints button clicked")
         view.setResultAndFinish(Activity.RESULT_OK,
             RefusalActResult(
-                RefusalActResult.Action.SCAN_FINGERPRINTS))
+                RefusalActResult.Action.SCAN_FINGERPRINTS, RefusalActResult.Answer()))
     }
 
     override fun handleLayoutChange() {

@@ -22,4 +22,8 @@ class FingerprintCrashReportManagerImpl(val crashReportManager: CoreCrashReportM
             crashPriority,
             message)
 
+    override fun logMalfunction(message: String) {
+        crashReportManager.logMalfunction(message)
+    }
+
 }

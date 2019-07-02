@@ -43,11 +43,9 @@ interface RefusalContract {
 
         fun handleTooYoungRadioClick()
 
-        fun handleSickRadioClick()
-
-        fun handlePregnantRadioClick()
-
         fun handleDoesNotHavePermissionRadioClick()
+
+        fun handlePersonNotPresentRadioClick()
 
         fun handleAppNotWorkingRadioClick()
 
