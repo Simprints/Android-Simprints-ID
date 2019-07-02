@@ -5,6 +5,7 @@ import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.data.domain.Action
 
 @Keep
 data class ParentalConsent(
@@ -19,11 +20,13 @@ data class ParentalConsent(
 ) {
 
     fun assembleText(context: Context, launchRequest: LaunchActRequest, programName: String, organisationName: String) = StringBuilder().apply {
-        if (launchRequest.action == LaunchActRequest.Action.IDENTIFY || launchRequest.action == LaunchActRequest.Action.VERIFY) {
-            if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
-        } else {
-            if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
-            if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
+        when (launchRequest.action) {
+            Action.IDENTIFY, Action.VERIFY ->
+                if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
+            else -> {
+                if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
+                if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
+            }
         }
         if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
         if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
