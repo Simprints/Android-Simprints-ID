@@ -245,8 +245,6 @@
     <string name="refusal_app_not_working">App not working</string>
     <string name="refusal_person_not_present">Person not present</string>
     <string name="refusal_too_young">Too young</string>
-    <string name="refusal_sick">Sick</string>
-    <string name="refusal_pregnant">Pregnant</string>
     <string name="refusal_other">Other</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>

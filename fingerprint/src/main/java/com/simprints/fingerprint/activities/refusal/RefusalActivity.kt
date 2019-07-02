@@ -74,8 +74,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
             R.id.rbDataConcerns -> viewPresenter.handleDataConcernsRadioClick()
             R.id.rbPersonNotPresent -> viewPresenter.handlePersonNotPresentRadioClick()
             R.id.rbTooYoung -> viewPresenter.handleTooYoungRadioClick()
-            R.id.rbSick -> viewPresenter.handleSickRadioClick()
-            R.id.rbPregnant -> viewPresenter.handlePregnantRadioClick()
             R.id.rbDoesNotHavePermission -> viewPresenter.handleDoesNotHavePermissionRadioClick()
             R.id.rbAppNotWorking -> viewPresenter.handleAppNotWorkingRadioClick()
             R.id.rbOther -> viewPresenter.handleOtherRadioOptionClick()

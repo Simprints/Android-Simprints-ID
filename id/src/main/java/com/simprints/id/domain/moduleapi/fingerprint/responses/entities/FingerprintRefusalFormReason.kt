@@ -9,8 +9,6 @@ enum class FingerprintRefusalFormReason {
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
-    REFUSED_SICK,
-    REFUSED_PREGNANT,
     OTHER
 }
 
@@ -21,8 +19,6 @@ fun FingerprintRefusalFormReason.toAppRefusalFormReason() =
         FingerprintRefusalFormReason.REFUSED_PERMISSION -> RefusalFormReason.REFUSED_PERMISSION
         FingerprintRefusalFormReason.REFUSED_YOUNG -> RefusalFormReason.REFUSED_YOUNG
         FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> RefusalFormReason.REFUSED_NOT_PRESENT
-        FingerprintRefusalFormReason.REFUSED_SICK -> RefusalFormReason.REFUSED_SICK
-        FingerprintRefusalFormReason.REFUSED_PREGNANT -> RefusalFormReason.REFUSED_PREGNANT
         FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> RefusalFormReason.SCANNER_NOT_WORKING
         FingerprintRefusalFormReason.OTHER -> RefusalFormReason.OTHER
     }

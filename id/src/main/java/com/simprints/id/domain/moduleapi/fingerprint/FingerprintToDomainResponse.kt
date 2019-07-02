@@ -48,8 +48,6 @@ object FingerprintToDomainResponse {
             IFingerprintRefusalReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
             IFingerprintRefusalReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
             IFingerprintRefusalReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
-            IFingerprintRefusalReason.REFUSED_SICK -> FingerprintRefusalFormReason.REFUSED_SICK
-            IFingerprintRefusalReason.REFUSED_PREGNANT -> FingerprintRefusalFormReason.REFUSED_PREGNANT
             IFingerprintRefusalReason.OTHER -> FingerprintRefusalFormReason.OTHER
         }
 

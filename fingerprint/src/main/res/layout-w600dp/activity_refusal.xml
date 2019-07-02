@@ -91,24 +91,6 @@
                 android:textSize="24sp" />
 
             <RadioButton
-                android:id="@+id/rbSick"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/refusal_sick"
-                android:textColor="@color/simprints_white"
-                android:textSize="24sp" />
-
-            <RadioButton
-                android:id="@+id/rbPregnant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/refusal_pregnant"
-                android:textColor="@color/simprints_white"
-                android:textSize="24sp" />
-
-            <RadioButton
                 android:id="@+id/rbOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
