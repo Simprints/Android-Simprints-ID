@@ -24,6 +24,7 @@ import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCap
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
@@ -176,9 +177,9 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun getTitle(): String =
         when (collectRequest.action) {
-            CollectFingerprintsActRequest.Action.ENROL -> context.getString(R.string.register_title)
-            CollectFingerprintsActRequest.Action.IDENTIFY -> context.getString(R.string.identify_title)
-            CollectFingerprintsActRequest.Action.VERIFY -> context.getString(R.string.verify_title)
+            Action.ENROL -> context.getString(R.string.register_title)
+            Action.IDENTIFY -> context.getString(R.string.identify_title)
+            Action.VERIFY -> context.getString(R.string.verify_title)
         }
 
     override fun refreshDisplay() {
@@ -248,7 +249,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
-    private fun isRegisteringElseIsMatching() = collectRequest.action == CollectFingerprintsActRequest.Action.ENROL
+    private fun isRegisteringElseIsMatching() = collectRequest.action == Action.ENROL
 
     @SuppressLint("CheckResult")
     private fun savePerson(person: Person) {
