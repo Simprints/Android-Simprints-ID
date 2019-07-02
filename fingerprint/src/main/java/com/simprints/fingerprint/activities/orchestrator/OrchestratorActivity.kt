@@ -29,7 +29,7 @@ class OrchestratorActivity : AppCompatActivity() {
         })
 
         viewModel.nextActivity.observe(this, Observer {
-            startActivityForResult(it.toIntent(this), it.resultCode)
+            startActivityForResult(it.createRequestIntent(this), it.requestCode)
         })
 
         viewModel.start(fingerprintRequest)

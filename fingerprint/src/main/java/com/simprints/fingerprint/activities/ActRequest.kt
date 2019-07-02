@@ -1,4 +1,5 @@
 package com.simprints.fingerprint.activities
 
-interface ActRequest {
-}
+import android.os.Parcelable
+
+interface ActRequest : Parcelable

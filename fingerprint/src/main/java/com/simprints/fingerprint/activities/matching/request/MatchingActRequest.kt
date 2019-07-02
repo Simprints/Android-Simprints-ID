@@ -1,10 +1,10 @@
 package com.simprints.fingerprint.activities.matching.request
 
 import android.os.Parcelable
+import com.simprints.fingerprint.activities.ActRequest
 import com.simprints.fingerprint.data.domain.person.Person
-import kotlinx.android.parcel.Parcelize
 
-interface MatchingActRequest: Parcelable {
+interface MatchingActRequest : ActRequest, Parcelable {
     companion object {
         const val BUNDLE_KEY = "MatchingRequestBundleKey"
     }
