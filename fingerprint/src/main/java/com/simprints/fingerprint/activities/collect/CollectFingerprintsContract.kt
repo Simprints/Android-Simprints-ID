@@ -10,7 +10,6 @@ import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
@@ -28,8 +27,7 @@ interface CollectFingerprintsContract {
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
-        fun finishSuccessEnrol(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
-        fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
+        fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsActResult)
         fun cancelAndFinish()
 
         fun showSplashScreen()
@@ -82,7 +80,5 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
-
-        fun getExtraForMatchingActivity(fingerprintsActResult: CollectFingerprintsActResult): MatchingActRequest
     }
 }

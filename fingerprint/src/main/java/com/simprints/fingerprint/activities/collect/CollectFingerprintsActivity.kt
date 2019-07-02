@@ -16,13 +16,11 @@ import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
-import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
@@ -49,10 +47,8 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var fingerprintRequest: FingerprintRequest
 
     private var rightToLeft: Boolean = false
-    private val resultIntent = Intent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +57,7 @@ class CollectFingerprintsActivity :
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
+        val fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY) as CollectFingerprintsActRequest?
             ?: throw InvalidRequestForFingerprintException()
 
         configureRightToLeft()
@@ -144,29 +140,15 @@ class CollectFingerprintsActivity :
         }
     }
 
-    override fun finishSuccessEnrol(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) =
-        setCollectResultInIntent(bundleKey, fingerprintsActResult).also {
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish()
-        }
-
-    override fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) =
-        setCollectResultInIntent(bundleKey, fingerprintsActResult).also {
-            startMatchingActivity(viewPresenter.getExtraForMatchingActivity(fingerprintsActResult))
-        }
-
-    private fun setCollectResultInIntent(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) {
-        resultIntent.putExtra(bundleKey, fingerprintsActResult)
+    override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsActResult) {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(CollectFingerprintsActResult.BUNDLE_KEY, fingerprintsActResult)
+        })
+        finish()
     }
+
 
     override fun startRefusalActivity() = launchRefusalActivity()
-
-    private fun startMatchingActivity(extra: MatchingActRequest) {
-        val matchingIntent = Intent(this, MatchingActivity::class.java)
-        matchingIntent.putExtra(MatchingActRequest.BUNDLE_KEY, extra)
-        startActivityForResult(matchingIntent, MATCHING_ACTIVITY_REQUEST)
-    }
-
 
     override fun cancelAndFinish() =
         setResult(Activity.RESULT_CANCELED).also { finish() }
