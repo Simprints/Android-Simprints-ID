@@ -58,16 +58,6 @@ class RefusalPresenter(private val view: RefusalContract.View,
         logRadioOptionForCrashReport("Person not present")
     }
 
-    override fun handleSickRadioClick() {
-        reason = REFUSED_SICK
-        logRadioOptionForCrashReport("Sick")
-    }
-
-    override fun handlePregnantRadioClick() {
-        reason = REFUSED_PREGNANT
-        logRadioOptionForCrashReport("Pregnant")
-    }
-
     override fun handleDoesNotHavePermissionRadioClick() {
         reason = REFUSED_PERMISSION
         logRadioOptionForCrashReport("Does not have permission")

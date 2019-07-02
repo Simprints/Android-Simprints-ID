@@ -13,7 +13,5 @@ enum class IFingerprintRefusalReason {
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
-    REFUSED_SICK,
-    REFUSED_PREGNANT,
     OTHER
 }

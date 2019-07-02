@@ -41,8 +41,6 @@ class RefusalActivityTest {
         onView(withId(R.id.rbAppNotWorking)).check(matches(isDisplayed()))
         onView(withId(R.id.rbPersonNotPresent)).check(matches(isDisplayed()))
         onView(withId(R.id.rbTooYoung)).check(matches(isDisplayed()))
-        onView(withId(R.id.rbSick)).check(matches(isDisplayed()))
-        onView(withId(R.id.rbPregnant)).check(matches(isDisplayed()))
         onView(withId(R.id.rbOther)).check(matches(isDisplayed()))
 
         onView(withId(R.id.btSubmitRefusalForm)).check(matches(isDisplayed()))
