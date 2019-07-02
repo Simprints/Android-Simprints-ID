@@ -12,11 +12,12 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.activities.launch.result.LaunchActResult
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
@@ -37,8 +38,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
-    private lateinit var fingerprintRequest: FingerprintRequest
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
@@ -46,13 +45,13 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
         val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         component.inject(this)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
+        val launchRequest = this.intent.extras?.getParcelable(LaunchActRequest.BUNDLE_KEY) as LaunchActRequest?
             ?: throw InvalidRequestForFingerprintException()
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
+        viewPresenter = LaunchPresenter(component, this, launchRequest)
         viewPresenter.start()
     }
 
@@ -102,7 +101,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun onActivityResultReceived() { viewPresenter.onActivityResult() }
+    override fun onActivityResultReceived() {
+        viewPresenter.onActivityResult()
+    }
+
     override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
@@ -148,10 +150,9 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun continueToNextActivity() {
-//        val intent = Intent(this, CollectFingerprintsActivity::class.java)
-//            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
-//        startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
-        setResultAndFinish(0, null)
+        setResultAndFinish(0, Intent().apply {
+            putExtra(LaunchActResult.BUNDLE_KEY, LaunchActResult())
+        })
     }
 
     override fun goToRefusalActivity() {

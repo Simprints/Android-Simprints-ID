@@ -73,8 +73,8 @@ sealed class ActivityCallFlow {
 
     protected val actResults: MutableMap<String, ActResult> = mutableMapOf()
 
-    lateinit var activityCalls: List<ActivityCall<*, *>>
-    var currentActivityCallIndex = 0
+    protected lateinit var activityCalls: List<ActivityCall<*, *>>
+    private var currentActivityCallIndex = 0
 
     fun getNextActivityCallAndCycle() = activityCalls[currentActivityCallIndex++]
     fun isFlowFinished() = currentActivityCallIndex >= activityCalls.size
@@ -84,7 +84,7 @@ sealed class ActivityCallFlow {
 
     fun saveActResult(activityResult: ActivityResult) {
         with(activityCalls[currentActivityCallIndex]) {
-//            actResult(activityResult.toActResult(resultBundleKey))
+            //            actResult(activityResult.toActResult(resultBundleKey))
             actResult(activityResult.resultData!!.getParcelableExtra(resultBundleKey)) // TODO
         }
     }
@@ -92,22 +92,20 @@ sealed class ActivityCallFlow {
     class Enrol : ActivityCallFlow() {
 
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            activityCalls = listOf(
-                Launch({
-                    with(fingerprintRequest) {
+            with(fingerprintRequest) {
+                activityCalls = listOf(
+                    Launch({
                         LaunchActRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }
-                }, { actResults["launch"] = it }),
-                CollectFingerprints({
-                    with(fingerprintRequest) {
+                    }, { actResults["launch"] = it }),
+                    CollectFingerprints({
                         CollectFingerprintsActRequest(
                             projectId, userId, moduleId, fingerStatus
                         )
-                    }
-                }, { actResults["collect"] = it })
-            )
+                    }, { actResults["collect"] = it })
+                )
+            }
         }
 
         override fun getFinalResult(): ActivityResult =
@@ -121,31 +119,27 @@ sealed class ActivityCallFlow {
     class Identify : ActivityCallFlow() {
 
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            activityCalls = listOf(
-                Launch({
-                    with(fingerprintRequest) {
+            with(fingerprintRequest as FingerprintIdentifyRequest) {
+                activityCalls = listOf(
+                    Launch({
                         LaunchActRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }
-                }, { actResults["launch"] = it }),
-                CollectFingerprints({
-                    with(fingerprintRequest) {
+                    }, { actResults["launch"] = it }),
+                    CollectFingerprints({
                         CollectFingerprintsActRequest(
                             projectId, userId, moduleId, fingerStatus
                         )
-                    }
-                }, { actResults["collect"] = it }),
-                Matching({
-                    with(fingerprintRequest as FingerprintIdentifyRequest) {
+                    }, { actResults["collect"] = it }),
+                    Matching({
                         with(actResults["collect"] as CollectFingerprintsActResult) {
                             MatchingActIdentifyRequest(
                                 language, probe, buildQueryForIdentifyPool(), returnIdCount
                             )
                         }
-                    }
-                }, { actResults["matching"] = it })
-            )
+                    }, { actResults["matching"] = it })
+                )
+            }
         }
 
         override fun getFinalResult(): ActivityResult =
@@ -159,31 +153,27 @@ sealed class ActivityCallFlow {
     class Verify : ActivityCallFlow() {
 
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            activityCalls = listOf(
-                Launch({
-                    with(fingerprintRequest) {
+            with(fingerprintRequest as FingerprintVerifyRequest) {
+                activityCalls = listOf(
+                    Launch({
                         LaunchActRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }
-                }, { actResults["launch"] = it }),
-                CollectFingerprints({
-                    with(fingerprintRequest) {
+                    }, { actResults["launch"] = it }),
+                    CollectFingerprints({
                         CollectFingerprintsActRequest(
                             projectId, userId, moduleId, fingerStatus
                         )
-                    }
-                }, { actResults["collect"] = it }),
-                Matching({
-                    with(fingerprintRequest as FingerprintVerifyRequest) {
+                    }, { actResults["collect"] = it }),
+                    Matching({
                         with(actResults["collect"] as CollectFingerprintsActResult) {
                             MatchingActVerifyRequest(
                                 language, probe, buildQueryForVerifyPool(), verifyGuid
                             )
                         }
-                    }
-                }, { actResults["matching"] = it })
-            )
+                    }, { actResults["matching"] = it })
+                )
+            }
         }
 
         override fun getFinalResult(): ActivityResult =

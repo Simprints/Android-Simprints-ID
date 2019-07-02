@@ -1,12 +1,10 @@
 package com.simprints.fingerprint.data.domain.consent
 
 import android.content.Context
-import com.google.gson.annotations.SerializedName
 import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
 
 @Keep
 data class ParentalConsent(
@@ -20,15 +18,12 @@ data class ParentalConsent(
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, fingerprintRequest: FingerprintRequest, programName: String, organisationName: String) = StringBuilder().apply {
-        when (fingerprintRequest) {
-            is FingerprintIdentifyRequest, is FingerprintVerifyRequest -> {
-                if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
-            }
-            else -> {
-                if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
-                if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
-            }
+    fun assembleText(context: Context, launchRequest: LaunchActRequest, programName: String, organisationName: String) = StringBuilder().apply {
+        if (launchRequest.action == LaunchActRequest.Action.IDENTIFY || launchRequest.action == LaunchActRequest.Action.VERIFY) {
+            if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
+        } else {
+            if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
+            if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
         }
         if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
         if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
