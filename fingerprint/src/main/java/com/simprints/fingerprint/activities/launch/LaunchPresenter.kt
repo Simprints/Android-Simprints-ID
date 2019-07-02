@@ -10,6 +10,12 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -29,27 +35,18 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.Companion.fromFingerprintAlertToErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
@@ -67,7 +64,7 @@ import javax.inject.Inject
 
 class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
-                      private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
+                      private val launchRequest: LaunchActRequest) : LaunchContract.Presenter {
 
     private var setupFlow: Disposable? = null
 
@@ -105,8 +102,8 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     override fun start() {
-        view.setLanguage(fingerprintRequest.language)
-        view.setLogoVisibility(fingerprintRequest.logoExists)
+        view.setLanguage(launchRequest.language)
+        view.setLogoVisibility(launchRequest.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
 
@@ -171,11 +168,11 @@ class LaunchPresenter(component: FingerprintComponent,
             .andThen(tryToFetchGuid())
 
     private fun tryToFetchGuid(): Completable {
-        return if (fingerprintRequest is FingerprintVerifyRequest) {
-            val guid = fingerprintRequest.verifyGuid
+        return if (launchRequest.verifyGuid != null) {
+            val guid = launchRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
             dbManager
-                .loadPerson(fingerprintRequest.projectId, guid)
+                .loadPerson(launchRequest.projectId, guid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess { personFetchResult ->
@@ -272,7 +269,7 @@ class LaunchPresenter(component: FingerprintComponent,
         scannerManager.scanner?.let {
             preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)
             preferencesManager.lastScannerVersion = it.hardwareVersion.toString()
-            analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId?: "")
+            analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId ?: "")
         }
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
@@ -293,7 +290,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return generalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -303,7 +300,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return parentalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
     }
 
     override fun handleOnBackPressed() {
@@ -355,10 +352,10 @@ class LaunchPresenter(component: FingerprintComponent,
             if (possibleRefusalForm != null) {
                 prepareRefusalForm(returnIntent, possibleRefusalForm)
             } else {
-                when (fingerprintRequest) {
-                    is FingerprintEnrolRequest -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
-                    is FingerprintIdentifyRequest -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
-                    is FingerprintVerifyRequest -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
+                when (launchRequest.action) {
+                    LaunchActRequest.Action.ENROL -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
+                    LaunchActRequest.Action.IDENTIFY -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
+                    LaunchActRequest.Action.VERIFY -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
                 }
             }
         }
