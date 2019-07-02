@@ -35,6 +35,7 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
@@ -353,9 +354,9 @@ class LaunchPresenter(component: FingerprintComponent,
                 prepareRefusalForm(returnIntent, possibleRefusalForm)
             } else {
                 when (launchRequest.action) {
-                    LaunchActRequest.Action.ENROL -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
-                    LaunchActRequest.Action.IDENTIFY -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
-                    LaunchActRequest.Action.VERIFY -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
+                    Action.ENROL -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
+                    Action.IDENTIFY -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
+                    Action.VERIFY -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
                 }
             }
         }

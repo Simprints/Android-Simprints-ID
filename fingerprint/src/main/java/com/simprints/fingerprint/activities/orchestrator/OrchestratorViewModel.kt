@@ -12,7 +12,6 @@ import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsA
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
-import com.simprints.fingerprint.activities.launch.request.toAction
 import com.simprints.fingerprint.activities.launch.result.LaunchActResult
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
@@ -28,6 +27,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorViewModel : ViewModel() {
@@ -101,7 +101,7 @@ sealed class ActivityCallFlow {
                     }, { actResults["launch"] = it }),
                     CollectFingerprints({
                         CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, fingerStatus
+                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
                     }, { actResults["collect"] = it })
                 )
@@ -128,7 +128,7 @@ sealed class ActivityCallFlow {
                     }, { actResults["launch"] = it }),
                     CollectFingerprints({
                         CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, fingerStatus
+                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
                     }, { actResults["collect"] = it }),
                     Matching({
@@ -162,7 +162,7 @@ sealed class ActivityCallFlow {
                     }, { actResults["launch"] = it }),
                     CollectFingerprints({
                         CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, fingerStatus
+                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
                     }, { actResults["collect"] = it }),
                     Matching({
