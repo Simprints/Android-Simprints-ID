@@ -1,4 +1,4 @@
-package com.simprints.clientapi.activities.robots
+package com.simprints.testtools.android
 
 import androidx.annotation.StringRes
 import androidx.test.espresso.Espresso.onView
@@ -6,7 +6,6 @@ import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.simprints.testtools.android.inToast
 
 open class BaseAssertions {
 
