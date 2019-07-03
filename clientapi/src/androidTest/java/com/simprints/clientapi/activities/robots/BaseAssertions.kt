@@ -6,7 +6,7 @@ import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.simprints.clientapi.extensions.inToast
+import com.simprints.testtools.android.inToast
 
 open class BaseAssertions {
 
