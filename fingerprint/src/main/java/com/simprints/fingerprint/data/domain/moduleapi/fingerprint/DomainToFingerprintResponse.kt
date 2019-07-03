@@ -3,8 +3,11 @@ package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
+import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
 import com.simprints.moduleapi.fingerprint.responses.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -24,8 +27,21 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintIdentifyResponse(identify: FingerprintIdentifyResponse): IFingerprintIdentifyResponse =
         IFingerprintIdentifyResponseImpl(identify.identifications.map { fromDomainToFingerprintIdentificationResult(it) })
 
-    fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintRefusalFormResponse =
-        IFingerprintRefusalFormResponseImpl(refusalResponse.reason, refusalResponse.extra)
+    fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintRefusalFormResponse {
+
+        val reason = when(refusalResponse.reason) {
+            FingerprintRefusalFormReason.REFUSED_RELIGION -> IFingerprintRefusalReason.REFUSED_RELIGION
+            FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintRefusalReason.REFUSED_DATA_CONCERNS
+            FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintRefusalReason.REFUSED_PERMISSION
+            FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintRefusalReason.SCANNER_NOT_WORKING
+            FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintRefusalReason.REFUSED_NOT_PRESENT
+            FingerprintRefusalFormReason.REFUSED_YOUNG -> IFingerprintRefusalReason.REFUSED_YOUNG
+            FingerprintRefusalFormReason.OTHER -> IFingerprintRefusalReason.OTHER
+        }
+
+        return IFingerprintRefusalFormResponseImpl(reason, refusalResponse.extra)
+    }
+
 
     private fun fromDomainToFingerprintIdentificationResult(result: MatchingResult): IMatchingResult =
         IMatchingResultImpl(result.guid, result.confidence, toIFingerprintResponseTier(result.tier))
@@ -69,7 +85,7 @@ private class IFingerprintIdentifyResponseImpl(
 
 @Parcelize
 private class IFingerprintRefusalFormResponseImpl(
-    override val reason: String,
+    override val reason: IFingerprintRefusalReason,
     override val extra: String) : IFingerprintRefusalFormResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.REFUSAL
 }

@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.orchestrator
 
 import android.app.Activity
 import android.content.Intent
+import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
@@ -13,9 +14,10 @@ import com.simprints.fingerprint.activities.matching.result.MatchingActResult
 import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
-import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
-import com.simprints.fingerprint.activities.refusal.result.RefusalActResult.Action.SCAN_FINGERPRINTS
-import com.simprints.fingerprint.activities.refusal.result.RefusalActResult.Action.SUBMIT
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SCAN_FINGERPRINTS
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult.Action.SUBMIT
+import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorImpl : Orchestrator {
@@ -34,6 +36,7 @@ class OrchestratorImpl : Orchestrator {
                 is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
                 is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
                 is MatchingActivity -> { handleResultInMatchingActivity(receiver, resultCode, data) }
+                is AlertActivity -> { handleResultInAlertActivity(receiver, resultCode, data) }
             }
         }
     }
@@ -121,6 +124,16 @@ class OrchestratorImpl : Orchestrator {
         forwardResultBack(receiver, resultCode, data)
     }
 
+    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
+        extractRefusalActResult(data)?.let {
+            when (it.action) {
+                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
+                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+            }
+            return
+        }
+    }
+
     private fun forwardResultBack(receiver: OrchestratorCallback, resultCode: Int?, data: Intent? = null) {
         receiver.setResultDataAndFinish(resultCode, data)
     }
@@ -135,8 +148,8 @@ class OrchestratorImpl : Orchestrator {
     private fun prepareRefusalForm(refusalForm: RefusalActResult) =
         Intent().apply {
             val fingerprintResult = FingerprintRefusalFormResponse(
-                refusalForm.answer?.reason.toString(),
-                refusalForm.answer?.optionalText.toString())
+                refusalForm.answer.reason.toFingerprintRefusalFormReason(),
+                refusalForm.answer.optionalText)
 
             putExtra(IFingerprintResponse.BUNDLE_KEY,
                 DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(fingerprintResult))

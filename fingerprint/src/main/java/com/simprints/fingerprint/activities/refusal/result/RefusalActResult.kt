@@ -6,10 +6,10 @@ import kotlinx.android.parcel.Parcelize
 
 //If user taps back-back then nothing is submitted "reason" = null
 @Parcelize
-class RefusalActResult(val action: Action, val answer: Answer? = null): Parcelable {
+class RefusalActResult(val action: Action, val answer: Answer): Parcelable {
 
     @Parcelize
-    class Answer(val reason: RefusalFormReason?, val optionalText: String = ""):Parcelable
+    class Answer(val reason: RefusalFormReason = RefusalFormReason.OTHER, val optionalText: String = ""):Parcelable
 
     enum class Action {
         SUBMIT, SCAN_FINGERPRINTS

@@ -55,9 +55,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':id')
     implementation project(':moduleapi')
-
-    // LibSimprints
-    implementation 'com.simprints:libsimprints:2018.2.0'
+    implementation project(':libsimprints')
 
     // Service Location
     implementation deps.koin.core
