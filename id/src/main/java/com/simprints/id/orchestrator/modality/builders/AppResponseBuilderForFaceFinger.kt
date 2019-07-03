@@ -43,7 +43,7 @@ class AppResponseBuilderForFaceFinger : AppResponseBuilderForModal {
 
     private fun buildAppRefusalFormResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse): AppRefusalFormResponse {
         return AppRefusalFormResponse(RefusalFormAnswer(
-            fingerprintRefusalFormResponse.reason?.toAppRefusalFormReason(),
+            fingerprintRefusalFormResponse.reason.toAppRefusalFormReason(),
             fingerprintRefusalFormResponse.optionalText))
     }
 

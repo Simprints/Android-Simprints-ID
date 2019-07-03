@@ -175,7 +175,7 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForRefusalApiModel() {
-        val callbackEvent = RefusalCallbackEvent(10, "reason", "extra")
+        val callbackEvent = RefusalCallbackEvent(10, "REFUSED_DATA_CONCERNS", "extra")
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
