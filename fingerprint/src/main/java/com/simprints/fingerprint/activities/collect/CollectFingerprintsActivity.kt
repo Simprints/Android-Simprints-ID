@@ -24,6 +24,8 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -52,6 +54,7 @@ class CollectFingerprintsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
+        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
@@ -187,5 +190,10 @@ class CollectFingerprintsActivity :
     override fun showSplashScreen() {
         startActivity(Intent(this, SplashScreenActivity::class.java))
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
     }
 }

@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
@@ -20,7 +22,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        logActivityCreated()
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -91,4 +93,9 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
             refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
+    }
 }
