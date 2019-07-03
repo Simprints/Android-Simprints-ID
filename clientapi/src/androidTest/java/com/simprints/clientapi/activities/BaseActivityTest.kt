@@ -11,7 +11,7 @@ import org.junit.Rule
 import kotlin.reflect.KClass
 
 open class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
-                                             private val autoLaunch: Boolean = true) {
+                                                  private val autoLaunch: Boolean = true) {
 
     @Rule
     @JvmField
