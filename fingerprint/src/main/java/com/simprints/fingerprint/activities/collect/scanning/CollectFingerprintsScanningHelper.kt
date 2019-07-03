@@ -19,15 +19,14 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.tools.extensions.Vibrate
+import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprint.tools.extensions.Vibrate
-import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -275,6 +274,10 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun stopReconnecting() {
+        scannerManager.disconnectScannerIfNeeded()
+    }
+
+    fun disconnectScannerIfNeeded() {
         scannerManager.disconnectScannerIfNeeded()
     }
 

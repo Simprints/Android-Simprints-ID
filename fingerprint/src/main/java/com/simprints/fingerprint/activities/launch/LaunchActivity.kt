@@ -148,7 +148,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun onDestroy() {
-        viewPresenter.handleOnDestroy()
         super.onDestroy()
         logActivityDestroyed()
     }

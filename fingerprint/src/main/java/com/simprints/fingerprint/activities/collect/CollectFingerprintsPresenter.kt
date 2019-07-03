@@ -329,6 +329,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
     }
 
+    override fun disconnectScannerIfNeeded() {
+        scanningHelper.disconnectScannerIfNeeded()
+    }
+
     private fun logMessageForCrashReport(message: String) {
         crashReportManager.logMessageForCrashReport(FINGER_CAPTURE, UI, message = message)
     }
