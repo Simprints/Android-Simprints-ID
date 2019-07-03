@@ -21,11 +21,12 @@ interface AlertContract {
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
-        fun closeActivityAfterTryAgainButton()
+        fun setTryAgainResultAndFinish()
         fun closeActivityAfterCloseButton()
     }
 
     interface Presenter : BasePresenter {
         fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
+        fun handleOnResume()
     }
 }

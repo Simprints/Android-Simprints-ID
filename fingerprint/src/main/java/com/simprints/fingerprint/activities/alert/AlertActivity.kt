@@ -44,6 +44,12 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         viewPresenter.start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewPresenter.handleOnResume()
+
+    }
+
     private fun isBluetoothAlert(alertType: FingerprintAlert) =
         (alertType == DISCONNECTED || alertType == NOT_PAIRED)
 
@@ -102,7 +108,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         startActivity(intent)
     }
 
-    override fun closeActivityAfterTryAgainButton() {
+    override fun setTryAgainResultAndFinish() {
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, TRY_AGAIN))
         })
