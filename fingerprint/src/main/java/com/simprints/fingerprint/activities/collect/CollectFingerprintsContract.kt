@@ -65,6 +65,7 @@ interface CollectFingerprintsContract {
         // Scanning
         var isConfirmDialogShown: Boolean
         fun isScanning(): Boolean
+        fun disconnectScannerIfNeeded()
 
         // Indicators
         fun initIndicators()

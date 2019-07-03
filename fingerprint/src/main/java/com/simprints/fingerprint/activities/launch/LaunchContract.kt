@@ -4,7 +4,6 @@ import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 

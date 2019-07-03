@@ -193,6 +193,7 @@ class CollectFingerprintsActivity :
     }
 
     override fun onDestroy() {
+        viewPresenter.disconnectScannerIfNeeded()
         super.onDestroy()
         logActivityDestroyed()
     }
