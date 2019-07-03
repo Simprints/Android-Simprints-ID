@@ -48,7 +48,6 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
