@@ -1,4 +1,4 @@
-package com.simprints.clientapi.activities
+package com.simprints.testtools.android
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
