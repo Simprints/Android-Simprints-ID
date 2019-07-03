@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.activities.alert
 
-import android.app.Activity.RESULT_CANCELED
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -9,7 +9,6 @@ import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEve
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintComponent
 import javax.inject.Inject
-import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintComponent,
@@ -61,6 +60,7 @@ class AlertPresenter(val view: AlertContract.View,
             is BluetoothSettings -> view.openBluetoothSettings()
             is TryAgain -> view.closeActivityAfterTryAgainButton()
             is Close -> view.closeActivityAfterCloseButton()
+            is PairScanner -> view.openBluetoothSettings()
         }
     }
 
