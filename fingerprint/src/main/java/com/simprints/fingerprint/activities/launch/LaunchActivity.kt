@@ -21,6 +21,8 @@ import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Co
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.tbruyelle.rxpermissions2.Permission
@@ -41,6 +43,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         component.inject(this)
@@ -147,6 +150,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun onDestroy() {
         viewPresenter.handleOnDestroy()
         super.onDestroy()
+        logActivityDestroyed()
     }
 
     override fun continueToNextActivity() {

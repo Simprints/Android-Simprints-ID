@@ -19,6 +19,8 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
@@ -28,6 +30,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fingerprint_alert)
+        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
@@ -107,5 +110,10 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         })
 
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
     }
 }

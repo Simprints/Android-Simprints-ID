@@ -26,6 +26,8 @@ import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
@@ -46,6 +48,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logActivityCreated()
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
         val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
@@ -160,5 +163,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
     override fun onDestroy() {
         viewPresenter.dispose()
         super.onDestroy()
+        logActivityDestroyed()
     }
 }
