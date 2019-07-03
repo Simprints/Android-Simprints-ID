@@ -28,7 +28,7 @@ class OrchestratorActivity : AppCompatActivity() {
             finish()
         })
 
-        viewModel.nextActivity.observe(this, Observer {
+        viewModel.nextActivityCall.observe(this, Observer {
             startActivityForResult(it.createRequestIntent(this), it.requestCode)
         })
 

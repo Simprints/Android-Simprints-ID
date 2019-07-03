@@ -32,28 +32,27 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class OrchestratorViewModel : ViewModel() {
 
-    val nextActivity = MutableLiveData<ActivityCall<*, *>>()
+    val nextActivityCall = MutableLiveData<ActivityCall<*, *>>()
     val finishedResult = MutableLiveData<ActivityResult>()
 
     private lateinit var activityCallFlow: ActivityCallFlow
 
-
     fun start(fingerprintRequest: FingerprintRequest) {
         activityCallFlow = fingerprintRequest.toActivityCallFlow()
-        cycleToNextActivityRequest()
+        postNextActivityCall()
     }
 
     fun handleActivityResult(activityResult: ActivityResult) {
-        activityCallFlow.saveActResult(activityResult)
+        activityCallFlow.saveActResultAndCycle(activityResult)
         if (activityCallFlow.isFlowFinished()) {
             handleFlowFinished()
         } else {
-            cycleToNextActivityRequest()
+            postNextActivityCall()
         }
     }
 
-    private fun cycleToNextActivityRequest() {
-        nextActivity.postValue(activityCallFlow.getNextActivityCallAndCycle())
+    private fun postNextActivityCall() {
+        nextActivityCall.postValue(activityCallFlow.getCurrentActivity())
     }
 
     private fun handleFlowFinished() {
@@ -76,17 +75,18 @@ sealed class ActivityCallFlow {
     protected lateinit var activityCalls: List<ActivityCall<*, *>>
     private var currentActivityCallIndex = 0
 
-    fun getNextActivityCallAndCycle() = activityCalls[currentActivityCallIndex++]
+    @Suppress("unchecked_cast")
+    fun getCurrentActivity() = activityCalls[currentActivityCallIndex] as ActivityCall<ActRequest, ActResult>
     fun isFlowFinished() = currentActivityCallIndex >= activityCalls.size
 
     abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
     abstract fun getFinalResult(): ActivityResult
 
-    fun saveActResult(activityResult: ActivityResult) {
-        with(activityCalls[currentActivityCallIndex]) {
-            //            actResult(activityResult.toActResult(resultBundleKey))
-            actResult(activityResult.resultData!!.getParcelableExtra(resultBundleKey)) // TODO
+    fun saveActResultAndCycle(activityResult: ActivityResult) {
+        with(getCurrentActivity()) {
+            actResult(activityResult.toActResult(resultBundleKey))
         }
+        currentActivityCallIndex++
     }
 
     class Enrol : ActivityCallFlow() {
@@ -219,8 +219,8 @@ class CollectFingerprints(collectFingerprintsActRequest: () -> CollectFingerprin
         collectFingerprintsActResult,
         CollectFingerprintsActivity::class.java,
         1,
-        LaunchActRequest.BUNDLE_KEY,
-        LaunchActResult.BUNDLE_KEY
+        CollectFingerprintsActRequest.BUNDLE_KEY,
+        CollectFingerprintsActResult.BUNDLE_KEY
     )
 
 class Matching(matchingActRequest: () -> MatchingActRequest, matchingActResult: (MatchingActResult) -> Unit) :
