@@ -8,6 +8,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintComponent
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
@@ -19,6 +20,8 @@ class AlertPresenter(val view: AlertContract.View,
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var sessionManager: FingerprintSessionEventsManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
+
+    private val settingsOpenedForPairing = AtomicBoolean(false)
 
     init {
         component.inject(this)
@@ -58,9 +61,18 @@ class AlertPresenter(val view: AlertContract.View,
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
             is BluetoothSettings -> view.openBluetoothSettings()
-            is TryAgain -> view.closeActivityAfterTryAgainButton()
+            is TryAgain -> view.setTryAgainResultAndFinish()
             is Close -> view.closeActivityAfterCloseButton()
-            is PairScanner -> view.openBluetoothSettings()
+            is PairScanner -> {
+                view.openBluetoothSettings()
+                settingsOpenedForPairing.set(true)
+            }
+        }
+    }
+
+    override fun handleOnResume() {
+        if(settingsOpenedForPairing.getAndSet(false)) {
+            view.setTryAgainResultAndFinish()
         }
     }
 
