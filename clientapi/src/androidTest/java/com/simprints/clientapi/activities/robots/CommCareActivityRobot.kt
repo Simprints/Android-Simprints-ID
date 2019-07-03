@@ -1,6 +1,7 @@
 package com.simprints.clientapi.activities.robots
 
 import com.simprints.clientapi.R
+import com.simprints.testtools.android.BaseAssertions
 
 fun commCare(func: CommCareActivityRobot.() -> Unit) = CommCareActivityRobot().apply(func)
 
