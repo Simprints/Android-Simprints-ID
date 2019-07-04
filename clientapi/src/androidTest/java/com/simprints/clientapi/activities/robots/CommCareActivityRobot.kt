@@ -16,7 +16,7 @@ class CommCareActivityRobot {
 class CommCareActivityAssertions : BaseAssertions() {
 
     fun dataSentIsDisplayedOnToast() {
-        assertToastMessageIs(R.string.data_sent)
+        assertToastMessageIs(R.string.guid_selection_data_sent)
     }
 
 }

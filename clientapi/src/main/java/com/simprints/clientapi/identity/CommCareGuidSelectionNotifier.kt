@@ -7,7 +7,7 @@ import com.simprints.clientapi.R
 class CommCareGuidSelectionNotifier(context: Context) : GuidSelectionNotifier(context) {
 
     override fun showMessage() {
-        Toast.makeText(context, R.string.data_sent, Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, R.string.guid_selection_data_sent, Toast.LENGTH_SHORT).show()
     }
 
 }
