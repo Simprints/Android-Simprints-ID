@@ -6,7 +6,7 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.simprints.id.identity.GuidSelectionWorker
+import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.tools.extensions.parseAppConfirmation
 
 class GuidSelectionActivity : AppCompatActivity() {

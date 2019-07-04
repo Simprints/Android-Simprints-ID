@@ -32,7 +32,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.identity.GuidSelectionWorker
+import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
