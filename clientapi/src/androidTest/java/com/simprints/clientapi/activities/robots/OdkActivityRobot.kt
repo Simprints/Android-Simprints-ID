@@ -16,7 +16,7 @@ class OdkActivityRobot {
 class OdkActivityAssertions : BaseAssertions() {
 
     fun resultSentIsDisplayedOnToast() {
-        assertToastMessageIs(R.string.result_sent)
+        assertToastMessageIs(R.string.guid_selection_result_sent)
     }
 
 }
