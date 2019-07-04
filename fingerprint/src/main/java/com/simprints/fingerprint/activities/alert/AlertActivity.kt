@@ -50,7 +50,6 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
             setContentView(R.layout.activity_fingerprint_alert)
         }
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
         viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
@@ -82,17 +81,17 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton.visibility = View.VISIBLE
-            alertLeftButton.setText(leftButtonAction.buttonText)
-            alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
+            alertLeftButton?.visibility = View.VISIBLE
+            alertLeftButton?.setText(leftButtonAction.buttonText)
+            alertLeftButton?.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
 
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton.visibility = View.VISIBLE
-            alertRightButton.setText(rightButtonAction.buttonText)
-            alertRightButton.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
+            alertRightButton?.visibility = View.VISIBLE
+            alertRightButton?.setText(rightButtonAction.buttonText)
+            alertRightButton?.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         }
     }
 
@@ -117,7 +116,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         startActivity(intent)
     }
 
-    override fun closeActivityAfterButtonAction(buttonAction: AlertActResult.CloseButtonAction) {
+    override fun finishWithAction(buttonAction: AlertActResult.CloseButtonAction) {
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
         })
