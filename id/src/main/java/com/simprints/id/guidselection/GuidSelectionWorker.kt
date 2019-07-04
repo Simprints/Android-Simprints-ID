@@ -1,4 +1,4 @@
-package com.simprints.id.identity
+package com.simprints.id.guidselection
 
 import android.annotation.SuppressLint
 import android.content.Context
