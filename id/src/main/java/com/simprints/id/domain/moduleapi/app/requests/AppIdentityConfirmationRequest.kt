@@ -23,9 +23,9 @@ data class AppIdentityConfirmationRequest(override val projectId: String,
         private const val KEY_SELECTED_GUID = "selected_guid"
 
         fun fromMap(map: Map<String, Any>) = AppIdentityConfirmationRequest(
-            map[KEY_PROJECT_ID] as String,
-            map[KEY_SESSION_ID] as String,
-            map[KEY_SELECTED_GUID] as String
+            map[KEY_PROJECT_ID].toString(),
+            map[KEY_SESSION_ID].toString(),
+            map[KEY_SELECTED_GUID].toString()
         )
     }
 
