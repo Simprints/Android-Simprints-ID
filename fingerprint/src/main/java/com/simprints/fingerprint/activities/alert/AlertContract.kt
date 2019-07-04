@@ -22,9 +22,8 @@ interface AlertContract {
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
-        fun closeActivityAfterButtonAction(buttonAction: AlertActResult.CloseButtonAction)
+        fun finishWithAction(buttonAction: AlertActResult.CloseButtonAction)
         fun startRefusalActivity()
-        fun closeActivityAfterCloseButton()
     }
 
     interface Presenter : BasePresenter {

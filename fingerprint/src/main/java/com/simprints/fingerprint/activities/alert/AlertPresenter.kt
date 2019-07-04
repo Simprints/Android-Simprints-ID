@@ -64,8 +64,8 @@ class AlertPresenter(val view: AlertContract.View,
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
             is BluetoothSettings -> view.openBluetoothSettings()
-            is TryAgain -> view.closeActivityAfterButtonAction(TRY_AGAIN)
-            is Close -> view.closeActivityAfterButtonAction(CLOSE)
+            is TryAgain -> view.finishWithAction(TRY_AGAIN)
+            is Close -> view.finishWithAction(CLOSE)
             is PairScanner -> {
                 view.openBluetoothSettings()
                 settingsOpenedForPairing.set(true)
@@ -75,7 +75,7 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun handleBackPressed() {
         if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
-            view.closeActivityAfterButtonAction(BACK)
+            view.finishWithAction(BACK)
         } else {
             view.startRefusalActivity()
         }
@@ -83,7 +83,7 @@ class AlertPresenter(val view: AlertContract.View,
 
     override fun handleOnResume() {
         if(settingsOpenedForPairing.getAndSet(false)) {
-            view.setTryAgainResultAndFinish()
+            view.finishWithAction(TRY_AGAIN)
         }
     }
 
