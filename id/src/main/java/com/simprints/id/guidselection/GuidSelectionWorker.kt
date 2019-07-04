@@ -5,6 +5,9 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.analytics.crashreport.CrashReportTag
+import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
 import com.simprints.id.services.GuidSelectionManager
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,6 +19,8 @@ import javax.inject.Inject
 class GuidSelectionWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
     @Inject lateinit var guidSelectionManager: GuidSelectionManager
+
+    @Inject lateinit var crashReportManager: CrashReportManager
 
     override fun doWork(): Result {
         (applicationContext as Application).component.inject(this)
@@ -31,8 +36,11 @@ class GuidSelectionWorker(context: Context, params: WorkerParameters) : Worker(c
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onComplete = {
                 Timber.d("Added Guid Selection Event")
+                crashReportManager.logMessageForCrashReport(CrashReportTag.SESSION,
+                    CrashReportTrigger.UI, message = "Added Guid Selection Event")
             }, onError = {
                 Timber.e(it)
+                crashReportManager.logException(it)
             })
     }
 
