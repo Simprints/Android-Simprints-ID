@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.core.tools.json.LanguageHelper
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
@@ -27,11 +27,7 @@ import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentif
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
@@ -39,7 +35,6 @@ import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.min

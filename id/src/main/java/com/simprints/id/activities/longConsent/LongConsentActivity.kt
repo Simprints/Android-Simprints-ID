@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.core.tools.json.LanguageHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_long_consent.*
 import javax.inject.Inject
