@@ -182,7 +182,7 @@ class AlertActivityTest {
 
 
     private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
-        onView(withId(R.id.alert_title))
+        onView(withId(R.id.alertTitle))
             .check(matches(withText(alertActivityViewModel.title)))
 
         onView(withId(R.id.message))

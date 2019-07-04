@@ -10,7 +10,7 @@
     tools:context=".activities.alert.AlertActivity">
 
     <TextView
-        android:id="@+id/alert_title"
+        android:id="@+id/alertTitle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -23,7 +23,7 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/alert_image"
+        android:id="@+id/alertImage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="50dp"
