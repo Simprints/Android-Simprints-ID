@@ -1,4 +1,4 @@
-package com.simprints.id.activities.identity
+package com.simprints.id.activities.guidselection
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

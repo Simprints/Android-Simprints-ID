@@ -105,7 +105,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.identity.GuidSelectionActivity"
+        <activity android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
