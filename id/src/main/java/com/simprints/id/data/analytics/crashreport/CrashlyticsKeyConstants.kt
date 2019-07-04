@@ -8,5 +8,6 @@ class CrashlyticsKeyConstants {
         const val PEOPLE_DOWN_SYNC_TRIGGERS = "People down sync triggers"
         const val SESSION_ID = "Session ID"
         const val FINGERS_SELECTED = "Fingers selected"
+        const val MALFUNCTION_MESSAGE = "Malfunction report"
     }
 }

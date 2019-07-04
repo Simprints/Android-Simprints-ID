@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.refusal
 
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 
 interface RefusalContract {
@@ -16,6 +15,16 @@ interface RefusalContract {
         fun enableSubmitButton()
 
         fun enableRefusalText()
+
+        fun setFocusOnRefusalReasonAndDisableSubmit()
+
+        fun isSubmitButtonEnabled(): Boolean
+
+        fun showToastForFormSubmit()
+
+        fun showToastForSelectOptionAndSubmit()
+
+        fun disableSubmitButton()
     }
 
     interface Presenter : BasePresenter {
@@ -28,6 +37,22 @@ interface RefusalContract {
 
         fun handleChangesInRefusalText(refusalText: String)
 
-        fun handleRadioOptionClicked(optionIdentifier: Int)
+        fun handleReligiousConcernsRadioClick()
+
+        fun handleDataConcernsRadioClick()
+
+        fun handleTooYoungRadioClick()
+
+        fun handleDoesNotHavePermissionRadioClick()
+
+        fun handlePersonNotPresentRadioClick()
+
+        fun handleAppNotWorkingRadioClick()
+
+        fun handleOtherRadioOptionClick()
+
+        fun handleRadioOptionCheckedChange()
+
+        fun handleOnBackPressed()
     }
 }
