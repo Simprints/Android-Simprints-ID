@@ -75,7 +75,7 @@ class AlertActivityTest {
         if (activities.size > 0) {
             launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
 
-            onView(withId(R.id.right_button)).perform(click())
+            onView(withId(R.id.alertRightButton)).perform(click())
 
             intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
         }
@@ -86,7 +86,7 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
             BLUETOOTH_NOT_ENABLED, AlertActResult.CloseButtonAction.TRY_AGAIN)
@@ -97,7 +97,7 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertActRequest(UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
             UNEXPECTED_ERROR, AlertActResult.CloseButtonAction.CLOSE)
@@ -118,7 +118,7 @@ class AlertActivityTest {
     @Test
     fun guidNotFoundOffline_userClicksOpenSettings_settingsShouldAppear() {
         launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_OFFLINE))
-        onView(withId(R.id.right_button)).perform(click())
+        onView(withId(R.id.alertRightButton)).perform(click())
 
         intended(hasAction(android.provider.Settings.ACTION_WIFI_SETTINGS))
     }
