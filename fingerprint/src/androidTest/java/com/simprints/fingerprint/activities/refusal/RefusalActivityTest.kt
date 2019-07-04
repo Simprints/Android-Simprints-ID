@@ -14,7 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.id.Application
 import org.hamcrest.CoreMatchers.not

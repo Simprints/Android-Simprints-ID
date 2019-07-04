@@ -10,6 +10,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
+import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
@@ -19,6 +20,8 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
@@ -36,9 +39,8 @@ import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
-import junit.framework.Assert.assertEquals
-import junit.framework.TestCase
 import kotlinx.android.synthetic.main.activity_launch.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -211,14 +213,14 @@ class LaunchActivityAndroidTest {
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(
             activity,
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
 
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        TestCase.assertEquals("", parentConsentText)
+        assertEquals("", parentConsentText)
     }
 
     @Test
@@ -230,13 +232,13 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(identifyRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        TestCase.assertEquals("", parentConsentText)
+        assertEquals("", parentConsentText)
     }
 
     @Test
@@ -248,14 +250,14 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultParentalConsentText, parentConsentText)
@@ -270,14 +272,14 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(identifyRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(identifyRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultParentalConsentText, parentConsentText)
@@ -292,7 +294,7 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
@@ -307,7 +309,7 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity,
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(targetConsentText, generalConsentText)
@@ -323,7 +325,7 @@ class LaunchActivityAndroidTest {
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(
             activity, 
-            fromFingerprintToDomainRequest(enrolRequest),
+            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(targetConsentText, generalConsentText)
@@ -363,6 +365,11 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.complete()
         scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, mockBluetoothAdapter)
     }
+
+    private fun fromFingerprintToLaunchActRequest(fingerprintRequest: FingerprintRequest) =
+        with(fingerprintRequest) {
+            LaunchActRequest(projectId, this.toAction(), language, logoExists, programName, organizationName)
+        }
 
     companion object {
         private const val DEFAULT_PROJECT_ID = "some_project_id"
