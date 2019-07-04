@@ -36,7 +36,7 @@
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:label="@string/title_activity_orchestrator"
             android:launchMode="standard"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
@@ -105,15 +105,17 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".activities.guidselection.GuidSelectionActivity"
+        <activity
+            android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="com.simprints.clientapp.CONFIRM_IDENTITY" />
                 <action android:name="com.simprints.legacy.CONFIRM_IDENTITY" />
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="LAUNCHER"/>
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="LAUNCHER" />
             </intent-filter>
         </activity>
 
