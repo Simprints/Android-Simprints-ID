@@ -101,6 +101,16 @@ class AlertActivityTest {
     }
 
     @Test
+    fun scannerNotPaired_userClicksPairScanner_bluetoothSettingsShouldAppear() {
+        launchAlertActivity(AlertActRequest(NOT_PAIRED))
+        ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
+
+        onView(withId(R.id.alertLeftButton)).perform(click())
+
+        intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
+    }
+
+    @Test
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
