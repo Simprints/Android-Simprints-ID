@@ -3,7 +3,6 @@ package com.simprints.id.activities.guidselection
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Data
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.guidselection.GuidSelectionWorker
@@ -22,16 +21,12 @@ class GuidSelectionActivity : AppCompatActivity() {
         WorkManager.getInstance().enqueue(guidSelectionWork)
     }
 
-    private fun buildGuidSelectionWork(): OneTimeWorkRequest {
-        val inputData = prepareInputData()
-        return OneTimeWorkRequestBuilder<GuidSelectionWorker>()
-            .setInputData(inputData)
-            .build()
-    }
+    private fun buildGuidSelectionWork() = OneTimeWorkRequestBuilder<GuidSelectionWorker>()
+        .setInputData(prepareInputData())
+        .build()
 
-    private fun prepareInputData(): Data {
-        val request = intent.parseAppConfirmation().toMap()
-        return Data.Builder().putAll(request).build()
+    private fun prepareInputData() = intent.parseAppConfirmation().toMap().let {
+        Data.Builder().putAll(it).build()
     }
 
 }
