@@ -5,10 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.activities.ActResult
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.orchestrator.*
 
 class OrchestratorViewModel : ViewModel() {
@@ -19,7 +16,7 @@ class OrchestratorViewModel : ViewModel() {
     private lateinit var activityTaskFlow: ActivityTaskFlow
 
     fun start(fingerprintRequest: FingerprintRequest) {
-        activityTaskFlow = fingerprintRequest.toActivityCallFlow()
+        activityTaskFlow = fingerprintRequest.toActivityTaskFlow()
         postNextActivityCall()
     }
 
@@ -39,14 +36,6 @@ class OrchestratorViewModel : ViewModel() {
     private fun handleFlowFinished() {
         finishedResult.postValue(activityTaskFlow.getFinalResult())
     }
-
-    private fun FingerprintRequest.toActivityCallFlow(): ActivityTaskFlow =
-        when (this) {
-            is FingerprintEnrolRequest -> Enrol()
-            is FingerprintIdentifyRequest -> Identify()
-            is FingerprintVerifyRequest -> Verify()
-            else -> throw Throwable("Woops") // TODO
-        }.also { it.computeFlow(this) }
 
     data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
