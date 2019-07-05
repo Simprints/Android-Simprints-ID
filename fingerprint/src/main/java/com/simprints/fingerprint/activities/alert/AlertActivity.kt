@@ -1,7 +1,5 @@
 package com.simprints.fingerprint.activities.alert
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -16,24 +14,19 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.result.AlertActResult
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.id.Application
-import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import javax.inject.Inject
+import com.simprints.id.Application
+import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 
-class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallback {
+class AlertActivity : AppCompatActivity(), AlertContract.View {
 
-    @Inject lateinit var orchestrator: Orchestrator
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
-
-    override val context: Context by lazy { this }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +100,13 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
     }
 
     override fun closeActivityAfterButtonAction(buttonAction: AlertActResult.CloseButtonAction) {
-        setResult(Activity.RESULT_OK, Intent().apply {
+        val resultCode = when (buttonAction) {
+            AlertActResult.CloseButtonAction.CLOSE,
+            AlertActResult.CloseButtonAction.BACK -> ResultCode.ALERT
+            AlertActResult.CloseButtonAction.TRY_AGAIN -> ResultCode.OK
+        }
+
+        setResult(resultCode.value, Intent().apply {
             putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
         })
 
@@ -116,17 +115,18 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
+        if (requestCode == InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                else -> {
+                }
+            }
+        }
     }
 
-    override fun tryAgain() {}
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResult(it, data)
-        }
+    private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
+        setResult(resultCode.value, data)
         finish()
     }
 
