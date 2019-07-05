@@ -33,7 +33,7 @@ class OrchestratorActivity : AppCompatActivity() {
         })
 
         viewModel.nextActivityCall.observe(this, Observer {
-            startActivityForResult(it.createRequestIntent(this), it.requestCode)
+            startActivityForResult(it.createIntent(this), it.requestCode)
         })
 
         viewModel.start(fingerprintRequest)
@@ -41,7 +41,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        viewModel.handleActivityResult(ActivityResult(resultCode, data))
+        viewModel.handleActivityResult(OrchestratorViewModel.ActivityResult(resultCode, data))
     }
 
     override fun onDestroy() {
