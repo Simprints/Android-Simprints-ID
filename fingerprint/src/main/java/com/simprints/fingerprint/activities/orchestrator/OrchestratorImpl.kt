@@ -19,6 +19,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
+@Deprecated("Old orchestrator")
 class OrchestratorImpl : Orchestrator {
 
     override fun onActivityResult(receiver: OrchestratorCallback, requestCode: Int, resultCode: Int?, data: Intent?) {

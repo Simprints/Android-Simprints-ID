@@ -1,50 +1,31 @@
 package com.simprints.fingerprint.activities.orchestrator
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.fingerprint.activities.ActRequest
 import com.simprints.fingerprint.activities.ActResult
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
-import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
-import com.simprints.fingerprint.activities.launch.LaunchActivity
-import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchActResult
-import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.toAction
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.orchestrator.*
 
 class OrchestratorViewModel : ViewModel() {
 
-    val nextActivityCall = MutableLiveData<ActivityCall<*, *>>()
+    val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
 
-    private lateinit var activityCallFlow: ActivityCallFlow
+    private lateinit var activityTaskFlow: ActivityTaskFlow
 
     fun start(fingerprintRequest: FingerprintRequest) {
-        activityCallFlow = fingerprintRequest.toActivityCallFlow()
+        activityTaskFlow = fingerprintRequest.toActivityCallFlow()
         postNextActivityCall()
     }
 
     fun handleActivityResult(activityResult: ActivityResult) {
-        activityCallFlow.saveActResultAndCycle(activityResult)
-        if (activityCallFlow.isFlowFinished()) {
+        activityTaskFlow.saveActResultAndCycle(activityResult::toActResult)
+        if (activityTaskFlow.isFlowFinished()) {
             handleFlowFinished()
         } else {
             postNextActivityCall()
@@ -52,198 +33,31 @@ class OrchestratorViewModel : ViewModel() {
     }
 
     private fun postNextActivityCall() {
-        nextActivityCall.postValue(activityCallFlow.getCurrentActivity())
+        nextActivityCall.postValue(activityTaskFlow.getCurrentActivity().toActivityCall())
     }
 
     private fun handleFlowFinished() {
-        finishedResult.postValue(activityCallFlow.getFinalResult())
+        finishedResult.postValue(activityTaskFlow.getFinalResult())
+    }
+
+    private fun FingerprintRequest.toActivityCallFlow(): ActivityTaskFlow =
+        when (this) {
+            is FingerprintEnrolRequest -> Enrol()
+            is FingerprintIdentifyRequest -> Identify()
+            is FingerprintVerifyRequest -> Verify()
+            else -> throw Throwable("Woops") // TODO
+        }.also { it.computeFlow(this) }
+
+    data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
+
+    private fun ActivityTask<*, *>.toActivityCall() =
+        ActivityCall(requestCode) { context ->
+            Intent(context, targetClass).apply { putExtra(requestBundleKey, createActRequest()) }
+        }
+
+    data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
+
+        fun toActResult(bundleKey: String): ActResult =
+            resultData?.getParcelableExtra(bundleKey) ?: throw Throwable("Woops") // TODO
     }
 }
-
-fun FingerprintRequest.toActivityCallFlow(): ActivityCallFlow =
-    when (this) {
-        is FingerprintEnrolRequest -> ActivityCallFlow.Enrol()
-        is FingerprintIdentifyRequest -> ActivityCallFlow.Identify()
-        is FingerprintVerifyRequest -> ActivityCallFlow.Verify()
-        else -> throw Throwable("Woops") // TODO
-    }.also { it.computeFlow(this) }
-
-sealed class ActivityCallFlow {
-
-    protected val actResults: MutableMap<String, ActResult> = mutableMapOf()
-
-    protected lateinit var activityCalls: List<ActivityCall<*, *>>
-    private var currentActivityCallIndex = 0
-
-    @Suppress("unchecked_cast")
-    fun getCurrentActivity() = activityCalls[currentActivityCallIndex] as ActivityCall<ActRequest, ActResult>
-    fun isFlowFinished() = currentActivityCallIndex >= activityCalls.size
-
-    abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
-    abstract fun getFinalResult(): ActivityResult
-
-    fun saveActResultAndCycle(activityResult: ActivityResult) {
-        with(getCurrentActivity()) {
-            actResult(activityResult.toActResult(resultBundleKey))
-        }
-        currentActivityCallIndex++
-    }
-
-    class Enrol : ActivityCallFlow() {
-
-        override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            with(fingerprintRequest) {
-                activityCalls = listOf(
-                    Launch({
-                        LaunchActRequest(
-                            projectId, this.toAction(), language, logoExists, programName, organizationName
-                        )
-                    }, { actResults["launch"] = it }),
-                    CollectFingerprints({
-                        CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                        )
-                    }, { actResults["collect"] = it })
-                )
-            }
-        }
-
-        override fun getFinalResult(): ActivityResult =
-            ActivityResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintEnrolResponse(
-                    FingerprintEnrolResponse((actResults["collect"] as CollectFingerprintsActResult).probe.patientId))
-                )
-            })
-    }
-
-    class Identify : ActivityCallFlow() {
-
-        override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            with(fingerprintRequest as FingerprintIdentifyRequest) {
-                activityCalls = listOf(
-                    Launch({
-                        LaunchActRequest(
-                            projectId, this.toAction(), language, logoExists, programName, organizationName
-                        )
-                    }, { actResults["launch"] = it }),
-                    CollectFingerprints({
-                        CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                        )
-                    }, { actResults["collect"] = it }),
-                    Matching({
-                        with(actResults["collect"] as CollectFingerprintsActResult) {
-                            MatchingActIdentifyRequest(
-                                language, probe, buildQueryForIdentifyPool(), returnIdCount
-                            )
-                        }
-                    }, { actResults["matching"] = it })
-                )
-            }
-        }
-
-        override fun getFinalResult(): ActivityResult =
-            ActivityResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintIdentifyResponse(
-                    FingerprintIdentifyResponse((actResults["matching"] as MatchingActIdentifyResult).identifications)
-                ))
-            })
-    }
-
-    class Verify : ActivityCallFlow() {
-
-        override fun computeFlow(fingerprintRequest: FingerprintRequest) {
-            with(fingerprintRequest as FingerprintVerifyRequest) {
-                activityCalls = listOf(
-                    Launch({
-                        LaunchActRequest(
-                            projectId, this.toAction(), language, logoExists, programName, organizationName
-                        )
-                    }, { actResults["launch"] = it }),
-                    CollectFingerprints({
-                        CollectFingerprintsActRequest(
-                            projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                        )
-                    }, { actResults["collect"] = it }),
-                    Matching({
-                        with(actResults["collect"] as CollectFingerprintsActResult) {
-                            MatchingActVerifyRequest(
-                                language, probe, buildQueryForVerifyPool(), verifyGuid
-                            )
-                        }
-                    }, { actResults["matching"] = it })
-                )
-            }
-        }
-
-        override fun getFinalResult(): ActivityResult =
-            ActivityResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintVerifyResponse(
-                    with(actResults["matching"] as MatchingActVerifyResult) {
-                        FingerprintVerifyResponse(guid, confidence, tier)
-                    }
-                ))
-            })
-    }
-}
-
-sealed class ActivityCall<out Request : ActRequest, in Result : ActResult>(
-    val actRequest: () -> Request,
-    val actResult: (Result) -> Unit,
-    private val targetClass: Class<*>,
-    val requestCode: Int,
-    private val requestBundleKey: String,
-    val resultBundleKey: String
-) {
-
-    fun createRequestIntent(packageContext: Context) =
-        Intent(packageContext, targetClass).apply {
-            putExtra(requestBundleKey, actRequest())
-        }
-}
-
-class Launch(launchActRequest: () -> LaunchActRequest, launchActResult: (LaunchActResult) -> Unit) :
-    ActivityCall<LaunchActRequest, LaunchActResult>(
-        launchActRequest,
-        launchActResult,
-        LaunchActivity::class.java,
-        0,
-        LaunchActRequest.BUNDLE_KEY,
-        LaunchActResult.BUNDLE_KEY
-    )
-
-class CollectFingerprints(collectFingerprintsActRequest: () -> CollectFingerprintsActRequest,
-                          collectFingerprintsActResult: (CollectFingerprintsActResult) -> Unit) :
-    ActivityCall<CollectFingerprintsActRequest, CollectFingerprintsActResult>(
-        collectFingerprintsActRequest,
-        collectFingerprintsActResult,
-        CollectFingerprintsActivity::class.java,
-        1,
-        CollectFingerprintsActRequest.BUNDLE_KEY,
-        CollectFingerprintsActResult.BUNDLE_KEY
-    )
-
-class Matching(matchingActRequest: () -> MatchingActRequest, matchingActResult: (MatchingActResult) -> Unit) :
-    ActivityCall<MatchingActRequest, MatchingActResult>(
-        matchingActRequest,
-        matchingActResult,
-        MatchingActivity::class.java,
-        2,
-        MatchingActRequest.BUNDLE_KEY,
-        MatchingActResult.BUNDLE_KEY
-    )
-
-data class ActivityResult(val resultCode: Int, val resultData: Intent?)
-
-fun ActivityResult.toActResult(bundleKey: String): ActResult =
-    resultData?.getParcelableExtra(bundleKey) ?: throw Throwable("Woops") // TODO
-
-fun FingerprintIdentifyRequest.buildQueryForIdentifyPool(): MatchingActIdentifyRequest.QueryForIdentifyPool =
-    when (matchGroup) {
-        MatchGroup.GLOBAL -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId)
-        MatchGroup.USER -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, userId = userId)
-        MatchGroup.MODULE -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, moduleId = moduleId)
-    }
-
-fun FingerprintVerifyRequest.buildQueryForVerifyPool(): MatchingActVerifyRequest.QueryForVerifyPool =
-    MatchingActVerifyRequest.QueryForVerifyPool(projectId)
