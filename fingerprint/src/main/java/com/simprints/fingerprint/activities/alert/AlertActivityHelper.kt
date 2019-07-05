@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.data.domain.InternalConstants
 
 object AlertActivityHelper {

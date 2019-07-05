@@ -15,7 +15,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.alert.result.AlertActResult
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -23,7 +23,6 @@ import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
-import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import javax.inject.Inject

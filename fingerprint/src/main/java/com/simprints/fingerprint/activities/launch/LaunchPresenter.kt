@@ -9,7 +9,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.alert.result.AlertActResult
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
