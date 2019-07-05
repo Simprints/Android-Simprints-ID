@@ -32,7 +32,7 @@ enum class AlertActivityViewModel(val type: Type,
             mainDrawable = R.drawable.error_hint_wifi),
         leftButton = ButtonAction.None,
         rightButton = ButtonAction.Close,
-        message = R.string.safetynet_down_message
+        message = R.string.safetynet_down_alert_message
     ),
 
     UNEXPECTED_ERROR(
