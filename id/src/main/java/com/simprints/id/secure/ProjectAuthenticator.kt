@@ -15,7 +15,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromInt
 import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.Singles
 import java.io.IOException
 import javax.inject.Inject

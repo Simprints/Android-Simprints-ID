@@ -27,6 +27,14 @@ enum class AlertActivityViewModel(val type: Type,
         message = R.string.different_userId_message
     ),
 
+    SAFETYNET_DOWN(
+        type = Type.ConfigurationError(title = R.string.alert_try_again_soon,
+            mainDrawable = R.drawable.error_hint_wifi),
+        leftButton = ButtonAction.None,
+        rightButton = ButtonAction.Close,
+        message = R.string.safetynet_down_message
+    ),
+
     UNEXPECTED_ERROR(
         type = Type.UnexpectedError(),
         leftButton = ButtonAction.Close,
@@ -40,6 +48,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                AlertType.SAFETYNET_DOWN -> SAFETYNET_DOWN
             }
     }
 
@@ -58,7 +67,7 @@ enum class AlertActivityViewModel(val type: Type,
         class ConfigurationError(title: Int = R.string.configuration_error_title,
                                  backgroundColor: Int = R.color.simprints_yellow,
                                  mainDrawable: Int = R.drawable.error_icon,
-                                 hintDrawable: Int?)
+                                 hintDrawable: Int? = null)
             : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         @Keep
