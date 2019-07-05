@@ -13,10 +13,7 @@ import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyR
 import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel.ActivityResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
@@ -151,3 +148,11 @@ fun FingerprintIdentifyRequest.buildQueryForIdentifyPool(): MatchingActIdentifyR
 
 fun FingerprintVerifyRequest.buildQueryForVerifyPool(): MatchingActVerifyRequest.QueryForVerifyPool =
     MatchingActVerifyRequest.QueryForVerifyPool(projectId)
+
+fun FingerprintRequest.toActivityTaskFlow(): ActivityTaskFlow =
+    when (this) {
+        is FingerprintEnrolRequest -> Enrol()
+        is FingerprintIdentifyRequest -> Identify()
+        is FingerprintVerifyRequest -> Verify()
+        else -> throw Throwable("Woops") // TODO
+    }.also { it.computeFlow(this) }
