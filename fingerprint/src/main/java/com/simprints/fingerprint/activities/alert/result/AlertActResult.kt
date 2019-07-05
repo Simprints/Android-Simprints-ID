@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.alert.response
+package com.simprints.fingerprint.activities.alert.result
 
 import android.os.Parcelable
 import com.simprints.fingerprint.activities.ActResult

@@ -23,7 +23,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.alert.result.AlertActResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -37,7 +37,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-import com.simprints.id.R as idR
 
 
 @RunWith(AndroidJUnit4::class)

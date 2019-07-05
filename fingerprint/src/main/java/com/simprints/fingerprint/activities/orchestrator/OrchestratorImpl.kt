@@ -3,8 +3,8 @@ package com.simprints.fingerprint.activities.orchestrator
 import android.app.Activity
 import android.content.Intent
 import com.simprints.fingerprint.activities.alert.AlertActivity
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
-import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
+import com.simprints.fingerprint.activities.alert.result.AlertActResult
+import com.simprints.fingerprint.activities.alert.result.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.fingerprint.activities.matching.MatchingActivity

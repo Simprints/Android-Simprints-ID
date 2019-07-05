@@ -6,7 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.activities.ActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.orchestrator.*
+import com.simprints.fingerprint.orchestrator.ActivityTask
+import com.simprints.fingerprint.orchestrator.ActivityTaskFlow
+import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.toActivityTaskFlow
 
 class OrchestratorViewModel : ViewModel() {
 
@@ -20,8 +23,11 @@ class OrchestratorViewModel : ViewModel() {
         postNextActivityCall()
     }
 
-    fun handleActivityResult(activityResult: ActivityResult) {
-        activityTaskFlow.saveActResultAndCycle(activityResult::toActResult)
+    fun handleActivityResult(activityResult: ActivityResult) { // TODO : move content of this function to orchestrator?
+        activityTaskFlow.handleActResult(
+            ResultCode.fromValue(activityResult.resultCode),
+            activityResult::toActResult
+        )
         if (activityTaskFlow.isFlowFinished()) {
             handleFlowFinished()
         } else {
