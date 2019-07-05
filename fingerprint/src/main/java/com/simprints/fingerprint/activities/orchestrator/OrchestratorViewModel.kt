@@ -36,7 +36,7 @@ class OrchestratorViewModel : ViewModel() {
     }
 
     private fun postNextActivityCall() {
-        nextActivityCall.postValue(activityTaskFlow.getCurrentActivity().toActivityCall())
+        nextActivityCall.postValue(activityTaskFlow.getCurrentActivityTask().toActivityCall())
     }
 
     private fun handleFlowFinished() {
@@ -45,7 +45,7 @@ class OrchestratorViewModel : ViewModel() {
 
     data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
-    private fun ActivityTask<*, *>.toActivityCall() =
+    private fun ActivityTask.toActivityCall() =
         ActivityCall(requestCode) { context ->
             Intent(context, targetClass).apply { putExtra(requestBundleKey, createActRequest()) }
         }

@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.orchestrator
 
 import com.simprints.fingerprint.activities.ActRequest
-import com.simprints.fingerprint.activities.ActResult
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
@@ -12,8 +11,8 @@ import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingActResult
 
-sealed class ActivityTask<out Request : ActRequest, in Result : ActResult>(
-    val createActRequest: () -> Request,
+sealed class ActivityTask(
+    val createActRequest: () -> ActRequest,
     val actResultKey: String,
     val targetClass: Class<*>,
     val requestCode: Int,
@@ -22,7 +21,7 @@ sealed class ActivityTask<out Request : ActRequest, in Result : ActResult>(
 )
 
 class Launch(createLaunchActRequest: () -> LaunchActRequest, actResultKey: String) :
-    ActivityTask<LaunchActRequest, LaunchActResult>(
+    ActivityTask(
         createLaunchActRequest,
         actResultKey,
         LaunchActivity::class.java,
@@ -33,7 +32,7 @@ class Launch(createLaunchActRequest: () -> LaunchActRequest, actResultKey: Strin
 
 class CollectFingerprints(createCollectFingerprintsActRequest: () -> CollectFingerprintsActRequest,
                           actResultKey: String) :
-    ActivityTask<CollectFingerprintsActRequest, CollectFingerprintsActResult>(
+    ActivityTask(
         createCollectFingerprintsActRequest,
         actResultKey,
         CollectFingerprintsActivity::class.java,
@@ -43,7 +42,7 @@ class CollectFingerprints(createCollectFingerprintsActRequest: () -> CollectFing
     )
 
 class Matching(createMatchingActRequest: () -> MatchingActRequest, actResultKey: String) :
-    ActivityTask<MatchingActRequest, MatchingActResult>(
+    ActivityTask(
         createMatchingActRequest,
         actResultKey,
         MatchingActivity::class.java,

@@ -2,7 +2,6 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import android.content.Intent
-import com.simprints.fingerprint.activities.ActRequest
 import com.simprints.fingerprint.activities.ActResult
 import com.simprints.fingerprint.activities.alert.result.AlertActResult
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
@@ -28,27 +27,26 @@ sealed class ActivityTaskFlow {
 
     protected val actResults: MutableMap<String, ActResult> = mutableMapOf()
 
-    protected lateinit var activityTasks: List<ActivityTask<*, *>>
-    private var currentActivityCallIndex = 0
-    private var lastResult = ResultCode.OK
+    protected lateinit var activityTasks: List<ActivityTask>
+    private var currentActivityTaskIndex = 0
+    private var lastResultCode = ResultCode.OK
 
-    @Suppress("unchecked_cast")
-    fun getCurrentActivity() = activityTasks[currentActivityCallIndex] as ActivityTask<ActRequest, ActResult>
+    fun getCurrentActivityTask() = activityTasks[currentActivityTaskIndex]
 
-    fun isFlowFinished() = isFlowFinishedPrematurely() || currentActivityCallIndex >= activityTasks.size
-    private fun isFlowFinishedPrematurely() = lastResult != ResultCode.OK
+    fun isFlowFinished() = isFlowFinishedPrematurely() || currentActivityTaskIndex >= activityTasks.size
+    private fun isFlowFinishedPrematurely() = lastResultCode != ResultCode.OK
 
     abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
     protected abstract fun getFinalOkResult(): ActivityResult // TODO : should have clean separation between VM classes and here. Perhaps a dedicated class for arranging this result for the Platform
 
     fun handleActResult(resultCode: ResultCode, getActResult: (bundleKey: String) -> ActResult) {
-        lastResult = resultCode
+        lastResultCode = resultCode
         when (resultCode) {
             ResultCode.OK -> {
-                with(getCurrentActivity()) {
+                with(getCurrentActivityTask()) {
                     actResults[actResultKey] = getActResult(resultBundleKey)
                 }
-                currentActivityCallIndex++
+                currentActivityTaskIndex++
             }
             ResultCode.CANCELLED -> {
             }
@@ -62,7 +60,7 @@ sealed class ActivityTaskFlow {
     }
 
     fun getFinalResult() =
-        when (lastResult) {
+        when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult()
             ResultCode.CANCELLED -> ActivityResult(Activity.RESULT_CANCELED, null)
             ResultCode.ALERT -> ActivityResult(Activity.RESULT_CANCELED, null)
