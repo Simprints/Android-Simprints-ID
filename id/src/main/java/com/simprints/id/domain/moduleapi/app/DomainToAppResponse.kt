@@ -3,12 +3,12 @@ package com.simprints.id.domain.moduleapi.app
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.Parcelize
-import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 object DomainToAppResponse {
 
@@ -34,6 +34,7 @@ object DomainToAppResponse {
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
             SCANNER_LOW_BATTERY -> IAppErrorReason.SCANNER_LOW_BATTERY
             UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
+            SAFETYNET_DOWN -> IAppErrorReason.SAFETYNET_DOWN
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

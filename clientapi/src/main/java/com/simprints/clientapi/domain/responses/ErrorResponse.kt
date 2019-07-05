@@ -32,6 +32,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         SCANNER_LOW_BATTERY,
+        SAFETYNET_DOWN,
         UNKNOWN_BLUETOOTH_ISSUE;
 
         companion object {
@@ -46,6 +47,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     IAppErrorReason.SCANNER_LOW_BATTERY -> SCANNER_LOW_BATTERY
                     IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
+                    IAppErrorReason.SAFETYNET_DOWN -> SAFETYNET_DOWN
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =
