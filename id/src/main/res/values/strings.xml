@@ -187,7 +187,7 @@
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
-    <string name="safetynet_down_alert_message">1. System issue \n 2. Please try again after 5–10 minutes</string>
+    <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Click close</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
     <string name="try_again_label">Try Again</string>
