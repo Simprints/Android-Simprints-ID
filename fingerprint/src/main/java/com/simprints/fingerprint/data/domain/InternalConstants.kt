@@ -1,7 +1,8 @@
 package com.simprints.fingerprint.data.domain
 
+@Deprecated("Redone in new orchestrator")
 class InternalConstants {
-
+    @Deprecated("Redone in new orchestrator")
     class RequestIntents {
         companion object {
             private const val PREFIX = 200

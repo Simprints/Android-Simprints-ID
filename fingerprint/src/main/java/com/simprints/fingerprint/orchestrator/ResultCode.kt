@@ -6,7 +6,7 @@ package com.simprints.fingerprint.orchestrator
  */
 enum class ResultCode(val value: Int) {
 
-    /** The ActivityTask finished normally and has the ActivityTask's normal return */
+    /** The ActivityTask finished normally and returned the ActivityTask's normal ActResult */
     OK(-1), // Activity.OK
 
     /**
