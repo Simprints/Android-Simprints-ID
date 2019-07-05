@@ -14,17 +14,17 @@ import com.simprints.fingerprint.activities.matching.result.MatchingActResult
 
 sealed class ActivityTask<out Request : ActRequest, in Result : ActResult>(
     val createActRequest: () -> Request,
-    val saveActResult: (Result) -> Unit,
+    val actResultKey: String,
     val targetClass: Class<*>,
     val requestCode: Int,
     val requestBundleKey: String,
     val resultBundleKey: String
 )
 
-class Launch(createLaunchActRequest: () -> LaunchActRequest, saveLaunchActResult: (LaunchActResult) -> Unit) :
+class Launch(createLaunchActRequest: () -> LaunchActRequest, actResultKey: String) :
     ActivityTask<LaunchActRequest, LaunchActResult>(
         createLaunchActRequest,
-        saveLaunchActResult,
+        actResultKey,
         LaunchActivity::class.java,
         0, // TODO request codes
         LaunchActRequest.BUNDLE_KEY,
@@ -32,20 +32,20 @@ class Launch(createLaunchActRequest: () -> LaunchActRequest, saveLaunchActResult
     )
 
 class CollectFingerprints(createCollectFingerprintsActRequest: () -> CollectFingerprintsActRequest,
-                          saveCollectFingerprintsActResult: (CollectFingerprintsActResult) -> Unit) :
+                          actResultKey: String) :
     ActivityTask<CollectFingerprintsActRequest, CollectFingerprintsActResult>(
         createCollectFingerprintsActRequest,
-        saveCollectFingerprintsActResult,
+        actResultKey,
         CollectFingerprintsActivity::class.java,
         1,
         CollectFingerprintsActRequest.BUNDLE_KEY,
         CollectFingerprintsActResult.BUNDLE_KEY
     )
 
-class Matching(createMatchingActRequest: () -> MatchingActRequest, saveMatchingActResult: (MatchingActResult) -> Unit) :
+class Matching(createMatchingActRequest: () -> MatchingActRequest, actResultKey: String) :
     ActivityTask<MatchingActRequest, MatchingActResult>(
         createMatchingActRequest,
-        saveMatchingActResult,
+        actResultKey,
         MatchingActivity::class.java,
         2,
         MatchingActRequest.BUNDLE_KEY,

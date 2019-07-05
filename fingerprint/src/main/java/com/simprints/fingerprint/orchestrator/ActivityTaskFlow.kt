@@ -45,7 +45,9 @@ sealed class ActivityTaskFlow {
         lastResult = resultCode
         when (resultCode) {
             ResultCode.OK -> {
-                with(getCurrentActivity()) { saveActResult(getActResult(resultBundleKey)) }
+                with(getCurrentActivity()) {
+                    actResults[actResultKey] = getActResult(resultBundleKey)
+                }
                 currentActivityCallIndex++
             }
             ResultCode.CANCELLED -> {
@@ -77,8 +79,8 @@ sealed class ActivityTaskFlow {
         }
 
     companion object {
-        protected const val REFUSED = "refused"
-        protected const val ALERT = "alert"
+        private const val REFUSED = "refused"
+        private const val ALERT = "alert"
     }
 }
 
@@ -91,12 +93,12 @@ class Enrol : ActivityTaskFlow() {
                     LaunchActRequest(
                         projectId, this.toAction(), language, logoExists, programName, organizationName
                     )
-                }, { actResults[LAUNCH] = it }),
+                }, LAUNCH),
                 CollectFingerprints({
                     CollectFingerprintsActRequest(
                         projectId, userId, moduleId, this.toAction(), language, fingerStatus
                     )
-                }, { actResults[COLLECT] = it })
+                }, COLLECT)
             )
         }
     }
@@ -123,19 +125,19 @@ class Identify : ActivityTaskFlow() {
                     LaunchActRequest(
                         projectId, this.toAction(), language, logoExists, programName, organizationName
                     )
-                }, { actResults[LAUNCH] = it }),
+                }, LAUNCH),
                 CollectFingerprints({
                     CollectFingerprintsActRequest(
                         projectId, userId, moduleId, this.toAction(), language, fingerStatus
                     )
-                }, { actResults[COLLECT] = it }),
+                }, COLLECT),
                 Matching({
                     with(actResults[COLLECT] as CollectFingerprintsActResult) {
                         MatchingActIdentifyRequest(
                             language, probe, buildQueryForIdentifyPool(), returnIdCount
                         )
                     }
-                }, { actResults[MATCHING] = it })
+                }, MATCHING)
             )
         }
     }
@@ -146,6 +148,13 @@ class Identify : ActivityTaskFlow() {
                 FingerprintIdentifyResponse((actResults[MATCHING] as MatchingActIdentifyResult).identifications)
             ))
         })
+
+    private fun FingerprintIdentifyRequest.buildQueryForIdentifyPool() =
+        when (matchGroup) {
+            MatchGroup.GLOBAL -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId)
+            MatchGroup.USER -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, userId = userId)
+            MatchGroup.MODULE -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, moduleId = moduleId)
+        }
 
     companion object {
         private const val LAUNCH = "launch"
@@ -163,19 +172,19 @@ class Verify : ActivityTaskFlow() {
                     LaunchActRequest(
                         projectId, this.toAction(), language, logoExists, programName, organizationName
                     )
-                }, { actResults[LAUNCH] = it }),
+                }, LAUNCH),
                 CollectFingerprints({
                     CollectFingerprintsActRequest(
                         projectId, userId, moduleId, this.toAction(), language, fingerStatus
                     )
-                }, { actResults[COLLECT] = it }),
+                }, COLLECT),
                 Matching({
                     with(actResults[COLLECT] as CollectFingerprintsActResult) {
                         MatchingActVerifyRequest(
                             language, probe, buildQueryForVerifyPool(), verifyGuid
                         )
                     }
-                }, { actResults[MATCHING] = it })
+                }, MATCHING)
             )
         }
     }
@@ -189,22 +198,15 @@ class Verify : ActivityTaskFlow() {
             ))
         })
 
+    private fun FingerprintVerifyRequest.buildQueryForVerifyPool() =
+        MatchingActVerifyRequest.QueryForVerifyPool(projectId)
+
     companion object {
         private const val LAUNCH = "launch"
         private const val COLLECT = "collect"
         private const val MATCHING = "matching"
     }
 }
-
-fun FingerprintIdentifyRequest.buildQueryForIdentifyPool(): MatchingActIdentifyRequest.QueryForIdentifyPool =
-    when (matchGroup) {
-        MatchGroup.GLOBAL -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId)
-        MatchGroup.USER -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, userId = userId)
-        MatchGroup.MODULE -> MatchingActIdentifyRequest.QueryForIdentifyPool(projectId, moduleId = moduleId)
-    }
-
-fun FingerprintVerifyRequest.buildQueryForVerifyPool(): MatchingActVerifyRequest.QueryForVerifyPool =
-    MatchingActVerifyRequest.QueryForVerifyPool(projectId)
 
 fun FingerprintRequest.toActivityTaskFlow(): ActivityTaskFlow =
     when (this) {
