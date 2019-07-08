@@ -1,21 +1,21 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
+import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
-import com.simprints.fingerprintmatcher.Person as MatcherPerson
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
@@ -23,6 +23,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import com.simprints.fingerprintmatcher.Person as MatcherPerson
 
 class MatchingPresenter(
     private val view: MatchingContract.View,
@@ -72,7 +73,7 @@ class MatchingPresenter(
     }
 
     private fun MatchTask.runMatch(candidates: List<Person>, probe: Person): Single<MatchResult> =
-        Single.create<MatchResult> { emitter ->
+        Single.create { emitter ->
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
@@ -102,6 +103,10 @@ class MatchingPresenter(
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Invalid action in MatchingActivity"))
         view.launchAlertActivity()
+    }
+
+    override fun handleBackPressed() {
+        view.setResultAndFinish(ResultCode.CANCELLED, null)
     }
 
     override fun dispose() {

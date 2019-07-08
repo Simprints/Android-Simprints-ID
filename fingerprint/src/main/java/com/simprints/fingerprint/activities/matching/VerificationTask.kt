@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.activities.matching
 
-import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingActResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -12,13 +15,10 @@ import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchE
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
-import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 
@@ -65,7 +65,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
             MatchingActVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
 
         preferenceManager.lastVerificationDate = Date()
-        view.doSetResult(Activity.RESULT_OK, resultData)
+        view.doSetResult(ResultCode.OK, resultData)
         view.doFinish()
     }
 
