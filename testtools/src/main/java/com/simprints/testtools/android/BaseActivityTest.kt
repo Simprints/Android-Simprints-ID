@@ -22,7 +22,7 @@ open class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
     }
 
     @Before
-    fun setUp() {
+    open fun setUp() {
         if (autoLaunch)
             launch(intent())
         else
@@ -30,14 +30,14 @@ open class BaseActivityTest<T: AppCompatActivity>(activityClass: KClass<T>,
     }
 
     @After
-    fun tearDown() {
+    open fun tearDown() {
         if (!autoLaunch)
             Intents.release()
     }
 
     open fun intent() = Intent()
 
-    private fun launch(intent: Intent) {
+    open fun launch(intent: Intent) {
         rule.launchActivity(intent)
     }
 
