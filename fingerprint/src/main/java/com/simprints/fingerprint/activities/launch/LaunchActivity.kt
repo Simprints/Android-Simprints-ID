@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.launch
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -14,12 +13,11 @@ import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAler
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchActResult
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
 import com.simprints.fingerprint.orchestrator.RequestCode
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
@@ -29,12 +27,8 @@ import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import javax.inject.Inject
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCallback {
-
-    override val context: Context by lazy { this }
-    @Inject lateinit var orchestrator: Orchestrator
+class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
@@ -100,18 +94,16 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun onActivityResultReceived() {
-        viewPresenter.onActivityResult()
-    }
-
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResultAndFinish(it, data)
+        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                    viewPresenter.onActivityResult()
+                    viewPresenter.tryAgainFromErrorOrRefusal()
+                }
+            }
         }
     }
 
@@ -153,7 +145,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun continueToNextActivity() {
-        setResultAndFinish(0, Intent().apply {
+        setResultAndFinish(ResultCode.OK, Intent().apply {
             putExtra(LaunchActResult.BUNDLE_KEY, LaunchActResult())
         })
     }
@@ -162,8 +154,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
         startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
-    override fun setResultAndFinish(resultCode: Int, resultData: Intent?) {
-        setResult(resultCode, resultData)
+    override fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
+        setResult(resultCode.value, resultData)
         finish()
     }
 

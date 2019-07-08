@@ -4,6 +4,7 @@ import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
@@ -18,7 +19,7 @@ interface LaunchContract {
         fun initTextsInButtons()
         fun initConsentTabs()
         fun setLogoVisibility(visible: Boolean)
-        fun setResultAndFinish(resultCode: Int, resultData: Intent?)
+        fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
@@ -36,11 +37,10 @@ interface LaunchContract {
         fun handleOnResume()
         fun handleOnPause()
 
-        fun tearDownAppWithResult(resultCode: Int, resultData: Intent?)
         fun confirmConsentAndContinueToNextActivity()
         fun handleDeclinePressed()
         fun handleOnBackPressed()
-        fun tryAgainFromErrorScreen()
+        fun tryAgainFromErrorOrRefusal()
         fun onActivityResult()
     }
 }

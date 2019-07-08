@@ -119,7 +119,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
             when (ResultCode.fromValue(resultCode)) {
                 ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
-                else -> {
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
                 }
             }
         }

@@ -15,10 +15,7 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel.A
 import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
@@ -63,7 +60,13 @@ sealed class ActivityTaskFlow {
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult()
             ResultCode.CANCELLED -> ActivityResult(Activity.RESULT_CANCELED, null)
-            ResultCode.ALERT -> ActivityResult(Activity.RESULT_CANCELED, null)
+            ResultCode.ALERT -> ActivityResult(Activity.RESULT_CANCELED, Intent().apply {
+                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse(
+                    with(actResults[ALERT] as AlertActResult) {
+                        FingerprintErrorReason.fromFingerprintAlertToErrorResponse(alert)
+                    }
+                ))
+            })
             ResultCode.REFUSED -> ActivityResult(Activity.RESULT_OK, Intent().apply {
                 putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(
                     with(actResults[REFUSED] as RefusalActResult) {
