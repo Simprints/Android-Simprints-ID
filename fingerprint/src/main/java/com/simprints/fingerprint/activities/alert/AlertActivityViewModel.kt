@@ -34,11 +34,11 @@ enum class AlertActivityViewModel(val type: Type,
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
         type = Type.BluetoothError(
-            backgroundColor = R.color.simprints_yellow,
+            backgroundColor = R.color.simprints_blue,
             hintDrawable = R.drawable.bt_not_enabled
         ),
         leftButton = ButtonAction.Close,
-        rightButton = ButtonAction.BluetoothSettings,
+        rightButton = ButtonAction.None,
         message = R.string.bluetooth_not_supported_message
     ),
 
