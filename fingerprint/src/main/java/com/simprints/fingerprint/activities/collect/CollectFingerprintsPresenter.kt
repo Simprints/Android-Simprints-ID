@@ -13,8 +13,8 @@ import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsF
 import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprintsIndicatorsHelper
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
-import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
@@ -38,7 +38,7 @@ import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
-                                   private val collectRequest: CollectFingerprintsActRequest,
+                                   private val collectRequest: CollectFingerprintsTaskRequest,
                                    private val component: FingerprintComponent)
     : CollectFingerprintsContract.Presenter {
 
@@ -261,7 +261,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun handleSavePersonSuccess(probe: Person) {
         preferencesManager.lastEnrolDate = Date()
-        view.setResultAndFinishSuccess(CollectFingerprintsActResult(probe))
+        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(probe))
     }
 
     private fun handleSavePersonFailure(throwable: Throwable) {
@@ -270,7 +270,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun goToMatching(person: Person) {
-        view.setResultAndFinishSuccess(CollectFingerprintsActResult(person))
+        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(person))
     }
 
     override fun handleException(simprintsException: FingerprintSimprintsException) {

@@ -8,7 +8,7 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 class LaunchPresenter(component: FingerprintComponent,
                       private val view: LaunchContract.View,
-                      private val launchRequest: LaunchActRequest) : LaunchContract.Presenter {
+                      private val launchRequest: LaunchTaskRequest) : LaunchContract.Presenter {
 
     private var setupFlow: Disposable? = null
 

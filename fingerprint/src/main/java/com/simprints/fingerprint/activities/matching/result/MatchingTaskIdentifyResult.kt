@@ -5,5 +5,5 @@ import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingActIdentifyResult(val identifications: List<MatchingResult>):
-    MatchingActResult, Parcelable
+class MatchingTaskIdentifyResult(val identifications: List<MatchingResult>):
+    MatchingTaskResult, Parcelable

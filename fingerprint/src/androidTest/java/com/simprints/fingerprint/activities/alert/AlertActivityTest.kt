@@ -22,8 +22,8 @@ import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
-import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.result.AlertActResult
+import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -67,7 +67,7 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotEnabled_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
     }
 
@@ -80,7 +80,7 @@ class AlertActivityTest {
 
         //In some emulators ACTION_BLUETOOTH_SETTINGS may be missing
         if (activities.size > 0) {
-            launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+            launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
 
             onView(withId(R.id.right_button)).perform(click())
 
@@ -90,41 +90,41 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotEnabled_userClicksTryAgain_alertShouldFinishWithTheRightResult() {
-        val scenario = launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        val scenario = launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
 
         onView(withId(R.id.left_button)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            BLUETOOTH_NOT_ENABLED, AlertActResult.CloseButtonAction.TRY_AGAIN)
+            BLUETOOTH_NOT_ENABLED, AlertTaskResult.CloseButtonAction.TRY_AGAIN)
     }
 
     @Test
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
-        val scenario = launchAlertActivity(AlertActRequest(UNEXPECTED_ERROR))
+        val scenario = launchAlertActivity(AlertTaskRequest(UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
         onView(withId(R.id.left_button)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            UNEXPECTED_ERROR, AlertActResult.CloseButtonAction.CLOSE)
+            UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE)
     }
 
     @Test
     fun lowBattery_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(LOW_BATTERY))
+        launchAlertActivity(AlertTaskRequest(LOW_BATTERY))
         ensureAlertScreenLaunched(AlertActivityViewModel.LOW_BATTERY)
     }
 
     @Test
     fun guidNotFoundOffline_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_OFFLINE))
+        launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_OFFLINE))
         ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
     }
 
     @Test
     fun guidNotFoundOffline_userClicksOpenSettings_settingsShouldAppear() {
-        launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_OFFLINE))
+        launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_OFFLINE))
         onView(withId(R.id.right_button)).perform(click())
 
         intended(hasAction(android.provider.Settings.ACTION_WIFI_SETTINGS))
@@ -132,32 +132,32 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotSupported_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_SUPPORTED))
+        launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_SUPPORTED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED)
     }
 
     @Test
     fun disconnected_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(DISCONNECTED))
+        launchAlertActivity(AlertTaskRequest(DISCONNECTED))
         ensureAlertScreenLaunched(AlertActivityViewModel.DISCONNECTED)
     }
 
     @Test
     fun notPaired_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(NOT_PAIRED))
+        launchAlertActivity(AlertTaskRequest(NOT_PAIRED))
         ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
     }
 
     @Test
     fun multiPairedScanners_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(MULTIPLE_PAIRED_SCANNERS))
+        launchAlertActivity(AlertTaskRequest(MULTIPLE_PAIRED_SCANNERS))
         ensureAlertScreenLaunched(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS)
     }
 
     @Test
     fun pressBackButtonOnBluetoothError_shouldStartRefusalActivity() {
         val context: Context = ApplicationProvider.getApplicationContext()
-        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
         Espresso.pressBackUnconditionally()
 
         intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
@@ -165,17 +165,17 @@ class AlertActivityTest {
 
     @Test
     fun pressBackButtonOnNonBluetoothError_shouldFinish () {
-        val scenario = launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_ONLINE))
+        val scenario = launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_ONLINE))
         Espresso.pressBackUnconditionally()
 
-        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertActResult.CloseButtonAction.BACK)
+        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertTaskResult.CloseButtonAction.BACK)
     }
 
-    private fun launchAlertActivity(request: AlertActRequest? = null): ActivityScenario<AlertActivity> =
+    private fun launchAlertActivity(request: AlertTaskRequest? = null): ActivityScenario<AlertActivity> =
         ActivityScenario.launch<AlertActivity>(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, AlertActivity::class.qualifiedName!!)
             request?.let {
-                putExtra(AlertActRequest.BUNDLE_KEY, request)
+                putExtra(AlertTaskRequest.BUNDLE_KEY, request)
             }
         })
 
@@ -190,12 +190,12 @@ class AlertActivityTest {
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
                                      fingerprintAlert: FingerprintAlert,
-                                     buttonAction: AlertActResult.CloseButtonAction) {
+                                     buttonAction: AlertTaskResult.CloseButtonAction) {
         Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
-        result.resultData.setExtrasClassLoader(AlertActResult::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<AlertActResult>(AlertActResult.BUNDLE_KEY)
-        Truth.assertThat(response).isEqualTo(AlertActResult(fingerprintAlert, buttonAction))
+        result.resultData.setExtrasClassLoader(AlertTaskResult::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<AlertTaskResult>(AlertTaskResult.BUNDLE_KEY)
+        Truth.assertThat(response).isEqualTo(AlertTaskResult(fingerprintAlert, buttonAction))
     }
 
     @After

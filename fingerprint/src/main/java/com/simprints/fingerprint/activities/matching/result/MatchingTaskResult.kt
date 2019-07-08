@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.activities.matching.result
 
 import android.os.Parcelable
-import com.simprints.fingerprint.activities.ActResult
+import com.simprints.fingerprint.orchestrator.task.TaskResult
 
-interface MatchingActResult : ActResult, Parcelable {
+interface MatchingTaskResult : TaskResult, Parcelable {
     companion object {
         const val BUNDLE_KEY = "MatchingResultBundleKey"
     }

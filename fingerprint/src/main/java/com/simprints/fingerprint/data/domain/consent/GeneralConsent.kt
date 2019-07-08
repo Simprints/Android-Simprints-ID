@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.data.domain.Action
 
 @Keep
@@ -19,7 +19,7 @@ data class GeneralConsent(
     @SerializedName("consent_confirmation") var consentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, launchRequest: LaunchActRequest, programName: String, organisationName: String) = StringBuilder().apply {
+    fun assembleText(context: Context, launchRequest: LaunchTaskRequest, programName: String, organisationName: String) = StringBuilder().apply {
         when (launchRequest.action) {
             Action.IDENTIFY, Action.VERIFY ->
                 if (consentIdVerify) append(context.getString(R.string.consent_id_verify).format(programName))

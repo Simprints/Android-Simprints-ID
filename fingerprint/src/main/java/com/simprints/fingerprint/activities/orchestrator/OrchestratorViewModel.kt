@@ -4,55 +4,51 @@ import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.fingerprint.activities.ActResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.orchestrator.ActivityTask
-import com.simprints.fingerprint.orchestrator.ActivityTaskFlow
-import com.simprints.fingerprint.orchestrator.ResultCode
-import com.simprints.fingerprint.orchestrator.toActivityTaskFlow
+import com.simprints.fingerprint.orchestrator.FinalResult
+import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
+import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.task.TaskResult
 
 class OrchestratorViewModel : ViewModel() {
 
-    val nextActivityCall = MutableLiveData<ActivityCall>()
-    val finishedResult = MutableLiveData<ActivityResult>()
+    internal val nextActivityCall = MutableLiveData<ActivityCall>()
+    internal val finishedResult = MutableLiveData<ActivityResult>()
 
-    private lateinit var activityTaskFlow: ActivityTaskFlow
+    private val orchestrator = Orchestrator(this)
 
     fun start(fingerprintRequest: FingerprintRequest) {
-        activityTaskFlow = fingerprintRequest.toActivityTaskFlow()
-        postNextActivityCall()
+        orchestrator.start(fingerprintRequest)
     }
 
-    fun handleActivityResult(activityResult: ActivityResult) { // TODO : move content of this function to orchestrator?
-        activityTaskFlow.handleActResult(
+    internal fun handleActivityResult(activityResult: ActivityResult) {
+        orchestrator.handleTaskResult(
             ResultCode.fromValue(activityResult.resultCode),
-            activityResult::toActResult
+            activityResult::toTaskResult
         )
-        if (activityTaskFlow.isFlowFinished()) {
-            handleFlowFinished()
-        } else {
-            postNextActivityCall()
-        }
     }
 
-    private fun postNextActivityCall() {
-        nextActivityCall.postValue(activityTaskFlow.getCurrentActivityTask().toActivityCall())
+    fun postNextTask(fingerprintTask: FingerprintTask) {
+        nextActivityCall.postValue(fingerprintTask.toActivityCall())
     }
 
-    private fun handleFlowFinished() {
-        finishedResult.postValue(activityTaskFlow.getFinalResult())
+    fun handleFlowFinished(finalResult: FinalResult) {
+        finishedResult.postValue(finalResult.toActivityResult())
     }
 
-    data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
+    internal data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
-    private fun ActivityTask.toActivityCall() =
+    private fun FingerprintTask.toActivityCall() =
         ActivityCall(requestCode.value) { context ->
-            Intent(context, targetClass).apply { putExtra(requestBundleKey, createActRequest()) }
+            Intent(context, targetClass).apply { putExtra(requestBundleKey, createTaskRequest()) }
         }
 
-    data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
+    internal data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
 
-        fun toActResult(bundleKey: String): ActResult =
+        fun toTaskResult(bundleKey: String): TaskResult =
             resultData?.getParcelableExtra(bundleKey) ?: throw Throwable("Woops") // TODO
     }
+
+    private fun FinalResult.toActivityResult() = ActivityResult(resultCode, resultData)
 }

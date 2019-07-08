@@ -14,7 +14,7 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -23,7 +23,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
@@ -46,7 +46,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         logActivityCreated()
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
-        val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
+        val matchingRequest: MatchingTaskRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
         LanguageHelper.setLanguage(this, matchingRequest.language)

@@ -5,10 +5,10 @@ import com.simprints.fingerprint.data.domain.person.Person
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingActIdentifyRequest(override val language: String,
-                                 override val probe: Person,
-                                 val queryForIdentifyPool: QueryForIdentifyPool,
-                                 val returnIdCount: Int): MatchingActRequest {
+class MatchingTaskIdentifyRequest(override val language: String,
+                                  override val probe: Person,
+                                  val queryForIdentifyPool: QueryForIdentifyPool,
+                                  val returnIdCount: Int): MatchingTaskRequest {
 
     @Parcelize
     data class QueryForIdentifyPool(val projectId: String,

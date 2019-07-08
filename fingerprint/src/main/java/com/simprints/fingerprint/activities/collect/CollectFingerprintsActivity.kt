@@ -15,13 +15,13 @@ import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
-import com.simprints.fingerprint.orchestrator.RequestCode
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.RequestCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
@@ -53,8 +53,8 @@ class CollectFingerprintsActivity :
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
 
-        val fingerprintRequest: CollectFingerprintsActRequest =
-            this.intent.extras?.getParcelable(CollectFingerprintsActRequest.BUNDLE_KEY)
+        val fingerprintRequest: CollectFingerprintsTaskRequest =
+            this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
                 ?: throw InvalidRequestForFingerprintException()
 
         configureRightToLeft()
@@ -137,9 +137,9 @@ class CollectFingerprintsActivity :
         }
     }
 
-    override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsActResult) {
+    override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult) {
         setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(CollectFingerprintsActResult.BUNDLE_KEY, fingerprintsActResult)
+            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, fingerprintsActResult)
         })
     }
 

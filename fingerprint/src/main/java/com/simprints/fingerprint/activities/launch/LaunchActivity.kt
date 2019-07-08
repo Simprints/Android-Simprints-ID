@@ -11,13 +11,13 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchActResult
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
-import com.simprints.fingerprint.orchestrator.RequestCode
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.RequestCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
@@ -42,7 +42,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         val component = FingerprintComponentBuilder.getComponent(this.application as Application)
         component.inject(this)
 
-        val launchRequest = this.intent.extras?.getParcelable(LaunchActRequest.BUNDLE_KEY) as LaunchActRequest?
+        val launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
             ?: throw InvalidRequestForFingerprintException()
 
         setButtonClickListeners()
@@ -146,7 +146,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun continueToNextActivity() {
         setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(LaunchActResult.BUNDLE_KEY, LaunchActResult())
+            putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())
         })
     }
 

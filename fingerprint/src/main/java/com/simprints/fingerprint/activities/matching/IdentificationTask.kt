@@ -2,10 +2,10 @@ package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
 import android.util.Log
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -19,21 +19,21 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
 internal class IdentificationTask(private val view: MatchingContract.View,
-                                  matchingRequest: MatchingActRequest,
+                                  matchingRequest: MatchingTaskRequest,
                                   private val dbManager: FingerprintDbManager,
                                   private val sessionEventsManager: FingerprintSessionEventsManager,
                                   private val crashReportManager: FingerprintCrashReportManager,
                                   private val timeHelper: FingerprintTimeHelper,
                                   private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
-    private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
+    private val matchingIdentifyRequest = matchingRequest as MatchingTaskIdentifyRequest
 
     companion object {
         const val matchingEndWaitTimeInMillis = 1000
@@ -87,8 +87,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
         preferenceManager.lastIdentificationDate = Date()
 
-        val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
-            MatchingActIdentifyResult(topCandidates))
+        val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
+            MatchingTaskIdentifyResult(topCandidates))
         view.doSetResult(ResultCode.OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis)
     }
