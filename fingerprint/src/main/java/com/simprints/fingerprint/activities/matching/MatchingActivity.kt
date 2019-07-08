@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.matching
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -15,17 +14,16 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
@@ -33,9 +31,7 @@ import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MatchingActivity : AppCompatActivity(), MatchingContract.View, OrchestratorCallback {
-
-    override val context: Context by lazy { this }
+class MatchingActivity : AppCompatActivity(), MatchingContract.View {
 
     override lateinit var viewPresenter: MatchingContract.Presenter
 
@@ -44,7 +40,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var orchestrator: Orchestrator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,17 +125,13 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() {}
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            doSetResult(it, data)
+        when (ResultCode.fromValue(resultCode)) {
+            ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+            ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+            ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+            ResultCode.OK -> {
+            }
         }
-        doFinish()
     }
 
     override fun launchAlertActivity() {
@@ -151,13 +142,22 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
     }
 
-    override fun doSetResult(resultCode: Int, resultData: Intent?) {
-        setResult(resultCode, resultData)
+    override fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
+        doSetResult(resultCode, resultData)
+        doFinish()
+    }
+
+    override fun doSetResult(resultCode: ResultCode, resultData: Intent?) {
+        setResult(resultCode.value, resultData)
     }
 
     override fun doFinish() {
         Timber.d("MatchingAct: done")
         finish()
+    }
+
+    override fun onBackPressed() {
+        viewPresenter.handleBackPressed()
     }
 
     override fun onDestroy() {

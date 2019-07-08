@@ -4,6 +4,7 @@ package com.simprints.fingerprint.activities.matching
 import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.orchestrator.ResultCode
 
 
 interface MatchingContract {
@@ -26,12 +27,16 @@ interface MatchingContract {
 
         fun makeToastMatchFailed()
 
-        fun doSetResult(resultCode: Int, resultData: Intent?)
+        fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?)
+
+        fun doSetResult(resultCode: ResultCode, resultData: Intent?)
 
         fun doFinish()
     }
 
     interface Presenter : BasePresenter {
+
+        fun handleBackPressed()
 
         fun dispose()
     }

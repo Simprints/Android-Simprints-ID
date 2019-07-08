@@ -106,11 +106,9 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
             AlertActResult.CloseButtonAction.TRY_AGAIN -> ResultCode.OK
         }
 
-        setResult(resultCode.value, Intent().apply {
+        setResultAndFinish(resultCode, Intent().apply {
             putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
         })
-
-        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

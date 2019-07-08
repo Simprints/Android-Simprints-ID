@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.activities.matching
 
-import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingActResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -13,13 +16,10 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -89,7 +89,7 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
         val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
             MatchingActIdentifyResult(topCandidates))
-        view.doSetResult(Activity.RESULT_OK, resultData)
+        view.doSetResult(ResultCode.OK, resultData)
         view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis)
     }
 
