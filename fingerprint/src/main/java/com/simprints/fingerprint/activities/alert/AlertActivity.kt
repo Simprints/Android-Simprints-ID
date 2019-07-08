@@ -15,8 +15,8 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ER
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.result.AlertActResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.orchestrator.RequestCode
 import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
@@ -84,7 +84,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun startRefusalActivity() {
         startActivityForResult(Intent(this, RefusalActivity::class.java),
-            InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST)
+            RequestCode.REFUSAL.value)
     }
 
     override fun openBluetoothSettings() {
@@ -115,7 +115,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST) {
+        if (requestCode == RequestCode.REFUSAL.value) {
             when (ResultCode.fromValue(resultCode)) {
                 ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)

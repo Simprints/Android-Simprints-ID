@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.data.domain.InternalConstants
+import com.simprints.fingerprint.orchestrator.RequestCode
 
 object AlertActivityHelper {
 
@@ -14,6 +14,6 @@ object AlertActivityHelper {
         }
 
     fun launchAlert(act: Activity, alertType: FingerprintAlert) {
-        act.startActivityForResult(buildAlertIntent(act, alertType), InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST)
+        act.startActivityForResult(buildAlertIntent(act, alertType), RequestCode.ALERT.value)
     }
 }
