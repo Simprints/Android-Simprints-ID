@@ -26,47 +26,47 @@ class OrchestratorImpl : Orchestrator {
         receiver.onActivityResultReceived()
 
         extractAlertActivityResult(data)?.let {
-            if (receiver is LaunchActivity) {
-                handleAlertScreenResultInLaunchAct(it, receiver)
-            } else {
-                handleAlertScreenResult(it, receiver, resultCode, data)
-            }
+//            if (receiver is LaunchActivity) {
+//                handleAlertScreenResultInLaunchAct(it, receiver)
+//            } else {
+//                handleAlertScreenResult(it, receiver, resultCode, data)
+//            }
         } ?: run {
             when (receiver) {
                 is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
-                is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
+//                is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
                 is MatchingActivity -> { handleResultInMatchingActivity(receiver, resultCode, data) }
-                is AlertActivity -> { handleResultInAlertActivity(receiver, resultCode, data) }
+                // is AlertActivity -> { handleResultInAlertActivity(receiver, resultCode, data) }
             }
         }
     }
-
-    private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
-                                                   receiver: OrchestratorCallback) {
-        when (alertActResult.closeButtonAction) {
-            CLOSE -> {
-                receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(alertActResult))
-            }
-            BACK -> {
-                receiver.setResultDataAndFinish(Activity.RESULT_CANCELED, null)
-            }
-            TRY_AGAIN -> receiver.tryAgain()
-        }
-    }
-
-    private fun handleAlertScreenResult(alertActResult: AlertActResult,
-                                        receiver: OrchestratorCallback,
-                                        resultCode: Int?,
-                                        data: Intent?) {
-
-        when (alertActResult.closeButtonAction) {
-            CLOSE, BACK -> {
-                forwardResultBack(receiver, resultCode, data)
-            }
-            TRY_AGAIN -> receiver.tryAgain()
-        }
-    }
-
+//
+//    private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
+//                                                   receiver: OrchestratorCallback) {
+//        when (alertActResult.closeButtonAction) {
+//            CLOSE -> {
+//                receiver.setResultDataAndFinish(Activity.RESULT_OK, prepareErrorResponse(alertActResult))
+//            }
+//            BACK -> {
+//                receiver.setResultDataAndFinish(Activity.RESULT_CANCELED, null)
+//            }
+//            TRY_AGAIN -> receiver.tryAgain()
+//        }
+//    }
+//
+//    private fun handleAlertScreenResult(alertActResult: AlertActResult,
+//                                        receiver: OrchestratorCallback,
+//                                        resultCode: Int?,
+//                                        data: Intent?) {
+//
+//        when (alertActResult.closeButtonAction) {
+//            CLOSE, BACK -> {
+//                forwardResultBack(receiver, resultCode, data)
+//            }
+//            TRY_AGAIN -> receiver.tryAgain()
+//        }
+//    }
+//
     private fun handleResultInMatchingActivity(receiver: OrchestratorCallback,
                                                resultCode: Int?, data: Intent?) {
 
@@ -90,94 +90,94 @@ class OrchestratorImpl : Orchestrator {
         forwardResultBack(receiver, resultCode, data)
     }
 
-    private fun handleResultInLaunchActivity(receiver: OrchestratorCallback,
-                                             resultCode: Int?,
-                                             data: Intent?) {
-
-        extractRefusalActResult(data)?.let {
-            when (it.action) {
-                SUBMIT -> receiver.setResultDataAndFinish(resultCode, prepareRefusalForm(it))
-                SCAN_FINGERPRINTS -> receiver.tryAgain()
-            }
-            return
-        }
-
-        //From CollectAct: for Enrolment
-        extractCollectActivityResponse(data)?.let {
-            receiver.setResultDataAndFinish(resultCode, prepareEnrolResponseIntent(it))
-            return
-        }
-
-        //From MatchingAct: for Identification and Verification
-        extractMatchingActResult(data)?.let {
-            when (it) {
-                is MatchingActVerifyResult -> prepareVerifyResponseIntent(it)
-                is MatchingActIdentifyResult -> prepareIdentifyResponseIntent(it)
-                else -> null
-            }
-        }?.let {
-            receiver.setResultDataAndFinish(Activity.RESULT_OK, it)
-            return
-        }
-
-        //Default behavior - E.g. RESULT_CANCEL (backButton)
-        forwardResultBack(receiver, resultCode, data)
-    }
-
-    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
-        extractRefusalActResult(data)?.let {
-            when (it.action) {
-                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
-                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
-            }
-            return
-        }
-    }
+//    private fun handleResultInLaunchActivity(receiver: OrchestratorCallback,
+//                                             resultCode: Int?,
+//                                             data: Intent?) {
+//
+//        extractRefusalActResult(data)?.let {
+//            when (it.action) {
+//                SUBMIT -> receiver.setResultDataAndFinish(resultCode, prepareRefusalForm(it))
+//                SCAN_FINGERPRINTS -> receiver.tryAgain()
+//            }
+//            return
+//        }
+//
+//        //From CollectAct: for Enrolment
+//        extractCollectActivityResponse(data)?.let {
+//            receiver.setResultDataAndFinish(resultCode, prepareEnrolResponseIntent(it))
+//            return
+//        }
+//
+//        //From MatchingAct: for Identification and Verification
+//        extractMatchingActResult(data)?.let {
+//            when (it) {
+//                is MatchingActVerifyResult -> prepareVerifyResponseIntent(it)
+//                is MatchingActIdentifyResult -> prepareIdentifyResponseIntent(it)
+//                else -> null
+//            }
+//        }?.let {
+//            receiver.setResultDataAndFinish(Activity.RESULT_OK, it)
+//            return
+//        }
+//
+//        //Default behavior - E.g. RESULT_CANCEL (backButton)
+//        forwardResultBack(receiver, resultCode, data)
+//    }
+//
+//    private fun handleResultInAlertActivity(receiver: OrchestratorCallback, resultCode: Int?, data: Intent?) {
+//        extractRefusalActResult(data)?.let {
+//            when (it.action) {
+//                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
+//                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+//            }
+//            return
+//        }
+//    }
 
     private fun forwardResultBack(receiver: OrchestratorCallback, resultCode: Int?, data: Intent? = null) {
         receiver.setResultDataAndFinish(resultCode, data)
     }
 
-    private fun prepareErrorResponse(alertActResult: AlertActResult) =
-        Intent().apply {
-            val fingerprintErrorResponse = FingerprintErrorReason.fromFingerprintAlertToErrorResponse(alertActResult.alert)
-            putExtra(IFingerprintResponse.BUNDLE_KEY,
-                DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse(fingerprintErrorResponse))
-        }
-
-    private fun prepareRefusalForm(refusalForm: RefusalActResult) =
-        Intent().apply {
-            val fingerprintResult = FingerprintRefusalFormResponse(
-                refusalForm.answer.reason.toFingerprintRefusalFormReason(),
-                refusalForm.answer.optionalText)
-
-            putExtra(IFingerprintResponse.BUNDLE_KEY,
-                DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
-        }
-
-    private fun prepareVerifyResponseIntent(matchVerifyResult: MatchingActVerifyResult) =
-        Intent().apply {
-            val fingerprintResult = FingerprintVerifyResponse(
-                matchVerifyResult.guid,
-                matchVerifyResult.confidence,
-                matchVerifyResult.tier)
-
-            putExtra(IFingerprintResponse.BUNDLE_KEY,
-                DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse(fingerprintResult))
-        }
-
-    private fun prepareIdentifyResponseIntent(matchIdentifyResult: MatchingActIdentifyResult) =
-        Intent().apply {
-            val fingerprintResult = FingerprintIdentifyResponse(matchIdentifyResult.identifications)
-            putExtra(IFingerprintResponse.BUNDLE_KEY,
-                DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse(fingerprintResult))
-        }
-
-    private fun prepareEnrolResponseIntent(collectFingerprintsActResult: CollectFingerprintsActResult) =
-        Intent().apply {
-            val fingerprintResult = FingerprintEnrolResponse(collectFingerprintsActResult.probe.patientId)
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(fingerprintResult))
-        }
+//    private fun prepareErrorResponse(alertActResult: AlertActResult) =
+//        Intent().apply {
+//            val fingerprintErrorResponse = FingerprintErrorReason.fromFingerprintAlertToErrorResponse(alertActResult.alert)
+//            putExtra(IFingerprintResponse.BUNDLE_KEY,
+//                DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse(fingerprintErrorResponse))
+//        }
+//
+//    private fun prepareRefusalForm(refusalForm: RefusalActResult) =
+//        Intent().apply {
+//            val fingerprintResult = FingerprintRefusalFormResponse(
+//                refusalForm.answer.reason.toFingerprintRefusalFormReason(),
+//                refusalForm.answer.optionalText)
+//
+//            putExtra(IFingerprintResponse.BUNDLE_KEY,
+//                DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
+//        }
+//
+//    private fun prepareVerifyResponseIntent(matchVerifyResult: MatchingActVerifyResult) =
+//        Intent().apply {
+//            val fingerprintResult = FingerprintVerifyResponse(
+//                matchVerifyResult.guid,
+//                matchVerifyResult.confidence,
+//                matchVerifyResult.tier)
+//
+//            putExtra(IFingerprintResponse.BUNDLE_KEY,
+//                DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse(fingerprintResult))
+//        }
+//
+//    private fun prepareIdentifyResponseIntent(matchIdentifyResult: MatchingActIdentifyResult) =
+//        Intent().apply {
+//            val fingerprintResult = FingerprintIdentifyResponse(matchIdentifyResult.identifications)
+//            putExtra(IFingerprintResponse.BUNDLE_KEY,
+//                DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse(fingerprintResult))
+//        }
+//
+//    private fun prepareEnrolResponseIntent(collectFingerprintsActResult: CollectFingerprintsActResult) =
+//        Intent().apply {
+//            val fingerprintResult = FingerprintEnrolResponse(collectFingerprintsActResult.probe.patientId)
+//            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(fingerprintResult))
+//        }
 
     private fun extractAlertActivityResult(data: Intent?): AlertActResult? =
         data?.getParcelableExtra(AlertActResult.BUNDLE_KEY)
@@ -185,10 +185,10 @@ class OrchestratorImpl : Orchestrator {
     private fun extractRefusalActResult(data: Intent?): RefusalActResult? =
         data?.getParcelableExtra(RefusalActResult.BUNDLE_KEY)
 
-    private fun extractMatchingActResult(data: Intent?): MatchingActResult? =
-        data?.getParcelableExtra(MatchingActResult.BUNDLE_KEY)
-
-    private fun extractCollectActivityResponse(data: Intent?): CollectFingerprintsActResult? =
-        data?.getParcelableExtra(CollectFingerprintsActResult.BUNDLE_KEY)
+//    private fun extractMatchingActResult(data: Intent?): MatchingActResult? =
+//        data?.getParcelableExtra(MatchingActResult.BUNDLE_KEY)
+//
+//    private fun extractCollectActivityResponse(data: Intent?): CollectFingerprintsActResult? =
+//        data?.getParcelableExtra(CollectFingerprintsActResult.BUNDLE_KEY)
 }
 
