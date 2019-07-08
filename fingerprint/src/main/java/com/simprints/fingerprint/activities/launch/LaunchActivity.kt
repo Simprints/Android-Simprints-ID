@@ -17,9 +17,9 @@ import com.simprints.fingerprint.activities.launch.result.LaunchActResult
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.orchestrator.RequestCode
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
@@ -159,7 +159,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun goToRefusalActivity() {
-        startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
+        startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
     override fun setResultAndFinish(resultCode: Int, resultData: Intent?) {

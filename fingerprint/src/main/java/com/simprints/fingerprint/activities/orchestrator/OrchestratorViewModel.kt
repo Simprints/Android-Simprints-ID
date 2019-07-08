@@ -46,7 +46,7 @@ class OrchestratorViewModel : ViewModel() {
     data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
     private fun ActivityTask.toActivityCall() =
-        ActivityCall(requestCode) { context ->
+        ActivityCall(requestCode.value) { context ->
             Intent(context, targetClass).apply { putExtra(requestBundleKey, createActRequest()) }
         }
 

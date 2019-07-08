@@ -15,7 +15,7 @@ sealed class ActivityTask(
     val createActRequest: () -> ActRequest,
     val actResultKey: String,
     val targetClass: Class<*>,
-    val requestCode: Int,
+    val requestCode: RequestCode,
     val requestBundleKey: String,
     val resultBundleKey: String
 )
@@ -25,7 +25,7 @@ class Launch(createLaunchActRequest: () -> LaunchActRequest, actResultKey: Strin
         createLaunchActRequest,
         actResultKey,
         LaunchActivity::class.java,
-        0, // TODO request codes
+        RequestCode.LAUNCH,
         LaunchActRequest.BUNDLE_KEY,
         LaunchActResult.BUNDLE_KEY
     )
@@ -36,7 +36,7 @@ class CollectFingerprints(createCollectFingerprintsActRequest: () -> CollectFing
         createCollectFingerprintsActRequest,
         actResultKey,
         CollectFingerprintsActivity::class.java,
-        1,
+        RequestCode.COLLECT,
         CollectFingerprintsActRequest.BUNDLE_KEY,
         CollectFingerprintsActResult.BUNDLE_KEY
     )
@@ -46,7 +46,7 @@ class Matching(createMatchingActRequest: () -> MatchingActRequest, actResultKey:
         createMatchingActRequest,
         actResultKey,
         MatchingActivity::class.java,
-        2,
+        RequestCode.MATCHING,
         MatchingActRequest.BUNDLE_KEY,
         MatchingActResult.BUNDLE_KEY
     )

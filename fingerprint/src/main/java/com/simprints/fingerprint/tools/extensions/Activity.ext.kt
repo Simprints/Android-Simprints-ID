@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
+import com.simprints.fingerprint.orchestrator.RequestCode
 import timber.log.Timber
 
-fun Activity.launchRefusalActivity(requestCode: Int = REFUSAL_ACTIVITY_REQUEST) {
+fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {
     val intent = Intent(this, RefusalActivity::class.java)
     startActivityForResult(intent, requestCode)
 }
