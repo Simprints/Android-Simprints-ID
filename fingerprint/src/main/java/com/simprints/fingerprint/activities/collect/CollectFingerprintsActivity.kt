@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.collect
 
 import android.app.Activity
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -19,25 +18,20 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsActRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.orchestrator.RequestCode
+import com.simprints.fingerprint.orchestrator.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
-import javax.inject.Inject
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),
-    CollectFingerprintsContract.View,
-    OrchestratorCallback {
-
-    override val context: Context by lazy { this }
-    @Inject lateinit var orchestrator: Orchestrator
+    CollectFingerprintsContract.View {
 
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
@@ -144,10 +138,9 @@ class CollectFingerprintsActivity :
     }
 
     override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsActResult) {
-        setResult(Activity.RESULT_OK, Intent().apply {
+        setResultAndFinish(ResultCode.OK, Intent().apply {
             putExtra(CollectFingerprintsActResult.BUNDLE_KEY, fingerprintsActResult)
         })
-        finish()
     }
 
 
@@ -162,19 +155,20 @@ class CollectFingerprintsActivity :
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() {
-        viewPresenter.handleTryAgainFromDifferentActivity()
-    }
-
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResult(it, data)
+        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                    viewPresenter.handleTryAgainFromDifferentActivity()
+                }
+            }
         }
+    }
+
+    private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
+        setResult(resultCode.value, data)
         finish()
     }
 
