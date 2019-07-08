@@ -1,5 +1,6 @@
 package com.simprints.clientapi.di
 
+import android.content.Context
 import com.simprints.clientapi.activities.commcare.CommCareContract
 import com.simprints.clientapi.activities.commcare.CommCarePresenter
 import com.simprints.clientapi.activities.errors.ErrorContract
@@ -14,6 +15,8 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManagerImpl
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManagerImpl
+import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
+import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.id.Application
@@ -51,7 +54,21 @@ object KoinInjector {
             defineBuildersForCoreManagers()
             defineBuildersForDomainManagers()
             defineBuildersForPresenters()
+            defineBuildersForGuidSelectionNotifiers()
         }
+
+    private fun Module.defineBuildersForCoreManagers() {
+        factory { SessionEventsManager.build(androidApplication() as Application) }
+        factory { CoreCrashReportManager.build(androidApplication() as Application) }
+        factory { TimeHelper.build(androidApplication() as Application) }
+    }
+
+    private fun Module.defineBuildersForDomainManagers() {
+        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
+        factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
+        factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
+        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
+    }
 
     private fun Module.defineBuildersForPresenters() {
         factory<ErrorContract.Presenter> { (view: ErrorContract.View) ->
@@ -68,17 +85,10 @@ object KoinInjector {
         }
     }
 
-    private fun Module.defineBuildersForDomainManagers() {
-        factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }
-        factory<ClientApiCrashReportManager> { ClientApiCrashReportManagerImpl(get()) }
-        factory<ClientApiTimeHelper> { ClientApiTimeHelperImpl(get()) }
-        factory<SharedPreferencesManager> { SharedPreferencesManagerImpl(androidContext()) }
+    private fun Module.defineBuildersForGuidSelectionNotifiers() {
+        factory { (context: Context) -> OdkGuidSelectionNotifier(context) }
+        factory { (context: Context) -> CommCareGuidSelectionNotifier(context) }
     }
 
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { SessionEventsManager.build(androidApplication() as Application) }
-        factory { CoreCrashReportManager.build(androidApplication() as Application) }
-        factory { TimeHelper.build(androidApplication() as Application) }
-    }
 }
 

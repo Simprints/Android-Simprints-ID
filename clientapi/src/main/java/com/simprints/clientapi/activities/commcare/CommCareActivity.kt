@@ -18,7 +18,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
 
-    override val guidSelectionNotifier = CommCareGuidSelectionNotifier(this)
+    override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
+        parametersOf(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
