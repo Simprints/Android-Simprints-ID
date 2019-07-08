@@ -11,4 +11,6 @@ interface FingerprintCrashReportManager {
 
     fun logExceptionOrSafeException(throwable: Throwable)
 
+    fun logMalfunction(message: String)
+
 }
