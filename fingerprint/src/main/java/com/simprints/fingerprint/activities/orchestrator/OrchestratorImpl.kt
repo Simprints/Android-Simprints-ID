@@ -25,20 +25,20 @@ class OrchestratorImpl : Orchestrator {
     override fun onActivityResult(receiver: OrchestratorCallback, requestCode: Int, resultCode: Int?, data: Intent?) {
         receiver.onActivityResultReceived()
 
-        extractAlertActivityResult(data)?.let {
-//            if (receiver is LaunchActivity) {
-//                handleAlertScreenResultInLaunchAct(it, receiver)
-//            } else {
-//                handleAlertScreenResult(it, receiver, resultCode, data)
-//            }
-        } ?: run {
+//        extractAlertActivityResult(data)?.let {
+////            if (receiver is LaunchActivity) {
+////                handleAlertScreenResultInLaunchAct(it, receiver)
+////            } else {
+////                handleAlertScreenResult(it, receiver, resultCode, data)
+////            }
+//        } ?: run {
             when (receiver) {
-                is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
+//                is CollectFingerprintsActivity -> handleResultInCollectActivity(receiver, resultCode, data)
 //                is LaunchActivity -> handleResultInLaunchActivity(receiver, resultCode, data)
                 is MatchingActivity -> { handleResultInMatchingActivity(receiver, resultCode, data) }
                 // is AlertActivity -> { handleResultInAlertActivity(receiver, resultCode, data) }
             }
-        }
+//        }
     }
 //
 //    private fun handleAlertScreenResultInLaunchAct(alertActResult: AlertActResult,
@@ -74,22 +74,22 @@ class OrchestratorImpl : Orchestrator {
         forwardResultBack(receiver, resultCode, data)
     }
 
-    private fun handleResultInCollectActivity(receiver: OrchestratorCallback,
-                                              resultCode: Int?,
-                                              data: Intent?) {
-
-        extractRefusalActResult(data)?.let {
-            when (it.action) {
-                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
-                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
-            }
-            return
-        }
-
-        //Default behavior - E.g. MatchinAct or RESULT_CANCEL (backButton)
-        forwardResultBack(receiver, resultCode, data)
-    }
-
+//    private fun handleResultInCollectActivity(receiver: OrchestratorCallback,
+//                                              resultCode: Int?,
+//                                              data: Intent?) {
+//
+//        extractRefusalActResult(data)?.let {
+//            when (it.action) {
+//                SUBMIT -> receiver.setResultDataAndFinish(resultCode, data)
+//                SCAN_FINGERPRINTS -> { /* Do Nothing */ }
+//            }
+//            return
+//        }
+//
+//        //Default behavior - E.g. MatchinAct or RESULT_CANCEL (backButton)
+//        forwardResultBack(receiver, resultCode, data)
+//    }
+//
 //    private fun handleResultInLaunchActivity(receiver: OrchestratorCallback,
 //                                             resultCode: Int?,
 //                                             data: Intent?) {
@@ -178,13 +178,13 @@ class OrchestratorImpl : Orchestrator {
 //            val fingerprintResult = FingerprintEnrolResponse(collectFingerprintsActResult.probe.patientId)
 //            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(fingerprintResult))
 //        }
-
-    private fun extractAlertActivityResult(data: Intent?): AlertActResult? =
-        data?.getParcelableExtra(AlertActResult.BUNDLE_KEY)
-
-    private fun extractRefusalActResult(data: Intent?): RefusalActResult? =
-        data?.getParcelableExtra(RefusalActResult.BUNDLE_KEY)
-
+//
+//    private fun extractAlertActivityResult(data: Intent?): AlertActResult? =
+//        data?.getParcelableExtra(AlertActResult.BUNDLE_KEY)
+//
+//    private fun extractRefusalActResult(data: Intent?): RefusalActResult? =
+//        data?.getParcelableExtra(RefusalActResult.BUNDLE_KEY)
+//
 //    private fun extractMatchingActResult(data: Intent?): MatchingActResult? =
 //        data?.getParcelableExtra(MatchingActResult.BUNDLE_KEY)
 //

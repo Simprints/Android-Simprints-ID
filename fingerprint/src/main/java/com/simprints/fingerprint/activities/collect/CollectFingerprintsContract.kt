@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -31,7 +30,6 @@ interface CollectFingerprintsContract {
         fun cancelAndFinish()
 
         fun showSplashScreen()
-        fun setResultDataAndFinish(resultCode: Int?, data: Intent?)
 
         // Fingers
         var pageAdapter: FingerPageAdapter
