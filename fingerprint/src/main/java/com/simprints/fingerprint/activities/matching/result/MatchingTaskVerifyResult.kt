@@ -5,7 +5,7 @@ import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingActVerifyResult(
+class MatchingTaskVerifyResult(
     val guid: String,
     val confidence: Int,
-    val tier: MatchingTier) : MatchingActResult, Parcelable
+    val tier: MatchingTier) : MatchingTaskResult, Parcelable

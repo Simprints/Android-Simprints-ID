@@ -12,12 +12,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.UNEXPECTED_ERROR
-import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.result.AlertActResult
+import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.orchestrator.RequestCode
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.RequestCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.Application
@@ -37,7 +37,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         val component = FingerprintComponentBuilder.getComponent(application as Application)
         component.inject(this)
 
-        alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
+        alertType = intent.extras?.getParcelable<AlertTaskRequest>(AlertTaskRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
         viewPresenter = AlertPresenter(this, component, alertType)
@@ -99,15 +99,15 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         startActivity(intent)
     }
 
-    override fun closeActivityAfterButtonAction(buttonAction: AlertActResult.CloseButtonAction) {
+    override fun closeActivityAfterButtonAction(buttonAction: AlertTaskResult.CloseButtonAction) {
         val resultCode = when (buttonAction) {
-            AlertActResult.CloseButtonAction.CLOSE,
-            AlertActResult.CloseButtonAction.BACK -> ResultCode.ALERT
-            AlertActResult.CloseButtonAction.TRY_AGAIN -> ResultCode.OK
+            AlertTaskResult.CloseButtonAction.CLOSE,
+            AlertTaskResult.CloseButtonAction.BACK -> ResultCode.ALERT
+            AlertTaskResult.CloseButtonAction.TRY_AGAIN -> ResultCode.OK
         }
 
         setResultAndFinish(resultCode, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
+            putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertType, buttonAction))
         })
     }
 

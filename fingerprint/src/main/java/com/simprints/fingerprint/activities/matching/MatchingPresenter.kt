@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.activities.matching
 
 import android.annotation.SuppressLint
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -12,7 +12,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.orchestrator.ResultCode
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
@@ -27,7 +27,7 @@ import com.simprints.fingerprintmatcher.Person as MatcherPerson
 
 class MatchingPresenter(
     private val view: MatchingContract.View,
-    private val matchingRequest: MatchingActRequest,
+    private val matchingRequest: MatchingTaskRequest,
     private val dbManager: FingerprintDbManager,
     private val sessionEventsManager: FingerprintSessionEventsManager,
     private val crashReportManager: FingerprintCrashReportManager,
@@ -42,14 +42,14 @@ class MatchingPresenter(
     @SuppressLint("CheckResult")
     override fun start() {
         when (matchingRequest) {
-            is MatchingActIdentifyRequest -> startMatchTask(::IdentificationTask)
-            is MatchingActVerifyRequest -> startMatchTask(::VerificationTask)
+            is MatchingTaskIdentifyRequest -> startMatchTask(::IdentificationTask)
+            is MatchingTaskVerifyRequest -> startMatchTask(::VerificationTask)
             else -> handleUnexpectedCallout()
         }
     }
 
     private fun startMatchTask(matchTaskConstructor: (MatchingContract.View,
-                                                      MatchingActRequest,
+                                                      MatchingTaskRequest,
                                                       FingerprintDbManager,
                                                       FingerprintSessionEventsManager,
                                                       FingerprintCrashReportManager,

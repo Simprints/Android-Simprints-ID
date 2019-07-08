@@ -14,7 +14,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.refusal.result.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.id.Application
 import org.hamcrest.CoreMatchers.not
@@ -86,7 +86,7 @@ class RefusalActivityTest {
         onView(withId(R.id.refusalText)).perform(typeText(refusalReasonText))
         onView(withId(R.id.btSubmitRefusalForm)).perform(click())
 
-        verifyIntentReturned(scenario.result, RefusalActResult.Action.SUBMIT,
+        verifyIntentReturned(scenario.result, RefusalTaskResult.Action.SUBMIT,
             RefusalFormReason.REFUSED_RELIGION, refusalReasonText)
     }
 
@@ -96,7 +96,7 @@ class RefusalActivityTest {
 
         onView(withId(R.id.btScanFingerprints)).perform(click())
 
-        verifyIntentReturned(scenario.result, RefusalActResult.Action.SCAN_FINGERPRINTS, RefusalFormReason.OTHER, "")
+        verifyIntentReturned(scenario.result, RefusalTaskResult.Action.SCAN_FINGERPRINTS, RefusalFormReason.OTHER, "")
     }
 
     private fun launchRefusalActivity(): ActivityScenario<RefusalActivity> =
@@ -105,15 +105,15 @@ class RefusalActivityTest {
         })
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
-                                     action: RefusalActResult.Action,
+                                     action: RefusalTaskResult.Action,
                                      refusalReason: RefusalFormReason,
                                      refusalReasonText: String) {
         Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
 
-        result.resultData.setExtrasClassLoader(RefusalActResult::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<RefusalActResult>(RefusalActResult.BUNDLE_KEY)
+        result.resultData.setExtrasClassLoader(RefusalTaskResult::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<RefusalTaskResult>(RefusalTaskResult.BUNDLE_KEY)
 
-        Truth.assertThat(response).isInstanceOf(RefusalActResult::class.java)
+        Truth.assertThat(response).isInstanceOf(RefusalTaskResult::class.java)
         Truth.assertThat(response.action).isEqualTo(action)
         Truth.assertThat(response.answer.reason).isEqualTo(refusalReason)
         Truth.assertThat(response.answer.optionalText).isEqualTo(refusalReasonText)

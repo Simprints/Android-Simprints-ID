@@ -10,7 +10,7 @@ import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
-import com.simprints.fingerprint.activities.launch.request.LaunchActRequest
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
@@ -368,7 +368,7 @@ class LaunchActivityAndroidTest {
 
     private fun fromFingerprintToLaunchActRequest(fingerprintRequest: FingerprintRequest) =
         with(fingerprintRequest) {
-            LaunchActRequest(projectId, this.toAction(), language, logoExists, programName, organizationName)
+            LaunchTaskRequest(projectId, this.toAction(), language, logoExists, programName, organizationName)
         }
 
     companion object {

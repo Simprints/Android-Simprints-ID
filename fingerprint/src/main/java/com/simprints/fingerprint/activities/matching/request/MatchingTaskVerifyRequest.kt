@@ -5,10 +5,10 @@ import com.simprints.fingerprint.data.domain.person.Person
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class MatchingActVerifyRequest(override val language: String,
-                               override val probe: Person,
-                               val queryForVerifyPool: QueryForVerifyPool,
-                               val verifyGuid: String): MatchingActRequest {
+class MatchingTaskVerifyRequest(override val language: String,
+                                override val probe: Person,
+                                val queryForVerifyPool: QueryForVerifyPool,
+                                val verifyGuid: String): MatchingTaskRequest {
 
     @Parcelize
     data class QueryForVerifyPool(val projectId: String): Parcelable

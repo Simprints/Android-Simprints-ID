@@ -8,7 +8,7 @@ import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsActResult
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
@@ -26,7 +26,7 @@ interface CollectFingerprintsContract {
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
-        fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsActResult)
+        fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult)
         fun cancelAndFinish()
 
         fun showSplashScreen()

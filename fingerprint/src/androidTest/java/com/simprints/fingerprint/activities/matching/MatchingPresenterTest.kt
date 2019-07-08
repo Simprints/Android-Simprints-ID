@@ -12,13 +12,13 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
-import com.simprints.fingerprint.activities.matching.request.MatchingActRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingActVerifyRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActResult
-import com.simprints.fingerprint.activities.matching.result.MatchingActVerifyResult
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -151,7 +151,7 @@ class MatchingPresenterTest {
         presenter.start()
         matchTaskFinishedFlag.take()
 
-        val verifyResponse = result.firstValue.getParcelableExtra<MatchingActVerifyResult>(MatchingActResult.BUNDLE_KEY)!!
+        val verifyResponse = result.firstValue.getParcelableExtra<MatchingTaskVerifyResult>(MatchingTaskResult.BUNDLE_KEY)!!
         Assert.assertEquals(VERIFY_GUID, verifyResponse.guid)
     }
 
@@ -240,7 +240,7 @@ class MatchingPresenterTest {
         setupPrefs()
         val result = captureMatchingResult()
 
-        runIdentification(MatchingActIdentifyRequest(
+        runIdentification(MatchingTaskIdentifyRequest(
             DEFAULT_LANGUAGE,
             probe,
             queryForIdentifyPool,
@@ -250,7 +250,7 @@ class MatchingPresenterTest {
     }
 
     private fun verifyIdentificationResult(result: KArgumentCaptor<Intent>, probe: Person, shouldProbeInMatchingResult: Boolean = true) {
-        val identifyResponse = result.firstValue.getParcelableExtra<MatchingActIdentifyResult>(MatchingActResult.BUNDLE_KEY)!!
+        val identifyResponse = result.firstValue.getParcelableExtra<MatchingTaskIdentifyResult>(MatchingTaskResult.BUNDLE_KEY)!!
         val identificationsResult = identifyResponse.identifications
         Assert.assertEquals(NUMBER_OF_ID_RETURNS, identificationsResult.size)
         if(shouldProbeInMatchingResult) {
@@ -261,7 +261,7 @@ class MatchingPresenterTest {
         }
     }
 
-    private fun createPresenter(request: MatchingActRequest,
+    private fun createPresenter(request: MatchingTaskRequest,
                                 mockLibMatcher: (LibPerson, List<LibPerson>, LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         MatchingPresenter(viewMock, request, dbManagerMock,
             sessionEventsManagerMock, crashReportManagerMock, mock(), mock(), mockLibMatcher)
@@ -286,7 +286,7 @@ class MatchingPresenterTest {
         return result
     }
 
-    private fun runIdentification(identifyRequest: MatchingActIdentifyRequest) {
+    private fun runIdentification(identifyRequest: MatchingTaskIdentifyRequest) {
         val presenter = createPresenter(identifyRequest, mockIdentificationLibMatcher)
         presenter.start()
         matchTaskFinishedFlag.take()
@@ -308,16 +308,16 @@ class MatchingPresenterTest {
             moduleId = DEFAULT_MODULE_ID
         )
 
-        private val identifyRequestWithinProjectGroup = MatchingActIdentifyRequest(
+        private val identifyRequestWithinProjectGroup = MatchingTaskIdentifyRequest(
             DEFAULT_LANGUAGE,
             probe,
             QueryForIdentifyPool(DEFAULT_PROJECT_ID),
             10)
 
-        private val verifyRequest = MatchingActVerifyRequest(
+        private val verifyRequest = MatchingTaskVerifyRequest(
             DEFAULT_LANGUAGE,
             probe,
-            MatchingActVerifyRequest.QueryForVerifyPool(DEFAULT_PROJECT_ID),
+            MatchingTaskVerifyRequest.QueryForVerifyPool(DEFAULT_PROJECT_ID),
             VERIFY_GUID)
     }
 }

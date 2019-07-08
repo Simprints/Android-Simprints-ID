@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager;
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.matching.request.MatchingActIdentifyRequest.QueryForIdentifyPool
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
 
 @Keep
 enum class MatchPoolType {
