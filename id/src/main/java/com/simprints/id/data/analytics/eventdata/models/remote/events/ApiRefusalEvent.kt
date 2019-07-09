@@ -11,14 +11,29 @@ class ApiRefusalEvent(val relativeStartTime: Long,
 
     @Keep
     enum class ApiAnswer {
-        BENEFICIARY_REFUSED,
+        REFUSED_RELIGION,
+        REFUSED_DATA_CONCERNS,
+        REFUSED_PERMISSION,
         SCANNER_NOT_WORKING,
+        REFUSED_NOT_PRESENT,
+        REFUSED_YOUNG,
         OTHER
     }
 
     constructor(refusalEvent: RefusalEvent) :
         this(refusalEvent.relativeStartTime ?: 0,
             refusalEvent.relativeEndTime ?: 0,
-            ApiAnswer.valueOf(refusalEvent.reason.toString()),
+            refusalEvent.reason.toApiRefusalEventAnswer(),
             refusalEvent.otherText)
 }
+
+fun RefusalEvent.Answer.toApiRefusalEventAnswer() =
+    when(this) {
+        RefusalEvent.Answer.REFUSED_RELIGION -> ApiRefusalEvent.ApiAnswer.REFUSED_RELIGION
+        RefusalEvent.Answer.REFUSED_DATA_CONCERNS -> ApiRefusalEvent.ApiAnswer.REFUSED_DATA_CONCERNS
+        RefusalEvent.Answer.REFUSED_PERMISSION -> ApiRefusalEvent.ApiAnswer.REFUSED_PERMISSION
+        RefusalEvent.Answer.SCANNER_NOT_WORKING -> ApiRefusalEvent.ApiAnswer.SCANNER_NOT_WORKING
+        RefusalEvent.Answer.REFUSED_NOT_PRESENT -> ApiRefusalEvent.ApiAnswer.REFUSED_NOT_PRESENT
+        RefusalEvent.Answer.REFUSED_YOUNG -> ApiRefusalEvent.ApiAnswer.REFUSED_YOUNG
+        RefusalEvent.Answer.OTHER -> ApiRefusalEvent.ApiAnswer.OTHER
+    }
