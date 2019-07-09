@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,10 @@ import org.koin.core.parameter.parametersOf
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
+
+    override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
+        parametersOf(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
