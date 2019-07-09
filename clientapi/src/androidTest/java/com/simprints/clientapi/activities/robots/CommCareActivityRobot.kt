@@ -1,22 +1,31 @@
 package com.simprints.clientapi.activities.robots
 
-import com.simprints.clientapi.R
+import androidx.test.rule.ActivityTestRule
+import com.simprints.clientapi.activities.commcare.CommCareActivity
+import com.simprints.clientapi.activities.commcare.CommCareActivityTest
 import com.simprints.testtools.android.BaseAssertions
+import com.simprints.testtools.common.syntax.verifyOnce
 
-fun commCare(func: CommCareActivityRobot.() -> Unit) = CommCareActivityRobot().apply(func)
+fun CommCareActivityTest.commCare(func: CommCareActivityRobot.() -> Unit): CommCareActivityRobot {
+    return CommCareActivityRobot(rule).apply(func)
+}
 
-class CommCareActivityRobot {
+class CommCareActivityRobot(private val rule: ActivityTestRule<CommCareActivity>) {
 
     infix fun assert(func: CommCareActivityAssertions.() -> Unit) {
-        CommCareActivityAssertions().run(func)
+        CommCareActivityAssertions(rule).run(func)
     }
 
 }
 
-class CommCareActivityAssertions : BaseAssertions() {
+class CommCareActivityAssertions(
+    private val rule: ActivityTestRule<CommCareActivity>
+) : BaseAssertions() {
 
-    fun dataSentIsDisplayedOnToast() {
-        assertToastMessageIs(R.string.guid_selection_data_sent)
+    fun toastIsDisplayed() {
+        verifyOnce(rule.activity.guidSelectionNotifier) {
+            showMessage()
+        }
     }
 
 }
