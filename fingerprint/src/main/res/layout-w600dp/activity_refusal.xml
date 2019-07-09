@@ -20,12 +20,13 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/whySkipFingerprintingText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:text="@string/why_did_you_skip_fingerprinting"
             android:textAlignment="center"
+            android:gravity="center"
             android:textColor="@color/simprints_white"
             android:textSize="28sp" />
 
@@ -36,33 +37,70 @@
             android:layout_marginBottom="15dp">
 
             <RadioButton
-                android:id="@+id/rbRefused"
+                android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/beneficiary_refused"
+                android:text="@string/refusal_religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
             <RadioButton
-                android:id="@+id/rbScannerNotWorking"
+                android:id="@+id/rbDataConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/scanner_not_working"
+                android:text="@string/refusal_data_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
             <RadioButton
-                android:id="@+id/rb_other"
+                android:id="@+id/rbDoesNotHavePermission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/other"
+                android:text="@string/refusal_does_not_have_permission"
+                android:textColor="@color/simprints_white"
+                android:textSize="24sp" />
+
+            <RadioButton
+                android:id="@+id/rbAppNotWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/refusal_app_not_working"
+                android:textColor="@color/simprints_white"
+                android:textSize="24sp" />
+
+            <RadioButton
+                android:id="@+id/rbPersonNotPresent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/refusal_person_not_present"
+                android:textColor="@color/simprints_white"
+                android:textSize="24sp" />
+
+            <RadioButton
+                android:id="@+id/rbTooYoung"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/refusal_too_young"
+                android:textColor="@color/simprints_white"
+                android:textSize="24sp" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="@string/refusal_other"
                 android:textColor="@color/simprints_white"
                 android:textSize="24sp" />
 
         </RadioGroup>
+
 
         <EditText
             android:id="@+id/refusalText"
