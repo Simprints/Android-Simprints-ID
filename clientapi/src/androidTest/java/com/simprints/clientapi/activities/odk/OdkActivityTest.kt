@@ -1,54 +1,42 @@
 package com.simprints.clientapi.activities.odk
 
-import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
-import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.clientapi.activities.robots.odk
+import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.libsimprints.Constants.*
 import com.simprints.testtools.android.BaseActivityTest
-import com.simprints.testtools.common.syntax.verifyOnce
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.startKoin
-import org.koin.core.parameter.parametersOf
-import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.inject
 import org.koin.test.mock.declareMock
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)
 class OdkActivityTest : BaseActivityTest<OdkActivity>(OdkActivity::class), KoinTest {
 
-    private val mod = module(override = true) {
-        factory { (context: Context) ->
-            OdkGuidSelectionNotifier(context)
-        }
-    }
-
-    private val guidSelectionNotifier by inject<OdkGuidSelectionNotifier> {
-        parametersOf(InstrumentationRegistry.getInstrumentation().targetContext)
-    }
-
     @Before
     override fun setUp() {
-        super.setUp()
-        startKoin { listOf(mod) }
+        loadClientApiKoinModules()
         declareMock<OdkGuidSelectionNotifier>()
+        super.setUp()
     }
 
     @Test
-    fun withConfirmIdentityIntent_shouldDisplayCorrectToastMessage() {
+    fun withConfirmIdentityIntent_shouldDisplayToastMessage() {
         odk {
         } assert {
-            verifyOnce(guidSelectionNotifier) {
-                showMessage()
-            }
+            toastMessageIsDisplayed()
         }
+    }
+
+    override fun tearDown() {
+        super.tearDown()
+        unloadClientApiKoinModules()
     }
 
     override fun intent(): Intent {
