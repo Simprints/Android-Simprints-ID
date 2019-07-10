@@ -153,7 +153,7 @@
     <string name="disconnected_title">Scanner not found</string>
     <string name="verify_guid_not_found_title">Person not found</string>
     <string name="error_occurred_title">Error occurred</string>
-    <string name="alert_try_again_soon">Try again soon</string>
+    <string name="alert_try_again">Try again</string>
     <string name="low_battery_title">Low battery</string>
     <string name="alert_api_key_verify_failed">Failed to verify API key</string>
     <!-- Error Message Text -->
@@ -187,7 +187,7 @@
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
-    <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Click close</string>
+    <string name="safetynet_down_alert_message">1. Please try again after 5–10 minutes \n 2. Tap close</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
     <string name="try_again_label">Try Again</string>

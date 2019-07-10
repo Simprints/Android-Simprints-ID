@@ -28,7 +28,7 @@ enum class AlertActivityViewModel(val type: Type,
     ),
 
     SAFETYNET_DOWN(
-        type = Type.ConfigurationError(title = R.string.alert_try_again_soon,
+        type = Type.ConfigurationError(title = R.string.alert_try_again,
             backgroundColor = R.color.simprints_light_grey,
             mainDrawable = R.drawable.error_hint_wifi),
         leftButton = ButtonAction.None,

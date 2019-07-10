@@ -14,6 +14,7 @@ import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.exceptions.safe.secure.SafetyNetDownException
+import com.simprints.id.exceptions.safe.secure.SafetyNetErrorReason
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.tools.TimeHelper
@@ -120,13 +121,22 @@ class LoginPresenter(val view: LoginContract.View,
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials().also { reason = BAD_CREDENTIALS }
             is SimprintsInternalServerException -> view.handleSignInFailedServerError().also { reason = TECHNICAL_FAILURE }
-            is SafetyNetDownException -> view.handleSafetyNetDownError().also { reason = SAFETYNET_DOWN }
+            is SafetyNetDownException -> view.handleSafetyNetDownError().also {
+                reason = getSafetyNetError(e)
+            }
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
 
         logMessageForCrashReportWithNetworkTrigger("Sign in reason - $reason")
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
+
+    private fun getSafetyNetError(e: SafetyNetDownException) =
+        if (e.reason == SafetyNetErrorReason.SAFETYNET_DOWN) {
+            SAFETYNET_DOWN
+        } else {
+            SAFETYNET_ERROR
+        }
 
     private fun logSignInError(e: Throwable) {
         when (e) {

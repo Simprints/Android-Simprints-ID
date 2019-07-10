@@ -186,8 +186,8 @@
     <string name="low_battery_message">Scanner battery low, please charge your scanner</string>
     <string name="unforeseen_error_message">Please try again and if Simprints does not work contact your system administrator</string>
     <string name="alert_api_key_verify_failed_body">"We could not verify your API key, please make sure you are connected to the internet and try again"</string>
-    <string name="bluetooth_error_pair_scanner_and_device_message">1. Check scanner is turned on. \n 2. Click pair scanner for pairing \n 3. Go back to Simprints</string>
-    <string name="scanner_error_turn_scanner_on_message">1. Turn scanner on \n 2. Click try again</string>
+    <string name="bluetooth_error_pair_scanner_and_device_message">1. Check scanner is turned on. \n 2. Tap pair scanner for pairing \n 3. Tap the back button to return to Simprints</string>
+    <string name="scanner_error_turn_scanner_on_message">1. Turn scanner on \n 2. Tap Try again</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">CLOSE</string>
     <string name="try_again_label">Try Again</string>
