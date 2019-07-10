@@ -16,6 +16,7 @@ class AuthenticationEvent(starTime: Long,
         BAD_CREDENTIALS,
         OFFLINE,
         TECHNICAL_FAILURE,
-        SAFETYNET_DOWN
+        SAFETYNET_DOWN,
+        SAFETYNET_ERROR
     }
 }
