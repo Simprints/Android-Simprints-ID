@@ -84,16 +84,16 @@ sealed class FingerprintTaskFlow {
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
             with(fingerprintRequest) {
                 fingerprintTasks = listOf(
-                    FingerprintTask.Launch({
+                    FingerprintTask.Launch(LAUNCH) {
                         LaunchTaskRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }, LAUNCH),
-                    FingerprintTask.CollectFingerprints({
+                    },
+                    FingerprintTask.CollectFingerprints(COLLECT) {
                         CollectFingerprintsTaskRequest(
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
-                    }, COLLECT)
+                    }
                 )
             }
         }
@@ -112,23 +112,23 @@ sealed class FingerprintTaskFlow {
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
             with(fingerprintRequest as FingerprintIdentifyRequest) {
                 fingerprintTasks = listOf(
-                    FingerprintTask.Launch({
+                    FingerprintTask.Launch(LAUNCH) {
                         LaunchTaskRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }, LAUNCH),
-                    FingerprintTask.CollectFingerprints({
+                    },
+                    FingerprintTask.CollectFingerprints(COLLECT) {
                         CollectFingerprintsTaskRequest(
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
-                    }, COLLECT),
-                    FingerprintTask.Matching({
+                    },
+                    FingerprintTask.Matching(MATCHING) {
                         with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
                             MatchingTaskIdentifyRequest(
                                 language, probe, buildQueryForIdentifyPool(), returnIdCount
                             )
                         }
-                    }, MATCHING)
+                    }
                 )
             }
         }
@@ -155,23 +155,23 @@ sealed class FingerprintTaskFlow {
         override fun computeFlow(fingerprintRequest: FingerprintRequest) {
             with(fingerprintRequest as FingerprintVerifyRequest) {
                 fingerprintTasks = listOf(
-                    FingerprintTask.Launch({
+                    FingerprintTask.Launch(LAUNCH) {
                         LaunchTaskRequest(
                             projectId, this.toAction(), language, logoExists, programName, organizationName
                         )
-                    }, LAUNCH),
-                    FingerprintTask.CollectFingerprints({
+                    },
+                    FingerprintTask.CollectFingerprints(COLLECT) {
                         CollectFingerprintsTaskRequest(
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
-                    }, COLLECT),
-                    FingerprintTask.Matching({
+                    },
+                    FingerprintTask.Matching(MATCHING) {
                         with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
                             MatchingTaskVerifyRequest(
                                 language, probe, buildQueryForVerifyPool(), verifyGuid
                             )
                         }
-                    }, MATCHING)
+                    }
                 )
             }
         }
