@@ -12,15 +12,28 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 
 sealed class FingerprintTask(
     val createTaskRequest: () -> TaskRequest,
-    val actResultKey: String,
-    val targetClass: Class<*>,
-    val requestCode: RequestCode,
-    val requestBundleKey: String,
-    val resultBundleKey: String
+    val taskResultKey: String
 ) {
 
+    abstract class RunnableTask(
+        createTaskRequest: () -> TaskRequest,
+        taskResultKey: String
+    ) : FingerprintTask(createTaskRequest, taskResultKey) {
+
+        abstract fun runTask(taskRequest: TaskRequest): TaskResult
+    }
+
+    abstract class ActivityTask(
+        createTaskRequest: () -> TaskRequest,
+        taskResultKey: String,
+        val targetClass: Class<*>,
+        val requestCode: RequestCode,
+        val requestBundleKey: String,
+        val resultBundleKey: String
+    ) : FingerprintTask(createTaskRequest, taskResultKey)
+
     class Launch(createLaunchActRequest: () -> LaunchTaskRequest, actResultKey: String) :
-        FingerprintTask(
+        ActivityTask(
             createLaunchActRequest,
             actResultKey,
             LaunchActivity::class.java,
@@ -31,7 +44,7 @@ sealed class FingerprintTask(
 
     class CollectFingerprints(createCollectFingerprintsActRequest: () -> CollectFingerprintsTaskRequest,
                               actResultKey: String) :
-        FingerprintTask(
+        ActivityTask(
             createCollectFingerprintsActRequest,
             actResultKey,
             CollectFingerprintsActivity::class.java,
@@ -41,7 +54,7 @@ sealed class FingerprintTask(
         )
 
     class Matching(createMatchingActRequest: () -> MatchingTaskRequest, actResultKey: String) :
-        FingerprintTask(
+        ActivityTask(
             createMatchingActRequest,
             actResultKey,
             MatchingActivity::class.java,
