@@ -62,16 +62,17 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Timber.d("RequestActivity: onActivityResult")
+        val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
-        if (resultCode != Activity.RESULT_OK || data == null)
+        if (isUnsuccessfulResponse)
             sendCancelResult()
-        else {
-            // TODO: Clean this flow up more
-            data.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
-                presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
-            } ?: routeAppResponse(data.getParcelableExtra(BUNDLE_KEY))
-        }
+        else
+            data?.let(::handleResponse)
+    }
 
+    protected fun sendOkResult(intent: Intent) {
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     private fun sendCancelResult() {
@@ -79,9 +80,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    protected fun sendOkResult(intent: Intent) {
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+    private fun handleResponse(response: Intent) {
+        response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
+            presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
+        } ?: routeAppResponse(response.getParcelableExtra(BUNDLE_KEY))
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
