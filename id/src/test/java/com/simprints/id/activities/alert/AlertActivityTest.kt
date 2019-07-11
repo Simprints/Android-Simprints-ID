@@ -88,7 +88,7 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertActRequest(AlertType.UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result, AlertType.UNEXPECTED_ERROR)
     }
@@ -103,13 +103,13 @@ class AlertActivityTest {
 
 
     private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
-        onView(withId(R.id.alert_title))
+        onView(withId(R.id.alertTitle))
             .check(matches(withText(alertActivityViewModel.title)))
 
         onView(withId(R.id.message))
             .check(matches(withText(alertActivityViewModel.message)))
 
-        onView(withId(R.id.alert_image)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
+        onView(withId(R.id.alertImage)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
     }
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
