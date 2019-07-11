@@ -18,6 +18,8 @@ interface CoreCrashReportManager {
     fun logException(throwable: Throwable)
     fun logSafeException(throwable: Throwable)
 
+    fun logMalfunction(message: String)
+
     fun setProjectIdCrashlyticsKey(projectId: String)
     fun setUserIdCrashlyticsKey(userId: String)
     fun setModuleIdsCrashlyticsKey(moduleIds: Set<String>?)

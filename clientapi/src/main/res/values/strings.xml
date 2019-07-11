@@ -13,4 +13,9 @@
     <string name="configuration_error_title">Configuration Error</string>
     <string name="configuration_error_message">A configuration error has occurred (%1$s), please contact your system administrator</string>
 
+    <!-- region GUID selection -->
+    <string name="guid_selection_data_sent">Data sent</string>
+    <string name="guid_selection_result_sent">Result sent</string>
+    <!-- endregion -->
+
 </resources>
