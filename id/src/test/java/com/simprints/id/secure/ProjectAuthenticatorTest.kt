@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
@@ -13,6 +14,8 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.exceptions.safe.secure.SafetyNetDownException
+import com.simprints.id.exceptions.safe.secure.SafetyNetErrorReason
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -130,6 +133,27 @@ class ProjectAuthenticatorTest {
         projectAuthenticator.getAuthenticationData(projectId, userId)
 
         verifyOnce(authenticationDataManager) { requestAuthenticationData(projectId, userId) }
+    }
+
+    @Test
+    fun safetyNetFailed_shouldThrowRightException() {
+        val attestationManager = mock<AttestationManager>()
+        val nonceScope = NonceScope(projectId, userId)
+
+        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_DOWN))
+
+        val testObserver = ProjectAuthenticator(
+            app.component,
+            SafetyNet.getClient(app),
+            SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
+            attestationManager)
+            .authenticate(nonceScope, projectId)
+            .test()
+
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertError(SafetyNetDownException::class.java)
     }
 
     private fun getMockAttestationManager(): AttestationManager {

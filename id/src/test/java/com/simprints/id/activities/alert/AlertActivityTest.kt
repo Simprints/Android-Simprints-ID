@@ -84,6 +84,12 @@ class AlertActivityTest {
     }
 
     @Test
+    fun safetyNetDown_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_DOWN))
+        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_DOWN)
+    }
+
+    @Test
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(AlertType.UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
