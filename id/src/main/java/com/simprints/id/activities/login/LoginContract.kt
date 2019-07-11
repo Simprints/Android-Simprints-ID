@@ -2,6 +2,7 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.secure.ProjectAuthenticator
 
 interface LoginContract {
@@ -24,7 +25,7 @@ interface LoginContract {
         fun handleSignInFailedProjectIdIntentMismatch()
         fun handleSignInFailedUnknownReason()
         fun handleSignInSuccess()
-        fun handleSafetyNetDownError()
+        fun handleSafetyNetDownError(alertType: AlertType)
     }
 
     interface Presenter : BasePresenter {
