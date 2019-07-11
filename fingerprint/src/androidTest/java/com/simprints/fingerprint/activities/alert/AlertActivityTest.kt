@@ -2,23 +2,29 @@ package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity
 import android.app.Instrumentation
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
+import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertActRequest
 import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
@@ -32,7 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 import com.simprints.id.R as idR
-import com.simprints.fingerprint.R
+
 
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest {
@@ -43,6 +49,8 @@ class AlertActivityTest {
         TestFingerprintCoreModule(
             fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
     }
+
+
 
     @Before
     fun setUp() {
@@ -145,6 +153,23 @@ class AlertActivityTest {
     fun multiPairedScanners_theRightAlertShouldAppear() {
         launchAlertActivity(AlertActRequest(MULTIPLE_PAIRED_SCANNERS))
         ensureAlertScreenLaunched(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS)
+    }
+
+    @Test
+    fun pressBackButtonOnBluetoothError_shouldStartRefusalActivity() {
+        val context: Context = ApplicationProvider.getApplicationContext()
+        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        Espresso.pressBackUnconditionally()
+
+        intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
+    }
+
+    @Test
+    fun pressBackButtonOnNonBluetoothError_shouldFinish () {
+        val scenario = launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_ONLINE))
+        Espresso.pressBackUnconditionally()
+
+        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertActResult.CloseButtonAction.BACK)
     }
 
     private fun launchAlertActivity(request: AlertActRequest? = null): ActivityScenario<AlertActivity> =

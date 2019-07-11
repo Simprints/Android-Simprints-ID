@@ -6,17 +6,32 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.tools.extensions.showToast
 import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
+import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
+
 
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override lateinit var viewPresenter: RefusalContract.Presenter
+
+    private val textWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(refusalTextCharSequence: CharSequence, start: Int, before: Int, count: Int) {
+            viewPresenter.handleChangesInRefusalText(refusalTextCharSequence.toString())
+        }
+
+        override fun afterTextChanged(s: Editable) {
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +43,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
-        setTextChangeListenerToRefusalText()
         setLayoutChangeListeners()
         setRadioGroupListener()
     }
@@ -36,20 +50,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     private fun setButtonClickListeners() {
         btSubmitRefusalForm.setOnClickListener { viewPresenter.handleSubmitButtonClick(getRefusalText()) }
         btScanFingerprints.setOnClickListener { viewPresenter.handleScanFingerprintsClick() }
-    }
-
-    private fun setTextChangeListenerToRefusalText() {
-        refusalText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                viewPresenter.handleChangesInRefusalText(getRefusalText())
-            }
-
-            override fun afterTextChanged(s: Editable) {
-            }
-        })
     }
 
     //Changes in the layout occur when the keyboard shows up
@@ -62,7 +62,21 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     private fun setRadioGroupListener() {
         refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            viewPresenter.handleRadioOptionClicked(optionIdentifier)
+            refusalText.removeTextChangedListener(textWatcher)
+            viewPresenter.handleRadioOptionCheckedChange()
+            handleRadioOptionIdentifierClick(optionIdentifier)
+        }
+    }
+
+    private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
+        when (optionIdentifier) {
+            R.id.rbReligiousConcerns -> viewPresenter.handleReligiousConcernsRadioClick()
+            R.id.rbDataConcerns -> viewPresenter.handleDataConcernsRadioClick()
+            R.id.rbPersonNotPresent -> viewPresenter.handlePersonNotPresentRadioClick()
+            R.id.rbTooYoung -> viewPresenter.handleTooYoungRadioClick()
+            R.id.rbDoesNotHavePermission -> viewPresenter.handleDoesNotHavePermissionRadioClick()
+            R.id.rbAppNotWorking -> viewPresenter.handleAppNotWorkingRadioClick()
+            R.id.rbOther -> viewPresenter.handleOtherRadioOptionClick()
         }
     }
 
@@ -76,8 +90,23 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         btSubmitRefusalForm.isEnabled = true
     }
 
+    override fun disableSubmitButton() {
+        btSubmitRefusalForm.isEnabled = false
+    }
+
     override fun enableRefusalText() {
         refusalText.isEnabled = true
+    }
+
+    override fun setFocusOnRefusalReasonAndDisableSubmit() {
+        btSubmitRefusalForm.isEnabled = false
+        refusalText.requestFocus()
+        setTextChangeListenerOnRefusalText()
+        inputMethodManager.showSoftInput(refusalText, SHOW_IMPLICIT)
+    }
+
+    private fun setTextChangeListenerOnRefusalText() {
+        refusalText.addTextChangedListener(textWatcher)
     }
 
     override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {
@@ -91,4 +120,18 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
             refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()
+
+    override fun onBackPressed() {
+        viewPresenter.handleOnBackPressed()
+    }
+
+    override fun isSubmitButtonEnabled() = btSubmitRefusalForm.isEnabled
+
+    override fun showToastForFormSubmit() {
+        showToast(R.string.refusal_toast_submit)
+    }
+
+    override fun showToastForSelectOptionAndSubmit() {
+        showToast(R.string.refusal_toast_select_option_submit)
+    }
 }

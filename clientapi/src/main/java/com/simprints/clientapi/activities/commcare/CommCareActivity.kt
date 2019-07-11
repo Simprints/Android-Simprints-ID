@@ -6,6 +6,7 @@ import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -31,6 +32,10 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
+
+    override val guidSelectionNotifier: CommCareGuidSelectionNotifier by inject {
+        parametersOf(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

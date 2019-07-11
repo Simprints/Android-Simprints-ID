@@ -1,8 +1,6 @@
 package com.simprints.clientapi.routers
 
 import android.app.Activity
-import android.content.Intent
-import android.os.Build
 import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
@@ -40,18 +38,12 @@ object AppRequestRouter {
         when (request) {
             // Regular Requests
             is IdentifyConfirmation ->
-                act.routeService(request.convertToAppRequest().toIntent(SELECT_GUID_INTENT))
+                act.startActivity(request.convertToAppRequest().toIntent(SELECT_GUID_INTENT))
 
             // Handle Error
             else -> throw InvalidClientRequestException("Invalid Confirmation AppRequest")
         }
     }
-
-    private fun Activity.routeService(intent: Intent) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            this.startForegroundService(intent)
-        else
-            this.startService(intent)
 
     private fun Activity.route(request: BaseRequest, route: String, code: Int) =
         this.startActivityForResult(request.convertToAppRequest().toIntent(route), code)

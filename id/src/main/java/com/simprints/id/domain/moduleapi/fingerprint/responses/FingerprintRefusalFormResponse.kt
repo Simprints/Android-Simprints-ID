@@ -5,7 +5,7 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FingerprintRefusalFormResponse(val reason: FingerprintRefusalFormReason?,
+data class FingerprintRefusalFormResponse(val reason: FingerprintRefusalFormReason,
                                           val optionalText: String = ""): FingerprintResponse {
     @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.REFUSAL
 }
