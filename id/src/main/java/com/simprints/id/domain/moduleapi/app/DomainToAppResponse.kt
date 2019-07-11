@@ -35,6 +35,7 @@ object DomainToAppResponse {
             SCANNER_LOW_BATTERY -> IAppErrorReason.SCANNER_LOW_BATTERY
             UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
             SAFETYNET_DOWN -> IAppErrorReason.SAFETYNET_DOWN
+            SAFETYNET_ERROR -> IAppErrorReason.SAFETYNET_ERROR
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

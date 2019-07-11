@@ -50,6 +50,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                 AlertType.SAFETYNET_DOWN -> SAFETYNET_DOWN
+                AlertType.SAFETYNET_ERROR -> SAFETYNET_DOWN
             }
     }
 
