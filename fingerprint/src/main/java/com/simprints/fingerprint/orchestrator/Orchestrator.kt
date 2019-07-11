@@ -1,10 +1,8 @@
 package com.simprints.fingerprint.orchestrator
 
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
@@ -17,25 +15,34 @@ class Orchestrator(private val viewModel: OrchestratorViewModel) {
 
         taskFlow = fingerprintRequest.toFingerprintTaskFlow()
 
-        viewModel.postNextTask(taskFlow.getCurrentTask())
+        startNextTask()
     }
 
-    fun handleTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
-
-        taskFlow.handleTaskResult(resultCode, getTaskResult)
-
-        if (taskFlow.isFlowFinished()) {
-            viewModel.handleFlowFinished(taskFlow.getFinalResult())
-        } else {
-            viewModel.postNextTask(taskFlow.getCurrentTask())
+    private fun startNextTask() {
+        taskFlow.getCurrentTask().also {
+            when (it) {
+                is FingerprintTask.RunnableTask -> doRunnableTaskAndHandleResult(it)
+                is FingerprintTask.ActivityTask -> viewModel.postNextTask(it)
+            }
         }
     }
 
-    private fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
-        when (this) {
-            is FingerprintEnrolRequest -> FingerprintTaskFlow.Enrol()
-            is FingerprintIdentifyRequest -> FingerprintTaskFlow.Identify()
-            is FingerprintVerifyRequest -> FingerprintTaskFlow.Verify()
-            else -> throw Throwable("Woops") // TODO
-        }.also { it.computeFlow(this) }
+    private fun doRunnableTaskAndHandleResult(task: FingerprintTask.RunnableTask) {
+        val taskResult = task.runTask(task.createTaskRequest())
+        taskFlow.handleRunnableTaskResult(taskResult)
+        cycleToNextTaskOrFinishFlow()
+    }
+
+    fun handleActivityTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
+        taskFlow.handleActivityTaskResult(resultCode, getTaskResult)
+        cycleToNextTaskOrFinishFlow()
+    }
+
+    private fun cycleToNextTaskOrFinishFlow() {
+        if (taskFlow.isFlowFinished()) {
+            viewModel.handleFlowFinished(taskFlow.getFinalResult())
+        } else {
+            startNextTask()
+        }
+    }
 }

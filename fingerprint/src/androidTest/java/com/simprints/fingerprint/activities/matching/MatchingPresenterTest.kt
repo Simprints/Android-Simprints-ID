@@ -282,7 +282,7 @@ class MatchingPresenterTest {
 
     private fun captureMatchingResult(): KArgumentCaptor<Intent> {
         val result = argumentCaptor<Intent>()
-        whenever(viewMock) { doSetResult(anyInt(), result.capture()) } thenDoNothing {}
+        whenever(viewMock) { doSetResult(anyNotNull(), result.capture()) } thenDoNothing {}
         return result
     }
 

@@ -1,7 +1,5 @@
 package com.simprints.fingerprint.orchestrator.taskflow
 
-import android.app.Activity
-import android.content.Intent
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
@@ -11,21 +9,19 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyR
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
-import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.fingerprint.data.domain.toAction
-import com.simprints.fingerprint.orchestrator.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 sealed class FingerprintTaskFlow {
+
+    protected val finalResultBuilder = FinalResultBuilder() // TODO : Koin this
 
     protected val taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
@@ -41,47 +37,39 @@ sealed class FingerprintTaskFlow {
 
     abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
 
-    fun handleTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
-        lastResultCode = resultCode
-        when (resultCode) {
-            ResultCode.OK -> {
-                with(getCurrentTask()) {
-                    taskResults[actResultKey] = getTaskResult(resultBundleKey)
+    fun handleActivityTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
+        (getCurrentTask() as FingerprintTask.ActivityTask).apply {
+            lastResultCode = resultCode
+            when (resultCode) {
+                ResultCode.OK -> {
+                    taskResults[taskResultKey] = getTaskResult(resultBundleKey)
+                    currentActivityTaskIndex++
                 }
-                currentActivityTaskIndex++
+                ResultCode.CANCELLED -> {
+                }
+                ResultCode.ALERT -> {
+                    taskResults[ALERT] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
+                }
+                ResultCode.REFUSED -> {
+                    taskResults[REFUSED] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
+                }
             }
-            ResultCode.CANCELLED -> {
-            }
-            ResultCode.ALERT -> {
-                taskResults[ALERT] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
-            }
-            ResultCode.REFUSED -> {
-                taskResults[REFUSED] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
-            }
+        }
+    }
+
+    fun handleRunnableTaskResult(taskResult: TaskResult) {
+        (getCurrentTask() as FingerprintTask.RunnableTask).apply {
+            taskResults[taskResultKey] = taskResult
+            currentActivityTaskIndex++
         }
     }
 
     fun getFinalResult() =
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult()
-            ResultCode.CANCELLED -> FinalResult(Activity.RESULT_CANCELED, null)
-            ResultCode.ALERT -> FinalResult(Activity.RESULT_CANCELED, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse(
-                    with(taskResults[ALERT] as AlertTaskResult) {
-                        FingerprintErrorReason.fromFingerprintAlertToErrorResponse(alert)
-                    }
-                ))
-            })
-            ResultCode.REFUSED -> FinalResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(
-                    with(taskResults[REFUSED] as RefusalTaskResult) {
-                        FingerprintRefusalFormResponse(
-                            answer.reason.toFingerprintRefusalFormReason(),
-                            answer.optionalText
-                        )
-                    }
-                ))
-            })
+            ResultCode.CANCELLED -> finalResultBuilder.createCancelledResult()
+            ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT] as AlertTaskResult)
+            ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED] as RefusalTaskResult)
         }
 
     protected abstract fun getFinalOkResult(): FinalResult
@@ -111,11 +99,7 @@ sealed class FingerprintTaskFlow {
         }
 
         override fun getFinalOkResult(): FinalResult =
-            FinalResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(
-                    FingerprintEnrolResponse((taskResults[COLLECT] as CollectFingerprintsTaskResult).probe.patientId))
-                )
-            })
+            finalResultBuilder.createEnrolResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)
 
         companion object {
             private const val LAUNCH = "launch"
@@ -150,11 +134,7 @@ sealed class FingerprintTaskFlow {
         }
 
         override fun getFinalOkResult(): FinalResult =
-            FinalResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse(
-                    FingerprintIdentifyResponse((taskResults[MATCHING] as MatchingTaskIdentifyResult).identifications)
-                ))
-            })
+            finalResultBuilder.createIdentifyResult(taskResults[MATCHING] as MatchingTaskIdentifyResult)
 
         private fun FingerprintIdentifyRequest.buildQueryForIdentifyPool() =
             when (matchGroup) {
@@ -197,13 +177,7 @@ sealed class FingerprintTaskFlow {
         }
 
         override fun getFinalOkResult(): FinalResult =
-            FinalResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse(
-                    with(taskResults[MATCHING] as MatchingTaskVerifyResult) {
-                        FingerprintVerifyResponse(guid, confidence, tier)
-                    }
-                ))
-            })
+            finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
 
         private fun FingerprintVerifyRequest.buildQueryForVerifyPool() =
             MatchingTaskVerifyRequest.QueryForVerifyPool(projectId)
