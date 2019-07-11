@@ -57,7 +57,6 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
     override fun onResume() {
         super.onResume()
         viewPresenter.handleOnResume()
-
     }
 
     private fun isBluetoothAlert(alertType: FingerprintAlert) =
