@@ -10,6 +10,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authentica
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -121,8 +122,8 @@ class LoginPresenter(val view: LoginContract.View,
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials().also { reason = BAD_CREDENTIALS }
             is SimprintsInternalServerException -> view.handleSignInFailedServerError().also { reason = TECHNICAL_FAILURE }
-            is SafetyNetDownException -> view.handleSafetyNetDownError().also {
-                reason = getSafetyNetError(e)
+            is SafetyNetDownException -> view.handleSafetyNetDownError(getAlertTypeForSafetyNetError(e.reason)).also {
+                reason = getSafetyNetErrorForAuthenticationEvent(e.reason)
             }
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
         }
@@ -131,11 +132,16 @@ class LoginPresenter(val view: LoginContract.View,
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
-    private fun getSafetyNetError(e: SafetyNetDownException) =
-        if (e.reason == SafetyNetErrorReason.SAFETYNET_DOWN) {
-            SAFETYNET_DOWN
-        } else {
-            SAFETYNET_ERROR
+    private fun getAlertTypeForSafetyNetError(e: SafetyNetErrorReason) =
+        when (e) {
+            SafetyNetErrorReason.SAFETYNET_DOWN -> AlertType.SAFETYNET_DOWN
+            SafetyNetErrorReason.SAFETYNET_ERROR -> AlertType.SAFETYNET_ERROR
+        }
+
+    private fun getSafetyNetErrorForAuthenticationEvent(e: SafetyNetErrorReason) =
+        when (e) {
+            SafetyNetErrorReason.SAFETYNET_DOWN -> SAFETYNET_DOWN
+            SafetyNetErrorReason.SAFETYNET_ERROR -> SAFETYNET_ERROR
         }
 
     private fun logSignInError(e: Throwable) {
