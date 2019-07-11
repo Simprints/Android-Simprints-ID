@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/alertLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    android:orientation="vertical"
+    android:weightSum="1"
+    tools:context=".activities.alert.AlertActivity">
+
+    <TextView
+        android:id="@+id/alertTitle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.15"
+        android:gravity="center"
+        android:textColor="@color/simprints_white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/alertImage"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_weight="0.45"
+        android:contentDescription="@string/main_error_graphic" />
+
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:textColor="@color/simprints_white" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/simprints_light_grey"/>
+
+    <TextView
+        android:id="@+id/alertLeftButton"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="2dp"
+        android:layout_weight="0.15"
+        android:gravity="center"
+        android:textColor="@color/simprints_white"
+        android:textSize="24sp"
+        android:visibility="gone" />
+
+</LinearLayout>
