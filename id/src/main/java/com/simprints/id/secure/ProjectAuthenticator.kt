@@ -74,7 +74,7 @@ open class ProjectAuthenticator(component: AppComponent,
             Single.just(projectSecretManager.encryptAndStoreAndReturnProjectSecret(projectSecret, it.publicKeyString))
         }
 
-    internal fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
+    private fun getGoogleAttestation(safetyNetClient: SafetyNetClient, authenticationDataSingle: Single<AuthenticationData>): Single<AttestToken> =
         authenticationDataSingle.flatMap {
             attestationManager.requestAttestation(safetyNetClient, it.nonce)
         }
