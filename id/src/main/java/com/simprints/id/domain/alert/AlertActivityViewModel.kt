@@ -15,15 +15,15 @@ enum class AlertActivityViewModel(val type: Type,
 
     DIFFERENT_PROJECT_ID(
         type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close,
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
         message = R.string.different_projectId_message
     ),
 
     DIFFERENT_USER_ID(
         type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close,
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
         message = R.string.different_userId_message
     ),
 
@@ -31,8 +31,8 @@ enum class AlertActivityViewModel(val type: Type,
         type = Type.ConfigurationError(title = R.string.alert_try_again,
             backgroundColor = R.color.simprints_grey,
             mainDrawable = R.drawable.error_icon),
-        leftButton = ButtonAction.None,
-        rightButton = ButtonAction.Close,
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
         message = R.string.safetynet_down_alert_message
     ),
 

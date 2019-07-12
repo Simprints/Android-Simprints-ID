@@ -173,7 +173,6 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleSafetyNetDownError(alertType: AlertType) {
         progressDialog.dismiss()
-
         launchAlert(this, alertType)
     }
 }
