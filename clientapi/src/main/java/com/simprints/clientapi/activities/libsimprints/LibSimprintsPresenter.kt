@@ -38,7 +38,9 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             INVALID_SELECTED_ID to SIMPRINTS_CANCELLED,
             INVALID_SESSION_ID to SIMPRINTS_CANCELLED,
             INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
-            INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
+            INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID,
+            SAFETYNET_DOWN to SIMPRINTS_SAFETYNET_DOWN,
+            SAFETYNET_ERROR to SIMPRINTS_SAFETYNET_ERROR)
 
     override suspend fun start() {
         if(action != SIMPRINTS_SELECT_GUID_INTENT) {
