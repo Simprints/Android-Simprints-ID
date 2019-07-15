@@ -8,8 +8,8 @@ import com.google.android.gms.common.api.CommonStatusCodes.INTERNAL_ERROR
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
 import com.simprints.id.BuildConfig
-import com.simprints.id.exceptions.safe.secure.SafetyNetDownException
-import com.simprints.id.exceptions.safe.secure.SafetyNetErrorReason
+import com.simprints.id.exceptions.safe.secure.SafetyNetException
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
@@ -25,18 +25,18 @@ class AttestationManager {
                 })
             result?.let {
                 AttestToken(it.jwsResult)
-            } ?: throw SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_ERROR)
+            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
         }
     }
 
     private fun throwSafetyNetExceptionWithError(exception: Exception) {
         if (exception is ApiException) {
             when(exception.statusCode) {
-                CANCELED, INTERNAL_ERROR -> throw SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_DOWN)
-                else -> throw SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_ERROR)
+                CANCELED, INTERNAL_ERROR -> throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_DOWN)
+                else -> throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
             }
         } else {
-            throw SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_ERROR)
+            throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
         }
     }
 
