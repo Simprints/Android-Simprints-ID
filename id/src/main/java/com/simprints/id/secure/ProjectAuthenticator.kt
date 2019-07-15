@@ -32,7 +32,7 @@ open class ProjectAuthenticator(component: AppComponent,
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var preferencesManager: PreferencesManager
 
-    private val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
+    internal val projectSecretManager by lazy { ProjectSecretManager(loginInfoManager) }
     private val authManager = AuthManager(secureApiClient)
 
  	init {
