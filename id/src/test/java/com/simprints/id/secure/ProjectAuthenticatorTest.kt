@@ -14,8 +14,8 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
-import com.simprints.id.exceptions.safe.secure.SafetyNetDownException
-import com.simprints.id.exceptions.safe.secure.SafetyNetErrorReason
+import com.simprints.id.exceptions.safe.secure.SafetyNetException
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -140,7 +140,7 @@ class ProjectAuthenticatorTest {
         val attestationManager = mock<AttestationManager>()
         val nonceScope = NonceScope(projectId, userId)
 
-        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetDownException(reason = SafetyNetErrorReason.SAFETYNET_DOWN))
+        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_DOWN))
 
         val testObserver = ProjectAuthenticator(
             app.component,
@@ -153,7 +153,7 @@ class ProjectAuthenticatorTest {
         testObserver.awaitTerminalEvent()
 
         testObserver
-            .assertError(SafetyNetDownException::class.java)
+            .assertError(SafetyNetException::class.java)
     }
 
     private fun getMockAttestationManager(): AttestationManager {
