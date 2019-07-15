@@ -11,7 +11,7 @@ import retrofit2.http.*
 
 interface SecureApiInterface {
     companion object {
-        var baseUrl = NetworkConstants.baseUrl
+        const val baseUrl = NetworkConstants.baseUrl
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 

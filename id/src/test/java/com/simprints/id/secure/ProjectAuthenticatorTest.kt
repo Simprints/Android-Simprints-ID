@@ -141,7 +141,6 @@ class ProjectAuthenticatorTest {
     fun authenticate_shouldAuthenticateWithRightRequestsToSecureApiInterface() {
 
         val mockWebServer = MockWebServer()
-        SecureApiInterface.baseUrl = mockWebServer.url("/").toString()
         val mockProjectSecretManager: ProjectSecretManager = mock()
 
         whenever { mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull()) } thenReturn "encrypted_project_secret"
@@ -152,7 +151,7 @@ class ProjectAuthenticatorTest {
         val authenticator = spy(ProjectAuthenticator(
             app.component,
             SafetyNet.getClient(app),
-            SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api,
+            SimApiClient(SecureApiInterface::class.java, mockWebServer.url("/").toString()).api,
             getMockAttestationManager()))
 
         whenever { authenticator.projectSecretManager } thenReturn mockProjectSecretManager
