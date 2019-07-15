@@ -46,49 +46,60 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     }
 
     override fun returnRegistration(guid: String, skipCheck: Boolean) = Intent().let {
-        val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
-        data.putString(REGISTRATION_GUID_KEY, guid)
+        val data = Bundle().apply {
+            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putString(REGISTRATION_GUID_KEY, guid)
+        }
 
-        it.putExtra(COMMCARE_BUNDLE_KEY, data)
+        injectDataAsCommCareBundleIntoIntent(it, data)
+        sendOkResult(it)
+    }
+
+    override fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean) = Intent().let {
+        val data = Bundle().apply {
+            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
+            putString(VERIFICATION_TIER_KEY, tier.name)
+            putString(VERIFICATION_GUID_KEY, guid)
+        }
+
+        injectDataAsCommCareBundleIntoIntent(it, data)
+        sendOkResult(it)
+    }
+
+    override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
+        val data = Bundle().apply {
+            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putString(EXIT_REASON, reason)
+            putString(EXIT_EXTRA, extra)
+        }
+
+        injectDataAsCommCareBundleIntoIntent(it, data)
+        sendOkResult(it)
+    }
+
+    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
+        val data = Bundle().apply {
+            putBoolean(SKIP_CHECK_KEY, errorResponse.skipCheckAfterError())
+        }
+
+        injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
     override fun returnIdentification(identifications: ArrayList<Identification>,
                                       sessionId: String) = Intent().let {
+
+        // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
+        // It's excepting Identifications results in the LibSimprints format.
         it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
         it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
 
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean) = Intent().let {
-        val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
-        data.putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
-        data.putString(VERIFICATION_TIER_KEY, tier.name)
-        data.putString(VERIFICATION_GUID_KEY, guid)
-
-        it.putExtra(COMMCARE_BUNDLE_KEY, data)
-        sendOkResult(it)
-    }
-
-    override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
-        val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, skipCheck)
-        data.putString(EXIT_REASON, reason)
-        data.putString(EXIT_EXTRA, extra)
-
-        it.putExtra(COMMCARE_BUNDLE_KEY, data)
-        sendOkResult(it)
-    }
-
-    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        val data = Bundle()
-        data.putBoolean(SKIP_CHECK_KEY, errorResponse.skipCheckAfterError())
-
-        it.putExtra(COMMCARE_BUNDLE_KEY, data)
-        sendOkResult(it)
+    private fun injectDataAsCommCareBundleIntoIntent(intent: Intent, data: Bundle) {
+        intent.putExtra(COMMCARE_BUNDLE_KEY, data)
     }
 
     override fun injectSessionIdIntoIntent(sessionId: String) {

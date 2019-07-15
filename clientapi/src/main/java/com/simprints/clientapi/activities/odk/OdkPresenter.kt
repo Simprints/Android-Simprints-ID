@@ -52,7 +52,7 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnRegistration(enroll.guid, skipCheck)
         }
     }
@@ -60,7 +60,7 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnIdentification(
                 identify.identifications.getIdsString(),
                 identify.identifications.getConfidencesString(),
@@ -74,7 +74,7 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnVerification(
                 verify.matchResult.guidFound,
                 verify.matchResult.confidence.toString(),
@@ -88,8 +88,11 @@ class OdkPresenter(private val view: OdkContract.View,
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnExitForm(refusalForm.reason, refusalForm.extra, skipCheck)
         }
     }
+
+    private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
+        sessionEventsManager.addSkipCheckEvent(skipCheck)
 }
