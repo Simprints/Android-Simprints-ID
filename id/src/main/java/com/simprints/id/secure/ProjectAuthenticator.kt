@@ -59,8 +59,10 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun buildAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
         getAuthenticationData(nonceScope.projectId, nonceScope.userId).flatMap { authenticationData ->
-            zipAuthRequestParameters(getEncryptedProjectSecret(projectSecret, authenticationData),
-                getGoogleAttestation(safetyNetClient, authenticationData), nonceScope)
+            zipAuthRequestParameters(
+                getEncryptedProjectSecret(projectSecret, authenticationData),
+                getGoogleAttestation(safetyNetClient, authenticationData),
+                nonceScope)
         }
 
     internal fun getAuthenticationData(projectId: String, userId: String) =
