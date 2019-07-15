@@ -14,11 +14,11 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
+import com.simprints.clientapi.routers.AppRequestRouter.CONFIRM_IDENTITY_REQUEST_CODE
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
-import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
 import timber.log.Timber
 
 
@@ -64,10 +64,13 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         Timber.d("RequestActivity: onActivityResult")
         val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
-        if (isUnsuccessfulResponse)
+        if (isUnsuccessfulResponse) {
             sendCancelResult()
-        else
-            data?.let(::handleResponse)
+        } else {
+            data?.let {
+                handleResponse(it, requestCode)
+            }
+        }
     }
 
     protected fun sendOkResult(intent: Intent) {
@@ -80,10 +83,13 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun handleResponse(response: Intent) {
+    private fun handleResponse(response: Intent, requestCode: Int) {
         response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
-        } ?: routeAppResponse(response.getParcelableExtra(BUNDLE_KEY))
+        } ?: routeAppResponse(response.getParcelableExtra(IAppResponse.BUNDLE_KEY))
+
+        if (requestCode == CONFIRM_IDENTITY_REQUEST_CODE)
+            sendOkResult(response)
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
