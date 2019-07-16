@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     companion object {
@@ -29,6 +28,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         const val VERIFICATION_GUID_KEY = "guid"
         const val EXIT_REASON = "reason"
         const val EXIT_EXTRA = "extra"
+        const val IDENTIFICATION_OUTCOME_EXTRA = "identificationOutcome"
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
@@ -78,6 +78,15 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         data.putBoolean(SKIP_CHECK_KEY, skipCheck)
         data.putString(EXIT_REASON, reason)
         data.putString(EXIT_EXTRA, extra)
+
+        it.putExtra(COMMCARE_BUNDLE_KEY, data)
+        sendOkResult(it)
+    }
+
+    override fun returnIdentityConfirmation(identificationOutcome: Boolean) = Intent().let {
+        val data = Bundle().apply {
+            putBoolean(IDENTIFICATION_OUTCOME_EXTRA, identificationOutcome)
+        }
 
         it.putExtra(COMMCARE_BUNDLE_KEY, data)
         sendOkResult(it)

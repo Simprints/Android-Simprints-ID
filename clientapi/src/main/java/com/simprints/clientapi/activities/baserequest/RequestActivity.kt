@@ -14,7 +14,6 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.toMap
 import com.simprints.clientapi.identity.GuidSelectionNotifier
-import com.simprints.clientapi.routers.AppRequestRouter.CONFIRM_IDENTITY_REQUEST_CODE
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmation
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
@@ -64,13 +63,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         Timber.d("RequestActivity: onActivityResult")
         val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
-        if (isUnsuccessfulResponse) {
+        if (isUnsuccessfulResponse)
             sendCancelResult()
-        } else {
-            data?.let {
-                handleResponse(it, requestCode)
-            }
-        }
+        else
+            data?.let(::handleResponse)
     }
 
     protected fun sendOkResult(intent: Intent) {
@@ -83,13 +79,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    private fun handleResponse(response: Intent, requestCode: Int) {
+    private fun handleResponse(response: Intent) {
         response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
         } ?: routeAppResponse(response.getParcelableExtra(IAppResponse.BUNDLE_KEY))
-
-        if (requestCode == CONFIRM_IDENTITY_REQUEST_CODE)
-            sendOkResult(response)
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
@@ -98,6 +91,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+        IAppResponseType.IDENTITY_CONFIRMATION -> presenter.handleIdentityConfirmationResponse(IdentityConfirmationResponse(response as IAppIdentityConfirmationResponse))
     }
 
 }

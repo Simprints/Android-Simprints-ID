@@ -84,7 +84,6 @@ class OdkPresenter(private val view: OdkContract.View,
         }
     }
 
-
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
@@ -92,4 +91,9 @@ class OdkPresenter(private val view: OdkContract.View,
             view.returnExitForm(refusalForm.reason, refusalForm.extra, skipCheck)
         }
     }
+
+    override fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse) {
+        view.returnIdentityConfirmation(response.identificationOutcome)
+    }
+
 }

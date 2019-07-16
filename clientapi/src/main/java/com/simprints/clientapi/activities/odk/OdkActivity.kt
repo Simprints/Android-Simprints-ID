@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-
 class OdkActivity : RequestActivity(), OdkContract.View {
 
     companion object {
@@ -25,6 +24,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_SESSION_ID = "odk-session-id"
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
+        private const val ODK_IDENTIFICATION_OUTCOME_KEY = "odk-identification-outcome"
     }
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
@@ -74,6 +74,11 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         it.putExtra(ODK_EXIT_EXTRA, extra)
         it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
 
+        sendOkResult(it)
+    }
+
+    override fun returnIdentityConfirmation(identificationOutcome: Boolean) = Intent().let {
+        it.putExtra(ODK_IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
         sendOkResult(it)
     }
 
