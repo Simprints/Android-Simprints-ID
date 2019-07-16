@@ -3,12 +3,12 @@ package com.simprints.id.domain.moduleapi.app
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.Parcelize
-import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 object DomainToAppResponse {
 
@@ -18,6 +18,7 @@ object DomainToAppResponse {
             IDENTIFY -> fromDomainToAppIdentifyResponse(response as AppIdentifyResponse)
             REFUSAL -> fromDomainToAppRefusalFormResponse(response as AppRefusalFormResponse)
             VERIFY -> fromDomainToAppVerifyResponse(response as AppVerifyResponse)
+            IDENTITY_CONFIRMATION -> fromDomainToAppIdentityConfirmationResponse(response as AppIdentityConfirmationResponse)
             ERROR -> fromDomainToAppErrorResponse(response as AppErrorResponse)
         }
 
@@ -51,6 +52,9 @@ object DomainToAppResponse {
 
     private fun fromDomainToAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
+
+    private fun fromDomainToAppIdentityConfirmationResponse(response: AppIdentityConfirmationResponse) =
+        IAppIdentityConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =
         when (tier) {
@@ -96,3 +100,10 @@ private data class IAppMatchResultImpl(
     override val guid: String,
     override val confidence: Int,
     override val tier: IAppResponseTier) : Parcelable, IAppMatchResult
+
+@Parcelize
+private data class IAppIdentityConfirmationResponseImpl(
+    override val identificationOutcome: Boolean
+) : IAppIdentityConfirmationResponse {
+    @IgnoredOnParcel override val type: IAppResponseType = IAppResponseType.IDENTITY_CONFIRMATION
+}

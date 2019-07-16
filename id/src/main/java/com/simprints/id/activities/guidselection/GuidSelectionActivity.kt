@@ -7,8 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppIdentityConfirmationResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.tools.extensions.parseAppConfirmation
+import com.simprints.moduleapi.app.responses.IAppResponse
 
 class GuidSelectionActivity : AppCompatActivity() {
 
@@ -24,10 +28,16 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun sendOkResult() {
-        val data = Intent().putExtra(IDENTIFICATION_OUTCOME_KEY, true)
-        setResult(Activity.RESULT_OK, data)
+        val response = AppIdentityConfirmationResponse(identificationOutcome = true)
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(IAppResponse.BUNDLE_KEY, fromDomainToAppResponse(response))
+        })
+
         finish()
     }
+
+    private fun fromDomainToAppResponse(response: AppResponse): IAppResponse =
+        DomainToAppResponse.fromDomainToAppResponse(response)
 
     private fun buildGuidSelectionWork() = OneTimeWorkRequestBuilder<GuidSelectionWorker>()
         .setInputData(prepareInputData())
@@ -35,10 +45,6 @@ class GuidSelectionActivity : AppCompatActivity() {
 
     private fun prepareInputData() = intent.parseAppConfirmation().toMap().let {
         Data.Builder().putAll(it).build()
-    }
-
-    companion object {
-        private const val IDENTIFICATION_OUTCOME_KEY = "identification_outcome"
     }
 
 }
