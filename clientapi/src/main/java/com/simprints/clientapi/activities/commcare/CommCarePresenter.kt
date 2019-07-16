@@ -88,6 +88,10 @@ class CommCarePresenter(private val view: CommCareContract.View,
         }
     }
 
+    override fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse) {
+        view.returnIdentityConfirmation(response.identificationOutcome)
+    }
+
     private fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {
             if (sharedPreferencesManager.peekSessionId().isNotBlank()) {

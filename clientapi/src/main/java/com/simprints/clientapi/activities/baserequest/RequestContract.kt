@@ -60,6 +60,8 @@ interface RequestContract {
 
         fun validateAndSendRequest(builder: ClientRequestBuilder)
 
+        fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse)
+
     }
 
 }

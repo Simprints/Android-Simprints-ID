@@ -21,6 +21,8 @@ interface LibSimprintsContract {
 
         fun returnRefusalForms(refusalForm: RefusalForm)
 
+        fun returnIdentityConfirmation(identificationOutcome: Boolean)
+
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter
