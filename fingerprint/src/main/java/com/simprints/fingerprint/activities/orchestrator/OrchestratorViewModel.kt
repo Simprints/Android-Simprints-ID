@@ -41,7 +41,7 @@ class OrchestratorViewModel : ViewModel() {
 
     private fun FingerprintTask.ActivityTask.toActivityCall() =
         ActivityCall(requestCode.value) { context ->
-            Intent(context, targetClass).apply { putExtra(requestBundleKey, createTaskRequest()) }
+            Intent(context, targetActivity).apply { putExtra(requestBundleKey, createTaskRequest()) }
         }
 
     internal data class ActivityResult(val resultCode: Int, val resultData: Intent?) {

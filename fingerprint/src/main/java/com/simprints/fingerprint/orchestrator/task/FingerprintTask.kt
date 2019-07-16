@@ -9,6 +9,8 @@ import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
 sealed class FingerprintTask(
     val taskResultKey: String,
@@ -16,47 +18,53 @@ sealed class FingerprintTask(
 ) {
 
     abstract class RunnableTask(
-        createTaskRequest: () -> TaskRequest,
-        taskResultKey: String
+        taskResultKey: String,
+        createTaskRequest: () -> TaskRequest
     ) : FingerprintTask(taskResultKey, createTaskRequest) {
 
         abstract fun runTask(taskRequest: TaskRequest): TaskResult
     }
 
+    class SavePerson(savePersonResultKey: String, createSavePersonTaskRequest: () -> SavePersonTaskRequest) :
+        RunnableTask(savePersonResultKey, createSavePersonTaskRequest) {
+
+        override fun runTask(taskRequest: TaskRequest): TaskResult =
+            SavePersonTask(taskRequest as SavePersonTaskRequest).savePerson()
+    }
+
     abstract class ActivityTask(
         taskResultKey: String,
         createTaskRequest: () -> TaskRequest,
-        val targetClass: Class<*>,
+        val targetActivity: Class<*>,
         val requestCode: RequestCode,
         val requestBundleKey: String,
         val resultBundleKey: String
     ) : FingerprintTask(taskResultKey, createTaskRequest)
 
-    class Launch(actResultKey: String, createLaunchActRequest: () -> LaunchTaskRequest) :
+    class Launch(taskResultKey: String, createLaunchTaskRequest: () -> LaunchTaskRequest) :
         ActivityTask(
-            actResultKey,
-            createLaunchActRequest,
+            taskResultKey,
+            createLaunchTaskRequest,
             LaunchActivity::class.java,
             RequestCode.LAUNCH,
             LaunchTaskRequest.BUNDLE_KEY,
             LaunchTaskResult.BUNDLE_KEY
         )
 
-    class CollectFingerprints(actResultKey: String,
-                              createCollectFingerprintsActRequest: () -> CollectFingerprintsTaskRequest) :
+    class CollectFingerprints(taskResultKey: String, createCollectFingerprintsTaskRequest: () -> CollectFingerprintsTaskRequest) :
         ActivityTask(
-            actResultKey,
-            createCollectFingerprintsActRequest,
+            taskResultKey,
+            createCollectFingerprintsTaskRequest,
             CollectFingerprintsActivity::class.java,
             RequestCode.COLLECT,
             CollectFingerprintsTaskRequest.BUNDLE_KEY,
             CollectFingerprintsTaskResult.BUNDLE_KEY
         )
 
-    class Matching(actResultKey: String, createMatchingActRequest: () -> MatchingTaskRequest) :
+    class Matching(taskResultKey: String, createMatchingTaskRequest: () -> MatchingTaskRequest) :
         ActivityTask(
-            actResultKey,
-            createMatchingActRequest,
+            taskResultKey,
+            createMatchingTaskRequest,
             MatchingActivity::class.java,
             RequestCode.MATCHING,
             MatchingTaskRequest.BUNDLE_KEY,
