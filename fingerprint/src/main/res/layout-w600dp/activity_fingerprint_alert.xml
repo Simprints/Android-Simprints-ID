@@ -10,7 +10,7 @@
     tools:context=".activities.alert.AlertActivity">
 
     <TextView
-        android:id="@+id/alert_title"
+        android:id="@+id/alertTitle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
@@ -23,7 +23,7 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/alert_image"
+        android:id="@+id/alertImage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginLeft="50dp"
@@ -70,7 +70,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/left_button"
+            android:id="@+id/alertLeftButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
@@ -82,7 +82,7 @@
             tools:ignore="NestedWeights" />
 
         <TextView
-            android:id="@+id/right_button"
+            android:id="@+id/alertRightButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="2dp"
