@@ -5,8 +5,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType
 
 @Keep
-class IdentificationOutcomeCallbackEvent(
+class IdentityConfirmationCallbackEvent(
     startTime: Long,
-    val reason: String,
-    val extra: String
+    val identificationOutcome: Boolean
 ) : Event(EventType.IDENTITY_CONFIRMATION, startTime)

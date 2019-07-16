@@ -50,14 +50,14 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 subscribeForFinalAppResponse()
             }
         }
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeBy(
-            onNext = {
-                handleNextModalityRequest(it)
-            },
-            onError = {
-                handleErrorInTheModalitiesFlow(it)
-            })
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = {
+                    handleNextModalityRequest(it)
+                },
+                onError = {
+                    handleErrorInTheModalitiesFlow(it)
+                })
 
     @SuppressLint("CheckResult")
     internal fun subscribeForFinalAppResponse() =
@@ -97,6 +97,7 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
                 AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
                 AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
+                AppResponseType.IDENTITY_CONFIRMATION -> buildIdentityConfirmationCallbackEvent(appResponse as AppIdentityConfirmationResponse)
                 AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
             }.let {
                 session.addEvent(it)
@@ -126,9 +127,15 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
         with(appRefusalResponse) {
             RefusalCallbackEvent(
                 timeHelper.now(),
-                answer.reason?.name ?: "",
+                answer.reason.name,
                 answer.optionalText)
         }
+
+    internal fun buildIdentityConfirmationCallbackEvent(appIdentityConfirmationResponse: AppIdentityConfirmationResponse) =
+        IdentityConfirmationCallbackEvent(
+            timeHelper.now(),
+            appIdentityConfirmationResponse.identificationOutcome
+        )
 
     internal fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
         ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
