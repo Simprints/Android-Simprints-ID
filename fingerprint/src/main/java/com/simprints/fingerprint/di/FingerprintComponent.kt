@@ -12,6 +12,7 @@ import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.MatchingPresenter
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
 import com.simprints.id.di.AppComponent
 import dagger.Component
 
@@ -36,4 +37,5 @@ interface FingerprintComponent {
     fun inject(collectFingerprintsActivity: CollectFingerprintsActivity)
     fun inject(launchActivity: LaunchActivity)
     fun inject(alertActivity: AlertActivity)
+    fun inject(savePersonTask: SavePersonTask)
 }

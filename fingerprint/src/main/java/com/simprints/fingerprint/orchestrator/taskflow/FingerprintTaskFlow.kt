@@ -18,6 +18,7 @@ import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
 sealed class FingerprintTaskFlow {
 
@@ -93,6 +94,13 @@ sealed class FingerprintTaskFlow {
                         CollectFingerprintsTaskRequest(
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
+                    },
+                    FingerprintTask.SavePerson(SAVE) {
+                        with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
+                            SavePersonTaskRequest(
+                                probe
+                            )
+                        }
                     }
                 )
             }
@@ -104,6 +112,7 @@ sealed class FingerprintTaskFlow {
         companion object {
             private const val LAUNCH = "launch"
             private const val COLLECT = "collect"
+            private const val SAVE = "save"
         }
     }
 

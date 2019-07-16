@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
@@ -29,8 +28,6 @@ import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -242,34 +239,6 @@ class CollectFingerprintsPresenter(private val context: Context,
 
         sessionEventsManager.addPersonCreationEventInBackground(person)
 
-        if (isRegisteringElseIsMatching()) {
-            savePerson(person)
-        } else {
-            goToMatching(person)
-        }
-    }
-
-    private fun isRegisteringElseIsMatching() = collectRequest.action == Action.ENROL
-
-    @SuppressLint("CheckResult")
-    private fun savePerson(person: Person) {
-        dbManager.savePerson(person)
-            .subscribeBy(
-                onComplete = { handleSavePersonSuccess(person) },
-                onError = { handleSavePersonFailure(it) })
-    }
-
-    private fun handleSavePersonSuccess(probe: Person) {
-        preferencesManager.lastEnrolDate = Date()
-        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(probe))
-    }
-
-    private fun handleSavePersonFailure(throwable: Throwable) {
-        handleException(FingerprintUnexpectedException(throwable))
-        view.cancelAndFinish()
-    }
-
-    private fun goToMatching(person: Person) {
         view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(person))
     }
 
