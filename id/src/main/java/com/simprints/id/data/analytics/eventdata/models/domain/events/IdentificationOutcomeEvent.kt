@@ -5,4 +5,4 @@ import androidx.annotation.Keep
 @Keep
 class IdentificationOutcomeEvent(
     startTime: Long,
-    val identificationOutcomeValue: Boolean) : Event(EventType.IDENTIFICATION_OUTCOME, startTime)
+    val identificationOutcomeValue: Boolean) : Event(EventType.IDENTITY_CONFIRMATION, startTime)

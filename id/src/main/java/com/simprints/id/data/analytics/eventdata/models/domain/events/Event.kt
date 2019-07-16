@@ -1,13 +1,12 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import androidx.annotation.Keep
-import com.google.gson.annotations.SerializedName
 import java.util.*
 
 @Keep
 abstract class Event(
     val type: EventType,
-    open val starTime: Long,
+    open val startTime: Long,
     open val endTime: Long? = null,
     val id: String = UUID.randomUUID().toString()) {
 
@@ -16,7 +15,7 @@ abstract class Event(
 
     fun updateRelativeTimes(sessionStartTime: Long) {
         if (relativeStartTime == null) {
-            relativeStartTime = starTime - sessionStartTime
+            relativeStartTime = startTime - sessionStartTime
         }
 
         endTime?.let {
