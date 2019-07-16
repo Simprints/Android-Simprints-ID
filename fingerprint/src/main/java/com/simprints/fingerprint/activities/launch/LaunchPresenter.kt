@@ -122,6 +122,7 @@ class LaunchPresenter(component: FingerprintComponent,
         requestPermissionsForLocation(5)
             .andThen(checkIfVerifyAndGuidExists(15))
             .andThen(disconnectVero())
+            .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
             .andThen(connectToVero())
             .andThen(resetVeroUI())
@@ -133,6 +134,11 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun disconnectVero() =
         veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
             logMessageForCrashReport("ScannerManager: disconnect")
+        }
+
+    private fun checkIfBluetoothIsEnabled() =
+        veroTask(37, R.string.launch_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
+            logMessageForCrashReport("ScannerManager: bluetooth is enabled")
         }
 
     private fun initVero() =
