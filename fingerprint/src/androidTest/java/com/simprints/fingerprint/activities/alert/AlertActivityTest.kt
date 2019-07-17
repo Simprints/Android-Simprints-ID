@@ -82,7 +82,7 @@ class AlertActivityTest {
         if (activities.size > 0) {
             launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
 
-            onView(withId(R.id.right_button)).perform(click())
+            onView(withId(R.id.alertRightButton)).perform(click())
 
             intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
         }
@@ -93,10 +93,20 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
             BLUETOOTH_NOT_ENABLED, AlertTaskResult.CloseButtonAction.TRY_AGAIN)
+    }
+
+    @Test
+    fun scannerNotPaired_userClicksPairScanner_bluetoothSettingsShouldAppear() {
+        launchAlertActivity(AlertActRequest(NOT_PAIRED))
+        ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
+
+        onView(withId(R.id.alertLeftButton)).perform(click())
+
+        intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
     }
 
     @Test
@@ -104,7 +114,7 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertTaskRequest(UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
             UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE)
@@ -125,7 +135,7 @@ class AlertActivityTest {
     @Test
     fun guidNotFoundOffline_userClicksOpenSettings_settingsShouldAppear() {
         launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_OFFLINE))
-        onView(withId(R.id.right_button)).perform(click())
+        onView(withId(R.id.alertRightButton)).perform(click())
 
         intended(hasAction(android.provider.Settings.ACTION_WIFI_SETTINGS))
     }
@@ -181,7 +191,7 @@ class AlertActivityTest {
 
 
     private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
-        onView(withId(R.id.alert_title))
+        onView(withId(R.id.alertTitle))
             .check(matches(withText(alertActivityViewModel.title)))
 
         onView(withId(R.id.message))
