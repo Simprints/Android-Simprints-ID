@@ -5,4 +5,6 @@ import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.A
 import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallbackType
 
 @Keep
-class ApiIdentificationOutcomeCallback : ApiCallback(ApiCallbackType.IDENTIFICATION_OUTCOME)
+class ApiIdentityConfirmationCallback(
+    val identificationOutcome: Boolean
+) : ApiCallback(ApiCallbackType.IDENTITY_CONFIRMATION)
