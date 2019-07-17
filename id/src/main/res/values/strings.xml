@@ -238,11 +238,7 @@
     <!-- Button Labels -->
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
-    <!-- Refusal Selection Points -->
-    <string name="beneficiary_refused">Beneficiary refused</string>
-    <string name="scanner_not_working">Scanner not working</string>
-    <string name="refusal_other">Other</string>
-    <!-- Text Prompt -->
+     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
 
 

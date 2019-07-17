@@ -27,7 +27,7 @@ enum class AlertActivityViewModel(val type: Type,
         message = R.string.different_userId_message
     ),
 
-    SAFETYNET_DOWN(
+    SAFETYNET_ERROR(
         type = Type.ConfigurationError(title = R.string.alert_try_again,
             backgroundColor = R.color.simprints_grey,
             mainDrawable = R.drawable.error_icon),
@@ -49,8 +49,7 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                AlertType.SAFETYNET_DOWN -> SAFETYNET_DOWN
-                AlertType.SAFETYNET_ERROR -> SAFETYNET_DOWN
+                AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
             }
     }
 

@@ -21,8 +21,6 @@ class ErrorCallbackEvent(starTime: Long,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         SCANNER_LOW_BATTERY,
-        SAFETYNET_DOWN,
-        SAFETYNET_ERROR,
         UNKNOWN_BLUETOOTH_ISSUE;
 
         companion object {
@@ -36,8 +34,6 @@ class ErrorCallbackEvent(starTime: Long,
                     AppErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AppErrorResponse.Reason.SCANNER_LOW_BATTERY -> SCANNER_LOW_BATTERY
                     AppErrorResponse.Reason.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
-                    AppErrorResponse.Reason.SAFETYNET_DOWN -> SAFETYNET_DOWN
-                    AppErrorResponse.Reason.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 }
         }
     }

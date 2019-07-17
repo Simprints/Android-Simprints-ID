@@ -84,25 +84,19 @@ class AlertActivityTest {
     }
 
     @Test
-    fun safetyNetDown_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_DOWN))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_DOWN)
-    }
-
-    @Test
     fun safetyNetError_theRightAlertShouldAppear() {
         launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_DOWN)
+        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
     }
 
     @Test
     fun safetyNetDown_userClicksClose_alertShouldFinishWithRightResult() {
-        val scenario = launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_DOWN))
-        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_DOWN)
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
 
-        onView(withId(R.id.alertRightButton)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
-        verifyIntentReturned(scenario.result, AlertType.SAFETYNET_DOWN)
+        verifyIntentReturned(scenario.result, AlertType.SAFETYNET_ERROR)
     }
 
 

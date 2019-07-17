@@ -38,9 +38,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             INVALID_SELECTED_ID to SIMPRINTS_CANCELLED,
             INVALID_SESSION_ID to SIMPRINTS_CANCELLED,
             INVALID_USER_ID to SIMPRINTS_INVALID_USER_ID,
-            INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID,
-            SAFETYNET_DOWN to SIMPRINTS_SAFETYNET_DOWN,
-            SAFETYNET_ERROR to SIMPRINTS_SAFETYNET_ERROR)
+            INVALID_VERIFY_ID to SIMPRINTS_INVALID_VERIFY_GUID)
 
     override suspend fun start() {
         if(action != SIMPRINTS_SELECT_GUID_INTENT) {
@@ -74,6 +72,5 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
-
 }
 
