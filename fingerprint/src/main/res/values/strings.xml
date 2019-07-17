@@ -247,6 +247,9 @@
     <string name="refusal_person_not_present">Person not present</string>
     <string name="refusal_too_young">Too young</string>
     <string name="refusal_other">Other</string>
+    <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="scanner_not_working">Scanner not working</string>
+
     <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>

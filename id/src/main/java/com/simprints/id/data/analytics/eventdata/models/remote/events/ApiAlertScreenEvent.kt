@@ -34,7 +34,6 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         INVALID_SESSION_ID,
         INVALID_USER_ID,
         INVALID_VERIFY_ID,
-        SAFETYNET_DOWN,
         SAFETYNET_ERROR;
 
         companion object {
@@ -60,7 +59,6 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
-                    AlertScreenEvent.AlertScreenEventType.SAFETYNET_DOWN -> SAFETYNET_DOWN
                     AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 }
         }

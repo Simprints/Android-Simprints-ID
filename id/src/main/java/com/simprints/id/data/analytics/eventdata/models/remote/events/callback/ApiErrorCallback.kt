@@ -17,8 +17,6 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         BLUETOOTH_NOT_SUPPORTED,
         SCANNER_LOW_BATTERY,
         UNKNOWN_BLUETOOTH_ISSUE,
-        SAFETYNET_DOWN,
-        SAFETYNET_ERROR
     }
 }
 
@@ -32,6 +30,4 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         BLUETOOTH_NOT_SUPPORTED -> ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
         SCANNER_LOW_BATTERY -> ApiErrorCallback.ApiReason.SCANNER_LOW_BATTERY
         UNKNOWN_BLUETOOTH_ISSUE -> ApiErrorCallback.ApiReason.UNKNOWN_BLUETOOTH_ISSUE
-        SAFETYNET_DOWN -> ApiErrorCallback.ApiReason.SAFETYNET_DOWN
-        SAFETYNET_ERROR -> ApiErrorCallback.ApiReason.SAFETYNET_ERROR
     }

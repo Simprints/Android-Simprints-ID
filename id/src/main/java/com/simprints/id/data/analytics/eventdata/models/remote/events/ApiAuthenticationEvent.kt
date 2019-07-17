@@ -21,8 +21,8 @@ class ApiAuthenticationEvent(val relativeStartTime: Long,
         BAD_CREDENTIALS,
         OFFLINE,
         TECHNICAL_FAILURE,
-        SAFETYNET_DOWN,
-        SAFETYNET_ERROR
+        SAFETYNET_UNAVAILABLE,
+        SAFETYNET_INVALID_CLAIM
     }
 
     constructor(authenticationEventDomain: AuthenticationEvent) :
@@ -38,6 +38,6 @@ fun AuthenticationEvent.Result.toApiAuthenticationEventResult() =
         AuthenticationEvent.Result.BAD_CREDENTIALS -> ApiAuthenticationEvent.ApiResult.BAD_CREDENTIALS
         AuthenticationEvent.Result.OFFLINE -> ApiAuthenticationEvent.ApiResult.OFFLINE
         AuthenticationEvent.Result.TECHNICAL_FAILURE -> ApiAuthenticationEvent.ApiResult.TECHNICAL_FAILURE
-        AuthenticationEvent.Result.SAFETYNET_DOWN -> ApiAuthenticationEvent.ApiResult.SAFETYNET_DOWN
-        AuthenticationEvent.Result.SAFETYNET_ERROR -> ApiAuthenticationEvent.ApiResult.SAFETYNET_ERROR
+        AuthenticationEvent.Result.SAFETYNET_UNAVAILABLE -> ApiAuthenticationEvent.ApiResult.SAFETYNET_UNAVAILABLE
+        AuthenticationEvent.Result.SAFETYNET_INVALID_CLAIM -> ApiAuthenticationEvent.ApiResult.SAFETYNET_INVALID_CLAIM
     }

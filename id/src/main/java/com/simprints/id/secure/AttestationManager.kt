@@ -2,9 +2,7 @@ package com.simprints.id.secure
 
 import android.util.Base64
 import android.util.Base64.NO_WRAP
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.CommonStatusCodes.CANCELED
-import com.google.android.gms.common.api.CommonStatusCodes.INTERNAL_ERROR
+import com.auth0.jwt.JWT
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
 import com.simprints.id.BuildConfig
@@ -21,23 +19,18 @@ class AttestationManager {
 
             val result = Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY)
                 .addOnFailureListener {
-                    throwSafetyNetExceptionWithError(it)
+                    throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE)
                 })
             result?.let {
+                checkForErrorClaimAndThrow(it.jwsResult)
                 AttestToken(it.jwsResult)
-            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
+            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE)
         }
     }
 
-    private fun throwSafetyNetExceptionWithError(exception: Exception) {
-        if (exception is ApiException) {
-            when(exception.statusCode) {
-                CANCELED, INTERNAL_ERROR -> throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_DOWN)
-                else -> throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
-            }
-        } else {
-            throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_ERROR)
+    private fun checkForErrorClaimAndThrow(jwsResult: String?) {
+        if(JWT.decode(jwsResult).claims.containsKey("error")) {
+            throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_INVALID_CLAIMS)
         }
     }
-
 }

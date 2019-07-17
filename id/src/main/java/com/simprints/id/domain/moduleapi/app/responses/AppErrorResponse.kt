@@ -17,8 +17,6 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         SCANNER_LOW_BATTERY,
-        SAFETYNET_DOWN,
-        SAFETYNET_ERROR,
         UNKNOWN_BLUETOOTH_ISSUE;
 
         companion object {
@@ -27,8 +25,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                    AlertType.SAFETYNET_DOWN -> SAFETYNET_DOWN
-                    AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
+                    AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
                 }
         }
     }

@@ -122,7 +122,7 @@ class LoginPresenter(val view: LoginContract.View,
             is DifferentProjectIdReceivedFromIntentException -> view.handleSignInFailedProjectIdIntentMismatch().also { reason = BAD_CREDENTIALS }
             is AuthRequestInvalidCredentialsException -> view.handleSignInFailedInvalidCredentials().also { reason = BAD_CREDENTIALS }
             is SimprintsInternalServerException -> view.handleSignInFailedServerError().also { reason = TECHNICAL_FAILURE }
-            is SafetyNetException -> view.handleSafetyNetDownError(getAlertTypeForSafetyNetError(e.reason)).also {
+            is SafetyNetException -> view.handleSafetyNetDownError().also {
                 reason = getSafetyNetErrorForAuthenticationEvent(e.reason)
             }
             else -> view.handleSignInFailedUnknownReason().also { reason = TECHNICAL_FAILURE }
@@ -132,16 +132,10 @@ class LoginPresenter(val view: LoginContract.View,
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
-    private fun getAlertTypeForSafetyNetError(e: SafetyNetExceptionReason) =
-        when (e) {
-            SafetyNetExceptionReason.SAFETYNET_DOWN -> AlertType.SAFETYNET_DOWN
-            SafetyNetExceptionReason.SAFETYNET_ERROR -> AlertType.SAFETYNET_ERROR
-        }
-
     private fun getSafetyNetErrorForAuthenticationEvent(e: SafetyNetExceptionReason) =
         when (e) {
-            SafetyNetExceptionReason.SAFETYNET_DOWN -> SAFETYNET_DOWN
-            SafetyNetExceptionReason.SAFETYNET_ERROR -> SAFETYNET_ERROR
+            SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
+            SafetyNetExceptionReason.SAFETYNET_INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
         }
 
     private fun logSignInError(e: Throwable) {
