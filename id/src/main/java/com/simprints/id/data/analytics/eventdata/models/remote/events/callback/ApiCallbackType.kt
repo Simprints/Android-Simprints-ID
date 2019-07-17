@@ -9,5 +9,5 @@ enum class ApiCallbackType {
     REFUSAL,
     VERIFICATION,
     ERROR,
-    IDENTITY_CONFIRMATION
+    CONFIRMATION
 }

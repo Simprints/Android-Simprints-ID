@@ -132,7 +132,7 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
         }
 
     internal fun buildIdentityConfirmationCallbackEvent(appIdentityConfirmationResponse: AppIdentityConfirmationResponse) =
-        IdentityConfirmationCallbackEvent(
+        ConfirmationCallbackEvent(
             timeHelper.now(),
             appIdentityConfirmationResponse.identificationOutcome
         )
