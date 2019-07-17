@@ -41,5 +41,5 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
         INTENT_PARSING -> ApiIntentParsingEvent(this as IntentParsingEvent)
         SKIP_CHECK -> ApiSkipCheckEvent(this as SkipCheckEvent)
-        IDENTITY_CONFIRMATION -> ApiIdentificationOutcomeEvent(this as IdentificationOutcomeEvent)
+        IDENTITY_CONFIRMATION -> ApiIdentityConfirmationEvent(this as IdentityConfirmationEvent)
     }

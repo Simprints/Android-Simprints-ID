@@ -39,7 +39,7 @@ fun DbEvent.toDomainEvent(): Event? =
             EventType.CALLBACK_ERROR -> JsonHelper.gson.fromJson(it, ErrorCallbackEvent::class.java)
             EventType.INTENT_PARSING -> JsonHelper.gson.fromJson(it, IntentParsingEvent::class.java)
             EventType.SKIP_CHECK -> JsonHelper.gson.fromJson(it, SkipCheckEvent::class.java)
-            EventType.IDENTITY_CONFIRMATION -> JsonHelper.gson.fromJson(it, IdentificationOutcomeEvent::class.java)
+            EventType.IDENTITY_CONFIRMATION -> JsonHelper.gson.fromJson(it, IdentityConfirmationEvent::class.java)
             null -> null
         }
     }
