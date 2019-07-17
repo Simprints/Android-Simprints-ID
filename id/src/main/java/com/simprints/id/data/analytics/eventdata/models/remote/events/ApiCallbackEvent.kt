@@ -30,14 +30,13 @@ class ApiCallbackEvent(val relativeStartTime: Long,
             fromDomainToApiCallback(errorCallbackEvent))
 }
 
-
 fun fromDomainToApiCallback(event: Event): ApiCallback =
     when (event) {
         is EnrolmentCallbackEvent -> with(event) { ApiEnrolmentCallback(guid) }
         is IdentificationCallbackEvent -> with(event) { ApiIdentificationCallback(sessionId, scores.map { it.fromDomainToApi() }) }
         is VerificationCallbackEvent -> with(event) { ApiVerificationCallback(score.fromDomainToApi()) }
         is RefusalCallbackEvent -> with(event) { ApiRefusalCallback(reason, extra) }
-        is IdentityConfirmationCallbackEvent -> with(event) { ApiIdentityConfirmationCallback(identificationOutcome) }
+        is ConfirmationCallbackEvent -> with(event) { ApiConfirmationCallback(identificationOutcome) }
         is ErrorCallbackEvent -> with(event) { ApiErrorCallback(reason.fromDomainToApi()) }
         else -> throw IllegalArgumentException("Invalid CallbackEvent")
     }
