@@ -3,11 +3,6 @@ package com.simprints.fingerprint.controllers.scanner
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
@@ -19,7 +14,6 @@ import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
 import com.simprints.fingerprintscanner.ScannerUtils
-import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
@@ -32,6 +26,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
     @SuppressLint("CheckResult")
     override fun start(): Completable =
         disconnectVero()
+            .andThen(checkBluetoothStatus())
             .andThen(initVero())
             .andThen(connectToVero())
             .andThen(resetVeroUI())
@@ -50,6 +45,16 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
             }))
         }
     }
+
+    override fun checkBluetoothStatus(): Completable = Completable.create {
+        if(!bluetoothIsEnabled()) {
+            it.onError(BluetoothNotEnabledException())
+        } else {
+            it.onComplete()
+        }
+    }
+
+    private fun bluetoothIsEnabled() = ScannerUtils.isBluetoothEnabled(bluetoothAdapter)
 
     override fun initVero(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)

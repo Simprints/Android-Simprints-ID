@@ -11,6 +11,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintComponent
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
@@ -22,6 +23,8 @@ class AlertPresenter(val view: AlertContract.View,
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var sessionManager: FingerprintSessionEventsManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
+
+    private val settingsOpenedForPairing = AtomicBoolean(false)
 
     init {
         component.inject(this)
@@ -61,16 +64,26 @@ class AlertPresenter(val view: AlertContract.View,
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
             is BluetoothSettings -> view.openBluetoothSettings()
-            is TryAgain -> view.closeActivityAfterButtonAction(TRY_AGAIN)
-            is Close -> view.closeActivityAfterButtonAction(CLOSE)
+            is TryAgain -> view.finishWithAction(TRY_AGAIN)
+            is Close -> view.finishWithAction(CLOSE)
+            is PairScanner -> {
+                view.openBluetoothSettings()
+                settingsOpenedForPairing.set(true)
+            }
         }
     }
 
     override fun handleBackPressed() {
         if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
-            view.closeActivityAfterButtonAction(BACK)
+            view.finishWithAction(BACK)
         } else {
             view.startRefusalActivity()
+        }
+    }
+
+    override fun handleOnResume() {
+        if(settingsOpenedForPairing.getAndSet(false)) {
+            view.finishWithAction(TRY_AGAIN)
         }
     }
 

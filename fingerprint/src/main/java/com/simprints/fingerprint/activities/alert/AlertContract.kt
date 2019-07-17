@@ -29,5 +29,6 @@ interface AlertContract {
     interface Presenter : BasePresenter {
         fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
         fun handleBackPressed()
+        fun handleOnResume()
     }
 }
