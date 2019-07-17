@@ -137,6 +137,7 @@ class SessionEventsUploaderTaskAndroidTest {
             addRefusalEvent()
             addScannerConnectionEvent()
             addSuspiciousIntentEvent()
+            addConfirmationEvent()
             addCallbackEvent()
             addCalloutEvent()
         }.also {
@@ -248,6 +249,10 @@ class SessionEventsUploaderTaskAndroidTest {
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
         addEvent(SuspiciousIntentEvent(0, mapOf("some_extra_key" to "value")))
+    }
+
+    private fun SessionEvents.addConfirmationEvent() {
+        addEvent(ConfirmationEvent(0, true))
     }
 
     private fun SessionEvents.addCallbackEvent() {
