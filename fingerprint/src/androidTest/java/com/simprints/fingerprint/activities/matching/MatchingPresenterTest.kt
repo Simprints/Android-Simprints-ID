@@ -2,16 +2,11 @@ package com.simprints.fingerprint.activities.matching
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
-import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
@@ -19,6 +14,11 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyR
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
+import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
@@ -41,7 +41,7 @@ import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
+@SmallTest
 class MatchingPresenterTest {
 
     @get:Rule val rxSchedulerRule = RxSchedulerRule()
@@ -96,7 +96,6 @@ class MatchingPresenterTest {
         }
 
     @Test
-    @MediumTest
     fun identificationRequestWithinProjectGroup_startedAndAwaited_finishesWithProbeInMatchResult() {
         testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID))
         verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, null, null) }
