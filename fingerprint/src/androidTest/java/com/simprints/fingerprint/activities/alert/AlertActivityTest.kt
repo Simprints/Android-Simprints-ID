@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.alert
 
-import android.app.Activity
 import android.app.Instrumentation
 import android.content.ComponentName
 import android.content.Context
@@ -28,6 +27,7 @@ import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
+import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.id.Application
 import com.simprints.testtools.common.di.DependencyRule
@@ -38,7 +38,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-
 @RunWith(AndroidJUnit4::class)
 class AlertActivityTest {
 
@@ -48,8 +47,6 @@ class AlertActivityTest {
         TestFingerprintCoreModule(
             fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
     }
-
-
 
     @Before
     fun setUp() {
@@ -96,7 +93,7 @@ class AlertActivityTest {
         onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            BLUETOOTH_NOT_ENABLED, AlertTaskResult.CloseButtonAction.TRY_AGAIN)
+            BLUETOOTH_NOT_ENABLED, AlertTaskResult.CloseButtonAction.TRY_AGAIN, ResultCode.OK)
     }
 
     @Test
@@ -117,7 +114,7 @@ class AlertActivityTest {
         onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result,
-            UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE)
+            UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.CLOSE, ResultCode.ALERT)
     }
 
     @Test
@@ -178,7 +175,7 @@ class AlertActivityTest {
         val scenario = launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_ONLINE))
         Espresso.pressBackUnconditionally()
 
-        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertTaskResult.CloseButtonAction.BACK)
+        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertTaskResult.CloseButtonAction.BACK, ResultCode.ALERT)
     }
 
     private fun launchAlertActivity(request: AlertTaskRequest? = null): ActivityScenario<AlertActivity> =
@@ -200,8 +197,9 @@ class AlertActivityTest {
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
                                      fingerprintAlert: FingerprintAlert,
-                                     buttonAction: AlertTaskResult.CloseButtonAction) {
-        Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
+                                     buttonAction: AlertTaskResult.CloseButtonAction,
+                                     expectedResultCode: ResultCode) {
+        Truth.assertThat(result.resultCode).isEqualTo(expectedResultCode.value)
 
         result.resultData.setExtrasClassLoader(AlertTaskResult::class.java.classLoader)
         val response = result.resultData.getParcelableExtra<AlertTaskResult>(AlertTaskResult.BUNDLE_KEY)

@@ -77,7 +77,7 @@ class MatchingPresenterTest {
 
     private val mockVerificationLibMatcher: (LibPerson, List<LibPerson>,
                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
-        { probe, candidates, _, scores, callback, _ ->
+        { _, _, _, scores, callback, _ ->
             mock {
                 whenever(it) { start() } then {
                     callback.onMatcherProgress(Progress(0))
