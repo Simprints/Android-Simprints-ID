@@ -3,6 +3,6 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class IdentificationOutcomeEvent(
+class IdentityConfirmationEvent(
     startTime: Long,
-    val identificationOutcomeValue: Boolean) : Event(EventType.IDENTITY_CONFIRMATION, startTime)
+    val identificationOutcome: Boolean) : Event(EventType.IDENTITY_CONFIRMATION, startTime)
