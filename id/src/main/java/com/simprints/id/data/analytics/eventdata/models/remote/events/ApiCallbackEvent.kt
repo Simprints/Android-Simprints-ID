@@ -3,9 +3,7 @@ package com.simprints.id.data.analytics.eventdata.models.remote.events
 import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallback
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.fromDomainToApi
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.*
 
 @Keep
 class ApiCallbackEvent(val relativeStartTime: Long,
