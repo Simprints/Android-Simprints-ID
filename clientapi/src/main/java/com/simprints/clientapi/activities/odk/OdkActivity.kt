@@ -77,7 +77,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnIdentityConfirmation(identificationOutcome: Boolean) = Intent().let {
+    override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
         it.putExtra(ODK_IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
         sendOkResult(it)
     }

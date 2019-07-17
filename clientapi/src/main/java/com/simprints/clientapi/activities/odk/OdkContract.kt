@@ -16,7 +16,7 @@ interface OdkContract {
 
         fun returnExitForm(reason: String, extra: String, skipCheck:Boolean)
 
-        fun returnIdentityConfirmation(identificationOutcome: Boolean)
+        fun returnConfirmation(identificationOutcome: Boolean)
 
     }
 

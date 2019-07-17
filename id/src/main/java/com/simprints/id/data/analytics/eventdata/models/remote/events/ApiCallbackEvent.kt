@@ -25,6 +25,10 @@ class ApiCallbackEvent(val relativeStartTime: Long,
         this(refusalCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(refusalCallbackEvent))
 
+    constructor(confirmationCallbackEvent: ConfirmationCallbackEvent) :
+        this(confirmationCallbackEvent.relativeStartTime ?: 0,
+            fromDomainToApiCallback(confirmationCallbackEvent))
+
     constructor(errorCallbackEvent: ErrorCallbackEvent) :
         this(errorCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(errorCallbackEvent))

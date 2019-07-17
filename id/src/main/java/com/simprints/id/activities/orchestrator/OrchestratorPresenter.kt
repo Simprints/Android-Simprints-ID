@@ -97,7 +97,7 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
                 AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
                 AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
-                AppResponseType.IDENTITY_CONFIRMATION -> buildIdentityConfirmationCallbackEvent(appResponse as AppIdentityConfirmationResponse)
+                AppResponseType.CONFIRMATION -> buildConfirmationCallbackEvent(appResponse as AppConfirmationResponse)
                 AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
             }.let {
                 session.addEvent(it)
@@ -131,10 +131,10 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 answer.optionalText)
         }
 
-    internal fun buildIdentityConfirmationCallbackEvent(appIdentityConfirmationResponse: AppIdentityConfirmationResponse) =
+    internal fun buildConfirmationCallbackEvent(appConfirmationResponse: AppConfirmationResponse) =
         ConfirmationCallbackEvent(
             timeHelper.now(),
-            appIdentityConfirmationResponse.identificationOutcome
+            appConfirmationResponse.identificationOutcome
         )
 
     internal fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =

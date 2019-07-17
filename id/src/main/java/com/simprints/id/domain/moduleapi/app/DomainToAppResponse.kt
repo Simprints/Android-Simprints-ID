@@ -18,7 +18,7 @@ object DomainToAppResponse {
             IDENTIFY -> fromDomainToAppIdentifyResponse(response as AppIdentifyResponse)
             REFUSAL -> fromDomainToAppRefusalFormResponse(response as AppRefusalFormResponse)
             VERIFY -> fromDomainToAppVerifyResponse(response as AppVerifyResponse)
-            IDENTITY_CONFIRMATION -> fromDomainToAppIdentityConfirmationResponse(response as AppIdentityConfirmationResponse)
+            CONFIRMATION -> fromDomainToAppIdentityConfirmationResponse(response as AppConfirmationResponse)
             ERROR -> fromDomainToAppErrorResponse(response as AppErrorResponse)
         }
 
@@ -53,8 +53,8 @@ object DomainToAppResponse {
     private fun fromDomainToAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
 
-    private fun fromDomainToAppIdentityConfirmationResponse(response: AppIdentityConfirmationResponse) =
-        IAppIdentityConfirmationResponseImpl(response.identificationOutcome)
+    private fun fromDomainToAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
+        IAppConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =
         when (tier) {
@@ -102,8 +102,8 @@ private data class IAppMatchResultImpl(
     override val tier: IAppResponseTier) : Parcelable, IAppMatchResult
 
 @Parcelize
-private data class IAppIdentityConfirmationResponseImpl(
+private data class IAppConfirmationResponseImpl(
     override val identificationOutcome: Boolean
-) : IAppIdentityConfirmationResponse {
-    @IgnoredOnParcel override val type: IAppResponseType = IAppResponseType.IDENTITY_CONFIRMATION
+) : IAppConfirmationResponse {
+    @IgnoredOnParcel override val type: IAppResponseType = IAppResponseType.CONFIRMATION
 }

@@ -1,6 +1,6 @@
 package com.simprints.moduleapi.app.responses
 
-interface IAppIdentityConfirmationResponse : IAppResponse {
+interface IAppConfirmationResponse : IAppResponse {
 
     val identificationOutcome: Boolean
 
