@@ -101,7 +101,7 @@ class AlertActivityTest {
 
     @Test
     fun scannerNotPaired_userClicksPairScanner_bluetoothSettingsShouldAppear() {
-        launchAlertActivity(AlertActRequest(NOT_PAIRED))
+        launchAlertActivity(AlertTaskRequest(NOT_PAIRED))
         ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
 
         onView(withId(R.id.alertLeftButton)).perform(click())
@@ -182,7 +182,7 @@ class AlertActivityTest {
     }
 
     private fun launchAlertActivity(request: AlertTaskRequest? = null): ActivityScenario<AlertActivity> =
-        ActivityScenario.launch<AlertActivity>(Intent().apply {
+        ActivityScenario.launch(Intent().apply {
             setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, AlertActivity::class.qualifiedName!!)
             request?.let {
                 putExtra(AlertTaskRequest.BUNDLE_KEY, request)

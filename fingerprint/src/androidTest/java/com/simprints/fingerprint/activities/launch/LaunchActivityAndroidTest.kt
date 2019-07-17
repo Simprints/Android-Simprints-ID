@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.launch
 
+import android.content.Intent
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -17,9 +18,9 @@ import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
@@ -32,7 +33,6 @@ import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
-import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -87,14 +87,14 @@ class LaunchActivityAndroidTest {
     @Test
     fun notScannerFromInitVeroStep_shouldShowAnErrorAlert() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(ScannerNotPairedException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
     fun multiScannersPairedFromInitVeroStep_shouldShowAnErrorAlert() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(MultipleScannersPairedException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS.title)))
     }
@@ -104,7 +104,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED.title)))
     }
@@ -114,7 +114,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED.title)))
     }
@@ -124,7 +124,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
@@ -134,7 +134,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
@@ -145,7 +145,7 @@ class LaunchActivityAndroidTest {
         makeConnectToVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
@@ -157,20 +157,19 @@ class LaunchActivityAndroidTest {
         makeResetVeroUISucceeding()
 
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(ScannerLowBatteryException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.LOW_BATTERY.title)))
     }
 
     @Test
-    @MediumTest
     fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
     }
@@ -182,7 +181,7 @@ class LaunchActivityAndroidTest {
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
         whenever(simNetworkUtilsMock) { isConnected() } thenReturn false
 
-        launchActivityRule.launchActivity(verifyRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.VERIFY).toIntent())
 
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE.title)))
@@ -198,7 +197,7 @@ class LaunchActivityAndroidTest {
         Timber.e("DbManager in test version is : $dbManagerMock")
         Timber.e("ScannerManager in test version is : $scannerManagerSpy")
 
-        launchActivityRule.launchActivity(verifyRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.VERIFY).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_ONLINE.title)))
     }
@@ -207,13 +206,13 @@ class LaunchActivityAndroidTest {
     fun enrollmentCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
         mockDefaultConsentDataManager(parentalConsentExists = false)
 
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(
             activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
 
@@ -227,12 +226,12 @@ class LaunchActivityAndroidTest {
     fun identifyCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
         mockDefaultConsentDataManager(parentalConsentExists = false)
 
-        launchActivityRule.launchActivity(identifyRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.IDENTIFY).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
+            launchTaskRequest(Action.IDENTIFY),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
@@ -245,19 +244,19 @@ class LaunchActivityAndroidTest {
     fun enrollmentCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
         mockDefaultConsentDataManager(parentalConsentExists = true)
 
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultParentalConsentText, parentConsentText)
@@ -267,19 +266,19 @@ class LaunchActivityAndroidTest {
     fun identifyCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
         mockDefaultConsentDataManager(parentalConsentExists = true)
 
-        launchActivityRule.launchActivity(identifyRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.IDENTIFY).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
+            launchTaskRequest(Action.IDENTIFY),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
         val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(identifyRequest)),
+            launchTaskRequest(Action.IDENTIFY),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultParentalConsentText, parentConsentText)
@@ -289,12 +288,12 @@ class LaunchActivityAndroidTest {
     fun malformedConsentJson_showsDefaultConsent() {
         mockDefaultConsentDataManager(generalConsentOptions = MALFORMED_CONSENT_OPTIONS)
 
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
@@ -304,12 +303,12 @@ class LaunchActivityAndroidTest {
     fun extraUnrecognisedConsentOptions_stillShowsCorrectValues() {
         mockDefaultConsentDataManager(generalConsentOptions = EXTRA_UNRECOGNISED_CONSENT_OPTIONS)
 
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity,
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(targetConsentText, generalConsentText)
@@ -319,13 +318,13 @@ class LaunchActivityAndroidTest {
     fun partiallyMissingConsentOptions_stillShowsCorrectValues() {
         mockDefaultConsentDataManager(generalConsentOptions = PARTIALLY_MISSING_CONSENT_OPTIONS)
 
-        launchActivityRule.launchActivity(enrolRequest.toIntent())
+        launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(
-            activity, 
-            fromFingerprintToLaunchActRequest(fromFingerprintToDomainRequest(enrolRequest)),
+            activity,
+            launchTaskRequest(Action.ENROL),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(targetConsentText, generalConsentText)
@@ -396,17 +395,26 @@ class LaunchActivityAndroidTest {
 
         private const val MAC_ADDRESS = "F0:AC:D7:C8:CB:22"
 
-        private val enrolRequest = FingerprintEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
+//        private val launchTaskRequest(Action.ENROL) = FingerprintlaunchTaskRequest(Action.ENROL)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
+//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
+//
+//        private val launchTaskRequest(Action.VERIFY) = FingerprintlaunchTaskRequest(Action.VERIFY)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
+//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_VERIFY_GUID)
+//
+//        private val launchTaskRequest(Action.IDENTIFY) = FingerprintlaunchTaskRequest(Action.IDENTIFY)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
+//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
+//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, IMatchGroup.GLOBAL, 1)
 
-        private val verifyRequest = FingerprintVerifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_VERIFY_GUID)
-
-        private val identifyRequest = FingerprintIdentifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, IMatchGroup.GLOBAL, 1)
+        private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
+            DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
+            DEFAULT_ORGANISATION_NAME, if (action == Action.VERIFY) DEFAULT_VERIFY_GUID else null
+        )
+        
+        private fun LaunchTaskRequest.toIntent() = Intent().also { 
+            it.putExtra(LaunchTaskRequest.BUNDLE_KEY, this)
+        }
 
         private const val REMOTE_CONSENT_GENERAL_OPTIONS = "{\"consent_enrol_only\":false,\"consent_enrol\":true,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true}"
         private const val REMOTE_CONSENT_PARENTAL_OPTIONS = "{\"consent_parent_enrol_only\":false,\"consent_parent_enrol\":true,\"consent_parent_id_verify\":true,\"consent_parent_share_data_no\":true,\"consent_parent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_parent_privacy_rights\":true,\"consent_parent_confirmation\":true}"
