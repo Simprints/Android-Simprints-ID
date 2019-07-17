@@ -4,9 +4,9 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class AppIdentityConfirmationResponse(val identificationOutcome: Boolean) : AppResponse {
+data class AppConfirmationResponse(val identificationOutcome: Boolean) : AppResponse {
 
     @IgnoredOnParcel
-    override val type: AppResponseType = AppResponseType.IDENTITY_CONFIRMATION
+    override val type: AppResponseType = AppResponseType.CONFIRMATION
 
 }

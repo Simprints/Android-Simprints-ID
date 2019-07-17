@@ -92,8 +92,8 @@ class OdkPresenter(private val view: OdkContract.View,
         }
     }
 
-    override fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse) {
-        view.returnIdentityConfirmation(response.identificationOutcome)
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
     }
 
 }

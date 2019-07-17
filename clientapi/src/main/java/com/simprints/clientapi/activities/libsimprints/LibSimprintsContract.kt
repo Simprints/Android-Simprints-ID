@@ -21,7 +21,7 @@ interface LibSimprintsContract {
 
         fun returnRefusalForms(refusalForm: RefusalForm)
 
-        fun returnIdentityConfirmation(identificationOutcome: Boolean)
+        fun returnConfirmation(identificationOutcome: Boolean)
 
     }
 

@@ -18,6 +18,6 @@ enum class IAppResponseType {
     VERIFY,
     REFUSAL,
     IDENTIFY,
-    ERROR,
-    IDENTITY_CONFIRMATION
+    CONFIRMATION,
+    ERROR
 }

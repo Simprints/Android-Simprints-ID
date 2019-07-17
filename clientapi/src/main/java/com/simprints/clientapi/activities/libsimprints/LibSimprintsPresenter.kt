@@ -55,8 +55,8 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
         view.returnRefusalForms(RefusalForm(refusalForm.reason, refusalForm.extra))
 
-    override fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse) {
-        view.returnIdentityConfirmation(response.identificationOutcome)
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
     }
 
 }

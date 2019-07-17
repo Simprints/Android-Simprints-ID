@@ -83,7 +83,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnIdentityConfirmation(identificationOutcome: Boolean) = Intent().let {
+    override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
         val data = Bundle().apply {
             putBoolean(IDENTIFICATION_OUTCOME_EXTRA, identificationOutcome)
         }

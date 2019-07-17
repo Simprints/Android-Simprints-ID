@@ -88,8 +88,8 @@ class CommCarePresenter(private val view: CommCareContract.View,
         }
     }
 
-    override fun handleIdentityConfirmationResponse(response: IdentityConfirmationResponse) {
-        view.returnIdentityConfirmation(response.identificationOutcome)
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
     }
 
     private fun checkAndProcessSessionId() {

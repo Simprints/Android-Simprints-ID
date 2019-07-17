@@ -30,6 +30,8 @@ fun Event.toApiEvent(): ApiEvent =
         CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
         INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
         SUSPICIOUS_INTENT -> ApiSuspiciousIntentEvent(this as SuspiciousIntentEvent)
+        SKIP_CHECK -> ApiSkipCheckEvent(this as SkipCheckEvent)
+        INTENT_PARSING -> ApiIntentParsingEvent(this as IntentParsingEvent)
         CALLOUT_CONFIRMATION -> ApiCalloutEvent(this as ConfirmationCalloutEvent)
         CALLOUT_IDENTIFICATION ->  ApiCalloutEvent(this as IdentificationCalloutEvent)
         CALLOUT_ENROLMENT -> ApiCalloutEvent(this as EnrolmentCalloutEvent)
@@ -38,8 +40,6 @@ fun Event.toApiEvent(): ApiEvent =
         CALLBACK_ENROLMENT -> ApiCallbackEvent(this as EnrolmentCallbackEvent)
         CALLBACK_REFUSAL -> ApiCallbackEvent(this as RefusalCallbackEvent)
         CALLBACK_VERIFICATION -> ApiCallbackEvent(this as VerificationCallbackEvent)
+        CALLBACK_CONFIRMATION -> ApiCallbackEvent(this as ConfirmationCallbackEvent)
         CALLBACK_ERROR -> ApiCallbackEvent(this as ErrorCallbackEvent)
-        INTENT_PARSING -> ApiIntentParsingEvent(this as IntentParsingEvent)
-        SKIP_CHECK -> ApiSkipCheckEvent(this as SkipCheckEvent)
-        CALLBACK_CONFIRMATION -> ApiConfirmationEvent(this as ConfirmationEvent)
     }

@@ -8,7 +8,7 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppIdentityConfirmationResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.tools.extensions.parseAppConfirmation
@@ -28,7 +28,7 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun sendOkResult() {
-        val response = AppIdentityConfirmationResponse(identificationOutcome = true)
+        val response = AppConfirmationResponse(identificationOutcome = true)
         setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(IAppResponse.BUNDLE_KEY, fromDomainToAppResponse(response))
         })

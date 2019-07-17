@@ -91,7 +91,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
-        IAppResponseType.IDENTITY_CONFIRMATION -> presenter.handleIdentityConfirmationResponse(IdentityConfirmationResponse(response as IAppIdentityConfirmationResponse))
+        IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(ConfirmationResponse(response as IAppConfirmationResponse))
     }
 
 }
