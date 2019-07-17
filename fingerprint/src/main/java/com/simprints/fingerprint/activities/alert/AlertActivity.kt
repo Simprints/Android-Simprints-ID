@@ -113,7 +113,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         startActivity(intent)
     }
 
-    override fun closeActivityAfterButtonAction(buttonAction: AlertTaskResult.CloseButtonAction) {
+    override fun finishWithAction(buttonAction: AlertTaskResult.CloseButtonAction) {
         val resultCode = when (buttonAction) {
             AlertTaskResult.CloseButtonAction.CLOSE,
             AlertTaskResult.CloseButtonAction.BACK -> ResultCode.ALERT
