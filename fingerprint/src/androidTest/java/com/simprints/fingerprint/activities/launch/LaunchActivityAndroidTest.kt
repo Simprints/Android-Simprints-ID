@@ -6,7 +6,6 @@ import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
@@ -21,8 +20,6 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
@@ -32,7 +29,6 @@ import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscannermock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.MockScannerManager
-import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -365,47 +361,15 @@ class LaunchActivityAndroidTest {
         scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, mockBluetoothAdapter)
     }
 
-    private fun fromFingerprintToLaunchActRequest(fingerprintRequest: FingerprintRequest) =
-        with(fingerprintRequest) {
-            LaunchTaskRequest(projectId, this.toAction(), language, logoExists, programName, organizationName)
-        }
-
     companion object {
         private const val DEFAULT_PROJECT_ID = "some_project_id"
-        private const val DEFAULT_USER_ID = "some_user_id"
-        private const val DEFAULT_MODULE_ID = "some_module_id"
-        private const val DEFAULT_METADATA = ""
         private const val DEFAULT_LANGUAGE = "en"
-        private val DEFAULT_FINGER_STATUS = mapOf(
-            IFingerIdentifier.RIGHT_THUMB to false,
-            IFingerIdentifier.RIGHT_INDEX_FINGER to false,
-            IFingerIdentifier.RIGHT_3RD_FINGER to false,
-            IFingerIdentifier.RIGHT_4TH_FINGER to false,
-            IFingerIdentifier.RIGHT_5TH_FINGER to false,
-            IFingerIdentifier.LEFT_THUMB to true,
-            IFingerIdentifier.LEFT_INDEX_FINGER to true,
-            IFingerIdentifier.LEFT_3RD_FINGER to false,
-            IFingerIdentifier.LEFT_4TH_FINGER to false,
-            IFingerIdentifier.LEFT_5TH_FINGER to false
-        )
         private const val DEFAULT_LOGO_EXISTS = true
         private const val DEFAULT_PROGRAM_NAME = "This program"
         private const val DEFAULT_ORGANISATION_NAME = "This organisation"
         private const val DEFAULT_VERIFY_GUID = "verify_guid"
 
         private const val MAC_ADDRESS = "F0:AC:D7:C8:CB:22"
-
-//        private val launchTaskRequest(Action.ENROL) = FingerprintlaunchTaskRequest(Action.ENROL)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
-//
-//        private val launchTaskRequest(Action.VERIFY) = FingerprintlaunchTaskRequest(Action.VERIFY)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_VERIFY_GUID)
-//
-//        private val launchTaskRequest(Action.IDENTIFY) = FingerprintlaunchTaskRequest(Action.IDENTIFY)(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-//            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-//            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, IMatchGroup.GLOBAL, 1)
 
         private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
             DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
