@@ -79,6 +79,11 @@ object ScannerUtils {
         private fun serialHexToMacAddress(hex: String): String = MAC_ADDRESS_PREFIX +
                 StringBuilder(hex).insert(1, ":").insert(4, ":").toString()
 
+
+        @JvmStatic
+        fun isBluetoothEnabled(bluetoothAdapter: BluetoothComponentAdapter): Boolean =
+            bluetoothAdapter.isEnabled()
+
         /**
          * Checks which ones of the paired bluetooth devices are Simprint's scanners
          *
