@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +26,10 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     }
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
+
+    override val guidSelectionNotifier: OdkGuidSelectionNotifier by inject {
+        parametersOf(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
