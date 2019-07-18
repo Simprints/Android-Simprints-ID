@@ -166,9 +166,6 @@
     <string name="button_submit">पेश गर्नुहोस्</string>
     <string name="button_scan_prints">औँठाछापहरू स्क्यान गर्नुहोस्</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">स्क्यानरले कार्य गरिरहेको छैन</string>
-    <string name="beneficiary_refused">लाभार्थीले अस्वीकार गर्नुभयो</string>
-    <string name="refusal_other">अन्य</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">थप जानकारी…</string>
 

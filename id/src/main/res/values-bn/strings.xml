@@ -143,9 +143,6 @@
     <string name="button_submit">জমা দিন</string>
     <string name="button_scan_prints">আঙুলের ছাপ স্ক্যান করুন</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">স্ক্যানার কাজ করছে না</string>
-    <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
-    <string name="refusal_other">অন্যান্য</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">আরো তথ্য…</string>
 
