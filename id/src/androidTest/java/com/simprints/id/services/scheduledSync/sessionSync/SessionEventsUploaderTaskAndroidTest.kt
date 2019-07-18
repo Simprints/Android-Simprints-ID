@@ -144,7 +144,6 @@ class SessionEventsUploaderTaskAndroidTest {
             addRefusalEvent()
             addScannerConnectionEvent()
             addSuspiciousIntentEvent()
-            addConfirmationEvent()
             addCallbackEvent()
             addCalloutEvent()
             addSkipCheckEvent()
@@ -264,10 +263,6 @@ class SessionEventsUploaderTaskAndroidTest {
         addEvent(SkipCheckEvent(0, true))
     }
 
-    private fun SessionEvents.addConfirmationEvent() {
-        addEvent(ConfirmationEvent(0, true))
-    }
-
     private fun SessionEvents.addCallbackEvent() {
         addEvent(EnrolmentCallbackEvent(0, "guid"))
 
@@ -281,6 +276,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
         addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
         addEvent(VerificationCallbackEvent(0, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
+        addEvent(ConfirmationCallbackEvent(0, true))
     }
 
     private fun SessionEvents.addCalloutEvent() {

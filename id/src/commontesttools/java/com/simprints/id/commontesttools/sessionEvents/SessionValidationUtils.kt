@@ -57,6 +57,7 @@ fun validateCallbackEventApiModel(json: JsonObject) {
             ApiCallbackType.IDENTIFICATION -> verifyCallbackIdentificationApiModel(it)
             ApiCallbackType.VERIFICATION -> verifyCallbackVerificationApiModel(it)
             ApiCallbackType.REFUSAL -> verifyCallbackRefusalApiModel(it)
+            ApiCallbackType.CONFIRMATION -> verifyCallbackConfirmationApiModel(it)
             ApiCallbackType.ERROR -> verifyCallbackErrorApiModel(it)
         }
     }
@@ -86,7 +87,7 @@ fun verifyCallbackVerificationApiModel(json: JsonObject) {
     with(json.get("score").asJsonObject) {
         assertThat(get("guid").asString)
         assertThat(get("confidence").asString)
-    assertThat(get("tier").asString)
+        assertThat(get("tier").asString)
     }
 }
 
@@ -94,6 +95,10 @@ fun verifyCallbackRefusalApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("REFUSAL")
     assertThat(json.get("reason").asString).isAnyOf("REFUSED_RELIGION", "REFUSED_DATA_CONCERNS", "REFUSED_PERMISSION", "SCANNER_NOT_WORKING", "REFUSED_NOT_PRESENT", "REFUSED_YOUNG", "OTHER")
     assertThat(json.get("extra").asString)
+}
+
+fun verifyCallbackConfirmationApiModel(json: JsonObject) {
+    assertThat(json.get("type").asString).isEqualTo("CONFIRMATION")
 }
 
 fun verifyCallbackErrorApiModel(json: JsonObject) {
@@ -329,6 +334,7 @@ fun validateEvent(json: JsonObject) {
         EventType.CALLBACK_REFUSAL,
         EventType.CALLBACK_ENROLMENT,
         EventType.CALLBACK_IDENTIFICATION,
+        EventType.CALLBACK_CONFIRMATION,
         EventType.CALLBACK_VERIFICATION -> validateCallbackEventApiModel(json)
         EventType.CALLOUT_ENROLMENT,
         EventType.CALLOUT_CONFIRMATION,
