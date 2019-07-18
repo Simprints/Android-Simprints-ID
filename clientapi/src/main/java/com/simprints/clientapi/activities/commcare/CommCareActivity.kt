@@ -47,7 +47,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnRegistration(guid: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putString(SKIP_CHECK_KEY, skipCheck.toString())
             putString(REGISTRATION_GUID_KEY, guid)
         }
 
@@ -57,7 +57,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putString(SKIP_CHECK_KEY, skipCheck.toString())
             putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
             putString(VERIFICATION_TIER_KEY, tier.name)
             putString(VERIFICATION_GUID_KEY, guid)
@@ -69,7 +69,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putBoolean(SKIP_CHECK_KEY, skipCheck)
+            putString(SKIP_CHECK_KEY, skipCheck.toString())
             putString(EXIT_REASON, reason)
             putString(EXIT_EXTRA, extra)
         }
@@ -80,7 +80,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
         val data = Bundle().apply {
-            putBoolean(SKIP_CHECK_KEY, errorResponse.skipCheckAfterError())
+            putString(SKIP_CHECK_KEY, errorResponse.skipCheckAfterError().toString())
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)

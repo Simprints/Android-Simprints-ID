@@ -3,7 +3,6 @@ package com.simprints.clientapi.integration.commcare.responses
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
@@ -48,7 +47,7 @@ class CommCareIdentifyResponseTest: BaseClientApiTest() {
                 ?: throw Throwable("No identifications returned")
 
             assertEqualIdentification(identificationsReturned[0], appIdentifyResponse.identifications[0])
-            assertThat(it.getBoolean("skipCheck")).isEqualTo(false)
+            assertThat(it.getString("skipCheck")).isEqualTo("false")
         } ?: throw Exception("No bundle found")
     }
 
