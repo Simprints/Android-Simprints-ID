@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.activities.alert
 
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.app.Instrumentation
 import android.content.ComponentName
 import android.content.Context
@@ -13,11 +14,13 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.R
@@ -37,10 +40,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
-import com.simprints.id.R as idR
 
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 class AlertActivityTest {
 
     @Inject lateinit var sessionEventManagerMock: FingerprintSessionEventsManager
@@ -49,7 +52,6 @@ class AlertActivityTest {
         TestFingerprintCoreModule(
             fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
     }
-
 
 
     @Before
@@ -74,19 +76,12 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotEnabled_userClicksOpenSettings_settingsShouldAppear() {
-        val bluetoothSettingsAction = android.provider.Settings.ACTION_BLUETOOTH_SETTINGS
-        val bluetoothSettingsIntent = Intent(bluetoothSettingsAction)
-        val app = ApplicationProvider.getApplicationContext<Application>()
-        val activities = app.packageManager.queryIntentActivities(bluetoothSettingsIntent, 0)
+        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        mockBluetoothSettingsIntent()
 
-        //In some emulators ACTION_BLUETOOTH_SETTINGS may be missing
-        if (activities.size > 0) {
-            launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        onView(withId(R.id.alertRightButton)).perform(click())
 
-            onView(withId(R.id.alertRightButton)).perform(click())
-
-            intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
-        }
+        intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
     }
 
     @Test
@@ -104,6 +99,7 @@ class AlertActivityTest {
     fun scannerNotPaired_userClicksPairScanner_bluetoothSettingsShouldAppear() {
         launchAlertActivity(AlertActRequest(NOT_PAIRED))
         ensureAlertScreenLaunched(AlertActivityViewModel.NOT_PAIRED)
+        mockBluetoothSettingsIntent()
 
         onView(withId(R.id.alertLeftButton)).perform(click())
 
@@ -175,7 +171,7 @@ class AlertActivityTest {
     }
 
     @Test
-    fun pressBackButtonOnNonBluetoothError_shouldFinish () {
+    fun pressBackButtonOnNonBluetoothError_shouldFinish() {
         val scenario = launchAlertActivity(AlertActRequest(GUID_NOT_FOUND_ONLINE))
         Espresso.pressBackUnconditionally()
 
@@ -207,6 +203,10 @@ class AlertActivityTest {
         result.resultData.setExtrasClassLoader(AlertActResult::class.java.classLoader)
         val response = result.resultData.getParcelableExtra<AlertActResult>(AlertActResult.BUNDLE_KEY)
         Truth.assertThat(response).isEqualTo(AlertActResult(fingerprintAlert, buttonAction))
+    }
+
+    private fun mockBluetoothSettingsIntent() {
+        intending(hasAction("android.settings.BLUETOOTH_SETTINGS")).respondWith(Instrumentation.ActivityResult(RESULT_OK, Intent()))
     }
 
     @After
