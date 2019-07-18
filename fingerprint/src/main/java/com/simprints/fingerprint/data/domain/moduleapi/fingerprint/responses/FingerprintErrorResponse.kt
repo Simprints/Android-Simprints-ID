@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
-import com.simprints.fingerprint.activities.alert.*
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -10,6 +10,10 @@ data class FingerprintErrorResponse(val reason: FingerprintErrorReason) : Finger
     @IgnoredOnParcel override val type: FingerprintResponseType = FingerprintResponseType.ERROR
 }
 
+/**
+ * If user presses a CLOSE button, we return a FingerprintResponse.
+ * If user presses BACK, an ExitForm is shown, except for UNEXPECTED_ERROR and GUID_NOT_FOUND_ONLINE (same as CLOSE).
+ */
 enum class FingerprintErrorReason {
     GUID_NOT_FOUND_ONLINE,
     GUID_NOT_FOUND_OFFLINE,
