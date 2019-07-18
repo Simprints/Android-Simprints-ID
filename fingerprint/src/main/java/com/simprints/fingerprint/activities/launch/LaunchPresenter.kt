@@ -331,8 +331,8 @@ class LaunchPresenter(component: FingerprintComponent,
     private fun addConsentEvent(result: ConsentEvent.Result) {
         sessionEventsManager.addEventInBackground(
             ConsentEvent(
-                timeHelper.now(),
                 startConsentEventTime,
+                timeHelper.now(),
                 if (view.isCurrentTabParental()) {
                     PARENTAL
                 } else {
