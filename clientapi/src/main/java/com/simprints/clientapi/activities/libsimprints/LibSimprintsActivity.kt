@@ -49,8 +49,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
-        // TODO: place key somewhere better
-        it.putExtra("identificationOutcome", identificationOutcome)
+        it.putExtra(IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
         sendOkResult(it)
     }
 
@@ -62,6 +61,10 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     override fun onDestroy() {
         super.onDestroy()
         unloadClientApiKoinModules()
+    }
+
+    companion object {
+        private const val IDENTIFICATION_OUTCOME_KEY = "identificationOutcome"
     }
 
 }
