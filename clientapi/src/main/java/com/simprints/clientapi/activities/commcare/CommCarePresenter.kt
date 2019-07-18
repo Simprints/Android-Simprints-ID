@@ -48,11 +48,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnRegistration(enroll.guid, skipCheck)
         }
     }
 
+    //CommCare can process Identifications results as LibSimprints format only.
+    //So CC will be able to handle skipCheck flag for Identifications only when libsimprints supports
+    // skipValue flag and CC updates the libsimprints version (=never)
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
         view.returnIdentification(ArrayList(identify.identifications.map {
@@ -62,7 +65,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            sessionEventsManager.addSkipCheckEvent(errorResponse.skipCheckAfterError())
+            addSkipCheckEvent(errorResponse.skipCheckAfterError())
             view.returnErrorToClient(errorResponse)
         }
     }
@@ -70,7 +73,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnVerification(
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
@@ -83,10 +86,13 @@ class CommCarePresenter(private val view: CommCareContract.View,
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = true
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            addSkipCheckEvent(skipCheck)
             view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
         }
     }
+
+    private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
+        sessionEventsManager.addSkipCheckEvent(skipCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
         view.returnConfirmation(response.identificationOutcome)

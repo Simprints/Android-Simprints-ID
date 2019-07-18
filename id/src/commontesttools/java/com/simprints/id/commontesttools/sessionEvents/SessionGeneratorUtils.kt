@@ -18,7 +18,7 @@ fun createFakeSession(timeHelper: TimeHelper? = null,
         appVersionName = "some_version",
         libVersionName = "some_version",
         language = "en",
-        device = Device(),
+        device = Device(deviceId = "device_id"),
         startTime = startTime,
         databaseInfo = databaseInfo).apply {
         relativeEndTime = fakeRelativeEndTime

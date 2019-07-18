@@ -49,7 +49,8 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_IDENTIFICATION_OUTCOME, identificationOutcome)
+        // TODO: place key somewhere better
+        it.putExtra("identificationOutcome", identificationOutcome)
         sendOkResult(it)
     }
 
