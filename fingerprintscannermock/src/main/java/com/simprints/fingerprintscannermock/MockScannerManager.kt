@@ -2,6 +2,7 @@ package com.simprints.fingerprintscannermock
 
 import com.simprints.fingerprintscanner.Message
 import com.simprints.fingerprintscannermock.ByteArrayUtils.bytesToMessage
+import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -13,7 +14,8 @@ class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1
                          var isAdapterNull: Boolean = false,
                          var isAdapterEnabled: Boolean = true,
                          var isDeviceBonded: Boolean = true,
-                         var deviceName: String = "") {
+                         var deviceName: String = "",
+                         var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf()) {
 
     private val mockResponseHelper = MockResponseHelper(this)
 
@@ -51,7 +53,8 @@ class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1
 
     fun connect() {
         refreshStreams()
-        OutputStreamInterceptor.observers.add(appToScannerObserver)
+        streamFromAppToScanner.observers.add(appToScannerObserver)
+        outgoingStreamObservers.forEach { streamFromAppToScanner.observers.add(it) }
     }
 
     private val appToScannerObserver = object : DisposableObserver<ByteArray>() {
@@ -75,7 +78,6 @@ class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1
         fakeScannerStream.close()
         streamFromScannerToApp.close()
         streamFromAppToScanner.close()
-        OutputStreamInterceptor.observers.remove(appToScannerObserver)
     }
 
     companion object {

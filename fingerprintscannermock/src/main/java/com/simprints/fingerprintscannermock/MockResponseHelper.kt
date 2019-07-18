@@ -83,7 +83,7 @@ class MockResponseHelper(private val mockScannerManager: MockScannerManager) {
     private fun crashFirmware() = byteArrayFromHexString("")
 
     private fun handleUnmockedResponse(message: Message): ByteArray {
-        System.out.println("MockScannerManager : Unmocked message type: " + message.messageType.toString())
+        println("MockScannerManager : Unmocked message type: " + message.messageType.toString())
         return byteArrayOf()
     }
 }

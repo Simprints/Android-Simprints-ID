@@ -10,6 +10,8 @@ import java.io.OutputStream
  */
 class OutputStreamInterceptor : OutputStream() {
 
+    val observers = mutableSetOf<Observer<ByteArray>>()
+
     private var buffer = mutableListOf<ByteArray>()
 
     override fun write(b: Int) {
@@ -32,9 +34,5 @@ class OutputStreamInterceptor : OutputStream() {
 
     override fun close() {
         observers.forEach { it.onComplete() }
-    }
-
-    companion object {
-        val observers = mutableSetOf<Observer<ByteArray>>()
     }
 }

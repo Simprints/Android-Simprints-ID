@@ -6,6 +6,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
@@ -21,7 +22,7 @@ import com.simprints.fingerprintscannermock.MockFinger
 import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -56,7 +57,7 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
@@ -64,8 +65,8 @@ class CollectFingerprintsActivityTest {
 
         waitForSplashScreenAppearsAndDisappears()
 
-        Assert.assertEquals(3, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        assertEquals(3, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
@@ -77,9 +78,9 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_FOUR_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
-        Assert.assertEquals(4, viewPager?.adapter?.count)
+        assertEquals(4, viewPager?.adapter?.count)
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
@@ -87,8 +88,8 @@ class CollectFingerprintsActivityTest {
 
         waitForSplashScreenAppearsAndDisappears()
 
-        Assert.assertEquals(4, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        assertEquals(4, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
@@ -100,14 +101,14 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
         collectFingerprintsPressScan()
 
-        Assert.assertEquals(2, viewPager?.adapter?.count)
-        Assert.assertEquals(0, viewPager?.currentItem)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
     }
 
     @Test
@@ -116,14 +117,14 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
 
         waitForSplashScreenAppearsAndDisappears()
 
-        Assert.assertEquals(3, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        assertEquals(3, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
@@ -132,13 +133,13 @@ class CollectFingerprintsActivityTest {
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_FOUR_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
         skipFinger()
 
         waitForSplashScreenAppearsAndDisappears()
-        Assert.assertEquals(4, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        assertEquals(4, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     companion object {
