@@ -168,9 +168,6 @@
     <string name="button_submit">سپارل</string>
     <string name="button_scan_prints">اوکی</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">سکنر کار نه ورکوي</string>
-    <string name="beneficiary_refused">ګټه اخیستونکی انکار وکړ</string>
-    <string name="refusal_other">نور</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">لا ډير معلومات</string>
 

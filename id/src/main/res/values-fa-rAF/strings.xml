@@ -171,9 +171,6 @@
     <string name="button_submit">سپردن</string>
     <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">اسکنر کار نمیدهد</string>
-    <string name="beneficiary_refused">مستفید شونده انکار نمود</string>
-    <string name="refusal_other">دیگر</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">معلومات بیشتر</string>
 
