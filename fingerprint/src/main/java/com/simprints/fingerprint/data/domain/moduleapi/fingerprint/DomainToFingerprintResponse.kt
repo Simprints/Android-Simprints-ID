@@ -57,10 +57,7 @@ object DomainToFingerprintResponse {
         when (reason) {
             UNEXPECTED_ERROR -> IFingerprintErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
-            SCANNER_LOW_BATTERY -> IFingerprintErrorReason.SCANNER_LOW_BATTERY
-            UNKNOWN_BLUETOOTH_ISSUE -> IFingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE
             GUID_NOT_FOUND_ONLINE -> IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE
-            GUID_NOT_FOUND_OFFLINE -> IFingerprintErrorReason.GUID_NOT_FOUND_OFFLINE
         }
 
 }

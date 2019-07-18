@@ -58,10 +58,7 @@ object FingerprintToDomainResponse {
         when(error) {
             IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
             IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
-            IFingerprintErrorReason.SCANNER_LOW_BATTERY -> FingerprintErrorReason.SCANNER_LOW_BATTERY
-            IFingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE -> FingerprintErrorReason.UNKNOWN_BLUETOOTH_ISSUE
             IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> FingerprintErrorReason.GUID_NOT_FOUND_ONLINE
-            IFingerprintErrorReason.GUID_NOT_FOUND_OFFLINE -> FingerprintErrorReason.GUID_NOT_FOUND_OFFLINE
         }
 
     private fun fromFingerprintToDomainTier(tier: IFingerprintResponseTier): FingerprintTier =

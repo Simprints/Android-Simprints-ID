@@ -20,7 +20,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE,
+        UNKNOWN_BLUETOOTH_ISSUE, //Deprecated: fingerprint module doesn't return it anymore.
         UNEXPECTED_ERROR,
         DISCONNECTED,
         MULTIPLE_PAIRED_SCANNERS,
@@ -45,7 +45,6 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AlertScreenEvent.AlertScreenEventType.LOW_BATTERY -> LOW_BATTERY
                     AlertScreenEvent.AlertScreenEventType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                    AlertScreenEvent.AlertScreenEventType.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
                     AlertScreenEvent.AlertScreenEventType.DISCONNECTED -> DISCONNECTED
                     AlertScreenEvent.AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
                     AlertScreenEvent.AlertScreenEventType.NOT_PAIRED -> NOT_PAIRED
