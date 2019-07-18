@@ -45,7 +45,7 @@ class GuidSelectionManagerImpl(val deviceId: String,
             .addGuidSelectionEvent(request.selectedGuid, request.sessionId)
 
     private fun reportToAnalytics(request: AppIdentityConfirmationRequest, callbackSent: Boolean) =
-        analyticsManager.logGuidSelectionService(
+        analyticsManager.logGuidSelectionWorker(
             loginInfoManager.getSignedInProjectIdOrEmpty(),
             request.sessionId,
             deviceId,

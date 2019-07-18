@@ -44,7 +44,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
-        if(isBluetoothAlert(alertType)) {
+        if(isNewBluetoothAlert(alertType)) {
            setContentView(R.layout.activity_fingerprint_bluetooth_alert)
         } else {
             setContentView(R.layout.activity_fingerprint_alert)
@@ -59,7 +59,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         viewPresenter.handleOnResume()
     }
 
-    private fun isBluetoothAlert(alertType: FingerprintAlert) =
+    //This check will be removed in the next release as we will be switching to the 'activity_fingerprint_bluetooth_alert' for all alerts
+    private fun isNewBluetoothAlert(alertType: FingerprintAlert) =
         (alertType == DISCONNECTED || alertType == NOT_PAIRED)
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
