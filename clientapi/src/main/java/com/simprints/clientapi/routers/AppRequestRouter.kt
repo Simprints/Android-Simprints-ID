@@ -12,11 +12,10 @@ import com.simprints.clientapi.extensions.toIntent
 
 object AppRequestRouter {
 
-    const val CONFIRM_IDENTITY_REQUEST_CODE = 100
-
     private const val REGISTER_REQUEST_CODE = 97
     private const val IDENTIFY_REQUEST_CODE = 98
     private const val VERIFY_REQUEST_CODE = 99
+    private const val CONFIRM_IDENTITY_REQUEST_CODE = 100
 
     private const val REGISTER = "com.simprints.clientapp.REGISTER"
     private const val IDENTIFY = "com.simprints.clientapp.IDENTIFY"
