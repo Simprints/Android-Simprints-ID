@@ -11,10 +11,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
-import com.simprints.clientapi.integration.standard.standardInvalidIntentRequest
-import com.simprints.clientapi.integration.standard.standardSuspiciousIntentRequest
-import com.simprints.clientapi.integration.standard.standardVerifyAction
+import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
@@ -25,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class StandardVerifyRequestTest : BaseClientApiTest() {
+class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -37,7 +34,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply {
-            action = standardVerifyAction
+            action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
 
@@ -55,7 +52,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply {
-            action = standardVerifyAction
+            action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value()) 
         })
         
@@ -65,7 +62,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply {
-            action = standardVerifyAction
+            action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         

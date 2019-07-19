@@ -11,10 +11,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
-import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
-import com.simprints.clientapi.integration.odk.odkSuspiciousIntentRequest
-import com.simprints.clientapi.integration.odk.odkVerifyAction
+import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
@@ -25,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class OdkVerifyRequestTest : BaseClientApiTest() {
+class OdkVerifyRequestTest : BaseOdkClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -37,7 +34,7 @@ class OdkVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
-            action = odkVerifyAction
+            action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
 
@@ -55,7 +52,7 @@ class OdkVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply {
-            action = odkVerifyAction
+            action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         
@@ -65,7 +62,7 @@ class OdkVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply {
-            action = odkVerifyAction
+            action = ODK_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         

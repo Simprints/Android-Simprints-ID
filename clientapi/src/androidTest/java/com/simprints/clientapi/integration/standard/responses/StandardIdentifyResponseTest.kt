@@ -8,9 +8,7 @@ import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.APP_IDENTIFY_ACTION
-import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
-import com.simprints.clientapi.integration.standard.standardIdentifyAction
+import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -20,7 +18,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class StandardIdentifyResponseTest: BaseClientApiTest() {
+class StandardIdentifyResponseTest: BaseStandardClientApiTest() {
 
     @Test
     fun appModuleSendsAnIdentifyAppResponse_shouldReturnAStandardIdentifyResponse() {
@@ -30,7 +28,7 @@ class StandardIdentifyResponseTest: BaseClientApiTest() {
         mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardIdentifyAction })
+            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
 
         assertStandardIdentifyResponse(scenario, appIdentifyResponse)
     }
