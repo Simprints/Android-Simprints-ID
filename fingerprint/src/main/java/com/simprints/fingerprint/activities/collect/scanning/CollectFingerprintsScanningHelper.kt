@@ -19,7 +19,6 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprintscanner.ButtonListener
@@ -57,8 +56,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             presenter.handleScannerButtonPressed()
     }
 
-    private fun shouldEnableScanButton() = !presenter.isTryDifferentFingerSplashShown &&
-        !presenter.isNudging
+    private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
     init {
         component.inject(this)
