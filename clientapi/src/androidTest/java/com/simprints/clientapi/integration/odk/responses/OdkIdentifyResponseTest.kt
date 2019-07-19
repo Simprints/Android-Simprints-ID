@@ -5,10 +5,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.AppIdentifyResponse
-import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.appIdentifyAction
+import com.simprints.clientapi.integration.*
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkIdentifyAction
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -42,7 +39,7 @@ class OdkIdentifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("odk-confidences")).isEqualTo(confidenceScoresInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString("odk-tiers")).isEqualTo(tiersInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString("odk-session-id")).isEqualTo(appIdentifyResponse.sessionId)
-            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
         } ?: throw Exception("No bundle found")
     }
 

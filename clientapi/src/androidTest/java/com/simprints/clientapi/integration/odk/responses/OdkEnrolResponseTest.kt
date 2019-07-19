@@ -10,6 +10,7 @@ import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.appEnrolAction
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkEnrolAction
+import com.simprints.clientapi.integration.skipCheckValueForFlowCompleted
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -33,7 +34,7 @@ class OdkEnrolResponseTest : BaseClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString("odk-registration-id")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
 
         } ?: throw Exception("No bundle found")
     }

@@ -22,7 +22,6 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class CommCareIdentifyResponseTest: BaseClientApiTest() {
 
-
     @Test
     fun appModuleSendsAnIdentifyAppResponse_shouldReturnACommCareIdentifyResponse() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
@@ -47,7 +46,6 @@ class CommCareIdentifyResponseTest: BaseClientApiTest() {
                 ?: throw Throwable("No identifications returned")
 
             assertEqualIdentification(identificationsReturned[0], appIdentifyResponse.identifications[0])
-            assertThat(it.getString("skipCheck")).isEqualTo("false")
         } ?: throw Exception("No bundle found")
     }
 

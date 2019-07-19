@@ -26,6 +26,7 @@ internal fun buildDummySessionEventsManagerMock(): SessionEventsManager =
     }
 
 
+internal const val skipCheckValueForFlowCompleted = true
 internal const val appEnrolAction = "com.simprints.clientapp.REGISTER"
 internal const val appIdentifyAction = "com.simprints.clientapp.IDENTIFY"
 internal const val appVerifyAction = "com.simprints.clientapp.VERIFY"

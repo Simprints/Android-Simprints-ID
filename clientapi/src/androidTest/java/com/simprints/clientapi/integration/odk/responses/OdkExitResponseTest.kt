@@ -10,6 +10,7 @@ import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.appEnrolAction
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkEnrolAction
+import com.simprints.clientapi.integration.skipCheckValueForFlowCompleted
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -33,7 +34,7 @@ class OdkExitResponseTest : BaseClientApiTest() {
         result.resultData.extras?.let {
             assertThat(it.getString("odk-exit-reason")).isEqualTo(appExitResponse.reason)
             assertThat(it.getString("odk-exit-extra")).isEqualTo(appExitResponse.extra)
-            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
         } ?: throw Exception("No bundle found")
     }
 }
