@@ -28,6 +28,8 @@ class CommCarePresenter(private val view: CommCareContract.View,
         const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
         const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
+
+        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = true
     }
 
     override suspend fun start() {
@@ -47,7 +49,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = true
+            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
             addSkipCheckEvent(skipCheck)
             view.returnRegistration(enroll.guid, skipCheck)
         }
@@ -72,7 +74,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = true
+            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
             addSkipCheckEvent(skipCheck)
             view.returnVerification(
                 verify.matchResult.confidence,
@@ -85,7 +87,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = true
+            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
             addSkipCheckEvent(skipCheck)
             view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
         }

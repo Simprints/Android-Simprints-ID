@@ -10,6 +10,7 @@ import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.appEnrolAction
 import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
 import com.simprints.clientapi.integration.commcare.commcareEnrolAction
+import com.simprints.clientapi.integration.skipCheckValueForFlowCompleted
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -33,7 +34,7 @@ class CommCareEnrolResponseTest : BaseClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.getBundle("odk_intent_bundle")?.let {
             assertThat(it.getString("guid")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getString("skipCheck")).isEqualTo("true")
+            assertThat(it.getString("skipCheck")).isEqualTo(skipCheckValueForFlowCompleted.toString())
         } ?: throw Exception("No bundle found")
     }
 }

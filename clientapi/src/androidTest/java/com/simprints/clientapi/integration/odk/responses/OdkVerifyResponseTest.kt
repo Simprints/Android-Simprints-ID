@@ -40,7 +40,7 @@ class OdkVerifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("odk-guids")).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString("odk-confidences")).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
             assertThat(it.getString("odk-tiers")).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
         } ?: throw Exception("No bundle found")
     }
 }

@@ -30,7 +30,8 @@ import java.util.*
 class CommCarePresenterTest {
 
     companion object {
-        private val integrationInfo = IntegrationInfo.COMMCARE
+        private val INTEGRATION_INFO = IntegrationInfo.COMMCARE
+        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = true
     }
 
     private val view = mock<CommCareActivity>()
@@ -49,7 +50,7 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(integrationInfo)) }
+        verifyOnce(view) { sendSimprintsRequest(EnrollRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
@@ -61,7 +62,7 @@ class CommCarePresenterTest {
             runBlocking { start() }
         }
 
-        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(integrationInfo)) }
+        verifyOnce(view) { sendSimprintsRequest(IdentifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
@@ -71,7 +72,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
-        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(integrationInfo)) }
+        verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
@@ -82,7 +83,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
-        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(integrationInfo)) }
+        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
@@ -97,7 +98,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mock(), mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
-        verifyOnce(view) { returnRegistration(registerId, false) }
+        verifyOnce(view) { returnRegistration(registerId, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
     }
 
     @Test
@@ -129,7 +130,7 @@ class CommCarePresenterTest {
                 verification.matchResult.confidence,
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
-                false)
+                SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)
         }
     }
 
