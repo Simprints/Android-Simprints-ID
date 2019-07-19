@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
+import com.simprints.clientapi.Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
@@ -28,12 +29,10 @@ class CommCarePresenter(private val view: CommCareContract.View,
         const val ACTION_IDENTIFY = "$PACKAGE_NAME.IDENTIFY"
         const val ACTION_VERIFY = "$PACKAGE_NAME.VERIFY"
         const val ACTION_CONFIRM_IDENTITY = "$PACKAGE_NAME.CONFIRM_IDENTITY"
-
-        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = true
     }
 
     override suspend fun start() {
-        if(action != ACTION_CONFIRM_IDENTITY) {
+        if (action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.COMMCARE)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
@@ -49,7 +48,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
             addSkipCheckEvent(skipCheck)
             view.returnRegistration(enroll.guid, skipCheck)
         }
@@ -67,14 +66,14 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            addSkipCheckEvent(errorResponse.skipCheckAfterError())
+            addSkipCheckEvent(errorResponse.skipCheckForError())
             view.returnErrorToClient(errorResponse)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
             addSkipCheckEvent(skipCheck)
             view.returnVerification(
                 verify.matchResult.confidence,
@@ -87,7 +86,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
             addSkipCheckEvent(skipCheck)
             view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
         }

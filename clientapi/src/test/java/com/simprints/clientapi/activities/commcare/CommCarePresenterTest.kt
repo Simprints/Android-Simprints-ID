@@ -31,7 +31,7 @@ class CommCarePresenterTest {
 
     companion object {
         private val INTEGRATION_INFO = IntegrationInfo.COMMCARE
-        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = true
+        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
     }
 
     private val view = mock<CommCareActivity>()
@@ -136,8 +136,9 @@ class CommCarePresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        CommCarePresenter(view, "", mock(), mock(), mockSharedPrefs()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
-        verifyOnce(view) { returnErrorToClient(anyNotNull()) }
+        val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
+        CommCarePresenter(view, "", mock(), mock(), mockSharedPrefs()).handleResponseError(error)
+        verifyOnce(view) { returnErrorToClient(error) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {
