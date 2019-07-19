@@ -12,11 +12,14 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
-        GUID_NOT_FOUND_OFFLINE, //Deprecated: fingerprint module doesn't return it anymore.
+        @Deprecated("User can't leave the app anymore in case of GUID_NOT_FOUND_OFFLINE. He exits through the ExitForm.")
+        GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
-        SCANNER_LOW_BATTERY, //Deprecated: fingerprint module doesn't return it anymore.
-        UNKNOWN_BLUETOOTH_ISSUE //Deprecated: fingerprint module doesn't return it anymore.
+        @Deprecated("User can't leave the app anymore in case of SCANNER_LOW_BATTERY. He exits through the ExitForm.")
+        SCANNER_LOW_BATTERY,
+        @Deprecated("Fingerprint module doesn't triggers it anymore")
+        UNKNOWN_BLUETOOTH_ISSUE
     }
 }
 
