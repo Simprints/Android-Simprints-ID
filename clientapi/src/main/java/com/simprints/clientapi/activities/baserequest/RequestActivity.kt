@@ -79,7 +79,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    protected fun sendOkResult(intent: Intent) {
+    internal fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

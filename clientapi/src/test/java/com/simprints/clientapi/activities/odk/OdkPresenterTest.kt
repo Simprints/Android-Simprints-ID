@@ -131,11 +131,12 @@ class OdkPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
+        val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
         OdkPresenter(view, "", mock(), mock()).apply {
-            handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+            handleResponseError(error)
         }
 
-        verifyOnce(view) { returnErrorToClient(anyNotNull()) }
+        verifyOnce(view) { returnErrorToClient(error) }
     }
 
     @Test
@@ -155,7 +156,7 @@ class OdkPresenterTest {
     }
 
     companion object {
-        internal const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = true
+        internal const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
     }
 
 }

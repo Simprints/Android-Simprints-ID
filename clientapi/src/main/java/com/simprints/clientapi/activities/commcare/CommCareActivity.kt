@@ -80,7 +80,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, errorResponse.skipCheckAfterError().toString())
+            putString(SKIP_CHECK_KEY, errorResponse.skipCheckForError().toString())
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
