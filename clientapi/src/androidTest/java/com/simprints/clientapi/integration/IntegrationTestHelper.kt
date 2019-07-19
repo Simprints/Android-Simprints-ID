@@ -1,66 +1,11 @@
 package com.simprints.clientapi.integration
 
-import android.app.Application
-import android.content.Intent
-import androidx.test.core.app.ApplicationProvider
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
 import com.simprints.moduleapi.app.requests.confirmations.IAppIdentifyConfirmation
 import com.simprints.moduleapi.app.responses.*
-import com.simprints.testtools.common.syntax.*
-import io.reactivex.Completable
-import io.reactivex.Single
 import kotlinx.android.parcel.Parcelize
-
-internal fun buildDummySessionEventsManagerMock(): SessionEventsManager =
-    mock<SessionEventsManager>().apply {
-        val sessionMock = mock<SessionEvents>().apply {
-            whenever(this) { id } thenReturn ""
-        }
-
-        whenever(this) { createSession(anyNotNull()) } thenReturn Single.just(sessionMock)
-        whenever(this) { addEvent(anyNotNull()) } thenReturn Completable.complete()
-    }
-
-
-internal const val SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW = false
-internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
-internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
-internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"
-internal const val APP_CONFIRM_ACTION = "com.simprints.clientapp.CONFIRM_IDENTITY"
-
-internal val projectIdField = "projectId" to "some_project"
-internal val userIdField = "userId" to "some_user_id"
-internal val moduleIdField = "moduleId" to "some_module_id"
-internal val metadataField = "metadata" to "some_metadata"
-internal val verifyGuidField = "verifyGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"
-internal val sessionIdField = "sessionId" to "some_sessionid"
-internal val selectedGuidField = "selectedGuid" to "8b3f577c-b6c7-4677-9af2-b08cd7f71b79"
-
-internal val extraField = "extra" to "some_extra"
-
-internal val packageName = ApplicationProvider.getApplicationContext<Application>().packageName
-
-
-internal val baseIntentRequest = Intent().apply {
-    putExtra(projectIdField.key(), projectIdField.value())
-    putExtra(userIdField.key(), userIdField.value())
-    putExtra(moduleIdField.key(), moduleIdField.value())
-    putExtra(metadataField.key(), metadataField.value())
-}
-
-internal val invalidIntentRequest = Intent().apply {
-    putExtra(projectIdField.key() + "_wrong",  projectIdField.value())
-    putExtra(userIdField.key(),  userIdField.value())
-    putExtra(moduleIdField.key(),  moduleIdField.value())
-}
-
-internal val suspiciousIntentRequest =  baseIntentRequest.apply {
-    putExtra( extraField.key(),  extraField.value())
-}
 
 @Parcelize
 internal data class AppEnrolResponse(

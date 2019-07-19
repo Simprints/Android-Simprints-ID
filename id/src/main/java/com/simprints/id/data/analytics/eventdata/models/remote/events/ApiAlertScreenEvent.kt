@@ -20,7 +20,8 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE, //Deprecated: fingerprint module doesn't return it anymore.
+        @Deprecated("Fingerprint module doesn't triggers it anymore")
+        UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
         MULTIPLE_PAIRED_SCANNERS,

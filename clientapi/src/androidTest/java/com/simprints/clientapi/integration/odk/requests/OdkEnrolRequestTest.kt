@@ -9,11 +9,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
-import com.simprints.clientapi.integration.odk.odkEnrolAction
-import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
-import com.simprints.clientapi.integration.odk.odkSuspiciousIntentRequest
+import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -24,7 +22,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class OdkEnrolRequestTest : BaseClientApiTest() {
+class OdkEnrolRequestTest : BaseOdkClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -35,7 +33,7 @@ class OdkEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkEnrolAction })
+        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
 
         val expectedAppRequest = AppEnrollRequest(
             projectIdField.value(),
@@ -49,13 +47,13 @@ class OdkEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = odkEnrolAction })
+        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = ODK_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = odkEnrolAction })
+        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = ODK_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }
