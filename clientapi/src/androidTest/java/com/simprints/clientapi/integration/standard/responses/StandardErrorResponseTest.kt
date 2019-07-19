@@ -4,9 +4,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
+import com.simprints.clientapi.integration.APP_ENROL_ACTION
 import com.simprints.clientapi.integration.AppErrorResponse
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.appEnrolAction
 import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
 import com.simprints.clientapi.integration.standard.standardEnrolAction
 import com.simprints.libsimprints.Constants
@@ -20,7 +20,7 @@ class StandardErrorResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnErrorAppResponse_shouldReturnAStandardErrorResponse() {
         val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        mockAppModuleResponse(appErrorResponse, appEnrolAction)
+        mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardEnrolAction })
@@ -31,7 +31,7 @@ class StandardErrorResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsANotBlockingErrorAppResponse_shouldReturnAStandardErrorResponseWithSkipCheck() {
         val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        mockAppModuleResponse(appErrorResponse, appEnrolAction)
+        mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardEnrolAction })

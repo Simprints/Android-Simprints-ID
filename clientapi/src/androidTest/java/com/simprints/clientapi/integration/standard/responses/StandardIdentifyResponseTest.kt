@@ -3,13 +3,12 @@ package com.simprints.clientapi.integration.standard.responses
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.appIdentifyAction
+import com.simprints.clientapi.integration.APP_IDENTIFY_ACTION
 import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
 import com.simprints.clientapi.integration.standard.standardIdentifyAction
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
@@ -28,7 +27,7 @@ class StandardIdentifyResponseTest: BaseClientApiTest() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         ), "session_id")
-        mockAppModuleResponse(appIdentifyResponse, appIdentifyAction)
+        mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardIdentifyAction })

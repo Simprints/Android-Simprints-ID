@@ -26,7 +26,7 @@ class StandardVerifyResponseTest : BaseClientApiTest() {
         val appVerifyResponse = AppVerifyResponse(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         )
-        mockAppModuleResponse(appVerifyResponse, appVerifyAction)
+        mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply {
