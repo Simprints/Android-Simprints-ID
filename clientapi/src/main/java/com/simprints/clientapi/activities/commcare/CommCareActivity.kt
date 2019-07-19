@@ -83,7 +83,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
             putString(IDENTIFICATION_OUTCOME_EXTRA, identificationOutcome.toString())
         }
 
-        it.putExtra(COMMCARE_BUNDLE_KEY, data)
+        injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
