@@ -31,7 +31,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
-        Intents.intending(hasAction(appVerifyAction)).respondWith(intentResultOk)
+        Intents.intending(hasAction(APP_VERIFICATION_ACTION)).respondWith(intentResultOk)
     }
 
     @Test
@@ -48,7 +48,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
             metadataField.value(),
             verifyGuidField.value())
 
-        intended(hasAction(appVerifyAction))
+        intended(hasAction(APP_VERIFICATION_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
@@ -59,7 +59,7 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
             putExtra(verifyGuidField.key(), verifyGuidField.value()) 
         })
         
-        intended(hasAction(appVerifyAction))
+        intended(hasAction(APP_VERIFICATION_ACTION))
     }
 
     @Test
@@ -69,6 +69,6 @@ class StandardVerifyRequestTest : BaseClientApiTest() {
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
         
-        intended(CoreMatchers.not(hasAction(appVerifyAction)), Intents.times(2))
+        intended(CoreMatchers.not(hasAction(APP_VERIFICATION_ACTION)), Intents.times(2))
     }
 }

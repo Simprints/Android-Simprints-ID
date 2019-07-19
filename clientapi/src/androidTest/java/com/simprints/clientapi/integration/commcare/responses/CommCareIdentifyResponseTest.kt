@@ -8,7 +8,7 @@ import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.appIdentifyAction
+import com.simprints.clientapi.integration.APP_IDENTIFY_ACTION
 import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
 import com.simprints.clientapi.integration.commcare.commcareIdentifyAction
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
@@ -27,7 +27,7 @@ class CommCareIdentifyResponseTest: BaseClientApiTest() {
         val appIdentifyResponse = AppIdentifyResponse(listOf(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         ), "session_id")
-        mockAppModuleResponse(appIdentifyResponse, appIdentifyAction)
+        mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })

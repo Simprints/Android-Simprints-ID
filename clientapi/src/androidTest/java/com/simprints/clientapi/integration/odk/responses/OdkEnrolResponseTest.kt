@@ -5,12 +5,12 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
+import com.simprints.clientapi.integration.APP_ENROL_ACTION
 import com.simprints.clientapi.integration.AppEnrolResponse
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.appEnrolAction
+import com.simprints.clientapi.integration.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkEnrolAction
-import com.simprints.clientapi.integration.skipCheckValueForFlowCompleted
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
@@ -21,7 +21,7 @@ class OdkEnrolResponseTest : BaseClientApiTest() {
     @Test
     fun appModuleSendsAnEnrolAppResponse_shouldReturnAOdkEnrolResponse() {
         val appEnrolResponse = AppEnrolResponse(UUID.randomUUID().toString())
-        mockAppModuleResponse(appEnrolResponse, appEnrolAction)
+        mockAppModuleResponse(appEnrolResponse, APP_ENROL_ACTION)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkEnrolAction })
@@ -34,7 +34,7 @@ class OdkEnrolResponseTest : BaseClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString("odk-registration-id")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
 
         } ?: throw Exception("No bundle found")
     }
