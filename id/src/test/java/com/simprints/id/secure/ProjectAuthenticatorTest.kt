@@ -171,7 +171,7 @@ class ProjectAuthenticatorTest {
         val attestationManager = mock<AttestationManager>()
         val nonceScope = NonceScope(projectId, userId)
 
-        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE))
+        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
         val testObserver = ProjectAuthenticator(
             app.component,
