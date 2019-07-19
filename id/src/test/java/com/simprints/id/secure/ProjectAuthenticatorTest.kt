@@ -3,8 +3,8 @@ package com.simprints.id.secure
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
-import com.nhaarman.mockitokotlin2.any
 import com.google.common.truth.Truth
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -146,7 +146,9 @@ class ProjectAuthenticatorTest {
         val mockWebServer = MockWebServer()
         val mockProjectSecretManager: ProjectSecretManager = mock()
 
-        whenever { mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull()) } thenReturn "encrypted_project_secret"
+        whenever {
+            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull())
+        } thenReturn "encrypted_project_secret"
 
         mockWebServer.enqueue(mockResponseForAuthenticationData())
         mockWebServer.enqueue(mockResponseForApiToken())
@@ -171,7 +173,9 @@ class ProjectAuthenticatorTest {
         val attestationManager = mock<AttestationManager>()
         val nonceScope = NonceScope(projectId, userId)
 
-        whenever { attestationManager.requestAttestation(any(), any()) }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
+        whenever {
+            attestationManager.requestAttestation(any(), any())
+        }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
 
         val testObserver = ProjectAuthenticator(
             app.component,
@@ -189,7 +193,10 @@ class ProjectAuthenticatorTest {
 
     private fun getMockAttestationManager(): AttestationManager {
         val attestationManager = mock<AttestationManager>()
-        whenever(attestationManager.requestAttestation(anyNotNull(), anyNotNull())).thenReturn(Single.just(AttestToken("google_attestation")) )
+        whenever {
+            attestationManager.requestAttestation(anyNotNull(), anyNotNull())
+        } thenReturn Single.just(AttestToken("google_attestation"))
+
         return attestationManager
     }
 
