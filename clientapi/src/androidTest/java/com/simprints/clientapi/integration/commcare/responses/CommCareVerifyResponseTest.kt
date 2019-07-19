@@ -42,7 +42,7 @@ class CommCareVerifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("guid")).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString("tier")).isEqualTo(appVerifyResponse.matchResult.tier.name)
             assertThat(it.getInt("confidence")).isEqualTo(appVerifyResponse.matchResult.confidence)
-            assertThat(it.getBoolean("skipCheck")).isTrue()
+            assertThat(it.getString("skipCheck")).isEqualTo(skipCheckValueForFlowCompleted.toString())
         } ?: throw Exception("No bundle found")
     }
 }
