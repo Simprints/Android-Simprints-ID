@@ -7,7 +7,8 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
 import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
-import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
@@ -19,18 +20,18 @@ class AttestationManager {
 
             val result = Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY)
                 .addOnFailureListener {
-                    throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
+                    throw SafetyNetException(reason = SERVICE_UNAVAILABLE)
                 })
             result?.let {
                 checkForErrorClaimAndThrow(it.jwsResult)
                 AttestToken(it.jwsResult)
-            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
+            } ?: throw SafetyNetException(reason = SERVICE_UNAVAILABLE)
         }
     }
 
     private fun checkForErrorClaimAndThrow(jwsResult: String?) {
         if(JWT.decode(jwsResult).claims.containsKey("error")) {
-            throw SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS)
+            throw SafetyNetException(reason = INVALID_CLAIMS)
         }
     }
 }
