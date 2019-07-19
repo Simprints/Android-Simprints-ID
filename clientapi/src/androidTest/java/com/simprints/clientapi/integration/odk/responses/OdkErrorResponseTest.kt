@@ -11,6 +11,7 @@ import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.appEnrolAction
 import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
 import com.simprints.clientapi.integration.odk.odkEnrolAction
+import com.simprints.clientapi.integration.skipCheckValueForFlowCompleted
 import com.simprints.moduleapi.app.responses.IAppErrorReason
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +35,7 @@ class OdkErrorResponseTest : BaseClientApiTest() {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
-            assertThat(it.getBoolean("odk-skip-check")).isTrue()
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
         } ?: throw Exception("No bundle found")
     }
 }
