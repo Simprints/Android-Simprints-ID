@@ -15,8 +15,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
 
-    //If user experienced a yellow/red screen, then SimprintsID should skip the check
-    fun skipCheckAfterError(): Boolean =
+    fun isUnrecoverableError(): Boolean =
         when (reason) {
             Reason.UNEXPECTED_ERROR,
             Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
@@ -31,7 +30,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
             Reason.INVALID_VERIFY_ID,
             Reason.BLUETOOTH_NOT_SUPPORTED,
             Reason.GUID_NOT_FOUND_ONLINE -> true
-            //Atm, there are not error cases when the app should return skipCheck = false
+            // Atm, if user experiences a recoverable error,
+            // he can't leave the app (e.g. pressing Back button).
         }
 
     enum class Reason {
