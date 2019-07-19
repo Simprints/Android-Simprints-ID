@@ -68,18 +68,21 @@ fun validateCallbackEventApiModel(json: JsonObject) {
 fun verifyCallbackEnrolmentApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ENROLMENT")
     assertThat(json.get("guid").asString)
+    assertThat(json.size()).isEqualTo(2)
 }
 
 fun verifyCallbackIdentificationApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("IDENTIFICATION")
     assertThat(json.get("sessionId").asString)
     verifyCallbackIdentificationScoresApiModel(json.getAsJsonArray("scores"))
+    assertThat(json.size()).isEqualTo(3)
 }
 
 fun verifyCallbackIdentificationScoresApiModel(jsonArray: JsonArray) {
     assertThat(jsonArray.get(0).asJsonObject.get("guid").asString)
     assertThat(jsonArray.get(0).asJsonObject.get("confidence").asString)
     assertThat(jsonArray.get(0).asJsonObject.get("tier").asString)
+    assertThat(jsonArray.size()).isEqualTo(3)
 }
 
 fun verifyCallbackVerificationApiModel(json: JsonObject) {
@@ -88,28 +91,31 @@ fun verifyCallbackVerificationApiModel(json: JsonObject) {
         assertThat(get("guid").asString)
         assertThat(get("confidence").asString)
         assertThat(get("tier").asString)
+        assertThat(size()).isEqualTo(3)
     }
+    assertThat(json.size()).isEqualTo(2)
 }
 
 fun verifyCallbackRefusalApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("REFUSAL")
     assertThat(json.get("reason").asString).isAnyOf("REFUSED_RELIGION", "REFUSED_DATA_CONCERNS", "REFUSED_PERMISSION", "SCANNER_NOT_WORKING", "REFUSED_NOT_PRESENT", "REFUSED_YOUNG", "OTHER")
     assertThat(json.get("extra").asString)
+    assertThat(json.size()).isEqualTo(3)
 }
 
 fun verifyCallbackConfirmationApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("CONFIRMATION")
-    assertThat(json.get("received").asBoolean).isNotNull()
+    assertThat(json.get("received").asBoolean)
     assertThat(json.size()).isEqualTo(2)
 }
 
 fun verifyCallbackErrorApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("ERROR")
     assertThat(json.get("reason").asString)
+    assertThat(json.size()).isEqualTo(2)
 }
 
 fun validateCalloutEventApiModel(json: JsonObject) {
-
     assertThat(json.get("type").asString).isEqualTo("CALLOUT")
     assertThat(json.get("relativeStartTime").asString)
     with(json.get("callout").asJsonObject) {
