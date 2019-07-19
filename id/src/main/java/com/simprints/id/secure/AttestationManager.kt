@@ -30,7 +30,7 @@ class AttestationManager {
     }
 
     private fun checkForErrorClaimAndThrow(jwsResult: String?) {
-        if(JWT.decode(jwsResult).claims.containsKey("error")) {
+        if (JWT.decode(jwsResult).claims.containsKey("error")) {
             throw SafetyNetException(reason = INVALID_CLAIMS)
         }
     }
