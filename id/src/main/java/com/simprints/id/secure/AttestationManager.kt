@@ -3,6 +3,7 @@ package com.simprints.id.secure
 import android.util.Base64
 import android.util.Base64.NO_WRAP
 import com.auth0.jwt.JWT
+import com.google.android.gms.safetynet.SafetyNetApi
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
 import com.simprints.id.BuildConfig
@@ -18,14 +19,20 @@ class AttestationManager {
     fun requestAttestation(safetyNetClient: SafetyNetClient, nonce: Nonce): Single<AttestToken> {
         return Single.fromCallable<AttestToken> {
 
-            val result = Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY)
-                .addOnFailureListener {
-                    throw SafetyNetException(reason = SERVICE_UNAVAILABLE)
-                })
-            result?.let {
+            val result = getSafetyNetAttestationResponse(safetyNetClient, nonce)
+
+            result.let {
                 checkForErrorClaimAndThrow(it.jwsResult)
                 AttestToken(it.jwsResult)
-            } ?: throw SafetyNetException(reason = SERVICE_UNAVAILABLE)
+            }
+        }
+    }
+
+    internal fun getSafetyNetAttestationResponse(safetyNetClient: SafetyNetClient, nonce: Nonce): SafetyNetApi.AttestationResponse {
+        return try {
+            Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY))
+        } catch (e: Throwable) {
+            throw SafetyNetException(reason = SERVICE_UNAVAILABLE)
         }
     }
 
