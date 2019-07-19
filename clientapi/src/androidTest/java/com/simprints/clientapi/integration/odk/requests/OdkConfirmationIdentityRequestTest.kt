@@ -9,7 +9,7 @@ package com.simprints.clientapi.integration.odk.requests
 //@Before
 //fun setUp() {
 //    Intents.init()
-//    Intents.intending(IntentMatchers.hasAction(appConfirmIdentityAction)).respondWith(intentResultOk)
+//    Intents.intending(IntentMatchers.hasAction(APP_CONFIRM_ACTION)).respondWith(intentResultOk)
 ////
 //        KoinInjector.loadClientApiKoinModules()
 //        declare {
@@ -30,7 +30,7 @@ package com.simprints.clientapi.integration.odk.requests
 //            sessionIdField.value(),
 //            selectedGuidField.value())
 //
-//        intended(hasAction(appConfirmIdentityAction))
+//        intended(hasAction(APP_CONFIRM_ACTION))
 //        intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, getMatcherFor(expectedAppRequest))))
 //    }
 //

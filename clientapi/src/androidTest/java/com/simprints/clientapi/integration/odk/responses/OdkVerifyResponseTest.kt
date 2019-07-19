@@ -22,7 +22,7 @@ class OdkVerifyResponseTest : BaseClientApiTest() {
         val appVerifyResponse = AppVerifyResponse(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         )
-        mockAppModuleResponse(appVerifyResponse, appVerifyAction)
+        mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply {
@@ -40,7 +40,7 @@ class OdkVerifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("odk-guids")).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString("odk-confidences")).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
             assertThat(it.getString("odk-tiers")).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(skipCheckValueForFlowCompleted)
+            assertThat(it.getBoolean("odk-skip-check")).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 }

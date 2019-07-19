@@ -32,7 +32,7 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
     override fun setUp() {
         super.setUp()
         val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
-        Intents.intending(hasAction(appIdentifyAction)).respondWith(intentResultOk)
+        Intents.intending(hasAction(APP_IDENTIFY_ACTION)).respondWith(intentResultOk)
     }
 
     @Test
@@ -46,19 +46,19 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
             moduleIdField.value(),
             metadataField.value())
 
-        intended(hasAction(appIdentifyAction))
+        intended(hasAction(APP_IDENTIFY_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = commcareIdentifyAction })
-        intended(hasAction(appIdentifyAction))
+        intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = commcareIdentifyAction })
-        intended(CoreMatchers.not(hasAction(appIdentifyAction)), times(2))
+        intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }
