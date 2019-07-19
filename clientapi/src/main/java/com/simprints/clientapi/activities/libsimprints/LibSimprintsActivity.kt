@@ -48,6 +48,9 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
+    /**
+     * TODO: LibSimprints and the development documentation need to be updated including this return
+     */
     override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
         it.putExtra(IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
         sendOkResult(it)
