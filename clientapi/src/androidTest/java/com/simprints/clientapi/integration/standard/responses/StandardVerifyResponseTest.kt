@@ -5,9 +5,10 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
-import com.simprints.clientapi.integration.standard.standardVerifyAction
+import com.simprints.clientapi.integration.AppMatchResult
+import com.simprints.clientapi.integration.AppVerifyResponse
+import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Verification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -19,7 +20,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class StandardVerifyResponseTest : BaseClientApiTest() {
+class StandardVerifyResponseTest : BaseStandardClientApiTest() {
 
     @Test
     fun appModuleSendsAVerifyAppResponse_shouldReturnAStandardVerifyResponse() {
@@ -30,7 +31,7 @@ class StandardVerifyResponseTest : BaseClientApiTest() {
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply {
-                action = standardVerifyAction
+                action = STANDARD_VERIFY_ACTION
                 putExtra(verifyGuidField.key(), verifyGuidField.value())
             })
 

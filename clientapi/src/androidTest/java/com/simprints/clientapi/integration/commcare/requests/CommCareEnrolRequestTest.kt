@@ -9,11 +9,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareInvalidIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareSuspiciousIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareEnrolAction
+import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -24,7 +21,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class CommCareEnrolRequestTest : BaseClientApiTest() {
+class CommCareEnrolRequestTest : BaseCommCareClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -35,7 +32,7 @@ class CommCareEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
         val expectedAppRequest = AppEnrollRequest(
             projectIdField.value(),
@@ -49,13 +46,13 @@ class CommCareEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = commcareEnrolAction })
+        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

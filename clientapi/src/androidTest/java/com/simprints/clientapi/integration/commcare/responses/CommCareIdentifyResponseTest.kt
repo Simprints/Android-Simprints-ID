@@ -8,9 +8,7 @@ import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.APP_IDENTIFY_ACTION
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareIdentifyAction
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -20,7 +18,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class CommCareIdentifyResponseTest: BaseClientApiTest() {
+class CommCareIdentifyResponseTest : BaseCommCareClientApiTest() {
 
     @Test
     fun appModuleSendsAnIdentifyAppResponse_shouldReturnACommCareIdentifyResponse() {
@@ -30,7 +28,7 @@ class CommCareIdentifyResponseTest: BaseClientApiTest() {
         mockAppModuleResponse(appIdentifyResponse, APP_IDENTIFY_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
 
         assertCommCareIdentifyResponse(scenario, appIdentifyResponse)
     }

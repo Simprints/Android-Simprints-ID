@@ -11,11 +11,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
-import com.simprints.clientapi.integration.standard.standardIdentifyAction
-import com.simprints.clientapi.integration.standard.standardInvalidIntentRequest
-import com.simprints.clientapi.integration.standard.standardSuspiciousIntentRequest
+import com.simprints.clientapi.integration.AppIdentifyRequest
+import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -25,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CommCareIdentifyRequestTest : BaseClientApiTest() {
+class CommCareIdentifyRequestTest : BaseStandardClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -36,7 +33,7 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardIdentifyAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -50,13 +47,13 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = standardIdentifyAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = standardIdentifyAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }
