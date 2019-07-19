@@ -99,6 +99,8 @@ fun verifyCallbackRefusalApiModel(json: JsonObject) {
 
 fun verifyCallbackConfirmationApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("CONFIRMATION")
+    assertThat(json.get("received").asBoolean).isNotNull()
+    assertThat(json.size()).isEqualTo(2)
 }
 
 fun verifyCallbackErrorApiModel(json: JsonObject) {
