@@ -12,11 +12,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareInvalidIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareSuspiciousIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareIdentifyAction
+import com.simprints.clientapi.integration.AppIdentifyRequest
+import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -26,7 +24,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CommCareIdentifyRequestTest : BaseClientApiTest() {
+class CommCareIdentifyRequestTest : BaseCommCareClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -38,7 +36,7 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
     @Test
     @MediumTest
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -52,13 +50,13 @@ class CommCareIdentifyRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = commcareIdentifyAction })
+        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply { action = COMMCARE_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

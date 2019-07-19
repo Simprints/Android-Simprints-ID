@@ -5,18 +5,15 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.APP_ENROL_ACTION
 import com.simprints.clientapi.integration.AppEnrolResponse
 import com.simprints.clientapi.integration.BaseClientApiTest
-import com.simprints.clientapi.integration.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareEnrolAction
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class CommCareEnrolResponseTest : BaseClientApiTest() {
+class CommCareEnrolResponseTest : BaseCommCareClientApiTest() {
 
     @Test
     fun appModuleSendsAnEnrolAppResponse_shouldReturnACommCareEnrolResponse() {
@@ -24,7 +21,7 @@ class CommCareEnrolResponseTest : BaseClientApiTest() {
         mockAppModuleResponse(appEnrolResponse, APP_ENROL_ACTION)
 
         val scenario =
-            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = commcareEnrolAction })
+            ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
         assertCommCareEnrolResponse(scenario, appEnrolResponse)
     }
@@ -32,9 +29,9 @@ class CommCareEnrolResponseTest : BaseClientApiTest() {
     private fun assertCommCareEnrolResponse(scenario: ActivityScenario<CommCareActivity>, appEnrolResponse: AppEnrolResponse) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
-        result.resultData.extras?.getBundle("odk_intent_bundle")?.let {
-            assertThat(it.getString("guid")).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getString("skipCheck")).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW.toString())
+        result.resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
+            assertThat(it.getString(REGISTRATION_GUID_KEY)).isEqualTo(appEnrolResponse.guid)
+            assertThat(it.getString(SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW.toString())
         } ?: throw Exception("No bundle found")
     }
 }

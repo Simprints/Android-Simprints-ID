@@ -12,10 +12,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.odk.odkBaseIntentRequest
-import com.simprints.clientapi.integration.odk.odkIdentifyAction
-import com.simprints.clientapi.integration.odk.odkInvalidIntentRequest
-import com.simprints.clientapi.integration.odk.odkSuspiciousIntentRequest
+import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -25,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class OdkIdentifyRequestTest : BaseClientApiTest() {
+class OdkIdentifyRequestTest : BaseOdkClientApiTest() {
 
 
     @Before
@@ -37,7 +34,7 @@ class OdkIdentifyRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsAnIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
 
         val expectedAppRequest = AppIdentifyRequest(
             projectIdField.value(),
@@ -51,13 +48,13 @@ class OdkIdentifyRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = odkIdentifyAction })
+        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

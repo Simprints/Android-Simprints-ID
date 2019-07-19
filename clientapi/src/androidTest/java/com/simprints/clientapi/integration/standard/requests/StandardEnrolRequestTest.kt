@@ -9,11 +9,9 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.standard.standardBaseIntentRequest
-import com.simprints.clientapi.integration.standard.standardEnrolAction
-import com.simprints.clientapi.integration.standard.standardInvalidIntentRequest
-import com.simprints.clientapi.integration.standard.standardSuspiciousIntentRequest
+import com.simprints.clientapi.integration.AppEnrollRequest
+import com.simprints.clientapi.integration.BaseClientApiTest
+import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.value
@@ -24,7 +22,7 @@ import org.junit.runner.RunWith
 
 
 @RunWith(AndroidJUnit4::class)
-class StandardEnrolRequestTest : BaseClientApiTest() {
+class StandardEnrolRequestTest : BaseStandardClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -35,7 +33,7 @@ class StandardEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsAnEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = standardEnrolAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
         val expectedAppRequest = AppEnrollRequest(
             projectIdField.value(),
@@ -49,13 +47,13 @@ class StandardEnrolRequestTest : BaseClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = standardEnrolAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = STANDARD_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = standardEnrolAction })
+        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = STANDARD_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

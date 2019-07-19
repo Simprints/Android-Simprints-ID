@@ -10,11 +10,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.integration.*
-import com.simprints.clientapi.integration.commcare.commCareBaseIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareInvalidIntentRequest
-import com.simprints.clientapi.integration.commcare.commCareSuspiciousIntentRequest
-import com.simprints.clientapi.integration.commcare.commcareVerifyAction
+import com.simprints.clientapi.integration.AppVerifyRequest
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
@@ -25,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CommCareVerifyRequestTest : BaseClientApiTest() {
+class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -37,7 +34,7 @@ class CommCareVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
-            action = commcareVerifyAction
+            action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
 
@@ -55,20 +52,20 @@ class CommCareVerifyRequestTest : BaseClientApiTest() {
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply {
-            action = commcareVerifyAction
-            putExtra(verifyGuidField.key(), verifyGuidField.value()) 
+            action = COMMCARE_VERIFY_ACTION
+            putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
-        
+
         intended(hasAction(APP_VERIFICATION_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
         ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply {
-            action = commcareVerifyAction
+            action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
-        
+
         intended(CoreMatchers.not(hasAction(APP_VERIFICATION_ACTION)), Intents.times(2))
     }
 }
