@@ -131,8 +131,8 @@ class LoginPresenter(val view: LoginContract.View,
         addAuthenticatedEventAndUpdateProjectIdIfRequired(reason, suppliedProjectId, suppliedUserId)
     }
 
-    private fun getSafetyNetErrorForAuthenticationEvent(e: SafetyNetExceptionReason) =
-        when (e) {
+    private fun getSafetyNetErrorForAuthenticationEvent(reason: SafetyNetExceptionReason) =
+        when (reason) {
             SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
             SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
         }
