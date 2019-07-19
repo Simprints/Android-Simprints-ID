@@ -19,18 +19,18 @@ class AttestationManager {
 
             val result = Tasks.await(safetyNetClient.attest(Base64.decode(nonce.value, NO_WRAP), BuildConfig.ANDROID_AUTH_API_KEY)
                 .addOnFailureListener {
-                    throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE)
+                    throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
                 })
             result?.let {
                 checkForErrorClaimAndThrow(it.jwsResult)
                 AttestToken(it.jwsResult)
-            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE)
+            } ?: throw SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE)
         }
     }
 
     private fun checkForErrorClaimAndThrow(jwsResult: String?) {
         if(JWT.decode(jwsResult).claims.containsKey("error")) {
-            throw SafetyNetException(reason = SafetyNetExceptionReason.SAFETYNET_INVALID_CLAIMS)
+            throw SafetyNetException(reason = SafetyNetExceptionReason.INVALID_CLAIMS)
         }
     }
 }

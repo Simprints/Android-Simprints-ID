@@ -10,7 +10,6 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authentica
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
@@ -134,8 +133,8 @@ class LoginPresenter(val view: LoginContract.View,
 
     private fun getSafetyNetErrorForAuthenticationEvent(e: SafetyNetExceptionReason) =
         when (e) {
-            SafetyNetExceptionReason.SAFETYNET_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
-            SafetyNetExceptionReason.SAFETYNET_INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
+            SafetyNetExceptionReason.SERVICE_UNAVAILABLE -> SAFETYNET_UNAVAILABLE
+            SafetyNetExceptionReason.INVALID_CLAIMS -> SAFETYNET_INVALID_CLAIM
         }
 
     private fun logSignInError(e: Throwable) {
