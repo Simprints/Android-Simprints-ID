@@ -18,4 +18,5 @@ interface ScannerManager {
     fun resetVeroUI(): Completable
     fun getAlertType(it: Throwable): FingerprintAlert
     fun disconnectScannerIfNeeded()
+    fun checkBluetoothStatus(): Completable
 }
