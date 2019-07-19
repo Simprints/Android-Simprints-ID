@@ -23,7 +23,7 @@ class CommCareVerifyResponseTest : BaseClientApiTest() {
         val appVerifyResponse = AppVerifyResponse(
             AppMatchResult(UUID.randomUUID().toString(), 90, IAppResponseTier.TIER_1)
         )
-        mockAppModuleResponse(appVerifyResponse, appVerifyAction)
+        mockAppModuleResponse(appVerifyResponse, APP_VERIFICATION_ACTION)
 
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
@@ -42,7 +42,7 @@ class CommCareVerifyResponseTest : BaseClientApiTest() {
             assertThat(it.getString("guid")).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString("tier")).isEqualTo(appVerifyResponse.matchResult.tier.name)
             assertThat(it.getInt("confidence")).isEqualTo(appVerifyResponse.matchResult.confidence)
-            assertThat(it.getString("skipCheck")).isEqualTo(skipCheckValueForFlowCompleted.toString())
+            assertThat(it.getString("skipCheck")).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW.toString())
         } ?: throw Exception("No bundle found")
     }
 }
