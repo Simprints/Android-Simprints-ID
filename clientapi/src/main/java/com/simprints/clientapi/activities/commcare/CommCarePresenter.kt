@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
+import com.simprints.clientapi.extensions.skipCheckForError
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -66,8 +67,9 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            addSkipCheckEvent(errorResponse.skipCheckForError())
-            view.returnErrorToClient(errorResponse)
+            val skipCheck = errorResponse.skipCheckForError()
+            addSkipCheckEvent(skipCheck)
+            view.returnErrorToClient(errorResponse, skipCheck)
         }
     }
 

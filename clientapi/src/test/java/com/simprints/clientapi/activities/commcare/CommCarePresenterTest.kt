@@ -95,10 +95,11 @@ class CommCarePresenterTest {
     @Test
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
-
-        CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, mock(), mock(), mockSharedPrefs())
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(registerId, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
+        verifyOnce(sessionEventsManagerMock) { runBlocking { addSkipCheckEvent(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) } }
     }
 
     @Test
@@ -138,7 +139,7 @@ class CommCarePresenterTest {
     fun handleResponseError_ShouldCallActionError() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
         CommCarePresenter(view, "", mock(), mock(), mockSharedPrefs()).handleResponseError(error)
-        verifyOnce(view) { returnErrorToClient(error) }
+        verifyOnce(view) { returnErrorToClient(error, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

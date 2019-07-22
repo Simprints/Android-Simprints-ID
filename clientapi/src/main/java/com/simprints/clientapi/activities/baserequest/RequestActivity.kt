@@ -57,7 +57,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse) = sendCancelResult()
+    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = sendCancelResult()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

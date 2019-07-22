@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppRefusalResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.RefusalForm
@@ -32,9 +31,13 @@ class StandardExitResponseTest: BaseStandardClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         scenario.result.resultData.setExtrasClassLoader(RefusalForm::class.java.classLoader)
 
-        result.resultData.extras?.getParcelable<RefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)?.let {
-            assertThat(it.reason).isEqualTo(appExitResponse.reason)
-            assertThat(it.extra).isEqualTo(appExitResponse.extra)
+        result.resultData.extras?.let {
+            it.getParcelable<RefusalForm>(Constants.SIMPRINTS_REFUSAL_FORM)?.let { refusal ->
+                assertThat(refusal.reason).isEqualTo(appExitResponse.reason)
+                assertThat(refusal.extra).isEqualTo(appExitResponse.extra)
+            } ?: throw Exception("No refusal form found")
+
+            assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 }
