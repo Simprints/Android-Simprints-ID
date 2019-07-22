@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.collectfingerprint
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
@@ -23,29 +22,22 @@ import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 
-@MediumTest
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest {
 
     @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
-    private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
+    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
     @Inject lateinit var scannerManager: ScannerManager
 
     private val fingerprintModule by lazy {
         TestFingerprintModule(
             bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
-    }
-
-    @Before
-    fun setUp() {
-        AndroidTestConfig(this, fingerprintModule).fullSetup()
     }
 
     @Test
@@ -54,8 +46,10 @@ class CollectFingerprintsActivityTest {
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -75,8 +69,10 @@ class CollectFingerprintsActivityTest {
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
             MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_FOUR_FINGERS).toIntent())
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -98,8 +94,10 @@ class CollectFingerprintsActivityTest {
             MockFinger.NO_FINGER,
             MockFinger.NO_FINGER,
             MockFinger.NO_FINGER)))
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -114,8 +112,10 @@ class CollectFingerprintsActivityTest {
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_TWO_FINGERS).toIntent())
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -130,8 +130,10 @@ class CollectFingerprintsActivityTest {
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
         mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
         setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(collectTaskRequest(Action.ENROL, FINGER_STATUS_FOUR_FINGERS).toIntent())
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -147,6 +149,7 @@ class CollectFingerprintsActivityTest {
         private const val DEFAULT_USER_ID = "some_user_id"
         private const val DEFAULT_MODULE_ID = "some_module_id"
         private const val DEFAULT_LANGUAGE = "en"
+        private val DEFAULT_ACTION = Action.ENROL
         private val FINGER_STATUS_TWO_FINGERS = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
@@ -172,9 +175,9 @@ class CollectFingerprintsActivityTest {
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
-        private fun collectTaskRequest(action: Action, fingerStatus: Map<FingerIdentifier, Boolean>) =
+        private fun collectTaskRequest(fingerStatus: Map<FingerIdentifier, Boolean>) =
             CollectFingerprintsTaskRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID,
-                action, DEFAULT_LANGUAGE, fingerStatus)
+                DEFAULT_ACTION, DEFAULT_LANGUAGE, fingerStatus)
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
             it.putExtra(CollectFingerprintsTaskRequest.BUNDLE_KEY, this)

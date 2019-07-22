@@ -72,7 +72,7 @@ fun collectFingerprintsPressScan() {
             .check(matches(not(withText(R.string.cancel_button))))
             .perform(click())
     }
-    Thread.sleep(500) //Wait for ViewPager animation
+    waitOnUi(2000) //Wait for ViewPager animation
 }
 
 fun skipFinger() {

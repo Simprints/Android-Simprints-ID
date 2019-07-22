@@ -9,7 +9,8 @@ import java.io.PipedOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
 
-class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1TwoFingersGoodScan,
+class MockScannerManager(var scannerState: ScannerState = ScannerState(),
+                         val mockFingers: Array<MockFinger> = MockFinger.person1TwoFingersGoodScan,
                          private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
                          var isAdapterNull: Boolean = false,
                          var isAdapterEnabled: Boolean = true,
@@ -20,7 +21,7 @@ class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1
     private val mockResponseHelper = MockResponseHelper(this)
 
     val mockFingerIndex = AtomicInteger(0)
-    fun currentMockFinger() = mockFingers[mockFingerIndex.get()]
+    fun currentMockFinger() = mockFingers[mockFingerIndex.get()].also { println("Scanner.currentMockFinger() : $it") }
     fun cycleToNextFinger() = mockFingerIndex.set((mockFingerIndex.get() + 1) % mockFingers.size)
 
     private lateinit var fakeScannerStream: PipedOutputStream
@@ -65,7 +66,8 @@ class MockScannerManager(val mockFingers: Array<MockFinger> = MockFinger.person1
 
     private fun handleAppToScannerEvent(bytes: ByteArray) {
         val message: Message = bytesToMessage(bytes)
-        val response: ByteArray = mockResponseHelper.createMockResponse(message, currentMockFinger())
+        scannerState.updateStateAccordingToOutgoingMessage(message)
+        val response: ByteArray = mockResponseHelper.createMockResponse(message)
         writeMockedResponseToStream(response)
     }
 
