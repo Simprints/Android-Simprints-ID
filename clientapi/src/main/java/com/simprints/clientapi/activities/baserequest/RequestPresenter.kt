@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.util.Log
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
@@ -45,7 +44,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
         when (request) {
             is BaseRequest -> view.sendSimprintsRequest(request)
-            is BaseConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
+            is BaseConfirmation -> view.sendSimprintsConfirmation(request)
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {

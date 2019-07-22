@@ -20,7 +20,6 @@ import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
 import timber.log.Timber
 
-
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
 
     abstract val guidSelectionNotifier: GuidSelectionNotifier
@@ -46,10 +45,9 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override fun sendSimprintsRequest(request: BaseRequest) =
         routeSimprintsRequest(this, request)
 
-    override fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation) {
+    override fun sendSimprintsConfirmation(request: BaseConfirmation) {
         routeSimprintsConfirmation(this, request)
         guidSelectionNotifier.showMessage()
-        finishAffinity()
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
