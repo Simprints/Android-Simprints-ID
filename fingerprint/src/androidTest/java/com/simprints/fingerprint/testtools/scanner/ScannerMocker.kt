@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.testtools.scanner
 
+import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.commontesttools.FingerprintGeneratorUtils
 import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
@@ -12,7 +14,7 @@ import com.simprints.testtools.common.syntax.setupMock
 import com.simprints.testtools.common.syntax.wheneverThis
 import org.mockito.ArgumentMatchers.*
 
-fun createMockedScanner(also: Scanner.() -> Unit): Scanner =
+fun createMockedScanner(also: Scanner.() -> Unit = {}): Scanner =
     setupMock {
         makeCallbackSucceeding { connect(anyOrNull()) }
         makeCallbackSucceeding { disconnect(anyOrNull()) }
@@ -42,7 +44,7 @@ fun createMockedScanner(also: Scanner.() -> Unit): Scanner =
         wheneverThis { hardwareVersion } thenReturn DEFAULT_HARDWARE_VERSION
         wheneverThis { crashLogValid } thenReturn true
         wheneverThis { un20State } thenReturn UN20_STATE.READY
-        wheneverThis { imageQuality } thenReturn DEFAULT_IMAGE_QUALITY
+        wheneverThis { imageQuality } thenReturn DEFAULT_GOOD_IMAGE_QUALITY
         wheneverThis { template } thenReturn PeopleGeneratorUtils.getRandomFingerprint().templateBytes
         wheneverThis { connection_sendOtaPacket(anyInt(), anyInt(), anyString()) } thenReturn true
         wheneverThis { connection_sendOtaMeta(anyInt(), anyShort()) } thenReturn true
@@ -64,6 +66,29 @@ fun Scanner.makeCallbackFailing(error: SCANNER_ERROR, method: (Scanner) -> Unit)
     }
 }
 
+fun Scanner.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
+    makeScansSuccessful()
+    wheneverThis { imageQuality } thenReturn qualityScore
+    wheneverThis { template } thenReturn FingerprintGeneratorUtils.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
+}
+
+fun Scanner.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
+    queueFinger(fingerIdentifier, DEFAULT_GOOD_IMAGE_QUALITY)
+
+fun Scanner.queueBadFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
+    queueFinger(fingerIdentifier, DEFAULT_BAD_IMAGE_QUALITY)
+
+fun Scanner.queueFingerNotDetected() {
+    // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
+    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
+    makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
+}
+
+fun Scanner.makeScansSuccessful() {
+    makeCallbackSucceeding { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
+    makeCallbackSucceeding { forceCapture(anyInt(), anyOrNull()) }
+}
+
 const val DEFAULT_SCANNER_ID = "scannerId"
 const val DEFAULT_UC_VERSION = 20.toShort()
 const val DEFAULT_BANK_ID = 0.toByte()
@@ -72,4 +97,5 @@ const val DEFAULT_MAC_ADDRESS = MockScannerManager.DEFAULT_MAC_ADDRESS
 const val DEFAULT_BATTERY_LEVEL_1 = 80.toShort()
 const val DEFAULT_BATTERY_LEVEL_2 = 80.toShort()
 const val DEFAULT_HARDWARE_VERSION = 6.toByte()
-const val DEFAULT_IMAGE_QUALITY = 80
+const val DEFAULT_GOOD_IMAGE_QUALITY = 87
+const val DEFAULT_BAD_IMAGE_QUALITY = 23
