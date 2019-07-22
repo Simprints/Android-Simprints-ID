@@ -2,37 +2,27 @@ package com.simprints.fingerprint.activities.collectfingerprint
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.collectFingerprintsPressScan
-import com.simprints.fingerprint.testtools.scanner.ScannerManagerMock
-import com.simprints.fingerprint.testtools.scanner.createMockedScanner
-import com.simprints.fingerprint.testtools.scanner.makeCallbackFailing
-import com.simprints.fingerprint.testtools.skipFinger
-import com.simprints.fingerprint.testtools.waitForSplashScreenAppearsAndDisappears
-import com.simprints.fingerprintscanner.SCANNER_ERROR
+import com.simprints.fingerprint.testtools.scanner.*
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.wheneverThis
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyLong
 import javax.inject.Inject
 
-@MediumTest
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest {
 
@@ -46,10 +36,77 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
+    fun twoGoodScansAndThenConfirm_finishesWithCorrectResult() {
+        scannerManagerMock = ScannerManagerMock(createMockedScanner())
+
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        pressScan()
+        pressScan()
+        checkIfDialogIsDisplayedWithResultAndClickConfirm()
+
+        val result = collectFingerprintsRule.activityResult.resultData.extras
+            ?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+
+        assertNotNull(result)
+        assertEquals(2, result?.probe?.fingerprints?.size)
+    }
+
+    @Test
+    fun mixedScansAndThenConfirm_finishesWithCorrectResult() {
+        val scanner = createMockedScanner()
+        scannerManagerMock = ScannerManagerMock(scanner)
+
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        // 1. Good scan
+        scanner.queueGoodFinger(FingerIdentifier.LEFT_THUMB)
+        pressScan()
+
+        // 2. Three bad scans
+        scanner.queueBadFinger(FingerIdentifier.LEFT_INDEX_FINGER)
+        pressScan()
+        pressScan()
+        pressScan()
+        waitForSplashScreenToAppearAndDisappear()
+
+        // 3. Finger skipped
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        // 4. Finger could not be acquired on sensor, two bad scans, and then a good scan
+        scanner.queueFingerNotDetected()
+        pressScan()
+        scanner.queueBadFinger(FingerIdentifier.RIGHT_INDEX_FINGER)
+        pressScan()
+        pressScan()
+        scanner.queueGoodFinger(FingerIdentifier.RIGHT_INDEX_FINGER)
+        pressScan()
+
+        checkIfDialogIsDisplayedWithResultAndClickConfirm("✓ LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n✓ RIGHT INDEX FINGER\n")
+
+        val result = collectFingerprintsRule.activityResult.resultData.extras
+            ?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+
+        assertNotNull(result)
+        result?.probe?.fingerprints?.let {
+            assertEquals(3, it.size)
+            assertEquals(DEFAULT_GOOD_IMAGE_QUALITY, it[0].qualityScore)
+            assertEquals(FingerIdentifier.LEFT_THUMB, it[0].fingerId)
+            assertEquals(DEFAULT_BAD_IMAGE_QUALITY, it[1].qualityScore)
+            assertEquals(FingerIdentifier.LEFT_INDEX_FINGER, it[1].fingerId)
+            assertEquals(DEFAULT_GOOD_IMAGE_QUALITY, it[2].qualityScore)
+            assertEquals(FingerIdentifier.RIGHT_INDEX_FINGER, it[2].fingerId)
+        }
+    }
+
+    @Test
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
-        scannerManagerMock = ScannerManagerMock(createMockedScanner {
-            wheneverThis { imageQuality } thenReturn 20 // Bad scan
-        })
+        scannerManagerMock = ScannerManagerMock(createMockedScanner { queueBadFinger() })
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
@@ -57,11 +114,11 @@ class CollectFingerprintsActivityTest {
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        pressScan()
+        pressScan()
+        pressScan()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
 
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
@@ -69,9 +126,7 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun threeBadAndMaxReached_shouldNotAddAFinger() {
-        scannerManagerMock = ScannerManagerMock(createMockedScanner {
-            wheneverThis { imageQuality } thenReturn 20 // Bad scan
-        })
+        scannerManagerMock = ScannerManagerMock(createMockedScanner { queueBadFinger() })
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
@@ -81,11 +136,11 @@ class CollectFingerprintsActivityTest {
 
         assertEquals(4, viewPager?.adapter?.count)
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        pressScan()
+        pressScan()
+        pressScan()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
 
         assertEquals(4, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
@@ -93,11 +148,7 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
-        scannerManagerMock = ScannerManagerMock(createMockedScanner {
-            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
-        })
+        scannerManagerMock = ScannerManagerMock(createMockedScanner { queueFingerNotDetected() })
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
@@ -105,9 +156,9 @@ class CollectFingerprintsActivityTest {
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        pressScan()
+        pressScan()
+        pressScan()
 
         assertEquals(2, viewPager?.adapter?.count)
         assertEquals(0, viewPager?.currentItem)
@@ -115,11 +166,7 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
-        scannerManagerMock = ScannerManagerMock(createMockedScanner {
-            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
-        })
+        scannerManagerMock = ScannerManagerMock(createMockedScanner())
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
@@ -129,7 +176,7 @@ class CollectFingerprintsActivityTest {
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
 
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
@@ -137,11 +184,7 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
-        scannerManagerMock = ScannerManagerMock(createMockedScanner {
-            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
-        })
+        scannerManagerMock = ScannerManagerMock(createMockedScanner())
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
@@ -151,7 +194,8 @@ class CollectFingerprintsActivityTest {
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
+
         assertEquals(4, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
