@@ -131,19 +131,20 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 answer.optionalText)
         }
 
-    internal fun buildConfirmationCallbackEvent(appConfirmationResponse: AppConfirmationResponse) =
-        ConfirmationCallbackEvent(
-            timeHelper.now(),
-            appConfirmationResponse.identificationOutcome
-        )
-
-    internal fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
-        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
-
     override fun handleResult(requestCode: Int, resultCode: Int, data: Intent?) {
         orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
     }
 
     override fun fromDomainToAppResponse(response: AppResponse?): IAppResponse? =
         response?.let { DomainToAppResponse.fromDomainToAppResponse(it) }
+
+    private fun buildConfirmationCallbackEvent(appConfirmationResponse: AppConfirmationResponse) =
+        ConfirmationCallbackEvent(
+            timeHelper.now(),
+            appConfirmationResponse.identificationOutcome
+        )
+
+    private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
+        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
+
 }
