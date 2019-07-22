@@ -55,6 +55,24 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
+    fun twoGoodScansAndThenRestart_restartsToBeginning() {
+        scannerManagerMock = ScannerManagerMock(createMockedScanner())
+
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        pressScan()
+        pressScan()
+        checkIfDialogIsDisplayedAndClickRestart()
+        checkFirstFingerYetToBeScanned()
+
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
+    }
+
+    @Test
     fun mixedScansAndThenConfirm_finishesWithCorrectResult() {
         val scanner = createMockedScanner()
         scannerManagerMock = ScannerManagerMock(scanner)
@@ -105,6 +123,34 @@ class CollectFingerprintsActivityTest {
     }
 
     @Test
+    fun onlySkippedFingers_pressConfirm_notAllowedToContinue() {
+        scannerManagerMock = ScannerManagerMock(createMockedScanner())
+
+        AndroidTestConfig(this, fingerprintModule).fullSetup()
+
+        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+
+        checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n× RIGHT INDEX FINGER\n")
+        checkNoFingersScannedToastIsShown(collectFingerprintsRule.activity)
+        checkFirstFingerYetToBeScanned()
+
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
+    }
+
+    @Test
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
         scannerManagerMock = ScannerManagerMock(createMockedScanner { queueBadFinger() })
 
@@ -112,20 +158,19 @@ class CollectFingerprintsActivityTest {
 
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
-
         pressScan()
         pressScan()
         pressScan()
 
         waitForSplashScreenToAppearAndDisappear()
 
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
-    fun threeBadAndMaxReached_shouldNotAddAFinger() {
+    fun threeBadScansAndMaxReached_shouldNotAddAFinger() {
         scannerManagerMock = ScannerManagerMock(createMockedScanner { queueBadFinger() })
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
@@ -154,12 +199,11 @@ class CollectFingerprintsActivityTest {
 
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
+        pressScan()
+        pressScan()
+        pressScan()
+
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
-
-        pressScan()
-        pressScan()
-        pressScan()
-
         assertEquals(2, viewPager?.adapter?.count)
         assertEquals(0, viewPager?.currentItem)
     }
@@ -172,12 +216,11 @@ class CollectFingerprintsActivityTest {
 
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
-
         skipFinger()
 
         waitForSplashScreenToAppearAndDisappear()
 
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
         assertEquals(3, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
@@ -190,12 +233,11 @@ class CollectFingerprintsActivityTest {
 
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
-        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
-
         skipFinger()
 
         waitForSplashScreenToAppearAndDisappear()
 
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
         assertEquals(4, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
     }
