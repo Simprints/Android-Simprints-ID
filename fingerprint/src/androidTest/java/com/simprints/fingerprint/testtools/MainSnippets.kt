@@ -72,7 +72,7 @@ fun collectFingerprintsPressScan() {
             .check(matches(not(withText(R.string.cancel_button))))
             .perform(click())
     }
-    waitOnUi(2000) //Wait for ViewPager animation
+    waitOnUi(500) // Wait for ViewPager animation
 }
 
 fun skipFinger() {
@@ -96,7 +96,7 @@ fun waitForSplashScreenAppearsAndDisappears() {
             .check(doesNotExist())
     }
 
-    waitOnUi(2000)
+    waitOnUi(500)
 }
 
 fun checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
