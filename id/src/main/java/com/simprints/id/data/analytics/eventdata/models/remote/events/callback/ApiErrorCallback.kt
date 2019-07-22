@@ -16,7 +16,7 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED,
         SCANNER_LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE
+        UNKNOWN_BLUETOOTH_ISSUE,
     }
 }
 

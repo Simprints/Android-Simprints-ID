@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.gms.safetynet.SafetyNet
 import com.google.common.truth.Truth
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -15,6 +16,8 @@ import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.exceptions.safe.secure.SafetyNetException
+import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
@@ -143,7 +146,9 @@ class ProjectAuthenticatorTest {
         val mockWebServer = MockWebServer()
         val mockProjectSecretManager: ProjectSecretManager = mock()
 
-        whenever { mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull()) } thenReturn "encrypted_project_secret"
+        whenever {
+            mockProjectSecretManager.encryptAndStoreAndReturnProjectSecret(ArgumentMatchers.anyString(), anyNotNull())
+        } thenReturn "encrypted_project_secret"
 
         mockWebServer.enqueue(mockResponseForAuthenticationData())
         mockWebServer.enqueue(mockResponseForApiToken())
@@ -163,9 +168,35 @@ class ProjectAuthenticatorTest {
         Truth.assertThat(mockWebServer.requestCount).isEqualTo(2)
     }
 
+    @Test
+    fun safetyNetFailed_shouldThrowRightException() {
+        val attestationManager = mock<AttestationManager>()
+        val nonceScope = NonceScope(projectId, userId)
+
+        whenever {
+            attestationManager.requestAttestation(any(), any())
+        }  thenThrow(SafetyNetException(reason = SafetyNetExceptionReason.SERVICE_UNAVAILABLE))
+
+        val testObserver = ProjectAuthenticator(
+            app.component,
+            SafetyNet.getClient(app),
+            SecureApiServiceMock(createMockBehaviorService(apiClient.retrofit, 0, SecureApiInterface::class.java)),
+            attestationManager)
+            .authenticate(nonceScope, projectId)
+            .test()
+
+        testObserver.awaitTerminalEvent()
+
+        testObserver
+            .assertError(SafetyNetException::class.java)
+    }
+
     private fun getMockAttestationManager(): AttestationManager {
         val attestationManager = mock<AttestationManager>()
-        whenever(attestationManager.requestAttestation(anyNotNull(), anyNotNull())).thenReturn(Single.just(AttestToken("google_attestation")) )
+        whenever {
+            attestationManager.requestAttestation(anyNotNull(), anyNotNull())
+        } thenReturn Single.just(AttestToken("google_attestation"))
+
         return attestationManager
     }
 
