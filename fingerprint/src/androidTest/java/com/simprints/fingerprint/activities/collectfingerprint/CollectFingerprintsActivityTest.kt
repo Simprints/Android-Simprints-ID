@@ -2,6 +2,7 @@ package com.simprints.fingerprint.activities.collectfingerprint
 
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
@@ -12,43 +13,46 @@ import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.ScannerUtils.setupScannerForCollectingFingerprints
 import com.simprints.fingerprint.testtools.collectFingerprintsPressScan
+import com.simprints.fingerprint.testtools.scanner.ScannerManagerMock
+import com.simprints.fingerprint.testtools.scanner.createMockedScanner
+import com.simprints.fingerprint.testtools.scanner.makeCallbackFailing
 import com.simprints.fingerprint.testtools.skipFinger
 import com.simprints.fingerprint.testtools.waitForSplashScreenAppearsAndDisappears
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.MockFinger
-import com.simprints.fingerprintscannermock.MockScannerManager
+import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.wheneverThis
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyLong
 import javax.inject.Inject
 
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest {
 
     @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
 
-    private lateinit var mockBluetoothAdapter: MockBluetoothAdapter
-    @Inject lateinit var scannerManager: ScannerManager
+    @Inject lateinit var scannerManagerMock: ScannerManager
 
     private val fingerprintModule by lazy {
         TestFingerprintModule(
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
+            scannerManagerRule = DependencyRule.ReplaceRule { scannerManagerMock })
     }
 
     @Test
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+        scannerManagerMock = ScannerManagerMock(createMockedScanner {
+            wheneverThis { imageQuality } thenReturn 20 // Bad scan
+        })
+
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
@@ -65,13 +69,12 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun threeBadAndMaxReached_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
+        scannerManagerMock = ScannerManagerMock(createMockedScanner {
+            wheneverThis { imageQuality } thenReturn 20 // Bad scan
+        })
+
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
@@ -90,13 +93,14 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.NO_FINGER,
-            MockFinger.NO_FINGER,
-            MockFinger.NO_FINGER)))
+        scannerManagerMock = ScannerManagerMock(createMockedScanner {
+            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
+        })
+
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
@@ -111,10 +115,14 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
+        scannerManagerMock = ScannerManagerMock(createMockedScanner {
+            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
+        })
+
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
@@ -129,10 +137,14 @@ class CollectFingerprintsActivityTest {
 
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
+        scannerManagerMock = ScannerManagerMock(createMockedScanner {
+            // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
+            makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
+        })
+
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
         collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
