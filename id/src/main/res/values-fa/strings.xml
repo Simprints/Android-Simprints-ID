@@ -33,7 +33,6 @@
     <string name="loading">در حال آماده شدن</string>
     <string name="updating_database">دیتابیس در حال اپدیت است…</string>
     <string name="launch_checking_permissions">اجازه چک کردن</string>
-    <string name="launch_checking_api_key">در حال چک کردن API Key..</string>
     <string name="launch_bt_connect">در حال تماس با Vero..</string>
     <string name="launch_wake_un20">بر حال کردن UN20..</string>
     <string name="launch_setup">آماده ساختن Vero..</string>
@@ -110,9 +109,7 @@
     <string name="verify_guid_not_found_title">شخص دریافت نشد</string>
     <string name="error_occurred_title">اشتباه رخ داد</string>
     <string name="low_battery_title">چارچ بطری کم است</string>
-    <string name="alert_api_key_verify_failed">شناسایی API key ناکام گردید</string>
     <!-- Error Message Text -->
-    <string name="invalid_apikey_message">در تنظیمات (invalid API Key) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_intentAction_message">در تنظیمات (invalid Intent Action) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="invalid_metadata_message">در تنظیمات (invalid metadata) اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
     <string name="missing_userId_message">در تنظیمات no user ID اشتباه رخ داده. لطفا با ادمین تماس بگیرید</string>
@@ -128,7 +125,6 @@
     <string name="disconnected_message">این اسکنر غیرقابل دسترس است، لطفا خود را مطمین سازید که اسکنر مذکور روشن است و نزدیک موبایل قرار دارد.</string>
     <string name="low_battery_message">بطری اسکنر ضعیف است. لطفاً اسکنر را چارچ کنید</string>
     <string name="unforeseen_error_message">معذرت میخواهیم، خطای غیر مترقبه رخ داده، برای دوام برنامه را بند کنید</string>
-    <string name="alert_api_key_verify_failed_body">ما نتوانستیم تا API key شما را شناسایی کنیم. لطفا خود مطمین سازید که با انترنت وصل هستید و دوباره کوشش کنید</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">بند کردن</string>
     <string name="try_again_label">لطفا دوباره تلاش کنید</string>
@@ -178,9 +174,6 @@
     <string name="button_submit">سپردن</string>
     <string name="button_scan_prints">اسکن نمودن نشان انگشتان</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">اسکنر کار نمیدهد</string>
-    <string name="beneficiary_refused">مستفید شونده انکار نمود</string>
-    <string name="refusal_other">دیگر</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">معلومات بیشتر</string>
 

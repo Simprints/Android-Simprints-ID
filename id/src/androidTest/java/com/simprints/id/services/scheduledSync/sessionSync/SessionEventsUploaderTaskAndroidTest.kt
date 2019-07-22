@@ -38,6 +38,7 @@ import com.simprints.id.testtools.testingapi.remote.RemoteTestingManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.testtools.android.waitOnSystem
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import com.simprints.testtools.common.syntax.mock
@@ -47,6 +48,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.*
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -54,6 +56,8 @@ class SessionEventsUploaderTaskAndroidTest {
 
     companion object {
         const val SIGNED_ID_USER = "some_signed_user"
+        val RANDOM_GUID = UUID.randomUUID().toString()
+        const val CLOUD_ASYNC_SESSION_CREATION_TIMEOUT = 5000L
     }
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
@@ -104,11 +108,14 @@ class SessionEventsUploaderTaskAndroidTest {
 
         val nSession = BATCH_SIZE + 1
         createClosedSessions(nSession).forEach {
+            it.addAlertScreenEvents()
             realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
 
         val testObserver = executeUpload()
         testObserver.awaitAndAssertSuccess()
+
+        waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
 
         val response = RemoteTestingManager.create().getSessionCount(testProject.id)
         Truth.assertThat(response.count).isEqualTo(nSession)
@@ -143,9 +150,10 @@ class SessionEventsUploaderTaskAndroidTest {
             realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
 
-
         val testObserver = executeUpload()
         testObserver.awaitAndAssertSuccess()
+
+        waitOnSystem(CLOUD_ASYNC_SESSION_CREATION_TIMEOUT)
 
         val response = RemoteTestingManager.create().getSessionCount(testProject.id)
         Truth.assertThat(response.count).isEqualTo(1)
@@ -165,26 +173,26 @@ class SessionEventsUploaderTaskAndroidTest {
 
     private fun SessionEvents.addAuthenticationEvent() {
         AuthenticationEvent.Result.values().forEach {
-            addEvent(AuthenticationEvent(0, 0, AuthenticationEvent.UserInfo("project_id", "user_id"), it))
+            addEvent(AuthenticationEvent(0, 0, AuthenticationEvent.UserInfo("some_project", "user_id"), it))
         }
     }
 
     private fun SessionEvents.addAuthorizationEvent() {
         AuthorizationEvent.Result.values().forEach {
-            addEvent(AuthorizationEvent(0, it, AuthorizationEvent.UserInfo("project_id", "user_id")))
+            addEvent(AuthorizationEvent(0, it, AuthorizationEvent.UserInfo("some_project", "user_id")))
         }
     }
 
     private fun SessionEvents.addCandidateReadEvent() {
         CandidateReadEvent.LocalResult.values().forEach { local ->
             CandidateReadEvent.RemoteResult.values().forEach { remote ->
-                addEvent(CandidateReadEvent(0, 0, "some_string", local, remote))
+                addEvent(CandidateReadEvent(0, 0, RANDOM_GUID, local, remote))
             }
         }
     }
 
     private fun SessionEvents.addConnectivitySnapshotEvent() {
-        addEvent(ConnectivitySnapshotEvent(0, "", listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))))
+        addEvent(ConnectivitySnapshotEvent(0,  "Unknown", listOf(SimNetworkUtils.Connection("connection", NetworkInfo.DetailedState.CONNECTED))))
     }
 
     private fun SessionEvents.addConsentEvent() {
@@ -196,7 +204,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addEnrolmentEvent() {
-        addEvent(EnrolmentEvent(0, "guid"))
+        addEvent(EnrolmentEvent(0, RANDOM_GUID))
     }
 
     private fun SessionEvents.addFingerprintCaptureEvent() {
@@ -229,11 +237,11 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addOneToOneMatchEvent() {
-        addEvent(OneToOneMatchEvent(0, 0, "guid", MatchEntry("guid", 0F)))
+        addEvent(OneToOneMatchEvent(0, 0, RANDOM_GUID, MatchEntry(RANDOM_GUID, 0F)))
     }
 
     private fun SessionEvents.addPersonCreationEvent() {
-        addEvent(PersonCreationEvent(0, listOf("id1, id2")))
+        addEvent(PersonCreationEvent(0, listOf(RANDOM_GUID, RANDOM_GUID)))
     }
 
     private fun SessionEvents.addRefusalEvent() {
@@ -258,11 +266,11 @@ class SessionEventsUploaderTaskAndroidTest {
         }
 
         Tier.values().forEach {
-            addEvent(IdentificationCallbackEvent(0, "session_id", listOf(CallbackComparisonScore("guid", 0, it))))
+            addEvent(IdentificationCallbackEvent(0, "session_id", listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
         }
 
         addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
-        addEvent(VerificationCallbackEvent(0, CallbackComparisonScore("guid", 0, Tier.TIER_1)))
+        addEvent(VerificationCallbackEvent(0, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
     }
 
     private fun SessionEvents.addCalloutEvent() {

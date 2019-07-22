@@ -3,12 +3,12 @@ package com.simprints.id.domain.moduleapi.app
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.Parcelize
-import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 object DomainToAppResponse {
 

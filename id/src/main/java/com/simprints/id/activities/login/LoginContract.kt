@@ -24,6 +24,7 @@ interface LoginContract {
         fun handleSignInFailedProjectIdIntentMismatch()
         fun handleSignInFailedUnknownReason()
         fun handleSignInSuccess()
+        fun handleSafetyNetDownError()
     }
 
     interface Presenter : BasePresenter {
