@@ -149,7 +149,7 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-    implementation deps.firebase.jwt
+    implementation deps.jwt.core
     api deps.firebase.database
     api deps.firebase.core
     api deps.firebase.auth

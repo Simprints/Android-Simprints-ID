@@ -56,8 +56,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             presenter.handleScannerButtonPressed()
     }
 
-    private fun shouldEnableScanButton() = !presenter.isTryDifferentFingerSplashShown &&
-        !presenter.isNudging
+    private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
     init {
         component.inject(this)

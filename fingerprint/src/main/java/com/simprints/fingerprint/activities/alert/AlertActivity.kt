@@ -53,7 +53,6 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun onResume() {
         super.onResume()
         viewPresenter.handleOnResume()
-
     }
 
     //This check will be removed in the next release as we will be switching to the 'activity_fingerprint_bluetooth_alert' for all alerts

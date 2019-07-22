@@ -108,12 +108,12 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     // Swipes ViewPager automatically when the current finger is complete
     fun doNudge() {
         if (presenter.currentActiveFingerNo < presenter.activeFingers.size) {
-            presenter.isNudging = true
+            presenter.isBusyWithFingerTransitionAnimation = true
             Handler().postDelayed({
                 view.viewPager.setScrollDuration(SLOW_SWIPE_SPEED)
                 view.viewPager.currentItem = presenter.currentActiveFingerNo + 1
                 view.viewPager.setScrollDuration(FAST_SWIPE_SPEED)
-                presenter.isNudging = false
+                presenter.isBusyWithFingerTransitionAnimation = false
             }, AUTO_SWIPE_DELAY)
         }
     }
