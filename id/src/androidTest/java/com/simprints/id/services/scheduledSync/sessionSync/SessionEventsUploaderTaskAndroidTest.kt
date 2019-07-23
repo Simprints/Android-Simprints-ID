@@ -146,6 +146,7 @@ class SessionEventsUploaderTaskAndroidTest {
             addSuspiciousIntentEvent()
             addCallbackEvent()
             addCalloutEvent()
+            addSkipCheckEvent()
         }.also {
             realmSessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
         }
@@ -256,6 +257,10 @@ class SessionEventsUploaderTaskAndroidTest {
 
     private fun SessionEvents.addSuspiciousIntentEvent() {
         addEvent(SuspiciousIntentEvent(0, mapOf("some_extra_key" to "value")))
+    }
+
+    private fun SessionEvents.addSkipCheckEvent() {
+        addEvent(SkipCheckEvent(0, true))
     }
 
     private fun SessionEvents.addCallbackEvent() {

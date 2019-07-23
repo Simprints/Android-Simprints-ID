@@ -239,6 +239,17 @@ class SessionEventsAdapterFactoryTest {
     }
 
     @Test
+    fun validate_skipCheckEventApiModel() {
+        val event = SkipCheckEvent(
+            10,
+            true)
+
+        val apiEvent = ApiSkipCheckEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+        validateSkipCheckEventApiModel(json)
+    }
+
+    @Test
     fun validate_fingerprintCaptureEventApiModel() {
         val event = FingerprintCaptureEvent(
             10,

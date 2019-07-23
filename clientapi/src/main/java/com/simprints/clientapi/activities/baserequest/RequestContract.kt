@@ -35,13 +35,10 @@ interface RequestContract {
 
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
-        fun returnErrorToClient(resultCode: Int?)
-
+        fun returnErrorToClient(errorResponse: ErrorResponse)
     }
 
     interface Presenter {
-
-        val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
 
         fun processEnrollRequest()
 

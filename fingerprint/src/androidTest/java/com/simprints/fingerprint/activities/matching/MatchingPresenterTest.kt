@@ -41,7 +41,6 @@ import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class MatchingPresenterTest {
 
     @get:Rule val rxSchedulerRule = RxSchedulerRule()
@@ -96,7 +95,6 @@ class MatchingPresenterTest {
         }
 
     @Test
-    @MediumTest
     fun identificationRequestWithinProjectGroup_startedAndAwaited_finishesWithProbeInMatchResult() {
         testIdentification(probe, QueryForIdentifyPool(DEFAULT_PROJECT_ID))
         verifyOnce(dbManagerMock) { loadPeople(DEFAULT_PROJECT_ID, null, null) }
