@@ -45,7 +45,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
         when (request) {
             is BaseRequest -> view.sendSimprintsRequest(request)
-            is BaseConfirmation -> view.sendSimprintsConfirmationAndFinish(request)
+            is BaseConfirmation -> view.sendSimprintsConfirmation(request)
             else -> throw InvalidClientRequestException()
         }
     } catch (exception: InvalidRequestException) {
