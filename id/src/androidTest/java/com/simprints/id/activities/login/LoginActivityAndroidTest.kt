@@ -1,9 +1,14 @@
 package com.simprints.id.activities.login
 
+import android.app.Activity
+import android.app.Instrumentation
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
@@ -14,6 +19,7 @@ import com.simprints.id.commontesttools.state.replaceSecureApiClientWithFailingC
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.secure.keystore.KeystoreManager
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.android.BaseAssertions
@@ -97,6 +103,23 @@ class LoginActivityAndroidTest : BaseAssertions() {
         pressSignIn()
 
         assertToastMessageIs(R.string.login_no_network)
+    }
+
+    @Test
+    fun pressBack_shouldFinishWithRightResult() {
+        val activityScenario = launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
+        Espresso.pressBackUnconditionally()
+
+        verifyIntentReturnedForLoginNotComplete(activityScenario.result)
+    }
+
+    private fun verifyIntentReturnedForLoginNotComplete(result: Instrumentation.ActivityResult) {
+        assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
+
+        result.resultData.setExtrasClassLoader(AppErrorResponse::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<AppErrorResponse>(LoginActivityResponse.BUNDLE_KEY)
+
+        assertThat(response.reason).isEqualTo(AppErrorResponse.Reason.LOGIN_NOT_COMPLETE)
     }
 
     companion object {
