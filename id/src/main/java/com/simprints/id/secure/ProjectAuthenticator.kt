@@ -11,7 +11,6 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.exceptions.safe.secure.DifferentProjectIdReceivedFromIntentException
 import com.simprints.id.secure.models.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -41,7 +40,6 @@ open class ProjectAuthenticator(component: AppComponent,
 
     /**
      * @throws IOException
-     * @throws DifferentProjectIdReceivedFromIntentException
      * @throws AuthRequestInvalidCredentialsException
      * @throws SimprintsInternalServerException
      */
@@ -53,6 +51,9 @@ open class ProjectAuthenticator(component: AppComponent,
             .fetchProjectRemoteConfigSettings(nonceScope.projectId)
             .storeProjectRemoteConfigSettingsAndReturnProjectLanguages()
             .fetchProjectLongConsentTexts()
+
+
+
 
     private fun Completable.prepareAuthRequestParameters(nonceScope: NonceScope, projectSecret: String): Single<AuthRequest> =
         andThen(buildAuthRequestParameters(nonceScope, projectSecret))
