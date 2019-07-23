@@ -6,6 +6,7 @@ import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
+import com.simprints.clientapi.extensions.skipCheckForError
 import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
@@ -78,9 +79,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
+    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, errorResponse.skipCheckForError().toString())
+            putString(SKIP_CHECK_KEY, skipCheck.toString())
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
