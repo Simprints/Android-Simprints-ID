@@ -33,7 +33,7 @@ fun <T> whenever(methodCall: () -> T): InfixOngoingStubbing<T> =
 fun <T, R> whenever(mock: T, methodCall: T.() -> R): InfixStubber<T, R> =
     InfixStubber(mock, methodCall)
 
-fun <T, R> T.wheneverThis(methodCall: T.() -> R): InfixStubber<T, R> =
+fun <T, R> T.whenThis(methodCall: T.() -> R): InfixStubber<T, R> =
     InfixStubber(this, methodCall)
 
 fun <T : Any, R> wheneverOnSuspend(mock: T, methodCall: suspend T.() -> R): InfixStubberOnSuspend<T, R> =
