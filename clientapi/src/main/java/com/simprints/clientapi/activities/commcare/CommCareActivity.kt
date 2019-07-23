@@ -19,16 +19,18 @@ import org.koin.core.parameter.parametersOf
 class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     companion object {
-        const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
+        private const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
 
-        const val SKIP_CHECK_KEY = "skipCheck"
-        const val REGISTRATION_GUID_KEY = "guid"
-        const val VERIFICATION_CONFIDENCE_KEY = "confidence"
-        const val VERIFICATION_TIER_KEY = "tier"
-        const val VERIFICATION_GUID_KEY = "guid"
-        const val EXIT_REASON = "reason"
-        const val EXIT_EXTRA = "extra"
-        const val IDENTIFICATION_OUTCOME_EXTRA = "identificationOutcome"
+        private const val SKIP_CHECK_KEY = "skipCheck"
+        private const val REGISTRATION_GUID_KEY = "guid"
+        private const val VERIFICATION_CONFIDENCE_KEY = "confidence"
+        private const val VERIFICATION_TIER_KEY = "tier"
+        private const val VERIFICATION_GUID_KEY = "guid"
+        private const val EXIT_REASON = "reason"
+        private const val EXIT_EXTRA = "extra"
+        private const val IDENTIFICATION_OUTCOME_EXTRA = "identificationOutcome"
+
+        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
     }
 
     override val presenter: CommCareContract.Presenter by inject { parametersOf(this, action) }
@@ -39,6 +41,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.action != CONFIRM_IDENTITY_ACTION)
+            showLauncherScreen()
+
         loadClientApiKoinModules()
         CoroutineScope(Dispatchers.Main).launch {
             presenter.start()
