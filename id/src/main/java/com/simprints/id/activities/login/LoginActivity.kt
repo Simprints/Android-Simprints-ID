@@ -11,9 +11,11 @@ import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.login.response.LoginActivityResponse.Companion.RESULT_CODE_LOGIN_SUCCEED
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
@@ -169,5 +171,16 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun handleSignInFailedUnknownReason() {
         progressDialog.dismiss()
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
+    }
+
+    override fun onBackPressed() {
+        viewPresenter.handleBackPressed()
+    }
+
+    override fun setErrorResponseAsResultAndFinish(activityResult: Int, appErrorResponse: AppErrorResponse) {
+        setResult(activityResult, Intent().apply {
+            putExtra(LoginActivityResponse.BUNDLE_KEY, appErrorResponse)
+        })
+        finish()
     }
 }

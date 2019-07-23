@@ -1,6 +1,7 @@
 package com.simprints.id.activities.login
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -10,6 +11,8 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.Authentica
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AuthenticationEvent.UserInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.LOGIN_NOT_COMPLETE
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.secure.ProjectAuthenticator
@@ -152,6 +155,10 @@ class LoginPresenter(val view: LoginContract.View,
             view.showErrorForInvalidQRCode()
             logMessageForCrashReportWithUITrigger("QR scanning unsuccessful")
         }
+    }
+
+    override fun handleBackPressed() {
+        view.setErrorResponseAsResultAndFinish(Activity.RESULT_OK, AppErrorResponse(LOGIN_NOT_COMPLETE))
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {
