@@ -170,4 +170,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         progressDialog.dismiss()
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
+
+    override fun handleSafetyNetDownError() {
+        progressDialog.dismiss()
+        launchAlert(this, AlertType.SAFETYNET_ERROR)
+    }
 }

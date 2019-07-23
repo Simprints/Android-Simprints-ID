@@ -73,8 +73,7 @@ interface CollectFingerprintsContract {
         fun initIndicators()
 
         // Finger
-        var isTryDifferentFingerSplashShown: Boolean
-        var isNudging: Boolean
+        var isBusyWithFingerTransitionAnimation: Boolean
         fun resolveFingerTerminalConditionTriggered()
 
         fun currentFinger(): Finger

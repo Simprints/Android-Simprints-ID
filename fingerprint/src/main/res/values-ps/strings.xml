@@ -28,7 +28,6 @@
     <string name="loading">د آماده کیدو پر حال</string>
     <string name="updating_database">ډیټابیس د تجدید یا اپدیټ په حال کی ده…</string>
     <string name="launch_checking_permissions">د چک کولو اجازه</string>
-    <string name="launch_checking_api_key">د ...... د چک کولو په حال</string>
     <string name="launch_bt_connect">له Veroسره د اړیکې په حال کې</string>
     <string name="launch_wake_un20">د .... برابرول</string>
     <string name="launch_setup">د .... آماده کول</string>
@@ -105,9 +104,7 @@
     <string name="verify_guid_not_found_title">کس پیدا نشو</string>
     <string name="error_occurred_title">تیروتنه رامنځته شوه</string>
     <string name="low_battery_title">د بطرۍ چارج لږ دی</string>
-    <string name="alert_api_key_verify_failed">د API Key پیژندنه ناکامه شوه</string>
     <!-- Error Message Text -->
-    <string name="invalid_apikey_message">د (invalid API Key)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
     <string name="missing_userId_message">د no user ID په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
@@ -123,7 +120,6 @@
     <string name="disconnected_message">دغه سکینر د لاسرسۍ وړ نه ده. په مهربانۍ سره ځان ډاډه کړئ چې سکینر لږیدلې او موبایل ته نژدې ایښودل شوی دی</string>
     <string name="low_battery_message">د سکینر بطري په ختمیدو ده. په مهربانۍ سره د خپل سکینر بطري چارج کړئ.</string>
     <string name="unforeseen_error_message">بښنه غواړو، غیر مترقبه تیروتنه ترسره شوی، د دوام لپاره پروګرام بند کړئ</string>
-    <string name="alert_api_key_verify_failed_body">مونږ ونشو کړې څو ستاسو .... وپیژنو، په مهربانۍ سره ځان ډاډه کړئ چې له انټرنټ سره وصل یاست او وروسته بیا کوښښ وکړئ.</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">بندول</string>
     <string name="try_again_label">په مهربانۍ سره بیا کوښښ وکړئ</string>
