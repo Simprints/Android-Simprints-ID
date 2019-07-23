@@ -25,6 +25,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
         private const val ODK_IDENTIFICATION_OUTCOME_KEY = "odk-identification-outcome"
+        private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
 
     override val presenter: OdkContract.Presenter by inject { parametersOf(this, action) }
@@ -35,6 +36,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.action != CONFIRM_IDENTITY_ACTION)
+            showLauncherScreen()
+
         loadClientApiKoinModules()
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }

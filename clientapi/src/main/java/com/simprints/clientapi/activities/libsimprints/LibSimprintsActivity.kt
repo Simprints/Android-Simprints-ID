@@ -22,6 +22,9 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.action != Constants.SIMPRINTS_SELECT_GUID_INTENT)
+            showLauncherScreen()
+
         loadClientApiKoinModules()
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }

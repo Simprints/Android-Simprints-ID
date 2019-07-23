@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -70,6 +71,11 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     protected fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
+    }
+
+    protected fun showLauncherScreen() {
+        setContentView(R.layout.launcher)
+        supportActionBar?.hide()
     }
 
     private fun sendCancelResult() {
