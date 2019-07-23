@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.simprints.clientapi.activities.baserequest.RequestActivity
 import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
 import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
+import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.libsimprints.*
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +47,11 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
         sendOkResult(it)
+    }
+
+    override fun returnErrorToClient(errorResponse: ErrorResponse) {
+        setResult(errorResponse.reason.libSimprintsResultCode())
+        finish()
     }
 
     override fun onDestroy() {

@@ -15,7 +15,7 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
+        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -74,6 +74,7 @@ dependencies {
 
     // Kotlin
     implementation deps.androidx.core
+    implementation deps.androidx.multidex
 
     // Unit Tests
     testImplementation project(':testtools')
@@ -91,6 +92,9 @@ dependencies {
     testImplementation deps.testing.androidx.ext_junit
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.koin.core_ext
+    testImplementation deps.testing.koin
 
     // Android Tests
     androidTestImplementation(project(':testtools')) {
@@ -118,4 +122,6 @@ dependencies {
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
     androidTestCompile deps.testing.mockito.mockito_inline_androidtests
+    androidTestImplementation deps.testing.truth
+
 }

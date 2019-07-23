@@ -57,20 +57,14 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun returnErrorToClient(resultCode: Int?) {
-        resultCode?.let {
-            setResult(it, intent)
-        } ?: setResult(Activity.RESULT_CANCELED)
-
-        finish()
-    }
+    override fun returnErrorToClient(errorResponse: ErrorResponse) = sendCancelResult()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Timber.d("RequestActivity: onActivityResult")
 
         if (resultCode != Activity.RESULT_OK || data == null)
-            setResult(resultCode, data).also { finish() }
+            sendCancelResult()
         else {
             // TODO: Clean this flow up more
             data.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
@@ -80,7 +74,12 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
 
     }
 
-    protected fun sendOkResult(intent: Intent) {
+    private fun sendCancelResult() {
+        setResult(Activity.RESULT_CANCELED)
+        finish()
+    }
+
+    internal fun sendOkResult(intent: Intent) {
         setResult(Activity.RESULT_OK, intent)
         finish()
     }
