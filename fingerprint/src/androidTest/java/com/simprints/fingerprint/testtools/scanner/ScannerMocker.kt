@@ -11,7 +11,7 @@ import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.wheneverThis
+import com.simprints.testtools.common.syntax.whenThis
 import org.mockito.ArgumentMatchers.*
 
 fun createMockedScanner(also: Scanner.() -> Unit = {}): Scanner =
@@ -27,40 +27,40 @@ fun createMockedScanner(also: Scanner.() -> Unit = {}): Scanner =
         makeCallbackSucceeding { un20Shutdown(anyOrNull()) }
         makeCallbackSucceeding { updateSensorInfo(anyOrNull()) }
         makeCallbackSucceeding { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
-        wheneverThis { stopContinuousCapture() } thenReturn true
-        wheneverThis { registerButtonListener(anyNotNull()) } thenReturn true
-        wheneverThis { unregisterButtonListener(anyNotNull()) } thenReturn true
+        whenThis { stopContinuousCapture() } thenReturn true
+        whenThis { registerButtonListener(anyNotNull()) } thenReturn true
+        whenThis { unregisterButtonListener(anyNotNull()) } thenReturn true
         makeCallbackSucceeding { forceCapture(anyInt(), anyOrNull()) }
         makeCallbackSucceeding { resetUI(anyNotNull()) }
-        wheneverThis { setHardwareConfig(anyNotNull(), anyOrNull()) }
-        wheneverThis { isConnected } thenReturn true
-        wheneverThis { scannerId } thenReturn DEFAULT_SCANNER_ID
-        wheneverThis { ucVersion } thenReturn DEFAULT_UC_VERSION
-        wheneverThis { bankId } thenReturn DEFAULT_BANK_ID
-        wheneverThis { unVersion } thenReturn DEFAULT_UN_VERSION
-        wheneverThis { macAddress } thenReturn DEFAULT_MAC_ADDRESS
-        wheneverThis { batteryLevel1 } thenReturn DEFAULT_BATTERY_LEVEL_1
-        wheneverThis { batteryLevel2 } thenReturn DEFAULT_BATTERY_LEVEL_2
-        wheneverThis { hardwareVersion } thenReturn DEFAULT_HARDWARE_VERSION
-        wheneverThis { crashLogValid } thenReturn true
-        wheneverThis { un20State } thenReturn UN20_STATE.READY
-        wheneverThis { imageQuality } thenReturn DEFAULT_GOOD_IMAGE_QUALITY
-        wheneverThis { template } thenReturn PeopleGeneratorUtils.getRandomFingerprint().templateBytes
-        wheneverThis { connection_sendOtaPacket(anyInt(), anyInt(), anyString()) } thenReturn true
-        wheneverThis { connection_sendOtaMeta(anyInt(), anyShort()) } thenReturn true
-        wheneverThis { connection_setBank(anyChar(), anyChar(), anyChar()) } thenReturn true
+        whenThis { setHardwareConfig(anyNotNull(), anyOrNull()) }
+        whenThis { isConnected } thenReturn true
+        whenThis { scannerId } thenReturn DEFAULT_SCANNER_ID
+        whenThis { ucVersion } thenReturn DEFAULT_UC_VERSION
+        whenThis { bankId } thenReturn DEFAULT_BANK_ID
+        whenThis { unVersion } thenReturn DEFAULT_UN_VERSION
+        whenThis { macAddress } thenReturn DEFAULT_MAC_ADDRESS
+        whenThis { batteryLevel1 } thenReturn DEFAULT_BATTERY_LEVEL_1
+        whenThis { batteryLevel2 } thenReturn DEFAULT_BATTERY_LEVEL_2
+        whenThis { hardwareVersion } thenReturn DEFAULT_HARDWARE_VERSION
+        whenThis { crashLogValid } thenReturn true
+        whenThis { un20State } thenReturn UN20_STATE.READY
+        whenThis { imageQuality } thenReturn DEFAULT_GOOD_IMAGE_QUALITY
+        whenThis { template } thenReturn PeopleGeneratorUtils.getRandomFingerprint().templateBytes
+        whenThis { connection_sendOtaPacket(anyInt(), anyInt(), anyString()) } thenReturn true
+        whenThis { connection_sendOtaMeta(anyInt(), anyShort()) } thenReturn true
+        whenThis { connection_setBank(anyChar(), anyChar(), anyChar()) } thenReturn true
         also(this)
     }
 
 fun Scanner.makeCallbackSucceeding(method: (Scanner) -> Unit) {
-    wheneverThis(method) then { onMock ->
+    whenThis(method) then { onMock ->
         val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
         callback?.onSuccess()
     }
 }
 
 fun Scanner.makeCallbackFailing(error: SCANNER_ERROR, method: (Scanner) -> Unit) {
-    wheneverThis(method) then { onMock ->
+    whenThis(method) then { onMock ->
         val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
         callback?.onFailure(error)
     }
@@ -68,8 +68,8 @@ fun Scanner.makeCallbackFailing(error: SCANNER_ERROR, method: (Scanner) -> Unit)
 
 fun Scanner.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
     makeScansSuccessful()
-    wheneverThis { imageQuality } thenReturn qualityScore
-    wheneverThis { template } thenReturn FingerprintGeneratorUtils.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
+    whenThis { imageQuality } thenReturn qualityScore
+    whenThis { template } thenReturn FingerprintGeneratorUtils.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
 }
 
 fun Scanner.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
