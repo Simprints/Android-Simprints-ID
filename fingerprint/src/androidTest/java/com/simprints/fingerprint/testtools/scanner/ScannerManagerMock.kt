@@ -3,11 +3,10 @@ package com.simprints.fingerprint.testtools.scanner
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscannermock.MockScannerManager
 import io.reactivex.Completable
 
 class ScannerManagerMock(override var scanner: Scanner?,
-                         override var macAddress: String? = MockScannerManager.DEFAULT_MAC_ADDRESS) : ScannerManager {
+                         override var macAddress: String? = DEFAULT_MAC_ADDRESS) : ScannerManager {
 
     override fun start(): Completable = Completable.complete()
 

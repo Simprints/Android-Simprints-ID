@@ -26,12 +26,11 @@ import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryExceptio
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.MockScannerManager
+import com.simprints.fingerprint.testtools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -50,7 +49,6 @@ class LaunchActivityAndroidTest {
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
     @get:Rule val launchActivityRule = ActivityTestRule(LaunchActivity::class.java, false, false)
 
-    private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
     @Inject lateinit var scannerManagerSpy: ScannerManager
     @Inject lateinit var dbManagerMock: FingerprintDbManager
     @Inject lateinit var simNetworkUtilsMock: FingerprintSimNetworkUtils
@@ -59,8 +57,7 @@ class LaunchActivityAndroidTest {
     private val fingerprintModule by lazy {
         TestFingerprintModule(
             scannerManagerRule = DependencyRule.SpyRule,
-            consentDataManagerRule = DependencyRule.MockRule,
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
+            consentDataManagerRule = DependencyRule.MockRule)
     }
 
     private val fingerprintCoreModule by lazy {
@@ -74,6 +71,7 @@ class LaunchActivityAndroidTest {
         AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
         mockDefaultConsentDataManager(true)
         mockDefaultDbManager()
+        scannerManagerSpy.setupScannerManagerMockWithMockedScanner()
     }
 
     private fun mockDefaultDbManager() {
@@ -200,7 +198,7 @@ class LaunchActivityAndroidTest {
 
     @Test
     fun enrollmentCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockDefaultConsentDataManager(parentalConsentExists = false)
+        mockDefaultConsentDataManager(hasParentalConsent = false)
 
         launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
@@ -220,7 +218,7 @@ class LaunchActivityAndroidTest {
 
     @Test
     fun identifyCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockDefaultConsentDataManager(parentalConsentExists = false)
+        mockDefaultConsentDataManager(hasParentalConsent = false)
 
         launchActivityRule.launchActivity(launchTaskRequest(Action.IDENTIFY).toIntent())
         val activity = launchActivityRule.activity
@@ -238,7 +236,7 @@ class LaunchActivityAndroidTest {
 
     @Test
     fun enrollmentCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockDefaultConsentDataManager(parentalConsentExists = true)
+        mockDefaultConsentDataManager(hasParentalConsent = true)
 
         launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         val activity = launchActivityRule.activity
@@ -260,7 +258,7 @@ class LaunchActivityAndroidTest {
 
     @Test
     fun identifyCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockDefaultConsentDataManager(parentalConsentExists = true)
+        mockDefaultConsentDataManager(hasParentalConsent = true)
 
         launchActivityRule.launchActivity(launchTaskRequest(Action.IDENTIFY).toIntent())
         val activity = launchActivityRule.activity
@@ -326,16 +324,15 @@ class LaunchActivityAndroidTest {
         assertEquals(targetConsentText, generalConsentText)
     }
 
-
-    private fun mockDefaultConsentDataManager(parentalConsentExists: Boolean = false,
+    private fun mockDefaultConsentDataManager(hasParentalConsent: Boolean = false,
                                               generalConsentOptions: String = REMOTE_CONSENT_GENERAL_OPTIONS,
                                               parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
-        whenever(consentDataManagerMock) { this.parentalConsentExists } thenReturn parentalConsentExists
-        whenever(consentDataManagerMock) { this.generalConsentOptionsJson } thenReturn generalConsentOptions
-        whenever(consentDataManagerMock) { this.parentalConsentOptionsJson } thenReturn parentalConsentOptions
-
+        with(consentDataManagerMock) {
+            whenThis { parentalConsentExists } thenReturn hasParentalConsent
+            whenThis { generalConsentOptionsJson } thenReturn generalConsentOptions
+            whenThis { parentalConsentOptionsJson } thenReturn parentalConsentOptions
+        }
     }
-
 
     private fun makeSetupVeroSucceeding() {
         makeInitVeroStepSucceeding()
@@ -358,7 +355,6 @@ class LaunchActivityAndroidTest {
 
     private fun makeInitVeroStepSucceeding() {
         whenever(scannerManagerSpy) { initVero() } thenReturn Completable.complete()
-        scannerManagerSpy.scanner = Scanner(MAC_ADDRESS, mockBluetoothAdapter)
     }
 
     companion object {
@@ -369,14 +365,12 @@ class LaunchActivityAndroidTest {
         private const val DEFAULT_ORGANISATION_NAME = "This organisation"
         private const val DEFAULT_VERIFY_GUID = "verify_guid"
 
-        private const val MAC_ADDRESS = "F0:AC:D7:C8:CB:22"
-
         private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
             DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME, if (action == Action.VERIFY) DEFAULT_VERIFY_GUID else null
         )
-        
-        private fun LaunchTaskRequest.toIntent() = Intent().also { 
+
+        private fun LaunchTaskRequest.toIntent() = Intent().also {
             it.putExtra(LaunchTaskRequest.BUNDLE_KEY, this)
         }
 

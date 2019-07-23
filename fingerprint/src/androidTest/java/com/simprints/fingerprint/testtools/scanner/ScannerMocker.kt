@@ -7,7 +7,6 @@ import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
 import com.simprints.fingerprintscanner.enums.UN20_STATE
-import com.simprints.fingerprintscannermock.MockScannerManager
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.setupMock
@@ -93,7 +92,7 @@ const val DEFAULT_SCANNER_ID = "scannerId"
 const val DEFAULT_UC_VERSION = 20.toShort()
 const val DEFAULT_BANK_ID = 0.toByte()
 const val DEFAULT_UN_VERSION = 0.toShort()
-const val DEFAULT_MAC_ADDRESS = MockScannerManager.DEFAULT_MAC_ADDRESS
+const val DEFAULT_MAC_ADDRESS = "F0:AC:D7:CE:E3:B5"
 const val DEFAULT_BATTERY_LEVEL_1 = 80.toShort()
 const val DEFAULT_BATTERY_LEVEL_2 = 80.toShort()
 const val DEFAULT_HARDWARE_VERSION = 6.toByte()
