@@ -1,6 +1,6 @@
 package com.simprints.id.data.db.remote
 
-import com.auth0.android.jwt.JWT
+import com.auth0.jwt.JWT
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -49,7 +49,7 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     }
 
     private fun cacheTokenClaims(token: String) {
-        val claims = JWT(token).claims
+        val claims = JWT.decode(token).claims
         loginInfoManager.projectIdTokenClaim = claims[projectIdClaim]?.asString()
         loginInfoManager.userIdTokenClaim = claims[userIdClaim]?.asString()
     }
