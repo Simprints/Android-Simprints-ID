@@ -87,7 +87,6 @@ class OdkPresenter(private val view: OdkContract.View,
         }
     }
 
-
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
@@ -98,4 +97,9 @@ class OdkPresenter(private val view: OdkContract.View,
 
     private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
         sessionEventsManager.addSkipCheckEvent(skipCheck)
+
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
+    }
+
 }

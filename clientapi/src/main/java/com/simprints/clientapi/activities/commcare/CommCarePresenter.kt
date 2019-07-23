@@ -97,6 +97,10 @@ class CommCarePresenter(private val view: CommCareContract.View,
     private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
         sessionEventsManager.addSkipCheckEvent(skipCheck)
 
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
+    }
+
     private fun checkAndProcessSessionId() {
         if ((view.extras?.get(Constants.SIMPRINTS_SESSION_ID) as CharSequence?).isNullOrBlank()) {
             if (sharedPreferencesManager.peekSessionId().isNotBlank()) {

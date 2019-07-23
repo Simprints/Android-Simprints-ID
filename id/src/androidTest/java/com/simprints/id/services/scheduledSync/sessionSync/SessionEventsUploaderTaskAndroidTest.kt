@@ -276,6 +276,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
         addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
         addEvent(VerificationCallbackEvent(0, CallbackComparisonScore(RANDOM_GUID, 0, Tier.TIER_1)))
+        addEvent(ConfirmationCallbackEvent(0, true))
     }
 
     private fun SessionEvents.addCalloutEvent() {

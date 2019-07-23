@@ -93,5 +93,9 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
 
     private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
         sessionEventsManager.addSkipCheckEvent(skipCheck)
+
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
+    }
 }
 
