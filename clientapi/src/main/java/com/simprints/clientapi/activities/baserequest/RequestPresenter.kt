@@ -1,6 +1,5 @@
 package com.simprints.clientapi.activities.baserequest
 
-import android.util.Log
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
 import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
@@ -14,6 +13,7 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.inBackground
+import com.simprints.clientapi.extensions.skipCheckForError
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
@@ -70,7 +70,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        view.returnErrorToClient(errorResponse)
+        view.returnErrorToClient(errorResponse, errorResponse.skipCheckForError())
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

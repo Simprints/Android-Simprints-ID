@@ -77,8 +77,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse) = Intent().let {
-        it.putExtra(ODK_SKIP_CHECK_KEY, errorResponse.skipCheckForError())
+    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = Intent().let {
+        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
         sendOkResult(it)
     }
 

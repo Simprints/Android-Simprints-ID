@@ -10,6 +10,7 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
+import com.simprints.clientapi.extensions.skipCheckForError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,8 +46,9 @@ class OdkPresenter(private val view: OdkContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            sessionEventsManager.addSkipCheckEvent(errorResponse.skipCheckForError())
-            view.returnErrorToClient(errorResponse)
+            val skipCheck = errorResponse.skipCheckForError()
+            sessionEventsManager.addSkipCheckEvent(skipCheck)
+            view.returnErrorToClient(errorResponse, skipCheck)
         }
     }
 

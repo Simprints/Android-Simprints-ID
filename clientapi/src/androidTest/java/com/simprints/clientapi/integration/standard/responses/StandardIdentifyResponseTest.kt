@@ -7,8 +7,8 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
+import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Constants.SIMPRINTS_IDENTIFICATIONS
 import com.simprints.libsimprints.Identification
 import com.simprints.moduleapi.app.responses.IAppMatchResult
@@ -44,6 +44,7 @@ class StandardIdentifyResponseTest: BaseStandardClientApiTest() {
                 ?: throw Throwable("No identifications returned")
 
             assertEqualIdentification(identificationsReturned[0], appIdentifyResponse.identifications[0])
+            assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 
