@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import com.simprints.clientapi.Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
@@ -9,16 +10,15 @@ import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.getConfidencesString
 import com.simprints.clientapi.extensions.getIdsString
 import com.simprints.clientapi.extensions.getTiersString
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class OdkPresenter(private val view: OdkContract.View,
                    private val action: String?,
                    private val sessionEventsManager: ClientApiSessionEventsManager,
                    private val crashReportManager: ClientApiCrashReportManager)
     : RequestPresenter(view, sessionEventsManager), OdkContract.Presenter {
-
-    override val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
-        get() = emptyMap() //We return CANCEL for any ErrorResponse.Reason
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -29,7 +29,7 @@ class OdkPresenter(private val view: OdkContract.View,
     }
 
     override suspend fun start() {
-        if(action != ACTION_CONFIRM_IDENTITY) {
+        if (action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
         }
@@ -43,21 +43,57 @@ class OdkPresenter(private val view: OdkContract.View,
         }
     }
 
-    override fun handleEnrollResponse(enroll: EnrollResponse) = view.returnRegistration(enroll.guid)
+    override fun handleResponseError(errorResponse: ErrorResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            sessionEventsManager.addSkipCheckEvent(errorResponse.skipCheckForError())
+            view.returnErrorToClient(errorResponse)
+        }
+    }
 
-    override fun handleIdentifyResponse(identify: IdentifyResponse) = view.returnIdentification(
-        identify.identifications.getIdsString(),
-        identify.identifications.getConfidencesString(),
-        identify.identifications.getTiersString(),
-        identify.sessionId
-    )
+    override fun handleEnrollResponse(enroll: EnrollResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+            addSkipCheckEvent(skipCheck)
+            view.returnRegistration(enroll.guid, skipCheck)
+        }
+    }
 
-    override fun handleVerifyResponse(verify: VerifyResponse) = view.returnVerification(
-        verify.matchResult.guidFound,
-        verify.matchResult.confidence.toString(),
-        verify.matchResult.tier.toString()
-    )
+    override fun handleIdentifyResponse(identify: IdentifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+            addSkipCheckEvent(skipCheck)
+            view.returnIdentification(
+                identify.identifications.getIdsString(),
+                identify.identifications.getConfidencesString(),
+                identify.identifications.getTiersString(),
+                identify.sessionId,
+                skipCheck
+            )
+        }
+    }
 
-    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) =
-        view.returnRefusalForm(refusalForm.reason, refusalForm.extra)
+    override fun handleVerifyResponse(verify: VerifyResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+            addSkipCheckEvent(skipCheck)
+            view.returnVerification(
+                verify.matchResult.guidFound,
+                verify.matchResult.confidence.toString(),
+                verify.matchResult.tier.toString(),
+                skipCheck
+            )
+        }
+    }
+
+
+    override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+            addSkipCheckEvent(skipCheck)
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, skipCheck)
+        }
+    }
+
+    private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
+        sessionEventsManager.addSkipCheckEvent(skipCheck)
 }
