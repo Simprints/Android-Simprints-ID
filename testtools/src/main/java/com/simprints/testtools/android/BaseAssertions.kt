@@ -4,13 +4,18 @@ import androidx.annotation.StringRes
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import org.hamcrest.Matchers
+
 
 open class BaseAssertions {
 
     fun assertToastMessageIs(@StringRes messageId: Int) {
-        onToast(messageId).check(matches(isDisplayed()))
+        onView(withText(messageId))
+            .inRoot(RootMatchers.withDecorView(Matchers.not((getCurrentActivity()?.window?.decorView))))
+            .check(matches(isDisplayed()))
     }
 
     private fun onToast(@StringRes messageId: Int): ViewInteraction {

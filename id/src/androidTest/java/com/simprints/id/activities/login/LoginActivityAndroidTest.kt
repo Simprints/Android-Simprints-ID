@@ -3,6 +3,7 @@ package com.simprints.id.activities.login
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.Application
+import com.simprints.id.R
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_TEST_CALLOUT_CREDENTIALS
@@ -15,14 +16,16 @@ import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.RandomGenerator
+import com.simprints.testtools.android.BaseAssertions
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.mock
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+
 @RunWith(AndroidJUnit4::class)
-class LoginActivityAndroidTest {
+class LoginActivityAndroidTest : BaseAssertions() {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 
@@ -49,46 +52,51 @@ class LoginActivityAndroidTest {
     }
 
     @Test
-    fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
+    fun invalidIntentProjectIdAndInvalidSubmittedProjectId_shouldFailWithToast() {
         launchLoginActivity(invalidCredentials)
         enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
-        ensureSignInFailure()
+
+        assertToastMessageIs(R.string.login_invalid_credentials)
     }
 
     @Test
-    fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFail() {
+    fun validIntentProjectIdAndInvalidSubmittedProjectId_shouldFailWithToast() {
         launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(invalidCredentials, DEFAULT_PROJECT_SECRET)
         pressSignIn()
-        ensureSignInFailure()
+
+        assertToastMessageIs(R.string.login_project_id_intent_mismatch)
     }
 
     @Test
-    fun validProjectIdAndInvalidSecret_shouldFail() {
+    fun validProjectIdAndInvalidSecret_shouldFailWithToast() {
         launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, invalidSecret)
         pressSignIn()
-        ensureSignInFailure()
+
+        assertToastMessageIs(R.string.login_invalid_credentials)
     }
 
     @Test
-    fun invalidCredentials_shouldFail() {
+    fun invalidCredentials_shouldFailWithToast() {
         launchLoginActivity(invalidCredentials)
         enterCredentialsDirectly(invalidCredentials, invalidSecret)
         pressSignIn()
-        ensureSignInFailure()
+
+        assertToastMessageIs(R.string.login_invalid_credentials)
     }
 
     @Test
-    fun validCredentialsWithoutInternet_shouldFail() {
+    fun validCredentialsWithoutInternet_shouldFailWithToast() {
         secureApiInterfaceRule = DependencyRule.ReplaceRule { replaceSecureApiClientWithFailingClientProvider() }
         AndroidTestConfig(this, module).initAndInjectComponent()
 
         launchLoginActivity(DEFAULT_TEST_CALLOUT_CREDENTIALS)
         enterCredentialsDirectly(DEFAULT_TEST_CALLOUT_CREDENTIALS, DEFAULT_PROJECT_SECRET)
         pressSignIn()
-        ensureSignInFailure()
+
+        assertToastMessageIs(R.string.login_no_network)
     }
 
     companion object {
