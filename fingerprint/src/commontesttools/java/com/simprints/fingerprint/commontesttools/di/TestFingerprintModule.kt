@@ -2,9 +2,6 @@ package com.simprints.fingerprint.commontesttools.di
 
 import android.content.Context
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
-import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.di.FingerprintModule
