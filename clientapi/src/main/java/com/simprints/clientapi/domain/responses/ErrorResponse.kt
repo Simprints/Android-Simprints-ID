@@ -31,7 +31,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
             Reason.BLUETOOTH_NOT_SUPPORTED,
             Reason.GUID_NOT_FOUND_ONLINE -> true
             // Atm, if user experiences a recoverable error,
-            // he can't leave the app (e.g. pressing Back button).
+            // he can't leave the app (e.g. pressing Back button) except for LoginActivity
+            Reason.LOGIN_NOT_COMPLETE -> false
         }
 
     enum class Reason {
@@ -46,6 +47,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
+        LOGIN_NOT_COMPLETE,
         UNEXPECTED_ERROR,
         BLUETOOTH_NOT_SUPPORTED;
 
@@ -58,6 +60,7 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                     IAppErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
+                    IAppErrorReason.LOGIN_NOT_COMPLETE -> LOGIN_NOT_COMPLETE
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

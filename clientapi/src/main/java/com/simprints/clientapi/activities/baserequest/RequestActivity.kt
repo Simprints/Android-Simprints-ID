@@ -91,5 +91,4 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
     }
-
 }
