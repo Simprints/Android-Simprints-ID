@@ -10,40 +10,31 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.commcare.CommCareActivity
-import com.simprints.clientapi.di.KoinInjector
-import com.simprints.clientapi.di.KoinInjector.loadClientApiKoinModules
+import com.simprints.clientapi.integration.AppVerifyRequest
+import com.simprints.clientapi.integration.commcare.BaseCommCareClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
 import com.simprints.testtools.common.syntax.key
 import com.simprints.testtools.common.syntax.value
 import org.hamcrest.CoreMatchers
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.test.KoinTest
-import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class VerifyRequestTest : KoinTest {
-
-    private val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+class CommCareVerifyRequestTest : BaseCommCareClientApiTest() {
 
     @Before
-    fun setUp() {
-        Intents.init()
-        Intents.intending(hasAction(appVerifyAction)).respondWith(intentResultOk)
-
-        loadClientApiKoinModules()
-        declare {
-            factory { buildDummySessionEventsManagerMock() }
-        }
+    override fun setUp() {
+        super.setUp()
+        val intentResultOk = Instrumentation.ActivityResult(Activity.RESULT_OK, null)
+        Intents.intending(hasAction(APP_VERIFICATION_ACTION)).respondWith(intentResultOk)
     }
 
     @Test
-    fun aVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(baseIntentRequest.apply {
-            action = commcareVerifyAction
+    fun callingAppSendsAVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply {
+            action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
 
@@ -54,33 +45,27 @@ class VerifyRequestTest : KoinTest {
             metadataField.value(),
             verifyGuidField.value())
 
-        intended(hasAction(appVerifyAction))
+        intended(hasAction(APP_VERIFICATION_ACTION))
         intended(hasExtras(hasEntry(IAppRequest.BUNDLE_KEY, bundleDataMatcherForParcelable(expectedAppRequest))))
     }
 
     @Test
-    fun aSuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(suspiciousIntentRequest.apply {
-            action = commcareVerifyAction
-            putExtra(verifyGuidField.key(), verifyGuidField.value()) 
+    fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<CommCareActivity>(commCareSuspiciousIntentRequest.apply {
+            action = COMMCARE_VERIFY_ACTION
+            putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
-        
-        intended(hasAction(appVerifyAction))
+
+        intended(hasAction(APP_VERIFICATION_ACTION))
     }
 
     @Test
-    fun anInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<CommCareActivity>(invalidIntentRequest.apply {
-            action = commcareVerifyAction
+    fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
+        ActivityScenario.launch<CommCareActivity>(commCareInvalidIntentRequest.apply {
+            action = COMMCARE_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })
-        
-        intended(CoreMatchers.not(hasAction(appVerifyAction)), Intents.times(2))
-    }
 
-    @After
-    fun tearDown() {
-        Intents.release()
-        KoinInjector.unloadClientApiKoinModules()
+        intended(CoreMatchers.not(hasAction(APP_VERIFICATION_ACTION)), Intents.times(2))
     }
 }

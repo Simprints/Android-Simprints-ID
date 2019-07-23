@@ -29,11 +29,8 @@ object DomainToAppResponse {
             DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
             DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN
             GUID_NOT_FOUND_ONLINE -> IAppErrorReason.GUID_NOT_FOUND_ONLINE
-            GUID_NOT_FOUND_OFFLINE ->IAppErrorReason.GUID_NOT_FOUND_OFFLINE
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
-            SCANNER_LOW_BATTERY -> IAppErrorReason.SCANNER_LOW_BATTERY
-            UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)

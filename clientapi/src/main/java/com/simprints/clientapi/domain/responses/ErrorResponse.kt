@@ -8,13 +8,31 @@ import com.simprints.moduleapi.app.responses.IAppErrorReason
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 data class ErrorResponse(val reason: Reason) : Parcelable {
 
     constructor(response: IAppErrorResponse) : this(fromModuleApiToDomain(response.reason))
 
     constructor(response: ClientApiAlert) : this(fromAlertTypeToDomain(response))
+
+    fun isUnrecoverableError(): Boolean =
+        when (reason) {
+            Reason.UNEXPECTED_ERROR,
+            Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            Reason.DIFFERENT_USER_ID_SIGNED_IN,
+            Reason.INVALID_CLIENT_REQUEST,
+            Reason.INVALID_METADATA,
+            Reason.INVALID_MODULE_ID,
+            Reason.INVALID_PROJECT_ID,
+            Reason.INVALID_SELECTED_ID,
+            Reason.INVALID_SESSION_ID,
+            Reason.INVALID_USER_ID,
+            Reason.INVALID_VERIFY_ID,
+            Reason.BLUETOOTH_NOT_SUPPORTED,
+            Reason.GUID_NOT_FOUND_ONLINE -> true
+            // Atm, if user experiences a recoverable error,
+            // he can't leave the app (e.g. pressing Back button).
+        }
 
     enum class Reason {
         INVALID_CLIENT_REQUEST,
@@ -28,11 +46,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         GUID_NOT_FOUND_ONLINE,
-        GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
-        BLUETOOTH_NOT_SUPPORTED,
-        SCANNER_LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE;
+        BLUETOOTH_NOT_SUPPORTED;
 
         companion object {
 
@@ -41,11 +56,8 @@ data class ErrorResponse(val reason: Reason) : Parcelable {
                     IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     IAppErrorReason.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-                    IAppErrorReason.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                     IAppErrorReason.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     IAppErrorReason.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
-                    IAppErrorReason.SCANNER_LOW_BATTERY -> SCANNER_LOW_BATTERY
-                    IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
                 }
 
             fun fromAlertTypeToDomain(clientApiAlert: ClientApiAlert): Reason =

@@ -9,6 +9,8 @@ interface ClientApiSessionEventsManager {
 
     suspend fun createSession(integration: IntegrationInfo): String
 
+    suspend fun addSkipCheckEvent(skipValue: Boolean)
+
     fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable
 
     fun addAlertScreenEvent(clientApiAlertType: ClientApiAlert): Completable

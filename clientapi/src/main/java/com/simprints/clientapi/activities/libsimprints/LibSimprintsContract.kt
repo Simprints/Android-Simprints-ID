@@ -24,5 +24,4 @@ interface LibSimprintsContract {
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter
-
 }

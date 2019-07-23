@@ -4,7 +4,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.setMain
 
 open class BaseUnitTestConfig {
@@ -21,6 +21,6 @@ open class BaseUnitTestConfig {
     }
 
     open fun coroutinesMainThread() = also {
-        Dispatchers.setMain(newSingleThreadContext("UI thread"))
+        Dispatchers.setMain(TestCoroutineDispatcher())
     }
 }
