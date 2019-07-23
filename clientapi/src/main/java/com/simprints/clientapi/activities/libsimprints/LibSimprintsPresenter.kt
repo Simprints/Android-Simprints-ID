@@ -8,8 +8,11 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.skipCheckForError
-import com.simprints.libsimprints.*
 import com.simprints.libsimprints.Constants.*
+import com.simprints.libsimprints.Identification
+import com.simprints.libsimprints.RefusalForm
+import com.simprints.libsimprints.Registration
+import com.simprints.libsimprints.Verification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,7 +61,10 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             val skipCheck = Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
             addSkipCheckEvent(skipCheck)
             view.returnIdentification(ArrayList(identify.identifications.map {
-                Identification(it.guidFound, it.confidence, Tier.valueOf(it.tier.name))
+                Identification(
+                    it.guidFound,
+                    it.confidence,
+                    it.tier.fromDomainToLibsimprintsTier())
             }), identify.sessionId, skipCheck)
         }
     }
@@ -70,7 +76,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             with(verify) {
                 val verification = Verification(
                     matchResult.confidence,
-                    Tier.valueOf(matchResult.tier.name),
+                    matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
                 view.returnVerification(verification, skipCheck)
             }
