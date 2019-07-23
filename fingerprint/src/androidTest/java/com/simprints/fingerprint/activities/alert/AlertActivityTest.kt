@@ -1,4 +1,6 @@
 package com.simprints.fingerprint.activities.alert
+
+import android.app.Activity.RESULT_OK
 import android.app.Instrumentation
 import android.content.ComponentName
 import android.content.Context
@@ -72,12 +74,10 @@ class AlertActivityTest {
 
     @Test
     fun bluetoothNotEnabled_userClicksOpenSettings_settingsShouldAppear() {
-        launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_ENABLED))
         mockBluetoothSettingsIntent()
 
-        //In some emulators ACTION_BLUETOOTH_SETTINGS may be missing
-        if (activities.size > 0) {
-            launchAlertActivity(AlertActRequest(BLUETOOTH_NOT_ENABLED))
+        onView(withId(R.id.alertRightButton)).perform(click())
 
         intended(hasAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS))
     }
@@ -169,7 +169,7 @@ class AlertActivityTest {
     }
 
     @Test
-    fun pressBackButtonOnNonBluetoothError_shouldFinish () {
+    fun pressBackButtonOnNonBluetoothError_shouldFinish() {
         val scenario = launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_ONLINE))
         Espresso.pressBackUnconditionally()
 
