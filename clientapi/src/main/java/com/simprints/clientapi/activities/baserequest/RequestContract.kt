@@ -31,7 +31,7 @@ interface RequestContract {
 
         fun sendSimprintsRequest(request: BaseRequest)
 
-        fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation)
+        fun sendSimprintsConfirmation(request: BaseConfirmation)
 
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
@@ -59,6 +59,8 @@ interface RequestContract {
         fun handleResponseError(errorResponse: ErrorResponse)
 
         fun validateAndSendRequest(builder: ClientRequestBuilder)
+
+        fun handleConfirmationResponse(response: ConfirmationResponse)
 
     }
 

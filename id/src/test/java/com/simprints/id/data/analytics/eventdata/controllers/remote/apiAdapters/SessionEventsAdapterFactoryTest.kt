@@ -182,6 +182,15 @@ class SessionEventsAdapterFactoryTest {
         validateCallbackEventApiModel(json)
     }
 
+    @Test
+    fun validate_callbackEventForConfirmationApiModel() {
+        val callbackEvent = ConfirmationCallbackEvent(10, true)
+        val apiEvent = ApiCallbackEvent(callbackEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCallbackEventApiModel(json)
+    }
+
     private fun getListOfCallbackComparisonScores() = listOf(
         CallbackComparisonScore("guid1", 42, Tier.TIER_1),
         CallbackComparisonScore("guid2", 43, Tier.TIER_2),
