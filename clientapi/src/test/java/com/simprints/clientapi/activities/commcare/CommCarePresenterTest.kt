@@ -83,7 +83,7 @@ class CommCarePresenterTest {
 
         CommCarePresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
-        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentifyFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test

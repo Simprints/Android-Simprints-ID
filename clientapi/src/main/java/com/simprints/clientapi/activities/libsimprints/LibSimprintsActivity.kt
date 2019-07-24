@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-
 class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override val presenter: LibSimprintsContract.Presenter by inject { parametersOf(this, action) }
@@ -23,6 +22,9 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (intent.action != Constants.SIMPRINTS_SELECT_GUID_INTENT)
+            showLauncherScreen()
+
         loadClientApiKoinModules()
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
@@ -49,6 +51,14 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
+    /**
+     * TODO: LibSimprints and the development documentation need to be updated including this return
+     */
+    override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
+        it.putExtra(IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
+        sendOkResult(it)
+    }
+
     override fun returnErrorToClient(errorResponse: ErrorResponse) {
         setResult(errorResponse.reason.libSimprintsResultCode())
         finish()
@@ -57,6 +67,10 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     override fun onDestroy() {
         super.onDestroy()
         unloadClientApiKoinModules()
+    }
+
+    companion object {
+        private const val IDENTIFICATION_OUTCOME_KEY = "identificationOutcome"
     }
 
 }

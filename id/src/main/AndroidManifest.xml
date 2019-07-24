@@ -36,7 +36,8 @@
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:label="@string/title_activity_orchestrator"
             android:launchMode="standard"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Launcher"/>
 
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"

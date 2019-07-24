@@ -16,6 +16,8 @@ interface OdkContract {
 
         fun returnExitForm(reason: String, extra: String, skipCheck:Boolean)
 
+        fun returnConfirmation(identificationOutcome: Boolean)
+
     }
 
     interface Presenter : BasePresenter, RequestContract.Presenter
