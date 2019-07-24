@@ -22,23 +22,24 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
-        assertStandardErrorResponse(scenario)
+        assertStandardErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
     }
 
     @Test
-    fun appModuleSendsANotBlockingErrorAppResponse_shouldReturnAStandardErrorResponseWithSkipCheck() {
-        val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
+    fun appModuleSendsAnErrorAppResponseAsLoginNotComplete_shouldReturnAStandardErrorResponse() {
+        val appErrorResponse = AppErrorResponse(IAppErrorReason.LOGIN_NOT_COMPLETE)
         mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
 
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
-        assertStandardErrorResponse(scenario)
+        assertStandardErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW)
     }
 
-    private fun assertStandardErrorResponse(scenario: ActivityScenario<LibSimprintsActivity>) {
+    private fun assertStandardErrorResponse(scenario: ActivityScenario<LibSimprintsActivity>,
+                                            expectedSkipCheck: Boolean) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Constants.SIMPRINTS_CANCELLED)
-        assertThat(result.resultData.extras?.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+        assertThat(result.resultData.extras?.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(expectedSkipCheck)
     }
 }
