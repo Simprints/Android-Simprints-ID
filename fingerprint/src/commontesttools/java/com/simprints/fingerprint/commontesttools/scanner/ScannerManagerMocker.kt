@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.testtools.scanner
+package com.simprints.fingerprint.commontesttools.scanner
 
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprintscanner.Scanner

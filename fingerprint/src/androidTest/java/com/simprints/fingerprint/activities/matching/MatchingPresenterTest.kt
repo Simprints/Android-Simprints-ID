@@ -14,15 +14,15 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyR
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
-import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
+import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.fingerprint.testtools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.fingerprint.commontesttools.DEFAULT_MODULE_ID
+import com.simprints.fingerprint.commontesttools.DEFAULT_PROJECT_ID
+import com.simprints.fingerprint.commontesttools.DEFAULT_USER_ID
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
@@ -64,12 +64,10 @@ class MatchingPresenterTest {
     private val mockIdentificationLibMatcher: (LibPerson, List<LibPerson>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { probe, candidates, _, scores, callback, _ ->
-            mock {
-                whenever(it) { start() } then {
+            setupMock {
+                whenThis { start() } then {
                     IDENTIFY_PROGRESS_RANGE.forEach { n -> callback.onMatcherProgress(Progress(n)) }
-                    scores.addAll(candidates.map {
-                        (if (it.guid == probe.guid) { 1L } else { 0L }).toFloat()
-                    })
+                    scores.addAll(candidates.map { ((if (it.guid == probe.guid) 1f else 0f)) })
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
                 }
             }
@@ -78,8 +76,8 @@ class MatchingPresenterTest {
     private val mockVerificationLibMatcher: (LibPerson, List<LibPerson>,
                                              LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, scores, callback, _ ->
-            mock {
-                whenever(it) { start() } then {
+            setupMock {
+                whenThis { start() } then {
                     callback.onMatcherProgress(Progress(0))
                     scores.add(Random.nextFloat())
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
@@ -90,8 +88,8 @@ class MatchingPresenterTest {
     private val mockErrorLibMatcher: (LibPerson, List<LibPerson>,
                                       LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
         { _, _, _, _, callback, _ ->
-            mock {
-                whenever(it) { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
+            setupMock {
+                whenThis { start() } then { callback.onMatcherEvent(EVENT.MATCH_NOT_RUNNING) }
             }
         }
 
@@ -224,10 +222,10 @@ class MatchingPresenterTest {
         val extraCandidates: List<Person>
 
         //Create people for the local db
-        if(!queryForIdentifyPool.moduleId.isNullOrEmpty()) {
+        if (!queryForIdentifyPool.moduleId.isNullOrEmpty()) {
             rightCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, moduleId = DEFAULT_MODULE_ID).toList()
             extraCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "${DEFAULT_MODULE_ID}_other_module").toList()
-        } else if(!queryForIdentifyPool.userId.isNullOrEmpty()) {
+        } else if (!queryForIdentifyPool.userId.isNullOrEmpty()) {
             rightCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, moduleId = DEFAULT_MODULE_ID).toList()
             extraCandidates = PeopleGeneratorUtils.getRandomPeople(CANDIDATE_POOL, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, "${DEFAULT_MODULE_ID}_other_module").toList()
         } else {
@@ -249,11 +247,11 @@ class MatchingPresenterTest {
     }
 
     private fun verifyIdentificationResult(result: KArgumentCaptor<Intent>, probe: Person, shouldProbeInMatchingResult: Boolean = true) {
-        val identifyResponse = result.firstValue.getParcelableExtra<MatchingTaskIdentifyResult>(MatchingTaskResult.BUNDLE_KEY)!!
+        val identifyResponse = result.firstValue.getParcelableExtra<MatchingTaskIdentifyResult>(MatchingTaskResult.BUNDLE_KEY)
         val identificationsResult = identifyResponse.identifications
         Assert.assertEquals(NUMBER_OF_ID_RETURNS, identificationsResult.size)
-        if(shouldProbeInMatchingResult) {
-            val highestScoreCandidate = identificationsResult.sortedByDescending { it.confidence }.first().guid
+        if (shouldProbeInMatchingResult) {
+            val highestScoreCandidate = identificationsResult.maxBy { it.confidence }?.guid
             assertThat(highestScoreCandidate).isEqualTo(probe.patientId)
         } else {
             assertThat(identificationsResult).doesNotContain(probe.patientId)

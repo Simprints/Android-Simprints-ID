@@ -1,8 +1,8 @@
-package com.simprints.fingerprint.testtools.scanner
+package com.simprints.fingerprint.commontesttools.scanner
 
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.commontesttools.FingerprintGeneratorUtils
-import com.simprints.fingerprint.commontesttools.PeopleGeneratorUtils
+import com.simprints.fingerprint.commontesttools.generators.FingerprintGeneratorUtils
+import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
