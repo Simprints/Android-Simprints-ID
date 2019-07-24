@@ -27,14 +27,14 @@ sealed class FingerprintTaskFlow {
     protected val taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
     protected lateinit var fingerprintTasks: List<FingerprintTask>
-    private var currentActivityTaskIndex = 0
+    private var currentTaskIndex = 0
     private var lastResultCode = ResultCode.OK
 
-    fun getCurrentTask() = fingerprintTasks[currentActivityTaskIndex]
+    fun getCurrentTask() = fingerprintTasks[currentTaskIndex]
 
     fun isFlowFinished() = isFlowFinishedPrematurely() or isPastFinalTask()
     private fun isFlowFinishedPrematurely() = lastResultCode != ResultCode.OK
-    private fun isPastFinalTask() = currentActivityTaskIndex >= fingerprintTasks.size
+    private fun isPastFinalTask() = currentTaskIndex >= fingerprintTasks.size
 
     abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
 
@@ -44,7 +44,7 @@ sealed class FingerprintTaskFlow {
             when (resultCode) {
                 ResultCode.OK -> {
                     taskResults[taskResultKey] = getTaskResult(resultBundleKey)
-                    currentActivityTaskIndex++
+                    currentTaskIndex++
                 }
                 ResultCode.CANCELLED -> {
                 }
@@ -61,7 +61,7 @@ sealed class FingerprintTaskFlow {
     fun handleRunnableTaskResult(taskResult: TaskResult) {
         (getCurrentTask() as FingerprintTask.RunnableTask).apply {
             taskResults[taskResultKey] = taskResult
-            currentActivityTaskIndex++
+            currentTaskIndex++
         }
     }
 
@@ -131,7 +131,7 @@ sealed class FingerprintTaskFlow {
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
                     },
-                    FingerprintTask.Matching(MATCHING) {
+                    FingerprintTask.Matching(MATCHING, FingerprintTask.Matching.SubAction.IDENTIFY) {
                         with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
                             MatchingTaskIdentifyRequest(
                                 language, probe, buildQueryForIdentifyPool(), returnIdCount
@@ -174,7 +174,7 @@ sealed class FingerprintTaskFlow {
                             projectId, userId, moduleId, this.toAction(), language, fingerStatus
                         )
                     },
-                    FingerprintTask.Matching(MATCHING) {
+                    FingerprintTask.Matching(MATCHING, FingerprintTask.Matching.SubAction.VERIFY) {
                         with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
                             MatchingTaskVerifyRequest(
                                 language, probe, buildQueryForVerifyPool(), verifyGuid
