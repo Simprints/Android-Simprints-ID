@@ -42,6 +42,7 @@ open class ProjectAuthenticator(component: AppComponent,
      * @throws IOException
      * @throws AuthRequestInvalidCredentialsException
      * @throws SimprintsInternalServerException
+     * @throws SafetyNetDownException
      */
     fun authenticate(nonceScope: NonceScope, projectSecret: String): Completable =
         createLocalDbKeyForProject(nonceScope.projectId)

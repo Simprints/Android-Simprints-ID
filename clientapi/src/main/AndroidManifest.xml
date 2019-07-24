@@ -16,7 +16,7 @@
 
         <activity
             android:name=".activities.odk.OdkActivity"
-            android:theme="@style/ClientApiTheme.Launcher">
+            android:theme="@style/ClientApiTheme.Transparent">
             <intent-filter>
                 <action android:name="com.simprints.simodkadapter.REGISTER" />
                 <action android:name="com.simprints.simodkadapter.IDENTIFY" />
@@ -43,7 +43,7 @@
 
         <activity
             android:name=".activities.libsimprints.LibSimprintsActivity"
-            android:theme="@style/ClientApiTheme.Launcher">
+            android:theme="@style/ClientApiTheme.Transparent">
             <intent-filter>
                 <action android:name="com.simprints.id.REGISTER" />
                 <action android:name="com.simprints.id.IDENTIFY" />
@@ -69,7 +69,7 @@
 
         <activity
             android:name=".activities.commcare.CommCareActivity"
-            android:theme="@style/ClientApiTheme.Launcher">
+            android:theme="@style/ClientApiTheme.Transparent">
             <intent-filter>
                 <action android:name="com.simprints.commcare.REGISTER" />
                 <action android:name="com.simprints.commcare.IDENTIFY" />

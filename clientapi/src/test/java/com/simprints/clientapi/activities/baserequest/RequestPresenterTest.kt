@@ -70,5 +70,6 @@ class ImplRequestPresenter(view: RequestContract.RequestView,
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {}
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {}
     override fun handleResponseError(errorResponse: ErrorResponse) {}
 }

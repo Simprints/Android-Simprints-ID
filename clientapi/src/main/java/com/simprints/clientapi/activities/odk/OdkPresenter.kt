@@ -7,9 +7,6 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.extensions.getConfidencesString
-import com.simprints.clientapi.extensions.getIdsString
-import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.extensions.skipCheckForError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,7 +84,6 @@ class OdkPresenter(private val view: OdkContract.View,
         }
     }
 
-
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
             val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
@@ -98,4 +94,9 @@ class OdkPresenter(private val view: OdkContract.View,
 
     private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
         sessionEventsManager.addSkipCheckEvent(skipCheck)
+
+    override fun handleConfirmationResponse(response: ConfirmationResponse) {
+        view.returnConfirmation(response.identificationOutcome)
+    }
+
 }

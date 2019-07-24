@@ -23,6 +23,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                    AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
                 }
         }
     }
