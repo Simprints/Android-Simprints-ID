@@ -173,6 +173,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         launchAlert(this, AlertType.UNEXPECTED_ERROR)
     }
 
+    override fun handleSafetyNetDownError() {
+        progressDialog.dismiss()
+        launchAlert(this, AlertType.SAFETYNET_ERROR)
+    }
+
     override fun onBackPressed() {
         viewPresenter.handleBackPressed()
     }

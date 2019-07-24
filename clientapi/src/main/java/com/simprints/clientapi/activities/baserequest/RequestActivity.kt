@@ -3,6 +3,7 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
 import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
@@ -18,9 +19,7 @@ import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmati
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
-import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY
 import timber.log.Timber
-
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
 
@@ -47,10 +46,9 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override fun sendSimprintsRequest(request: BaseRequest) =
         routeSimprintsRequest(this, request)
 
-    override fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation) {
+    override fun sendSimprintsConfirmation(request: BaseConfirmation) {
         routeSimprintsConfirmation(this, request)
         guidSelectionNotifier.showMessage()
-        finishAffinity()
     }
 
     override fun handleClientRequestError(clientApiAlert: ClientApiAlert) {
@@ -62,16 +60,22 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Timber.d("RequestActivity: onActivityResult")
+        val isUnsuccessfulResponse = resultCode != Activity.RESULT_OK || data == null
 
-        if (resultCode != Activity.RESULT_OK || data == null)
+        if (isUnsuccessfulResponse)
             sendCancelResult()
-        else {
-            // TODO: Clean this flow up more
-            data.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
-                presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
-            } ?: routeAppResponse(data.getParcelableExtra(BUNDLE_KEY))
-        }
+        else
+            data?.let(::handleResponse)
+    }
 
+    protected fun sendOkResult(intent: Intent) {
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+    }
+
+    protected fun showLauncherScreen() {
+        setContentView(R.layout.launcher)
+        supportActionBar?.hide()
     }
 
     private fun sendCancelResult() {
@@ -79,9 +83,10 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         finish()
     }
 
-    internal fun sendOkResult(intent: Intent) {
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+    private fun handleResponse(response: Intent) {
+        response.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
+            presenter.handleResponseError(ErrorResponse(it.clientApiAlert))
+        } ?: routeAppResponse(response.getParcelableExtra(IAppResponse.BUNDLE_KEY))
     }
 
     private fun routeAppResponse(response: IAppResponse) = when (response.type) {
@@ -90,5 +95,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         IAppResponseType.VERIFY -> presenter.handleVerifyResponse(VerifyResponse(response as IAppVerifyResponse))
         IAppResponseType.REFUSAL -> presenter.handleRefusalResponse(RefusalFormResponse(response as IAppRefusalFormResponse))
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
+        IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(ConfirmationResponse(response as IAppConfirmationResponse))
     }
 }
