@@ -1,0 +1,5 @@
+def min_sdk = 21
+
+ext.config = [
+        min_sdk : min_sdk
+]

@@ -19,7 +19,7 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
