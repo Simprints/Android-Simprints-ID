@@ -136,7 +136,7 @@ class OdkPresenterTest {
             handleResponseError(error)
         }
 
-        verifyOnce(view) { returnErrorToClient(error) }
+        verifyOnce(view) { returnErrorToClient(error, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
     }
 
     @Test

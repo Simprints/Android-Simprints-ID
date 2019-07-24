@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppMatchResult
 import com.simprints.clientapi.integration.AppVerifyResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Verification
@@ -49,6 +48,7 @@ class StandardVerifyResponseTest : BaseStandardClientApiTest() {
                 ?: throw Throwable("No verification result returned")
 
             assertEqualIdentification(verificationResult, appVerifyResponse.matchResult)
+            assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 

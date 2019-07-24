@@ -6,20 +6,20 @@ import com.simprints.clientapi.activities.baserequest.RequestContract
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
 import com.simprints.libsimprints.Registration
-import com.simprints.libsimprints.Tier
+import com.simprints.libsimprints.Verification
 
 
 interface LibSimprintsContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(registration: Registration)
+        fun returnRegistration(registration: Registration, skipCheck: Boolean)
 
-        fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String)
+        fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String, skipCheck: Boolean)
 
-        fun returnVerification(confidence: Int, tier: Tier, guid: String)
+        fun returnVerification(verification: Verification, skipCheck: Boolean)
 
-        fun returnRefusalForms(refusalForm: RefusalForm)
+        fun returnRefusalForms(refusalForm: RefusalForm, skipCheck: Boolean)
 
         fun returnConfirmation(identificationOutcome: Boolean)
 
