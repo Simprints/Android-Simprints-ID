@@ -16,7 +16,7 @@ interface LoginContract {
         fun showErrorForInvalidQRCode()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
-        fun setErrorResponseAsResultAndFinish(activityResult: Int, appErrorResponse: AppErrorResponse)
+        fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse)
 
         // Callbacks from signing in
 
