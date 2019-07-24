@@ -8,6 +8,6 @@
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/launch_screen"
+        android:src="@drawable/clientapi_launch_screen"
         android:contentDescription="@null"/>
 </FrameLayout>

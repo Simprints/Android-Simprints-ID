@@ -31,8 +31,7 @@ class OdkEnrolResponseTest : BaseOdkClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString(ODK_REGISTRATION_ID_KEY)).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
-
+            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 }

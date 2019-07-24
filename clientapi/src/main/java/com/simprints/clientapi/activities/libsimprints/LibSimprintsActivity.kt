@@ -29,25 +29,36 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
-    override fun returnRegistration(registration: Registration) = Intent().let {
+    override fun returnRegistration(registration: Registration,
+                                    skipCheck: Boolean) = Intent().let {
+
         it.putExtra(Constants.SIMPRINTS_REGISTRATION, registration)
+        it.putExtra(Constants.SIMPRINTS_SKIP_CHECK, skipCheck)
         sendOkResult(it)
     }
 
     override fun returnIdentification(identifications: ArrayList<Identification>,
-                                      sessionId: String) = Intent().let {
+                                      sessionId: String,
+                                      skipCheck: Boolean) = Intent().let {
+
         it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)
         it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
+        it.putExtra(Constants.SIMPRINTS_SKIP_CHECK, skipCheck)
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_VERIFICATION, Verification(confidence, tier, guid))
+    override fun returnVerification(verification: Verification,
+                                    skipCheck: Boolean) = Intent().let {
+        it.putExtra(Constants.SIMPRINTS_VERIFICATION, verification)
+        it.putExtra(Constants.SIMPRINTS_SKIP_CHECK, skipCheck)
         sendOkResult(it)
     }
 
-    override fun returnRefusalForms(refusalForm: RefusalForm) = Intent().let {
+    override fun returnRefusalForms(refusalForm: RefusalForm,
+                                    skipCheck: Boolean) = Intent().let {
+
         it.putExtra(Constants.SIMPRINTS_REFUSAL_FORM, refusalForm)
+        it.putExtra(Constants.SIMPRINTS_SKIP_CHECK, skipCheck)
         sendOkResult(it)
     }
 
@@ -59,8 +70,10 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse) {
-        setResult(errorResponse.reason.libSimprintsResultCode())
+    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) {
+        setResult(
+            errorResponse.reason.libSimprintsResultCode(),
+            Intent().putExtra(Constants.SIMPRINTS_SKIP_CHECK, skipCheck))
         finish()
     }
 
