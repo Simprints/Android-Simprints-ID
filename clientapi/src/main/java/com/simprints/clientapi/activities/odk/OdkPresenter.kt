@@ -7,9 +7,6 @@ import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReport
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.extensions.getConfidencesString
-import com.simprints.clientapi.extensions.getIdsString
-import com.simprints.clientapi.extensions.getTiersString
 import com.simprints.clientapi.extensions.skipCheckForError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
