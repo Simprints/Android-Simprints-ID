@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.commontesttools
+package com.simprints.fingerprint.commontesttools.generators
 
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.data.domain.person.Fingerprint

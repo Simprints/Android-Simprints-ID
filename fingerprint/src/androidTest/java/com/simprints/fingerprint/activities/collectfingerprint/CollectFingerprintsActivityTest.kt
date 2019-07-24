@@ -10,10 +10,10 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
+import com.simprints.fingerprint.commontesttools.scanner.*
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.scanner.*
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
 import org.junit.Assert.assertEquals

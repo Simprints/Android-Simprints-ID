@@ -26,7 +26,7 @@ import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryExceptio
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.scanner.setupScannerManagerMockWithMockedScanner
+import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
