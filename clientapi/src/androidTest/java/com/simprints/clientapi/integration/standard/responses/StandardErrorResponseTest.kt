@@ -25,17 +25,6 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         assertStandardErrorResponse(scenario)
     }
 
-    @Test
-    fun appModuleSendsANotBlockingErrorAppResponse_shouldReturnAStandardErrorResponseWithSkipCheck() {
-        val appErrorResponse = AppErrorResponse(IAppErrorReason.UNEXPECTED_ERROR)
-        mockAppModuleResponse(appErrorResponse, APP_ENROL_ACTION)
-
-        val scenario =
-            ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
-
-        assertStandardErrorResponse(scenario)
-    }
-
     private fun assertStandardErrorResponse(scenario: ActivityScenario<LibSimprintsActivity>) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Constants.SIMPRINTS_CANCELLED)
