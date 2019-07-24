@@ -97,5 +97,4 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         IAppResponseType.ERROR -> presenter.handleResponseError(ErrorResponse(response as IAppErrorResponse))
         IAppResponseType.CONFIRMATION -> presenter.handleConfirmationResponse(ConfirmationResponse(response as IAppConfirmationResponse))
     }
-
 }

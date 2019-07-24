@@ -18,6 +18,5 @@ internal fun ErrorResponse.skipCheckForError(): Boolean =
         ErrorResponse.Reason.INVALID_VERIFY_ID,
         ErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
         ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-        // Atm, if user experiences a recoverable error,
-        // he can't leave the app (e.g. pressing Back button).
+        ErrorResponse.Reason.LOGIN_NOT_COMPLETE -> Constants.SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW
     }

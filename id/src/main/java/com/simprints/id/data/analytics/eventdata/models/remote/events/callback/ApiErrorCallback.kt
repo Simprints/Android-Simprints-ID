@@ -19,7 +19,8 @@ class ApiErrorCallback(val reason: ApiReason) : ApiCallback(ApiCallbackType.ERRO
         @Deprecated("User can't leave the app anymore in case of SCANNER_LOW_BATTERY. He exits through the ExitForm.")
         SCANNER_LOW_BATTERY,
         @Deprecated("Fingerprint module doesn't triggers it anymore")
-        UNKNOWN_BLUETOOTH_ISSUE
+        UNKNOWN_BLUETOOTH_ISSUE,
+        LOGIN_NOT_COMPLETE
     }
 }
 
@@ -30,4 +31,5 @@ fun ErrorCallbackEvent.Reason.fromDomainToApi() =
         GUID_NOT_FOUND_ONLINE -> ApiErrorCallback.ApiReason.GUID_NOT_FOUND_ONLINE
         UNEXPECTED_ERROR -> ApiErrorCallback.ApiReason.UNEXPECTED_ERROR
         BLUETOOTH_NOT_SUPPORTED -> ApiErrorCallback.ApiReason.BLUETOOTH_NOT_SUPPORTED
+        LOGIN_NOT_COMPLETE -> ApiErrorCallback.ApiReason.LOGIN_NOT_COMPLETE
     }

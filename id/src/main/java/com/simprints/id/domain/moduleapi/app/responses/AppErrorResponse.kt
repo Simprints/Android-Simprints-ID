@@ -13,6 +13,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
         UNEXPECTED_ERROR,
+        LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
         GUID_NOT_FOUND_ONLINE;
 
