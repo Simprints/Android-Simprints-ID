@@ -48,13 +48,14 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        extractPotentialAlertScreenResponse(requestCode, resultCode, data)?.let {
-            viewPresenter.onAlertScreenReturn(it)
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
+        val appErrorResponseForLoginScreen = extractAppErrorResponseForLoginScreen(data)
+
+        when {
+            potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
+            appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
+            else -> viewPresenter.checkSignedInStateIfPossible()
         }
-        extractAppErrorResponseForLoginScreen(data)?.let {
-            viewPresenter.onLoginScreenErrorReturn(it)
-        }
-        viewPresenter.checkSignedInStateIfPossible()
     }
 
     private fun extractAppErrorResponseForLoginScreen(data: Intent?): AppErrorResponse? =

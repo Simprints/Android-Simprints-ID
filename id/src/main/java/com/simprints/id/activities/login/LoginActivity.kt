@@ -9,6 +9,7 @@ import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
@@ -99,7 +100,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
         if (potentialAlertScreenResponse != null) {
             setResult(resultCode, data)
             finish()

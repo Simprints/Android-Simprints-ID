@@ -15,6 +15,6 @@ object AlertActivityHelper {
         act.startActivityForResult(intent, InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST)
     }
 
-    fun extractPotentialAlertScreenResponse(requestCode: Int, resultCode: Int, data: Intent?): AlertActResponse? =
+    fun extractPotentialAlertScreenResponse(data: Intent?): AlertActResponse? =
         data?.getParcelableExtra(AlertActResponse.BUNDLE_KEY)
 }
