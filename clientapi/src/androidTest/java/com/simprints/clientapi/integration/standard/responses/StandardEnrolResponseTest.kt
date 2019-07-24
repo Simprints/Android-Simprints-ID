@@ -33,7 +33,10 @@ class StandardEnrolResponseTest : BaseStandardClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         scenario.result.resultData.setExtrasClassLoader(Registration::class.java.classLoader)
         result.resultData.extras?.let {
-            assertThat(it.getParcelable<Registration>(Constants.SIMPRINTS_REGISTRATION).guid).isEqualTo(appEnrolResponse.guid)
+            it.getParcelable<Registration>(Constants.SIMPRINTS_REGISTRATION)?.let { registration ->
+                assertThat(registration.guid).isEqualTo(appEnrolResponse.guid)
+            } ?: throw Exception("No registration found")
+
             assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
