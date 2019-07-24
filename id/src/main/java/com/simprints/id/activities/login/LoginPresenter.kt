@@ -1,7 +1,6 @@
 package com.simprints.id.activities.login
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -169,7 +168,7 @@ class LoginPresenter(val view: LoginContract.View,
     }
 
     override fun handleBackPressed() {
-        view.setErrorResponseAsResultAndFinish(Activity.RESULT_OK, AppErrorResponse(LOGIN_NOT_COMPLETE))
+        view.setErrorResponseInActivityResultAndFinish(AppErrorResponse(LOGIN_NOT_COMPLETE))
     }
 
     override fun logMessageForCrashReportWithUITrigger(message: String) {

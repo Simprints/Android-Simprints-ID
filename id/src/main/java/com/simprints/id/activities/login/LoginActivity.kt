@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.safetynet.SafetyNet
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.request.LoginActivityRequest
@@ -183,8 +182,8 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         viewPresenter.handleBackPressed()
     }
 
-    override fun setErrorResponseAsResultAndFinish(activityResult: Int, appErrorResponse: AppErrorResponse) {
-        setResult(activityResult, Intent().apply {
+    override fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse) {
+        setResult(Activity.RESULT_OK, Intent().apply {
             putExtra(LoginActivityResponse.BUNDLE_KEY, appErrorResponse)
         })
         finish()
