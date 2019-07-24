@@ -61,7 +61,7 @@ sealed class FingerprintTask(
             CollectFingerprintsTaskResult.BUNDLE_KEY
         )
 
-    class Matching(taskResultKey: String, createMatchingTaskRequest: () -> MatchingTaskRequest) :
+    class Matching(taskResultKey: String, val subAction: SubAction, createMatchingTaskRequest: () -> MatchingTaskRequest) :
         ActivityTask(
             taskResultKey,
             createMatchingTaskRequest,
@@ -69,5 +69,9 @@ sealed class FingerprintTask(
             RequestCode.MATCHING,
             MatchingTaskRequest.BUNDLE_KEY,
             MatchingTaskResult.BUNDLE_KEY
-        )
+        ) {
+        enum class SubAction {
+            IDENTIFY, VERIFY
+        }
+    }
 }

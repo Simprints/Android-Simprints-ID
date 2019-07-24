@@ -7,7 +7,8 @@ import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
 
-class Orchestrator(private val viewModel: OrchestratorViewModel) {
+class Orchestrator(private val viewModel: OrchestratorViewModel,
+                   private val runnableTaskDispatcher: RunnableTaskDispatcher = RunnableTaskDispatcher()) {
 
     private lateinit var taskFlow: FingerprintTaskFlow
 
@@ -21,14 +22,13 @@ class Orchestrator(private val viewModel: OrchestratorViewModel) {
     private fun startNextTask() {
         taskFlow.getCurrentTask().also {
             when (it) {
-                is FingerprintTask.RunnableTask -> doRunnableTaskAndHandleResult(it)
+                is FingerprintTask.RunnableTask -> runnableTaskDispatcher.runTask(it, ::handleRunnableTaskResult)
                 is FingerprintTask.ActivityTask -> viewModel.postNextTask(it)
             }
         }
     }
 
-    private fun doRunnableTaskAndHandleResult(task: FingerprintTask.RunnableTask) {
-        val taskResult = task.runTask(task.createTaskRequest())
+    internal fun handleRunnableTaskResult(taskResult: TaskResult) {
         taskFlow.handleRunnableTaskResult(taskResult)
         cycleToNextTaskOrFinishFlow()
     }
