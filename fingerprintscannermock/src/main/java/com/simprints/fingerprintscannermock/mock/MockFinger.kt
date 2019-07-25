@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
 
 enum class MockFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99
@@ -87,18 +87,18 @@ enum class MockFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 0
 
         val person1TwoFingersGoodScan =
                 arrayOf(PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-                        PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)
+                    PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)
 
         val person1TwoFingersAgainGoodScan =
                 arrayOf(PERSON_1_VERSION_2_LEFT_THUMB_GOOD_SCAN,
-                        PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN)
+                    PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN)
 
         val person2TwoFingersGoodScan =
                 arrayOf(PERSON_2_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-                        PERSON_2_VERSION_1_LEFT_INDEX_GOOD_SCAN)
+                    PERSON_2_VERSION_1_LEFT_INDEX_GOOD_SCAN)
 
         val person2TwoFingersAgainGoodScan =
                 arrayOf(PERSON_2_VERSION_2_LEFT_THUMB_GOOD_SCAN,
-                        PERSON_2_VERSION_2_LEFT_INDEX_GOOD_SCAN)
+                    PERSON_2_VERSION_2_LEFT_INDEX_GOOD_SCAN)
     }
 }

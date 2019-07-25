@@ -171,7 +171,7 @@ class AlertActivityTest {
     @Test
     fun pressBackButtonOnLowBatteryScannerError_shouldStartRefusalActivity() {
         val context: Context = ApplicationProvider.getApplicationContext()
-        launchAlertActivity(AlertActRequest(LOW_BATTERY))
+        launchAlertActivity(AlertTaskRequest(LOW_BATTERY))
         Espresso.pressBackUnconditionally()
 
         intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))

@@ -1,9 +1,9 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
 import com.simprints.fingerprintscanner.Message
 import com.simprints.fingerprintscanner.enums.MESSAGE_TYPE.*
-import com.simprints.fingerprintscannermock.ByteArrayUtils.byteArrayFromHexString
-import com.simprints.fingerprintscannermock.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.byteArrayFromHexString
+import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.bytesToMessage
 
 
 class MockResponseHelper(private val mockScannerManager: MockScannerManager) {

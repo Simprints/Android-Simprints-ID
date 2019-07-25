@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
 import com.simprints.fingerprintscanner.Message
 import com.simprints.fingerprintscanner.enums.MESSAGE_TYPE

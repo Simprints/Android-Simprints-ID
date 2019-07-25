@@ -13,6 +13,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
+import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
@@ -26,7 +27,7 @@ import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryExceptio
 import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
+import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.testtools.android.waitOnUi
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -57,7 +58,8 @@ class LaunchActivityAndroidTest {
     private val fingerprintModule by lazy {
         TestFingerprintModule(
             scannerManagerRule = DependencyRule.SpyRule,
-            consentDataManagerRule = DependencyRule.MockRule)
+            consentDataManagerRule = DependencyRule.MockRule,
+            bluetoothComponentAdapter = DependencyRule.ReplaceRule { DummyBluetoothAdapter() })
     }
 
     private val fingerprintCoreModule by lazy {

@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket
 import java.io.InputStream
