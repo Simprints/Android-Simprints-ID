@@ -13,6 +13,7 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.inBackground
+import com.simprints.clientapi.extensions.skipCheckForError
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
@@ -69,7 +70,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        view.returnErrorToClient(errorResponse)
+        view.returnErrorToClient(errorResponse, errorResponse.skipCheckForError())
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

@@ -32,6 +32,7 @@ object DomainToAppResponse {
             GUID_NOT_FOUND_ONLINE -> IAppErrorReason.GUID_NOT_FOUND_ONLINE
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
+            LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
