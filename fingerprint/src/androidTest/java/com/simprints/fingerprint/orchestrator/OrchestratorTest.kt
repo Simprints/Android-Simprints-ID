@@ -3,6 +3,8 @@ package com.simprints.fingerprint.orchestrator
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
@@ -10,6 +12,7 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentify
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
+import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
@@ -128,6 +131,74 @@ class OrchestratorTest {
         }
     }
 
+    @Test
+    fun enrolTaskFlow_failsDueToAlertInLaunch_shouldFinishCancelledWithError() {
+        mockActivityResults(launch = ::setupAlertResult)
+
+        orchestrator.start(createFingerprintRequest(Action.ENROL))
+
+        isFlowFinished.await()
+
+        val activityTasks = argumentCaptor<ActivityTask>()
+        val finalResult = argumentCaptor<FinalResult>()
+        verifyOnce(viewModelMock) { postNextTask(activityTasks.capture()) }
+        verifyNever(runnableTaskDispatcherMock) { runTask(anyNotNull(), anyNotNull()) }
+        verifyOnce(viewModelMock) { handleFlowFinished(finalResult.capture()) }
+
+        assertTrue(activityTasks.firstValue is Launch)
+        with(finalResult.firstValue) {
+            assertEquals(Activity.RESULT_CANCELED, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintErrorResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.ERROR, type)
+            })
+        }
+    }
+
+    @Test
+    fun enrolTaskFlow_failsDueToRefusalInLaunch_shouldFinishOkWithRefused() {
+        mockActivityResults(launch = ::setupRefusalResult)
+
+        orchestrator.start(createFingerprintRequest(Action.ENROL))
+
+        isFlowFinished.await()
+
+        val activityTasks = argumentCaptor<ActivityTask>()
+        val finalResult = argumentCaptor<FinalResult>()
+        verifyOnce(viewModelMock) { postNextTask(activityTasks.capture()) }
+        verifyNever(runnableTaskDispatcherMock) { runTask(anyNotNull(), anyNotNull()) }
+        verifyOnce(viewModelMock) { handleFlowFinished(finalResult.capture()) }
+
+        assertTrue(activityTasks.firstValue is Launch)
+        with(finalResult.firstValue) {
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintRefusalFormResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.REFUSAL, type)
+            })
+        }
+    }
+
+    @Test
+    fun enrolTaskFlow_cancelledSomehow_shouldFinishCancelledWithNoData() {
+        mockActivityResults(collect = ::setupCancelledResult)
+
+        orchestrator.start(createFingerprintRequest(Action.ENROL))
+
+        isFlowFinished.await()
+
+        val activityTasks = argumentCaptor<ActivityTask>()
+        val finalResult = argumentCaptor<FinalResult>()
+        verifyExactly(2, viewModelMock) { postNextTask(activityTasks.capture()) }
+        verifyNever(runnableTaskDispatcherMock) { runTask(anyNotNull(), anyNotNull()) }
+        verifyOnce(viewModelMock) { handleFlowFinished(finalResult.capture()) }
+
+        assertTrue(activityTasks.firstValue is Launch)
+        assertTrue(activityTasks.secondValue is CollectFingerprints)
+        with(finalResult.firstValue) {
+            assertEquals(Activity.RESULT_CANCELED, resultCode)
+            assertNull(resultData?.extras)
+        }
+    }
+
     private fun mockActivityResults(
         launch: () -> Unit = ::setupOkLaunchResult,
         collect: () -> Unit = ::setupOkCollectResult,
@@ -196,6 +267,26 @@ class OrchestratorTest {
         orchestrator.handleRunnableTaskResult(
             SavePersonTaskResult(true)
         )
+    }
+
+    private fun setupAlertResult() {
+        orchestrator.handleActivityTaskResult(ResultCode.ALERT) { key ->
+            assertEquals(AlertTaskResult.BUNDLE_KEY, key)
+            AlertTaskResult(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED, AlertTaskResult.CloseButtonAction.CLOSE)
+        }
+    }
+
+    private fun setupRefusalResult() {
+        orchestrator.handleActivityTaskResult(ResultCode.REFUSED) { key ->
+            assertEquals(RefusalTaskResult.BUNDLE_KEY, key)
+            RefusalTaskResult(RefusalTaskResult.Action.SUBMIT, RefusalTaskResult.Answer())
+        }
+    }
+
+    private fun setupCancelledResult() {
+        orchestrator.handleActivityTaskResult(ResultCode.CANCELLED) {
+            throw IllegalStateException("Should not be invoked")
+        }
     }
 
     companion object {
