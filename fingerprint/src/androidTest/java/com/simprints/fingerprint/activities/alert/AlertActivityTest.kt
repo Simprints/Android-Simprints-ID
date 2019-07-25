@@ -169,6 +169,15 @@ class AlertActivityTest {
     }
 
     @Test
+    fun pressBackButtonOnLowBatteryScannerError_shouldStartRefusalActivity() {
+        val context: Context = ApplicationProvider.getApplicationContext()
+        launchAlertActivity(AlertActRequest(LOW_BATTERY))
+        Espresso.pressBackUnconditionally()
+
+        intended(hasComponent(ComponentName(context, RefusalActivity::class.java)))
+    }
+
+    @Test
     fun pressBackButtonOnNonBluetoothError_shouldFinish() {
         val scenario = launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_ONLINE))
         Espresso.pressBackUnconditionally()
