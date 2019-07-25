@@ -1,9 +1,9 @@
 package com.simprints.id.commontesttools.state
 
+import com.simprints.core.network.NetworkConstants
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.network.NetworkConstants
-import com.simprints.id.network.SimApiClient
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.whenever
@@ -17,7 +17,8 @@ fun replaceRemoteDbManagerApiClientsWithFailingClients(remotePeopleManagerSpy: R
 
 fun replaceSecureApiClientWithFailingClientProvider() = createFailingApiClient<SecureApiInterface>()
 
-inline fun <reified T> createFailingApiClientForRemotePeopleManager(remotePeopleManagerSpy: RemotePeopleManager, getClient: RemotePeopleManager.() -> Single<T>) {
+inline fun <reified T> createFailingApiClientForRemotePeopleManager(remotePeopleManagerSpy: RemotePeopleManager,
+                                                                    getClient: RemotePeopleManager.() -> Single<T>) {
     val poorNetworkClientMock: T = createFailingApiClient()
     whenever(remotePeopleManagerSpy.getClient()).thenReturn(Single.just(poorNetworkClientMock))
 }

@@ -1,14 +1,17 @@
 package com.simprints.id.services.scheduledSync.sessionSync
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ArtificialTerminationEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.remote.session.ApiSessionEvents
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureException
 import com.simprints.id.exceptions.safe.session.SessionUploadFailureRetryException
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
 import retrofit2.adapter.rxjava2.Result
@@ -35,6 +38,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
             .filterClosedSessions()
             .uploadClosedSessionsOrThrowIfNoSessions(projectId)
             .deleteSessionsFromDb()
+            .trace("uploadSessionsBatch")
 
     @SuppressLint("CheckResult")
     internal fun Single<List<SessionEvents>>.closeOpenSessionsAndUpdateUploadTime(): Single<List<SessionEvents>> =
@@ -43,7 +47,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
 
             sessions.forEach {
                 forceSessionToCloseIfOpenAndNotInProgress(it, timeHelper)
-                it.relativeUploadTime = it.nowRelativeToStartTime(timeHelper)
+                it.relativeUploadTime = it.timeRelativeToStartTime(timeHelper.now())
                 sessionEventsManager.insertOrUpdateSessionEvents(it).blockingAwait()
             }
             Single.just(sessions)
@@ -74,7 +78,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
             if (sessions.isEmpty())
                 throw NoSessionsFoundException()
 
-            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.toTypedArray()))
+            sessionApiClient.uploadSessions(projectId, hashMapOf("sessions" to sessions.map { ApiSessionEvents(it) }.toTypedArray()))
                 .checkUploadSucceedAndRetryIfNecessary()
                 .andThen(Single.just(sessions))
         }
@@ -91,7 +95,9 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
                 isResponseAnErrorThatIsWorthToRetry(response.code()) ->
                     continueWithRetryException(Throwable("Sessions upload response code: ${response.code()}"))
                 else ->
-                    continueWithNoRetryException()
+                    continueWithNoRetryException().also {
+                        Timber.d(response.message())
+                    }
             }
         }.retry { counter, t ->
             counter < NUMBER_OF_ATTEMPTS_TO_RETRY_NETWORK_CALLS && t !is SessionUploadFailureException
@@ -106,6 +112,7 @@ class SessionEventsUploaderTask(private val sessionEventsManager: SessionEventsM
 
     internal fun Single<List<SessionEvents>>.deleteSessionsFromDb(): Completable =
         this.flatMapCompletable { sessions ->
+            Timber.d("SessionEventsUploaderTask deleteSessionsFromDb()")
             Completable.fromCallable {
                 sessions.forEach { session ->
                     sessionEventsManager.deleteSessions(sessionId = session.id, openSession = false).blockingGet()

@@ -1,6 +1,6 @@
 package com.simprints.id.data.consent
 
-import android.content.Context
+import android.os.Handler
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -10,8 +10,12 @@ import io.reactivex.Completable
 import io.reactivex.Flowable
 import java.io.BufferedReader
 import java.io.File
+import android.os.Looper
+import com.google.android.gms.tasks.Tasks
+import timber.log.Timber
 
-class LongConsentManagerImpl(context: Context,
+
+class LongConsentManagerImpl(absolutePath: String,
                              private val loginInfoManager: LoginInfoManager,
                              private val crashReportManager: CrashReportManager) : LongConsentManager {
 
@@ -23,22 +27,28 @@ class LongConsentManagerImpl(context: Context,
         private const val TIMEOUT_FAILURE_WINDOW_MILLIS = 1L
     }
 
-    private val filePath: File
-    private val firebaseStorage = FirebaseStorage.getInstance()
-
-    init {
-        filePath = createLocalFilePath(context)
+    internal val baseFilePath: File by lazy {
+        createBaseFilePath(absolutePath)
     }
 
-    private fun createLocalFilePath(context: Context): File {
-        val filePath = File(context.filesDir.absolutePath +
-            File.separator +
-            FILE_PATH +
+    internal val filePathForProject: File by lazy {
+        createLocalFilePath(baseFilePath.absolutePath)
+    }
+
+    private val firebaseStorage = FirebaseStorage.getInstance()
+
+    private fun createBaseFilePath(absolutePath: String) = File (absolutePath +
+        File.separator +
+        FILE_PATH)
+
+    internal fun createLocalFilePath(absolutePath: String): File {
+        val filePath = File(absolutePath +
             File.separator +
             loginInfoManager.getSignedInProjectIdOrEmpty())
 
-        if (!filePath.exists())
+        if (!filePath.exists()) {
             filePath.mkdirs()
+        }
 
         return filePath
     }
@@ -50,7 +60,9 @@ class LongConsentManagerImpl(context: Context,
                 downloadTasks.add(
                     downloadLongConsentWithProgress(language)
                         .ignoreElements()
-                        .doOnError { crashReportManager.logExceptionOrThrowable(it) }
+                        .doOnError {
+                            Timber.e(it)
+                            crashReportManager.logExceptionOrSafeException(it) }
                         .onErrorComplete()
                 )
         }
@@ -60,7 +72,7 @@ class LongConsentManagerImpl(context: Context,
     override fun downloadLongConsentWithProgress(language: String): Flowable<Int> = Flowable.create<Int>(
         { emitter ->
             firebaseStorage.maxDownloadRetryTimeMillis = TIMEOUT_FAILURE_WINDOW_MILLIS
-            val file = createFileForLanguage(language)
+            val file = createFileForLanguage(filePathForProject, language)
             getFileDownloadTask(language, file)
                 .addOnSuccessListener {
                     emitter.onComplete()
@@ -84,12 +96,12 @@ class LongConsentManagerImpl(context: Context,
             "$language.$FILE_TYPE"
         }
 
-        return File(filePath, fileName).exists()
+        return File(filePathForProject, fileName).exists()
     }
 
     override fun getLongConsentText(language: String): String {
 
-        val br: BufferedReader = createFileForLanguage(language).bufferedReader()
+        val br: BufferedReader = createFileForLanguage(filePathForProject, language).bufferedReader()
         val fileContent = StringBuffer("")
 
         br.forEachLine {
@@ -99,6 +111,22 @@ class LongConsentManagerImpl(context: Context,
         return fileContent.toString()
     }
 
-    private fun createFileForLanguage(language: String): File =
-        File(filePath, "$language.$FILE_TYPE")
+    internal fun createFileForLanguage(parentLanguageFilePath: File, language: String): File =
+        File(parentLanguageFilePath, "$language.$FILE_TYPE")
+
+    override fun deleteLongConsents() {
+        getAllLongConsentFiles()?.forEach { baseFile ->
+            if(baseFile.isDirectory) {
+                deleteFilesInDirectory(baseFile)
+            }
+            baseFile.delete()
+        }
+    }
+
+    private fun getAllLongConsentFiles() =
+        baseFilePath.listFiles()
+
+    private fun deleteFilesInDirectory(baseFile: File) {
+        baseFile.listFiles().forEach { it.delete() }
+    }
 }

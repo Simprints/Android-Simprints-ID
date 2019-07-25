@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- This language is called Chichewa (as spoken in Malawi) -->
+
+    <string name="consent_general_title">Chilolezo</string>
+    
+    <string name="consent_enrol">Ndikufuna kugwiritsa ntchito zidindo za dzala zanu kuti ndikulowetseni mkafukufuku wa %1$s komanso kuti ndidzathe kukuzindikirani mtsogolo.&#160;</string>
+    <string name="consent_id_verify">Ndikufukuna kugwiritsa ntchito zidindo za dzala zanu kuti ndithe kupeza uthenga wanu mkafukufuku wa %1$s.&#160;</string>
+    <string name="consent_share_data_no">Bungwe la Simprints, lomwe ndi bungwe limene silipanga phindu la ndalama, lidzagwiritsa ntchito uthenga okhudzana ndi dzala zanu komanso malo omwe mukupezeka panopa.&#160;</string>
+    <string name="consent_privacy_rights">Ngati mwavomereza kutenga nawo mbali, mutha kusiya kutenga nawo nthawi ina iliyonse ndipo mutha kunena ngati mukufuna kuti uthenga wanu womwe watengedwa utayidwe.&#160;</string>
+    <string name="consent_confirmation">Kodi ndingathe kugwiritsa ntchito zidindo za dzala zanu? Chonde nenani \"Ndikuvomera\", \"Ndikukana\", kapena \"Ndili ndi mafunso.\"</string>
+
+    <string name="launch_consent_decline_button">Kukana</string>
+    <string name="launch_consent_accept_button">Kuvomereza</string>
+
+</resources>

@@ -8,8 +8,8 @@ import com.google.common.truth.Truth
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
-import com.simprints.id.commontesttools.di.DependencyRule.MockRule
-import com.simprints.id.commontesttools.di.DependencyRule.SpyRule
+import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.DbManager
@@ -21,6 +21,8 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
+import com.simprints.id.domain.PeopleCount
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
@@ -57,12 +59,12 @@ class DashboardSyncCardViewModelTest {
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
     @Inject lateinit var dbManagerMock: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncSCopeBuilder: SyncScopesBuilder
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var timeHelper: TimeHelper
 
     private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
     private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
-    private val syncScope by lazy { syncSCopeBuilder.buildSyncScope()!! }
+    private val syncScope by lazy { syncScopeBuilder.buildSyncScope()!! }
     private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
     private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
     private val fakeSyncStateLiveData = MutableLiveData<SyncState>()
@@ -99,7 +101,8 @@ class DashboardSyncCardViewModelTest {
     @Test
     fun downSyncIsNotRunning_shouldFetchDownSyncCounterFromRetrofit() {
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
-        mockCounters(1, 2, 3)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
@@ -108,13 +111,14 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
         Truth.assert_().that(lastState?.peopleToUpload).isEqualTo(2)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(3)
-        verifyOnce(dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(dbManagerMock) { getPeopleCountToDownSync(anyNotNull()) }
     }
 
     @Test
     fun downSyncIsNotRunning_shouldEnableTheSyncButton() {
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
-        mockCounters(1, 2, 3)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
         val vm = dashboardCardViewModel.viewModelStateLiveData.testObserver()
@@ -126,7 +130,7 @@ class DashboardSyncCardViewModelTest {
     @Test
     fun downSyncIsRunning_shouldFetchDownSyncCounterFromWorkers() {
         insertASyncWorkInfoEvent(SyncState.RUNNING)
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -139,7 +143,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun downSyncIsRunning_shouldShowARunningStateForSyncButton() {
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), totalToDownload = 100))
 
@@ -153,7 +157,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun upSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
@@ -169,7 +173,7 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun downSyncIsTheLatestSync_shouldShowUpSyncTimeAsLatestTimestamp() {
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         val latestSyncTime = timeHelper.now()
         insertADownSyncStatusInDb(DownSyncStatus(subSyncScopes.first(), lastSyncTime = timeHelper.nowMinus(2, TimeUnit.MINUTES)))
@@ -187,7 +191,7 @@ class DashboardSyncCardViewModelTest {
     fun downSyncFinishes_shouldUpdateTheTotalCounter() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitAndUpdateUpSyncCounter = 2
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -205,7 +209,7 @@ class DashboardSyncCardViewModelTest {
     fun whileDownSyncProgresses_shouldNotUpdateTotalAndLocalCounters() {
         val requiredCallsToInitTotalCounter = 1
         val requiredCallToInitUpSyncCounter = 1
-        mockCounters(1, 2)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2)
         insertASyncWorkInfoEvent(SyncState.RUNNING)
 
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -223,7 +227,8 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun manualTriggerIsOff_shouldNotShowTheSyncButton() {
-        mockCounters(1, 2, 3)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to false))
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -236,7 +241,8 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun manualTriggerIsOn_shouldShowTheSyncButton() {
-        mockCounters(1, 2, 3)
+        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+            getMockListOfPeopleCountWithCounter(3))
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
         insertASyncWorkInfoEvent(SyncState.RUNNING)
         dashboardCardViewModel = createViewModelDashboardToTest()
@@ -247,9 +253,9 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.syncCardState).isEqualTo(SyncCardState.SYNC_RUNNING)
     }
 
-    private fun mockCounters(peopleInDb: Int? = null, peopleToUpload: Int? = null, peopleToDownload: Int? = null) {
-        peopleInDb?.let {
-            whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
+    private fun mockCounters(peopleInDb: List<PeopleCount>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {
+        peopleToUpload?.let {
+            whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
         }
 
         peopleInDb?.let {
@@ -257,9 +263,12 @@ class DashboardSyncCardViewModelTest {
         }
 
         peopleToDownload?.let {
-            whenever(dbManagerMock.calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleToDownload))
+            whenever(dbManagerMock.getPeopleCountToDownSync(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         }
     }
+
+    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 
     private fun createViewModelDashboardToTest() =
         DashboardSyncCardViewModel(
@@ -285,11 +294,11 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
-        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) }
+        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) }
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
-        verifyExactly(times, dbManagerMock) { calculateNPatientsToDownSync(anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyExactly(times, dbManagerMock) { getPeopleCountToDownSync(anyNotNull()) }
 
     }
 

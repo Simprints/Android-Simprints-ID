@@ -1,8 +1,11 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class ScannerConnectionEvent(val relativeStartTime: Long, val scannerInfo: ScannerInfo) : Event(EventType.SCANNER_CONNECTION) {
+@Keep
+class ScannerConnectionEvent(starTime: Long,
+                             val scannerInfo: ScannerInfo) : Event(EventType.SCANNER_CONNECTION, starTime) {
 
+    @Keep
     class ScannerInfo(val scannerId: String, val macAddress: String, var hardwareVersion: String)
 }

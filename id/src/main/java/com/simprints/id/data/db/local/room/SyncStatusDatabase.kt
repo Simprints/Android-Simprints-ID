@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.annotation.Keep
 
 @Database(entities = [DownSyncStatus::class, UpSyncStatus::class], version = 1, exportSchema = false)
+@Keep
 abstract class SyncStatusDatabase : RoomDatabase() {
 
     abstract val downSyncDao: DownSyncDao

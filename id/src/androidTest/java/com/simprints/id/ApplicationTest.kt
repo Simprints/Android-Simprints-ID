@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class ApplicationTest {
 
     @get:Rule val loginTestRule = ActivityTestRule(CheckLoginFromMainLauncherActivity::class.java, false, false)

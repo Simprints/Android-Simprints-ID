@@ -6,8 +6,9 @@ import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
 import com.simprints.id.domain.Project
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
-import com.simprints.id.network.SimApiClient
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.tools.extensions.handleResponse
+import com.simprints.id.tools.extensions.trace
 import io.reactivex.Single
 import retrofit2.HttpException
 import java.io.IOException
@@ -19,18 +20,22 @@ open class RemoteProjectManagerImpl(private val remoteDbManager: RemoteDbManager
         getProjectApiClient().flatMap {
             it.requestProject(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProject")
                 .handleResponse(::defaultResponseErrorHandling)
+                .trace("requestProject")
         }
 
     override fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement> =
         getProjectApiClient().flatMap {
             it.requestProjectConfig(projectId)
                 .retry(::retryCriteria)
+                .trace("requestProjectConfig")
                 .handleResponse(::defaultResponseErrorHandling)
+                .trace("requestProjectConfig")
         }
 
     override fun getProjectApiClient(): Single<ProjectRemoteInterface> =
-        remoteDbManager.getCurrentFirestoreToken()
+        remoteDbManager.getCurrentToken()
             .flatMap {
                 Single.just(buildProjectApi(it))
             }

@@ -1,11 +1,11 @@
 package com.simprints.id.domain
 
+import androidx.annotation.Keep
 
+@Keep
 open class Project {
 
     lateinit var id: String
-
-    var legacyId: String? = null
 
     lateinit var name: String
 

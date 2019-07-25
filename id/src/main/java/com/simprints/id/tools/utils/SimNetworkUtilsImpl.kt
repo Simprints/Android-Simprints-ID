@@ -9,32 +9,39 @@ import com.simprints.id.tools.utils.SimNetworkUtils.Connection
 
 open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
 
-    private val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    private val tm = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    private val connectivityManager = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val telephonyManager = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
-    override fun isConnected(): Boolean {
-        return cm.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
+    override fun isConnected(): Boolean = try {
+        connectivityManager.activeNetworkInfo.detailedState == NetworkInfo.DetailedState.CONNECTED
+    } catch (e: IllegalStateException) {
+        false
     }
+
 
     override var connectionsStates: List<Connection> =
         arrayListOf<Connection>().apply {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    cm.allNetworks?.map { network ->
-                        cm.getNetworkInfo(network).let {
-                            add(SimNetworkUtils.Connection(it.typeName, it.detailedState))
+                    connectivityManager.allNetworks?.map { network ->
+                        connectivityManager.getNetworkInfo(network).let {
+                            if(it.typeName != null && it.detailedState != null) {
+                                add(Connection(it.typeName, it.detailedState))
+                            }
                         }
                     }
                 } else {
-                    cm.allNetworkInfo.map {
-                        add(Connection(it.typeName, it.detailedState))
+                    connectivityManager.allNetworkInfo.map {
+                        if(it.typeName != null && it.detailedState != null) {
+                            add(Connection(it.typeName, it.detailedState))
+                        }
                     }
                 }
             } catch (e: Exception) { }
         }
 
     override var mobileNetworkType: String? =
-        tm.networkType.let {
+        telephonyManager.networkType.let {
             return@let when (it) {
                 TelephonyManager.NETWORK_TYPE_1xRTT -> "1xRTT"
                 TelephonyManager.NETWORK_TYPE_CDMA -> "CDMA"

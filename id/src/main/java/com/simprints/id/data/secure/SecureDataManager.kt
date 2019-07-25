@@ -5,7 +5,7 @@ import com.simprints.id.data.db.local.models.LocalDbKey
 
 interface SecureDataManager : LocalDbKeyProvider {
 
-    fun setLocalDatabaseKey(projectId: String, legacyApiKey: String?)
+    fun setLocalDatabaseKey(projectId: String)
 
     override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey
 }

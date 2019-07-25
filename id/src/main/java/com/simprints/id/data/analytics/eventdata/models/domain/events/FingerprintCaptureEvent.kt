@@ -1,35 +1,25 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
-import com.simprints.id.domain.Finger
-import com.simprints.libsimprints.FingerIdentifier
+import androidx.annotation.Keep
+import com.simprints.id.FingerIdentifier
 
-class FingerprintCaptureEvent(val relativeStartTime: Long,
-                              val relativeEndTime: Long,
+@Keep
+class FingerprintCaptureEvent(starTime: Long,
+                              endTime: Long,
                               val finger: FingerIdentifier,
                               val qualityThreshold: Int,
                               val result: Result,
-                              val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE) {
+                              val fingerprint: Fingerprint?) : Event(EventType.FINGERPRINT_CAPTURE, starTime, endTime) {
 
-    class Fingerprint(val quality: Int, val template: String)
+    @Keep
+    class Fingerprint(val finger: FingerIdentifier, val quality: Int, val template: String)
 
+    @Keep
     enum class Result {
         GOOD_SCAN,
         BAD_QUALITY,
         NO_FINGER_DETECTED,
         SKIPPED,
         FAILURE_TO_ACQUIRE;
-
-        companion object {
-            fun fromFingerStatus(fingerStatus: Finger.Status): Result {
-                return when (fingerStatus) {
-                    Finger.Status.GOOD_SCAN, Finger.Status.RESCAN_GOOD_SCAN -> GOOD_SCAN
-                    Finger.Status.BAD_SCAN -> BAD_QUALITY
-                    Finger.Status.NO_FINGER_DETECTED -> NO_FINGER_DETECTED
-                    Finger.Status.FINGER_SKIPPED -> SKIPPED
-                    else -> FAILURE_TO_ACQUIRE
-                }
-            }
-        }
     }
 }

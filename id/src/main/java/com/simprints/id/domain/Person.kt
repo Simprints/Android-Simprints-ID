@@ -1,23 +1,26 @@
 package com.simprints.id.domain
 
+import android.os.Parcelable
+import com.simprints.id.domain.fingerprint.Fingerprint
+import kotlinx.android.parcel.Parcelize
 import java.util.*
-import com.simprints.libcommon.Fingerprint as LibFingerprint
-import com.simprints.libcommon.Person as LibPerson
 
+@Parcelize
 data class Person (
     val patientId: String,
     val projectId: String,
     val userId: String,
     val moduleId: String,
-    val createdAt: Date?,
-    val updatedAt: Date?,
-    val toSync: Boolean, // TODO: stop leaking data layer concerns into domain layer
-    val fingerprints: List<Fingerprint>
-)
-
-// TODO: move this adapter out of domain code. The domain layer should not be aware of outer layers
-fun Person.toLibPerson(): LibPerson =
-    LibPerson(
-        patientId,
-        fingerprints.mapNotNull(Fingerprint::toLibFingerprintOrNull)
-    )
+    var fingerprints: List<Fingerprint>,
+    val createdAt: Date? = null,
+    val updatedAt: Date? = null,
+    var toSync: Boolean = true
+): Parcelable {
+    init {
+        fingerprints = fingerprints
+            .groupBy { it.finger }
+            .mapValues { it.value.maxBy { it.qualityScore } }
+            .values
+            .toMutableList() as MutableList<Fingerprint>
+    }
+}

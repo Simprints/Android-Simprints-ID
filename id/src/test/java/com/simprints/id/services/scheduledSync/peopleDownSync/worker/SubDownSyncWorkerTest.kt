@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.id.commontesttools.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -83,7 +83,7 @@ class SubDownSyncWorkerTest {
         val result = subDownSyncWorker.doWork()
 
         verifyOnce(mockDownSyncTask) { execute(anyNotNull()) }
-        verifyOnce(crashReportManagerMock) { logExceptionOrThrowable(anyNotNull()) }
+        verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         assert(result is ListenableWorker.Result.Failure)
     }
 }

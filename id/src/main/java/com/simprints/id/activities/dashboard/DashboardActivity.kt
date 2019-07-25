@@ -6,9 +6,11 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.LongConsentActivity
@@ -16,9 +18,6 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.tools.LanguageHelper
-import com.simprints.id.tools.extensions.launchAlert
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -33,8 +32,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
-        private const val LONG_CONSENT_ACTIVITY_REQUEST_CODE = 2
-
         private const val LOGOUT_RESULT_CODE = 1
 
     }
@@ -86,6 +83,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun updateCardViews() {
         runOnUiThread {
+            dashboardCardsView.recycledViewPool.clear()
             cardsViewAdapter.notifyDataSetChanged()
         }
     }
@@ -112,7 +110,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
             val id = menuItem.itemId
             when (id) {
-                R.id.menuPrivacyNotice -> startActivityForResult(Intent(this, LongConsentActivity::class.java), LONG_CONSENT_ACTIVITY_REQUEST_CODE)
+                R.id.menuPrivacyNotice -> startActivity(Intent(this, LongConsentActivity::class.java))
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }
@@ -121,6 +119,12 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            finish()
+        }
+
         if (resultCode == LOGOUT_RESULT_CODE && requestCode == SETTINGS_ACTIVITY_REQUEST_CODE) {
             viewPresenter.logout()
         }
@@ -133,10 +137,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun getStringWithParams(stringRes: Int, currentValue: Int, maxValue: Int): String {
         return getString(stringRes, currentValue, maxValue)
-    }
-
-    override fun launchAlertView(error: ALERT_TYPE) {
-        this.launchAlert(error)
     }
 
     override fun showToastForUserOffline() {

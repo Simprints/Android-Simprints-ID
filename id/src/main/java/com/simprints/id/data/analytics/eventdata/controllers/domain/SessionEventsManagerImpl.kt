@@ -1,31 +1,30 @@
 package com.simprints.id.data.analytics.eventdata.controllers.domain
 
+import android.annotation.SuppressLint
 import android.os.Build
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
-import com.simprints.id.data.analytics.eventdata.models.domain.session.Location
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.analytics.eventdata.models.domain.session.*
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
+import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
-import com.simprints.id.exceptions.unexpected.SessionNotFoundException
+import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
+import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
-import com.simprints.libcommon.Person
-import com.simprints.libcommon.Utils
-import com.simprints.libsimprints.Identification
-import com.simprints.libsimprints.Verification
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.*
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val deviceId: String,
+                                    private val appVersionName: String,
                                     private val sessionEventsSyncManager: SessionEventsSyncManager,
                                     private val sessionEventsLocalDbManager: SessionEventsLocalDbManager,
                                     private val preferencesManager: PreferencesManager,
@@ -47,27 +46,38 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             it[0]
         }
 
-    override fun createSession(): Single<SessionEvents> =
-        createSessionWithAvailableInfo(PROJECT_ID_FOR_NOT_SIGNED_IN).let {
-            Timber.d("Created session: ${it.id}")
-            sessionEventsSyncManager.scheduleSessionsSync()
+    override fun createSession(libSimprintsVersionName: String): Single<SessionEvents> =
+        sessionEventsLocalDbManager.getSessionCount().flatMap {
+            createSessionWithAvailableInfo(
+                PROJECT_ID_FOR_NOT_SIGNED_IN,
+                libSimprintsVersionName,
+                appVersionName,
+                DatabaseInfo(it)).let {
+                Timber.d("Created session: ${it.id}")
+                sessionEventsSyncManager.scheduleSessionsSync()
 
-            closeLastSessionsIfPending()
-                .andThen(insertOrUpdateSessionEvents(it))
-                .toSingle { it }
+                closeLastSessionsIfPending()
+                    .andThen(insertOrUpdateSessionEvents(it))
+                    .toSingle { it }
+            }
         }
 
-    private fun createSessionWithAvailableInfo(projectId: String): SessionEvents =
+
+    private fun createSessionWithAvailableInfo(projectId: String,
+                                               libVersionName: String,
+                                               appVersionName: String,
+                                               databaseInfo: DatabaseInfo): SessionEvents =
         SessionEvents(
             projectId,
-            preferencesManager.appVersionName,
-            preferencesManager.libVersionName,
+            appVersionName,
+            libVersionName,
             preferencesManager.language,
             Device(
                 Build.VERSION.SDK_INT.toString(),
-               Build.MANUFACTURER + "_" + Build.MODEL,
+                Build.MANUFACTURER + "_" + Build.MODEL,
                 deviceId),
-            timeHelper.now())
+            timeHelper.now(),
+            databaseInfo)
 
     override fun updateSession(block: (sessionEvents: SessionEvents) -> Unit): Completable =
         getCurrentSession().flatMapCompletable {
@@ -79,9 +89,10 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
         }.doOnError {
             Timber.e(it)
-            crashReportManager.logExceptionOrThrowable(it)
+            crashReportManager.logExceptionOrSafeException(it)
         }.onErrorComplete() // because events are low priority, it swallows the exception
 
+    @SuppressLint("CheckResult")
     override fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit) {
         updateSession(block).subscribeBy()
     }
@@ -96,49 +107,22 @@ open class SessionEventsManagerImpl(private val deviceId: String,
             }
             Completable.complete()
         }.doOnError {
-            crashReportManager.logExceptionOrThrowable(it)
+            crashReportManager.logExceptionOrSafeException(it)
         }.onErrorComplete()
 
-    /** @throws SessionNotFoundException */
-    override fun addGuidSelectionEventToLastIdentificationIfExists(selectedGuid: String, sessionId: String): Completable =
-        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable {
-            it.events.add(GuidSelectionEvent(
-                it.nowRelativeToStartTime(timeHelper),
-                selectedGuid
-            ))
-            insertOrUpdateSessionEvents(it)
-        }
+    override fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable =
+        sessionEventsLocalDbManager.loadSessionById(sessionId).flatMapCompletable { session ->
 
-    override fun addOneToOneMatchEventInBackground(patientId: String, startTimeVerification: Long, match: Verification?) {
-        updateSessionInBackground { session ->
-            session.events.add(OneToOneMatchEvent(
-                session.timeRelativeToStartTime(startTimeVerification),
-                session.nowRelativeToStartTime(timeHelper),
-                preferencesManager.patientId,
-                match?.let { MatchEntry(it.guid, match.confidence) }))
-        }
-    }
+            if (session.isOpen() &&
+                !session.hasEvent(GUID_SELECTION) &&
+                session.hasEvent(CALLBACK_IDENTIFICATION)) {
 
-    override fun addOneToManyEventInBackground(startTimeIdentification: Long, matches: List<Identification>, matchSize: Int) {
-        updateSessionInBackground { session ->
-            session.events.add(OneToManyMatchEvent(
-                session.timeRelativeToStartTime(startTimeIdentification),
-                session.nowRelativeToStartTime(timeHelper),
-                OneToManyMatchEvent.MatchPool(OneToManyMatchEvent.MatchPoolType.fromConstantGroup(preferencesManager.matchGroup), matchSize),
-                matches.map { MatchEntry(it.guid, it.confidence) }.toList().toTypedArray()))
-        }
-    }
-
-    override fun addEventForScannerConnectivityInBackground(scannerInfo: ScannerConnectionEvent.ScannerInfo) {
-        updateSessionInBackground {
-            if (it.events.filterIsInstance(ScannerConnectionEvent::class.java).isEmpty()) {
-                it.events.add(ScannerConnectionEvent(
-                    it.nowRelativeToStartTime(timeHelper),
-                    scannerInfo
-                ))
+                session.addEvent(GuidSelectionEvent(timeHelper.now(), selectedGuid))
+                insertOrUpdateSessionEvents(session)
+            } else {
+                Completable.error(InvalidSessionForGuidSelectionEvent("open: ${session.isOpen()}"))
             }
         }
-    }
 
     override fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String) {
         updateSessionInBackground { session ->
@@ -149,33 +133,23 @@ open class SessionEventsManagerImpl(private val deviceId: String,
 
     override fun addPersonCreationEventInBackground(person: Person) {
         updateSessionInBackground { session ->
-            session.events.add(PersonCreationEvent(
-                session.nowRelativeToStartTime(timeHelper),
-                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { Utils.byteArrayToBase64(it.templateBytes) })
+            session.addEvent(PersonCreationEvent(
+                timeHelper.now(),
+                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
             ))
         }
     }
 
-    override fun addEventForCandidateReadInBackground(guid: String,
-                                                      startCandidateSearchTime: Long,
-                                                      localResult: CandidateReadEvent.LocalResult,
-                                                      remoteResult: CandidateReadEvent.RemoteResult?) {
+    override fun addEventInBackground(sessionEvent: Event) {
         updateSessionInBackground {
-            it.events.add(CandidateReadEvent(
-                it.timeRelativeToStartTime(startCandidateSearchTime),
-                it.nowRelativeToStartTime(timeHelper),
-                guid,
-                localResult,
-                remoteResult
-            ))
+            it.addEvent(sessionEvent)
         }
     }
 
-    override fun addLocationToSession(latitude: Double, longitude: Double) {
-        this.updateSessionInBackground { sessionEvents ->
-            sessionEvents.location = Location(latitude, longitude)
+    override fun addEvent(sessionEvent: Event): Completable =
+        updateSession {
+            it.addEvent(sessionEvent)
         }
-    }
 
     override fun signOut() {
         deleteSessions()

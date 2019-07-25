@@ -6,37 +6,28 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.IntentKeys
-import com.simprints.id.activities.launch.LaunchActivity
+import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
+import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
+import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.ALERT_TYPE
-import com.simprints.id.exceptions.unexpected.CallingAppFromUnknownSourceException
-import com.simprints.id.session.callout.Callout
-import com.simprints.id.session.callout.Callout.Companion.toCallout
-import com.simprints.id.tools.InternalConstants
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.extensions.isCallingAppFromUnknownSource
-import com.simprints.id.tools.extensions.launchAlert
+import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
+import com.simprints.id.tools.extensions.*
+import com.simprints.moduleapi.app.responses.IAppErrorResponse
+import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 // App launched when user open SimprintsID using a client app (by intent)
 open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var timeHelper: TimeHelper
-
-    companion object {
-        const val LOGIN_REQUEST_CODE: Int = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 1
-        private const val LAUNCH_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 2
-        private const val ALERT_ACTIVITY_REQUEST_CODE = InternalConstants.LAST_GLOBAL_REQUEST_CODE + 3
-    }
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
-
-    private val app: Application by lazy { application as Application }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,61 +36,59 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val component = (application as Application).component
         component.inject(this)
 
-        viewPresenter = CheckLoginFromIntentPresenter(this, component)
+        viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         viewPresenter.setup()
-    }
-
-    override fun onResume() {
-        super.onResume()
         viewPresenter.start()
     }
 
-    override fun parseCallout(): Callout =
-        intent.toCallout()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-    override fun checkCallingAppIsFromKnownSource() {
-        preferencesManager.callingPackage = getCallingPackageName()
-        if (app.packageManager.isCallingAppFromUnknownSource(preferencesManager.callingPackage)) {
-            crashReportManager.logExceptionOrThrowable(CallingAppFromUnknownSourceException())
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        if (potentialAlertScreenResponse != null) {
+            viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
+        } else {
+            viewPresenter.checkSignedInStateIfPossible()
         }
     }
+
+    override fun setResultErrorAndFinish(appResponse: IAppErrorResponse) {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(IAppResponse.BUNDLE_KEY, appResponse)
+        })
+        finish()
+    }
+
+    override fun parseRequest() =
+        intent.parseAppRequest() as AppRequest
+
+    override fun getCheckCallingApp() = getCallingPackageName()
 
     open fun getCallingPackageName(): String {
         return callingPackage ?: ""
     }
 
-    override fun openAlertActivityForError(alertType: ALERT_TYPE) {
-        launchAlert(alertType)
+    override fun openAlertActivityForError(alertType: AlertType) {
+        launchAlert(this, alertType)
     }
 
-    override fun openLoginActivity(legacyApiKey: String) {
+    override fun openLoginActivity(appRequest: AppRequest) {
         val loginIntent = Intent(this, LoginActivity::class.java)
-        loginIntent.putExtra(IntentKeys.loginActivityLegacyProjectIdKey, legacyApiKey)
-        startActivityForResult(loginIntent, LOGIN_REQUEST_CODE)
+        loginIntent.putExtra(LoginActivityRequest.BUNDLE_KEY, LoginActivityRequest(appRequest.projectId, appRequest.userId))
+        startActivityForResult(loginIntent, LOGIN_ACTIVITY_REQUEST)
+    }
+
+    override fun openOrchestratorActivity(appRequest: AppRequest) {
+        val intent = Intent(this, OrchestratorActivity::class.java).apply {
+            putExtra(AppRequest.BUNDLE_KEY, appRequest)
+            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+        }
+        startActivity(intent)
+        finish()
     }
 
     override fun finishCheckLoginFromIntentActivity() {
         finish()
-    }
-
-    override fun openLaunchActivity() {
-        val nextIntent = Intent(this, LaunchActivity::class.java)
-        startActivityForResult(nextIntent, LAUNCH_ACTIVITY_REQUEST_CODE)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-
-        // We need to call setResult and finish when the either CollectFingerprintsActivity returns a result
-        // that needs to be forward back to the calling app or the user tapped on "close" button (RESULT_CANCELED)
-        // in a error screen.
-        // If the activity doesn't finish, then we check again the SignedInState in onResume.
-        if (requestCode == LAUNCH_ACTIVITY_REQUEST_CODE ||
-            requestCode == ALERT_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_CANCELED) {
-
-            viewPresenter.handleActivityResult(requestCode, resultCode, data.toCallout())
-            setResult(resultCode, data)
-            finish()
-        }
     }
 }
