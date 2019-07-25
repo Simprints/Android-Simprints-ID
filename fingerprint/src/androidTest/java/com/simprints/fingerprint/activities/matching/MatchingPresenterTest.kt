@@ -14,20 +14,21 @@ import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyR
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
+import com.simprints.fingerprint.commontesttools.DEFAULT_MODULE_ID
+import com.simprints.fingerprint.commontesttools.DEFAULT_PROJECT_ID
+import com.simprints.fingerprint.commontesttools.DEFAULT_USER_ID
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.commontesttools.DEFAULT_MODULE_ID
-import com.simprints.fingerprint.commontesttools.DEFAULT_PROJECT_ID
-import com.simprints.fingerprint.commontesttools.DEFAULT_USER_ID
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.testtools.common.blocking.BlockingFlag
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.reactive.RxSchedulerRule
 import io.reactivex.Single
@@ -36,7 +37,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyInt
-import java.util.concurrent.LinkedBlockingQueue
 import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
@@ -46,14 +46,14 @@ class MatchingPresenterTest {
 
     @get:Rule val rxSchedulerRule = RxSchedulerRule()
 
-    private val matchTaskFinishedFlag = LinkedBlockingQueue<Unit>()
+    private val matchTaskFinishedFlag = BlockingFlag()
 
     private val viewMock = mock<MatchingContract.View> {
-        whenever(it) { makeToastMatchFailed() } then { matchTaskFinishedFlag.put(Unit) }
-        whenever(it) { doFinish() } then { matchTaskFinishedFlag.put(Unit) }
+        whenever(it) { makeToastMatchFailed() } then { matchTaskFinishedFlag.finish() }
+        whenever(it) { doFinish() } then { matchTaskFinishedFlag.finish() }
         whenever(it) {
             setIdentificationProgressFinished(anyInt(), anyInt(), anyInt(), anyInt(), anyInt())
-        } then { matchTaskFinishedFlag.put(Unit) }
+        } then { matchTaskFinishedFlag.finish() }
     }
 
     private val dbManagerMock = mock<FingerprintDbManager>()
@@ -146,7 +146,7 @@ class MatchingPresenterTest {
 
         val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
 
         val verifyResponse = result.firstValue.getParcelableExtra<MatchingTaskVerifyResult>(MatchingTaskResult.BUNDLE_KEY)!!
         Assert.assertEquals(VERIFY_GUID, verifyResponse.guid)
@@ -161,7 +161,7 @@ class MatchingPresenterTest {
 
         val presenter = createPresenter(identifyRequestWithinProjectGroup, mockIdentificationLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
 
         verifyOnce(viewMock) { setIdentificationProgressLoadingStart() }
         verifyOnce(viewMock) { setIdentificationProgressMatchingStart(eq(CANDIDATE_POOL)) }
@@ -171,7 +171,7 @@ class MatchingPresenterTest {
             .containsExactlyElementsIn(IDENTIFY_PROGRESS_RANGE)
             .inOrder()
         verifyOnce(viewMock) { setIdentificationProgressReturningStart() }
-        verifyOnce(viewMock) { setIdentificationProgressFinished(eq(NUMBER_OF_ID_RETURNS), anyInt(), anyInt(), anyInt(), anyInt()) }
+        verifyOnce(viewMock) { setIdentificationProgressFinished(eq(DEFAULT_NUMBER_OF_ID_RETURNS), anyInt(), anyInt(), anyInt(), anyInt()) }
     }
 
     @Test
@@ -181,7 +181,7 @@ class MatchingPresenterTest {
 
         val presenter = createPresenter(verifyRequest, mockVerificationLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
 
         verifyOnce(viewMock) { setVerificationProgress() }
         verifyOnce(viewMock) { doFinish() }
@@ -195,7 +195,7 @@ class MatchingPresenterTest {
 
         val presenter = createPresenter(identifyRequestWithinProjectGroup, mockErrorLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
         verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
@@ -208,7 +208,7 @@ class MatchingPresenterTest {
 
         val presenter = createPresenter(verifyRequest, mockErrorLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
 
         verifyOnce(viewMock) { makeToastMatchFailed() }
         verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
@@ -241,7 +241,7 @@ class MatchingPresenterTest {
             DEFAULT_LANGUAGE,
             probe,
             queryForIdentifyPool,
-            10))
+            DEFAULT_NUMBER_OF_ID_RETURNS))
 
         verifyIdentificationResult(result, personToIdentify, shouldProbeInMatchingResult)
     }
@@ -249,7 +249,7 @@ class MatchingPresenterTest {
     private fun verifyIdentificationResult(result: KArgumentCaptor<Intent>, probe: Person, shouldProbeInMatchingResult: Boolean = true) {
         val identifyResponse = result.firstValue.getParcelableExtra<MatchingTaskIdentifyResult>(MatchingTaskResult.BUNDLE_KEY)
         val identificationsResult = identifyResponse.identifications
-        Assert.assertEquals(NUMBER_OF_ID_RETURNS, identificationsResult.size)
+        Assert.assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, identificationsResult.size)
         if (shouldProbeInMatchingResult) {
             val highestScoreCandidate = identificationsResult.maxBy { it.confidence }?.guid
             assertThat(highestScoreCandidate).isEqualTo(probe.patientId)
@@ -273,7 +273,7 @@ class MatchingPresenterTest {
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(PersonFetchResult(candidate, false))
     }
 
-    private fun setupPrefs(numberIdReturns: Int = NUMBER_OF_ID_RETURNS) {
+    private fun setupPrefs(numberIdReturns: Int = DEFAULT_NUMBER_OF_ID_RETURNS) {
         whenever(preferencesManagerMock) { returnIdCount } thenReturn numberIdReturns
     }
 
@@ -286,13 +286,13 @@ class MatchingPresenterTest {
     private fun runIdentification(identifyRequest: MatchingTaskIdentifyRequest) {
         val presenter = createPresenter(identifyRequest, mockIdentificationLibMatcher)
         presenter.start()
-        matchTaskFinishedFlag.take()
+        matchTaskFinishedFlag.await()
     }
 
 
     companion object {
 
-        private const val NUMBER_OF_ID_RETURNS = 10
+        private const val DEFAULT_NUMBER_OF_ID_RETURNS = 10
         private const val CANDIDATE_POOL = 50
         private val IDENTIFY_PROGRESS_RANGE = 0..100
 
@@ -309,7 +309,7 @@ class MatchingPresenterTest {
             DEFAULT_LANGUAGE,
             probe,
             QueryForIdentifyPool(DEFAULT_PROJECT_ID),
-            10)
+            DEFAULT_NUMBER_OF_ID_RETURNS)
 
         private val verifyRequest = MatchingTaskVerifyRequest(
             DEFAULT_LANGUAGE,
