@@ -4,6 +4,7 @@ import java.util.*
 
 interface RecentEventsPreferencesManager {
 
+    var lastScannerVersion: String
     var lastScannerUsed: String
     var lastUserUsed: String
 

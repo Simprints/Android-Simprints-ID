@@ -3,9 +3,16 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Android-Simprints-ID.iml" filepath="$PROJECT_DIR$/Android-Simprints-ID.iml" />
+      <module fileurl="file://$PROJECT_DIR$/clientapi/clientapi.iml" filepath="$PROJECT_DIR$/clientapi/clientapi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/face/face.iml" filepath="$PROJECT_DIR$/face/face.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fingerprint/fingerprint.iml" filepath="$PROJECT_DIR$/fingerprint/fingerprint.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fingerprintmatcher/fingerprintmatcher.iml" filepath="$PROJECT_DIR$/fingerprintmatcher/fingerprintmatcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" filepath="$PROJECT_DIR$/fingerprintscanner/fingerprintscanner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" filepath="$PROJECT_DIR$/fingerprintscannermock/fingerprintscannermock.iml" />
       <module fileurl="file://$PROJECT_DIR$/id/id.iml" filepath="$PROJECT_DIR$/id/id.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libcommon/libcommon.iml" filepath="$PROJECT_DIR$/libcommon/libcommon.iml" />
       <module fileurl="file://$PROJECT_DIR$/libsimprints/libsimprints.iml" filepath="$PROJECT_DIR$/libsimprints/libsimprints.iml" />
+      <module fileurl="file://$PROJECT_DIR$/moduleapi/moduleapi.iml" filepath="$PROJECT_DIR$/moduleapi/moduleapi.iml" />
       <module fileurl="file://$PROJECT_DIR$/testtools/testtools.iml" filepath="$PROJECT_DIR$/testtools/testtools.iml" />
     </modules>
   </component>

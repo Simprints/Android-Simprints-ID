@@ -1,15 +1,19 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class ConsentEvent(val relativeStartTime: Long,
-                   var relativeEndTime: Long,
+@Keep
+class ConsentEvent(starTime: Long,
+                   endTime: Long,
                    val consentType: Type,
-                   var result: Result) : Event(EventType.CONSENT) {
+                   var result: Result) : Event(EventType.CONSENT, starTime, endTime) {
 
+    @Keep
     enum class Type {
         INDIVIDUAL, PARENTAL
     }
+
+    @Keep
     enum class Result {
         ACCEPTED, DECLINED, NO_RESPONSE
     }

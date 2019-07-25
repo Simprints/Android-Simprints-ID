@@ -2,7 +2,10 @@ package com.simprints.id.testtools.state
 
 import android.content.SharedPreferences
 import com.google.gson.JsonObject
-import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivityTest
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
@@ -19,6 +22,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
 import org.mockito.stubbing.Answer
+import java.math.BigInteger
 
 object RobolectricTestMocker {
 
@@ -41,18 +45,17 @@ object RobolectricTestMocker {
             sharedPrefs.getBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, false)
         }
         whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
-        whenever { remoteDbManagerMock.getCurrentFirestoreToken() } thenReturn Single.just("")
+        whenever { remoteDbManagerMock.getCurrentToken() } thenReturn Single.just("")
         whenever { remoteDbManagerMock.signInToRemoteDb(anyNotNull()) } thenReturn Completable.complete()
         return this
     }
 
     fun setUserLogInState(logged: Boolean,
                           sharedPrefs: SharedPreferences,
-                          projectId: String = CheckLoginFromIntentActivityTest.DEFAULT_PROJECT_ID,
-                          legacyApiKey: String = CheckLoginFromIntentActivityTest.DEFAULT_LEGACY_API_KEY,
-                          userId: String = CheckLoginFromIntentActivityTest.DEFAULT_USER_ID,
-                          projectSecret: String = CheckLoginFromIntentActivityTest.DEFAULT_PROJECT_SECRET,
-                          realmKey: String = CheckLoginFromIntentActivityTest.DEFAULT_REALM_KEY): RobolectricTestMocker {
+                          projectId: String = DEFAULT_PROJECT_ID,
+                          userId: String = DEFAULT_USER_ID,
+                          projectSecret: String = DEFAULT_PROJECT_SECRET,
+                          realmKey: String = BigInteger(1, DEFAULT_REALM_KEY).toString(16)): RobolectricTestMocker {
 
         Thread.sleep(1000)
         val editor = sharedPrefs.edit()
@@ -61,13 +64,6 @@ object RobolectricTestMocker {
         editor.putString(LoginInfoManagerImpl.USER_ID, if (logged) userId else "")
         editor.putBoolean(SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID, logged)
         editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY + projectId, if (logged) realmKey else "")
-        editor.putString(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_LEGACY_REALM_KEY + projectId, if (logged) "enc_$legacyApiKey" else "")
-
-        if (!legacyApiKey.isEmpty()) {
-            val hashedLegacyApiKey = Hasher().hash(legacyApiKey)
-            editor.putString(projectId, if (logged) hashedLegacyApiKey else "")
-            editor.putString(hashedLegacyApiKey, if (logged) projectId else "")
-        }
         editor.commit()
         return this
     }
@@ -80,11 +76,11 @@ object RobolectricTestMocker {
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         whenever { localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull()) } thenReturn Completable.complete()
         whenever { localDbManagerSpy.loadPersonFromLocal(anyNotNull()) } thenReturn Single.error(IllegalStateException())
-        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
+        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyOrNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 
-        whenever { remoteDbManagerSpy.getCurrentFirestoreToken() } thenReturn Single.just("someToken")
+        whenever { remoteDbManagerSpy.getCurrentToken() } thenReturn Single.just("someToken")
         return this
     }
 

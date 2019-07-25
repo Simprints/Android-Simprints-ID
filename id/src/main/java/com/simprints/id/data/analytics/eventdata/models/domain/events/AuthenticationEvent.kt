@@ -1,12 +1,14 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class AuthenticationEvent(val relativeStartTime: Long,
-                          val relativeEndTime: Long,
+@Keep
+class AuthenticationEvent(starTime: Long,
+                          endTime: Long,
                           val userInfo: UserInfo,
-                          val result: Result) : Event(EventType.AUTHENTICATION) {
+                          val result: Result) : Event(EventType.AUTHENTICATION, starTime, endTime) {
 
+    @Keep
     class UserInfo(val projectId: String, val userId: String)
 
     enum class Result {

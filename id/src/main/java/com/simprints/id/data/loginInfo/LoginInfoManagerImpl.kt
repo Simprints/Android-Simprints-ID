@@ -3,7 +3,6 @@ package com.simprints.id.data.loginInfo
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.exceptions.safe.CredentialMissingException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.secure.cryptography.Hasher
 import io.reactivex.Single
 
 open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) : LoginInfoManager {
@@ -11,6 +10,9 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
     companion object {
         const val ENCRYPTED_PROJECT_SECRET: String = "ENCRYPTED_PROJECT_SECRET"
         const val PROJECT_ID: String = "PROJECT_ID"
+        const val PROJECT_ID_CLAIM: String = "PROJECT_ID_CLAIM"
+        const val USER_ID_CLAIM: String = "USER_ID_CLAIM"
+
         const val USER_ID: String = "USER_ID"
         private const val DEFAULT_VALUE: String = ""
     }
@@ -61,8 +63,6 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
             ""
         }
 
-    override fun getSignedInHashedLegacyApiKeyOrEmpty(): String = getHashedLegacyProjectIdForProjectIdOrEmpty(getSignedInProjectIdOrEmpty())
-
     override fun getSignedInProjectIdOrEmpty(): String =
         try {
             signedInProjectId
@@ -86,37 +86,40 @@ open class LoginInfoManagerImpl(override var prefs: ImprovedSharedPreferences) :
             }
         }
 
+    override var projectIdTokenClaim: String? = DEFAULT_VALUE
+        get() = prefs.getPrimitive(PROJECT_ID_CLAIM, DEFAULT_VALUE)
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(PROJECT_ID_CLAIM, field ?: DEFAULT_VALUE).commit()
+        }
+
+    override var userIdTokenClaim: String? = DEFAULT_VALUE
+        get() = prefs.getPrimitive(USER_ID_CLAIM, DEFAULT_VALUE)
+        set(value) {
+            field = value
+            prefs.edit().putPrimitive(USER_ID_CLAIM, field ?: DEFAULT_VALUE).commit()
+        }
+
+
     override fun isProjectIdSignedIn(possibleProjectId: String): Boolean =
         getSignedInProjectIdOrEmpty().isNotEmpty() &&
             getSignedInProjectIdOrEmpty() == possibleProjectId &&
             getEncryptedProjectSecretOrEmpty().isNotEmpty()
 
     override fun cleanCredentials() {
-
-        val projectId = getSignedInProjectIdOrEmpty()
-        val possibleHashedLegacyApiKey = prefs.getPrimitive(projectId, "")
-        prefs.edit().putPrimitive(projectId, "").commit()
-        prefs.edit().putPrimitive(possibleHashedLegacyApiKey, "").commit()
-
         encryptedProjectSecret = ""
         signedInProjectId = ""
         signedInUserId = ""
+        clearCachedTokenClaims()
     }
 
-    override fun storeCredentials(projectId: String, legacyProjectId: String?, userId: String) {
-        storeProjectIdWithLegacyProjectIdPair(projectId, legacyProjectId)
+    override fun clearCachedTokenClaims() {
+        projectIdTokenClaim = ""
+        userIdTokenClaim = ""
+    }
+
+    override fun storeCredentials(projectId: String, userId: String) {
         signedInProjectId = projectId
         signedInUserId = userId
     }
-
-    override fun storeProjectIdWithLegacyProjectIdPair(projectId: String, legacyProjectId: String?) {
-        if (legacyProjectId != null && legacyProjectId.isNotEmpty()) {
-            val hashedLegacyApiKey = Hasher().hash(legacyProjectId)
-            prefs.edit().putPrimitive(hashedLegacyApiKey, projectId).commit()
-            prefs.edit().putPrimitive(projectId, hashedLegacyApiKey).commit()
-        }
-    }
-
-    override fun getHashedLegacyProjectIdForProjectIdOrEmpty(projectId: String): String = prefs.getString(projectId, "")
-    override fun getProjectIdForHashedLegacyProjectIdOrEmpty(hashedLegacyApiKey: String): String = prefs.getString(hashedLegacyApiKey, "")
 }

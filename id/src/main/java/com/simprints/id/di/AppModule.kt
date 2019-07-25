@@ -1,11 +1,9 @@
 package com.simprints.id.di
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.simprints.core.network.SimApiClient
 import com.simprints.id.Application
-import com.simprints.id.data.DataManager
-import com.simprints.id.data.DataManagerImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -35,13 +33,17 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
+import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.network.SimApiClient
-import com.simprints.id.scanner.ScannerManager
-import com.simprints.id.scanner.ScannerManagerImpl
+import com.simprints.id.orchestrator.OrchestratorManager
+import com.simprints.id.orchestrator.OrchestratorManagerImpl
+import com.simprints.id.orchestrator.modality.ModalityFlowFactory
+import com.simprints.id.orchestrator.modality.ModalityFlowFactoryImpl
+import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
+import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
@@ -60,31 +62,36 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.id.tools.utils.*
-import com.simprints.libscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.libscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.core.tools.AndroidResourcesHelper
+import com.simprints.core.tools.AndroidResourcesHelperImpl
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
+import com.simprints.id.services.GuidSelectionManager
+import com.simprints.id.services.GuidSelectionManagerImpl
+import com.simprints.id.tools.extensions.packageVersionName
+import com.simprints.id.tools.utils.SimNetworkUtils
+import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module
-open class AppModule(val app: Application) {
+@Module(subcomponents = [OrchestratorActivityComponent::class])
+open class AppModule {
 
     @Provides
     @Singleton
-    fun provideApplication(): Application = app
+    fun provideContext(app: Application): Context = app
 
     @Provides
     @Singleton
-    fun provideContext(): Context = app
+    open fun provideLocalDbManager(ctx: Context,
+                                   secureDataManager: SecureDataManager,
+                                   loginInfoManager: LoginInfoManager): LocalDbManager =
+        RealmDbManagerImpl(ctx, secureDataManager, loginInfoManager)
 
     @Provides
     @Singleton
-    open fun provideLocalDbManager(ctx: Context): LocalDbManager = RealmDbManagerImpl(ctx)
-
-    @Provides
-    @Singleton
-    open fun provideRemoteDbManager(ctx: Context): RemoteDbManager = FirebaseManagerImpl(ctx)
+    open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager = FirebaseManagerImpl(loginInfoManager)
 
     @Provides
     @Singleton
@@ -111,7 +118,7 @@ open class AppModule(val app: Application) {
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
+        DbManagerImpl(localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton
@@ -128,7 +135,7 @@ open class AppModule(val app: Application) {
     @Singleton
     open fun provideAnalyticsManager(loginInfoManager: LoginInfoManager,
                                      preferencesManager: PreferencesManager,
-                                     firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, preferencesManager, firebaseAnalytics)
+                                     firebaseAnalytics: FirebaseAnalytics): AnalyticsManager = AnalyticsManagerImpl(loginInfoManager, firebaseAnalytics)
 
     @Provides
     @Singleton
@@ -136,7 +143,11 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl(app)
+    open fun provideCoreCrashReportManager(crashReportManager: CrashReportManager): CoreCrashReportManager = crashReportManager
+
+    @Provides
+    @Singleton
+    open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
 
     @Provides
     @Singleton
@@ -149,36 +160,15 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideDataManager(preferencesManager: PreferencesManager,
-                                loginInfoManager: LoginInfoManager,
-                                analyticsManager: AnalyticsManager,
-                                remoteDbManager: RemoteDbManager): DataManager =
-        DataManagerImpl(preferencesManager, loginInfoManager, analyticsManager, remoteDbManager)
-
-    @Provides
-    @Singleton
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
-        LongConsentManager = LongConsentManagerImpl(ctx, loginInfoManager, crashReportManager)
+        LongConsentManager = LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
 
     @Provides
     @Singleton
     open fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils = SimNetworkUtilsImpl(ctx)
 
     @Provides
-    @Singleton
-    open fun provideBluetoothComponentAdapter(): BluetoothComponentAdapter =
-        AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter())
-
-    @Provides
     open fun provideSecureApiInterface(): SecureApiInterface = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl).api
-
-    @Provides
-    @Singleton
-    open fun provideScannerManager(preferencesManager: PreferencesManager,
-                                   analyticsManager: AnalyticsManager,
-                                   crashReportManager: CrashReportManager,
-                                   bluetoothComponentAdapter: BluetoothComponentAdapter): ScannerManager =
-        ScannerManagerImpl(preferencesManager, analyticsManager, crashReportManager, bluetoothComponentAdapter)
 
     @Provides
     @Singleton
@@ -202,7 +192,7 @@ open class AppModule(val app: Application) {
                                          preferencesManager: PreferencesManager,
                                          timeHelper: TimeHelper,
                                          crashReportManager: CrashReportManager): SessionEventsManager =
-        SessionEventsManagerImpl(ctx.deviceId, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
+        SessionEventsManagerImpl(ctx.deviceId, ctx.packageVersionName, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
 
 
     @Provides
@@ -212,8 +202,8 @@ open class AppModule(val app: Application) {
 
     @Provides
     @Singleton
-    open fun provideSyncStatusDatabase(): SyncStatusDatabase =
-        SyncStatusDatabase.getDatabase(provideContext())
+    open fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
+        SyncStatusDatabase.getDatabase(ctx)
 
     @Provides
     @Singleton
@@ -259,7 +249,28 @@ open class AppModule(val app: Application) {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    @Singleton
-    open fun provideLocationProvider(ctx: Context): LocationProvider = LocationProviderImpl(ctx)
+    open fun provideAppResponseBuilderFactory(): AppResponseFactory = AppResponseFactoryImpl()
+
+    @Provides
+    open fun provideModalityFlowFactory(ctx: Context, prefs: PreferencesManager): ModalityFlowFactory = ModalityFlowFactoryImpl(prefs, ctx.packageName)
+
+    @Provides
+    open fun provideOrchestratorManager(settingsPreferencesManager: SettingsPreferencesManager,
+                                        modalityFlowFactory: ModalityFlowFactory,
+                                        appResponseFactory: AppResponseFactory): OrchestratorManager =
+        OrchestratorManagerImpl(
+            settingsPreferencesManager.modality,
+            modalityFlowFactory,
+            appResponseFactory)
+
+    @Provides
+    open fun provideGuidSelectionManager(context: Context,
+                                         loginInfoManager: LoginInfoManager,
+                                         analyticsManager: AnalyticsManager,
+                                         crashReportManager: CrashReportManager,
+                                         timeHelper: TimeHelper,
+                                         sessionEventsManager: SessionEventsManager): GuidSelectionManager =
+        GuidSelectionManagerImpl(
+            context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
 }
 

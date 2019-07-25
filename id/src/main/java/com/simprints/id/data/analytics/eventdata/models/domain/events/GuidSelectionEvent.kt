@@ -1,5 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
-import com.simprints.id.data.analytics.eventdata.models.domain.EventType
+import androidx.annotation.Keep
 
-class GuidSelectionEvent(val relativeStartTime: Long, val selectedId: String) : Event(EventType.GUID_SELECTION)
+@Keep
+class GuidSelectionEvent(starTime: Long,
+                         val selectedId: String) : Event(EventType.GUID_SELECTION, starTime)

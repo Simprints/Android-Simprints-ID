@@ -1,1 +1,1 @@
-include ':id', ':libcommon', ':libsimprints', ':testtools'
+include ':id', ':libsimprints', ':fingerprintmatcher', 'fingerprintscanner', 'fingerprintscannermock', ':testtools', ':fingerprint', ':face', ':core', ':clientapi', ':moduleapi'

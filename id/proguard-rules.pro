@@ -21,6 +21,8 @@
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
 
+-keep @com.simprints.core.annotations.Unobfuscate public class * {*;}
+
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
 # Platform used when running on Java 8 VMs. Will not be used at runtime.
@@ -46,28 +48,23 @@
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
 
-# Application classes that will be serialized/deserialized over Gson
--keep class com.simprints.id.secure.models.** { *; }
--keep class com.simprints.id.domain.consent.** { *; }
--keep class com.simprints.id.domain.Project { *; }
--keep class com.simprints.id.domain.ALERT_TYPE { *; }
--keep class com.simprints.id.session.Session { *; }
-
--keep class com.simprints.id.data.db.remote.models.** { *; }
--keep class com.simprints.id.services.scheduledSync.peopleDownSync.models.** { *; }
--keep class com.simprints.id.data.analytics.eventdata.models.** { *; }
--keep class com.simprints.id.tools.utils.SimNetworkUtils$Connection { *; }
-
--keep class com.simprints.id.session.callout.** { *; }
--keep class com.simprints.id.tools.json.** { *; }
 -keepclassmembers enum * { *; }
 
 # For Realm
 -keepnames public class * extends io.realm.RealmObject
+-keep @io.realm.annotations.RealmModule class *
+-keepattributes Annotation
+-dontwarn javax.**
+-dontwarn io.realm.**
+-keep class io.realm.annotations.RealmModule
+-keep @interface io.realm.annotations.RealmModule { *; }
+-keep class io.realm.annotations.RealmModule { *; }
 
-# These contain serialised models
+
+# These contain serialised models - TODO: should be more selective?
 -keep class com.simprints.libsimprints.** { *; }
--keep class com.simprints.libcommon.** { *; }
+-keep class com.simprints.fingerprintmatcher.** { *; }
+-dontwarn com.simprints.fingerprintmatcher.**
 
 # Deobfuscations for Crashlytics:
 # https://firebase.google.com/docs/crashlytics/get-deobfuscated-reports

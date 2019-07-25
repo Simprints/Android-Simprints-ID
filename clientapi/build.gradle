@@ -1,0 +1,89 @@
+apply plugin: 'com.android.dynamic-feature'
+apply plugin: 'kotlin-android'
+apply plugin: "kotlin-kapt"
+apply plugin: 'kotlin-android-extensions'
+
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            // If we enable a specific pro-guard, then we need to add rules for the Activities.
+            // in Dynamic Features, aapt doesn't pull them out from the Manifest as it does with the base model
+            //proguardFiles 'proguard-rules-dynamic-features.pro'
+        }
+        releaseWithLogfile {
+            initWith release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':id')
+    implementation project(':moduleapi')
+    implementation project(':libsimprints')
+
+    // Service Location
+    implementation deps.koin.core
+
+    // Support
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.ui.constraintlayout
+    implementation deps.support.material
+    implementation deps.kotlin.reflect
+    implementation deps.kotlin.anko
+    implementation deps.gson.core
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.kotlin
+
+    // Kotlin
+    implementation deps.androidx.core
+
+    // Unit Tests
+    testImplementation project(':testtools')
+    testImplementation deps.testing.junit
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.robolectric.core
+    testImplementation deps.testing.robolectric.multidex
+    testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.truth
+    testImplementation deps.testing.coroutines_test
+
+    // Android Tests
+    androidTestImplementation(project(':testtools')) {
+        exclude group: 'org.apache.maven'
+        exclude group: 'org.mockito'
+        exclude group: 'org.robolectric'
+        exclude group: 'org.jetbrains.kotlinx'
+    }
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
+}

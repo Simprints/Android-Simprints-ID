@@ -4,8 +4,20 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
 import org.junit.Assert
+import com.nhaarman.mockitokotlin2.*
 import org.mockito.Mockito
 import org.mockito.verification.VerificationMode
+
+inline fun <reified T : Any> argThat(crossinline assertation: (T) -> Unit): T {
+    return com.nhaarman.mockitokotlin2.argThat {
+        try {
+            assertation(this)
+            true
+        } catch (t: Throwable) {
+            false
+        }
+    }
+}
 
 fun <T> verifyOnce(mock: T, methodCall: T.() -> Any?) =
     verifyExactly(1, mock, methodCall)
@@ -26,15 +38,15 @@ private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, met
     Mockito.verify(mock, mode(times)).methodCall()
 
 fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
-    Mockito.verify(mock).methodCall()
-    Mockito.verifyNoMoreInteractions(mock)
+    verify(mock).methodCall()
+    verifyNoMoreInteractions(mock)
 }
 
 fun <T> verifyOnlyInteractions(mock: T, vararg methodCalls: T.() -> Any?) {
     for (methodCall in methodCalls) {
-        Mockito.verify(mock).methodCall()
+        verify(mock).methodCall()
     }
-    Mockito.verifyNoMoreInteractions(mock)
+    verifyNoMoreInteractions(mock)
 }
 
 inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {

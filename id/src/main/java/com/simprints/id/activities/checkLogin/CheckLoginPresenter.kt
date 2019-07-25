@@ -7,13 +7,13 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.ALERT_TYPE
+import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.session.sessionParameters.extractors.SessionParametersExtractor
 import com.simprints.id.tools.TimeHelper
+import timber.log.Timber
 import javax.inject.Inject
 
 abstract class CheckLoginPresenter(
@@ -27,7 +27,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureDataManager
-    @Inject lateinit var sessionParametersExtractor: SessionParametersExtractor
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     init {
@@ -38,17 +37,18 @@ abstract class CheckLoginPresenter(
         try {
             checkSignedInOrThrow()
             handleSignedInUser()
-        } catch (e: Throwable) {
+        } catch (t: Throwable) {
+            Timber.e(t)
 
             syncSchedulerHelper.cancelAllWorkers()
-            when (e) {
-                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_PROJECT_ID)
-                is DifferentUserIdSignedInException -> view.openAlertActivityForError(ALERT_TYPE.INVALID_USER_ID)
+            when (t) {
+                is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
+                is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser()
                 else -> {
-                    e.printStackTrace()
-                    crashReportManager.logExceptionOrThrowable(e)
-                    view.openAlertActivityForError(ALERT_TYPE.UNEXPECTED_ERROR)
+                    Timber.e(t)
+                    crashReportManager.logExceptionOrSafeException(t)
+                    view.openAlertActivityForError(UNEXPECTED_ERROR)
                 }
             }
         }

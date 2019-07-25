@@ -1,0 +1,8 @@
+
+Gradlew doesn't support junit tests in dynamic features with references to the main modules,
+they can be launched only from Android Studio. Because CI needs to be able to run tests from the console,
+then our junit tests need to sit in the Android Tests package (unfortunately they will be slower).
+Annotations are useful to run just a small set of android tests on local machines.
+
+E.g @MediumTest
+./gradlew fingerprint:connectedCheck  -Pandroid.testInstrumentationRunnerArguments.size=medium
