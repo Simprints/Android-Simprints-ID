@@ -8,7 +8,7 @@ import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
 
 class Orchestrator(private val viewModel: OrchestratorViewModel,
-                   private val runnableTaskDispatcher: RunnableTaskDispatcher = RunnableTaskDispatcher()) {
+                   private val runnableTaskDispatcher: RunnableTaskDispatcher = RunnableTaskDispatcher()) { // TODO : Koin runnableTaskDispatcher
 
     private lateinit var taskFlow: FingerprintTaskFlow
 

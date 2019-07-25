@@ -44,6 +44,11 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         animationsDisabled = true
     }
+
+    // https://github.com/mockito/mockito/issues/1376
+    packagingOptions {
+        pickFirst 'mockito-extensions/org.mockito.plugins.MockMaker'
+    }
 }
 
 buildscript {
@@ -178,6 +183,7 @@ dependencies {
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
+    androidTestCompile deps.testing.mockito.mockito_inline_androidtests
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core
