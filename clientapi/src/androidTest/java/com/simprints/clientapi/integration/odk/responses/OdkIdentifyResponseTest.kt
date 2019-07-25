@@ -7,7 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppIdentifyResponse
 import com.simprints.clientapi.integration.AppMatchResult
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.responses.IAppMatchResult
 import com.simprints.moduleapi.app.responses.IAppResponseTier
@@ -40,16 +39,16 @@ class OdkIdentifyResponseTest : BaseOdkClientApiTest() {
             assertThat(it.getString(ODK_CONFIDENCES_KEY)).isEqualTo(confidenceScoresInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_TIERS_KEY)).isEqualTo(tiersInOdkFormat(appIdentifyResponse.identifications))
             assertThat(it.getString(ODK_SESSION_ID)).isEqualTo(appIdentifyResponse.sessionId)
-            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
         } ?: throw Exception("No bundle found")
     }
 
     private fun confidenceScoresInOdkFormat(identifications: List<IAppMatchResult>) =
-        identifications.joinToString(separator = "", transform = { "${it.confidence} " }).trimEnd()
+        identifications.map { it.confidence }.joinToString(separator = " ").trimEnd()
 
     private fun guidsInOdkFormat(identifications: List<IAppMatchResult>) =
-        identifications.joinToString(separator = "", transform = { "${it.guid} " }).trimEnd()
+        identifications.map { it.guid }.joinToString(separator = " ").trimEnd()
 
     private fun tiersInOdkFormat(identifications: List<IAppMatchResult>) =
-        identifications.joinToString(separator = "", transform = { "${it.tier} " }).trimEnd()
+        identifications.map { it.tier }.joinToString(separator = " ").trimEnd()
 }
