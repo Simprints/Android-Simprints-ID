@@ -2,7 +2,6 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
@@ -33,7 +32,6 @@ import org.junit.runner.RunWith
 import java.util.*
 import kotlin.random.Random as Rand
 
-@MediumTest
 @RunWith(AndroidJUnit4::class)
 class OrchestratorTest {
 

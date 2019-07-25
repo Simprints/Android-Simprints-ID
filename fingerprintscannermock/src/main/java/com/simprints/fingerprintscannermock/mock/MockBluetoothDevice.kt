@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentDevice
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket
@@ -13,7 +13,7 @@ class MockBluetoothDevice(private val mockScannerManager: MockScannerManager,
     override fun isBonded(): Boolean = mockScannerManager.isDeviceBonded
 
     override fun createRfcommSocketToServiceRecord(uuid: UUID): BluetoothComponentSocket =
-            MockBluetoothSocket(mockScannerManager)
+        MockBluetoothSocket(mockScannerManager)
 
     override val address: String = macAddress
 }

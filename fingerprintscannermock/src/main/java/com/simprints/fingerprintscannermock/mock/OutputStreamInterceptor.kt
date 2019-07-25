@@ -1,6 +1,6 @@
-package com.simprints.fingerprintscannermock
+package com.simprints.fingerprintscannermock.mock
 
-import com.simprints.fingerprintscannermock.ByteArrayUtils.concatenateByteArrays
+import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.concatenateByteArrays
 import io.reactivex.Observer
 import java.io.OutputStream
 

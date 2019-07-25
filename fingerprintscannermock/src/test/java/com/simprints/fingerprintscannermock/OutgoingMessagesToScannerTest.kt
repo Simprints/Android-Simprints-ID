@@ -3,6 +3,9 @@ package com.simprints.fingerprintscannermock
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
 import com.simprints.fingerprintscanner.wrappedScannerCallback
+import com.simprints.fingerprintscannermock.mock.ByteArrayUtils
+import com.simprints.fingerprintscannermock.mock.MockBluetoothAdapter
+import com.simprints.fingerprintscannermock.mock.MockScannerManager
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
