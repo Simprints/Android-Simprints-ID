@@ -17,6 +17,7 @@ import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.id.Application
+import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
 import org.junit.Before
@@ -74,7 +75,9 @@ class RefusalActivityTest {
         onView(withId(R.id.btSubmitRefusalForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
         onView(withId(R.id.refusalText)).perform(typeText("Reason for other"))
-        onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
+        tryOnUiUntilTimeout(1000, 200) {
+            onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
+        }
     }
 
     @Test
