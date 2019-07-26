@@ -22,8 +22,6 @@ import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
 sealed class FingerprintTaskFlow {
 
-    protected val finalResultBuilder = FinalResultBuilder() // TODO : Koin this
-
     protected val taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
     protected lateinit var fingerprintTasks: List<FingerprintTask>
@@ -65,15 +63,15 @@ sealed class FingerprintTaskFlow {
         }
     }
 
-    fun getFinalResult() =
+    fun getFinalResult(finalResultBuilder: FinalResultBuilder) =
         when (lastResultCode) {
-            ResultCode.OK -> getFinalOkResult()
+            ResultCode.OK -> getFinalOkResult(finalResultBuilder)
             ResultCode.CANCELLED -> finalResultBuilder.createCancelledResult()
             ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT] as AlertTaskResult)
             ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED] as RefusalTaskResult)
         }
 
-    protected abstract fun getFinalOkResult(): FinalResult
+    protected abstract fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult
 
     companion object {
         private const val REFUSED = "refused"
@@ -106,7 +104,7 @@ sealed class FingerprintTaskFlow {
             }
         }
 
-        override fun getFinalOkResult(): FinalResult =
+        override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
             finalResultBuilder.createEnrolResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)
 
         companion object {
@@ -142,7 +140,7 @@ sealed class FingerprintTaskFlow {
             }
         }
 
-        override fun getFinalOkResult(): FinalResult =
+        override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
             finalResultBuilder.createIdentifyResult(taskResults[MATCHING] as MatchingTaskIdentifyResult)
 
         private fun FingerprintIdentifyRequest.buildQueryForIdentifyPool() =
@@ -185,7 +183,7 @@ sealed class FingerprintTaskFlow {
             }
         }
 
-        override fun getFinalOkResult(): FinalResult =
+        override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
             finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
 
         private fun FingerprintVerifyRequest.buildQueryForVerifyPool() =
