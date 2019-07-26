@@ -4,7 +4,7 @@ package com.simprints.fingerprint.activities.matching
 import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 
 
 interface MatchingContract {

@@ -12,7 +12,7 @@ import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.data.domain.refusal.toRefusalAnswerForEvent
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import io.reactivex.rxkotlin.subscribeBy
 import javax.inject.Inject
 
