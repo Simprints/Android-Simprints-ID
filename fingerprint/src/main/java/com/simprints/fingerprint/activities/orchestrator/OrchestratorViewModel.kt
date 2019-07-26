@@ -5,21 +5,22 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.orchestrator.taskflow.FinalResult
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
+import com.simprints.fingerprint.orchestrator.taskflow.FinalResult
 
-class OrchestratorViewModel : ViewModel() {
+class OrchestratorViewModel(private val orchestrator: Orchestrator,
+                            private val runnableTaskDispatcher: RunnableTaskDispatcher) : ViewModel() {
 
     internal val nextActivityCall = MutableLiveData<ActivityCall>()
     internal val finishedResult = MutableLiveData<ActivityResult>()
 
-    private val orchestrator = Orchestrator(this)
-
     fun start(fingerprintRequest: FingerprintRequest) {
         orchestrator.start(fingerprintRequest)
+        executeNextTaskOrFinish()
     }
 
     internal fun handleActivityResult(activityResult: ActivityResult) {
@@ -27,13 +28,30 @@ class OrchestratorViewModel : ViewModel() {
             ResultCode.fromValue(activityResult.resultCode),
             activityResult::toTaskResult
         )
+        executeNextTaskOrFinish()
     }
 
-    fun postNextTask(activityTask: FingerprintTask.ActivityTask) {
+    private fun executeNextTaskOrFinish() {
+        if (orchestrator.isFinished()) {
+            postFinishedResult(orchestrator.getFinalResult())
+        } else {
+            executeNextTask()
+        }
+    }
+
+    private fun executeNextTask() =
+        when (val task = orchestrator.getNextTask()) {
+            is FingerprintTask.ActivityTask -> postNextTask(task)
+            is FingerprintTask.RunnableTask -> runnableTaskDispatcher.runTask(task) {
+                orchestrator.handleRunnableTaskResult(it)
+            }
+        }
+
+    private fun postNextTask(activityTask: FingerprintTask.ActivityTask) {
         nextActivityCall.postValue(activityTask.toActivityCall())
     }
 
-    fun handleFlowFinished(finalResult: FinalResult) {
+    private fun postFinishedResult(finalResult: FinalResult) {
         finishedResult.postValue(finalResult.toActivityResult())
     }
 

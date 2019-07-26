@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.orchestrator
+package com.simprints.fingerprint.tasks
 
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
