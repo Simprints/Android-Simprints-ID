@@ -8,9 +8,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.fingerprint.orchestrator.taskflow.FinalResult
+import com.simprints.fingerprint.orchestrator.models.FinalResult
 
 class OrchestratorViewModel(private val orchestrator: Orchestrator,
                             private val runnableTaskDispatcher: RunnableTaskDispatcher) : ViewModel() {

@@ -15,7 +15,7 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.id.Application
 import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.hamcrest.CoreMatchers.not

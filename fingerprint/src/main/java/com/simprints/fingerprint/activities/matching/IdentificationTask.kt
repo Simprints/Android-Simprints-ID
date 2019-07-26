@@ -19,7 +19,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single

@@ -20,8 +20,8 @@ import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTa
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
-import com.simprints.fingerprint.orchestrator.task.RequestCode
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed

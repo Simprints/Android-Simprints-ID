@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.orchestrator.task.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import timber.log.Timber
 
 fun Activity.launchRefusalActivity(requestCode: Int = RequestCode.REFUSAL.value) {

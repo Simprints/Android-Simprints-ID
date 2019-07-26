@@ -1,15 +1,14 @@
-package com.simprints.fingerprint.orchestrator
+package com.simprints.fingerprint.orchestrator.taskflow
 
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
     when (this) {
-        is FingerprintEnrolRequest -> FingerprintTaskFlow.Enrol()
-        is FingerprintIdentifyRequest -> FingerprintTaskFlow.Identify()
-        is FingerprintVerifyRequest -> FingerprintTaskFlow.Verify()
+        is FingerprintEnrolRequest -> EnrolTaskFlow()
+        is FingerprintIdentifyRequest -> IdentifyTaskFlow()
+        is FingerprintVerifyRequest -> VerifyTaskFlow()
         else -> throw Throwable("Woops") // TODO
     }.also { it.computeFlow(this) }

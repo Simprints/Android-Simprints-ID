@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.orchestrator.task
+package com.simprints.fingerprint.orchestrator.domain
 
 enum class RequestCode(val value: Int) {
 

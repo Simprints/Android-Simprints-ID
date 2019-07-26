@@ -21,7 +21,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskResult
 import com.simprints.moduleapi.fingerprint.responses.*
 import org.junit.Assert.*

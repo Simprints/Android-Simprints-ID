@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
-import com.simprints.fingerprint.orchestrator.task.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
 object AlertActivityHelper {
 

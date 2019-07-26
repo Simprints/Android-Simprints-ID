@@ -9,7 +9,7 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyRe
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
-import com.simprints.fingerprint.orchestrator.taskflow.FinalResult
+import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class FinalResultBuilder {

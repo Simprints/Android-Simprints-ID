@@ -9,6 +9,7 @@ import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
@@ -61,7 +62,7 @@ sealed class FingerprintTask(
             CollectFingerprintsTaskResult.BUNDLE_KEY
         )
 
-    class Matching(taskResultKey: String, val subAction: SubAction, createMatchingTaskRequest: () -> MatchingTaskRequest) :
+    class Matching(taskResultKey: String, createMatchingTaskRequest: () -> MatchingTaskRequest) :
         ActivityTask(
             taskResultKey,
             createMatchingTaskRequest,
@@ -69,9 +70,5 @@ sealed class FingerprintTask(
             RequestCode.MATCHING,
             MatchingTaskRequest.BUNDLE_KEY,
             MatchingTaskResult.BUNDLE_KEY
-        ) {
-        enum class SubAction {
-            IDENTIFY, VERIFY
-        }
-    }
+        )
 }

@@ -2,9 +2,10 @@ package com.simprints.fingerprint.orchestrator
 
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.orchestrator.task.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
+import com.simprints.fingerprint.orchestrator.taskflow.toFingerprintTaskFlow
 
 class Orchestrator(private val finalResultBuilder: FinalResultBuilder) {
 
