@@ -7,6 +7,7 @@ import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.di.FingerprintCoreModule
 import com.simprints.fingerprint.di.FingerprintModule
 import com.simprints.fingerprint.activities.collectfingerprint.CollectFingerprintsActivityTest
+import com.simprints.fingerprint.integration.FingerprintFlowsIntegrationTest
 import com.simprints.id.di.AppComponent
 import dagger.Component
 
@@ -27,4 +28,5 @@ interface FingerprintComponentForAndroidTests: FingerprintComponent {
     fun inject(launchActivityAndroidTest: LaunchActivityAndroidTest)
     fun inject(collectFingerprintsActivityTest: CollectFingerprintsActivityTest)
     fun inject(alertActivityTest: AlertActivityTest)
+    fun inject(fingerprintFlowsIntegrationTest: FingerprintFlowsIntegrationTest)
 }

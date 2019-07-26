@@ -6,11 +6,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.orchestrator.Orchestrator
-import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
-import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.models.FinalResult
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
+import com.simprints.fingerprint.orchestrator.task.TaskResult
+import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 
 class OrchestratorViewModel(private val orchestrator: Orchestrator,
                             private val runnableTaskDispatcher: RunnableTaskDispatcher) : ViewModel() {
@@ -44,6 +44,7 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
             is FingerprintTask.ActivityTask -> postNextTask(task)
             is FingerprintTask.RunnableTask -> runnableTaskDispatcher.runTask(task) {
                 orchestrator.handleRunnableTaskResult(it)
+                executeNextTaskOrFinish()
             }
         }
 
