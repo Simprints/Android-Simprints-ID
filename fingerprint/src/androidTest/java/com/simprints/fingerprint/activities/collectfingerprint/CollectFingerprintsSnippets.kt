@@ -19,6 +19,14 @@ import com.simprints.testtools.android.waitOnUi
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.not
 
+fun takeScansAndConfirm(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
+    log("CollectFingerprints::takeScansAndConfirm")
+
+    repeat(numberOfScans) { pressScan() }
+
+    checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
+}
+
 fun pressScan() {
     log("CollectFingerprints::pressScan")
     tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
