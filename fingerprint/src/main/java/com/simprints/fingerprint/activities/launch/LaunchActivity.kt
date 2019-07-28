@@ -15,7 +15,7 @@ import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
@@ -43,7 +43,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         component.inject(this)
 
         val launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
-            ?: throw InvalidRequestForFingerprintException()
+            ?: throw InvalidRequestForLaunchActivityException()
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()

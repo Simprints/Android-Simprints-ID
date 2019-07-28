@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.orchestrator.domain
 
+import com.simprints.fingerprint.exceptions.unexpected.result.InvalidResultCodeException
+
 /**
  * Result code for individual ActivityTasks.
  * Specifies what result will be available in the FingerprintTask's returned bundle
@@ -24,6 +26,6 @@ enum class ResultCode(val value: Int) {
     companion object {
 
         fun fromValue(value: Int) = values().find { it.value == value } ?:
-            throw Throwable("Woops") // TODO
+            throw InvalidResultCodeException.forResultCode(value)
     }
 }

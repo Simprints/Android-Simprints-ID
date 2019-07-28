@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultException
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
@@ -65,8 +66,8 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
 
     internal data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
 
-        fun toTaskResult(bundleKey: String): TaskResult =
-            resultData?.getParcelableExtra(bundleKey) ?: throw Throwable("Woops") // TODO
+        fun toTaskResult(bundleKey: String): TaskResult = resultData?.getParcelableExtra(bundleKey)
+            ?: throw NoTaskResultException.inIntent(resultData)
     }
 
     private fun FinalResult.toActivityResult() = ActivityResult(resultCode, resultData)

@@ -19,7 +19,7 @@ import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsT
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
@@ -55,7 +55,7 @@ class CollectFingerprintsActivity :
 
         val fingerprintRequest: CollectFingerprintsTaskRequest =
             this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
-                ?: throw InvalidRequestForFingerprintException()
+                ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         configureRightToLeft()
 

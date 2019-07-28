@@ -31,7 +31,7 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
+import com.simprints.fingerprint.exceptions.unexpected.domain.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
