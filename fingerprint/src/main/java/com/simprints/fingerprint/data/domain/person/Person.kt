@@ -7,7 +7,7 @@ import com.simprints.fingerprintmatcher.Person as PersonMatcher
 import com.simprints.id.domain.Person as PersonCore
 
 @Parcelize
-data class Person (
+data class Person(
     val patientId: String,
     val projectId: String,
     val userId: String,
@@ -16,11 +16,13 @@ data class Person (
     val createdAt: Date? = null,
     val updatedAt: Date? = null,
     var toSync: Boolean = true
-): Parcelable {
+) : Parcelable {
+
     init {
+        @Suppress("unchecked_cast")
         fingerprints = fingerprints
             .groupBy { it.fingerId }
-            .mapValues { it.value.maxBy { it.qualityScore } }
+            .mapValues { it.value.maxBy { fingerprint -> fingerprint.qualityScore } }
             .values
             .toMutableList() as MutableList<Fingerprint>
     }
@@ -30,7 +32,7 @@ data class Person (
             with(corePerson) {
                 Person(patientId, projectId, userId, moduleId, fingerprints.map { Fingerprint.fromCoreToDomain(it) }, createdAt, updatedAt, toSync)
             }
-        }
+    }
 }
 
 fun Person.fromDomainToCore() =

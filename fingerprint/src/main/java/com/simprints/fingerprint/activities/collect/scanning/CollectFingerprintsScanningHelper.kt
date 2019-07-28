@@ -260,9 +260,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) {
         if (quality >= qualityThreshold) {
-            currentFingerStatus = FingerStatus.GOOD_SCAN
+            currentFingerStatus = GOOD_SCAN
         } else {
-            currentFingerStatus = FingerStatus.BAD_SCAN
+            currentFingerStatus = BAD_SCAN
             presenter.currentFinger().numberOfBadScans += 1
         }
         logMessageForCrashReport("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
@@ -281,7 +281,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
-        currentFingerStatus = FingerStatus.FINGER_SKIPPED
+        currentFingerStatus = FINGER_SKIPPED
         presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
         presenter.refreshDisplay()
     }

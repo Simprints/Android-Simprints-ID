@@ -22,7 +22,7 @@ class AndroidTestConfig<T : Any>(
 
     fun fullSetup() = initAndInjectComponent()
 
-    /** Runs [fullSetup] with an extra block of code inserted just before [initDependencies]
+    /** Runs [fullSetup] with an extra block of code inserted just before [initAndInjectComponent]
      * Useful for setting up mocks before the Application is created */
     fun fullSetupWith(block: () -> Unit) =
         initAndInjectComponent()

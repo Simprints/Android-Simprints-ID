@@ -106,7 +106,7 @@ class MatchingPresenterTest {
     }
 
     @Test
-    fun identificationRequestWithinUserGroupAndProbeEnroledByDifferentUser_startedAndAwaited_finishesWithoutProbeInMatchResult() {
+    fun identificationRequestWithinUserGroupAndProbeEnrolledByDifferentUser_startedAndAwaited_finishesWithoutProbeInMatchResult() {
         val probe = PeopleGeneratorUtils.getRandomPerson(
             projectId = DEFAULT_PROJECT_ID,
             userId = "${DEFAULT_USER_ID}_different_user",

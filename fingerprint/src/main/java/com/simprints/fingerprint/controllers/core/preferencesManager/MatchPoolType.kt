@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.core.preferencesManager;
+package com.simprints.fingerprint.controllers.core.preferencesManager
 
 import androidx.annotation.Keep
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
