@@ -4,6 +4,8 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
+import com.simprints.id.Application
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -38,7 +40,7 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainObjects() {
         factory { FinalResultBuilder() }
-        factory { RunnableTaskDispatcher() }
+        factory { RunnableTaskDispatcher.build(androidApplication() as Application) }
         factory { Orchestrator(get()) }
     }
 
