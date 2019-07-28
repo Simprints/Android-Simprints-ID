@@ -15,9 +15,6 @@ class FingerprintComponentBuilder {
                 it
             } ?: buildComponent(app.component).also { component = it }
 
-        @JvmStatic
-        fun getComponent(): FingerprintComponent? = component // TODO
-
         private fun buildComponent(appComponent: AppComponent): FingerprintComponent =
             DaggerFingerprintComponent
                 .builder()
@@ -30,4 +27,3 @@ class FingerprintComponentBuilder {
 
     }
 }
-
