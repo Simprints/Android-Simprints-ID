@@ -1,9 +1,9 @@
-package com.simprints.fingerprintscannermock.mock
+package com.simprints.fingerprintscannermock.simulated
 
 
-enum class MockFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99
-                      val generateTemplateResponse: String = "fa fa fa fa 0c 00 8c 00 f5 f5 f5 f5 ", // OK response
-                      val getTemplateFragmentsResponses: List<String>) {
+enum class SimulatedFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99
+                           val generateTemplateResponse: String = "fa fa fa fa 0c 00 8c 00 f5 f5 f5 f5 ", // OK response
+                           val getTemplateFragmentsResponses: List<String>) {
 
     PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN(
             getTemplateFragmentsResponses = listOf(

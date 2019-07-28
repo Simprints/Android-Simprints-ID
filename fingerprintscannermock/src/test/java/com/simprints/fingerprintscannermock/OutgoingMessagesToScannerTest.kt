@@ -3,9 +3,9 @@ package com.simprints.fingerprintscannermock
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
 import com.simprints.fingerprintscanner.wrappedScannerCallback
-import com.simprints.fingerprintscannermock.mock.ByteArrayUtils
-import com.simprints.fingerprintscannermock.mock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.mock.MockScannerManager
+import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils
+import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import io.reactivex.observers.TestObserver
 import org.junit.Assert
 import org.junit.Before
@@ -27,9 +27,9 @@ class OutgoingMessagesToScannerTest : RxJavaTest {
     fun setup() {
         testObserver = TestObserver()
 
-        val mockScannerManager = MockScannerManager(outgoingStreamObservers = setOf(testObserver))
-        val mockBluetoothAdapter = MockBluetoothAdapter(mockScannerManager)
-        testScanner = Scanner("F0:AC:D7:C0:00:00", mockBluetoothAdapter)
+        val simulatedScannerManager = SimulatedScannerManager(outgoingStreamObservers = setOf(testObserver))
+        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(simulatedScannerManager)
+        testScanner = Scanner("F0:AC:D7:C0:00:00", simulatedBluetoothAdapter)
 
         assertOnSuccessCallback { testScanner.connect(it) }
     }

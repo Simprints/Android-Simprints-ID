@@ -1,7 +1,7 @@
-package com.simprints.fingerprintscannermock.mock
+package com.simprints.fingerprintscannermock.simulated
 
 import com.simprints.fingerprintscanner.Message
-import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.bytesToMessage
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
 import java.io.PipedInputStream
@@ -9,40 +9,40 @@ import java.io.PipedOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
 
-class MockScannerManager(var scannerState: ScannerState = ScannerState(),
-                         val mockFingers: Array<MockFinger> = MockFinger.person1TwoFingersGoodScan,
-                         private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
-                         var isAdapterNull: Boolean = false,
-                         var isAdapterEnabled: Boolean = true,
-                         var isDeviceBonded: Boolean = true,
-                         var deviceName: String = "",
-                         var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf()) {
+class SimulatedScannerManager(var scannerState: ScannerState = ScannerState(),
+                              val simulatedFingers: Array<SimulatedFinger> = SimulatedFinger.person1TwoFingersGoodScan,
+                              private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
+                              var isAdapterNull: Boolean = false,
+                              var isAdapterEnabled: Boolean = true,
+                              var isDeviceBonded: Boolean = true,
+                              var deviceName: String = "",
+                              var outgoingStreamObservers: Set<Observer<ByteArray>> = setOf()) {
 
-    private val mockResponseHelper = MockResponseHelper(this)
+    private val mockResponseHelper = SimulatedResponseHelper(this)
 
     val mockFingerIndex = AtomicInteger(0)
-    fun currentMockFinger() = mockFingers[mockFingerIndex.get()].also { println("Scanner.currentMockFinger() : $it") }
-    fun cycleToNextFinger() = mockFingerIndex.set((mockFingerIndex.get() + 1) % mockFingers.size)
+    fun currentMockFinger() = simulatedFingers[mockFingerIndex.get()].also { println("Scanner.currentMockFinger() : $it") }
+    fun cycleToNextFinger() = mockFingerIndex.set((mockFingerIndex.get() + 1) % simulatedFingers.size)
 
     private lateinit var fakeScannerStream: PipedOutputStream
     lateinit var streamFromScannerToApp: PipedInputStream
     lateinit var streamFromAppToScanner: OutputStreamInterceptor
 
-    var pairedScanners: Set<MockBluetoothDevice>
+    var pairedScanners: Set<SimulatedBluetoothDevice>
 
     init {
         pairedScanners = createScannersFromAddresses()
         refreshStreams()
     }
 
-    private fun createScannersFromAddresses(): Set<MockBluetoothDevice> =
+    private fun createScannersFromAddresses(): Set<SimulatedBluetoothDevice> =
             pairedScannerAddresses
-                    .map { MockBluetoothDevice(this, it) }
+                    .map { SimulatedBluetoothDevice(this, it) }
                     .toSet()
 
-    fun getScannerWithAddress(address: String): MockBluetoothDevice =
+    fun getScannerWithAddress(address: String): SimulatedBluetoothDevice =
             pairedScanners.firstOrNull { address == it.address }
-                    ?: MockBluetoothDevice(this, address)
+                    ?: SimulatedBluetoothDevice(this, address)
 
     private fun refreshStreams() {
         this.fakeScannerStream = PipedOutputStream()
