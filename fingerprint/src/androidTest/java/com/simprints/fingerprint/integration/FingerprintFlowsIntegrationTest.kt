@@ -14,8 +14,8 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprintscannermock.mock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.mock.MockScannerManager
+import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.*
@@ -38,7 +38,7 @@ class FingerprintFlowsIntegrationTest {
 
     private val fingerprintModule by lazy {
         TestFingerprintModule(
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { MockBluetoothAdapter(MockScannerManager()) }
+            bluetoothComponentAdapter = DependencyRule.ReplaceRule { SimulatedBluetoothAdapter(SimulatedScannerManager()) }
         )
     }
 

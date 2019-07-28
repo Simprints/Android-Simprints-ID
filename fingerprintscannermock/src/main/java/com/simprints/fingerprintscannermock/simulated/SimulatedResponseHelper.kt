@@ -1,12 +1,12 @@
-package com.simprints.fingerprintscannermock.mock
+package com.simprints.fingerprintscannermock.simulated
 
 import com.simprints.fingerprintscanner.Message
 import com.simprints.fingerprintscanner.enums.MESSAGE_TYPE.*
-import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.byteArrayFromHexString
-import com.simprints.fingerprintscannermock.mock.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.byteArrayFromHexString
+import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.bytesToMessage
 
 
-class MockResponseHelper(private val mockScannerManager: MockScannerManager) {
+class SimulatedResponseHelper(private val simulatedScannerManager: SimulatedScannerManager) {
 
     fun createMockResponse(message: Message): ByteArray =
         when (message.messageType) {
@@ -36,7 +36,7 @@ class MockResponseHelper(private val mockScannerManager: MockScannerManager) {
     )
 
     private fun getSensorInfoResponse() =
-        if (mockScannerManager.scannerState.isUn20On) {
+        if (simulatedScannerManager.scannerState.isUn20On) {
             byteArrayFromHexString(
                 "fa fa fa fa 1d 00 80 00 b5 07 49 cc 88 06 06 00 06 00 a3 0e 83 0e 00 00 02 f5 f5 f5 f5 "
             )
@@ -56,19 +56,19 @@ class MockResponseHelper(private val mockScannerManager: MockScannerManager) {
     )
 
     private fun imageQualityResponse() = byteArrayFromHexString(
-        mockScannerManager.currentMockFinger().imageQualityResponse
+        simulatedScannerManager.currentMockFinger().imageQualityResponse
     )
 
     private fun generateTemplateResponse() = byteArrayFromHexString(
-        mockScannerManager.currentMockFinger().generateTemplateResponse
+        simulatedScannerManager.currentMockFinger().generateTemplateResponse
     )
 
     private fun getTemplateFragmentResponseAndCycleToNextFingerIfNeeded(message: Message): ByteArray {
         val response = byteArrayFromHexString(
-            mockScannerManager.currentMockFinger().getTemplateFragmentsResponses[message.fragmentNumber.toInt()]
+            simulatedScannerManager.currentMockFinger().getTemplateFragmentsResponses[message.fragmentNumber.toInt()]
         )
         if (bytesToMessage(response).isLastFragment) {
-            mockScannerManager.cycleToNextFinger()
+            simulatedScannerManager.cycleToNextFinger()
         }
         return response
     }
@@ -96,6 +96,6 @@ class MockResponseHelper(private val mockScannerManager: MockScannerManager) {
     private fun crashFirmware() = byteArrayFromHexString("")
 
     private fun handleUnmockedResponse(message: Message): ByteArray {
-        throw UnsupportedOperationException("MockScannerManager : Unmocked message type: $message.messageType.toString()")
+        throw UnsupportedOperationException("SimulatedScannerManager : Unmocked message type: $message.messageType.toString()")
     }
 }

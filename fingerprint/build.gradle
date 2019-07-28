@@ -14,7 +14,7 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
-        versionName "2019.1.0-dev0"
+        versionName "2019.3.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -198,25 +198,4 @@ dependencies {
 
     // Truth
     androidTestImplementation deps.testing.truth
-
-    // TODO : Needed for android test since fingerprint depends on id
-
-    androidTestImplementation deps.playservices.safetynet
-
-    // Retrofit
-    testImplementation deps.retrofit.core
-    testImplementation deps.testing.retrofit
-    androidTestImplementation deps.retrofit.core
-    androidTestImplementation deps.testing.retrofit
-    androidTestImplementation deps.retrofit.adapter
-    androidTestImplementation deps.retrofit.convertergson
-
-    // Realm
-    implementation deps.realm.annotations
-    implementation(deps.realm.kotlin) {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-    }
-    implementation deps.realm.android
-    kapt deps.realm.annotations_processor
-    compileOnly deps.realm.glassfish_annotation
 }
