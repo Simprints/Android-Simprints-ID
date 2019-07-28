@@ -18,9 +18,7 @@ import com.simprints.fingerprintscannermock.mock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.mock.MockScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.whenThis
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.junit.Assert.assertEquals
@@ -81,6 +79,8 @@ class FingerprintFlowsIntegrationTest {
                 assertEquals(IFingerprintResponseType.ENROL, type)
             })
         }
+
+        verifyOnce(dbManagerMock) { savePerson(anyNotNull()) }
     }
 
     @Test
