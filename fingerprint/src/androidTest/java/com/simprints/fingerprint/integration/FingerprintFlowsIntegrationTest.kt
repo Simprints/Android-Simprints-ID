@@ -1,8 +1,8 @@
 package com.simprints.fingerprint.integration
 
+import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collectfingerprint.takeScansAndConfirm
 import com.simprints.fingerprint.activities.launch.setupActivityAndContinue
@@ -16,16 +16,15 @@ import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscannermock.mock.MockBluetoothAdapter
 import com.simprints.fingerprintscannermock.mock.MockScannerManager
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintEnrolResponse
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.whenThis
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +32,6 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class FingerprintFlowsIntegrationTest {
 
     @Inject lateinit var dbManagerMock: FingerprintDbManager
@@ -76,9 +74,44 @@ class FingerprintFlowsIntegrationTest {
         setupActivityAndContinue()
         takeScansAndConfirm()
 
-        with(scenario.result.resultData) {
-            assertTrue(hasExtra(IFingerprintResponse.BUNDLE_KEY))
-            assertNotNull(getParcelableExtra<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY))
+        with(scenario.result) {
+            resultData.setExtrasClassLoader(IFingerprintEnrolResponse::class.java.classLoader)
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.ENROL, type)
+            })
+        }
+    }
+
+    @Test
+    fun identifyFlow_finishesSuccessfully() {
+        val scenario = ActivityScenario.launch<OrchestratorActivity>(createFingerprintRequestIntent(Action.IDENTIFY))
+
+        setupActivityAndContinue()
+        takeScansAndConfirm()
+
+        with(scenario.result) {
+            resultData.setExtrasClassLoader(IFingerprintIdentifyResponse::class.java.classLoader)
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.IDENTIFY, type)
+            })
+        }
+    }
+
+    @Test
+    fun verifyFlow_finishesSuccessfully() {
+        val scenario = ActivityScenario.launch<OrchestratorActivity>(createFingerprintRequestIntent(Action.VERIFY))
+
+        setupActivityAndContinue()
+        takeScansAndConfirm()
+
+        with(scenario.result) {
+            resultData.setExtrasClassLoader(IFingerprintVerifyResponse::class.java.classLoader)
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintVerifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.VERIFY, type)
+            })
         }
     }
 
