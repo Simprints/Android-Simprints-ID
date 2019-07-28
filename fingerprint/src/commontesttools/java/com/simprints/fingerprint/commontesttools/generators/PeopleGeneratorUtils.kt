@@ -6,8 +6,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScop
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
 
-// Duplicated from id/commontestttools
-
 object PeopleGeneratorUtils {
 
     private val random = Random()

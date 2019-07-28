@@ -17,7 +17,6 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -36,7 +35,7 @@ open class FingerprintCoreModule {
 
     @Provides
     @FeatureScope
-    open fun provideAnalyicsManager(analyticsManager: AnalyticsManager): FingerprintAnalyticsManager =
+    open fun provideAnalyticsManager(analyticsManager: AnalyticsManager): FingerprintAnalyticsManager =
         FingerprintAnalyticsManagerImpl(analyticsManager)
 
     @Provides
