@@ -22,7 +22,7 @@ import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 
-internal class VerificationTask(private val view: MatchingContract.View,
+internal class VerificationTask(private val viewModel: MatchingViewModel,
                                 matchingRequest: MatchingTaskRequest,
                                 private val dbManager: FingerprintDbManager,
                                 private val sessionEventsManager: FingerprintSessionEventsManager,
@@ -47,7 +47,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
     override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_VERIFY
 
     override fun onMatchProgressDo(progress: Int) {
-        view.setVerificationProgress()
+        viewModel.progress.postValue(100)
     }
 
     override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
@@ -65,8 +65,7 @@ internal class VerificationTask(private val view: MatchingContract.View,
             MatchingTaskVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
 
         preferenceManager.lastVerificationDate = Date()
-        view.doSetResult(ResultCode.OK, resultData)
-        view.doFinish()
+        viewModel.result.postValue(MatchingViewModel.FinishResult(ResultCode.OK, resultData, 0))
     }
 
     private fun logMessageForCrashReport(message: String) {

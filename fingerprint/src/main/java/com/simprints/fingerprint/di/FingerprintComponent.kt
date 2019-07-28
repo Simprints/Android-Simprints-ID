@@ -8,8 +8,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.fingerprint.activities.launch.LaunchPresenter
-import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.activities.matching.MatchingPresenter
+import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
@@ -26,8 +25,7 @@ interface FingerprintComponent {
         fun build(): FingerprintComponent
     }
 
-    fun inject(matchingActivity: MatchingActivity)
-    fun inject(matchingPresenter: MatchingPresenter)
+    fun inject(matchingViewModel: MatchingViewModel)
     fun inject(collectFingerprintsPresenter: CollectFingerprintsPresenter)
     fun inject(collectFingerprintsScanningHelper: CollectFingerprintsScanningHelper)
     fun inject(scannerManager: ScannerManager)

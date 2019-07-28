@@ -30,13 +30,13 @@ open class FingerprintCoreModule {
 
     @Provides
     @FeatureScope
-    open fun provideFingerprintPreferencesManager(prefs: PreferencesManager): FingerprintPreferencesManager =
-        FingerprintPreferencesManagerImpl(prefs)
+    open fun provideFingerprintPreferencesManager(corePreferencesManager: PreferencesManager): FingerprintPreferencesManager =
+        FingerprintPreferencesManagerImpl(corePreferencesManager)
 
     @Provides
     @FeatureScope
-    open fun provideAnalyticsManager(analyticsManager: AnalyticsManager): FingerprintAnalyticsManager =
-        FingerprintAnalyticsManagerImpl(analyticsManager)
+    open fun provideAnalyticsManager(coreAnalyticsManager: AnalyticsManager): FingerprintAnalyticsManager =
+        FingerprintAnalyticsManagerImpl(coreAnalyticsManager)
 
     @Provides
     @FeatureScope
