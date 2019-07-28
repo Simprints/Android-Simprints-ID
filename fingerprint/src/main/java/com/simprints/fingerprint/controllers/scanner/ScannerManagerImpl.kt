@@ -3,13 +3,13 @@ package com.simprints.fingerprint.controllers.scanner
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
-import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
-import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
-import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
-import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
-import com.simprints.fingerprint.exceptions.unexpected.BluetoothNotSupportedException
-import com.simprints.fingerprint.exceptions.unexpected.NullScannerException
-import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
+import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
+import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
+import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
+import com.simprints.fingerprint.exceptions.unexpected.scanner.BluetoothNotSupportedException
+import com.simprints.fingerprint.exceptions.unexpected.scanner.NullScannerException
+import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.fingerprintscanner.ScannerCallback
@@ -83,8 +83,8 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
                         SCANNER_ERROR.BLUETOOTH_DISABLED -> BluetoothNotEnabledException()
                         SCANNER_ERROR.BLUETOOTH_NOT_SUPPORTED -> BluetoothNotSupportedException()
                         SCANNER_ERROR.SCANNER_UNBONDED -> ScannerNotPairedException()
-                        SCANNER_ERROR.BUSY, SCANNER_ERROR.IO_ERROR -> UnknownBluetoothIssueException()
-                        else -> UnknownBluetoothIssueException()
+                        SCANNER_ERROR.BUSY, SCANNER_ERROR.IO_ERROR -> UnknownScannerIssueException.forScannerError(scannerError)
+                        else -> UnknownScannerIssueException.forScannerError(scannerError)
                     }
                     result.onError(issue)
                 } ?: result.onComplete()
@@ -105,7 +105,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
                         SCANNER_ERROR.UN20_LOW_VOLTAGE -> {
                             ScannerLowBatteryException()
                         }
-                        else -> UnknownBluetoothIssueException()
+                        else -> UnknownScannerIssueException.forScannerError(scannerError)
                     }
                     result.onError(issue)
                 } ?: result.onComplete()
@@ -121,7 +121,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
             scanner?.un20Shutdown(WrapperScannerCallback({
                 result.onComplete()
             }, {
-                result.onError(UnknownBluetoothIssueException())
+                result.onError(UnknownScannerIssueException.forScannerError(it))
             }))
         }
     }
@@ -135,7 +135,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
                 result.onComplete()
             }, { scannerError ->
                 scannerError?.let {
-                    result.onError(UnknownBluetoothIssueException(it.details()))
+                    result.onError(UnknownScannerIssueException.forScannerError(it))
                 } ?: result.onComplete()
             }))
         }
@@ -148,7 +148,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
             is MultipleScannersPairedException -> MULTIPLE_PAIRED_SCANNERS
             is ScannerLowBatteryException -> LOW_BATTERY
             is ScannerNotPairedException -> NOT_PAIRED
-            is UnknownBluetoothIssueException -> DISCONNECTED
+            is UnknownScannerIssueException -> DISCONNECTED
             else -> UNEXPECTED_ERROR
         }
 

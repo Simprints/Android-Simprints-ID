@@ -21,11 +21,11 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.exceptions.safe.setup.BluetoothNotEnabledException
-import com.simprints.fingerprint.exceptions.safe.setup.MultipleScannersPairedException
-import com.simprints.fingerprint.exceptions.safe.setup.ScannerLowBatteryException
-import com.simprints.fingerprint.exceptions.safe.setup.ScannerNotPairedException
-import com.simprints.fingerprint.exceptions.unexpected.UnknownBluetoothIssueException
+import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
+import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
+import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
+import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
+import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
 import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.testtools.android.waitOnUi
@@ -129,7 +129,7 @@ class LaunchActivityAndroidTest {
     fun unknownBluetoothIssueFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownScannerIssueException())
         launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
@@ -140,7 +140,7 @@ class LaunchActivityAndroidTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
 
-        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownScannerIssueException())
         launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
@@ -164,7 +164,7 @@ class LaunchActivityAndroidTest {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
+        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownScannerIssueException())
         launchActivityRule.launchActivity(launchTaskRequest(Action.ENROL).toIntent())
         waitOnUi(1000)
         onView(withId(R.id.alertTitle)).check(ViewAssertions.matches(withText(AlertActivityViewModel.DISCONNECTED.title)))

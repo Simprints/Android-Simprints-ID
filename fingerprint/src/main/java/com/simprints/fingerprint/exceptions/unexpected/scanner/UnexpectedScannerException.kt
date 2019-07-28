@@ -1,5 +1,6 @@
-package com.simprints.fingerprint.exceptions.unexpected
+package com.simprints.fingerprint.exceptions.unexpected.scanner
 
+import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 
 

@@ -5,6 +5,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -16,5 +17,5 @@ fun FingerprintRequest.toAction() = when (this) {
     is FingerprintEnrolRequest -> Action.ENROL
     is FingerprintIdentifyRequest -> Action.IDENTIFY
     is FingerprintVerifyRequest -> Action.VERIFY
-    else -> throw Throwable("Woops") // TODO
+    else -> throw InvalidRequestForFingerprintException("Could not find Action for FingerprintRequest")
 }

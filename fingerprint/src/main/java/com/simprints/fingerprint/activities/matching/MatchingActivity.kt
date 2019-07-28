@@ -22,7 +22,7 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
