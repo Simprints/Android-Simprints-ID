@@ -9,44 +9,30 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_matching.*
-import timber.log.Timber
-import javax.inject.Inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class MatchingActivity : AppCompatActivity(), MatchingContract.View {
+class MatchingActivity : AppCompatActivity() {
 
-    override lateinit var viewPresenter: MatchingContract.Presenter
+    private val viewModel: MatchingViewModel by viewModel()
 
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
+    private lateinit var matchingRequest: MatchingTaskRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logActivityCreated()
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
-        val matchingRequest: MatchingTaskRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
+
+        matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
         LanguageHelper.setLanguage(this, matchingRequest.language)
@@ -54,73 +40,79 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         setContentView(R.layout.activity_matching)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val extras = intent.extras
-        if (extras == null) {
-            crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Null extras passed to MatchingActivity"))
-            launchAlertActivity()
-            return
-        }
-
-        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, preferencesManager, timeHelper)
+        observeResult()
+        observeProgress()
+        observeTextViewUpdates()
+        observeErrorHandlingCases()
     }
 
     override fun onResume() {
         super.onResume()
-        viewPresenter.start()
+        viewModel.start(matchingRequest)
+    }
+
+    private fun observeResult() {
+        viewModel.result.observe(this, Observer {
+            setResult(it.resultCode.value, it.data)
+            if (it.finishDelayMillis > 0) {
+                Handler().postDelayed({ finish() }, it.finishDelayMillis.toLong())
+            } else {
+                finish()
+            }
+        })
+    }
+
+    private fun observeProgress() {
+        viewModel.progress.observe(this, Observer {
+            setIdentificationProgress(it)
+        })
+    }
+
+    private fun observeTextViewUpdates() {
+        viewModel.hasLoadingBegun.observe(this, Observer {
+            if (it) tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+        })
+
+        viewModel.matchBeginningSummary.observe(this, Observer {
+            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, it.matchSize, it.matchSize)
+            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
+        })
+
+        viewModel.matchFinishedSummary.observe(this, Observer {
+            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, it.returnSize, it.returnSize)
+
+            if (it.tier1Or2Matches > 0) {
+                tv_matchingResultStatus1.visibility = View.VISIBLE
+                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, it.tier1Or2Matches, it.tier1Or2Matches)
+            }
+            if (it.tier3Matches > 0) {
+                tv_matchingResultStatus2.visibility = View.VISIBLE
+                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, it.tier3Matches, it.tier3Matches)
+            }
+            if (it.tier1Or2Matches < 1 && it.tier3Matches < 1 || it.tier4Matches > 1) {
+                tv_matchingResultStatus3.visibility = View.VISIBLE
+                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, it.tier4Matches, it.tier4Matches)
+            }
+            setIdentificationProgress(100)
+        })
+    }
+
+    private fun observeErrorHandlingCases() {
+        viewModel.alert.observe(this, Observer { launchAlert(this, it) })
+
+        viewModel.hasMatchFailed.observe(this, Observer {
+            if (it) {
+                Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     @SuppressLint("ObjectAnimatorBinding")
-    override fun setIdentificationProgress(progress: Int) =
+    private fun setIdentificationProgress(progress: Int) =
         runOnUiThread {
             ObjectAnimator.ofInt(pb_identification, "progress", pb_identification.progress, progress)
                 .setDuration((progress * 10).toLong())
                 .start()
-        }
-
-    override fun setVerificationProgress() =
-        runOnUiThread {
-            setIdentificationProgress(100)
-        }
-
-    override fun setIdentificationProgressLoadingStart() =
-        runOnUiThread {
-            tv_matchingProgressStatus1.setText(R.string.loading_candidates)
-            setIdentificationProgress(25)
-        }
-
-    override fun setIdentificationProgressMatchingStart(matchSize: Int) =
-        runOnUiThread {
-            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, matchSize, matchSize)
-            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
-            setIdentificationProgress(50)
-        }
-
-    override fun setIdentificationProgressReturningStart() =
-        runOnUiThread {
-            tv_matchingProgressStatus2.setText(R.string.returning_results)
-            setIdentificationProgress(90)
-        }
-
-    override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
-        runOnUiThread {
-            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, returnSize, returnSize)
-
-            if (tier1Or2Matches > 0) {
-                tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
-            }
-            if (tier3Matches > 0) {
-                tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
-            }
-            if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
-                tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
-            }
-            setIdentificationProgress(100)
-
-            val handler = Handler()
-            handler.postDelayed({ finish() }, matchingEndWaitTimeMillis.toLong())
         }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -134,34 +126,17 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View {
         }
     }
 
-    override fun launchAlertActivity() {
-        launchAlert(this, FingerprintAlert.UNEXPECTED_ERROR)
-    }
-
-    override fun makeToastMatchFailed() {
-        Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
-    }
-
-    override fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
-        doSetResult(resultCode, resultData)
-        doFinish()
-    }
-
-    override fun doSetResult(resultCode: ResultCode, resultData: Intent?) {
+    private fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
         setResult(resultCode.value, resultData)
-    }
-
-    override fun doFinish() {
-        Timber.d("MatchingAct: done")
         finish()
     }
 
     override fun onBackPressed() {
-        viewPresenter.handleBackPressed()
+        viewModel.handleBackPressed()
     }
 
     override fun onDestroy() {
-        viewPresenter.dispose()
+        viewModel.dispose()
         super.onDestroy()
         logActivityDestroyed()
     }

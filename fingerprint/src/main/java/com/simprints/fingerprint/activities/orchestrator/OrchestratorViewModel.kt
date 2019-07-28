@@ -19,7 +19,7 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
     internal val nextActivityCall = MutableLiveData<ActivityCall>()
     internal val finishedResult = MutableLiveData<ActivityResult>()
 
-    fun start(fingerprintRequest: FingerprintRequest) {
+    internal fun start(fingerprintRequest: FingerprintRequest) {
         orchestrator.start(fingerprintRequest)
         executeNextTaskOrFinish()
     }

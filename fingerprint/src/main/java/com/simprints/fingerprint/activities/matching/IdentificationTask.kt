@@ -25,7 +25,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
-internal class IdentificationTask(private val view: MatchingContract.View,
+internal class IdentificationTask(private val viewModel: MatchingViewModel,
                                   matchingRequest: MatchingTaskRequest,
                                   private val dbManager: FingerprintDbManager,
                                   private val sessionEventsManager: FingerprintSessionEventsManager,
@@ -43,7 +43,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
     override fun loadCandidates(): Single<List<Person>> =
         Completable.fromAction {
-            view.setIdentificationProgressLoadingStart()
+            viewModel.hasLoadingBegun.postValue(true)
+            viewModel.progress.postValue(25)
         }.andThen(
             with(matchingIdentifyRequest.queryForIdentifyPool) {
                 dbManager.loadPeople(this.projectId, this.userId, this.moduleId)
@@ -53,17 +54,18 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
-        view.setIdentificationProgressMatchingStart(candidates.size)
+        viewModel.matchBeginningSummary.postValue(MatchingViewModel.IdentificationBeginningSummary(candidates.size))
+        viewModel.progress.postValue(50)
     }
 
     override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
 
     override fun onMatchProgressDo(progress: Int) {
-        view.setIdentificationProgress(progress)
+        // Progress mapped from 0 to 100 to be between 50 and 100
+        viewModel.progress.postValue(progress / 2 + 50)
     }
 
     override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
-        view.setIdentificationProgressReturningStart()
 
         val topCandidates = candidates
             .zip(scores)
@@ -89,8 +91,15 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
             MatchingTaskIdentifyResult(topCandidates))
-        view.doSetResult(ResultCode.OK, resultData)
-        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis)
+
+        viewModel.progress.postValue(100)
+
+        viewModel.matchFinishedSummary.postValue(MatchingViewModel.IdentificationFinishedSummary(
+            topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches
+        ))
+        viewModel.result.postValue(MatchingViewModel.FinishResult(
+            ResultCode.OK, resultData, matchingEndWaitTimeInMillis
+        ))
     }
 
     private fun logMessageForCrashReport(message: String) {

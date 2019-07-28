@@ -179,6 +179,7 @@ dependencies {
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
+    androidTestImplementation deps.testing.live_data
 
     // Mockito
     androidTestImplementation deps.testing.mockito.core

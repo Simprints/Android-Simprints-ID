@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.di
 
+import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
@@ -46,5 +47,6 @@ object KoinInjector {
 
     private fun Module.defineBuildersForViewModels() {
         viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { MatchingViewModel.build(androidApplication() as Application) }
     }
 }
