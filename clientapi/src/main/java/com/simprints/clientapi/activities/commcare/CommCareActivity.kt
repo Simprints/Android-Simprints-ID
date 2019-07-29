@@ -21,7 +21,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     companion object {
         private const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
 
-        private const val SKIP_CHECK_KEY = "skipCheck"
+        private const val BIOMETRICS_COMPLETE_CHECK_KEY = "biometricsComplete"
         private const val REGISTRATION_GUID_KEY = "guid"
         private const val VERIFICATION_CONFIDENCE_KEY = "confidence"
         private const val VERIFICATION_TIER_KEY = "tier"
@@ -50,9 +50,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         }
     }
 
-    override fun returnRegistration(guid: String, skipCheck: Boolean) = Intent().let {
+    override fun returnRegistration(guid: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, skipCheck.toString())
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(REGISTRATION_GUID_KEY, guid)
         }
 
@@ -60,9 +60,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean) = Intent().let {
+    override fun returnVerification(confidence: Int, tier: Tier, guid: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, skipCheck.toString())
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
             putString(VERIFICATION_TIER_KEY, tier.name)
             putString(VERIFICATION_GUID_KEY, guid)
@@ -72,9 +72,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnExitForms(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
+    override fun returnExitForms(reason: String, extra: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, skipCheck.toString())
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(EXIT_REASON, reason)
             putString(EXIT_EXTRA, extra)
         }
@@ -92,9 +92,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = Intent().let {
+    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(SKIP_CHECK_KEY, skipCheck.toString())
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)

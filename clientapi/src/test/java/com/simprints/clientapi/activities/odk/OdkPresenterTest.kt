@@ -89,7 +89,7 @@ class OdkPresenterTest {
             handleEnrollResponse(EnrollResponse(registerId))
         }
 
-        verifyOnce(view) { returnRegistration(registerId, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
+        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -108,7 +108,7 @@ class OdkPresenterTest {
                 confidenceList = "${id1.confidence} ${id2.confidence}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
-                skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
@@ -125,7 +125,7 @@ class OdkPresenterTest {
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
                 tier = verification.matchResult.tier.toString(),
-                skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
@@ -136,7 +136,7 @@ class OdkPresenterTest {
             handleResponseError(error)
         }
 
-        verifyOnce(view) { returnErrorToClient(error, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
+        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -156,7 +156,7 @@ class OdkPresenterTest {
     }
 
     companion object {
-        internal const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
+        internal const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
 }

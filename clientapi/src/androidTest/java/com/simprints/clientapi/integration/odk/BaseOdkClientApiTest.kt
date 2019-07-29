@@ -22,7 +22,7 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
     companion object {
         internal const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         internal const val ODK_GUIDS_KEY = "odk-guids"
-        internal const val ODK_SKIP_CHECK_KEY = "odk-skip-check"
+        internal const val ODK_BIOMETRICS_COMPLETE_KEY = "odk-biometrics-complete"
         internal const val ODK_CONFIDENCES_KEY = "odk-confidences"
         internal const val ODK_TIERS_KEY = "odk-tiers"
         internal const val ODK_SESSION_ID = "odk-session-id"

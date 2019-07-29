@@ -24,5 +24,5 @@ enum class ApiEventType {
     INVALID_INTENT,
     SUSPICIOUS_INTENT,
     INTENT_PARSING,
-    SKIP_CHECK
+    COMPLETION_CHECK
 }
