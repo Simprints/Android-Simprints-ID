@@ -35,7 +35,7 @@ interface RequestContract {
 
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
-        fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean)
+        fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean)
     }
 
     interface Presenter {

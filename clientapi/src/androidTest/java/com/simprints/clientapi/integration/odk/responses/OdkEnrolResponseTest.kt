@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppEnrolResponse
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +30,7 @@ class OdkEnrolResponseTest : BaseOdkClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
             assertThat(it.getString(ODK_REGISTRATION_ID_KEY)).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

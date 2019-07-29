@@ -18,7 +18,7 @@ class OdkActivity : RequestActivity(), OdkContract.View {
     companion object {
         private const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         private const val ODK_GUIDS_KEY = "odk-guids"
-        private const val ODK_SKIP_CHECK_KEY = "odk-skip-check"
+        private const val ODK_BIOMETRICS_COMPLETE_CHECK_KEY = "odk-biometrics-complete"
         private const val ODK_CONFIDENCES_KEY = "odk-confidences"
         private const val ODK_TIERS_KEY = "odk-tiers"
         private const val ODK_SESSION_ID = "odk-session-id"
@@ -43,9 +43,9 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
-    override fun returnRegistration(registrationId: String, skipCheck: Boolean) = Intent().let {
+    override fun returnRegistration(registrationId: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_REGISTRATION_ID_KEY, registrationId)
-        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -54,29 +54,29 @@ class OdkActivity : RequestActivity(), OdkContract.View {
                                       confidenceList: String,
                                       tierList: String,
                                       sessionId: String,
-                                      skipCheck: Boolean) = Intent().let {
+                                      flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, idList)
         it.putExtra(ODK_CONFIDENCES_KEY, confidenceList)
         it.putExtra(ODK_TIERS_KEY, tierList)
         it.putExtra(ODK_SESSION_ID, sessionId)
-        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
     }
 
-    override fun returnVerification(id: String, confidence: String, tier: String, skipCheck: Boolean) = Intent().let {
+    override fun returnVerification(id: String, confidence: String, tier: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_GUIDS_KEY, id)
         it.putExtra(ODK_CONFIDENCES_KEY, confidence)
         it.putExtra(ODK_TIERS_KEY, tier)
-        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
     }
 
-    override fun returnExitForm(reason: String, extra: String, skipCheck: Boolean) = Intent().let {
+    override fun returnExitForm(reason: String, extra: String, flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(ODK_EXIT_REASON, reason)
         it.putExtra(ODK_EXIT_EXTRA, extra)
-        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
 
         sendOkResult(it)
     }
@@ -86,8 +86,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = Intent().let {
-        it.putExtra(ODK_SKIP_CHECK_KEY, skipCheck)
+    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = Intent().let {
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
         sendOkResult(it)
     }
 

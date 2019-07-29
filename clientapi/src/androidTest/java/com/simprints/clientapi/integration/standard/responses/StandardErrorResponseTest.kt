@@ -22,7 +22,7 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
-        assertStandardErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+        assertStandardErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
 
     @Test
@@ -33,13 +33,13 @@ class StandardErrorResponseTest : BaseStandardClientApiTest() {
         val scenario =
             ActivityScenario.launch<LibSimprintsActivity>(standardBaseIntentRequest.apply { action = STANDARD_ENROL_ACTION })
 
-        assertStandardErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW)
+        assertStandardErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }
 
     private fun assertStandardErrorResponse(scenario: ActivityScenario<LibSimprintsActivity>,
-                                            expectedSkipCheck: Boolean) {
+                                            expectedBiometricsCompleteCheck: Boolean) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Constants.SIMPRINTS_CANCELLED)
-        assertThat(result.resultData.extras?.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(expectedSkipCheck)
+        assertThat(result.resultData.extras?.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(expectedBiometricsCompleteCheck)
     }
 }
