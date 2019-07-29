@@ -26,8 +26,8 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val VERIFICATION_CONFIDENCE_KEY = "confidence"
         private const val VERIFICATION_TIER_KEY = "tier"
         private const val VERIFICATION_GUID_KEY = "guid"
-        private const val EXIT_REASON = "reason"
-        private const val EXIT_EXTRA = "extra"
+        private const val EXIT_REASON = "exitReason"
+        private const val EXIT_EXTRA = "exitExtra"
         private const val IDENTIFICATION_OUTCOME_EXTRA = "identificationOutcome"
 
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"

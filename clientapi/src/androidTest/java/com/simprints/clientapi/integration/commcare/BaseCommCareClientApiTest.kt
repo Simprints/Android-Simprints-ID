@@ -27,8 +27,8 @@ open class BaseCommCareClientApiTest : BaseClientApiTest() {
         const val VERIFICATION_CONFIDENCE_KEY = "confidence"
         const val VERIFICATION_TIER_KEY = "tier"
         const val VERIFICATION_GUID_KEY = "guid"
-        const val EXIT_REASON = "reason"
-        const val EXIT_EXTRA = "extra"
+        const val EXIT_REASON = "exitReason"
+        const val EXIT_EXTRA = "exitExtra"
 
         internal const val COMMCARE_ENROL_ACTION = "com.simprints.commcare.REGISTER"
         internal const val COMMCARE_IDENTIFY_ACTION = "com.simprints.commcare.IDENTIFY"
