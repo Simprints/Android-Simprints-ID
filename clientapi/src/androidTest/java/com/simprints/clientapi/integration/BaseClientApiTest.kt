@@ -84,8 +84,8 @@ open class BaseClientApiTest : KoinTest {
     }
 
     companion object {
-        internal const val SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW = false
-        internal const val SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW = !SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+        internal const val RETURN_FOR_FLOW_COMPLETED = true
+        internal const val RETURN_FOR_FLOW_NOT_COMPLETED = !RETURN_FOR_FLOW_COMPLETED
         internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
         internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
         internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"

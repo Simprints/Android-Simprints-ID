@@ -8,13 +8,13 @@ interface OdkContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(registrationId: String, skipCheck:Boolean)
+        fun returnRegistration(registrationId: String, flowCompletedCheck:Boolean)
 
-        fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String, skipCheck:Boolean)
+        fun returnIdentification(idList: String, confidenceList: String, tierList: String, sessionId: String, flowCompletedCheck:Boolean)
 
-        fun returnVerification(id: String, confidence: String, tier: String, skipCheck:Boolean)
+        fun returnVerification(id: String, confidence: String, tier: String, flowCompletedCheck:Boolean)
 
-        fun returnExitForm(reason: String, extra: String, skipCheck:Boolean)
+        fun returnExitForm(reason: String, extra: String, flowCompletedCheck:Boolean)
 
         fun returnConfirmation(identificationOutcome: Boolean)
 

@@ -22,7 +22,7 @@ open class BaseCommCareClientApiTest : BaseClientApiTest() {
     companion object {
         const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
 
-        const val SKIP_CHECK_KEY = "skipCheck"
+        const val BIOMETRICS_COMPLETE_KEY = "biometricsComplete"
         const val REGISTRATION_GUID_KEY = "guid"
         const val VERIFICATION_CONFIDENCE_KEY = "confidence"
         const val VERIFICATION_TIER_KEY = "tier"
