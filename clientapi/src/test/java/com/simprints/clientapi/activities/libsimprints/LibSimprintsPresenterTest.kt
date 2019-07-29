@@ -31,7 +31,7 @@ import java.util.*
 class LibSimprintsPresenterTest {
 
     companion object {
-        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
+        const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
     private val view = mock<LibSimprintsActivity>()
@@ -105,9 +105,9 @@ class LibSimprintsPresenterTest {
                 argThat {
                     assertThat(it.guid).isEqualTo(registerId)
                 },
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
@@ -132,10 +132,10 @@ class LibSimprintsPresenterTest {
                     }
                 },
                 eq(sessionId),
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
 
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
@@ -158,22 +158,22 @@ class LibSimprintsPresenterTest {
                     assertThat(it.tier).isEqualTo(libVerification.tier)
                     assertThat(it.guid).isEqualTo(libVerification.guid)
                 },
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
         LibSimprintsPresenter(view, "", clientApiSessionEventsManager, mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
         verifyOnce(view) {
-            returnErrorToClient(anyNotNull(), eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
-    private fun verifySkipCheckEventWasAdded() {
-        verifyOnce(clientApiSessionEventsManager) { runBlocking { addSkipCheckEvent(eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)) } }
+    private fun verifyCompletionCheckEventWasAdded() {
+        verifyOnce(clientApiSessionEventsManager) { runBlocking { addCompletionCheckEvent(eq(RETURN_FOR_FLOW_COMPLETED_CHECK)) } }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

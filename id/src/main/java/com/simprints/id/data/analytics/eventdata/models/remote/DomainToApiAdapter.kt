@@ -30,7 +30,7 @@ fun Event.toApiEvent(): ApiEvent =
         CONNECTIVITY_SNAPSHOT -> ApiConnectivitySnapshotEvent(this as ConnectivitySnapshotEvent)
         INVALID_INTENT -> ApiInvalidIntentEvent(this as InvalidIntentEvent)
         SUSPICIOUS_INTENT -> ApiSuspiciousIntentEvent(this as SuspiciousIntentEvent)
-        SKIP_CHECK -> ApiSkipCheckEvent(this as SkipCheckEvent)
+        COMPLETION_CHECK -> ApiCompletionCheckEvent(this as CompletionCheckEvent)
         INTENT_PARSING -> ApiIntentParsingEvent(this as IntentParsingEvent)
         CALLOUT_CONFIRMATION -> ApiCalloutEvent(this as ConfirmationCalloutEvent)
         CALLOUT_IDENTIFICATION ->  ApiCalloutEvent(this as IdentificationCalloutEvent)

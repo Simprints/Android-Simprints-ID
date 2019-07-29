@@ -37,7 +37,7 @@ class StandardEnrolResponseTest : BaseStandardClientApiTest() {
                 assertThat(registration.guid).isEqualTo(appEnrolResponse.guid)
             } ?: throw Exception("No registration found")
 
-            assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+            assertThat(it.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

@@ -9,7 +9,7 @@ interface ClientApiSessionEventsManager {
 
     suspend fun createSession(integration: IntegrationInfo): String
 
-    suspend fun addSkipCheckEvent(skipValue: Boolean)
+    suspend fun addCompletionCheckEvent(complete: Boolean)
 
     fun addInvalidIntentEvent(action: String, extras: Map<String, Any?>): Completable
 

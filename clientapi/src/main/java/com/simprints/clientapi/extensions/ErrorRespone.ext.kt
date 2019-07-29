@@ -3,7 +3,7 @@ package com.simprints.clientapi.extensions
 import com.simprints.clientapi.Constants
 import com.simprints.clientapi.domain.responses.ErrorResponse
 
-internal fun ErrorResponse.skipCheckForError(): Boolean =
+internal fun ErrorResponse.isFlowCompletedWithCurrentError(): Boolean =
     when (reason) {
         ErrorResponse.Reason.UNEXPECTED_ERROR,
         ErrorResponse.Reason.DIFFERENT_PROJECT_ID_SIGNED_IN,
@@ -17,6 +17,6 @@ internal fun ErrorResponse.skipCheckForError(): Boolean =
         ErrorResponse.Reason.INVALID_USER_ID,
         ErrorResponse.Reason.INVALID_VERIFY_ID,
         ErrorResponse.Reason.BLUETOOTH_NOT_SUPPORTED,
-        ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-        ErrorResponse.Reason.LOGIN_NOT_COMPLETE -> Constants.SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW
+        ErrorResponse.Reason.GUID_NOT_FOUND_ONLINE -> Constants.RETURN_FOR_FLOW_COMPLETED
+        ErrorResponse.Reason.LOGIN_NOT_COMPLETE -> Constants.RETURN_FOR_FLOW_NOT_COMPLETED
     }

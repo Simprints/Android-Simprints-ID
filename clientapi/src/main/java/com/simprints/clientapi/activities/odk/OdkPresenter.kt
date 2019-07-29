@@ -1,13 +1,13 @@
 package com.simprints.clientapi.activities.odk
 
-import com.simprints.clientapi.Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.extensions.skipCheckForError
+import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,57 +43,57 @@ class OdkPresenter(private val view: OdkContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = errorResponse.skipCheckForError()
-            sessionEventsManager.addSkipCheckEvent(skipCheck)
-            view.returnErrorToClient(errorResponse, skipCheck)
+            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
+            sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck)
         }
     }
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
-            view.returnRegistration(enroll.guid, skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnRegistration(enroll.guid, flowCompletedCheck)
         }
     }
 
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
             view.returnIdentification(
                 identify.identifications.getIdsString(),
                 identify.identifications.getConfidencesString(),
                 identify.identifications.getTiersString(),
                 identify.sessionId,
-                skipCheck
+                flowCompletedCheck
             )
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
             view.returnVerification(
                 verify.matchResult.guidFound,
                 verify.matchResult.confidence.toString(),
                 verify.matchResult.tier.toString(),
-                skipCheck
+                flowCompletedCheck
             )
         }
     }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
-            view.returnExitForm(refusalForm.reason, refusalForm.extra, skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnExitForm(refusalForm.reason, refusalForm.extra, flowCompletedCheck)
         }
     }
 
-    private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
-        sessionEventsManager.addSkipCheckEvent(skipCheck)
+    private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
+        sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
         view.returnConfirmation(response.identificationOutcome)
