@@ -226,7 +226,7 @@ fun validateEnrolmentEventApiModel(json: JsonObject) {
 fun validateCompletionCheckEventApiModel(json: JsonObject) {
     assertThat(json.get("type").asString).isEqualTo("COMPLETION_CHECK")
     assertThat(json.get("relativeStartTime").asLong)
-    assertThat(json.get("completed").asBoolean).isTrue()
+    assertThat(json.get("completed").asBoolean)
     assertThat(json.size()).isEqualTo(3)
 }
 
