@@ -125,7 +125,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
         waitOnUi(1000)
-        onView(withText(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
+        onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
@@ -165,14 +165,15 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun unknownBluetoothIssueFromResetUIVeroStep_shouldShowAnErrorAlert() {
+    fun unknownBluetoothIssueFromResetUIVeroStep_shouldShowErrorConfirmDialog() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
 
         whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
-        waitOnUi(1000)
-        onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
+
+        onView(withText(containsString("Is this your scanner")))
+            .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
     }
 
     @Test
@@ -188,15 +189,16 @@ class LaunchActivityAndroidTest {
     }
 
     @Test
-    fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowAnErrorAlert() {
+    fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowErrorConfirmDialog() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
         makeResetVeroUISucceeding()
 
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
-        waitOnUi(1000)
-        onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.DISCONNECTED.title)))
+
+        onView(withText(containsString("Is this your scanner")))
+            .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
     }
 
     @Test
