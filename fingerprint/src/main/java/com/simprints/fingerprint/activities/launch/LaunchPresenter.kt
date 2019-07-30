@@ -9,7 +9,6 @@ import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -36,7 +35,6 @@ import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentify
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
 import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
@@ -45,7 +43,6 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.Companion.fromFingerprintAlertToErrorResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
@@ -379,12 +376,6 @@ class LaunchPresenter(component: FingerprintComponent,
         }
 
         view.setResultAndFinish(resultCode, returnIntent)
-    }
-
-    private fun prepareErrorResponse(resultData: Intent, alertActResult: AlertActResult) {
-        val fingerprintErrorResponse = fromFingerprintAlertToErrorResponse(alertActResult.alert)
-        resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
-            fromDomainToFingerprintErrorResponse(fingerprintErrorResponse))
     }
 
     private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
