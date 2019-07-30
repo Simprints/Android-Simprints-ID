@@ -17,32 +17,35 @@ class VerifyTaskFlow : FingerprintTaskFlow() {
     override fun computeFlow(fingerprintRequest: FingerprintRequest) {
         with(fingerprintRequest as FingerprintVerifyRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) {
-                    LaunchTaskRequest(
-                        projectId, this.toAction(), language, logoExists, programName, organizationName
-                    )
-                },
-                FingerprintTask.CollectFingerprints(COLLECT) {
-                    CollectFingerprintsTaskRequest(
-                        projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                    )
-                },
-                FingerprintTask.Matching(MATCHING) {
-                    with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
-                        MatchingTaskVerifyRequest(
-                            language, probe, buildQueryForVerifyPool(), verifyGuid
-                        )
-                    }
-                }
+                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
+                FingerprintTask.Matching(MATCHING) { createMatchingTaskRequest() }
             )
         }
     }
 
-    override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
-        finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
+    private fun FingerprintVerifyRequest.createLaunchTaskRequest() =
+        LaunchTaskRequest(
+            projectId, this.toAction(), language, logoExists, programName, organizationName
+        )
+
+    private fun FingerprintVerifyRequest.createCollectFingerprintsTaskRequest() =
+        CollectFingerprintsTaskRequest(
+            projectId, userId, moduleId, this.toAction(), language, fingerStatus
+        )
+
+    private fun FingerprintVerifyRequest.createMatchingTaskRequest() =
+        with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
+            MatchingTaskVerifyRequest(
+                language, probe, buildQueryForVerifyPool(), verifyGuid
+            )
+        }
 
     private fun FingerprintVerifyRequest.buildQueryForVerifyPool() =
         MatchingTaskVerifyRequest.QueryForVerifyPool(projectId)
+
+    override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
+        finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
 
     companion object {
         private const val LAUNCH = "launch"
