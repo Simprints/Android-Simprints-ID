@@ -54,7 +54,7 @@
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
     <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
-    <string name="scanner_id_comfirmation_message">Is this your scanner %1$s?</string>
+    <string name="scanner_id_comfirmation_message">Is %1$s your scanner?</string>
     <string name="scanner_confirmation_yes">Yes</string>
     <string name="scanner_confirmation_no">No</string>
     <!-- Loading Messages-->

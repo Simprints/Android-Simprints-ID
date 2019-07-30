@@ -134,7 +134,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
 
-        onView(withText(containsString("Is this your scanner")))
+        onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
     }
 
@@ -144,7 +144,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
 
-        onView(withText(containsString("Is this your scanner")))
+        onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
         onView(withText(R.string.scanner_confirmation_yes)).perform(click())
 
@@ -157,7 +157,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
 
-        onView(withText(containsString("Is this your scanner")))
+        onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
         onView(withText(R.string.scanner_confirmation_no)).perform(click())
 
@@ -172,7 +172,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
 
-        onView(withText(containsString("Is this your scanner")))
+        onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
     }
 
@@ -197,7 +197,7 @@ class LaunchActivityAndroidTest {
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownBluetoothIssueException())
         launchActivityRule.launchActivity(enrolRequest.toIntent())
 
-        onView(withText(containsString("Is this your scanner")))
+        onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
     }
 
