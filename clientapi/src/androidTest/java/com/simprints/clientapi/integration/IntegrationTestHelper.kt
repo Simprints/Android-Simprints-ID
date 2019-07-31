@@ -79,7 +79,7 @@ internal data class AppVerifyRequest(
 ) : IAppVerifyRequest
 
 @Parcelize
-internal data class AppIdentifyConfirmationRequest(
+internal data class AppIdentityConfirmationRequest(
     override val projectId: String,
     override val sessionId: String,
     override val selectedGuid: String
