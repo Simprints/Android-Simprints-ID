@@ -4,7 +4,6 @@ import android.content.Intent
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Observable
 
@@ -24,6 +23,7 @@ interface LaunchContract {
         fun goToRefusalActivity()
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun doVibrate()
+        fun showDialogForScannerErrorConfirmation(scannerId: String)
 
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)
@@ -43,5 +43,7 @@ interface LaunchContract {
         fun handleOnBackPressed()
         fun tryAgainFromErrorScreen()
         fun onActivityResult()
+        fun handleScannerDisconnectedYesClick()
+        fun handleScannerDisconnectedNoClick()
     }
 }
