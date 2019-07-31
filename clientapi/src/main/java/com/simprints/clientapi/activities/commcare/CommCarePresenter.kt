@@ -98,7 +98,11 @@ class CommCarePresenter(private val view: CommCareContract.View,
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        view.returnConfirmation(response.identificationOutcome)
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck)
+        }
     }
 
     private fun checkAndProcessSessionId() {
@@ -108,7 +112,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
             }
         }
 
-        processConfirmIdentifyRequest()
+        processConfirmIdentityRequest()
     }
 
 }
