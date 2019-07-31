@@ -3,7 +3,7 @@ package com.simprints.clientapi.integration
 import com.simprints.moduleapi.app.requests.IAppEnrollRequest
 import com.simprints.moduleapi.app.requests.IAppIdentifyRequest
 import com.simprints.moduleapi.app.requests.IAppVerifyRequest
-import com.simprints.moduleapi.app.requests.confirmations.IAppIdentifyConfirmationRequest
+import com.simprints.moduleapi.app.requests.confirmations.IAppIdentityConfirmationRequest
 import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.Parcelize
 
@@ -83,4 +83,4 @@ internal data class AppIdentifyConfirmationRequest(
     override val projectId: String,
     override val sessionId: String,
     override val selectedGuid: String
-) : IAppIdentifyConfirmationRequest
+) : IAppIdentityConfirmationRequest

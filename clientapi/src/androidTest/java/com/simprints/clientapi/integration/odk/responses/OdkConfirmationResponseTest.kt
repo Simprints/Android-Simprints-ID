@@ -25,10 +25,11 @@ class OdkConfirmationResponseTest : BaseOdkClientApiTest() {
     }
 
     private fun assertOdkConfirmationResponse(scenario: ActivityScenario<OdkActivity>) {
-        val result = scenario.result
-        Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
-        result.resultData.extras?.let {
-            Truth.assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
-        } ?: throw Exception("No bundle found")
+        with(scenario.result) {
+            Truth.assertThat(resultCode).isEqualTo(Activity.RESULT_OK)
+            resultData.extras?.let {
+                Truth.assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
+            } ?: throw Exception("No bundle found")
+        }
     }
 }

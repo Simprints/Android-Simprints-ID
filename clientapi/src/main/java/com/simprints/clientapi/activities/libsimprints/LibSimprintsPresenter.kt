@@ -34,7 +34,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
             SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
             SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }

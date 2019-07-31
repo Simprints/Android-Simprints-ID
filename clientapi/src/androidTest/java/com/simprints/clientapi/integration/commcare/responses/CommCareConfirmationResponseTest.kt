@@ -26,10 +26,11 @@ class CommCareConfirmationResponseTest : BaseCommCareClientApiTest() {
     }
 
     private fun assertCommCareConfirmationResponse(scenario: ActivityScenario<CommCareActivity>) {
-        val result = scenario.result
-        Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
-        result.resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
-            Truth.assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
-        } ?: throw Exception("No bundle found")
+        with(scenario.result) {
+            Truth.assertThat(resultCode).isEqualTo(Activity.RESULT_OK)
+            resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
+                Truth.assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
+            } ?: throw Exception("No bundle found")
+        }
     }
 }
