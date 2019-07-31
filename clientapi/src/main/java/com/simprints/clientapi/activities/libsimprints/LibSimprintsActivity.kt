@@ -66,7 +66,7 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
      * TODO: The development documentation needs to be updated including this return
      */
     override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
-        it.putExtra(Constants.SIMPRINTS_IDENTIFICATION_OUTCOME, identificationOutcome)
+        it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, identificationOutcome)
         sendOkResult(it)
     }
 

@@ -34,7 +34,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
             SIMPRINTS_REGISTER_INTENT -> processEnrollRequest()
             SIMPRINTS_IDENTIFY_INTENT -> processIdentifyRequest()
             SIMPRINTS_VERIFY_INTENT -> processVerifyRequest()
-            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentifyRequest()
+            SIMPRINTS_SELECT_GUID_INTENT -> processConfirmIdentityRequest()
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
@@ -95,7 +95,11 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        view.returnConfirmation(response.identificationOutcome)
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck)
+        }
     }
 }
 

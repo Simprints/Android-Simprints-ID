@@ -2,32 +2,32 @@ package com.simprints.clientapi.requestFactories
 
 import com.simprints.clientapi.clientrequests.builders.ConfirmIdentifyBuilder
 import com.simprints.clientapi.clientrequests.extractors.ClientRequestExtractor
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
-import com.simprints.clientapi.domain.requests.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.IdentityConfirmation
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 
-object ConfirmIdentifyFactory : RequestFactory() {
+object ConfirmIdentityFactory : RequestFactory() {
 
     override fun getValidSimprintsRequest(integrationInfo: IntegrationInfo): BaseConfirmation =
-        IdentifyConfirmation(
+        IdentityConfirmation(
             projectId = MOCK_PROJECT_ID,
             sessionId = MOCK_SESSION_ID,
             selectedGuid = MOCK_SELECTED_GUID,
             unknownExtras = emptyMap()
         )
 
-    override fun getValidator(extractor: ClientRequestExtractor): ConfirmIdentifyValidator =
-        ConfirmIdentifyValidator(extractor as ConfirmIdentifyExtractor)
+    override fun getValidator(extractor: ClientRequestExtractor): ConfirmIdentityValidator =
+        ConfirmIdentityValidator(extractor as ConfirmIdentityExtractor)
 
     override fun getBuilder(extractor: ClientRequestExtractor): ConfirmIdentifyBuilder =
-        ConfirmIdentifyBuilder(extractor as ConfirmIdentifyExtractor, getValidator(extractor))
+        ConfirmIdentifyBuilder(extractor as ConfirmIdentityExtractor, getValidator(extractor))
 
-    override fun getMockExtractor(): ConfirmIdentifyExtractor {
-        val mockConfirmIdentifyExtractor = mock<ConfirmIdentifyExtractor>()
+    override fun getMockExtractor(): ConfirmIdentityExtractor {
+        val mockConfirmIdentifyExtractor = mock<ConfirmIdentityExtractor>()
         setMockDefaultExtractor(mockConfirmIdentifyExtractor)
         whenever(mockConfirmIdentifyExtractor) { getSessionId() } thenReturn MOCK_SESSION_ID
         whenever(mockConfirmIdentifyExtractor) { getSelectedGuid() } thenReturn MOCK_SELECTED_GUID
