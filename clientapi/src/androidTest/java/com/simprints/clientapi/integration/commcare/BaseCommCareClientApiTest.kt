@@ -1,5 +1,6 @@
 package com.simprints.clientapi.integration.commcare
 
+import android.content.Intent
 import com.simprints.clientapi.activities.commcare.CommCareActivity
 import com.simprints.clientapi.integration.BaseClientApiTest
 
@@ -7,17 +8,24 @@ open class BaseCommCareClientApiTest : BaseClientApiTest() {
 
     private val commCareActivityName = CommCareActivity::class.qualifiedName!!
 
+    internal val commCareConfirmIntentRequest = baseConfirmIntentRequest.apply {
+        setClassName(packageName, commCareActivityName)
+    }
+
     internal val commCareBaseIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, commCareActivityName)
     }
 
-    internal val commCareInvalidIntentRequest = invalidIntentRequest.apply {
-        setClassName(packageName, commCareActivityName)
-    }
+    fun makeIntentRequestInvalid(baseIntent: Intent, invalidParam: Pair<String, String> = projectIdField) =
+        super.getInvalidIntentRequest(baseIntent, invalidParam).apply {
+            setClassName(packageName, commCareActivityName)
+        }
 
-    internal val commCareSuspiciousIntentRequest = suspiciousIntentRequest.apply {
-        setClassName(packageName, commCareActivityName)
-    }
+    override fun makeIntentRequestSuspicious(baseIntent: Intent) =
+        super.makeIntentRequestSuspicious(baseIntent).apply {
+            setClassName(packageName, commCareActivityName)
+        }
+
 
     companion object {
         const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"

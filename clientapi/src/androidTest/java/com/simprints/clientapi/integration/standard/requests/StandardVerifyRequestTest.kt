@@ -10,7 +10,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.AppVerifyRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
@@ -51,7 +51,7 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousVerifyRequest_shouldLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply {
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply {
             action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value()) 
         })
@@ -61,7 +61,7 @@ class StandardVerifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsAnInvalidVerifyRequest_shouldNotLaunchAnAppVerifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply {
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply {
             action = STANDARD_VERIFY_ACTION
             putExtra(verifyGuidField.key(), verifyGuidField.value())
         })

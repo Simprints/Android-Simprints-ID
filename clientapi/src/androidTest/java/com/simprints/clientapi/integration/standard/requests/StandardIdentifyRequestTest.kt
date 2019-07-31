@@ -22,7 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class CommCareIdentifyRequestTest : BaseStandardClientApiTest() {
+class StandardIdentifyRequestTest : BaseStandardClientApiTest() {
 
     @Before
     override fun setUp() {
@@ -47,13 +47,13 @@ class CommCareIdentifyRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = STANDARD_IDENTIFY_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply { action = STANDARD_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

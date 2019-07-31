@@ -19,7 +19,7 @@ interface CommCareContract {
 
         fun returnExitForms(reason: String, extra: String, flowCompletedCheck: Boolean)
 
-        fun returnConfirmation(identificationOutcome: Boolean)
+        fun returnConfirmation(flowCompletedCheck: Boolean)
 
         fun injectSessionIdIntoIntent(sessionId: String)
 

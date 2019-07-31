@@ -10,7 +10,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
 import com.simprints.clientapi.integration.AppEnrollRequest
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
@@ -47,13 +46,13 @@ class StandardEnrolRequestTest : BaseStandardClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardSuspiciousIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestSuspicious(standardBaseIntentRequest).apply { action = STANDARD_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<LibSimprintsActivity>(standardInvalidIntentRequest.apply { action = STANDARD_ENROL_ACTION })
+        ActivityScenario.launch<LibSimprintsActivity>(makeIntentRequestInvalid(standardBaseIntentRequest).apply { action = STANDARD_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

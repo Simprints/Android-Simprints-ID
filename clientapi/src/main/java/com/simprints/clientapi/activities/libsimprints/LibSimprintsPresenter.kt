@@ -95,7 +95,11 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        view.returnConfirmation(response.identificationOutcome)
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck)
+        }
     }
 }
 
