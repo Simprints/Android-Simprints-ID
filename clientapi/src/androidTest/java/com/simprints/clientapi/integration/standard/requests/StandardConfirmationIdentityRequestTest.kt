@@ -8,7 +8,7 @@ import androidx.test.espresso.intent.matcher.BundleMatchers
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.libsimprints.LibSimprintsActivity
-import com.simprints.clientapi.integration.AppIdentifyConfirmationRequest
+import com.simprints.clientapi.integration.AppIdentityConfirmationRequest
 import com.simprints.clientapi.integration.standard.BaseStandardClientApiTest
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
@@ -32,7 +32,7 @@ class StandardConfirmationIdentityRequestTest : BaseStandardClientApiTest() {
     fun callingAppSendsAnConfirmRequest_shouldLaunchAnAppConfirmRequest() {
         ActivityScenario.launch<LibSimprintsActivity>(standardConfirmIntentRequest.apply { action = STANDARD_CONFIRM_IDENTITY_ACTION })
 
-        val expectedAppRequest = AppIdentifyConfirmationRequest(
+        val expectedAppRequest = AppIdentityConfirmationRequest(
             projectIdField.value(),
             sessionIdField.value(),
             selectedGuidField.value())
