@@ -45,9 +45,9 @@ open class BaseClientApiTest : KoinTest {
     }
 
     internal open fun getInvalidIntentRequest(baseIntent: Intent = baseIntentRequest,
-                                              pair: Pair<String, String> = projectIdField) =  baseIntent.apply {
-        putExtra("${pair.key()}_wrong", pair.value())
-        removeExtra(pair.key())
+                                              invalidPair: Pair<String, String> = projectIdField) =  baseIntent.apply {
+        putExtra("${invalidPair.key()}_wrong", invalidPair.value())
+        removeExtra(invalidPair.key())
     }
 
     internal open fun makeIntentRequestSuspicious(baseIntent: Intent = baseIntentRequest) =  baseIntent.apply {

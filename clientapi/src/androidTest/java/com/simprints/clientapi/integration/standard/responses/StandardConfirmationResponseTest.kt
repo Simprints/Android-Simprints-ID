@@ -26,10 +26,11 @@ class StandardConfirmationResponseTest : BaseStandardClientApiTest() {
     }
 
     private fun assertStandardConfirmationResponse(scenario: ActivityScenario<LibSimprintsActivity>) {
-        val result = scenario.result
-        Truth.assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
-        result.resultData.extras?.let {
-            Truth.assertThat(it.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
-        } ?: throw Exception("No bundle found")
+        with(scenario.result) {
+            Truth.assertThat(resultCode).isEqualTo(Activity.RESULT_OK)
+            resultData.extras?.let {
+                Truth.assertThat(it.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
+            } ?: throw Exception("No bundle found")
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
@@ -32,10 +32,10 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
     )
 
-    override fun processConfirmIdentifyRequest() = validateAndSendRequest(
+    override fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
-            view.confirmIdentifyExtractor,
-            ConfirmIdentifyValidator(view.confirmIdentifyExtractor)
+            view.confirmIdentityExtractor,
+            ConfirmIdentityValidator(view.confirmIdentityExtractor)
         )
     )
 

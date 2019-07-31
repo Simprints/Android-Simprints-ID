@@ -36,7 +36,7 @@ class OdkPresenter(private val view: OdkContract.View,
             ACTION_REGISTER -> processEnrollRequest()
             ACTION_IDENTIFY -> processIdentifyRequest()
             ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
+            ACTION_CONFIRM_IDENTITY -> processConfirmIdentityRequest()
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }

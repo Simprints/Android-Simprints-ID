@@ -112,7 +112,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
             }
         }
 
-        processConfirmIdentifyRequest()
+        processConfirmIdentityRequest()
     }
 
 }
