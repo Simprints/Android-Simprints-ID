@@ -10,7 +10,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.AppEnrollRequest
-import com.simprints.clientapi.integration.BaseClientApiTest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
@@ -47,13 +46,13 @@ class OdkEnrolRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousEnrolRequest_shouldLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = ODK_ENROL_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseIntentRequest).apply { action = ODK_ENROL_ACTION })
         intended(hasAction(APP_ENROL_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidEnrolRequest_shouldNotLaunchAnAppEnrolRequest() {
-        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = ODK_ENROL_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseIntentRequest).apply { action = ODK_ENROL_ACTION })
         intended(not(hasAction(APP_ENROL_ACTION)), times(2))
     }
 }

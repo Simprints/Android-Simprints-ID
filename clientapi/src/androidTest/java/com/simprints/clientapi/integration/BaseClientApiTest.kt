@@ -31,6 +31,12 @@ open class BaseClientApiTest : KoinTest {
     private val extraField = "extra" to "some_extra"
     internal val packageName = ApplicationProvider.getApplicationContext<Application>().packageName
 
+    internal val baseConfirmIntentRequest = Intent().apply {
+        putExtra(projectIdField.key(), projectIdField.value())
+        putExtra(sessionIdField.key(), sessionIdField.value())
+        putExtra(selectedGuidField.key(), selectedGuidField.value())
+    }
+
     internal val baseIntentRequest = Intent().apply {
         putExtra(projectIdField.key(), projectIdField.value())
         putExtra(userIdField.key(), userIdField.value())
@@ -38,13 +44,13 @@ open class BaseClientApiTest : KoinTest {
         putExtra(metadataField.key(), metadataField.value())
     }
 
-    internal val invalidIntentRequest = Intent().apply {
-        putExtra(projectIdField.key() + "_wrong",  projectIdField.value())
-        putExtra(userIdField.key(),  userIdField.value())
-        putExtra(moduleIdField.key(),  moduleIdField.value())
+    internal open fun getInvalidIntentRequest(baseIntent: Intent = baseIntentRequest,
+                                              pair: Pair<String, String> = projectIdField) =  baseIntent.apply {
+        putExtra("${pair.key()}_wrong", pair.value())
+        removeExtra(pair.key())
     }
 
-    internal val suspiciousIntentRequest =  baseIntentRequest.apply {
+    internal open fun makeIntentRequestSuspicious(baseIntent: Intent = baseIntentRequest) =  baseIntent.apply {
         putExtra( extraField.key(),  extraField.value())
     }
 
