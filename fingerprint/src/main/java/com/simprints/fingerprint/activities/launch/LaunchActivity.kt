@@ -13,7 +13,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
-import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorDialog
+import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -188,10 +188,12 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
-        ConfirmScannerErrorDialog(this, scannerId,
-            callbackYes = { viewPresenter.handleScannerDisconnectedYesClick() },
-            callbackNo = { viewPresenter.handleScannerDisconnectedNoClick() })
-            .create()
+        ConfirmScannerErrorBuilder()
+            .build(
+                this, scannerId,
+                onYes = { viewPresenter.handleScannerDisconnectedYesClick() },
+                onNo = { viewPresenter.handleScannerDisconnectedNoClick() }
+            )
 
     private fun logScannerErrorDialogShownToCrashReport() {
         crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
