@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
@@ -141,14 +141,14 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
             runBlocking { start() }
         }
 
-        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

@@ -28,7 +28,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val VERIFICATION_GUID_KEY = "guid"
         private const val EXIT_REASON = "exitReason"
         private const val EXIT_EXTRA = "exitExtra"
-        private const val IDENTIFICATION_OUTCOME_EXTRA = "identificationOutcome"
 
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
     }
@@ -72,7 +71,10 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnExitForms(reason: String, extra: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnExitForms(reason: String,
+                                 extra: String,
+                                 flowCompletedCheck: Boolean) = Intent().let {
+
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(EXIT_REASON, reason)
@@ -83,16 +85,18 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
+    override fun returnConfirmation(flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
-            putString(IDENTIFICATION_OUTCOME_EXTRA, identificationOutcome.toString())
+            putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
         }
 
         injectDataAsCommCareBundleIntoIntent(it, data)
         sendOkResult(it)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnErrorToClient(errorResponse: ErrorResponse,
+                                     flowCompletedCheck: Boolean) = Intent().let {
+
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
         }
@@ -103,6 +107,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     override fun returnIdentification(identifications: ArrayList<Identification>,
                                       sessionId: String) = Intent().let {
+
         // CommCare can't process Identifications as standard CommCare Bundle (COMMCARE_BUNDLE_KEY).
         // It's excepting Identifications results in the LibSimprints format.
         it.putParcelableArrayListExtra(Constants.SIMPRINTS_IDENTIFICATIONS, identifications)

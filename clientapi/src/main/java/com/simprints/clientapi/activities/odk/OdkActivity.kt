@@ -24,7 +24,6 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         private const val ODK_SESSION_ID = "odk-session-id"
         private const val ODK_EXIT_REASON = "odk-exit-reason"
         private const val ODK_EXIT_EXTRA = "odk-exit-extra"
-        private const val ODK_IDENTIFICATION_OUTCOME_KEY = "odk-identification-outcome"
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.simodkadapter.CONFIRM_IDENTITY"
     }
 
@@ -81,8 +80,8 @@ class OdkActivity : RequestActivity(), OdkContract.View {
         sendOkResult(it)
     }
 
-    override fun returnConfirmation(identificationOutcome: Boolean) = Intent().let {
-        it.putExtra(ODK_IDENTIFICATION_OUTCOME_KEY, identificationOutcome)
+    override fun returnConfirmation(flowCompletedCheck: Boolean) = Intent().let {
+        it.putExtra(ODK_BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck)
         sendOkResult(it)
     }
 

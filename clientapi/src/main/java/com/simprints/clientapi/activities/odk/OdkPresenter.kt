@@ -36,7 +36,7 @@ class OdkPresenter(private val view: OdkContract.View,
             ACTION_REGISTER -> processEnrollRequest()
             ACTION_IDENTIFY -> processIdentifyRequest()
             ACTION_VERIFY -> processVerifyRequest()
-            ACTION_CONFIRM_IDENTITY -> processConfirmIdentifyRequest()
+            ACTION_CONFIRM_IDENTITY -> processConfirmIdentityRequest()
             else -> view.handleClientRequestError(ClientApiAlert.INVALID_CLIENT_REQUEST)
         }
     }
@@ -96,7 +96,10 @@ class OdkPresenter(private val view: OdkContract.View,
         sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        view.returnConfirmation(response.identificationOutcome)
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck)
+        }
     }
-
 }

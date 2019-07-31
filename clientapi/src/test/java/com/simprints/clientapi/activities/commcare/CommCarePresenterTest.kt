@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.responses.IdentifyResponse
 import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.RequestFactory.Companion.MOCK_SESSION_ID
@@ -77,13 +77,13 @@ class CommCarePresenterTest {
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
         whenever(view) { extras } thenReturn mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
 
         CommCarePresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
-        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentifyFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
