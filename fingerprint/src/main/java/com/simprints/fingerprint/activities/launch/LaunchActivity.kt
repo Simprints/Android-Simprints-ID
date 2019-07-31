@@ -13,9 +13,13 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
@@ -36,6 +40,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
 
     override val context: Context by lazy { this }
     @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
 
     override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
@@ -174,6 +179,27 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun isCurrentTabParental(): Boolean = tabHost.currentTab == 1
 
     override fun doVibrate() = vibrate(this)
+
+    override fun showDialogForScannerErrorConfirmation(scannerId: String) {
+        buildConfirmScannerErrorAlertDialog(scannerId).also {
+                it.show()
+                logScannerErrorDialogShownToCrashReport()
+            }
+    }
+
+    private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
+        ConfirmScannerErrorBuilder()
+            .build(
+                this, scannerId,
+                onYes = { viewPresenter.handleScannerDisconnectedYesClick() },
+                onNo = { viewPresenter.handleScannerDisconnectedNoClick() }
+            )
+
+    private fun logScannerErrorDialogShownToCrashReport() {
+        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
+            FingerprintCrashReportTrigger.SCANNER,
+            message = "Scanner error confirm dialog shown")
+    }
 
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
