@@ -9,7 +9,6 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.remote.RemoteDbManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
@@ -32,7 +31,6 @@ import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
-import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -56,9 +54,7 @@ class ProjectAuthenticatorTest {
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
-
 
     private val projectId = "project_id"
     private val userId = "user_id"
@@ -71,7 +67,6 @@ class ProjectAuthenticatorTest {
             remoteProjectManagerRule = MockRule,
             loginInfoManagerRule = MockRule,
             syncSchedulerHelperRule = MockRule,
-            longConsentManagerRule = MockRule,
             peopleUpSyncMasterRule = MockRule,
             keystoreManagerRule = ReplaceRule { mock<KeystoreManager>().apply { setupFakeKeyStore(this) } }
         )
@@ -86,7 +81,6 @@ class ProjectAuthenticatorTest {
             .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
 
         whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
-        whenever(longConsentManager.downloadAllLongConsents(anyNotNull())).thenReturn(Completable.complete())
 
         apiClient = SimApiClient(SecureApiInterface::class.java, SecureApiInterface.baseUrl)
     }

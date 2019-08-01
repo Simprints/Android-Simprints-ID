@@ -161,4 +161,6 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         viewPresenter.dispose()
         super.onDestroy()
     }
+
+    override fun onBackPressed() { }
 }
