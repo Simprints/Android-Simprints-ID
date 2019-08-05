@@ -1,7 +1,7 @@
 package com.simprints.id.activities.orchestrator.di
 
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
-import com.simprints.id.activities.orchestrator.OrchestratorPresenter
+import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import dagger.BindsInstance
 import dagger.Subcomponent
 
@@ -15,5 +15,5 @@ interface OrchestratorActivityComponent {
     }
 
     fun inject(orchestratorActivity: OrchestratorActivity)
-    fun inject(orchestratorActivity: OrchestratorPresenter)
+    fun inject(orchestratorViewModelFactory: OrchestratorViewModelFactory)
 }

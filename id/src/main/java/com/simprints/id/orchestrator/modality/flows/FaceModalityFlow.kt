@@ -33,17 +33,17 @@ class FaceModalityFlow(private val appRequest: AppRequest,
 
     @Throws(IllegalArgumentException::class)
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean =
-        if (isFaceResult(requestCode)) {
-            require(resultCode == Activity.RESULT_OK && data != null)
-
-            val potentialFaceResponse = data.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
-            fromFaceToDomainResponse(potentialFaceResponse).also {
-                steps[1].result = it
+        isFaceResult(requestCode).also { isFace ->
+            if (isFace) {
+                require(resultCode == Activity.RESULT_OK && data != null)
+                processResult(data)
             }
-            true
-        } else {
-            false
         }
+
+    private fun processResult(data: Intent) {
+        val potentialFaceResponse = data.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)
+        steps[0].result = fromFaceToDomainResponse(potentialFaceResponse)
+    }
 
     private fun isFaceResult(requestCode: Int): Boolean = requestCode == REQUEST_CODE_FACE
 }

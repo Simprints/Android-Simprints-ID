@@ -1,15 +1,16 @@
 package com.simprints.id.domain.moduleapi.face
 
-import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchingResult
 import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchingResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceTier
 import com.simprints.moduleapi.face.responses.*
 
 object FaceToDomainResponse {
 
+    //TODO: update using enum as we do in FingerprintToDomainResponse
     fun fromFaceToDomainResponse(faceResponse: IFaceResponse): FaceResponse =
         when (faceResponse) {
             is IFaceEnrolResponse -> fromFaceToDomainEnrolResponse(faceResponse)

@@ -2,10 +2,6 @@ package com.simprints.id.activities.orchestrator.di
 
 import com.simprints.id.Application
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
-import com.simprints.id.activities.orchestrator.OrchestratorPresenter
-import com.simprints.id.di.AppComponent
-import kotlinx.android.synthetic.main.activity_front.view.*
-import java.lang.IllegalArgumentException
 
 class OrchestratorComponentInjector {
 
@@ -26,10 +22,6 @@ class OrchestratorComponentInjector {
         fun inject(activity: OrchestratorActivity) {
             val orchestratorActivityComponent = getComponent(activity)
             orchestratorActivityComponent.inject(activity)
-        }
-
-        fun inject(orchestratorPresenter: OrchestratorPresenter) {
-            component?.inject(orchestratorPresenter)
         }
     }
 }
