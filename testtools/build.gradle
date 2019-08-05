@@ -10,7 +10,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
@@ -32,6 +32,9 @@ android {
         }
     }
 }
+
+//Required to make the mock-android library to work in a no android module.
+System.setProperty("org.mockito.mock.android", "true")
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -59,6 +62,8 @@ dependencies {
 
     implementation deps.testing.mockito.inline
     implementation deps.testing.mockito.kotlin
+    implementation deps.testing.mockito.android
+
     implementation deps.testing.robolectric.core
     implementation deps.testing.robolectric.multidex
     implementation deps.testing.mockwebserver

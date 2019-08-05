@@ -28,7 +28,6 @@
     <string name="loading">লোড হচ্ছে</string>
     <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
     <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
-    <string name="launch_checking_api_key">API কী পরীক্ষা করা হচ্ছে…</string>
     <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
     <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
     <string name="launch_setup">सेट अप Vero</string>
@@ -87,9 +86,7 @@
     <string name="verify_guid_not_found_title">ব্যক্তি খুঁজে পাওয়া যায়নি</string>
     <string name="error_occurred_title">ত্রুটি ঘটেছে</string>
     <string name="low_battery_title">ব্যাটারীর চার্জ কম</string>
-    <string name="alert_api_key_verify_failed">API কী যাচাই করতে ব্যর্থ</string>
     <!-- Error Message Text -->
-    <string name="invalid_apikey_message">একটি কনফিগারেশন ত্রুটি ঘটেছে (অবৈধ API Key), আপনার সিস্টেম অ্যাডমিনস্ট্রেটরের সঙ্গে যোগাযোগ করুন</string>
     <string name="invalid_intentAction_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid intent action)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="invalid_metadata_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (invalid metadata)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
     <string name="missing_userId_message">একটি কনফগািরশনে ত্রুটি ঘটছেে (ইউজার আইডি নই)ে, আপনার সস্টমিে অ্যাডমনস্ট্রিটিরেরে সাথে  যোগাযোগকরুন</string>
@@ -105,7 +102,6 @@
     <string name="disconnected_message">স্ক্যানারটি পাওয়া যাচ্ছে না, দয়া করে নিশ্চিত করুন যে  এটি চালু এবং ফোনেরি</string>
     <string name="low_battery_message">" स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज"</string>
     <string name="unforeseen_error_message">স্ক্যানার পাওয়া যাচ্ছেনা, দয়া করে নিশ্চিন হন এর পাওয়ার চালু আছে কিনা এবং ফোন বন্ধ আছে কিনা।</string>
-    <string name="alert_api_key_verify_failed_body">\"আমরা আপনার API কী যাচাই করতে পারিনি, দয়া করে নিশ্চিত করুন যে আপনি ইন্টারনেটের সাথে সংযুক্ত করা হয় এবং আবার চেষ্টা করুন\"</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">বন্ধ করা</string>
     <string name="try_again_label">আবার চেষ্টা করা</string>
@@ -149,7 +145,7 @@
     <!-- Refusal Selection Points -->
     <string name="scanner_not_working">স্ক্যানার কাজ করছে না</string>
     <string name="beneficiary_refused">সুবিধাভোগী প্রত্যাখ্যান করেছেন</string>
-    <string name="other">অন্যান্য</string>
+    <string name="refusal_other">অন্যান্য</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">আরো তথ্য…</string>
 

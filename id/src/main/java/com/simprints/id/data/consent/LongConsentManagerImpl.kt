@@ -1,6 +1,5 @@
 package com.simprints.id.data.consent
 
-import android.os.Handler
 import com.google.firebase.storage.FileDownloadTask
 import com.google.firebase.storage.FirebaseStorage
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -8,11 +7,9 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
-import android.os.Looper
-import com.google.android.gms.tasks.Tasks
-import timber.log.Timber
 
 
 class LongConsentManagerImpl(absolutePath: String,
@@ -35,13 +32,13 @@ class LongConsentManagerImpl(absolutePath: String,
         createLocalFilePath(baseFilePath.absolutePath)
     }
 
-    private val firebaseStorage = FirebaseStorage.getInstance()
+    private val firebaseStorage by lazy { FirebaseStorage.getInstance() }
 
     private fun createBaseFilePath(absolutePath: String) = File (absolutePath +
         File.separator +
         FILE_PATH)
 
-    internal fun createLocalFilePath(absolutePath: String): File {
+    private fun createLocalFilePath(absolutePath: String): File {
         val filePath = File(absolutePath +
             File.separator +
             loginInfoManager.getSignedInProjectIdOrEmpty())

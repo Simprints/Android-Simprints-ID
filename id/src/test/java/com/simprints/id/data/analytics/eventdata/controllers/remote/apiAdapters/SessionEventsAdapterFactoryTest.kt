@@ -175,7 +175,16 @@ class SessionEventsAdapterFactoryTest {
 
     @Test
     fun validate_callbackEventForRefusalApiModel() {
-        val callbackEvent = RefusalCallbackEvent(10, "reason", "extra")
+        val callbackEvent = RefusalCallbackEvent(10, "REFUSED_DATA_CONCERNS", "extra")
+        val apiEvent = ApiCallbackEvent(callbackEvent)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+
+        validateCallbackEventApiModel(json)
+    }
+
+    @Test
+    fun validate_callbackEventForConfirmationApiModel() {
+        val callbackEvent = ConfirmationCallbackEvent(10, true)
         val apiEvent = ApiCallbackEvent(callbackEvent)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
 
@@ -236,6 +245,17 @@ class SessionEventsAdapterFactoryTest {
         val apiEvent = ApiEnrolmentEvent(event)
         val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
         validateEnrolmentEventApiModel(json)
+    }
+
+    @Test
+    fun validate_completionCheckEventApiModel() {
+        val event = CompletionCheckEvent(
+            10,
+            true)
+
+        val apiEvent = ApiCompletionCheckEvent(event)
+        val json = gsonWithAdapters.toJsonTree(apiEvent).asJsonObject
+        validateCompletionCheckEventApiModel(json)
     }
 
     @Test

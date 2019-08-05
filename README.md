@@ -7,69 +7,39 @@
 Temporarily, until the libsimprints git submodule makes it to master:
 `git submodule update --init --recursive`
 
-Add in ~/.gradle/gradle.properties:
-
-`SIMPRINTS_ARTIFACTORY_USERNAME=`
-
-`SIMPRINTS_ARTIFACTORY_PASSWORD=`
-
-`SIMPRINTSID_DEV_GCP_PROJECT=simprints-dev`
-
-`SIMPRINTSID_PUBLISH_KEY_FILE=some_string` required only to publish apks
-
-`SIMPRINTSID_RELEASE_STORE_FILE=`
-
-`SIMPRINTSID_RELEASE_STORE_PASSWORD=`
-
-`SIMPRINTSID_RELEASE_KEY_ALIAS=`
-
-`SIMPRINTSID_RELEASE_KEY_PASSWORD=`
-
 ## Testing
 
-Tests can be run in Android Studio, but it requires Cerberus installed and running (foreground) on the devices where tests will be launched.
-Alternatively, `run ./instrumented_tests` checkouts and builds Cerberus before launching the instrumented tests on the devices.
+### How to run tests
+Unfortunately, Android Studio and the ADT don't fully support tests with Dynamic Features (DF).
 
-#### Requirements for testing:
+https://issuetracker.google.com/issues/123441249
+https://issuetracker.google.com/issues/133624929
+https://issuetracker.google.com/issues/115569342
+https://issuetracker.google.com/issues/132906456
+https://issuetracker.google.com/issues/125437348
 
-#####  Gradle properties #####
-variables in ~/.gradle/gradle.properties:
+The following matrix shows the support for each type of test suites:
 
-`sdk.dir=/..../Android/sdk`
+| From/What                 | Android Studio  | ./gradlew* |  CI (Bitrise/FirebaseLab)  |
+|---------------------------|-----------------|------------|----------------------------|
+| DF (unit tests)           |       ✓         |     x      |             x              |
+| DF (android tests)        |       X         |     ✓      |             x              |
+| App Module (unit tests)   |       ✓         |     ✓      |             ✓              |
+| App Module (android tests)|       ✓         |     ✓      |             ✓              |
 
-`SIMPRINTSID_TEST_SCANNER=`
+DF modules are: clientapi, fingeprint, face
+App module is: id
 
-`SIMPRINTSID_TEST_WIFI=`
+*To run android tests for a specific DF module: ./gradlew _name_of_df_module_:cAT
 
-`SIMPRINTSID_TEST_WIFI_PASSWORD=`
+During the development of new android tests in DF modules, it can be useful to run a specific test only.
+That is possible marking the test with @SmallTest annotation and run ./gradlew _name_of_df_module_:cAT  -Pandroid.testInstrumentationRunnerArguments.size=small
 
-#####  ENV #####
-ANDROID_HOME set to the Android SDK path
-ANDROID_HOME/tools-platform included in PATH
+###Limitations
 
-```
-echo "export ANDROID_HOME=**YOUR_SDK_PATH**" >> ~/.bash_profile
-echo "export PATH=$PATH:$ANDROID_HOME/platform-tools" >> ~/.bash_profile
+As mentioned above, android tests in DF modules can be launched only from gradlew.
+If Mockito lib is used, they can be launched only on devices with API 28 and above.
 
-```
-
-
-## Using your own development GCP project
-
-By default, any debug build of Simprints ID will interact with the `simprints-dev` GCP project.
-
-To change that behaviour:
-- Your development GCP project should be properly setup. To do so follow [the instructions in the Panda wiki](https://sites.google.com/simprints.com/panda-wiki/cloud/set-up-a-development-gcp-project).
-- Add the following property into your Global `gradle.properties` (located in `USER_HOME/.gradle`)
-```
-development_gcp_project=[YOUR_GCP_PROJECT_ID]
-```
-- Follow [these instructions](https://firebase.google.com/docs/android/setup#manually_add_firebase) to add the App to your GCP / Firebase project and download the corresponding `google-services.json` file (or files, in the case of adding your own Firestore project as well).
- 
-- Rename this file as `[YOUR_GCP_PROJECT_ID]_google_services.json`, replacing all hyphens with underscores, and place it the folder `id/src/debug/res/raw` (it won't be committed thanks to the .gitignore). If necessary, do the same with the firestore version with the format `[YOUR_GCP_PROJECT_ID]_fs_google_services.json`. 
-
-- Run the file `update_google_services_jsons.sh` located in the root folder. (This copies the appropriate file for each build-type in res/raw to the top of the build-type folder, and renames it `google-services.json`)
-
-- Rebuild. Gradle might complain at first, but the build should eventually succeed.
-
-Note: When switching from a GCP project to another, it's necessary to re-run `update_google_services_jsons.sh` and it's recommended to do a clean reinstall of the app.
+Normally, Mockito-inline and Mockito-android can mock `val` properties (e.g. whenever(mock) { val_property } thenReturn "some_value") and they achieve that modifying the Dex files (e.g. removing the `final` attribute).
+Unfortunately, the this approach doesn't work on DF modules.
+To use Mockito in DF modules for android tests, a different dexer is required: com.linkedin.dexmaker:dexmaker-mockito-inline and it requires API 28 (https://github.com/linkedin/dexmaker#mocking-final-classes--methods).

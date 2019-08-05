@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1

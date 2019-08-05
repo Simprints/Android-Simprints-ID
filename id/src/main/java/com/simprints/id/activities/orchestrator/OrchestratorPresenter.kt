@@ -82,6 +82,7 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
                 AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
                 AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
                 AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
+                AppResponseType.CONFIRMATION -> buildConfirmationCallbackEvent(appResponse as AppConfirmationResponse)
                 AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
             }.let {
                 session.addEvent(it)
@@ -111,7 +112,7 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
         with(appRefusalResponse) {
             RefusalCallbackEvent(
                 timeHelper.now(),
-                answer.reason?.name ?: "",
+                answer.reason.name,
                 answer.optionalText)
         }
 
@@ -127,4 +128,14 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
 
     override fun fromDomainToAppResponse(response: AppResponse?): IAppResponse? =
         response?.let { DomainToAppResponse.fromDomainToAppResponse(it) }
+
+    private fun buildConfirmationCallbackEvent(appConfirmationResponse: AppConfirmationResponse) =
+        ConfirmationCallbackEvent(
+            timeHelper.now(),
+            appConfirmationResponse.identificationOutcome
+        )
+
+    private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
+        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
+
 }

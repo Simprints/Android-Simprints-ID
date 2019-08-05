@@ -3,12 +3,12 @@ package com.simprints.id.domain.moduleapi.app
 import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.*
+import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.moduleapi.app.responses.*
-import kotlinx.android.parcel.Parcelize
-import com.simprints.id.domain.moduleapi.app.responses.AppResponseType.*
 import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 
 object DomainToAppResponse {
 
@@ -18,6 +18,7 @@ object DomainToAppResponse {
             IDENTIFY -> fromDomainToAppIdentifyResponse(response as AppIdentifyResponse)
             REFUSAL -> fromDomainToAppRefusalFormResponse(response as AppRefusalFormResponse)
             VERIFY -> fromDomainToAppVerifyResponse(response as AppVerifyResponse)
+            CONFIRMATION -> fromDomainToAppIdentityConfirmationResponse(response as AppConfirmationResponse)
             ERROR -> fromDomainToAppErrorResponse(response as AppErrorResponse)
         }
 
@@ -29,11 +30,9 @@ object DomainToAppResponse {
             DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
             DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN
             GUID_NOT_FOUND_ONLINE -> IAppErrorReason.GUID_NOT_FOUND_ONLINE
-            GUID_NOT_FOUND_OFFLINE ->IAppErrorReason.GUID_NOT_FOUND_OFFLINE
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
-            SCANNER_LOW_BATTERY -> IAppErrorReason.SCANNER_LOW_BATTERY
-            UNKNOWN_BLUETOOTH_ISSUE -> IAppErrorReason.UNKNOWN_BLUETOOTH_ISSUE
+            LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
         }
 
     private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
@@ -51,6 +50,9 @@ object DomainToAppResponse {
 
     private fun fromDomainToAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
+
+    private fun fromDomainToAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
+        IAppConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =
         when (tier) {
@@ -96,3 +98,10 @@ private data class IAppMatchResultImpl(
     override val guid: String,
     override val confidence: Int,
     override val tier: IAppResponseTier) : Parcelable, IAppMatchResult
+
+@Parcelize
+private data class IAppConfirmationResponseImpl(
+    override val identificationOutcome: Boolean
+) : IAppConfirmationResponse {
+    @IgnoredOnParcel override val type: IAppResponseType = IAppResponseType.CONFIRMATION
+}
