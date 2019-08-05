@@ -87,7 +87,7 @@ class OrchestratorPresenterTest {
         val orchestratorPresenter = createOrchestratorPresenter()
         orchestratorPresenter.sessionEventsManager = mockSessionEventsManagerToReturnASessionId()
         orchestratorPresenter.orchestratorManager = mock<OrchestratorManager>().apply {
-            whenever(this) { getAppResponse() } thenReturn Single.error(Throwable("Error trying to generate App Response"))
+            whenever(this) { getAppResponse() } thenReturn Single.error(Throwable("Error trying to generate App Result"))
             whenever(this) { startFlow(anyNotNull(), anyNotNull()) } thenReturn Observable.never()
         }
 

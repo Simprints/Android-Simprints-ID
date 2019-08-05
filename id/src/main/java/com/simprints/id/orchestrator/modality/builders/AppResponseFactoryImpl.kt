@@ -10,13 +10,13 @@ class AppResponseFactoryImpl : AppResponseFactory {
 
     override fun buildAppResponse(modality: Modality,
                                   appRequest: AppRequest,
-                                  modalityResponses: List<ModalityFlow.Step>,
+                                  modalitiesResults: List<ModalityFlow.Result>,
                                   sessionId: String): AppResponse =
         when (modality) {
             FACE -> AppResponseBuilderForFace()
             FINGER -> AppResponseBuilderForFinger()
             FINGER_FACE -> AppResponseBuilderForFingerFace()
             FACE_FINGER -> AppResponseBuilderForFaceFinger()
-        }.buildResponse(appRequest, modalityResponses.mapNotNull { it.response }, sessionId)
+        }.buildResponse(appRequest, modalitiesResults, sessionId)
 }
 

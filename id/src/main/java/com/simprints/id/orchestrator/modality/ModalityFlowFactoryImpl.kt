@@ -18,11 +18,14 @@ class ModalityFlowFactoryImpl(private val prefs: PreferencesManager,
         when (modality) {
             FACE -> buildModalityFlow(listOf(
                 buildFaceModality(appRequest, packageName)))
+
             FINGER -> buildModalityFlow(listOf(
                 buildFingerprintModality(appRequest, packageName)))
+
             FINGER_FACE -> buildModalityFlow(listOf(
                 buildFingerprintModality(appRequest, packageName),
                 buildFaceModality(appRequest, packageName)))
+
             FACE_FINGER -> buildModalityFlow(listOf(
                 buildFaceModality(appRequest, packageName),
                 buildFingerprintModality(appRequest, packageName)))

@@ -9,6 +9,6 @@ interface AppResponseFactory {
 
     fun buildAppResponse(modality: Modality,
                          appRequest: AppRequest,
-                         modalityResponses: List<ModalityFlow.Step>,
+                         modalitiesResults: List<ModalityFlow.Result>,
                          sessionId: String): AppResponse
 }
