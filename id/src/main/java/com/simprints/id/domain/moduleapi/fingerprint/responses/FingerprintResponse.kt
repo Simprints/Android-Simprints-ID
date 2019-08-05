@@ -3,7 +3,7 @@ package com.simprints.id.domain.moduleapi.fingerprint.responses
 import android.os.Parcelable
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 
-interface FingerprintResponse: Parcelable, ModalityFlow.Response {
+interface FingerprintResponse: Parcelable, ModalityFlow.Result {
     val type: FingerprintTypeResponse
 
     companion object {

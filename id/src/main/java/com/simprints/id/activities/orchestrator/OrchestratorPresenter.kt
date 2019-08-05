@@ -134,8 +134,4 @@ class OrchestratorPresenter : OrchestratorContract.Presenter {
             timeHelper.now(),
             appConfirmationResponse.identificationOutcome
         )
-
-    private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
-        ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
-
 }

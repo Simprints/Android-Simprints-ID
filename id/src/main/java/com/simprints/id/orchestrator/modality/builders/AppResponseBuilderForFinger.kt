@@ -15,7 +15,7 @@ import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 class AppResponseBuilderForFinger : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
-                               modalityRespons: List<ModalityFlow.Response>,
+                               modalityRespons: List<ModalityFlow.Result>,
                                sessionId: String): AppResponse {
 
         val fingerResponse = modalityRespons.first()

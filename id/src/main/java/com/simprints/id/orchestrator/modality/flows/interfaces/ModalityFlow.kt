@@ -7,20 +7,32 @@ import android.content.Intent
  */
 interface ModalityFlow {
 
-    val steps: Map<Int, Step?>
+    val steps: List<Step>
 
-    val nextRequest: Request?
+    fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean
 
-    fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Response?
+    fun getLatestOngoingStep(): Step?
 
     data class Step(val request: Request,
-                    var response: Response? = null)
+                    var status: Status) {
+
+        var result: Result? = null
+            set(value) {
+                field = value
+                if (field != null) {
+                    status = Status.COMPLETED
+                }
+            }
+
+        enum class Status {
+            ONGOING, COMPLETED
+        }
+    }
 
     data class Request(val requestCode: Int,
-                       val intent: Intent,
-                       var launched: Boolean = false)
+                       val intent: Intent)
 
-    interface Response
+    interface Result
 }
 
 
@@ -28,13 +40,13 @@ interface ModalityFlow {
  * Represents a single Modality Flow
  * @see com.simprints.id.orchestrator.modality.flows.SingleModalityFlowBase
  */
-interface SingleModalityFlow: ModalityFlow
+interface SingleModalityFlow : ModalityFlow
 
 /**
  * Represents a multi Modality Flow.
  * MultiModalitiesFlow can host SingleModalityFlows
  * @see com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
  */
-interface MultiModalitiesFlow: ModalityFlow
+interface MultiModalitiesFlow : ModalityFlow
 
 
