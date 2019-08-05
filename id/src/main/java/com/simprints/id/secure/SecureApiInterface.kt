@@ -1,8 +1,8 @@
 package com.simprints.id.secure
 
-import com.simprints.id.BuildConfig
 import com.simprints.core.network.NetworkConstants
-import com.simprints.id.secure.models.*
+import com.simprints.id.BuildConfig
+import com.simprints.id.secure.models.AuthRequestBody
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
 import io.reactivex.Single

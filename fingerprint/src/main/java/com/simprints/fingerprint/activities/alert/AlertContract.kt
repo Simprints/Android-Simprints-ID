@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.activities.alert.response.AlertActResult
 
 interface AlertContract {
 
@@ -21,11 +22,13 @@ interface AlertContract {
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun openBluetoothSettings()
         fun openWifiSettings()
-        fun closeActivityAfterTryAgainButton()
-        fun closeActivityAfterCloseButton()
+        fun finishWithAction(buttonAction: AlertActResult.CloseButtonAction)
+        fun startRefusalActivity()
     }
 
     interface Presenter : BasePresenter {
         fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction)
+        fun handleBackPressed()
+        fun handleOnResume()
     }
 }

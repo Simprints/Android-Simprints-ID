@@ -132,6 +132,10 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         view.setResultErrorAndFinish(fromDomainToAppErrorResponse(domainErrorResponse))
     }
 
+    override fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse) {
+        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(appErrorResponse))
+    }
+
     private fun extractSessionParametersOrThrow() =
         with(appRequest) {
             analyticsManager.logCallout(this)

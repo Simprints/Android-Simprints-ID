@@ -19,12 +19,12 @@ android {
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionCode 161
-        versionName "2019.2.0-rc5"
+        versionName "2019.3.0"
+        versionCode 170
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -74,16 +74,13 @@ android {
         }
     }
 
-    testBuildType "debug"
-
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'
         test {
             java.srcDir sharedTestDir
         }
-        androidTest {
-            java.srcDir sharedTestDir
-        }
+        androidTest.java.srcDir sharedTestDir
+        androidTest.java.srcDir 'src/androidTest/java'
     }
 
     testOptions {
@@ -152,7 +149,7 @@ dependencies {
     implementation deps.playservices.location
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
-    implementation deps.firebase.jwt
+    implementation deps.jwt.core
     api deps.firebase.database
     api deps.firebase.core
     api deps.firebase.auth
@@ -185,7 +182,6 @@ dependencies {
     api deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
-    implementation deps.koin.core
     implementation deps.koin.android
 
     // Test

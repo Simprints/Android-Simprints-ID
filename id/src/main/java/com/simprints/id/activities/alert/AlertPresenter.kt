@@ -15,14 +15,14 @@ import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: AppComponent,
-                     private val alertTypeType:  AlertType) : AlertContract.Presenter {
+                     private val alertType:  AlertType) : AlertContract.Presenter {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
 
-    private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertTypeType)
+    private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 
     init {
         component.inject(this)
@@ -35,7 +35,7 @@ class AlertPresenter(val view: AlertContract.View,
         initColours()
         initTextAndDrawables()
 
-        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertTypeType.fromAlertToAlertTypeEvent()))
+        sessionManager.addEventInBackground(AlertScreenEvent(timeHelper.now(), alertType.fromAlertToAlertTypeEvent()))
     }
 
     private fun initButtons() {

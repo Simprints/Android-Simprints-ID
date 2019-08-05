@@ -1,6 +1,7 @@
 package com.simprints.fingerprint.di
 
 import com.simprints.core.di.FeatureScope
+import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
@@ -34,4 +35,5 @@ interface FingerprintComponent {
     fun inject(refusalPresenter: RefusalPresenter)
     fun inject(collectFingerprintsActivity: CollectFingerprintsActivity)
     fun inject(launchActivity: LaunchActivity)
+    fun inject(alertActivity: AlertActivity)
 }

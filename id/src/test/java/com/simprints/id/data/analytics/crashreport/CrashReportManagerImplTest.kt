@@ -4,13 +4,16 @@ import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.crashlytics.android.core.CrashlyticsCore
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
+import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.testtools.common.syntax.*
@@ -162,6 +165,19 @@ class CrashReportManagerImplTest {
         crashReportManagerSpy.setDownSyncTriggersCrashlyticsKey(testDownSyncTriggers)
 
         verifyOnce(crashlyticsInstanceMock) { setString(PEOPLE_DOWN_SYNC_TRIGGERS, testDownSyncTriggers.toString()) }
+    }
+
+    @Test
+    fun logMalfunction_shouldSetUserMessageAsKeyAndLogMalfunctionException() {
+        val crashReportManagerSpy = spy(CrashReportManagerImpl())
+        val crashlyticsInstanceMock: CrashlyticsCore = mock()
+        val userMessage = "user message for malfunction"
+
+        whenever(crashReportManagerSpy) { crashlyticsInstance } thenReturn crashlyticsInstanceMock
+        crashReportManagerSpy.logMalfunction(userMessage)
+
+        verifyOnce(crashlyticsInstanceMock) { setString(MALFUNCTION_MESSAGE, userMessage) }
+        verifyOnce(crashlyticsInstanceMock) { logException(any<MalfunctionException>()) }
     }
 
     @After

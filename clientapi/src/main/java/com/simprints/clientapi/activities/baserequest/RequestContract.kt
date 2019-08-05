@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.clientrequests.builders.ClientRequestBuilder
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
@@ -27,21 +27,18 @@ interface RequestContract {
 
         val identifyExtractor: IdentifyExtractor
 
-        val confirmIdentifyExtractor: ConfirmIdentifyExtractor
+        val confirmIdentityExtractor: ConfirmIdentityExtractor
 
         fun sendSimprintsRequest(request: BaseRequest)
 
-        fun sendSimprintsConfirmationAndFinish(request: BaseConfirmation)
+        fun sendSimprintsConfirmation(request: BaseConfirmation)
 
         fun handleClientRequestError(clientApiAlert: ClientApiAlert)
 
-        fun returnErrorToClient(resultCode: Int?)
-
+        fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean)
     }
 
     interface Presenter {
-
-        val domainErrorToCallingAppResultCode: Map<ErrorResponse.Reason, Int>
 
         fun processEnrollRequest()
 
@@ -49,7 +46,7 @@ interface RequestContract {
 
         fun processVerifyRequest()
 
-        fun processConfirmIdentifyRequest()
+        fun processConfirmIdentityRequest()
 
         fun handleEnrollResponse(enroll: EnrollResponse)
 
@@ -62,6 +59,8 @@ interface RequestContract {
         fun handleResponseError(errorResponse: ErrorResponse)
 
         fun validateAndSendRequest(builder: ClientRequestBuilder)
+
+        fun handleConfirmationResponse(response: ConfirmationResponse)
 
     }
 

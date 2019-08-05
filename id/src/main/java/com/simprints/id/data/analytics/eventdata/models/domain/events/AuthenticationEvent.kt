@@ -15,6 +15,8 @@ class AuthenticationEvent(starTime: Long,
         AUTHENTICATED,
         BAD_CREDENTIALS,
         OFFLINE,
-        TECHNICAL_FAILURE
+        TECHNICAL_FAILURE,
+        SAFETYNET_UNAVAILABLE,
+        SAFETYNET_INVALID_CLAIM
     }
 }

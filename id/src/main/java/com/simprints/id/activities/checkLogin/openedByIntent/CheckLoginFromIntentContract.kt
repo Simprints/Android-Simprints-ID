@@ -6,7 +6,6 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.checkLogin.CheckLoginContract
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 
 interface CheckLoginFromIntentContract {
@@ -25,5 +24,6 @@ interface CheckLoginFromIntentContract {
         fun setup()
         fun checkSignedInStateIfPossible()
         fun onAlertScreenReturn(alertActResponse: AlertActResponse)
+        fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse)
     }
 }

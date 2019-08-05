@@ -1,6 +1,8 @@
 package com.simprints.fingerprint.activities.alert
 
-import android.app.Activity.RESULT_CANCELED
+import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
+import com.simprints.fingerprint.activities.alert.response.AlertActResult.CloseButtonAction.*
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.ALERT
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -8,8 +10,8 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.di.FingerprintComponent
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import com.simprints.fingerprint.activities.alert.AlertActivityViewModel.ButtonAction.*
 
 class AlertPresenter(val view: AlertContract.View,
                      val component: FingerprintComponent,
@@ -20,6 +22,8 @@ class AlertPresenter(val view: AlertContract.View,
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     @Inject lateinit var sessionManager: FingerprintSessionEventsManager
     @Inject lateinit var timeHelper: FingerprintTimeHelper
+
+    private val settingsOpenedForPairing = AtomicBoolean(false)
 
     init {
         component.inject(this)
@@ -59,8 +63,34 @@ class AlertPresenter(val view: AlertContract.View,
             is None -> Unit
             is WifiSettings -> view.openWifiSettings()
             is BluetoothSettings -> view.openBluetoothSettings()
-            is TryAgain -> view.closeActivityAfterTryAgainButton()
-            is Close -> view.closeActivityAfterCloseButton()
+            is TryAgain -> view.finishWithAction(TRY_AGAIN)
+            is Close -> finishWithCloseActionExceptForLowBatteryAlert()
+            is PairScanner -> {
+                view.openBluetoothSettings()
+                settingsOpenedForPairing.set(true)
+            }
+        }
+    }
+
+    private fun finishWithCloseActionExceptForLowBatteryAlert() {
+        if (alertType == LOW_BATTERY) {
+            view.startRefusalActivity()
+        } else {
+            view.finishWithAction(CLOSE)
+        }
+    }
+
+    override fun handleBackPressed() {
+        if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
+            view.finishWithAction(BACK)
+        } else {
+            view.startRefusalActivity()
+        }
+    }
+
+    override fun handleOnResume() {
+        if(settingsOpenedForPairing.getAndSet(false)) {
+            view.finishWithAction(TRY_AGAIN)
         }
     }
 

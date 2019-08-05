@@ -1,7 +1,6 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import androidx.annotation.Keep
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 
@@ -9,7 +8,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 class ConnectivitySnapshotEvent(
     starTime: Long,
     val networkType: String,
-    val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT, starTime = starTime) {
+    val connections: List<SimNetworkUtils.Connection>) : Event(EventType.CONNECTIVITY_SNAPSHOT, startTime = starTime) {
 
     companion object {
         fun buildEvent(simNetworkUtils: SimNetworkUtils,

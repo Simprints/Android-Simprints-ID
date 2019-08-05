@@ -9,7 +9,7 @@ androidExtensions {
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
