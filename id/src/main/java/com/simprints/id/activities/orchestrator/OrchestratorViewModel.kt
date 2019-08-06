@@ -1,6 +1,7 @@
 package com.simprints.id.activities.orchestrator
 
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -9,17 +10,14 @@ import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class OrchestratorViewModel(val appRequest: AppRequest,
-                            val orchestratorManager: OrchestratorManager,
-                            val sessionEventsManager: SessionEventsManager,
-                            val syncSchedulerHelper: SyncSchedulerHelper,
-                            val timeHelper: TimeHelper) : ViewModel() {
+class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager,
+                            private val sessionEventsManager: SessionEventsManager,
+                            private val timeHelper: TimeHelper) : ViewModel() {
 
     val nextActivity = orchestratorManager.nextIntent
 
@@ -28,9 +26,9 @@ class OrchestratorViewModel(val appRequest: AppRequest,
         DomainToAppResponse.fromDomainToAppResponse(it)
     }
 
-    fun start() {
+    fun start(appRequest: AppRequest) {
         CoroutineScope(Dispatchers.Main).launch {
-            orchestratorManager.initOrchestrator(appRequest, sessionEventsManager.getCurrentSession().map { it.id }.blockingGet())
+            orchestratorManager.start(appRequest, sessionEventsManager.getCurrentSession().map { it.id }.blockingGet())
         }
     }
 
@@ -39,7 +37,8 @@ class OrchestratorViewModel(val appRequest: AppRequest,
             orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
         }
 
-    internal fun addCallbackEventInSessions(appResponse: AppResponse) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun addCallbackEventInSessions(appResponse: AppResponse) =
 
         sessionEventsManager.updateSession { session ->
 
@@ -55,10 +54,12 @@ class OrchestratorViewModel(val appRequest: AppRequest,
             }
         }
 
-    internal fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
         EnrolmentCallbackEvent(timeHelper.now(), appResponse.guid)
 
-    internal fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildIdentificationCallbackEvent(appResponse: AppIdentifyResponse) =
         with(appResponse) {
             IdentificationCallbackEvent(
                 timeHelper.now(),
@@ -68,13 +69,15 @@ class OrchestratorViewModel(val appRequest: AppRequest,
                 })
         }
 
-    internal fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildVerificationCallbackEvent(appVerifyResponse: AppVerifyResponse) =
         with(appVerifyResponse.matchingResult) {
             VerificationCallbackEvent(timeHelper.now(),
                 CallbackComparisonScore(guidFound, confidence, tier))
         }
 
-    internal fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildRefusalCallbackEvent(appRefusalResponse: AppRefusalFormResponse) =
         with(appRefusalResponse) {
             RefusalCallbackEvent(
                 timeHelper.now(),

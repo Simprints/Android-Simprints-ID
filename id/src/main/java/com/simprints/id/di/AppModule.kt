@@ -6,7 +6,6 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -75,7 +74,7 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
-@Module(subcomponents = [OrchestratorActivityComponent::class])
+@Module
 open class AppModule {
 
     @Provides

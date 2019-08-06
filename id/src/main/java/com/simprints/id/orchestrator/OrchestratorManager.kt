@@ -11,6 +11,6 @@ interface OrchestratorManager {
     val nextIntent: LiveData<ModalityFlow.Request>
     val appResponse: LiveData<AppResponse>
 
-    suspend fun initOrchestrator(appRequest: AppRequest, sessionId:String)
+    suspend fun start(appRequest: AppRequest, sessionId:String)
     suspend fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?)
 }

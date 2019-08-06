@@ -4,6 +4,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
+import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow
 import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow
 import com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
@@ -35,8 +37,8 @@ class ModalityFlowFactoryImpl(private val prefs: PreferencesManager,
         MultiModalitiesFlowBase(steps)
 
     internal fun buildFingerprintModality(appRequest: AppRequest, packageName: String) =
-        FingerprintModalityFlow(appRequest, packageName, prefs)
+        FingerprintModalityFlow(appRequest, packageName, FingerprintRequestFactoryImpl(), prefs)
 
     internal fun buildFaceModality(appRequest: AppRequest, packageName: String) =
-        FaceModalityFlow(appRequest, packageName)
+        FaceModalityFlow(appRequest, packageName, FaceRequestFactoryImpl())
 }

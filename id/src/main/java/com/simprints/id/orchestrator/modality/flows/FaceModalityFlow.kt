@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.modality.flows
 import android.app.Activity
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactory.buildFaceRequest
+import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
 import com.simprints.id.domain.moduleapi.face.requests.DomainToFaceRequest.fromDomainToFaceRequest
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.Request
@@ -14,20 +14,24 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
 class FaceModalityFlow(private val appRequest: AppRequest,
-                       private val packageName: String) : SingleModalityFlow {
+                       private val packageName: String,
+                       private val faceRequestFactory: FaceRequestFactory) : SingleModalityFlow {
 
     companion object {
         const val faceActivityClassName = "com.simprints.face.activities.FaceCaptureActivity"
         const val REQUEST_CODE_FACE = 1
     }
 
-    override val steps = listOf(Step(getModalityStepRequestForFace(), ONGOING))
+    override val steps by lazy {
+        listOf(Step(getModalityStepRequestForFace(), ONGOING))
+    }
 
     override fun getLatestOngoingStep(): Step? = steps.firstOrNull { it.status == ONGOING }
 
-    private fun getModalityStepRequestForFace(): Request {
+    internal fun getModalityStepRequestForFace(): Request {
         val intent = Intent().setClassName(packageName, faceActivityClassName)
-        intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(buildFaceRequest(appRequest)))
+        val domainFaceRequest = faceRequestFactory.buildFaceRequest(appRequest)
+        intent.putExtra(IFaceRequest.BUNDLE_KEY, fromDomainToFaceRequest(domainFaceRequest))
         return Request(REQUEST_CODE_FACE, intent)
     }
 
