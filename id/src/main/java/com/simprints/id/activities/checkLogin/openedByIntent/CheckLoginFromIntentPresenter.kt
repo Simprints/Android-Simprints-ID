@@ -57,6 +57,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     @SuppressLint("CheckResult")
     override fun setup() {
         try {
+            addInfoIntoSessionEvents()
             parseAppRequest()
             extractSessionParametersOrThrow()
             addCalloutAndConnectivityEventsInSession(appRequest)
@@ -178,7 +179,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
          *  the userId in the Intent as new signed User */
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
-        addInfoIntoSessionEventsAfterUserSignIn()
+        sessionEventsManager.updateSession {
+            it.events.apply {
+                addAuthorizationEvent(it, AUTHORIZED)
+            }
+        }
 
         view.openOrchestratorActivity(appRequest)
 
@@ -196,7 +201,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     @SuppressLint("CheckResult")
-    private fun addInfoIntoSessionEventsAfterUserSignIn() {
+    private fun addInfoIntoSessionEvents() {
         try {
             Singles.zip(
                 fetchAnalyticsId(),
@@ -219,9 +224,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
             it.databaseInfo.recordCount = peopleDbCount
-            it.events.apply {
-                addAuthorizationEvent(it, AUTHORIZED)
-            }
         }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
