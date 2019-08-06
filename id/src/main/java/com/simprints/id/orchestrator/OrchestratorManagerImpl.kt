@@ -19,11 +19,11 @@ open class OrchestratorManagerImpl(private val modality: Modality,
     internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
-    internal val modalitiesFlow by lazy {
+    private val modalitiesFlow by lazy {
         flowModalityFactory.buildModalityFlow(appRequest, modality)
     }
 
-    override suspend fun initOrchestrator(appRequest: AppRequest, sessionId: String) {
+    override suspend fun start(appRequest: AppRequest, sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
         proceedToNextIntentOrAppResponse()

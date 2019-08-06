@@ -2,10 +2,11 @@ package com.simprints.id.orchestrator.modality.flows
 
 import android.app.Activity
 import android.content.Intent
+import androidx.annotation.VisibleForTesting
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToFingerprintRequest.fromDomainToFingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory.buildFingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintToDomainResponse.fromFingerprintToDomainResponse
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.Request
 import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.Step
@@ -16,6 +17,7 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
 class FingerprintModalityFlow(private val appRequest: AppRequest,
                               private val packageName: String,
+                              private val fingerprintRequestFactory: FingerprintRequestFactory,
                               private val prefs: PreferencesManager) : SingleModalityFlow {
 
     companion object {
@@ -23,13 +25,16 @@ class FingerprintModalityFlow(private val appRequest: AppRequest,
         const val REQUEST_CODE_FINGERPRINT = 2
     }
 
-    override val steps = listOf(Step(getModalityStepRequestForFingerprint(), ONGOING))
+    override val steps by lazy {
+        listOf(Step(getModalityStepRequestForFingerprint(), ONGOING))
+    }
 
     override fun getLatestOngoingStep(): Step? = steps.firstOrNull { it.status == ONGOING }
 
-    private fun getModalityStepRequestForFingerprint(): Request {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getModalityStepRequestForFingerprint(): Request {
         val intent = Intent().setClassName(packageName, fingerprintActivityClassName)
-        val domainFingerprintRequest = buildFingerprintRequest(appRequest, prefs)
+        val domainFingerprintRequest = fingerprintRequestFactory.buildFingerprintRequest(appRequest, prefs)
         intent.putExtra(IFingerprintRequest.BUNDLE_KEY, fromDomainToFingerprintRequest(domainFingerprintRequest))
         return Request(REQUEST_CODE_FINGERPRINT, intent)
     }

@@ -1,15 +1,5 @@
 package com.simprints.id.activities.orchestrator
 
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
-import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.tools.TimeHelper
-import com.simprints.testtools.common.syntax.mock
-import dagger.Component
-import dagger.Module
-import dagger.Provides
 
 //fun mockOrchestratorDI(){
 //    OrchestratorComponentInjector.component = DaggerTestOrchestratorActivityComponent.create()
