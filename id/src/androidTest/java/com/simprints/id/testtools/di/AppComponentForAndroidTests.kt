@@ -5,10 +5,7 @@ import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
-import com.simprints.id.di.AppComponent
-import com.simprints.id.di.AppModule
-import com.simprints.id.di.PreferencesModule
-import com.simprints.id.di.SerializerModule
+import com.simprints.id.di.*
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplAndroidTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTaskAndroidTest
 import dagger.BindsInstance
@@ -27,6 +24,7 @@ interface AppComponentForAndroidTests : AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
+        fun androidModule(androidModule: AndroidModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }
