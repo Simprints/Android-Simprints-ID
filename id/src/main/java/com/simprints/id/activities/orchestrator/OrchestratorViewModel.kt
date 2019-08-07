@@ -21,7 +21,9 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
                             private val sessionEventsManager: SessionEventsManager,
                             private val timeHelper: TimeHelper) : ViewModel() {
 
-    val nextActivity = orchestratorManager.nextIntent
+    val nextActivity = Transformations.map(orchestratorManager.onGoingStep) {
+        it.request
+    }
 
     val appResponse = Transformations.map(orchestratorManager.appResponse) {
         addCallbackEventInSessions(it)

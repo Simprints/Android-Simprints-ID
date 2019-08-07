@@ -13,8 +13,15 @@ import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Compan
 abstract class BaseFingerprintStepProcessor : StepProcessor {
 
     companion object {
-        const val FINGERPRINT_REQUEST_CODE = 100
-        private const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+        const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+
+        private const val FINGERPRINT_REQUEST_CODE = 100
+        const val FINGERPRINT_ENROL_REQUEST_CODE = FINGERPRINT_REQUEST_CODE + 1
+        const val FINGERPRINT_IDENTIFY_REQUEST_CODE = FINGERPRINT_REQUEST_CODE + 2
+        const val FINGERPRINT_VERIFY_REQUEST_CODE = FINGERPRINT_REQUEST_CODE + 3
+
+        fun isFingerprintResult(requestCode: Int) =
+            listOf(FINGERPRINT_ENROL_REQUEST_CODE, FINGERPRINT_IDENTIFY_REQUEST_CODE, FINGERPRINT_VERIFY_REQUEST_CODE).contains(requestCode)
     }
 
     protected fun buildIntent(fingerprintRequest: IFingerprintRequest,

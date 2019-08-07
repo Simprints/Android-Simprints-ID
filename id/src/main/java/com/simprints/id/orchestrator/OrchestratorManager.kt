@@ -9,9 +9,9 @@ import com.simprints.id.orchestrator.steps.Step
 
 interface OrchestratorManager {
 
-    val nextIntent: LiveData<Step.Request>
+    val onGoingStep: LiveData<Step>
     val appResponse: LiveData<AppResponse>
 
-    suspend fun start(modalities: List<Modality>, appRequest: AppRequest, sessionId:String)
+    suspend fun start(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
     suspend fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?)
 }

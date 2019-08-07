@@ -16,7 +16,7 @@ class FingerprintEnrolStepProcessorImpl(private val fingerprintRequestFactory: F
                                         private val prefs: PreferencesManager,
                                         private val packageName: String) : BaseFingerprintStepProcessor(), FingerprintEnrolStepProcessor {
 
-    override val requestCode = FINGERPRINT_REQUEST_CODE + 1
+    override val requestCode = FINGERPRINT_ENROL_REQUEST_CODE
 
     override fun buildStep(enrolAppRequest: AppEnrolRequest): Step {
         val fingerprintRequest = fingerprintRequestFactory.buildFingerprintRequest(enrolAppRequest, prefs)

@@ -8,16 +8,15 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.Step.Request
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 
 open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlowFactory,
                                    private val appResponseFactory: AppResponseFactory) : OrchestratorManager {
 
-    override val nextIntent = MutableLiveData<Request>()
+    override val onGoingStep = MutableLiveData<Step>()
     override val appResponse = MutableLiveData<AppResponse>()
 
-    private lateinit var modalities: List<Modality>
+    internal lateinit var modalities: List<Modality>
     internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
@@ -52,7 +51,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
 
     private fun startStep(it: Step) {
         it.status = ONGOING
-        nextIntent.postValue(it.request)
+        onGoingStep.postValue(it)
     }
 
     private fun ModalityFlow.anyStepOnGoing() =
