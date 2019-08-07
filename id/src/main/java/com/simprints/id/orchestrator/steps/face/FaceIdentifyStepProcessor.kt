@@ -14,7 +14,7 @@ interface FaceIdentifyStepProcessor : StepProcessor {
 class FaceIdentifyStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory,
                                     private val packageName: String) : BaseFaceStepProcessor(), FaceIdentifyStepProcessor {
 
-    override val requestCode = FACE_REQUEST_CODE + 3
+    override val requestCode = FACE_IDENTIFY_REQUEST_CODE
 
     override fun buildStep(identifyRequest: AppIdentifyRequest): Step {
         val faceRequest = faceRequestFactory.buildFaceRequest(identifyRequest)

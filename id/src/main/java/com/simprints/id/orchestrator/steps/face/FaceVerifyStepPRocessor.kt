@@ -14,7 +14,7 @@ interface FaceVerifyStepProcessor : StepProcessor {
 class FaceVerifyStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory,
                                   private val packageName: String) : BaseFaceStepProcessor(), FaceVerifyStepProcessor {
 
-    override val requestCode = FACE_REQUEST_CODE + 2
+    override val requestCode = FACE_VERIFY_REQUEST_CODE
 
     override fun buildStep(verifyRequest: AppVerifyRequest): Step {
         val faceRequest = faceRequestFactory.buildFaceRequest(verifyRequest)

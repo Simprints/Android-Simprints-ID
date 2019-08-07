@@ -16,7 +16,7 @@ class FingerprintVerifyStepProcessorImpl(private val fingerprintRequestFactory: 
                                          private val prefs: PreferencesManager,
                                          private val packageName: String) : BaseFingerprintStepProcessor(), FingerprintVerifyStepProcessor {
 
-    override val requestCode = FINGERPRINT_REQUEST_CODE + 3
+    override val requestCode = FINGERPRINT_VERIFY_REQUEST_CODE
 
     override fun buildStep(verifyRequest: AppVerifyRequest): Step {
         val fingerprintRequest = fingerprintRequestFactory.buildFingerprintRequest(verifyRequest, prefs)

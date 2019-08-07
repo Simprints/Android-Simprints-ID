@@ -13,8 +13,15 @@ import com.simprints.moduleapi.face.responses.IFaceResponse.Companion.BUNDLE_KEY
 abstract class BaseFaceStepProcessor : StepProcessor {
 
     companion object {
-        const val FACE_REQUEST_CODE = 200
-        private const val ACTIVITY_CLASS_NAME = "com.simprints.face.activities.FaceCaptureActivity"
+        const val ACTIVITY_CLASS_NAME = "com.simprints.face.activities.FaceCaptureActivity"
+
+        private const val FACE_REQUEST_CODE = 200
+        const val FACE_ENROL_REQUEST_CODE = FACE_REQUEST_CODE + 1
+        const val FACE_IDENTIFY_REQUEST_CODE = FACE_REQUEST_CODE + 2
+        const val FACE_VERIFY_REQUEST_CODE = FACE_REQUEST_CODE + 3
+
+        fun isFaceResult(requestCode: Int) =
+            listOf(FACE_ENROL_REQUEST_CODE, FACE_IDENTIFY_REQUEST_CODE, FACE_VERIFY_REQUEST_CODE).contains(requestCode)
     }
 
     protected fun buildIntent(faceRequest: IFaceRequest,

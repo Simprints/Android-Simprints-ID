@@ -6,8 +6,8 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.canProcessRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceIdentifyStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.BaseFingerprintStepProcessor.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintIdentifyStepProcessor
 
 
@@ -35,7 +35,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintIdentifyStepProcessor: Fin
 
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = if (fingerprintIdentifyStepProcessor.canProcessRequestCode(requestCode)) {
+        val result = if (isFingerprintResult(requestCode)) {
             fingerprintIdentifyStepProcessor.processResult(requestCode, resultCode, data)
         } else {
             faceIdentifyStepProcessor.processResult(requestCode, resultCode, data)

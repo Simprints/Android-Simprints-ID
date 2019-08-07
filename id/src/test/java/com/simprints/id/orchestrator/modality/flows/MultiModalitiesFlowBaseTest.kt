@@ -3,7 +3,6 @@ package com.simprints.id.orchestrator.modality.flows
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever

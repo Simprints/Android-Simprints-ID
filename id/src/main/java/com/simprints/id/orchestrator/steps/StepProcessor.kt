@@ -9,5 +9,3 @@ interface StepProcessor {
 
     fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Result?
 }
-
-fun StepProcessor.canProcessRequestCode(receivedRequestCode: Int) = receivedRequestCode == requestCode

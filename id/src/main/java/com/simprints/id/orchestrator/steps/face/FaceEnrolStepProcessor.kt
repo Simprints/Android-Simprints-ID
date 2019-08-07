@@ -14,7 +14,7 @@ interface FaceEnrolStepProcessor : StepProcessor {
 class FaceEnrolStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory,
                                  private val packageName: String) : BaseFaceStepProcessor(), FaceEnrolStepProcessor {
 
-    override val requestCode = FACE_REQUEST_CODE + 1
+    override val requestCode = FACE_ENROL_REQUEST_CODE
 
     override fun buildStep(enrolRequest: AppEnrolRequest): Step {
         val faceRequest = faceRequestFactory.buildFaceRequest(enrolRequest)
