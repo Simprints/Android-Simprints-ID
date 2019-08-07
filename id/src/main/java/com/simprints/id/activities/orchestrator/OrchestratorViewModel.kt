@@ -6,6 +6,7 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager,
+                            private val preferencesManager: PreferencesManager,
                             private val sessionEventsManager: SessionEventsManager,
                             private val timeHelper: TimeHelper) : ViewModel() {
 
@@ -28,7 +30,10 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
 
     fun start(appRequest: AppRequest) {
         CoroutineScope(Dispatchers.Main).launch {
-            orchestratorManager.start(appRequest, sessionEventsManager.getCurrentSession().map { it.id }.blockingGet())
+            orchestratorManager.start(
+                preferencesManager.modalities,
+                appRequest,
+                sessionEventsManager.getCurrentSession().map { it.id }.blockingGet())
         }
     }
 

@@ -10,15 +10,17 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
+import com.simprints.id.orchestrator.Step
 
 class AppResponseBuilderForFinger : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
-                               modalityRespons: List<ModalityFlow.Result>,
+                               steps: List<Step>,
                                sessionId: String): AppResponse {
 
-        val fingerResponse = modalityRespons.first()
+        val results = steps.map { it.result }
+        val fingerResponse = results.first()
+
         if (fingerResponse is FingerprintRefusalFormResponse)
             return buildAppRefusalFormResponse(fingerResponse)
 

@@ -13,15 +13,17 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.toAppMatchResult
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
+import com.simprints.id.orchestrator.Step
 
 class AppResponseBuilderForFace : AppResponseBuilderForModal {
 
     override fun buildResponse(appRequest: AppRequest,
-                               modalityRespons: List<ModalityFlow.Result>,
+                               steps: List<Step>,
                                sessionId: String): AppResponse {
 
-        val faceResponse = modalityRespons.first()
+        val results = steps.map { it.result }
+        val faceResponse = results.first()
+
         return when (appRequest) {
             is AppEnrolRequest -> buildAppEnrolResponse(faceResponse as FaceEnrolResponse)
             is AppIdentifyRequest -> {

@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.modality
 
 import com.simprints.id.domain.modality.Modality.*
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
 import com.simprints.testtools.common.syntax.*
 import org.junit.Test
 
@@ -16,7 +17,7 @@ class ModalityFlowBuilderImplTest {
         val app = mock<AppRequest>()
         val modalityFlowFactorySpy = spy(ModalityFlowFactoryImpl(mock(), packageName))
 
-        modalityFlowFactorySpy.buildModalityFlow(app, FACE)
+        modalityFlowFactorySpy.startModalityFlow(app, FACE)
 
         verifyOnce(modalityFlowFactorySpy) { buildFaceModality(anyNotNull(), anyNotNull()) }
         verifyNever(modalityFlowFactorySpy) { buildFingerprintModality(anyNotNull(), anyNotNull()) }
@@ -28,7 +29,7 @@ class ModalityFlowBuilderImplTest {
         val app = mock<AppRequest>()
         val modalityFlowFactorySpy = spy(ModalityFlowFactoryImpl(mock(), packageName))
 
-         modalityFlowFactorySpy.buildModalityFlow(app, FINGER)
+         modalityFlowFactorySpy.startModalityFlow(app, FINGER)
 
         verifyOnce(modalityFlowFactorySpy) { buildFingerprintModality(anyNotNull(), anyNotNull()) }
         verifyNever(modalityFlowFactorySpy) { buildFaceModality(anyNotNull(), anyNotNull()) }
@@ -39,7 +40,7 @@ class ModalityFlowBuilderImplTest {
         val app = mock<AppRequest>()
         val modalityFlowFactorySpy = spy(ModalityFlowFactoryImpl(mock(), packageName))
 
-         modalityFlowFactorySpy.buildModalityFlow(app, FACE_FINGER)
+         modalityFlowFactorySpy.startModalityFlow(app, FACE_FINGER)
 
         verifyOnce(modalityFlowFactorySpy) { buildFaceModality(anyNotNull(), anyNotNull()) }
         verifyOnce(modalityFlowFactorySpy) { buildFingerprintModality(anyNotNull(), anyNotNull()) }
@@ -50,7 +51,7 @@ class ModalityFlowBuilderImplTest {
         val app = mock<AppRequest>()
         val modalityFlowFactorySpy = spy(ModalityFlowFactoryImpl(mock(), packageName))
 
-         modalityFlowFactorySpy.buildModalityFlow(app, FINGER_FACE)
+         modalityFlowFactorySpy.startModalityFlow(app, FINGER_FACE)
 
         verifyOnce(modalityFlowFactorySpy) { buildFaceModality(anyNotNull(), anyNotNull()) }
         verifyOnce(modalityFlowFactorySpy) { buildFingerprintModality(anyNotNull(), anyNotNull()) }

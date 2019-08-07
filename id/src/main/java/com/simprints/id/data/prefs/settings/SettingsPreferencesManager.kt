@@ -25,7 +25,7 @@ interface SettingsPreferencesManager {
 
     var logoExists: Boolean
 
-    var modality: Modality
+    var modalities: List<Modality>
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 
     fun getRemoteConfigStringPreference(key: String): String
