@@ -20,8 +20,7 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
+import com.simprints.id.orchestrator.builders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow
 import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow.Companion.REQUEST_CODE_FACE
 import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow.Companion.faceActivityClassName
@@ -144,7 +143,7 @@ class OrchestratorManagerImplTest {
                     whenever(this) { buildFingerprintRequest(anyNotNull(), anyNotNull()) } thenReturn fingerprintEnrolRequest
                 }, mock()))
         }.let { modalities ->
-            whenever(modalityFlowFactoryMock) { buildModalityFlow(anyNotNull(), anyNotNull()) } thenReturn MultiModalitiesFlowBase(modalities)
+            whenever(modalityFlowFactoryMock) { startModalityFlow(anyNotNull(), anyNotNull()) } thenReturn MultiModalitiesFlowBase(modalities)
         }
 
         return OrchestratorManagerImpl(modality, modalityFlowFactoryMock, AppResponseFactoryImpl())
