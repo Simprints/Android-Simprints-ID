@@ -1,8 +1,8 @@
-package com.simprints.id.orchestrator.modality.builders
+package com.simprints.id.orchestrator.builders
 
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.Step
+import com.simprints.id.orchestrator.steps.Step
 
 interface AppResponseBuilderForModal {
 
