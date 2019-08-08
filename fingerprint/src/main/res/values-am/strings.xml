@@ -84,4 +84,15 @@
     <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
     <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
     <string name="why_did_you_skip_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
+    <string name="bluetooth_error_pair_scanner_and_device_title">እስካነርና ስልኩን ያጣምሩ</string>
+    <string name="consent_enrol">እርስዎን %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራዎትን መጠቀም እፈልጋለሁ:&#160;</string>
+    <string name="consent_parental_enrol">እርስዎን ልጅ %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራውን መጠቀም እፈልጋለሁ:&#160;</string>
+    <string name="consent_parental_id_verify">የእርስዎን ልጅበሚመለከት %1$s ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራውን  መጠቀም እፈልጋለሁ:&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s ሲምፕሪንት ከተባለው ድርጅት ጋር የጣት አሻራ መረጃ እና አሁን ስላሉበት አድራሻ መረጃ የማግኘት ፈቃድ አለዎት:&#160;</string>
+    <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:&#160;</string>
+    <string name="consent_parental_confirmation">ልጁን የጣት አሻራ መጠቀም እችላለሁ? እባክዎትን እስማማለሁ፣ አልስማማም፣ ጥያቄ አለኝ በማለት ይመልሱ:</string>
+    <string name="consent_id_verify">እርስዎን በሚመለከት %1$s ት ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራዎትን መጠቀም እፈልጋለሁ:&#160;</string>
+    <string name="consent_share_data_yes">%1$s ሲምፕሪንት የተባለው ድርጅት ስለእርስዎ የጣት አሻራ እና አድራሻዎ መረጃ ይኖኖራቸዋል:&#160;</string>
+    <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:&#160;</string>
+    <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ:</string>
 </resources>
