@@ -1,8 +1,11 @@
 package com.simprints.id.di
 
+import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
+import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse
@@ -80,10 +83,15 @@ class AndroidModule {
         OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory)
 
     @Provides
+    fun provideOrchestratorEventsHelper(sessionEventsManager: SessionEventsManager,
+                                        timeHelper: TimeHelper): OrchestratorEventsHelper =
+        OrchestratorEventsHelperImpl(sessionEventsManager, timeHelper)
+
+    @Provides
     fun provideOrchestratorViewModelFactory(orchestratorManager: OrchestratorManager,
+                                            orchestratorEventsHelper: OrchestratorEventsHelper,
                                             preferenceManager: PreferencesManager,
-                                            sessionEventsManager: SessionEventsManager,
-                                            timeHelper: TimeHelper) =
-        OrchestratorViewModelFactory(orchestratorManager, preferenceManager, sessionEventsManager, timeHelper)
+                                            sessionEventsManager: SessionEventsManager) =
+        OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager, sessionEventsManager, DomainToModuleApiAppResponse)
 
 }

@@ -10,7 +10,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.requests.IFaceVerifyRequest
 import kotlinx.android.parcel.Parcelize
 
-object ModuleApiToDomainFaceRequest {
+object DomainToModuleApiFaceRequest {
 
     fun fromDomainToModuleApiFaceRequest(faceRequest: FaceRequest): IFaceRequest =
         when (faceRequest) {
