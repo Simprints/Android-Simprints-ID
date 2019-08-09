@@ -34,7 +34,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
         proceedToNextIntentOrAppResponse()
     }
 
-    override suspend fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
+    override suspend fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(requestCode, resultCode, data)
         proceedToNextIntentOrAppResponse()
     }

@@ -21,5 +21,7 @@ interface FingerprintStepProcessor {
                         metadata: String,
                         verifyGuid: String): Step
 
-    fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result?
+    fun processResult(requestCode: Int,
+                      resultCode: Int,
+                      data: Intent?): Step.Result?
 }
