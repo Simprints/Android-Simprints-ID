@@ -10,22 +10,22 @@ import com.simprints.moduleapi.app.responses.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
-object DomainToAppResponse {
+object DomainToModuleApiAppResponse {
 
-    fun fromDomainToAppResponse(response: AppResponse): IAppResponse =
+    fun fromDomainModuleApiAppResponse(response: AppResponse): IAppResponse =
         when (response.type) {
-            ENROL -> fromDomainToAppEnrolResponse(response as AppEnrolResponse)
-            IDENTIFY -> fromDomainToAppIdentifyResponse(response as AppIdentifyResponse)
-            REFUSAL -> fromDomainToAppRefusalFormResponse(response as AppRefusalFormResponse)
-            VERIFY -> fromDomainToAppVerifyResponse(response as AppVerifyResponse)
-            CONFIRMATION -> fromDomainToAppIdentityConfirmationResponse(response as AppConfirmationResponse)
-            ERROR -> fromDomainToAppErrorResponse(response as AppErrorResponse)
+            ENROL -> fromDomainToModuleApiAppEnrolResponse(response as AppEnrolResponse)
+            IDENTIFY -> fromDomainToModuleApiAppIdentifyResponse(response as AppIdentifyResponse)
+            REFUSAL -> fromDomainToModuleApiAppRefusalFormResponse(response as AppRefusalFormResponse)
+            VERIFY -> fromDomainToModuleApiAppVerifyResponse(response as AppVerifyResponse)
+            CONFIRMATION -> fromDomainToModuleApiAppIdentityConfirmationResponse(response as AppConfirmationResponse)
+            ERROR -> fromDomainToModuleApiAppErrorResponse(response as AppErrorResponse)
         }
 
-    fun fromDomainToAppErrorResponse(response: AppErrorResponse): IAppErrorResponse =
-        IAppErrorResponseImpl(fromDomainToAppErrorReason(response.reason))
+    fun fromDomainToModuleApiAppErrorResponse(response: AppErrorResponse): IAppErrorResponse =
+        IAppErrorResponseImpl(fromDomainToModuleApiAppErrorReason(response.reason))
 
-    private fun fromDomainToAppErrorReason(reason: AppErrorResponse.Reason): IAppErrorReason =
+    private fun fromDomainToModuleApiAppErrorReason(reason: AppErrorResponse.Reason): IAppErrorReason =
         when (reason) {
             DIFFERENT_PROJECT_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_PROJECT_ID_SIGNED_IN
             DIFFERENT_USER_ID_SIGNED_IN -> IAppErrorReason.DIFFERENT_USER_ID_SIGNED_IN
@@ -35,23 +35,23 @@ object DomainToAppResponse {
             LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
         }
 
-    private fun fromDomainToAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
+    private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
 
-    private fun fromDomainToAppVerifyResponse(verify: AppVerifyResponse): IAppVerifyResponse =
+    private fun fromDomainToModuleApiAppVerifyResponse(verify: AppVerifyResponse): IAppVerifyResponse =
         with(verify.matchingResult) {
             IAppVerifyResponseImpl(IAppMatchResultImpl(guidFound, confidence, fromDomainToAppIAppResponseTier(tier)))
         }
 
-    private fun fromDomainToAppIdentifyResponse(identify: AppIdentifyResponse): IAppIdentifyResponse =
-        IAppIdentifyResponseImpl(identify.identifications.map { fromDomainToAppMatchResult(it) }, identify.sessionId)
+    private fun fromDomainToModuleApiAppIdentifyResponse(identify: AppIdentifyResponse): IAppIdentifyResponse =
+        IAppIdentifyResponseImpl(identify.identifications.map { fromDomainToModuleApiAppMatchResult(it) }, identify.sessionId)
 
-    private fun fromDomainToAppRefusalFormResponse(refusaResponse: AppRefusalFormResponse): IAppRefusalFormResponse =
+    private fun fromDomainToModuleApiAppRefusalFormResponse(refusaResponse: AppRefusalFormResponse): IAppRefusalFormResponse =
         IAppRefusalFormResponseImpl(refusaResponse.answer.reason.toString(), refusaResponse.answer.optionalText)
 
-    private fun fromDomainToAppMatchResult(result: MatchResult): IAppMatchResult =
+    private fun fromDomainToModuleApiAppMatchResult(result: MatchResult): IAppMatchResult =
         IAppMatchResultImpl(result.guidFound, result.confidence, fromDomainToAppIAppResponseTier(result.tier))
 
-    private fun fromDomainToAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
+    private fun fromDomainToModuleApiAppIdentityConfirmationResponse(response: AppConfirmationResponse) =
         IAppConfirmationResponseImpl(response.identificationOutcome)
 
     private fun fromDomainToAppIAppResponseTier(tier: Tier): IAppResponseTier =
