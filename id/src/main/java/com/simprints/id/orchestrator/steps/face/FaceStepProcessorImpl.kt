@@ -1,5 +1,4 @@
 package com.simprints.id.orchestrator.steps.face
-
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse
@@ -7,14 +6,6 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-
-interface FaceStepProcessor {
-
-    fun buildStepEnrol(projectId: String, userId: String, moduleId: String): Step
-    fun buildStepIdentify(projectId: String, userId: String, moduleId: String): Step
-    fun buildStepVerify(projectId: String, userId: String, moduleId: String): Step
-    fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result?
-}
 
 class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory,
                             private val converterModuleApiToDomain: ModuleApiToDomainFaceResponse) : FaceStepProcessor {
@@ -58,7 +49,7 @@ class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory,
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result? =
         if (isFaceResult(requestCode)) {
             data?.getParcelableExtra<IFaceResponse>(IFaceResponse.BUNDLE_KEY)?.let {
-                converterModuleApiToDomain.fromModuleApiToDomain(it)
+                converterModuleApiToDomain.fromModuleApiToDomainFaceResponse(it)
             }
         } else {
             null
