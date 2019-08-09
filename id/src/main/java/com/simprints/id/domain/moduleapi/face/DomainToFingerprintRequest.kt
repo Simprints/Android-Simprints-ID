@@ -1,32 +1,36 @@
-package com.simprints.id.domain.moduleapi.face.requests
+package com.simprints.id.domain.moduleapi.face
 
+import com.simprints.id.domain.moduleapi.face.requests.FaceEnrolRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
 import com.simprints.moduleapi.face.requests.IFaceEnrolRequest
 import com.simprints.moduleapi.face.requests.IFaceIdentifyRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.requests.IFaceVerifyRequest
 import kotlinx.android.parcel.Parcelize
 
-object DomainToFaceRequest {
+object ModuleApiToDomainFaceRequest {
 
-    fun fromDomainToFaceRequest(faceRequest: FaceRequest): IFaceRequest =
+    fun fromDomainToModuleApiFaceRequest(faceRequest: FaceRequest): IFaceRequest =
         when (faceRequest) {
-            is FaceEnrolRequest -> fromDomainToFaceEnrolRequest(faceRequest)
-            is FaceVerifyRequest -> fromDomainToFaceVerifyRequest(faceRequest)
-            is FaceIdentifyRequest -> fromDomainToFaceIdentifyRequest(faceRequest)
+            is FaceEnrolRequest -> fromDomainToModuleApiFaceEnrolRequest(faceRequest)
+            is FaceVerifyRequest -> fromDomainToModuleApiFaceVerifyRequest(faceRequest)
+            is FaceIdentifyRequest -> fromDomainToModuleApiFaceIdentifyRequest(faceRequest)
             else -> throw IllegalStateException("Invalid face request")
         }
 
-    private fun fromDomainToFaceEnrolRequest(enrolRequest: FaceEnrolRequest): IFaceEnrolRequest =
+    private fun fromDomainToModuleApiFaceEnrolRequest(enrolRequest: FaceEnrolRequest): IFaceEnrolRequest =
         with(enrolRequest) {
             FaceEnrolRequestImpl(projectId, userId, moduleId)
         }
 
-    private fun fromDomainToFaceVerifyRequest(verifyRequest: FaceVerifyRequest): IFaceVerifyRequest =
+    private fun fromDomainToModuleApiFaceVerifyRequest(verifyRequest: FaceVerifyRequest): IFaceVerifyRequest =
         with(verifyRequest) {
             FaceVerifyRequestImpl(projectId, userId, moduleId)
         }
 
-    private fun fromDomainToFaceIdentifyRequest(identifyRequest: FaceIdentifyRequest): IFaceIdentifyRequest =
+    private fun fromDomainToModuleApiFaceIdentifyRequest(identifyRequest: FaceIdentifyRequest): IFaceIdentifyRequest =
 
         with(identifyRequest) {
             FaceIdentifyRequestImpl(projectId, userId, moduleId)

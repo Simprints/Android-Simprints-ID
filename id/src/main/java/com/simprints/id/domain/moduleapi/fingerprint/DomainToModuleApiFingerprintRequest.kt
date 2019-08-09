@@ -10,17 +10,17 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.Fingerpri
 import com.simprints.moduleapi.fingerprint.requests.*
 import kotlinx.android.parcel.Parcelize
 
-object DomainToFingerprintRequest {
+object DomainToModuleApiFingerprintRequest {
 
-    fun fromDomainToFingerprintRequest(fingerprintRequest: FingerprintRequest): IFingerprintRequest =
+    fun fromDomainToModuleApiFingerprintRequest(fingerprintRequest: FingerprintRequest): IFingerprintRequest =
         when (fingerprintRequest) {
-            is FingerprintEnrolRequest -> fromDomainToFingerprintEnrolRequest(fingerprintRequest)
-            is FingerprintVerifyRequest -> fromDomainToFingerprintVerifyRequest(fingerprintRequest)
-            is FingerprintIdentifyRequest -> fromDomainToFingerprintIdentifyRequest(fingerprintRequest)
+            is FingerprintEnrolRequest -> fromDomainToModuleApiFingerprintEnrolRequest(fingerprintRequest)
+            is FingerprintVerifyRequest -> fromDomainToModuleApiFingerprintVerifyRequest(fingerprintRequest)
+            is FingerprintIdentifyRequest -> fromDomainToModuleApiFingerprintIdentifyRequest(fingerprintRequest)
             else -> throw IllegalStateException("Invalid fingerprint request")
         }
 
-    private fun fromDomainToFingerprintEnrolRequest(enrolRequest: FingerprintEnrolRequest): IFingerprintEnrolRequest =
+    private fun fromDomainToModuleApiFingerprintEnrolRequest(enrolRequest: FingerprintEnrolRequest): IFingerprintEnrolRequest =
         with(enrolRequest) {
             FingerprintEnrolRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
@@ -29,7 +29,7 @@ object DomainToFingerprintRequest {
                 programName)
         }
 
-    private fun fromDomainToFingerprintVerifyRequest(verifyRequest: FingerprintVerifyRequest): IFingerprintVerifyRequest =
+    private fun fromDomainToModuleApiFingerprintVerifyRequest(verifyRequest: FingerprintVerifyRequest): IFingerprintVerifyRequest =
         with(verifyRequest) {
             FingerprintVerifyRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
@@ -39,7 +39,7 @@ object DomainToFingerprintRequest {
                 verifyGuid)
         }
 
-    private fun fromDomainToFingerprintIdentifyRequest(identifyRequest: FingerprintIdentifyRequest): IFingerprintIdentifyRequest =
+    private fun fromDomainToModuleApiFingerprintIdentifyRequest(identifyRequest: FingerprintIdentifyRequest): IFingerprintIdentifyRequest =
 
         with(identifyRequest) {
             FingerprintIdentifyRequestImpl(

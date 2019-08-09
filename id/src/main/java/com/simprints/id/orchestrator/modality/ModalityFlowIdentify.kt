@@ -4,15 +4,14 @@ import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.face.FaceIdentifyStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.BaseFingerprintStepProcessor.Companion.isFingerprintResult
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintIdentifyStepProcessor
 
-
-class ModalityFlowIdentifyImpl(private val fingerprintIdentifyStepProcessor: FingerprintIdentifyStepProcessor,
-                               private val faceIdentifyStepProcessor: FaceIdentifyStepProcessor) : ModalityFlow {
+class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
+                               private val faceStepProcessor: FaceStepProcessor) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -24,9 +23,11 @@ class ModalityFlowIdentifyImpl(private val fingerprintIdentifyStepProcessor: Fin
 
     private fun buildStepsList(appRequest: AppIdentifyRequest, modalities: List<Modality>) =
         modalities.map {
-            when (it) {
-                Modality.FINGER -> fingerprintIdentifyStepProcessor.buildStep(appRequest)
-                Modality.FACE -> faceIdentifyStepProcessor.buildStep(appRequest)
+            with(appRequest) {
+                when (it) {
+                    Modality.FINGER -> fingerprintStepProcessor.buildStepIdentify(projectId, userId, moduleId, metadata)
+                    Modality.FACE -> faceStepProcessor.buildStepIdentify(projectId, userId, moduleId)
+                }
             }
         }
 
@@ -36,12 +37,12 @@ class ModalityFlowIdentifyImpl(private val fingerprintIdentifyStepProcessor: Fin
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = if (isFingerprintResult(requestCode)) {
-            fingerprintIdentifyStepProcessor.processResult(requestCode, resultCode, data)
+            fingerprintStepProcessor.processResult(requestCode, resultCode, data)
         } else {
-            faceIdentifyStepProcessor.processResult(requestCode, resultCode, data)
+            faceStepProcessor.processResult(requestCode, resultCode, data)
         }
 
-        val stepForRequest = steps.firstOrNull { it.request.requestCode == requestCode }
+        val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         stepForRequest?.result = result
     }
 }

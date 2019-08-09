@@ -36,7 +36,10 @@ class OrchestratorActivity : AppCompatActivity() {
             ?: throw InvalidAppRequest()
 
         vm.nextActivity.observe(this, Observer {
-            startActivityForResult(it.intent, it.requestCode)
+            with(Intent().setClassName(packageName, it.activityName)) {
+                putExtra(it.bundleKey, it.request)
+                startActivityForResult(this, it.requestCode)
+            }
         })
 
         vm.appResponse.observe(this, Observer {
