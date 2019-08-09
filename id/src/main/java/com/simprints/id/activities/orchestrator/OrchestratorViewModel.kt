@@ -18,7 +18,7 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
                             private val sessionEventsManager: SessionEventsManager,
                             private val domainToModuleApiConverter: DomainToModuleApiAppResponse) : ViewModel() {
 
-    val nextActivity = orchestratorManager.onGoingStep
+    val onGoingStep = orchestratorManager.onGoingStep
 
     val appResponse = Transformations.map(orchestratorManager.appResponse) {
         orchestratorEventsHelper.addCallbackEventInSessions(it)
@@ -36,6 +36,6 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
 
     fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) =
         CoroutineScope(Dispatchers.Main).launch {
-            orchestratorManager.onModalStepRequestDone(requestCode, resultCode, data)
+            orchestratorManager.handleIntentResult(requestCode, resultCode, data)
         }
 }

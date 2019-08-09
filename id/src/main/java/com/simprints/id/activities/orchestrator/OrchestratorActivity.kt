@@ -36,7 +36,7 @@ class OrchestratorActivity : AppCompatActivity() {
         appRequest = this.intent.extras?.getParcelable<AppRequest>(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
-        vm.nextActivity.observe(this, Observer {
+        vm.onGoingStep.observe(this, Observer {
             with(Intent().setClassName(packageName, it.activityName)) {
                 putExtra(it.bundleKey, it.request.fromDomainToModuleApi())
                 startActivityForResult(this, it.requestCode)

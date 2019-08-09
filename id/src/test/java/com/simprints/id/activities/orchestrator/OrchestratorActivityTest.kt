@@ -36,7 +36,7 @@ import org.koin.core.context.stopKoin
 //        const val REQUEST_CODE_NEXT_ACTIVITY = 1
 //    }
 //
-//    private val nextActivity = Intent().apply { action = NEXT_ACTIVITY_ACTION }
+//    private val onGoingStep = Intent().apply { action = NEXT_ACTIVITY_ACTION }
 //    private val returnNextActivity = Intent()
 //
 //    private lateinit var activityScenario: ActivityScenario<OrchestratorActivity>
@@ -93,7 +93,7 @@ import org.koin.core.context.stopKoin
 //
 //    private fun mockResultForNextActivity() {
 //        Intents.init()
-//        intending(hasAction(nextActivity.action)).respondWith(ActivityResult(RESULT_OK, returnNextActivity))
+//        intending(hasAction(onGoingStep.action)).respondWith(ActivityResult(RESULT_OK, returnNextActivity))
 //    }
 //
 //    private fun createScenarioForOrchestratorActivity(): ActivityScenario<OrchestratorActivity> =
@@ -104,7 +104,7 @@ import org.koin.core.context.stopKoin
 //        })
 //
 //    private fun startNextActivity(activity: OrchestratorActivity) {
-//        activity.startNextActivity(REQUEST_CODE_NEXT_ACTIVITY, nextActivity)
+//        activity.startNextActivity(REQUEST_CODE_NEXT_ACTIVITY, onGoingStep)
 //    }
 //
 //    private fun verifyPresenterReceivesTheResultFromNextActivity(viewPresenter: OrchestratorContract.Presenter) {

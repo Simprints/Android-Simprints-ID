@@ -89,7 +89,7 @@ class OrchestratorViewModelTest {
             vm.onModalStepRequestDone(REQUEST_CODE, Activity.RESULT_OK, null)
             verifyOnce(orchestratorManagerMock) {
                 runBlocking {
-                    onModalStepRequestDone(REQUEST_CODE, Activity.RESULT_OK, null)
+                    handleIntentResult(REQUEST_CODE, Activity.RESULT_OK, null)
                 }
             }
         }

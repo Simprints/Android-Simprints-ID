@@ -155,7 +155,7 @@ class OrchestratorManagerImplTest {
             mockSteps.firstOrNull { it.status == ONGOING }?.result = fromModuleApiToDomainFaceResponse(response)
         }
 
-        onModalStepRequestDone(
+        handleIntentResult(
             requestCode,
             Activity.RESULT_OK,
             Intent().putExtra(FACE_BUNDLE_KEY, response))
