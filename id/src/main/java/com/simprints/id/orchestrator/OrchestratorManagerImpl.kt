@@ -5,27 +5,32 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
-import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow.Request
+import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 
-open class OrchestratorManagerImpl(private val modality: Modality,
-                                   private val flowModalityFactory: ModalityFlowFactory,
+open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlowFactory,
                                    private val appResponseFactory: AppResponseFactory) : OrchestratorManager {
 
-    override val nextIntent = MutableLiveData<Request>()
+    override val onGoingStep = MutableLiveData<Step>()
     override val appResponse = MutableLiveData<AppResponse>()
 
+    internal lateinit var modalities: List<Modality>
     internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
     private val modalitiesFlow by lazy {
-        flowModalityFactory.buildModalityFlow(appRequest, modality)
+        flowModalityFactory.startModalityFlow(appRequest, modalities)
     }
 
-    override suspend fun start(appRequest: AppRequest, sessionId: String) {
+    override suspend fun start(modalities: List<Modality>,
+                               appRequest: AppRequest,
+                               sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
+        this.modalities = modalities
+
         proceedToNextIntentOrAppResponse()
     }
 
@@ -35,14 +40,25 @@ open class OrchestratorManagerImpl(private val modality: Modality,
     }
 
     private fun proceedToNextIntentOrAppResponse() {
-        modalitiesFlow.getLatestOngoingStep()?.request?.let {
-            nextIntent.postValue(it)
-        } ?: appResponse.postValue(buildAppResponse())
+        with(modalitiesFlow) {
+            if (!anyStepOnGoing()) {
+                getNextStepToStart()?.let {
+                    startStep(it)
+                } ?: buildAppResponse()
+            }
+        }
     }
 
-    private fun buildAppResponse(): AppResponse {
-        val results = modalitiesFlow.steps.mapNotNull { it.result }
-        return appResponseFactory.buildAppResponse(modality, appRequest, results, sessionId)
+    private fun startStep(it: Step) {
+        it.status = ONGOING
+        onGoingStep.postValue(it)
     }
 
+    private fun ModalityFlow.anyStepOnGoing() =
+        steps.firstOrNull { it.status == ONGOING } != null
+
+    private fun buildAppResponse() {
+        val appResponseToReturn = appResponseFactory.buildAppResponse(modalities, appRequest, modalitiesFlow.steps, sessionId)
+        appResponse.postValue(appResponseToReturn)
+    }
 }

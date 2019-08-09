@@ -58,7 +58,7 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
-                                               @Named("ModalSerializer") modalitySerializer: Serializer<Modality>,
+                                               @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
                                                @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
                                                @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                                @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
@@ -66,7 +66,7 @@ open class PreferencesModule {
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
             groupSerializer,
-            modalitySerializer,
+            modalitiesSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer)

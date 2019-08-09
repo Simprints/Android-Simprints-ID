@@ -8,11 +8,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
-import com.simprints.moduleapi.app.requests.IAppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDLE_KEY as APP_REQUEST_BUNDLE_KEY
 import com.simprints.moduleapi.app.responses.IAppResponse.Companion.BUNDLE_KEY as APP_RESPONSE_BUNDLE_KEY
 
 class OrchestratorActivity : AppCompatActivity() {
@@ -36,7 +37,10 @@ class OrchestratorActivity : AppCompatActivity() {
             ?: throw InvalidAppRequest()
 
         vm.nextActivity.observe(this, Observer {
-            startActivityForResult(it.intent, it.requestCode)
+            with(Intent().setClassName(packageName, it.activityName)) {
+                putExtra(it.bundleKey, it.request.fromDomainToModuleApi())
+                startActivityForResult(this, it.requestCode)
+            }
         })
 
         vm.appResponse.observe(this, Observer {
