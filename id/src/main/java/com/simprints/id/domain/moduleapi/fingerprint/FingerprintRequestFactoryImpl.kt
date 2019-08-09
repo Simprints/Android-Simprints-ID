@@ -4,65 +4,66 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.FingerIdentifier.*
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
 
 
-class FingerprintRequestFactoryImpl: FingerprintRequestFactory {
+class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
 
-    override fun buildFingerprintRequest(appRequest: AppRequest, prefs: PreferencesManager): FingerprintRequest =
-        when (appRequest) {
-            is AppEnrolRequest -> buildFingerprintEnrolRequest(appRequest, prefs)
-            is AppVerifyRequest -> buildFingerprintVerifyRequest(appRequest, prefs)
-            is AppIdentifyRequest -> buildFingerprintIdentifyRequest(appRequest, prefs)
-            else -> throw IllegalStateException("Invalid fingerprint request")
-        }
-
-    private fun buildFingerprintEnrolRequest(enrol: AppEnrolRequest, prefs: PreferencesManager): FingerprintEnrolRequest =
-        with(enrol) {
+    override fun buildFingerprintEnrolRequest(projectId: String,
+                                              userId: String,
+                                              moduleId: String,
+                                              metadata: String,
+                                              prefs: PreferencesManager): FingerprintEnrolRequest =
+        with(prefs) {
             FingerprintEnrolRequest(
-                projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName)
+                projectId,
+                userId,
+                moduleId,
+                metadata,
+                language,
+                fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
+                logoExists,
+                organizationName,
+                programName)
         }
 
-    private fun buildFingerprintVerifyRequest(verify: AppVerifyRequest, prefs: PreferencesManager): FingerprintVerifyRequest =
-        with(verify) {
+    override fun buildFingerprintVerifyRequest(projectId: String,
+                                               userId: String,
+                                               moduleId: String,
+                                               metadata: String,
+                                               verifyGuid: String,
+                                               prefs: PreferencesManager): FingerprintVerifyRequest =
+        with(prefs) {
             FingerprintVerifyRequest(
                 projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName,
+                language,
+                fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
+                logoExists,
+                organizationName,
+                programName,
                 verifyGuid)
         }
 
-    private fun buildFingerprintIdentifyRequest(
-        identify: AppIdentifyRequest,
-        prefs: PreferencesManager,
-        returnIdCount: Int = 10): FingerprintIdentifyRequest =
+    override fun buildFingerprintIdentifyRequest(projectId: String,
+                                                 userId: String,
+                                                 moduleId: String,
+                                                 metadata: String,
+                                                 prefs: PreferencesManager,
+                                                 returnIdCount: Int): FingerprintIdentifyRequest =
 
-        with(identify) {
+        with(prefs) {
             FingerprintIdentifyRequest(
                 projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName,
-                buildFingerprintMatchGroup(prefs.matchGroup),
+                language,
+                fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
+                logoExists,
+                organizationName,
+                programName,
+                buildFingerprintMatchGroup(matchGroup),
                 returnIdCount)
         }
 

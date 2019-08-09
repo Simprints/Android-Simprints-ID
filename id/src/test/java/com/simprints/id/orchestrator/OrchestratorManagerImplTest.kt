@@ -3,47 +3,38 @@ package com.simprints.id.orchestrator
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Intent
-import android.os.Parcelable
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.Modality.*
+import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
-import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
-import com.simprints.id.domain.moduleapi.face.requests.FaceEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
-import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow
-import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow.Companion.REQUEST_CODE_FACE
-import com.simprints.id.orchestrator.modality.flows.FaceModalityFlow.Companion.faceActivityClassName
-import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow
-import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow.Companion.REQUEST_CODE_FINGERPRINT
-import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow.Companion.fingerprintActivityClassName
-import com.simprints.id.orchestrator.modality.flows.MultiModalitiesFlowBase
-import com.simprints.id.orchestrator.modality.flows.interfaces.ModalityFlow
+import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse.fromModuleApiToDomainFaceResponse
+import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_ENROL_REQUEST_CODE
+import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
+import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.moduleapi.face.requests.IFaceRequest
+import com.simprints.testtools.common.syntax.*
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.koin.core.context.stopKoin
+import org.mockito.Mockito.*
+import org.mockito.stubbing.Answer
+import com.simprints.moduleapi.face.responses.IFaceResponse.Companion.BUNDLE_KEY as FACE_BUNDLE_KEY
 
 @RunWith(AndroidJUnit4::class)
 class OrchestratorManagerImplTest {
@@ -51,10 +42,13 @@ class OrchestratorManagerImplTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    @Mock private lateinit var modalityFlowFactoryMock: ModalityFlowFactory
-    @Mock private lateinit var modalityFlowMock: ModalityFlow
+    private lateinit var appResponseFactoryMock: AppResponseFactory
+    private lateinit var modalityFlowMock: ModalityFlow
+    private lateinit var orchestrator: OrchestratorManager
+    private val mockSteps = mutableListOf<Step>()
+    val modalities = listOf(FACE)
 
-    private val appRequest = AppEnrolRequest("some_project_id", "some_user_id", "some_module_id", "some_metadata")
+    private val appEnrolRequest = AppEnrolRequest("some_project_id", "some_user_id", "some_module_id", "some_metadata")
 
     @Before
     fun setUp() {
@@ -62,136 +56,119 @@ class OrchestratorManagerImplTest {
             .coroutinesMainThread()
             .rescheduleRxMainThread()
 
-        MockitoAnnotations.initMocks(this)
         Intents.init()
-    }
 
-    @Test
-    fun startSingleFlowModality_orchestratorShouldInvokeTheRightIntent() {
-        with(buildOrchestratorManager(FACE)) {
-
-            runBlocking {
-                startFlow()
-            }
-
-            checkNextIntentIsForFace()
+        mockSteps.clear()
+        modalityFlowMock = mock<ModalityFlow>().apply {
+            whenever(this) { this.steps } thenAnswer Answer { mockSteps }
         }
+        appResponseFactoryMock = mock()
+
+        orchestrator = buildOrchestratorManager()
+        prepareModalFlowForFaceEnrol()
+
+        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME)).respondWith(ActivityResult(Activity.RESULT_OK, null))
     }
 
     @Test
-    fun startMultiFlowModality_orchestratorShouldInvokeTheRightIntent() {
-        with(buildOrchestratorManager(FACE_FINGER)) {
-
+    fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() {
+        with(orchestrator) {
             runBlocking {
-                startFlow()
+                startFlow(modalities)
             }
 
-            checkNextIntentIsForFace()
+            verifyOrchestratorGotNextStepFromModalityFlow()
         }
     }
 
     @Test
-    fun modalityHasFinished_orchestratorShouldProduceAnAppResponse() {
-        with(buildOrchestratorManager(FACE)) {
-
+    fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() {
+        with(orchestrator) {
             runBlocking {
-                startFlow()
-                progressWithResult(FaceEnrolResponse(SOME_GUID))
+                startFlow(modalities)
+                progressWitFaceEnrol()
             }
 
-            checkAppResponse(AppEnrolResponse(SOME_GUID))
+            verifyOrchestratorTriedToBuildFinalAppResponse()
         }
     }
 
     @Test
-    fun modalityNotFinishedYet_orchestratorShouldInvokeNextIntent() {
-        with(buildOrchestratorManager(FACE_FINGER)) {
-
+    fun modalityFlowReceivesAWrongResult_orchestratorShouldNotGoAhead() {
+        with(orchestrator) {
             runBlocking {
-                startFlow()
-                progressWithResult(FaceEnrolResponse(SOME_GUID))
+                startFlow(modalities)
+                progressWitFaceEnrol(WRONG_REQUEST_CODE, null)
             }
 
-            checkNextIntentIsForFingerprint()
+            verifyOrchestratorDidntTryToBuildFinalAppResponse()
         }
     }
 
-    private fun buildOrchestratorManager(modality: Modality): OrchestratorManager {
-        intending(toPackage(faceActivityClassName)).respondWith(ActivityResult(Activity.RESULT_OK, null))
-        intending(toPackage(fingerprintActivityClassName)).respondWith(ActivityResult(Activity.RESULT_OK, null))
+    @Test
+    fun orchestratorReceivesAResult_itShouldBeForwardedToModalityFlowAndMoveOn() {
+        with(orchestrator) {
+            runBlocking {
+                startFlow(modalities)
+                progressWitFaceEnrol()
+            }
 
-        when (modality) {
-            FACE -> listOf(
-                FaceModalityFlow(appRequest, PACKAGE_NAME, mock<FaceRequestFactory>().apply {
-                    whenever(this) { buildFaceRequest(anyNotNull()) } thenReturn faceEnrolRequest
-                }))
-            FINGER_FACE -> listOf(
-                FingerprintModalityFlow(appRequest, PACKAGE_NAME, mock<FingerprintRequestFactory>().apply {
-                    whenever(this) { buildFingerprintRequest(anyNotNull(), anyNotNull()) } thenReturn fingerprintEnrolRequest
-                }, mock()),
-                FaceModalityFlow(appRequest, PACKAGE_NAME, mock<FaceRequestFactory>().apply {
-                    whenever(this) { buildFaceRequest(anyNotNull()) } thenReturn faceEnrolRequest
-                }))
-            FACE_FINGER -> listOf(
-                FaceModalityFlow(appRequest, PACKAGE_NAME, mock<FaceRequestFactory>().apply {
-                    whenever(this) { buildFaceRequest(anyNotNull()) } thenReturn faceEnrolRequest
-                }),
-                FingerprintModalityFlow(appRequest, PACKAGE_NAME, mock<FingerprintRequestFactory>().apply {
-                    whenever(this) { buildFingerprintRequest(anyNotNull(), anyNotNull()) } thenReturn fingerprintEnrolRequest
-                }, mock()))
-            FINGER -> listOf(
-                FingerprintModalityFlow(appRequest, PACKAGE_NAME, mock<FingerprintRequestFactory>().apply {
-                    whenever(this) { buildFingerprintRequest(anyNotNull(), anyNotNull()) } thenReturn fingerprintEnrolRequest
-                }, mock()))
-        }.let { modalities ->
-            whenever(modalityFlowFactoryMock) { buildModalityFlow(anyNotNull(), anyNotNull()) } thenReturn MultiModalitiesFlowBase(modalities)
+            verifyOrchestratorForwardedResultsToModalityFlow()
+            verifyOrchestratorGotNextStepFromModalityFlow(2)
+        }
+    }
+
+    private fun verifyOrchestratorGotNextStepFromModalityFlow(nTimes: Int = 1) =
+        verify(modalityFlowMock, times(nTimes)).getNextStepToStart()
+
+    private fun verifyOrchestratorForwardedResultsToModalityFlow() =
+        verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
+
+    private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
+        verifyNever(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+
+    private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
+        verifyOnce(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+
+    private fun prepareModalFlowForFaceEnrol() {
+        whenever(modalityFlowMock) { getNextStepToStart() } thenAnswer Answer { mockSteps.firstOrNull { it.status == NOT_STARTED } }
+        mockSteps.add(Step(FACE_ENROL_REQUEST_CODE, FaceStepProcessorImpl.ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, mock(), NOT_STARTED))
+    }
+
+    private fun buildOrchestratorManager(): OrchestratorManager {
+        val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
+            whenever(this) { startModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
 
-        return OrchestratorManagerImpl(modality, modalityFlowFactoryMock, AppResponseFactoryImpl())
+        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock)
     }
 
-    private fun OrchestratorManager.checkNextIntentIsForFace() = checkNextIntent(REQUEST_CODE_FACE)
-    private fun OrchestratorManager.checkNextIntentIsForFingerprint() = checkNextIntent(REQUEST_CODE_FINGERPRINT)
-    private fun OrchestratorManager.checkNextIntent(requestCode: Int) {
-        assertThat(nextIntent.value?.requestCode).isEqualTo(requestCode)
-    }
+    private suspend fun OrchestratorManager.startFlow(
+        modalities: List<Modality>,
+        request: AppRequest = appEnrolRequest,
+        sessionId: String = "") = start(modalities, request, sessionId)
 
-    private fun OrchestratorManager.checkAppResponse(response: AppResponse) {
-        assertThat(appResponse.value).isEqualTo(response)
-    }
+    private suspend fun OrchestratorManager.progressWitFaceEnrol(requestCode: Int = FACE_ENROL_REQUEST_CODE,
+                                                                 response: FaceEnrolResponse? = FaceEnrolResponse(SOME_GUID)) {
 
-    private suspend fun OrchestratorManager.startFlow(request: AppRequest = appRequest, sessionId: String = "") {
-        start(request, sessionId)
-    }
-
-    private suspend fun OrchestratorManager.progressWithResult(response: Parcelable) {
-        val requestCode = if (response is IFaceResponse) {
-            REQUEST_CODE_FACE
-        } else {
-            REQUEST_CODE_FINGERPRINT
-        }
-
-        val bundleKey = if (response is IFaceResponse) {
-            IFaceResponse.BUNDLE_KEY
-        } else {
-            IFingerprintResponse.BUNDLE_KEY
+        response?.let {
+            mockSteps.firstOrNull { it.status == ONGOING }?.result = fromModuleApiToDomainFaceResponse(response)
         }
 
         onModalStepRequestDone(
             requestCode,
             Activity.RESULT_OK,
-            Intent().putExtra(bundleKey, response))
+            Intent().putExtra(FACE_BUNDLE_KEY, response))
     }
 
     companion object {
-        private const val PACKAGE_NAME = "com.simprints.id"
         private const val SOME_GUID = "some_guid"
-        private const val SOME_PROJECT_ID = "some_project"
-        private const val SOME_USER_ID = "some_user"
-        private const val SOME_MODULE_ID = "some_module"
+        private const val WRONG_REQUEST_CODE = 1
+    }
 
-        private val faceEnrolRequest = FaceEnrolRequest(SOME_PROJECT_ID, SOME_USER_ID, SOME_MODULE_ID)
-        private val fingerprintEnrolRequest:FingerprintEnrolRequest =
-            FingerprintEnrolRequest(SOME_PROJECT_ID, SOME_USER_ID, SOME_MODULE_ID, "", "", mapOf(), false, "", "")
+    @After
+    fun tearDown(){
+        Intents.release()
+        stopKoin()
     }
 }
