@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.steps.fingerprint
 import android.content.Intent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse.fromModuleApiToFingerprintResponse
+import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -12,28 +12,8 @@ import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY as RESPONSE_BUNDLE_KEY
 
-interface FingerprintStepProcessor {
-
-    fun buildStepEnrol(projectId: String,
-                       userId: String,
-                       moduleId: String,
-                       metadata: String): Step
-
-    fun buildStepIdentify(projectId: String,
-                          userId: String,
-                          moduleId: String,
-                          metadata: String): Step
-
-    fun buildStepVerify(projectId: String,
-                        userId: String,
-                        moduleId: String,
-                        metadata: String,
-                        verifyGuid: String): Step
-
-    fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result?
-}
-
 class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: FingerprintRequestFactory,
+                                   private val converterModuleApiToDomain: ModuleApiToDomainFingerprintResponse,
                                    private val prefs: PreferencesManager) : FingerprintStepProcessor {
 
     companion object {
@@ -79,7 +59,7 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): FingerprintResponse? =
         if (isFingerprintResult(requestCode)) {
             data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.let {
-                fromModuleApiToFingerprintResponse(it)
+                converterModuleApiToDomain.fromModuleApiToDomainFingerprintResponse(it)
             }
         } else {
             null
