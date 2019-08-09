@@ -6,18 +6,18 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.moduleapi.fingerprint.responses.*
 
-object FingerprintToDomainResponse {
+object ModuleApiToDomainFingerprintResponse {
 
-    fun fromFingerprintToDomainResponse(fingerprintResponse: IFingerprintResponse): FingerprintResponse =
+    fun fromModuleApiToDomainFingerprintResponse(fingerprintResponse: IFingerprintResponse): FingerprintResponse =
         when (fingerprintResponse.type) {
-            IFingerprintResponseType.ENROL -> fromFingerprintToDomainEnrolResponse(fingerprintResponse as IFingerprintEnrolResponse)
-            IFingerprintResponseType.VERIFY -> fromFingerprintToDomainVerifyResponse(fingerprintResponse as IFingerprintVerifyResponse)
-            IFingerprintResponseType.IDENTIFY -> fromFingerprintToDomainIdentifyResponse(fingerprintResponse as IFingerprintIdentifyResponse)
-            IFingerprintResponseType.REFUSAL -> fromFingerprintToDomainRefusalResponse(fingerprintResponse as IFingerprintRefusalFormResponse)
-            IFingerprintResponseType.ERROR -> fromFingerprintToDomainErrorResponse(fingerprintResponse as IFingerprintErrorResponse)
+            IFingerprintResponseType.ENROL -> fromModuleApiToFingerprintEnrolResponse(fingerprintResponse as IFingerprintEnrolResponse)
+            IFingerprintResponseType.VERIFY -> fromModuleApiToFingerprintVerifyResponse(fingerprintResponse as IFingerprintVerifyResponse)
+            IFingerprintResponseType.IDENTIFY -> fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse as IFingerprintIdentifyResponse)
+            IFingerprintResponseType.REFUSAL -> fromModuleApiToFingerprintRefusalResponse(fingerprintResponse as IFingerprintRefusalFormResponse)
+            IFingerprintResponseType.ERROR -> fromModuleApiToFingerprintErrorResponse(fingerprintResponse as IFingerprintErrorResponse)
         }
 
-    private fun fromFingerprintToDomainVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): FingerprintVerifyResponse {
+    private fun fromModuleApiToFingerprintVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): FingerprintVerifyResponse {
         val matchResult = FingerprintMatchingResult(
             fingerprintResponse.matchingResult.guid,
             fingerprintResponse.matchingResult.confidence,
@@ -26,20 +26,20 @@ object FingerprintToDomainResponse {
         return FingerprintVerifyResponse(matchResult)
     }
 
-    private fun fromFingerprintToDomainErrorResponse(fingerprintResponse: IFingerprintErrorResponse): FingerprintErrorResponse =
+    private fun fromModuleApiToFingerprintErrorResponse(fingerprintResponse: IFingerprintErrorResponse): FingerprintErrorResponse =
         FingerprintErrorResponse(fromFingerprintToDomainError(fingerprintResponse.error))
 
 
-    private fun fromFingerprintToDomainEnrolResponse(fingerprintResponse: IFingerprintEnrolResponse): FingerprintEnrolResponse =
+    private fun fromModuleApiToFingerprintEnrolResponse(fingerprintResponse: IFingerprintEnrolResponse): FingerprintEnrolResponse =
         FingerprintEnrolResponse(fingerprintResponse.guid)
 
-    private fun fromFingerprintToDomainIdentifyResponse(fingerprintResponse: IFingerprintIdentifyResponse): FingerprintIdentifyResponse =
+    private fun fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse: IFingerprintIdentifyResponse): FingerprintIdentifyResponse =
         FingerprintIdentifyResponse(fingerprintResponse.identifications.map { fromFingerprintToDomainMatchingResult(it) })
 
     private fun fromFingerprintToDomainMatchingResult(matchingResult: IMatchingResult): FingerprintMatchingResult =
         FingerprintMatchingResult(matchingResult.guid, matchingResult.confidence, fromFingerprintToDomainTier(matchingResult.tier))
 
-    private fun fromFingerprintToDomainRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse {
+    private fun fromModuleApiToFingerprintRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse {
 
         val reason = when(fingerprintResponse.reason) {
             IFingerprintRefusalReason.REFUSED_RELIGION -> FingerprintRefusalFormReason.REFUSED_RELIGION

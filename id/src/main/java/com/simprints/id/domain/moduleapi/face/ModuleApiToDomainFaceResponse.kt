@@ -8,28 +8,27 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchingRes
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceTier
 import com.simprints.moduleapi.face.responses.*
 
-object FaceToDomainResponse {
+object ModuleApiToDomainFaceResponse {
 
-    //TODO: update using enum as we do in FingerprintToDomainResponse
-    fun fromFaceToDomainResponse(faceResponse: IFaceResponse): FaceResponse =
+    fun fromModuleApiToDomainFaceResponse(faceResponse: IFaceResponse): FaceResponse =
         when (faceResponse) {
-            is IFaceEnrolResponse -> fromFaceToDomainEnrolResponse(faceResponse)
-            is IFaceVerifyResponse -> fromFaceToDomainVerifyResponse(faceResponse)
-            is IFaceIdentifyResponse -> fromFaceToDomainIdentifyResponse(faceResponse)
+            is IFaceEnrolResponse -> fromModuleApiToDomainEnrolResponse(faceResponse)
+            is IFaceVerifyResponse -> fromModuleApiToDomainVerifyResponse(faceResponse)
+            is IFaceIdentifyResponse -> fromModuleApiToDomainIdentifyResponse(faceResponse)
             else -> throw IllegalStateException("Invalid face request")
         }
 
-    private fun fromFaceToDomainVerifyResponse(faceResponse: IFaceVerifyResponse): FaceVerifyResponse {
+    private fun fromModuleApiToDomainVerifyResponse(faceResponse: IFaceVerifyResponse): FaceVerifyResponse {
         with(faceResponse.matchingResult) {
             val matchResult = FaceMatchingResult(guid, confidence, fromFaceToDomainTier(tier))
             return FaceVerifyResponse(matchResult)
         }
     }
 
-    private fun fromFaceToDomainEnrolResponse(faceResponse: IFaceEnrolResponse): FaceEnrolResponse =
+    private fun fromModuleApiToDomainEnrolResponse(faceResponse: IFaceEnrolResponse): FaceEnrolResponse =
         FaceEnrolResponse(faceResponse.guid)
 
-    private fun fromFaceToDomainIdentifyResponse(faceResponse: IFaceIdentifyResponse): FaceIdentifyResponse =
+    private fun fromModuleApiToDomainIdentifyResponse(faceResponse: IFaceIdentifyResponse): FaceIdentifyResponse =
         FaceIdentifyResponse(faceResponse.identifications.map { fromFaceToDomainIdentificationResult(it) })
 
     private fun fromFaceToDomainIdentificationResult(identification: IFaceMatchingResult): FaceMatchingResult =

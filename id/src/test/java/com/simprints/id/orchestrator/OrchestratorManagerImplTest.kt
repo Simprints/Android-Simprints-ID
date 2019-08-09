@@ -13,24 +13,25 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.face.FaceToDomainResponse.fromFaceToDomainResponse
+import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse.fromModuleApiToDomainFaceResponse
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_ENROL_REQUEST_CODE
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.Step.Request
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
-import com.simprints.id.orchestrator.steps.face.BaseFaceStepProcessor
-import com.simprints.id.orchestrator.steps.face.BaseFaceStepProcessor.Companion.FACE_ENROL_REQUEST_CODE
-import com.simprints.id.orchestrator.steps.fingerprint.BaseFingerprintStepProcessor
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.testtools.common.syntax.*
 import kotlinx.coroutines.runBlocking
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
 import com.simprints.moduleapi.face.responses.IFaceResponse.Companion.BUNDLE_KEY as FACE_BUNDLE_KEY
@@ -66,8 +67,7 @@ class OrchestratorManagerImplTest {
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
 
-        intending(toPackage(BaseFingerprintStepProcessor.ACTIVITY_CLASS_NAME)).respondWith(ActivityResult(Activity.RESULT_OK, null))
-        intending(toPackage(BaseFaceStepProcessor.ACTIVITY_CLASS_NAME)).respondWith(ActivityResult(Activity.RESULT_OK, null))
+        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME)).respondWith(ActivityResult(Activity.RESULT_OK, null))
     }
 
     @Test
@@ -132,7 +132,7 @@ class OrchestratorManagerImplTest {
 
     private fun prepareModalFlowForFaceEnrol() {
         whenever(modalityFlowMock) { getNextStepToStart() } thenAnswer Answer { mockSteps.firstOrNull { it.status == NOT_STARTED } }
-        mockSteps.add(Step(Request(FACE_ENROL_REQUEST_CODE, Intent()), NOT_STARTED))
+        mockSteps.add(Step(FACE_ENROL_REQUEST_CODE, FaceStepProcessorImpl.ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, mock(), NOT_STARTED))
     }
 
     private fun buildOrchestratorManager(): OrchestratorManager {
@@ -152,7 +152,7 @@ class OrchestratorManagerImplTest {
                                                                  response: FaceEnrolResponse? = FaceEnrolResponse(SOME_GUID)) {
 
         response?.let {
-            mockSteps.firstOrNull { it.status == ONGOING }?.result = fromFaceToDomainResponse(response)
+            mockSteps.firstOrNull { it.status == ONGOING }?.result = fromModuleApiToDomainFaceResponse(response)
         }
 
         onModalStepRequestDone(
@@ -164,5 +164,11 @@ class OrchestratorManagerImplTest {
     companion object {
         private const val SOME_GUID = "some_guid"
         private const val WRONG_REQUEST_CODE = 1
+    }
+
+    @After
+    fun tearDown(){
+        Intents.release()
+        stopKoin()
     }
 }

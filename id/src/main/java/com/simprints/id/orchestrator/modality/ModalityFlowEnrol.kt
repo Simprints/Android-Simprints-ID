@@ -6,13 +6,13 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.face.FaceEnrolStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.BaseFingerprintStepProcessor.Companion.isFingerprintResult
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintEnrolStepProcessor
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.isFingerprintResult
 
 
-class ModalityFlowEnrolImpl(private val fingerprintEnrolStepProcessor: FingerprintEnrolStepProcessor,
-                            private val faceEnrolStepProcessor: FaceEnrolStepProcessor) : ModalityFlow {
+class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
+                            private val faceEnrolProcessor: FaceStepProcessor) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -24,9 +24,11 @@ class ModalityFlowEnrolImpl(private val fingerprintEnrolStepProcessor: Fingerpri
 
     private fun buildStepsList(appRequest: AppEnrolRequest, modalities: List<Modality>) =
         modalities.map {
-            when (it) {
-                Modality.FINGER -> fingerprintEnrolStepProcessor.buildStep(appRequest)
-                Modality.FACE -> faceEnrolStepProcessor.buildStep(appRequest)
+            with(appRequest) {
+                when (it) {
+                    Modality.FINGER -> fingerprintStepProcessor.buildStepEnrol(projectId, userId, moduleId, metadata)
+                    Modality.FACE -> faceEnrolProcessor.buildStepEnrol(projectId, userId, moduleId)
+                }
             }
         }
 
@@ -34,12 +36,12 @@ class ModalityFlowEnrolImpl(private val fingerprintEnrolStepProcessor: Fingerpri
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = if (isFingerprintResult(requestCode)) {
-            fingerprintEnrolStepProcessor.processResult(requestCode, resultCode, data)
+            fingerprintStepProcessor.processResult(requestCode, resultCode, data)
         } else {
-            faceEnrolStepProcessor.processResult(requestCode, resultCode, data)
+            faceEnrolProcessor.processResult(requestCode, resultCode, data)
         }
 
-        val stepForRequest = steps.firstOrNull { it.request.requestCode == requestCode }
+        val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         stepForRequest?.result = result
     }
 }

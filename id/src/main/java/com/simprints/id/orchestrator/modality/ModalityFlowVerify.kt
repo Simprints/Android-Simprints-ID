@@ -6,13 +6,13 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
-import com.simprints.id.orchestrator.steps.face.FaceVerifyStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.BaseFingerprintStepProcessor.Companion.isFingerprintResult
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintVerifyStepProcessor
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.isFingerprintResult
 
 
-class ModalityFlowVerifyImpl(private val fingerprintVerifyStepProcessor: FingerprintVerifyStepProcessor,
-                             private val faceVerifyStepProcessor: FaceVerifyStepProcessor) : ModalityFlow {
+class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
+                             private val faceStepProcessor: FaceStepProcessor) : ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -24,9 +24,11 @@ class ModalityFlowVerifyImpl(private val fingerprintVerifyStepProcessor: Fingerp
 
     private fun buildStepsList(appRequest: AppVerifyRequest, modalities: List<Modality>) =
         modalities.map {
-            when (it) {
-                Modality.FINGER -> fingerprintVerifyStepProcessor.buildStep(appRequest)
-                Modality.FACE -> faceVerifyStepProcessor.buildStep(appRequest)
+            with(appRequest) {
+                when (it) {
+                    Modality.FINGER -> fingerprintStepProcessor.buildStepVerify(projectId, userId, projectId, metadata, verifyGuid)
+                    Modality.FACE -> faceStepProcessor.buildStepVerify(projectId, userId, projectId)
+                }
             }
         }
 
@@ -34,12 +36,12 @@ class ModalityFlowVerifyImpl(private val fingerprintVerifyStepProcessor: Fingerp
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = if (isFingerprintResult(requestCode)) {
-            fingerprintVerifyStepProcessor.processResult(requestCode, resultCode, data)
+            fingerprintStepProcessor.processResult(requestCode, resultCode, data)
         } else {
-            faceVerifyStepProcessor.processResult(requestCode, resultCode, data)
+            faceStepProcessor.processResult(requestCode, resultCode, data)
         }
 
-        val stepForRequest = steps.firstOrNull { it.request.requestCode == requestCode }
+        val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         stepForRequest?.result = result
     }
 }
