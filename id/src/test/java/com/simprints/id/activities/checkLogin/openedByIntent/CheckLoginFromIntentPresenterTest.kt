@@ -1,9 +1,13 @@
 package com.simprints.id.activities.checkLogin.openedByIntent
 
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
+import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.domain.moduleapi.app.requests.*
+import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
@@ -98,5 +102,41 @@ class CheckLoginFromIntentPresenterTest {
         verifyOnce(checkLoginFromIntentPresenter) {
             buildVerificationCalloutEvent(anyNotNull(), ArgumentMatchers.anyLong())
         }
+    }
+
+    @Test
+    fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddInfoToSession() {
+
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock())).apply {
+
+            whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
+
+            remoteConfigFetcher = mock()
+            analyticsManager = mock()
+            preferencesManager = mock()
+
+            dbManager = mock<LocalDbManager>().apply {
+                whenever(this) { getPeopleCountFromLocal() } thenReturn Single.just(0)
+            }
+
+            crashReportManager = mock<CrashReportManager>().apply {
+                whenever(this) { setSessionIdCrashlyticsKey(anyNotNull()) } thenDoNothing {}
+            }
+
+            sessionEventsManager = mock<SessionEventsManager>().apply {
+                whenever(this) { createSession("") } thenReturn Single.just(createFakeSession())
+                whenever(this) { getCurrentSession() } thenReturn Single.just(createFakeSession())
+                whenever(this) { getSessionCount() } thenReturn Single.just(0)
+            }
+
+            analyticsManager = mock<AnalyticsManager>().apply {
+                whenever(this) { analyticsId } thenReturn Single.just("analyticsId")
+            }
+        }
+
+        checkLoginFromIntentPresenter.setup()
+
+        verifyOnce(checkLoginFromIntentPresenter) { addInfoIntoSessionEvents() }
+        verifyOnce(checkLoginFromIntentPresenter) { populateSessionWithAnalyticsIdAndDbInfo("analyticsId", 0) }
     }
 }
