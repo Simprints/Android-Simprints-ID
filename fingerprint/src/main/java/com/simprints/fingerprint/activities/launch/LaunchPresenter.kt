@@ -237,7 +237,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
         if (alert == FingerprintAlert.DISCONNECTED) {
-            view.showDialogForScannerErrorConfirmation(scannerManager.lastPairedScanner ?: "")
+            view.showDialogForScannerErrorConfirmation(scannerManager.lastPairedScannerId ?: "")
         } else {
             launchAlert(alert)
         }
