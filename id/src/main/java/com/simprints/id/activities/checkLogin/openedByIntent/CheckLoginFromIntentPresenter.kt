@@ -201,25 +201,28 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     }
 
     @SuppressLint("CheckResult")
-    private fun addInfoIntoSessionEvents() {
+    internal fun addInfoIntoSessionEvents() {
         try {
-            Singles.zip(
-                fetchAnalyticsId(),
-                fetchPeopleCountInLocalDatabase(),
-                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
-                return@zip Triple(gaId, peopleDbCount, sessionDbCount)
-            }.flatMapCompletable { (gaId, peopleDbCount, sessionDbCount) ->
-                populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount)
-            }.subscribeBy(onError = { it.printStackTrace() })
+            fetchAnalyticsIdPeopleCountAndSessionCount().subscribeBy(onError = { it.printStackTrace() })
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    private fun fetchAnalyticsIdPeopleCountAndSessionCount() = Singles.zip(
+            fetchAnalyticsId(),
+            fetchPeopleCountInLocalDatabase(),
+            fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
+            return@zip Triple(gaId, peopleDbCount, sessionDbCount)
+        }.flatMapCompletable { (gaId, peopleDbCount, _) ->
+            populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount)
+        }
+
+
     private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
     private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
-    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int): Completable =
+    internal fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int): Completable =
         sessionEventsManager.updateSession {
             it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
             it.analyticsId = gaId
