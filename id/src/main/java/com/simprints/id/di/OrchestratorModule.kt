@@ -29,10 +29,9 @@ import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
-class AndroidModule {
+class OrchestratorModule {
 
     @Provides
     fun provideFaceRequestFactory(): FaceRequestFactory = FaceRequestFactoryImpl()
@@ -77,7 +76,6 @@ class AndroidModule {
         ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
 
     @Provides
-    @Singleton
     fun provideOrchestratorManager(modalityFlowFactory: ModalityFlowFactory,
                                    appResponseFactory: AppResponseFactory): OrchestratorManager =
         OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory)

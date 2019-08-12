@@ -7,8 +7,8 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.isFingerprintResult
 
 
 class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
@@ -32,7 +32,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
             }
         }
 
-    override fun getNextStepToStart(): Step? = steps.firstOrNull { it.status == NOT_STARTED }
+    override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.status == NOT_STARTED }
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = if (isFingerprintResult(requestCode)) {

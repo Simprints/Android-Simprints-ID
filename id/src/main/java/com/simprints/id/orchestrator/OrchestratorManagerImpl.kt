@@ -20,9 +20,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
     internal lateinit var appRequest: AppRequest
     internal var sessionId: String = ""
 
-    private val modalitiesFlow by lazy {
-        flowModalityFactory.startModalityFlow(appRequest, modalities)
-    }
+    private lateinit var modalitiesFlow: ModalityFlow
 
     override suspend fun start(modalities: List<Modality>,
                                appRequest: AppRequest,
@@ -30,6 +28,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
         this.sessionId = sessionId
         this.appRequest = appRequest
         this.modalities = modalities
+        modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
 
         proceedToNextIntentOrAppResponse()
     }
@@ -42,9 +41,12 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
     private fun proceedToNextIntentOrAppResponse() {
         with(modalitiesFlow) {
             if (!anyStepOnGoing()) {
-                getNextStepToStart()?.let {
-                    startStep(it)
-                } ?: buildAppResponse()
+                val potentialNextStep = getNextStepToLaunch()
+                if (potentialNextStep != null) {
+                    startStep(potentialNextStep)
+                } else {
+                    buildAppResponse()
+                }
             }
         }
     }

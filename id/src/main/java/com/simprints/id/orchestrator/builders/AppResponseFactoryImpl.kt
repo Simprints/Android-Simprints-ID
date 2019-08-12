@@ -14,6 +14,10 @@ class AppResponseFactoryImpl : AppResponseFactory {
                                   steps: List<Step>,
                                   sessionId: String): AppResponse =
         when (modalities) {
+            /**
+             * Currently only FINGER/AppResponseBuilderForFinger is used. The others
+             * are placeholders for when we will introduce the FaceModality
+             */
             listOf(FINGER) -> AppResponseBuilderForFinger()
             listOf(FINGER, FACE) -> AppResponseBuilderForFingerFace()
             listOf(FACE, FINGER) -> AppResponseBuilderForFaceFinger()

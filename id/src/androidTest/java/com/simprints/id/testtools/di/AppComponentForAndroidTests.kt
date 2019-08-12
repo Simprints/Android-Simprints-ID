@@ -24,7 +24,7 @@ interface AppComponentForAndroidTests : AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
-        fun androidModule(androidModule: AndroidModule): Builder
+        fun androidModule(orchestratorModule: OrchestratorModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }

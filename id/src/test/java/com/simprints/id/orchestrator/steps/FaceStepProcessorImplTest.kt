@@ -12,11 +12,9 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.identifyAppRequest
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_ENROL_REQUEST_CODE
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_IDENTIFY_REQUEST_CODE
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_VERIFY_REQUEST_CODE
 import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.testtools.common.syntax.*
@@ -59,7 +57,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
         with(verifyAppRequest) {
             val step = faceStepProcess.buildStepVerify(projectId, userId, moduleId)
 
-            verifyFaceIntent<FaceVerifyRequest>(step, FACE_VERIFY_REQUEST_CODE)
+            verifyFaceIntent<FaceVerifyRequest>(step, VERIFY.value)
         }
     }
 
@@ -68,7 +66,7 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
         with(enrolAppRequest) {
             val step = faceStepProcess.buildStepEnrol(projectId, userId, moduleId)
 
-            verifyFaceIntent<FaceEnrolRequest>(step, FACE_ENROL_REQUEST_CODE)
+            verifyFaceIntent<FaceEnrolRequest>(step, ENROL.value)
         }
     }
 
@@ -77,27 +75,27 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
         with(identifyAppRequest) {
             val step = faceStepProcess.buildStepIdentify(projectId, userId, moduleId)
 
-            verifyFaceIntent<FaceIdentifyRequest>(step, FACE_IDENTIFY_REQUEST_CODE)
+            verifyFaceIntent<FaceIdentifyRequest>(step, IDENTIFY.value)
         }
     }
 
     @Test
     fun steProcessorShouldProcessFaceEnrolResult() {
-        faceStepProcess.processResult(FACE_ENROL_REQUEST_CODE, Activity.RESULT_OK, result)
+        faceStepProcess.processResult(ENROL.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
     }
 
     @Test
     fun steProcessorShouldProcessFaceIdentifyResult() {
-        faceStepProcess.processResult(FACE_IDENTIFY_REQUEST_CODE, Activity.RESULT_OK, result)
+        faceStepProcess.processResult(IDENTIFY.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
     }
 
     @Test
     fun steProcessorShouldProcessFaceVerifyResult() {
-        faceStepProcess.processResult(FACE_VERIFY_REQUEST_CODE, Activity.RESULT_OK, result)
+        faceStepProcess.processResult(VERIFY.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
     }

@@ -4,11 +4,11 @@ import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
 class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                                private val faceStepProcessor: FaceStepProcessor) : ModalityFlow {
@@ -31,7 +31,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
             }
         }
 
-    override fun getNextStepToStart(): Step? =
+    override fun getNextStepToLaunch(): Step? =
         steps.firstOrNull { it.status == NOT_STARTED }
 
 
