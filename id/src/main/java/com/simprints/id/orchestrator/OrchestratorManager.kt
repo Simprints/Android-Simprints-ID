@@ -7,6 +7,10 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 
+/**
+ * It produces [Step]s to run and finally creates an [AppResponse] to return
+ * to the the ClientApi
+ */
 interface OrchestratorManager {
 
     val onGoingStep: LiveData<Step>

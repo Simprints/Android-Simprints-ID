@@ -13,11 +13,9 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentif
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.identifyAppRequest
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.FINGERPRINT_ENROL_REQUEST_CODE
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.FINGERPRINT_IDENTIFY_REQUEST_CODE
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl.Companion.FINGERPRINT_VERIFY_REQUEST_CODE
 import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
@@ -67,7 +65,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         with(verifyAppRequest) {
             val step = fingerprintStepProcess.buildStepVerify(projectId, userId, moduleId, metadata, verifyGuid)
 
-            verifyFingerprintIntent<FingerprintVerifyRequest>(step, FINGERPRINT_VERIFY_REQUEST_CODE)
+            verifyFingerprintIntent<FingerprintVerifyRequest>(step, VERIFY.value)
         }
     }
 
@@ -76,7 +74,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepEnrol(projectId, userId, moduleId, metadata)
 
-            verifyFingerprintIntent<FingerprintEnrolRequest>(step, FINGERPRINT_ENROL_REQUEST_CODE)
+            verifyFingerprintIntent<FingerprintEnrolRequest>(step, ENROL.value)
         }
     }
 
@@ -85,27 +83,27 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         with(identifyAppRequest) {
             val step = fingerprintStepProcess.buildStepIdentify(projectId, userId, moduleId, metadata)
 
-            verifyFingerprintIntent<FingerprintIdentifyRequest>(step, FINGERPRINT_IDENTIFY_REQUEST_CODE)
+            verifyFingerprintIntent<FingerprintIdentifyRequest>(step, IDENTIFY.value)
         }
     }
 
     @Test
     fun steProcessorShouldProcessFingerprintEnrolResult() {
-        fingerprintStepProcess.processResult(FINGERPRINT_ENROL_REQUEST_CODE, Activity.RESULT_OK, result)
+        fingerprintStepProcess.processResult(ENROL.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
     }
 
     @Test
     fun steProcessorShouldProcessFingerprintIdentifyResult() {
-        fingerprintStepProcess.processResult(FINGERPRINT_IDENTIFY_REQUEST_CODE, Activity.RESULT_OK, result)
+        fingerprintStepProcess.processResult(IDENTIFY.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
     }
 
     @Test
     fun steProcessorShouldProcessFingerprintVerifyResult() {
-        fingerprintStepProcess.processResult(FINGERPRINT_VERIFY_REQUEST_CODE, Activity.RESULT_OK, result)
+        fingerprintStepProcess.processResult(VERIFY.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
     }

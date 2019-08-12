@@ -6,7 +6,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 
 interface ModalityFlowFactory {
 
-    fun startModalityFlow(appRequest: AppRequest,
-                          modalities: List<Modality>): ModalityFlow
+    fun createModalityFlow(appRequest: AppRequest,
+                           modalities: List<Modality>): ModalityFlow
 
 }

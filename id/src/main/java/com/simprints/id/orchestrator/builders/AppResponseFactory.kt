@@ -5,6 +5,9 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 
+/**
+ * It creates a final AppResponse based on the results of the ModalityFlow steps.
+ */
 interface AppResponseFactory {
 
     fun buildAppResponse(modalities: List<Modality>,

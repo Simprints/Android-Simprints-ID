@@ -25,19 +25,19 @@ class ModalityFlowFactoryImplTest {
 
     @Test
     fun enrolFlow_factoryShouldReturnTheRightModalityFlow() {
-        modalityFlowFactory.startModalityFlow(enrolAppRequest, listOf(FACE))
+        modalityFlowFactory.createModalityFlow(enrolAppRequest, listOf(FACE))
         verifyModalityFlowStarted(enrolFlow)
     }
 
     @Test
     fun identifyFlow_factoryShouldReturnTheRightModalityFlow() {
-        modalityFlowFactory.startModalityFlow(identifyAppRequest, listOf(FACE))
+        modalityFlowFactory.createModalityFlow(identifyAppRequest, listOf(FACE))
         verifyModalityFlowStarted(identifyFlow)
     }
 
     @Test
     fun verifyFlow_factoryShouldReturnTheRightModalityFlow() {
-        modalityFlowFactory.startModalityFlow(verifyAppRequest, listOf(FACE))
+        modalityFlowFactory.createModalityFlow(verifyAppRequest, listOf(FACE))
         verifyModalityFlowStarted(verifyFlow)
     }
 

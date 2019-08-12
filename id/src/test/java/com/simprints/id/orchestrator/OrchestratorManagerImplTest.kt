@@ -17,10 +17,11 @@ import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse.from
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
-import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl.Companion.FACE_ENROL_REQUEST_CODE
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.testtools.common.syntax.*
@@ -119,7 +120,7 @@ class OrchestratorManagerImplTest {
     }
 
     private fun verifyOrchestratorGotNextStepFromModalityFlow(nTimes: Int = 1) =
-        verify(modalityFlowMock, times(nTimes)).getNextStepToStart()
+        verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
         verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
@@ -131,13 +132,13 @@ class OrchestratorManagerImplTest {
         verifyOnce(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
 
     private fun prepareModalFlowForFaceEnrol() {
-        whenever(modalityFlowMock) { getNextStepToStart() } thenAnswer Answer { mockSteps.firstOrNull { it.status == NOT_STARTED } }
-        mockSteps.add(Step(FACE_ENROL_REQUEST_CODE, FaceStepProcessorImpl.ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, mock(), NOT_STARTED))
+        whenever(modalityFlowMock) { getNextStepToLaunch() } thenAnswer Answer { mockSteps.firstOrNull { it.status == NOT_STARTED } }
+        mockSteps.add(Step(ENROL.value, FaceStepProcessorImpl.ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, mock(), NOT_STARTED))
     }
 
     private fun buildOrchestratorManager(): OrchestratorManager {
         val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
-            whenever(this) { startModalityFlow(any(), any()) } thenReturn modalityFlowMock
+            whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
 
         return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock)
@@ -148,7 +149,7 @@ class OrchestratorManagerImplTest {
         request: AppRequest = appEnrolRequest,
         sessionId: String = "") = start(modalities, request, sessionId)
 
-    private suspend fun OrchestratorManager.progressWitFaceEnrol(requestCode: Int = FACE_ENROL_REQUEST_CODE,
+    private suspend fun OrchestratorManager.progressWitFaceEnrol(requestCode: Int = ENROL.value,
                                                                  response: FaceEnrolResponse? = FaceEnrolResponse(SOME_GUID)) {
 
         response?.let {
