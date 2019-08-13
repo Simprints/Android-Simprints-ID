@@ -46,7 +46,6 @@
     <string name="loading_candidates">ዕጩዎችን በመጫን ላይ ነው</string>
     <string name="matching_fingerprints">የጣት አሻራውን ማመሳከር</string>
     <string name="returning_results">ውጤቱን መመለስ</string>
-    <string name="disconnected_title">እስካነሩን ያብሩ</string>
     <string name="verify_guid_not_found_title">ግለሰቡ አልተገኘም</string>
     <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="low_battery_title">ዝቅተኛ ባትሪ</string>
@@ -54,7 +53,7 @@
     <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
     <string name="button_submit">ይላኩ</string>
     <string name="close">ይዝጉ</string>
-    <string name="scanner_error_turn_scanner_on_message">\"1. እስካነሩን ያስነሱ \n 2. እንደገና ይሞክሩ\"</string>
+    <string name="scanner_error_turn_scanner_on_message">1. እስካነሩን ያስነሱ \n 2. እንደገና ይሞክሩ</string>
     <string name="refusal_toast_select_option_submit">እባክዎት ካሉት አማራጮች ይምረጡ እና ይላኩ</string>
     <string name="refusal_toast_submit">እባክዎት ቅጽን ይላኩ</string>
     <string name="get_ready">"ዝግጁ ነው "</string>
@@ -79,7 +78,7 @@
     <string name="bluetooth_error_title">የብሉቱዝ ስህተት</string>
     <string name="bluetooth_not_enabled_message">ብሉቱዝ አልተከፈተም ፡ለመጠቀም አያስችልም፤እባክዎ ማስተካከያው ውስጥ ገብተው ብሉቱዙን ከፍተው እንደገና ይሞክሩ</string>
     <string name="bluetooth_not_supported_message">የሚጠቀሙበት መሳሪያ ብሉቱዝ ለመጠቀም አያስችልም፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
-    <string name="bluetooth_error_pair_scanner_and_device_message">1. እስካነሩ መብራቱን ያረጋግጡ \n 2. መቸቱን /ሴቲንግ ይምረጡ \n 3 የተጣመረውን እስካነር ያለያዩ \n 4.እስካነርና ስልኩን ያጣምሩ \n 5 ወደ ሲምፕሪንት ይመለሱ</string>
+    <string name="bluetooth_error_pair_scanner_and_device_message">1. እስካነሩ መብራቱን ያረጋግጡ \n 2. መቸቱን /ሴቲንግ ይምረጡ \n 3. የተጣመረውን እስካነር ያለያዩ \n 4.እስካነርና ስልኩን ያጣምሩ \n 5. ወደ ሲምፕሪንት ይመለሱ</string>
     <string name="unforeseen_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
     <string name="verify_guid_not_found_offline_message">ግለሰቡ የለም፡ እባክዎ ከኢንተርኔት ጋር መገናኘትዎን አረጋግጠው እንደገና ይሞክሩ</string>
     <string name="verify_guid_not_found_online_message">አንዲጠራ የተመረጠው ግለሰብ ዳታቤዙ ውስጥ የለም</string>
@@ -95,4 +94,7 @@
     <string name="consent_share_data_yes">%1$s ሲምፕሪንት የተባለው ድርጅት ስለእርስዎ የጣት አሻራ እና አድራሻዎ መረጃ ይኖኖራቸዋል:&#160;</string>
     <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ:&#160;</string>
     <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ:</string>
+    <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
+    <string name="settings_label">የስልክ ማስተካከያ</string>
+    <string name="privacy_notice_title">የደህንነት ማሳታወቂያ</string>
 </resources>

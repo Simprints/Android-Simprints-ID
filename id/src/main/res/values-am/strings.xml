@@ -73,7 +73,6 @@
     <string name="preference_summary_modules">ሲንክ እንዲደረግ የሚፈልጉትን ምዕራፍይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>
-    <string name="privacy_notice_title">የደህንነት ማሳታወቂያ</string>
     <string name="records_up_to_date">ሁሉም መረጃዎች ወቅታዊ ሆነዋል</string>
     <string name="requestLogin_message">መግባት ከፈለጉ፡ እባክዎ የደንበኛውን አፕልኬሽን ከፍተው የሲም ፕሪንትን መለያቁጥር በመጠቀም መግባት ይችላሉ</string>
     <string name="requestLogin_title">መግባት ይጠበቅበዎታል፡፡</string>
@@ -83,7 +82,6 @@
     <string name="settings_app_version">የአፕልኬሽን ስሪት</string>
     <string name="settings_general">አጠቃላይ</string>
     <string name="settings_invalid_selection">የተሳሳተ ምርጫ</string>
-    <string name="settings_label">የስልክ ማስተካከያ</string>
     <string name="settings_no_modules_toast">የተሳሳተ ምርጫ፡ እባክዎት ካለው የምዕራፍ አማራጭ ውስጥ ቢያንስ አንድ ይምረጡ</string>
     <string name="settings_scanner_version">የእስካነር  ስሪት</string>
     <string name="simprints_logo">የስምፕሪንት አርማ</string>
