@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
@@ -89,7 +89,7 @@ class OdkPresenterTest {
             handleEnrollResponse(EnrollResponse(registerId))
         }
 
-        verifyOnce(view) { returnRegistration(registerId, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
+        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -108,7 +108,7 @@ class OdkPresenterTest {
                 confidenceList = "${id1.confidence} ${id2.confidence}",
                 tierList = "${id1.tier} ${id2.tier}",
                 sessionId = sessionId,
-                skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
@@ -125,7 +125,7 @@ class OdkPresenterTest {
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
                 tier = verification.matchResult.tier.toString(),
-                skipCheck = SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
@@ -136,19 +136,19 @@ class OdkPresenterTest {
             handleResponseError(error)
         }
 
-        verifyOnce(view) { returnErrorToClient(error, SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED) }
+        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
             runBlocking { start() }
         }
 
-        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {
@@ -156,7 +156,7 @@ class OdkPresenterTest {
     }
 
     companion object {
-        internal const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
+        internal const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
 }

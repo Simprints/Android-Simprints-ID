@@ -12,7 +12,6 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
@@ -65,7 +64,8 @@ class MatchingPresenter(
             .setMatchingSchedulers()
             .subscribeBy(
                 onSuccess = {
-                    matchTask.handleMatchResult(it.candidates, it.scores) },
+                    matchTask.handleMatchResult(it.candidates, it.scores)
+                },
                 onError = {
                     crashReportManager.logExceptionOrSafeException(it)
                     view.makeToastMatchFailed()
@@ -106,7 +106,7 @@ class MatchingPresenter(
     }
 
     override fun handleBackPressed() {
-        view.setResultAndFinish(ResultCode.CANCELLED, null)
+        /** Do nothing */
     }
 
     override fun dispose() {

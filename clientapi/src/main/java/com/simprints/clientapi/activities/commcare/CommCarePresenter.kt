@@ -1,6 +1,6 @@
 package com.simprints.clientapi.activities.commcare
 
-import com.simprints.clientapi.Constants.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+import com.simprints.clientapi.Constants.RETURN_FOR_FLOW_COMPLETED
 import com.simprints.clientapi.activities.baserequest.RequestPresenter
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.crashreport.ClientApiCrashReportManager
@@ -8,7 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.data.sharedpreferences.SharedPreferencesManager
 import com.simprints.clientapi.domain.responses.*
-import com.simprints.clientapi.extensions.skipCheckForError
+import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
@@ -49,15 +49,15 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleEnrollResponse(enroll: EnrollResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
-            view.returnRegistration(enroll.guid, skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnRegistration(enroll.guid, flowCompletedCheck)
         }
     }
 
     //CommCare can process Identifications results as LibSimprints format only.
-    //So CC will be able to handle skipCheck flag for Identifications only when libsimprints supports
-    // skipValue flag and CC updates the libsimprints version (=never)
+    //So CC will be able to handle flowCompletedCheck flag for Identifications only when libsimprints supports
+    // flowCompletedCheck flag and CC updates the libsimprints version (=never)
     override fun handleIdentifyResponse(identify: IdentifyResponse) {
         sharedPreferencesManager.stashSessionId(identify.sessionId)
         view.returnIdentification(ArrayList(identify.identifications.map {
@@ -67,38 +67,42 @@ class CommCarePresenter(private val view: CommCareContract.View,
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = errorResponse.skipCheckForError()
-            addSkipCheckEvent(skipCheck)
-            view.returnErrorToClient(errorResponse, skipCheck)
+            val flowCompletedCheck = errorResponse.isFlowCompletedWithCurrentError()
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnErrorToClient(errorResponse, flowCompletedCheck)
         }
     }
 
     override fun handleVerifyResponse(verify: VerifyResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
             view.returnVerification(
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
-                skipCheck
+                flowCompletedCheck
             )
         }
     }
 
     override fun handleRefusalResponse(refusalForm: RefusalFormResponse) {
         CoroutineScope(Dispatchers.Main).launch {
-            val skipCheck = SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
-            addSkipCheckEvent(skipCheck)
-            view.returnExitForms(refusalForm.reason, refusalForm.extra, skipCheck)
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnExitForms(refusalForm.reason, refusalForm.extra, flowCompletedCheck)
         }
     }
 
-    private suspend fun addSkipCheckEvent(skipCheck: Boolean) =
-        sessionEventsManager.addSkipCheckEvent(skipCheck)
+    private suspend fun addCompletionCheckEvent(flowCompletedCheck: Boolean) =
+        sessionEventsManager.addCompletionCheckEvent(flowCompletedCheck)
 
     override fun handleConfirmationResponse(response: ConfirmationResponse) {
-        view.returnConfirmation(response.identificationOutcome)
+        CoroutineScope(Dispatchers.Main).launch {
+            val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
+            addCompletionCheckEvent(flowCompletedCheck)
+            view.returnConfirmation(flowCompletedCheck)
+        }
     }
 
     private fun checkAndProcessSessionId() {
@@ -108,7 +112,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
             }
         }
 
-        processConfirmIdentifyRequest()
+        processConfirmIdentityRequest()
     }
 
 }

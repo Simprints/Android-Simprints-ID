@@ -2,7 +2,7 @@ package com.simprints.clientapi.activities.baserequest
 
 import com.simprints.clientapi.activities.errors.ClientApiAlert.*
 import com.simprints.clientapi.clientrequests.builders.*
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.clientrequests.validators.EnrollValidator
 import com.simprints.clientapi.clientrequests.validators.IdentifyValidator
 import com.simprints.clientapi.clientrequests.validators.VerifyValidator
@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.inBackground
-import com.simprints.clientapi.extensions.skipCheckForError
+import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
@@ -32,10 +32,10 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
         VerifyBuilder(view.verifyExtractor, VerifyValidator(view.verifyExtractor))
     )
 
-    override fun processConfirmIdentifyRequest() = validateAndSendRequest(
+    override fun processConfirmIdentityRequest() = validateAndSendRequest(
         ConfirmIdentifyBuilder(
-            view.confirmIdentifyExtractor,
-            ConfirmIdentifyValidator(view.confirmIdentifyExtractor)
+            view.confirmIdentityExtractor,
+            ConfirmIdentityValidator(view.confirmIdentityExtractor)
         )
     )
 
@@ -70,7 +70,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
     }
 
     override fun handleResponseError(errorResponse: ErrorResponse) {
-        view.returnErrorToClient(errorResponse, errorResponse.skipCheckForError())
+        view.returnErrorToClient(errorResponse, errorResponse.isFlowCompletedWithCurrentError())
     }
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {

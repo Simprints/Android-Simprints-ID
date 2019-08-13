@@ -11,15 +11,15 @@ interface CommCareContract {
 
     interface View : BaseView<Presenter>, RequestContract.RequestView {
 
-        fun returnRegistration(guid: String, skipCheck: Boolean)
+        fun returnRegistration(guid: String, flowCompletedCheck: Boolean)
 
         fun returnIdentification(identifications: ArrayList<Identification>, sessionId: String)
 
-        fun returnVerification(confidence: Int, tier: Tier, guid: String, skipCheck: Boolean)
+        fun returnVerification(confidence: Int, tier: Tier, guid: String, flowCompletedCheck: Boolean)
 
-        fun returnExitForms(reason: String, extra: String, skipCheck: Boolean)
+        fun returnExitForms(reason: String, extra: String, flowCompletedCheck: Boolean)
 
-        fun returnConfirmation(identificationOutcome: Boolean)
+        fun returnConfirmation(flowCompletedCheck: Boolean)
 
         fun injectSessionIdIntoIntent(sessionId: String)
 

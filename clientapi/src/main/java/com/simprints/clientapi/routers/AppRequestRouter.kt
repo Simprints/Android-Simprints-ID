@@ -6,7 +6,7 @@ import com.simprints.clientapi.domain.requests.EnrollRequest
 import com.simprints.clientapi.domain.requests.IdentifyRequest
 import com.simprints.clientapi.domain.requests.VerifyRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
-import com.simprints.clientapi.domain.requests.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.IdentityConfirmation
 import com.simprints.clientapi.exceptions.InvalidClientRequestException
 import com.simprints.clientapi.extensions.toIntent
 
@@ -37,7 +37,7 @@ object AppRequestRouter {
                                    request: BaseConfirmation) {
         when (request) {
             // Regular Requests
-            is IdentifyConfirmation ->
+            is IdentityConfirmation ->
                 act.route(request, CONFIRM_IDENTITY, CONFIRM_IDENTITY_REQUEST_CODE)
 
             // Handle Error
