@@ -11,7 +11,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
@@ -31,7 +31,7 @@ import java.util.*
 class LibSimprintsPresenterTest {
 
     companion object {
-        const val SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED = false
+        const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
     private val view = mock<LibSimprintsActivity>()
@@ -79,12 +79,12 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
         LibSimprintsPresenter(view, Constants.SIMPRINTS_SELECT_GUID_INTENT, mockSessionManagerToCreateSession(), mock()).apply { runBlocking { start() } }
 
-        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentifyFactory.getValidSimprintsRequest(STANDARD)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(STANDARD)) }
     }
 
     @Test
@@ -105,9 +105,9 @@ class LibSimprintsPresenterTest {
                 argThat {
                     assertThat(it.guid).isEqualTo(registerId)
                 },
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
@@ -132,10 +132,10 @@ class LibSimprintsPresenterTest {
                     }
                 },
                 eq(sessionId),
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
 
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
@@ -158,22 +158,22 @@ class LibSimprintsPresenterTest {
                     assertThat(it.tier).isEqualTo(libVerification.tier)
                     assertThat(it.guid).isEqualTo(libVerification.guid)
                 },
-                eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+                eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
         LibSimprintsPresenter(view, "", clientApiSessionEventsManager, mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
         verifyOnce(view) {
-            returnErrorToClient(anyNotNull(), eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED))
+            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
-        verifySkipCheckEventWasAdded()
+        verifyCompletionCheckEventWasAdded()
     }
 
-    private fun verifySkipCheckEventWasAdded() {
-        verifyOnce(clientApiSessionEventsManager) { runBlocking { addSkipCheckEvent(eq(SKIP_CHECK_VALUE_FOR_FLOW_COMPLETED)) } }
+    private fun verifyCompletionCheckEventWasAdded() {
+        verifyOnce(clientApiSessionEventsManager) { runBlocking { addCompletionCheckEvent(eq(RETURN_FOR_FLOW_COMPLETED_CHECK)) } }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {

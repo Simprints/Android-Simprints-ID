@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.activities.errors.response.AlertActResponse
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
 import com.simprints.clientapi.clientrequests.extractors.EnrollExtractor
 import com.simprints.clientapi.clientrequests.extractors.IdentifyExtractor
 import com.simprints.clientapi.clientrequests.extractors.VerifyExtractor
@@ -40,8 +40,8 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     override val identifyExtractor: IdentifyExtractor
         get() = IdentifyExtractor(intent)
 
-    override val confirmIdentifyExtractor: ConfirmIdentifyExtractor
-        get() = ConfirmIdentifyExtractor(intent)
+    override val confirmIdentityExtractor: ConfirmIdentityExtractor
+        get() = ConfirmIdentityExtractor(intent)
 
     override fun sendSimprintsRequest(request: BaseRequest) =
         routeSimprintsRequest(this, request)
@@ -55,7 +55,7 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
         launchAlert(this, clientApiAlert)
     }
 
-    override fun returnErrorToClient(errorResponse: ErrorResponse, skipCheck: Boolean) = sendCancelResult()
+    override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = sendCancelResult()
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

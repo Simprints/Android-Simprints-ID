@@ -22,7 +22,7 @@ class CommCareErrorResponseTest : BaseCommCareClientApiTest() {
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
-        assertCommCareErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+        assertCommCareErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
 
     @Test
@@ -33,14 +33,15 @@ class CommCareErrorResponseTest : BaseCommCareClientApiTest() {
         val scenario =
             ActivityScenario.launch<CommCareActivity>(commCareBaseIntentRequest.apply { action = COMMCARE_ENROL_ACTION })
 
-        assertCommCareErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW)
+        assertCommCareErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }
 
-    private fun assertCommCareErrorResponse(scenario: ActivityScenario<CommCareActivity>, expectedSkipCheck: Boolean) {
+    private fun assertCommCareErrorResponse(scenario: ActivityScenario<CommCareActivity>,
+                                            expectedBiometricsCompleteCheck: Boolean) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
-            assertThat(it.getString(SKIP_CHECK_KEY)).isEqualTo(expectedSkipCheck.toString())
+            assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(expectedBiometricsCompleteCheck.toString())
         } ?: throw Exception("No bundle found")
     }
 }

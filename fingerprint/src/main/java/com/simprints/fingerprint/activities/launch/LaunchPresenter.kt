@@ -212,8 +212,16 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
-        launchAlert(scannerManager.getAlertType(it))
+        launchScannerAlertOrShowDialog(scannerManager.getAlertType(it))
         crashReportManager.logExceptionOrSafeException(it)
+    }
+
+    private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
+        if (alert == FingerprintAlert.DISCONNECTED) {
+            view.showDialogForScannerErrorConfirmation(scannerManager.scanner?.scannerId ?: "")
+        } else {
+            launchAlert(alert)
+        }
     }
 
     private fun requestPermissionsForLocation(progress: Int): Completable {
@@ -350,6 +358,14 @@ class LaunchPresenter(component: FingerprintComponent,
 
     override fun handleOnPause() {
         launchOutOfFocus = true
+    }
+
+    override fun handleScannerDisconnectedYesClick() {
+        launchAlert(FingerprintAlert.DISCONNECTED)
+    }
+
+    override fun handleScannerDisconnectedNoClick() {
+        launchAlert(FingerprintAlert.NOT_PAIRED)
     }
 
     private fun addBluetoothConnectivityEvent() {

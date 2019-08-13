@@ -1,5 +1,6 @@
 package com.simprints.clientapi.integration.odk
 
+import android.content.Intent
 import com.simprints.clientapi.activities.odk.OdkActivity
 import com.simprints.clientapi.integration.BaseClientApiTest
 
@@ -7,22 +8,29 @@ open class BaseOdkClientApiTest : BaseClientApiTest() {
 
     private val odkActivityName = OdkActivity::class.qualifiedName!!
 
+    internal val odkConfirmIntentRequest = baseConfirmIntentRequest.apply {
+        setClassName(packageName, odkActivityName)
+    }
+
     internal val odkBaseIntentRequest = baseIntentRequest.apply {
         setClassName(packageName, odkActivityName)
     }
 
-    internal val odkInvalidIntentRequest = invalidIntentRequest.apply {
-        setClassName(packageName, odkActivityName)
-    }
+    fun makeIntentRequestInvalid(baseIntent: Intent, invalidParam: Pair<String, String> = projectIdField) =
+        super.getInvalidIntentRequest(baseIntent, invalidParam).apply {
+            setClassName(packageName, odkActivityName)
+        }
 
-    internal val odkSuspiciousIntentRequest = suspiciousIntentRequest.apply {
-        setClassName(packageName, odkActivityName)
-    }
+    override fun makeIntentRequestSuspicious(baseIntent: Intent) =
+        super.makeIntentRequestSuspicious(baseIntent).apply {
+            setClassName(packageName, odkActivityName)
+        }
+    
 
     companion object {
         internal const val ODK_REGISTRATION_ID_KEY = "odk-registration-id"
         internal const val ODK_GUIDS_KEY = "odk-guids"
-        internal const val ODK_SKIP_CHECK_KEY = "odk-skip-check"
+        internal const val ODK_BIOMETRICS_COMPLETE_KEY = "odk-biometrics-complete"
         internal const val ODK_CONFIDENCES_KEY = "odk-confidences"
         internal const val ODK_TIERS_KEY = "odk-tiers"
         internal const val ODK_SESSION_ID = "odk-session-id"
