@@ -136,7 +136,7 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.setup()
 
-        verifyOnce(checkLoginFromIntentPresenter) { addInfoIntoSessionEvents() }
+        verifyOnce(checkLoginFromIntentPresenter) { addAnalyticsInfo() }
         verifyOnce(checkLoginFromIntentPresenter) { populateSessionWithAnalyticsIdAndDbInfo("analyticsId", 0) }
     }
 }
