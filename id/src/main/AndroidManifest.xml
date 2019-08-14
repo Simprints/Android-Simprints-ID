@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.id">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -20,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity android:name=".activities.consent.ConsentActivity"></activity>
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"
@@ -28,17 +27,16 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:label="@string/title_activity_orchestrator"
             android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher" />
-
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:label="@string/title_activity_front"
@@ -61,7 +59,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.alert.AlertActivity"
             android:label="@string/alert_title"
@@ -96,7 +93,6 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
-
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:label="@string/dashboard_label"
@@ -106,7 +102,6 @@
             android:name=".activities.longConsent.LongConsentActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"
