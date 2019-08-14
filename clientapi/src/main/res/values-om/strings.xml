@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Client API</string>
+    <string name="guid_selection_result_sent">Bu\'aan ergameera</string>
+    <string name="configuration_error_title">Rakkoo sirreeffamaa</string>
+    <string name="guid_selection_data_sent">Ragaan ergameera</string>
+    <string name="configuration_error_message">Rakkoon sirreeffamaa uumameera (%1$s), maaloo superzaayisara kee haasofsiisi</string>
+</resources>
