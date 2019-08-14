@@ -60,7 +60,7 @@
     <string name="records_up_to_date">Galmeen hundi haaromfameera</string>
     <string name="requestLogin_message">"Seenuu si barbaachisa. \"Simprints ID\" banuuf maaloo mosaajii tajaajilamtuu seeni "</string>
     <string name="requestLogin_title">"Seenuu si barbaachisa "</string>
-    <string name="safetynet_down_alert_message">Daqiiqaa 5-10 booda irra deebi\'uun yaali</string>
+    <string name="safetynet_down_alert_message">Daqiiqaa 5–10 booda irra deebi\'uun yaali</string>
     <string name="settings_app_details">Odeeffannoo Mosaajii</string>
     <string name="settings_app_version">Varzinii Mosaajii</string>
     <string name="settings_general">Waliigala</string>
@@ -70,4 +70,23 @@
     <string name="simprints_logo">Asxaa Simptrints</string>
     <string name="title_activity_settings_about">Waa\'ee</string>
     <string name="unforeseen_error_message">Maaloo irra deebi\'ii yaaliitii yoo \'Simprints\' kee hin hojjetu ta\'e,suppervaayizera kee quunnami.</string>
+    <string name="about_libsimprints_version">LibSimprints Varzinii</string>
+    <string name="configuration_error_title">Dogoggora \'Configuration\'</string>
+    <string name="different_projectId_message">Dogoggorri \'configuration\' uumameera (Projektii ID\'n adda) maaloo fuula screen(home screen) keessaa bahii suppervaayizera kee quunnami.</string>
+    <string name="different_userId_message">Dogoggorri \'configuration\' uumameera (ID\'n fayyadamaa adda) maaloo fuula screen(home screen) keessaa bahii suppervaayizera kee quunnami.</string>
+    <string name="invalid_intentAction_message">Dogoggorri \'configuration\' uumameera (Intent action\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_metadata_message">Dogoggorri \'configuration\' uumameera (metadata\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_moduleId_message">Dogoggorri \'configuration\' uumameera (ID\'n module sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_projectId_message">Dogoggorri \'configuration\' uumameera (Projektii ID\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_selectedId_message">Dogoggorri \'configuration\' uumameera (ID\'n filatame sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_sessionId_message">Dogoggorri \'configuration\' uumameera (session ID\'n sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_userId_message">Dogoggorri \'configuration\' uumameera (ID\'n fayyadamaa sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="invalid_verifyId_message">Dogoggorri \'configuration\' uumameera (GUID\'n mirkanaa\'u sirrii miti) maaloo suppervaayizera kee quunnami.</string>
+    <string name="login">Seeni</string>
+    <string name="login_enter_project_secret_id">Adda baaftuu omoshaa fi furtuu kee galchi</string>
+    <string name="login_id_hint">Adda Baaftuu Omishaa</string>
+    <string name="login_secret_hint">Furtuu Omishaa</string>
+    <string name="menu_settings">Mijeessaa</string>
+    <string name="settings_too_many_modules_toast">Filannoo dogoggoraa. Maaloo, %1$d moojulii ol hin filatiin.</string>
+    <string name="title_activity_settings">Mijeessaa</string>
 </resources>
