@@ -52,7 +52,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         component.inject(this)
     }
 
-    @SuppressLint("CheckResult")
     override fun setup() {
         try {
             addAnalyticsInfoAndProjectId()
@@ -204,7 +203,6 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    @SuppressLint("CheckResult")
     internal fun addAnalyticsInfoAndProjectId() =
         fetchAnalyticsId()
             .flatMapCompletable { gaId ->
@@ -215,7 +213,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                     }
                     it.analyticsId = gaId
                 }
-            }
+            }.subscribeBy(onError = { it.printStackTrace() })
 
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
