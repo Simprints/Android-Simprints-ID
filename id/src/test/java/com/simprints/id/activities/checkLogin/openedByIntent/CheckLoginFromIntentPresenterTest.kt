@@ -34,6 +34,10 @@ class CheckLoginFromIntentPresenterTest {
             dbManager = mock()
             preferencesManager = mock()
 
+            analyticsManager = mock<AnalyticsManager>().apply {
+                whenever(this) { analyticsId } thenReturn Single.just("analyticsId")
+            }
+
             crashReportManager = mock<CrashReportManager>().apply {
                 whenever(this) { setSessionIdCrashlyticsKey(anyNotNull()) } thenDoNothing {}
             }
@@ -136,7 +140,6 @@ class CheckLoginFromIntentPresenterTest {
 
         checkLoginFromIntentPresenter.setup()
 
-        verifyOnce(checkLoginFromIntentPresenter) { addAnalyticsInfo() }
-        verifyOnce(checkLoginFromIntentPresenter) { populateSessionWithAnalyticsIdAndDbInfo("analyticsId", 0) }
+        verifyOnce(checkLoginFromIntentPresenter) { addAnalyticsInfoAndProjectId() }
     }
 }
