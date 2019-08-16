@@ -37,11 +37,10 @@ class ConsentActivity : AppCompatActivity() {
 
         observeGeneralConsentData()
         observeParentalConsentData()
+        observeConsentClick()
 
         addClickListenerToConsentAccept()
         addClickListenerToConsentDecline()
-
-        viewModel.start()
     }
 
     private fun setupTabs() {
@@ -59,6 +58,10 @@ class ConsentActivity : AppCompatActivity() {
 
         generalConsentTextView.movementMethod = ScrollingMovementMethod()
         parentalConsentTextView.movementMethod = ScrollingMovementMethod()
+
+        tabHost.setOnTabChangedListener {
+            viewModel.isConsentTabGeneral = (it == GENERAL_CONSENT_TAB_TAG)
+        }
     }
 
     private fun observeGeneralConsentData() {
@@ -72,6 +75,14 @@ class ConsentActivity : AppCompatActivity() {
             if (it.parentalConsentExists) {
                 tabHost.addTab(parentalConsentTab)
                 parentalConsentTextView.text = it.assembleText(this, appRequest)
+            }
+        })
+    }
+
+    private fun observeConsentClick() {
+        viewModel.consentAcceptClick.observe(this, Observer {
+            if (it) {
+                //launch collect fingerprints
             }
         })
     }

@@ -283,7 +283,9 @@ open class AppModule {
     @Provides
     open fun provideConsentViewModelFactory(consentDataManager: ConsentDataManager,
                                             crashReportManager: CrashReportManager,
-                                            preferencesManager: PreferencesManager) =
-        ConsentViewModelFactory(consentDataManager, crashReportManager, preferencesManager)
+                                            preferencesManager: PreferencesManager,
+                                            sessionEventsManager: SessionEventsManager,
+                                            timeHelper: TimeHelper) =
+        ConsentViewModelFactory(consentDataManager, crashReportManager, preferencesManager, sessionEventsManager, timeHelper)
 }
 
