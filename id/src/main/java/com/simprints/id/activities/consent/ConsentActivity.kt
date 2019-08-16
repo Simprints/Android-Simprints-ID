@@ -6,24 +6,38 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import kotlinx.android.synthetic.main.activity_consent.*
+import javax.inject.Inject
 
 class ConsentActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ConsentViewModel
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
+    private lateinit var appRequest: AppRequest
+
+    @Inject lateinit var viewModelFactory: ConsentViewModelFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_consent)
 
-        viewModel = ViewModelProviders.of(this).get(ConsentViewModel::class.java)
+        val component = (application as Application).component
+        component.inject(this)
+
+        appRequest = intent.extras?.getParcelable(AppRequest.BUNDLE_KEY) ?: throw InvalidAppRequest()
+
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConsentViewModel::class.java)
 
         setupTabs()
-        observeGeneralConsentText()
-        observeParentalConsentText()
+
+        observeGeneralConsentData()
+        observeParentalConsentData()
+
         addClickListenerToConsentAccept()
         addClickListenerToConsentDecline()
 
@@ -47,16 +61,18 @@ class ConsentActivity : AppCompatActivity() {
         parentalConsentTextView.movementMethod = ScrollingMovementMethod()
     }
 
-    private fun observeParentalConsentText() {
-        viewModel.parentalConsentText.observe(this, Observer {
-            tabHost.addTab(parentalConsentTab)
-            parentalConsentTextView.text = it
+    private fun observeGeneralConsentData() {
+        viewModel.generalConsentData.observe(this, Observer {
+            generalConsentTextView.text = it.assembleText(this, appRequest)
         })
     }
 
-    private fun observeGeneralConsentText() {
-        viewModel.generalConsentText.observe(this, Observer {
-            generalConsentTextView.text = it
+    private fun observeParentalConsentData() {
+        viewModel.parentalConsentData.observe(this, Observer {
+            if (it.parentalConsentExists) {
+                tabHost.addTab(parentalConsentTab)
+                parentalConsentTextView.text = it.assembleText(this, appRequest)
+            }
         })
     }
 

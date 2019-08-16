@@ -9,7 +9,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
-import com.simprints.id.activities.consent.ConsentViewModel
+import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
@@ -100,7 +100,7 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
-    fun inject(consentViewModel: ConsentViewModel)
+    fun inject(consentActivity: ConsentActivity)
 
 
     fun getDbManager(): DbManager

@@ -6,6 +6,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
+import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
@@ -18,6 +19,8 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
+import com.simprints.id.data.consent.shortconsent.ConsentDataManager
+import com.simprints.id.data.consent.shortconsent.ConsentDataManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -34,6 +37,7 @@ import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -271,5 +275,15 @@ open class AppModule {
                                          sessionEventsManager: SessionEventsManager): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
+
+    @Provides
+    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentDataManager =
+        ConsentDataManagerImpl(prefs, remoteConfigWrapper)
+
+    @Provides
+    open fun provideConsentViewModelFactory(consentDataManager: ConsentDataManager,
+                                            crashReportManager: CrashReportManager,
+                                            preferencesManager: PreferencesManager) =
+        ConsentViewModelFactory(consentDataManager, crashReportManager, preferencesManager)
 }
 
