@@ -21,6 +21,8 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.consent.shortconsent.ConsentDataManager
 import com.simprints.id.data.consent.shortconsent.ConsentDataManagerImpl
+import com.simprints.id.data.consent.shortconsent.ConsentTextManager
+import com.simprints.id.data.consent.shortconsent.ConsentTextManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -281,11 +283,17 @@ open class AppModule {
         ConsentDataManagerImpl(prefs, remoteConfigWrapper)
 
     @Provides
-    open fun provideConsentViewModelFactory(consentDataManager: ConsentDataManager,
-                                            crashReportManager: CrashReportManager,
-                                            preferencesManager: PreferencesManager,
+    open fun provideConsentTextManager(context: Context,
+                                       consentDataManager: ConsentDataManager,
+                                       crashReportManager: CrashReportManager,
+                                       preferencesManager: PreferencesManager) : ConsentTextManager =
+        ConsentTextManagerImpl(context, consentDataManager, crashReportManager,
+            preferencesManager.programName, preferencesManager.organizationName)
+
+    @Provides
+    open fun provideConsentViewModelFactory(consentTextManager: ConsentTextManager,
                                             sessionEventsManager: SessionEventsManager,
                                             timeHelper: TimeHelper) =
-        ConsentViewModelFactory(consentDataManager, crashReportManager, preferencesManager, sessionEventsManager, timeHelper)
+        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
 }
 

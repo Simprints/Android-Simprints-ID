@@ -3,10 +3,10 @@ package com.simprints.id.data.analytics.eventdata.models.domain.events
 import androidx.annotation.Keep
 
 @Keep
-class ConsentEvent(starTime: Long,
+class ConsentEvent(startTime: Long,
                    endTime: Long,
                    val consentType: Type,
-                   var result: Result) : Event(EventType.CONSENT, starTime, endTime) {
+                   var result: Result) : Event(EventType.CONSENT, startTime, endTime) {
 
     @Keep
     enum class Type {

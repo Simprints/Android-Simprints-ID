@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
 
@@ -21,6 +24,10 @@ class ConsentActivity : AppCompatActivity() {
     private lateinit var appRequest: AppRequest
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
+    @Inject lateinit var timeHelper: TimeHelper
+
+    private val consentEvents = MutableLiveData<ConsentEvent>()
+    private var startConsentEventTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +36,20 @@ class ConsentActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
 
+        startConsentEventTime = timeHelper.now()
+
         appRequest = intent.extras?.getParcelable(AppRequest.BUNDLE_KEY) ?: throw InvalidAppRequest()
 
+        viewModelFactory.consentEvents = consentEvents
+
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConsentViewModel::class.java)
+        viewModel.appRequest.postValue(appRequest)
 
         setupTabs()
 
         observeGeneralConsentData()
         observeParentalConsentData()
-        observeConsentClick()
+        observeParentalConsentExistance()
 
         addClickListenerToConsentAccept()
         addClickListenerToConsentDecline()
@@ -65,34 +77,43 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun observeGeneralConsentData() {
-        viewModel.generalConsentData.observe(this, Observer {
-            generalConsentTextView.text = it.assembleText(this, appRequest)
+        viewModel.generalConsentText.observe(this, Observer {
+            generalConsentTextView.text = it
         })
     }
 
     private fun observeParentalConsentData() {
-        viewModel.parentalConsentData.observe(this, Observer {
-            if (it.parentalConsentExists) {
-                tabHost.addTab(parentalConsentTab)
-                parentalConsentTextView.text = it.assembleText(this, appRequest)
-            }
+        viewModel.parentalConsentText.observe(this, Observer {
+            parentalConsentTextView.text = it
         })
     }
 
-    private fun observeConsentClick() {
-        viewModel.consentAcceptClick.observe(this, Observer {
+    private fun observeParentalConsentExistance() {
+        viewModel.parentalConsentExists.observe(this, Observer {
             if (it) {
-                //launch collect fingerprints
+                tabHost.addTab(parentalConsentTab)
             }
         })
     }
 
     private fun addClickListenerToConsentAccept() {
-        consentAcceptButton.setOnClickListener { viewModel.handleConsentAcceptClick() }
+        consentAcceptButton.setOnClickListener {
+            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+                getCurrentConsentTab(), ConsentEvent.Result.ACCEPTED))
+        }
     }
 
     private fun addClickListenerToConsentDecline() {
-        consentDeclineButton.setOnClickListener { viewModel.handleConsentDeclineClick() }
+        consentDeclineButton.setOnClickListener {
+            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+                getCurrentConsentTab(), ConsentEvent.Result.DECLINED))
+        }
+    }
+
+    private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
+        GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
+        PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
+        else -> throw Exception()
     }
 
     companion object {
