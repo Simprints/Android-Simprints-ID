@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
 import com.simprints.id.R
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 
 @Keep
-data class ParentalConsent(
+data class ParentalConsentOptions(
     @SerializedName("consent_parent_enrol_only") var consentParentEnrolOnly: Boolean = false,
     @SerializedName("consent_parent_enrol") var consentParentEnrol: Boolean = true,
     @SerializedName("consent_parent_id_verify") var consentParentIdVerify: Boolean = true,
@@ -20,9 +20,9 @@ data class ParentalConsent(
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, fingerprintRequest: FingerprintRequest, programName: String, organisationName: String) = StringBuilder().apply {
-        when (fingerprintRequest) {
-            is FingerprintIdentifyRequest, is FingerprintVerifyRequest -> {
+    fun assembleText(context: Context, appRequest: AppRequest, programName: String, organisationName: String) = StringBuilder().apply {
+        when (appRequest) {
+            is AppIdentifyRequest, is AppVerifyRequest -> {
                 if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
             }
             else -> {
