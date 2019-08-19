@@ -59,7 +59,7 @@
     <string name="get_ready">"ዝግጁ ነው "</string>
     <string name="hint_other_reason">ተጨማሪ ኢንፎርሜሽን</string>
     <string name="low_battery_message">የእስካነሩ ባትሪ እያለቀ ነው እባክዎ እስካነሩን ቻርጅ ያድርጉ</string>
-    <string name="missing_finger">"የተዘለለ ጣት "</string>
+    <string name="missing_finger"><u>የተዘለለ ጣት</u></string>
     <string name="multiple_scanners_found_message">በስልኩ ላይ ከአንድ በላይ እስካነር ተገናኝቷል፣ እባክዎ የማይፈልጉትን እስካነር ግንኙነቱን ያቋርጡ</string>
     <string name="pair_scanner_label">ማስተካከያ</string>
     <string name="refusal_data_concerns">መረጃውን ለመስጠት አልፈለጉም</string>
@@ -96,5 +96,5 @@
     <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ:</string>
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="settings_label">የስልክ ማስተካከያ</string>
-    <string name="privacy_notice_text">የደህንነት ማሳታወቂያ</string>
+    <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
 </resources>
