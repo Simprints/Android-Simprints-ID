@@ -37,7 +37,6 @@
     <string name="no_finger_detected_message">Ashaaraan qubaa hin argamne</string>
     <string name="no_fingers_scanned">Maaloo yoo xiqqate quba barbaadamu 1 \'scan\' godhi.</string>
     <string name="please_wait">Maaloo hanga nuti adda baafannutti eegi</string>
-    <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
     <string name="r_3_finger_name">Quba mirgaa 3ffaa</string>
     <string name="r_4_finger_name">Quba mirgaa 4ffaa</string>
     <string name="r_5_finger_name">Quba mirgaa 5ffaa</string>
@@ -96,4 +95,5 @@
     <string name="bluetooth_error_pair_scanner_and_device_title">Skaanarii fi meshaa walquunnamsisi</string>
     <string name="low_battery_message">Chaarjiin tiriikaa (battery) iskaanarii gadi aanaa dha, maaloo iskaanarii kee chaarjii godhi.</string>
     <string name="pair_scanner_label">Mijeessaa</string>
+    <string name="privacy_notice_text">Yaadachiisa iccitiin eegamu</string>
 </resources>

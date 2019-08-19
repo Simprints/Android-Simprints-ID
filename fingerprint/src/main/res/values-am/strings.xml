@@ -96,5 +96,5 @@
     <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ:</string>
     <string name="scanner_error_turn_scanner_on_title">እስካነሩን ያብሩ</string>
     <string name="settings_label">የስልክ ማስተካከያ</string>
-    <string name="privacy_notice_title">የደህንነት ማሳታወቂያ</string>
+    <string name="privacy_notice_text">የደህንነት ማሳታወቂያ</string>
 </resources>
