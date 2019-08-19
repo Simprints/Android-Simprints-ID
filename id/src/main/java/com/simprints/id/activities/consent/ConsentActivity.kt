@@ -1,5 +1,6 @@
 package com.simprints.id.activities.consent
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.TabHost
@@ -9,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -53,6 +55,7 @@ class ConsentActivity : AppCompatActivity() {
 
         addClickListenerToConsentAccept()
         addClickListenerToConsentDecline()
+        addClickListenerToPrivacyNotice()
     }
 
     private fun setupTabs() {
@@ -98,14 +101,14 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun addClickListenerToConsentAccept() {
         consentAcceptButton.setOnClickListener {
-            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+            viewModel.consentLiveData.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
                 getCurrentConsentTab(), ConsentEvent.Result.ACCEPTED))
         }
     }
 
     private fun addClickListenerToConsentDecline() {
         consentDeclineButton.setOnClickListener {
-            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+            viewModel.consentLiveData.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
                 getCurrentConsentTab(), ConsentEvent.Result.DECLINED))
         }
     }
@@ -114,6 +117,16 @@ class ConsentActivity : AppCompatActivity() {
         GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
         else -> throw Exception()
+    }
+
+    private fun addClickListenerToPrivacyNotice() {
+        privacyNoticeText.setOnClickListener {
+            startPrivacyNoticeActivity()
+        }
+    }
+
+    private fun startPrivacyNoticeActivity() {
+        startActivity(Intent(this, LongConsentActivity::class.java))
     }
 
     companion object {
