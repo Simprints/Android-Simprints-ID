@@ -100,17 +100,12 @@ class LoginPresenter(val view: LoginContract.View,
                                                                   suppliedProjectId: String,
                                                                   suppliedUserId: String) {
 
-        sessionEventsManager.updateSessionInBackground {
-            if (result == AUTHENTICATED) {
-                it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-            }
-
-            it.addEvent(AuthenticationEvent(
+        sessionEventsManager.addEventInBackground(
+            AuthenticationEvent(
                 startTimeLogin,
                 timeHelper.now(),
                 UserInfo(suppliedProjectId, suppliedUserId),
                 result))
-        }
     }
 
     private fun handleSignInError(e: Throwable,
