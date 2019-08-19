@@ -21,7 +21,7 @@ import io.reactivex.Completable
 open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
-    override var macAddress: String? = null
+    override var lastPairedScannerId: String? = null
 
     @SuppressLint("CheckResult")
     override fun start(): Completable =
@@ -64,7 +64,7 @@ open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAd
             else -> {
                 val macAddress = pairedScanners[0]
                 scanner = Scanner(macAddress, bluetoothAdapter)
-                this.macAddress = macAddress
+                this.lastPairedScannerId = ScannerUtils.convertAddressToSerial(macAddress)
                 it.onComplete()
             }
         }
