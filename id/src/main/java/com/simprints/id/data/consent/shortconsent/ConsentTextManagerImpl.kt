@@ -1,7 +1,6 @@
 package com.simprints.id.data.consent.shortconsent
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonSyntaxException
@@ -20,7 +19,6 @@ class ConsentTextManagerImpl(private val context: Context,
     private val parentalConsentExists = MutableLiveData(false)
 
     override fun getGeneralConsentText(appRequest: AppRequest): LiveData<String> {
-        Log.d("General live", getGeneralConsentData().assembleText(context, appRequest))
         generalConsentText.postValue(getGeneralConsentData().assembleText(context, appRequest))
         return generalConsentText
     }
@@ -31,7 +29,6 @@ class ConsentTextManagerImpl(private val context: Context,
     }
 
     override fun getParentalConsentText(appRequest: AppRequest): LiveData<String> {
-        Log.d("Parental live", getParentalConsentData().assembleText(context, appRequest))
         parentalConsentText.postValue(getParentalConsentData().assembleText(context, appRequest))
         return parentalConsentText
     }
