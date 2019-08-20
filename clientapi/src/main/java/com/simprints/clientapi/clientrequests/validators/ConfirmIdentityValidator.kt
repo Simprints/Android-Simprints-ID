@@ -1,11 +1,11 @@
 package com.simprints.clientapi.clientrequests.validators
 
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
 import com.simprints.clientapi.exceptions.InvalidSelectedIdException
 import com.simprints.clientapi.exceptions.InvalidSessionIdException
 
 
-class ConfirmIdentifyValidator(val extractor: ConfirmIdentifyExtractor)
+class ConfirmIdentityValidator(val extractor: ConfirmIdentityExtractor)
     : ClientRequestValidator(extractor) {
 
     override fun validateClientRequest() {

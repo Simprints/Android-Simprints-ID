@@ -15,26 +15,29 @@ class EnrolTaskFlow : FingerprintTaskFlow() {
     override fun computeFlow(fingerprintRequest: FingerprintRequest) {
         with(fingerprintRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) {
-                    LaunchTaskRequest(
-                        projectId, this.toAction(), language, logoExists, programName, organizationName
-                    )
-                },
-                FingerprintTask.CollectFingerprints(COLLECT) {
-                    CollectFingerprintsTaskRequest(
-                        projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                    )
-                },
-                FingerprintTask.SavePerson(SAVE) {
-                    with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
-                        SavePersonTaskRequest(
-                            probe
-                        )
-                    }
-                }
+                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
+                FingerprintTask.SavePerson(SAVE) { createSavePersonTaskRequest() }
             )
         }
     }
+
+    private fun FingerprintRequest.createLaunchTaskRequest() =
+        LaunchTaskRequest(
+            projectId, this.toAction(), language, logoExists, programName, organizationName
+        )
+
+    private fun FingerprintRequest.createCollectFingerprintsTaskRequest() =
+        CollectFingerprintsTaskRequest(
+            projectId, userId, moduleId, this.toAction(), language, fingerStatus
+        )
+
+    private fun createSavePersonTaskRequest() =
+        with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
+            SavePersonTaskRequest(
+                probe
+            )
+        }
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
         finalResultBuilder.createEnrolResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)

@@ -24,6 +24,7 @@ interface LaunchContract {
         fun goToRefusalActivity()
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun doVibrate()
+        fun showDialogForScannerErrorConfirmation(scannerId: String)
 
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)
@@ -42,5 +43,7 @@ interface LaunchContract {
         fun handleOnBackPressed()
         fun tryAgainFromErrorOrRefusal()
         fun onActivityResult()
+        fun handleScannerDisconnectedYesClick()
+        fun handleScannerDisconnectedNoClick()
     }
 }

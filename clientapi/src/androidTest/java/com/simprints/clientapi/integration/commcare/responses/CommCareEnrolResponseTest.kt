@@ -31,7 +31,7 @@ class CommCareEnrolResponseTest : BaseCommCareClientApiTest() {
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.getBundle(COMMCARE_BUNDLE_KEY)?.let {
             assertThat(it.getString(REGISTRATION_GUID_KEY)).isEqualTo(appEnrolResponse.guid)
-            assertThat(it.getString(SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW.toString())
+            assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
         } ?: throw Exception("No bundle found")
     }
 }
