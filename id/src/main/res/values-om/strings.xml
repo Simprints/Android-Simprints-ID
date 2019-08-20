@@ -89,4 +89,6 @@
     <string name="menu_settings">Mijeessaa</string>
     <string name="settings_too_many_modules_toast">Filannoo dogoggoraa. Maaloo, %1$d moojulii ol hin filatiin.</string>
     <string name="title_activity_settings">Mijeessaa</string>
+    <string name="settings_title">Mijeessaa</string>
+    <string name="close">Cufi</string>
 </resources>

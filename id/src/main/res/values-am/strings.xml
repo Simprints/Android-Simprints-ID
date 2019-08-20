@@ -90,4 +90,5 @@
     <string name="unforeseen_error_message">እባክዎ እንደገና ይሞክሩ እና ሲምፕሪንቱ መስራት ካለቻለ የሲስተም አስተዳዳሪውን ያነጋግረ</string>
     <string name="dashboard_card_sync_last_sync">ያለፈው ግንኙነት: %1$s</string>
     <string name="settings_too_many_modules_toast">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
+    <string name="settings_title">ማስተካከያ</string>
 </resources>

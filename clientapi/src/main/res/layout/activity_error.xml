@@ -81,6 +81,7 @@
             android:background="@color/alert_yellow"
             android:gravity="center"
             android:text="@string/close"
+            android:textAllCaps="true"
             android:textColor="@color/simprints_white"
             android:textSize="24sp"
             tools:ignore="NestedWeights" />
