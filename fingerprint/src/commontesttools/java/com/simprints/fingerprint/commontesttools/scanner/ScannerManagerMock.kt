@@ -6,7 +6,7 @@ import com.simprints.fingerprintscanner.Scanner
 import io.reactivex.Completable
 
 class ScannerManagerMock(override var scanner: Scanner?,
-                         override var macAddress: String? = DEFAULT_MAC_ADDRESS) : ScannerManager {
+                         override var lastPairedScannerId: String? = DEFAULT_MAC_ADDRESS) : ScannerManager {
 
     override fun start(): Completable = Completable.complete()
 
