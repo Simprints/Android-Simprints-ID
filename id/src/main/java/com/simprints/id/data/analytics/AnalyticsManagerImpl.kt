@@ -53,20 +53,20 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
         firebaseAnalytics.setUserProperty("scanner_id", scannerId)
     }
 
-    override fun logGuidSelectionService(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean) {
-        logGuidSelectionService(projectId, sessionId, selectedGuid, callbackSent, deviceId)
+    override fun logGuidSelectionWorker(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean) {
+        logGuidSelectionWorker(projectId, sessionId, selectedGuid, callbackSent, deviceId)
     }
 
-    private fun logGuidSelectionService(apiKey: String, sessionId: String,
-                                        selectedGuid: String, callbackSent: Boolean, androidId: String) {
-        Timber.d("AnalyticsManagerImpl.logGuidSelectionService(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
+    private fun logGuidSelectionWorker(apiKey: String, sessionId: String,
+                                       selectedGuid: String, callbackSent: Boolean, androidId: String) {
+        Timber.d("AnalyticsManagerImpl.logGuidSelectionWorker(selectedGuid=$selectedGuid, callbackSent=$callbackSent)")
         val bundle = Bundle()
         bundle.putString("api_key", apiKey)
         bundle.putString("selected_guid", selectedGuid)
         bundle.putString("android_id", androidId)
         bundle.putString("session_id", sessionId)
         bundle.putBoolean("callback_sent", callbackSent)
-        firebaseAnalytics.logEvent("guid_selection_service", bundle)
+        firebaseAnalytics.logEvent("guid_selection_worker", bundle)
     }
 
     override fun logConnectionStateChange(connected: Boolean, deviceId: String, sessionId: String) {

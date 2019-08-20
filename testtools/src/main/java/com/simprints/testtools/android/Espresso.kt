@@ -11,6 +11,8 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import java.util.*
 import android.graphics.drawable.ColorDrawable
+import android.os.Parcelable
+import org.hamcrest.BaseMatcher
 
 
 private fun hasBackgroundColor(expectedObject: Matcher<Int>): Matcher<Any> {
@@ -74,3 +76,11 @@ private fun assertDrawable(actual: Drawable, expectedId: Int, v: View): Boolean 
     }
 }
 
+
+fun <T : Parcelable> bundleDataMatcherForParcelable(parcelable: T) =
+    object : BaseMatcher<T>() {
+        override fun describeTo(description: Description?) {}
+        override fun matches(item: Any?): Boolean {
+            return item.toString() == parcelable.toString()
+        }
+    }

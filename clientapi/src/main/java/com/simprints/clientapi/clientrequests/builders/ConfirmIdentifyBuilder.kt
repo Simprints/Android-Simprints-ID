@@ -1,16 +1,16 @@
 package com.simprints.clientapi.clientrequests.builders
 
-import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentifyExtractor
-import com.simprints.clientapi.clientrequests.validators.ConfirmIdentifyValidator
+import com.simprints.clientapi.clientrequests.extractors.ConfirmIdentityExtractor
+import com.simprints.clientapi.clientrequests.validators.ConfirmIdentityValidator
 import com.simprints.clientapi.domain.ClientBase
-import com.simprints.clientapi.domain.requests.confirmations.IdentifyConfirmation
+import com.simprints.clientapi.domain.requests.confirmations.IdentityConfirmation
 
 
-class ConfirmIdentifyBuilder(val extractor: ConfirmIdentifyExtractor,
-                             validator: ConfirmIdentifyValidator) :
+class ConfirmIdentifyBuilder(val extractor: ConfirmIdentityExtractor,
+                             validator: ConfirmIdentityValidator) :
     ClientRequestBuilder(validator) {
 
-    override fun buildAppRequest(): ClientBase = IdentifyConfirmation(
+    override fun buildAppRequest(): ClientBase = IdentityConfirmation(
         projectId = extractor.getProjectId(),
         sessionId = extractor.getSessionId(),
         selectedGuid = extractor.getSelectedGuid(),

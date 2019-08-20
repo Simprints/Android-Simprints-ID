@@ -28,7 +28,6 @@
     <string name="loading">लोड हुँदै</string>
     <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै…</string>
     <string name="launch_checking_permissions">"अनुमति जाँच गर्दै… "</string>
-    <string name="launch_checking_api_key">"एपीआई प्रमुख जाँच गर्दै… "</string>
     <string name="launch_bt_connect">Vero जडान…</string>
     <string name="launch_wake_un20">" UN20 उठ्दै…"</string>
     <string name="launch_setup">ঠিককরা Vero</string>
@@ -104,9 +103,7 @@
     <string name="verify_guid_not_found_title">व्यक्ति भेटीएन</string>
     <string name="error_occurred_title">गल्ती भयो</string>
     <string name="low_battery_title">कम ब्याट्री</string>
-    <string name="alert_api_key_verify_failed">एपीआई प्रमुख प्रमाणित गर्न असफल</string>
     <!-- Error Message Text -->
-    <string name="invalid_apikey_message">API Key मिलेन | कृपया सिस्टम प्रशासकलाइ खबर गर्नुहोस |</string>
     <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent action), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="invalid_metadata_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid metadata), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="missing_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
@@ -122,7 +119,6 @@
     <string name="disconnected_message">स्क्यानरसंग सम्पर्क हुन सकेन, अन गर्नुहोस र फोनको नजिक राख्नुहोस </string>
     <string name="low_battery_message">स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज</string>
     <string name="unforeseen_error_message">माफ गर्नुहोस, नचिताएको गल्ती भयो | बन्द गर्नुहोस र अगाडी बढ्नुहोस |</string>
-    <string name="alert_api_key_verify_failed_body">\"हामी तपाईंको एपीआई प्रमुख प्रमाणित गर्न सक्दैन, कृपया पक्का इन्टरनेट जडान गर्दै छन् र फेरि प्रयास गर्नुहोस्\"</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">बन्द गर्नुहोस</string>
     <string name="try_again_label">फेरी प्रयास गर्नुहोस </string>
@@ -172,7 +168,7 @@
     <!-- Refusal Selection Points -->
     <string name="scanner_not_working">स्क्यानरले कार्य गरिरहेको छैन</string>
     <string name="beneficiary_refused">लाभार्थीले अस्वीकार गर्नुभयो</string>
-    <string name="other">अन्य</string>
+    <string name="refusal_other">अन्य</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">थप जानकारी…</string>
 

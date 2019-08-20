@@ -20,6 +20,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
+        @Deprecated("Fingerprint module doesn't triggers it anymore")
         UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
@@ -33,7 +34,8 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
         INVALID_SELECTED_ID,
         INVALID_SESSION_ID,
         INVALID_USER_ID,
-        INVALID_VERIFY_ID;
+        INVALID_VERIFY_ID,
+        SAFETYNET_ERROR;
 
         companion object {
             fun fromDomainToApi(type: AlertScreenEvent.AlertScreenEventType): ApiAlertScreenEvent =
@@ -45,7 +47,6 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                     AlertScreenEvent.AlertScreenEventType.LOW_BATTERY -> LOW_BATTERY
                     AlertScreenEvent.AlertScreenEventType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
-                    AlertScreenEvent.AlertScreenEventType.UNKNOWN_BLUETOOTH_ISSUE -> UNKNOWN_BLUETOOTH_ISSUE
                     AlertScreenEvent.AlertScreenEventType.DISCONNECTED -> DISCONNECTED
                     AlertScreenEvent.AlertScreenEventType.MULTIPLE_PAIRED_SCANNERS -> MULTIPLE_PAIRED_SCANNERS
                     AlertScreenEvent.AlertScreenEventType.NOT_PAIRED -> NOT_PAIRED
@@ -58,6 +59,7 @@ class ApiAlertScreenEvent(val relativeStartTime: Long,
                     AlertScreenEvent.AlertScreenEventType.INVALID_SESSION_ID -> INVALID_SESSION_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_USER_ID -> INVALID_USER_ID
                     AlertScreenEvent.AlertScreenEventType.INVALID_VERIFY_ID -> INVALID_VERIFY_ID
+                    AlertScreenEvent.AlertScreenEventType.SAFETYNET_ERROR -> SAFETYNET_ERROR
                 }
         }
     }

@@ -47,8 +47,3 @@ fun ensureSignInSuccess(scenario: ActivityScenario<LoginActivity>) {
     val result = scenario.result
     Truth.assertThat(result.resultCode).isEqualTo(RESULT_CODE_LOGIN_SUCCEED)
 }
-
-fun ensureSignInFailure() {
-    onView(withId(R.id.loginButtonSignIn))
-        .check(matches(isEnabled()))
-}

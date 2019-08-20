@@ -3,9 +3,13 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.tools.AndroidResourcesHelper
+import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
+import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
+import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -45,6 +49,8 @@ import com.simprints.id.orchestrator.modality.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.builders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.services.GuidSelectionManager
+import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
@@ -62,12 +68,6 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.TimeHelperImpl
 import com.simprints.id.tools.extensions.deviceId
-import com.simprints.core.tools.AndroidResourcesHelper
-import com.simprints.core.tools.AndroidResourcesHelperImpl
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
-import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.services.GuidSelectionManager
-import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
@@ -159,7 +159,6 @@ open class AppModule {
         SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
 
     @Provides
-    @Singleton
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
         LongConsentManager = LongConsentManagerImpl(ctx.filesDir.absolutePath, loginInfoManager, crashReportManager)
 

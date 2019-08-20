@@ -45,13 +45,18 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
         val component = (application as Application).component
         component.inject(this)
-        setSupportActionBar(dashboardToolbar)
         LanguageHelper.setLanguage(this, preferences.language)
+        setupActionBar()
 
         viewPresenter = DashboardPresenter(this, component)
         setMenuItemClickListener()
 
         initCards()
+    }
+
+    private fun setupActionBar() {
+        dashboardToolbar.title = getString(R.string.dashboard_label)
+        setSupportActionBar(dashboardToolbar)
     }
 
     private fun initCards() {
@@ -120,7 +125,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(data)
         if (potentialAlertScreenResponse != null) {
             finish()
         }

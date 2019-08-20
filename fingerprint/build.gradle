@@ -10,7 +10,7 @@ androidExtensions {
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
@@ -24,8 +24,6 @@ android {
             initWith release
         }
     }
-
-    testBuildType "debug"
 
     sourceSets {
         String sharedTestDir = 'src/commontesttools/java'

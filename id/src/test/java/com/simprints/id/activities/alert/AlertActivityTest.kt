@@ -84,11 +84,28 @@ class AlertActivityTest {
     }
 
     @Test
+    fun safetyNetError_theRightAlertShouldAppear() {
+        launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+    }
+
+    @Test
+    fun safetyNetDown_userClicksClose_alertShouldFinishWithRightResult() {
+        val scenario = launchAlertActivity(AlertActRequest(AlertType.SAFETYNET_ERROR))
+        ensureAlertScreenLaunched(AlertActivityViewModel.SAFETYNET_ERROR)
+
+        onView(withId(R.id.alertLeftButton)).perform(click())
+
+        verifyIntentReturned(scenario.result, AlertType.SAFETYNET_ERROR)
+    }
+
+
+    @Test
     fun unexpectedAlert_userClicksClose_alertShouldFinishWithTheRightResult() {
         val scenario = launchAlertActivity(AlertActRequest(AlertType.UNEXPECTED_ERROR))
         ensureAlertScreenLaunched(AlertActivityViewModel.UNEXPECTED_ERROR)
 
-        onView(withId(R.id.left_button)).perform(click())
+        onView(withId(R.id.alertLeftButton)).perform(click())
 
         verifyIntentReturned(scenario.result, AlertType.UNEXPECTED_ERROR)
     }
@@ -103,13 +120,13 @@ class AlertActivityTest {
 
 
     private fun ensureAlertScreenLaunched(alertActivityViewModel: AlertActivityViewModel) {
-        onView(withId(R.id.alert_title))
+        onView(withId(R.id.alertTitle))
             .check(matches(withText(alertActivityViewModel.title)))
 
         onView(withId(R.id.message))
             .check(matches(withText(alertActivityViewModel.message)))
 
-        onView(withId(R.id.alert_image)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
+        onView(withId(R.id.alertImage)).check(matches(hasImage(alertActivityViewModel.mainDrawable)))
     }
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,

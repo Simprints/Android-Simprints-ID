@@ -11,12 +11,13 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     buildTypes {
@@ -35,6 +36,15 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
+    }
+
+    // https://github.com/mockito/mockito/issues/1376
+    packagingOptions {
+        pickFirst 'mockito-extensions/org.mockito.plugins.MockMaker'
+    }
 }
 
 repositories {
@@ -49,6 +59,7 @@ dependencies {
 
     // Service Location
     implementation deps.koin.core
+    implementation deps.koin.android
 
     // Support
     implementation deps.androidx.appcompat
@@ -63,6 +74,7 @@ dependencies {
 
     // Kotlin
     implementation deps.androidx.core
+    implementation deps.androidx.multidex
 
     // Unit Tests
     testImplementation project(':testtools')
@@ -74,6 +86,15 @@ dependencies {
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.truth
     testImplementation deps.testing.coroutines_test
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.androidx.monitor
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.mockito.inline
+    testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.espresso.intents
+    testImplementation deps.koin.core_ext
+    testImplementation deps.testing.koin
 
     // Android Tests
     androidTestImplementation(project(':testtools')) {
@@ -82,8 +103,25 @@ dependencies {
         exclude group: 'org.robolectric'
         exclude group: 'org.jetbrains.kotlinx'
     }
+
+    androidTestImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
     androidTestImplementation deps.testing.androidx.runner
+    androidTestUtil deps.testing.androidx.orchestrator
+
     androidTestImplementation deps.testing.androidx.rules
     androidTestImplementation deps.testing.espresso.core
     androidTestImplementation deps.testing.espresso.intents
+
+    androidTestImplementation deps.koin.core_ext
+    androidTestImplementation deps.testing.koin
+
+    androidTestImplementation deps.testing.mockito.core
+    androidTestImplementation deps.testing.mockito.android
+    androidTestImplementation deps.testing.mockito.kotlin
+    androidTestCompile deps.testing.mockito.mockito_inline_androidtests
+    androidTestImplementation deps.testing.truth
+
 }

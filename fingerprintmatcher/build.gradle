@@ -9,7 +9,7 @@ project.version = "2019.1.0"
 android {
     compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion config.min_sdk
         targetSdkVersion 28
         versionCode 2
         versionName project.version

@@ -4,19 +4,23 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.activities.login.response.LoginActivityResponse
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
-import com.simprints.id.tools.extensions.*
+import com.simprints.id.tools.extensions.deviceId
+import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
@@ -36,6 +40,8 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         val component = (application as Application).component
         component.inject(this)
 
+        LanguageHelper.setLanguage(this, preferencesManager.language)
+
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         viewPresenter.setup()
@@ -45,13 +51,19 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(requestCode, resultCode, data)
-        if (potentialAlertScreenResponse != null) {
-            viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
-        } else {
-            viewPresenter.checkSignedInStateIfPossible()
+        val potentialAlertScreenResponse = extractPotentialAlertScreenResponse(data)
+        val appErrorResponseForLoginScreen = extractAppErrorResponseForLoginScreen(data)
+
+        when {
+            potentialAlertScreenResponse != null -> viewPresenter.onAlertScreenReturn(potentialAlertScreenResponse)
+            appErrorResponseForLoginScreen != null -> viewPresenter.onLoginScreenErrorReturn(appErrorResponseForLoginScreen)
+            else -> viewPresenter.checkSignedInStateIfPossible()
         }
     }
+
+    private fun extractAppErrorResponseForLoginScreen(data: Intent?): AppErrorResponse? =
+        data?.getParcelableExtra(LoginActivityResponse.BUNDLE_KEY)
+
 
     override fun setResultErrorAndFinish(appResponse: IAppErrorResponse) {
         setResult(Activity.RESULT_OK, Intent().apply {
