@@ -59,9 +59,7 @@ open class SimNetworkUtilsImpl(ctx: Context) : SimNetworkUtils {
                 TelephonyManager.NETWORK_TYPE_LTE -> "LTE"
                 TelephonyManager.NETWORK_TYPE_UMTS -> "UMTS"
                 TelephonyManager.NETWORK_TYPE_UNKNOWN -> "Unknown"
-                else -> {
-                    null
-                }
+                else ->  "Unknown"
             }
         }
 }

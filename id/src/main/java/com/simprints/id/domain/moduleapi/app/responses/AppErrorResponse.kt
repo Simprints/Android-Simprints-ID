@@ -12,12 +12,10 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
     enum class Reason {
         DIFFERENT_PROJECT_ID_SIGNED_IN,
         DIFFERENT_USER_ID_SIGNED_IN,
-        GUID_NOT_FOUND_ONLINE,
-        GUID_NOT_FOUND_OFFLINE,
         UNEXPECTED_ERROR,
+        LOGIN_NOT_COMPLETE,
         BLUETOOTH_NOT_SUPPORTED,
-        SCANNER_LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE;
+        GUID_NOT_FOUND_ONLINE;
 
         companion object {
             fun fromDomainAlertTypeToAppErrorType(alertType: AlertType) =
@@ -25,6 +23,7 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN -> DIFFERENT_PROJECT_ID_SIGNED_IN
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
+                    AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
                 }
         }
     }

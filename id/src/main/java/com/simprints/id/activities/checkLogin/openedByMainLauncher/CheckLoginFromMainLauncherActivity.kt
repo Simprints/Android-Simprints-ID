@@ -38,7 +38,7 @@ open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginF
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(requestCode, resultCode, data)
+        val potentialAlertScreenResponse = AlertActivityHelper.extractPotentialAlertScreenResponse(data)
         if (potentialAlertScreenResponse != null) {
             finish()
         }

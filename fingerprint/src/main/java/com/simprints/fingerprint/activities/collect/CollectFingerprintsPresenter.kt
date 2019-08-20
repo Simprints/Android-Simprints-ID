@@ -59,8 +59,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override val activeFingers = ArrayList<Finger>()
     override var currentActiveFingerNo: Int = 0
     override var isConfirmDialogShown = false
-    override var isTryDifferentFingerSplashShown = false
-    override var isNudging = false
+    override var isBusyWithFingerTransitionAnimation = false
     private var lastCaptureStartedAt: Long = 0
     private var confirmDialog: AlertDialog? = null
 
@@ -349,11 +348,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper.resetFingerIndexToBeginning()
         isConfirmDialogShown = false
         confirmDialog = null
+        isBusyWithFingerTransitionAnimation = false
     }
 
     override fun handleMissingFingerClick() {
         logMessageForCrashReport("Missing finger text clicked")
-        if (!currentFinger().isCollecting) {
+        if (!currentFinger().isCollecting && !isBusyWithFingerTransitionAnimation) {
+            isBusyWithFingerTransitionAnimation = true
             scanningHelper.setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger()
             lastCaptureStartedAt = timeHelper.now()
             addCaptureEventInSession(currentFinger())

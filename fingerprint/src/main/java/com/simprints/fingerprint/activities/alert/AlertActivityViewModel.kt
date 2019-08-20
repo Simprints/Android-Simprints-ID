@@ -34,11 +34,10 @@ enum class AlertActivityViewModel(val type: Type,
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
         type = Type.BluetoothError(
-            backgroundColor = R.color.simprints_yellow,
             hintDrawable = R.drawable.bt_not_enabled
         ),
         leftButton = ButtonAction.Close,
-        rightButton = ButtonAction.BluetoothSettings,
+        rightButton = ButtonAction.None,
         message = R.string.bluetooth_not_supported_message
     ),
 
@@ -53,11 +52,12 @@ enum class AlertActivityViewModel(val type: Type,
 
     NOT_PAIRED(
         type = Type.BluetoothError(
+            title = R.string.bluetooth_error_pair_scanner_and_device_title,
             hintDrawable = R.drawable.bt_not_enabled
         ),
-        leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.BluetoothSettings,
-        message = R.string.unbonded_scanner_message
+        leftButton = ButtonAction.PairScanner,
+        rightButton = ButtonAction.None,
+        message = R.string.bluetooth_error_pair_scanner_and_device_message
     ),
 
     MULTIPLE_PAIRED_SCANNERS(
@@ -72,12 +72,12 @@ enum class AlertActivityViewModel(val type: Type,
     // Scanner errors
     DISCONNECTED(
         type = Type.ScannerError(
-            title = R.string.disconnected_title,
+            title = R.string.scanner_error_turn_scanner_on_title,
             hintDrawable = null
         ),
         leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.BluetoothSettings,
-        message = R.string.disconnected_message
+        rightButton = ButtonAction.None,
+        message = R.string.scanner_error_turn_scanner_on_message
     ),
 
     LOW_BATTERY(
@@ -154,5 +154,6 @@ enum class AlertActivityViewModel(val type: Type,
         object BluetoothSettings : ButtonAction(R.string.settings_label)
         object TryAgain : ButtonAction(R.string.try_again_label)
         object Close : ButtonAction(R.string.close)
+        object PairScanner: ButtonAction(R.string.pair_scanner_label)
     }
 }

@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class RefusalFormAnswer(val reason: RefusalFormReason?, val optionalText: String = ""): Parcelable
+class RefusalFormAnswer(val reason: RefusalFormReason, val optionalText: String = ""): Parcelable

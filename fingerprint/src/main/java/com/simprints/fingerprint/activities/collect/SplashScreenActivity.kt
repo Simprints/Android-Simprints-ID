@@ -16,4 +16,6 @@ class SplashScreenActivity : AppCompatActivity() {
             overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
         }, CollectFingerprintsFingerDisplayHelper.TRY_DIFFERENT_FINGER_SPLASH_DELAY)
     }
+
+    override fun onBackPressed() { }
 }

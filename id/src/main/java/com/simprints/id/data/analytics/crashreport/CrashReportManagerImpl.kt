@@ -4,11 +4,13 @@ import android.util.Log
 import com.crashlytics.android.Crashlytics
 import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
+import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PEOPLE_DOWN_SYNC_TRIGGERS
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
+import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.SafeException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 
@@ -39,6 +41,11 @@ class CrashReportManagerImpl: CrashReportManager {
 
     override fun logSafeException(throwable: Throwable) {
         crashlyticsInstance.log(Log.ERROR, CrashReportTag.SAFE_EXCEPTION.name, "$throwable")
+    }
+
+    override fun logMalfunction(message: String) {
+        crashlyticsInstance.setString(MALFUNCTION_MESSAGE, message)
+        crashlyticsInstance.logException(MalfunctionException())
     }
 
     override fun setProjectIdCrashlyticsKey(projectId: String) {

@@ -2,6 +2,7 @@ package com.simprints.id.activities.login
 
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
+import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.secure.ProjectAuthenticator
 
 interface LoginContract {
@@ -15,6 +16,7 @@ interface LoginContract {
         fun showErrorForInvalidQRCode()
         fun updateProjectSecretInTextView(projectSecret: String)
         fun updateProjectIdInTextView(projectId: String)
+        fun setErrorResponseInActivityResultAndFinish(appErrorResponse: AppErrorResponse)
 
         // Callbacks from signing in
 
@@ -24,6 +26,7 @@ interface LoginContract {
         fun handleSignInFailedProjectIdIntentMismatch()
         fun handleSignInFailedUnknownReason()
         fun handleSignInSuccess()
+        fun handleSafetyNetDownError()
     }
 
     interface Presenter : BasePresenter {
@@ -37,5 +40,6 @@ interface LoginContract {
         fun openScanQRApp()
         fun processQRScannerAppResponse(scannedText: String)
         fun logMessageForCrashReportWithUITrigger(message: String)
+        fun handleBackPressed()
     }
 }

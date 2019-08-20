@@ -3,10 +3,7 @@ package com.simprints.id.data.analytics.eventdata.models.remote.events
 import androidx.annotation.Keep
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiCallback
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.ApiErrorCallback
-import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.fromDomainToApi
-import java.lang.IllegalArgumentException
+import com.simprints.id.data.analytics.eventdata.models.remote.events.callback.*
 
 @Keep
 class ApiCallbackEvent(val relativeStartTime: Long,
@@ -28,11 +25,14 @@ class ApiCallbackEvent(val relativeStartTime: Long,
         this(refusalCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(refusalCallbackEvent))
 
+    constructor(confirmationCallbackEvent: ConfirmationCallbackEvent) :
+        this(confirmationCallbackEvent.relativeStartTime ?: 0,
+            fromDomainToApiCallback(confirmationCallbackEvent))
+
     constructor(errorCallbackEvent: ErrorCallbackEvent) :
         this(errorCallbackEvent.relativeStartTime ?: 0,
             fromDomainToApiCallback(errorCallbackEvent))
 }
-
 
 fun fromDomainToApiCallback(event: Event): ApiCallback =
     when (event) {
@@ -40,6 +40,7 @@ fun fromDomainToApiCallback(event: Event): ApiCallback =
         is IdentificationCallbackEvent -> with(event) { ApiIdentificationCallback(sessionId, scores.map { it.fromDomainToApi() }) }
         is VerificationCallbackEvent -> with(event) { ApiVerificationCallback(score.fromDomainToApi()) }
         is RefusalCallbackEvent -> with(event) { ApiRefusalCallback(reason, extra) }
+        is ConfirmationCallbackEvent -> with(event) { ApiConfirmationCallback(identificationOutcome) }
         is ErrorCallbackEvent -> with(event) { ApiErrorCallback(reason.fromDomainToApi()) }
         else -> throw IllegalArgumentException("Invalid CallbackEvent")
     }

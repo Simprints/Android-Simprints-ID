@@ -13,7 +13,7 @@ import com.simprints.clientapi.domain.responses.VerifyResponse
 import com.simprints.clientapi.domain.responses.entities.MatchResult
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_1
 import com.simprints.clientapi.domain.responses.entities.Tier.TIER_5
-import com.simprints.clientapi.requestFactories.ConfirmIdentifyFactory
+import com.simprints.clientapi.requestFactories.ConfirmIdentityFactory
 import com.simprints.clientapi.requestFactories.EnrollRequestFactory
 import com.simprints.clientapi.requestFactories.IdentifyRequestFactory
 import com.simprints.clientapi.requestFactories.VerifyRequestFactory
@@ -31,7 +31,9 @@ class OdkPresenterTest {
 
     @Before
     fun setup() {
-        BaseUnitTestConfig().rescheduleRxMainThread().coroutinesMainThread()
+        BaseUnitTestConfig()
+            .rescheduleRxMainThread()
+            .coroutinesMainThread()
     }
 
     @Test
@@ -83,9 +85,11 @@ class OdkPresenterTest {
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER, mock(), mock()).handleEnrollResponse(EnrollResponse(registerId))
+        OdkPresenter(view, ACTION_REGISTER, mock(), mock()).apply {
+            handleEnrollResponse(EnrollResponse(registerId))
+        }
 
-        verifyOnce(view) { returnRegistration(registerId) }
+        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -94,15 +98,17 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).handleIdentifyResponse(
-            IdentifyResponse(arrayListOf(id1, id2), sessionId))
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+            handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
+        }
 
         verifyOnce(view) {
             returnIdentification(
                 idList = "${id1.guidFound} ${id2.guidFound}",
                 confidenceList = "${id1.confidence} ${id2.confidence}",
                 tierList = "${id1.tier} ${id2.tier}",
-                sessionId = sessionId)
+                sessionId = sessionId,
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
@@ -110,37 +116,47 @@ class OdkPresenterTest {
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).handleVerifyResponse(verification)
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+            handleVerifyResponse(verification)
+        }
 
         verifyOnce(view) {
             returnVerification(
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
-                tier = verification.matchResult.tier.toString())
+                tier = verification.matchResult.tier.toString(),
+                flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
-        OdkPresenter(view, "", mock(), mock())
-            .handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
-        verifyOnce(view) { returnErrorToClient(anyOrNull()) }
+        val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
+        OdkPresenter(view, "", mock(), mock()).apply {
+            handleResponseError(error)
+        }
+
+        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
     fun startPresenterForConfirmIdentify_ShouldRequestConfirmIdentify() {
-        val confirmIdentify = ConfirmIdentifyFactory.getMockExtractor()
-        whenever(view) { confirmIdentifyExtractor } thenReturn confirmIdentify
+        val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
+        whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
         OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
             runBlocking { start() }
         }
 
-        verifyOnce(view) { sendSimprintsConfirmationAndFinish(ConfirmIdentifyFactory.getValidSimprintsRequest(ODK)) }
+        verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(ODK)) }
     }
 
     private fun mockSessionManagerToCreateSession() = mock<ClientApiSessionEventsManager>().apply {
         wheneverOnSuspend(this) { createSession(anyNotNull()) } thenOnBlockingReturn "session_id"
+    }
+
+    companion object {
+        internal const val RETURN_FOR_FLOW_COMPLETED_CHECK = true
     }
 
 }

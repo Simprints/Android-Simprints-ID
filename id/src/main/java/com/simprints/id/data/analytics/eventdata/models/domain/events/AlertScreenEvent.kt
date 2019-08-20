@@ -13,7 +13,6 @@ class AlertScreenEvent(starTime: Long,
         GUID_NOT_FOUND_OFFLINE,
         BLUETOOTH_NOT_SUPPORTED,
         LOW_BATTERY,
-        UNKNOWN_BLUETOOTH_ISSUE,
         UNEXPECTED_ERROR,
         DISCONNECTED,
         MULTIPLE_PAIRED_SCANNERS,
@@ -26,6 +25,7 @@ class AlertScreenEvent(starTime: Long,
         INVALID_SELECTED_ID,
         INVALID_SESSION_ID,
         INVALID_USER_ID,
-        INVALID_VERIFY_ID
+        INVALID_VERIFY_ID,
+        SAFETYNET_ERROR
     }
 }
