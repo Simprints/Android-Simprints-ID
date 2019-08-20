@@ -25,6 +25,7 @@ interface LaunchContract {
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun doVibrate()
         fun showDialogForScannerErrorConfirmation(scannerId: String)
+        fun dismissScannerErrorConfirmationDialog()
 
         fun setTextToGeneralConsent(generalConsentText: String)
         fun addParentalConsentTabWithText(parentalConsentText: String)

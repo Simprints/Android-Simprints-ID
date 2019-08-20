@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.launch
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -40,6 +41,8 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
+
+    private var scannerErrorConfirmationDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -175,7 +178,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun doVibrate() = vibrate(this)
 
     override fun showDialogForScannerErrorConfirmation(scannerId: String) {
-        buildConfirmScannerErrorAlertDialog(scannerId).also {
+        scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
             logScannerErrorDialogShownToCrashReport()
         }
@@ -188,6 +191,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
                 onYes = { viewPresenter.handleScannerDisconnectedYesClick() },
                 onNo = { viewPresenter.handleScannerDisconnectedNoClick() }
             )
+
+    override fun dismissScannerErrorConfirmationDialog() {
+        scannerErrorConfirmationDialog?.dismiss()
+    }
 
     private fun logScannerErrorDialogShownToCrashReport() {
         crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
