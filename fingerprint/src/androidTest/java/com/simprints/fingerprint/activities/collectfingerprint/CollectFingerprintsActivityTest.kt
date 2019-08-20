@@ -1,8 +1,9 @@
 package com.simprints.fingerprint.activities.collectfingerprint
 
 import android.content.Intent
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.ViewPagerCustom
@@ -14,11 +15,13 @@ import com.simprints.fingerprint.commontesttools.scanner.*
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.testtools.AndroidTestConfig
+import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.failTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
@@ -26,7 +29,7 @@ import javax.inject.Inject
 @RunWith(AndroidJUnit4::class)
 class CollectFingerprintsActivityTest {
 
-    @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
+    private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
 
     @Inject lateinit var scannerManagerMock: ScannerManager
 
@@ -41,14 +44,16 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
         checkIfDialogIsDisplayedWithResultAndClickConfirm()
 
-        val result = collectFingerprintsRule.activityResult.resultData.extras
-            ?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        val result = scenario.result.resultData.run {
+            setExtrasClassLoader(CollectFingerprintsTaskResult::class.java.classLoader)
+            extras?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        }
 
         assertNotNull(result)
         assertEquals(2, result?.probe?.fingerprints?.size)
@@ -60,7 +65,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -79,7 +84,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         // 1. Good scan
         scanner.queueGoodFinger(FingerIdentifier.LEFT_THUMB)
@@ -107,8 +112,10 @@ class CollectFingerprintsActivityTest {
 
         checkIfDialogIsDisplayedWithResultAndClickConfirm("✓ LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n✓ RIGHT INDEX FINGER\n")
 
-        val result = collectFingerprintsRule.activityResult.resultData.extras
-            ?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        val result = scenario.result.resultData.run {
+            setExtrasClassLoader(CollectFingerprintsTaskResult::class.java.classLoader)
+            extras?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        }
 
         assertNotNull(result)
         result?.probe?.fingerprints?.let {
@@ -128,7 +135,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         skipFinger()
         waitForSplashScreenToAppearAndDisappear()
@@ -142,7 +149,7 @@ class CollectFingerprintsActivityTest {
         skipFinger()
 
         checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n× RIGHT INDEX FINGER\n")
-        checkNoFingersScannedToastIsShown(collectFingerprintsRule.activity)
+        checkNoFingersScannedToastIsShown(getCurrentActivity() ?: failTest("No activity found"))
         checkFirstFingerYetToBeScanned()
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
@@ -156,7 +163,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -175,7 +182,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -197,7 +204,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -214,7 +221,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         skipFinger()
 
@@ -231,7 +238,7 @@ class CollectFingerprintsActivityTest {
 
         AndroidTestConfig(this, fingerprintModule).fullSetup()
 
-        collectFingerprintsRule.launchActivity(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         skipFinger()
 
@@ -240,6 +247,11 @@ class CollectFingerprintsActivityTest {
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
         assertEquals(4, viewPager?.adapter?.count)
         assertEquals(1, viewPager?.currentItem)
+    }
+
+    @After
+    fun tearDown() {
+        if (::scenario.isInitialized) scenario.close()
     }
 
     companion object {
@@ -278,6 +290,7 @@ class CollectFingerprintsActivityTest {
                 DEFAULT_ACTION, DEFAULT_LANGUAGE, fingerStatus)
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
+            it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, CollectFingerprintsActivity::class.qualifiedName!!)
             it.putExtra(CollectFingerprintsTaskRequest.BUNDLE_KEY, this)
         }
     }

@@ -21,6 +21,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -47,6 +48,8 @@ class FingerprintFlowsIntegrationTest {
             fingerprintDbManagerRule = DependencyRule.MockRule)
     }
 
+    private lateinit var scenario: ActivityScenario<OrchestratorActivity>
+
     @Before
     fun setUp() {
         AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
@@ -67,7 +70,7 @@ class FingerprintFlowsIntegrationTest {
 
     @Test
     fun enrolFlow_finishesSuccessfully() {
-        val scenario = ActivityScenario.launch<OrchestratorActivity>(createFingerprintRequestIntent(Action.ENROL))
+        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
 
         setupActivityAndContinue()
         takeScansAndConfirm()
@@ -85,7 +88,7 @@ class FingerprintFlowsIntegrationTest {
 
     @Test
     fun identifyFlow_finishesSuccessfully() {
-        val scenario = ActivityScenario.launch<OrchestratorActivity>(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
         setupActivityAndContinue()
         takeScansAndConfirm()
@@ -101,7 +104,7 @@ class FingerprintFlowsIntegrationTest {
 
     @Test
     fun verifyFlow_finishesSuccessfully() {
-        val scenario = ActivityScenario.launch<OrchestratorActivity>(createFingerprintRequestIntent(Action.VERIFY))
+        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
 
         setupActivityAndContinue()
         takeScansAndConfirm()
@@ -113,6 +116,11 @@ class FingerprintFlowsIntegrationTest {
                 assertEquals(IFingerprintResponseType.VERIFY, type)
             })
         }
+    }
+
+    @After
+    fun tearDown() {
+        if (::scenario.isInitialized) scenario.close()
     }
 
     companion object {

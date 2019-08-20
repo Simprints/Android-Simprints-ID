@@ -2,8 +2,9 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
@@ -20,8 +21,9 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
-import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskResult
 import com.simprints.moduleapi.fingerprint.responses.*
 import org.junit.Assert.*
@@ -37,14 +39,11 @@ class OrchestratorTest {
     fun enrolTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             okLaunchResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is CollectFingerprints)
+            assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is SavePerson)
+            assertNextTaskIs<SavePerson>()
             okSavePersonResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -60,14 +59,11 @@ class OrchestratorTest {
     fun identifyTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.IDENTIFY))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             okLaunchResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is CollectFingerprints)
+            assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Matching)
+            assertNextTaskIs<Matching>()
             okMatchingIdentifyResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -83,14 +79,11 @@ class OrchestratorTest {
     fun verifyTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.VERIFY))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             okLaunchResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is CollectFingerprints)
+            assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Matching)
+            assertNextTaskIs<Matching>()
             okMatchingVerifyResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -106,8 +99,7 @@ class OrchestratorTest {
     fun enrolTaskFlow_failsDueToAlertInLaunch_shouldFinishCancelledWithError() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             alertResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -123,8 +115,7 @@ class OrchestratorTest {
     fun enrolTaskFlow_failsDueToRefusalInLaunch_shouldFinishOkWithRefused() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             refusalResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -140,11 +131,9 @@ class OrchestratorTest {
     fun enrolTaskFlow_cancelledSomehow_shouldFinishCancelledWithNoData() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is Launch)
+            assertNextTaskIs<Launch>()
             okLaunchResult()
-            assertFalse(isFinished())
-            assertTrue(getNextTask() is CollectFingerprints)
+            assertNextTaskIs<CollectFingerprints>()
             cancelledResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -152,6 +141,11 @@ class OrchestratorTest {
                 assertNull(resultData?.extras)
             }
         }
+    }
+
+    private inline fun <reified T : FingerprintTask> Orchestrator.assertNextTaskIs() {
+        assertFalse(isFinished())
+        assertTrue(getNextTask() is T)
     }
 
     private fun Orchestrator.okLaunchResult() {
@@ -195,7 +189,7 @@ class OrchestratorTest {
     private fun Orchestrator.alertResult() {
         handleActivityTaskResult(ResultCode.ALERT) { key ->
             assertEquals(AlertTaskResult.BUNDLE_KEY, key)
-            AlertTaskResult(FingerprintAlert.BLUETOOTH_NOT_SUPPORTED, AlertTaskResult.CloseButtonAction.CLOSE)
+            AlertTaskResult(BLUETOOTH_NOT_SUPPORTED, CLOSE)
         }
     }
 
