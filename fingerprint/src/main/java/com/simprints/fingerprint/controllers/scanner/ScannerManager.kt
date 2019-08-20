@@ -7,7 +7,7 @@ import io.reactivex.Completable
 interface ScannerManager {
 
     var scanner: Scanner?
-    var macAddress: String?
+    var lastPairedScannerId: String?
 
     fun start(): Completable
     fun disconnectVero(): Completable
