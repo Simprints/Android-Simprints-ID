@@ -43,7 +43,7 @@ class CommCareVerifyResponseTest : BaseCommCareClientApiTest() {
             assertThat(it.getString(VERIFICATION_GUID_KEY)).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString(VERIFICATION_TIER_KEY)).isEqualTo(appVerifyResponse.matchResult.tier.name)
             assertThat(it.getInt(VERIFICATION_CONFIDENCE_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence)
-            assertThat(it.getString(SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW.toString())
+            assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
         } ?: throw Exception("No bundle found")
     }
 }

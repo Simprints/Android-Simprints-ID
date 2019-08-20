@@ -44,7 +44,7 @@ class StandardIdentifyResponseTest: BaseStandardClientApiTest() {
                 ?: throw Throwable("No identifications returned")
 
             assertEqualIdentification(identificationsReturned[0], appIdentifyResponse.identifications[0])
-            assertThat(it.getBoolean(Constants.SIMPRINTS_SKIP_CHECK)).isEqualTo(SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+            assertThat(it.getBoolean(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK)).isEqualTo(RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 

@@ -22,7 +22,7 @@ class OdkErrorResponseTest : BaseOdkClientApiTest() {
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
 
-        assertOdkErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+        assertOdkErrorResponse(scenario, RETURN_FOR_FLOW_COMPLETED)
     }
 
     @Test
@@ -33,13 +33,13 @@ class OdkErrorResponseTest : BaseOdkClientApiTest() {
         val scenario =
             ActivityScenario.launch<OdkActivity>(odkBaseIntentRequest.apply { action = ODK_ENROL_ACTION })
 
-        assertOdkErrorResponse(scenario, SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW)
+        assertOdkErrorResponse(scenario, RETURN_FOR_FLOW_NOT_COMPLETED)
     }
-    private fun assertOdkErrorResponse(scenario: ActivityScenario<OdkActivity>, expectedSkipCheck: Boolean) {
+    private fun assertOdkErrorResponse(scenario: ActivityScenario<OdkActivity>, expectedBiometricsCompleteCheck: Boolean) {
         val result = scenario.result
         assertThat(result.resultCode).isEqualTo(Activity.RESULT_OK)
         result.resultData.extras?.let {
-            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(expectedSkipCheck)
+            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(expectedBiometricsCompleteCheck)
         } ?: throw Exception("No bundle found")
     }
 }

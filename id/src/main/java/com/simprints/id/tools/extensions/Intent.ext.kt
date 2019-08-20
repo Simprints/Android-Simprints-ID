@@ -7,7 +7,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationReq
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.moduleapi.app.requests.confirmations.IAppConfirmation
-import com.simprints.moduleapi.app.requests.confirmations.IAppIdentifyConfirmation
+import com.simprints.moduleapi.app.requests.confirmations.IAppIdentityConfirmationRequest
 
 fun Intent.parseAppRequest(): AppBaseRequest =
     this.extras?.getParcelable<IAppRequest>(IAppRequest.BUNDLE_KEY)?.let {
@@ -15,6 +15,6 @@ fun Intent.parseAppRequest(): AppBaseRequest =
     } ?: throw InvalidAppRequest()
 
 fun Intent.parseAppConfirmation(): AppIdentityConfirmationRequest =
-    this.extras?.getParcelable<IAppIdentifyConfirmation>(IAppConfirmation.BUNDLE_KEY)?.let {
+    this.extras?.getParcelable<IAppIdentityConfirmationRequest>(IAppConfirmation.BUNDLE_KEY)?.let {
         AppIdentityConfirmationRequest(it)
 } ?: throw InvalidAppRequest()

@@ -11,7 +11,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.clientapi.activities.odk.OdkActivity
-import com.simprints.clientapi.integration.*
+import com.simprints.clientapi.integration.AppIdentifyRequest
 import com.simprints.clientapi.integration.odk.BaseOdkClientApiTest
 import com.simprints.moduleapi.app.requests.IAppRequest
 import com.simprints.testtools.android.bundleDataMatcherForParcelable
@@ -48,13 +48,13 @@ class OdkIdentifyRequestTest : BaseOdkClientApiTest() {
 
     @Test
     fun callingAppSendsASuspiciousIdentifyRequest_shouldLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkSuspiciousIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestSuspicious(odkBaseIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
         intended(hasAction(APP_IDENTIFY_ACTION))
     }
 
     @Test
     fun callingAppSendsAnInvalidIdentifyRequest_shouldNotLaunchAnAppIdentifyRequest() {
-        ActivityScenario.launch<OdkActivity>(odkInvalidIntentRequest.apply { action = ODK_IDENTIFY_ACTION })
+        ActivityScenario.launch<OdkActivity>(makeIntentRequestInvalid(odkBaseIntentRequest).apply { action = ODK_IDENTIFY_ACTION })
         intended(CoreMatchers.not(hasAction(APP_IDENTIFY_ACTION)), times(2))
     }
 }

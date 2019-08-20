@@ -18,29 +18,29 @@ class IdentifyTaskFlow : FingerprintTaskFlow() {
     override fun computeFlow(fingerprintRequest: FingerprintRequest) {
         with(fingerprintRequest as FingerprintIdentifyRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) {
-                    LaunchTaskRequest(
-                        projectId, this.toAction(), language, logoExists, programName, organizationName
-                    )
-                },
-                FingerprintTask.CollectFingerprints(COLLECT) {
-                    CollectFingerprintsTaskRequest(
-                        projectId, userId, moduleId, this.toAction(), language, fingerStatus
-                    )
-                },
-                FingerprintTask.Matching(MATCHING) {
-                    with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
-                        MatchingTaskIdentifyRequest(
-                            language, probe, buildQueryForIdentifyPool(), returnIdCount
-                        )
-                    }
-                }
+                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
+                FingerprintTask.Matching(MATCHING) { createMatchingTaskRequest() }
             )
         }
     }
 
-    override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
-        finalResultBuilder.createIdentifyResult(taskResults[MATCHING] as MatchingTaskIdentifyResult)
+    private fun FingerprintIdentifyRequest.createLaunchTaskRequest() =
+        LaunchTaskRequest(
+            projectId, this.toAction(), language, logoExists, programName, organizationName
+        )
+
+    private fun FingerprintIdentifyRequest.createCollectFingerprintsTaskRequest() =
+        CollectFingerprintsTaskRequest(
+            projectId, userId, moduleId, this.toAction(), language, fingerStatus
+        )
+
+    private fun FingerprintIdentifyRequest.createMatchingTaskRequest() =
+        with(taskResults[COLLECT] as CollectFingerprintsTaskResult) {
+            MatchingTaskIdentifyRequest(
+                language, probe, buildQueryForIdentifyPool(), returnIdCount
+            )
+        }
 
     private fun FingerprintIdentifyRequest.buildQueryForIdentifyPool() =
         when (matchGroup) {
@@ -48,6 +48,9 @@ class IdentifyTaskFlow : FingerprintTaskFlow() {
             MatchGroup.USER -> MatchingTaskIdentifyRequest.QueryForIdentifyPool(projectId, userId = userId)
             MatchGroup.MODULE -> MatchingTaskIdentifyRequest.QueryForIdentifyPool(projectId, moduleId = moduleId)
         }
+
+    override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
+        finalResultBuilder.createIdentifyResult(taskResults[MATCHING] as MatchingTaskIdentifyResult)
 
     companion object {
         private const val LAUNCH = "launch"

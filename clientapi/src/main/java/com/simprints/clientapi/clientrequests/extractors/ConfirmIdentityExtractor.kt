@@ -5,7 +5,7 @@ import com.simprints.libsimprints.Constants.SIMPRINTS_SELECTED_GUID
 import com.simprints.libsimprints.Constants.SIMPRINTS_SESSION_ID
 
 
-class ConfirmIdentifyExtractor(val intent: Intent) : ClientRequestExtractor(intent) {
+class ConfirmIdentityExtractor(val intent: Intent) : ClientRequestExtractor(intent) {
 
     fun getSessionId(): String = intent.extractString(SIMPRINTS_SESSION_ID)
 

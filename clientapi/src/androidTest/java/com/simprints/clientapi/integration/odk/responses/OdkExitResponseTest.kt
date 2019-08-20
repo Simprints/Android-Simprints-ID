@@ -31,7 +31,7 @@ class OdkExitResponseTest : BaseOdkClientApiTest() {
         result.resultData.extras?.let {
             assertThat(it.getString(ODK_EXIT_REASON)).isEqualTo(appExitResponse.reason)
             assertThat(it.getString(ODK_EXIT_EXTRA)).isEqualTo(appExitResponse.extra)
-            assertThat(it.getBoolean(ODK_SKIP_CHECK_KEY)).isEqualTo(BaseClientApiTest.SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW)
+            assertThat(it.getBoolean(ODK_BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED)
         } ?: throw Exception("No bundle found")
     }
 }

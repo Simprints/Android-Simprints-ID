@@ -31,6 +31,12 @@ open class BaseClientApiTest : KoinTest {
     private val extraField = "extra" to "some_extra"
     internal val packageName = ApplicationProvider.getApplicationContext<Application>().packageName
 
+    internal val baseConfirmIntentRequest = Intent().apply {
+        putExtra(projectIdField.key(), projectIdField.value())
+        putExtra(sessionIdField.key(), sessionIdField.value())
+        putExtra(selectedGuidField.key(), selectedGuidField.value())
+    }
+
     internal val baseIntentRequest = Intent().apply {
         putExtra(projectIdField.key(), projectIdField.value())
         putExtra(userIdField.key(), userIdField.value())
@@ -38,13 +44,13 @@ open class BaseClientApiTest : KoinTest {
         putExtra(metadataField.key(), metadataField.value())
     }
 
-    internal val invalidIntentRequest = Intent().apply {
-        putExtra(projectIdField.key() + "_wrong",  projectIdField.value())
-        putExtra(userIdField.key(),  userIdField.value())
-        putExtra(moduleIdField.key(),  moduleIdField.value())
+    internal open fun getInvalidIntentRequest(baseIntent: Intent = baseIntentRequest,
+                                              invalidPair: Pair<String, String> = projectIdField) =  baseIntent.apply {
+        putExtra("${invalidPair.key()}_wrong", invalidPair.value())
+        removeExtra(invalidPair.key())
     }
 
-    internal val suspiciousIntentRequest =  baseIntentRequest.apply {
+    internal open fun makeIntentRequestSuspicious(baseIntent: Intent = baseIntentRequest) =  baseIntent.apply {
         putExtra( extraField.key(),  extraField.value())
     }
 
@@ -84,8 +90,8 @@ open class BaseClientApiTest : KoinTest {
     }
 
     companion object {
-        internal const val SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW = false
-        internal const val SKIP_CHECK_VALUE_FOR_NOT_COMPLETED_FLOW = !SKIP_CHECK_VALUE_FOR_COMPLETED_FLOW
+        internal const val RETURN_FOR_FLOW_COMPLETED = true
+        internal const val RETURN_FOR_FLOW_NOT_COMPLETED = !RETURN_FOR_FLOW_COMPLETED
         internal const val APP_ENROL_ACTION = "com.simprints.clientapp.REGISTER"
         internal const val APP_IDENTIFY_ACTION = "com.simprints.clientapp.IDENTIFY"
         internal const val APP_VERIFICATION_ACTION = "com.simprints.clientapp.VERIFY"
