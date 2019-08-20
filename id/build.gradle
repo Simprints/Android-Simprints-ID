@@ -97,18 +97,6 @@ android {
     }
 
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
-
-    bundle {
-        density {
-            enableSplit false
-        }
-        abi {
-            enableSplit false
-        }
-        language {
-            enableSplit false
-        }
-    }
 }
 
 buildscript {
