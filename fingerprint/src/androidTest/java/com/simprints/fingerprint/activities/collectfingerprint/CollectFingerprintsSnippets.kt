@@ -27,6 +27,22 @@ fun takeScansAndConfirm(numberOfScans: Int = 2, dialogResult: String = "✓ LEFT
     checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
 }
 
+/** Work around for reconnecting dialog that pops up sometimes when using SimulatedScannerManager */
+fun pressScanUntilDialogIsDisplayedAndClickConfirm(dialogResult: String = "✓ LEFT THUMB\n✓ LEFT INDEX FINGER\n") {
+    log("CollectFingerprints::pressScanUntilDialogIsDisplayedAndClickConfirm")
+
+    try {
+        repeat(10) {
+            onView(withId(R.id.scan_button))
+                .check(matches(not(withText(R.string.cancel_button))))
+                .perform(click())
+            waitOnUi(500)
+        }
+    } catch (e: Throwable) {}
+
+    checkIfDialogIsDisplayedWithResultAndClickConfirm(dialogResult)
+}
+
 fun pressScan() {
     log("CollectFingerprints::pressScan")
     tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_LONG) {
