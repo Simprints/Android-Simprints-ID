@@ -18,8 +18,6 @@ class ConsentViewModel(private val consentTextManager: ConsentTextManager,
     var parentalConsentText: LiveData<String>
     val  parentalConsentExists = consentTextManager.parentalConsentExists()
 
-    var isConsentTabGeneral = true
-
     init {
         generalConsentText = Transformations.switchMap(appRequest) {
             consentTextManager.getGeneralConsentText(it)
