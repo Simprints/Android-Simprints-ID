@@ -3,7 +3,9 @@ package com.simprints.fingerprint.integration
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
+import com.simprints.fingerprint.activities.collectfingerprint.pressScanUntilDialogIsDisplayedAndClickConfirm
 import com.simprints.fingerprint.activities.collectfingerprint.takeScansAndConfirm
 import com.simprints.fingerprint.activities.launch.setupActivityAndContinue
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
@@ -73,7 +75,7 @@ class FingerprintFlowsIntegrationTest {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
 
         setupActivityAndContinue()
-        takeScansAndConfirm()
+        pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
             resultData.setExtrasClassLoader(IFingerprintEnrolResponse::class.java.classLoader)
@@ -91,7 +93,7 @@ class FingerprintFlowsIntegrationTest {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
         setupActivityAndContinue()
-        takeScansAndConfirm()
+        pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
             resultData.setExtrasClassLoader(IFingerprintIdentifyResponse::class.java.classLoader)
@@ -107,7 +109,7 @@ class FingerprintFlowsIntegrationTest {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
 
         setupActivityAndContinue()
-        takeScansAndConfirm()
+        pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
             resultData.setExtrasClassLoader(IFingerprintVerifyResponse::class.java.classLoader)

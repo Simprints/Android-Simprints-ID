@@ -87,14 +87,17 @@ class LaunchActivityAndroidTest {
 
     @Test
     fun notScannerFromInitVeroStep_shouldShowAnErrorAlert() {
-        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(ScannerNotPairedException())
+        makeInitVeroStepFailing(ScannerNotPairedException())
+
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
 
     @Test
     fun multiScannersPairedFromInitVeroStep_shouldShowAnErrorAlert() {
-        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(MultipleScannersPairedException())
+        makeInitVeroStepFailing(MultipleScannersPairedException())
+
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS.title)))
@@ -103,8 +106,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun bluetoothOffFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
+        makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED.title)))
@@ -113,8 +116,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun bluetoothNotSupportedFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
+        makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(BluetoothNotEnabledException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED.title)))
@@ -123,8 +126,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun bluetoothNotPairedFromConnectVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
+        makeConnectToVeroStepFailing(ScannerNotPairedException())
 
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(ScannerNotPairedException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
@@ -133,7 +136,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun unknownBluetoothIssueFromConnectVeroStep_shouldShowScannerErrorConfirmDialog() {
         makeInitVeroStepSucceeding()
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownScannerIssueException())
+        makeConnectToVeroStepFailing(UnknownScannerIssueException())
+
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withText(containsString("your scanner?")))
@@ -143,7 +147,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun unknownBluetoothIssueFromConnectVeroSetup_clickYes_shouldShowCorrectAlert() {
         makeInitVeroStepSucceeding()
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownScannerIssueException())
+        makeConnectToVeroStepFailing(UnknownScannerIssueException())
+
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withText(containsString("your scanner?")))
@@ -156,7 +161,8 @@ class LaunchActivityAndroidTest {
     @Test
     fun unknownBluetoothIssueFromConnectVeroSetup_clickNo_shouldShowCorrectAlert() {
         makeInitVeroStepSucceeding()
-        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(UnknownScannerIssueException())
+        makeConnectToVeroStepFailing(UnknownScannerIssueException())
+
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withText(containsString("your scanner?")))
@@ -170,8 +176,8 @@ class LaunchActivityAndroidTest {
     fun unknownBluetoothIssueFromResetUIVeroStep_shouldShowErrorConfirmDialog() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
+        makeResetVeroUIStepFailing(UnknownScannerIssueException())
 
-        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(UnknownScannerIssueException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withText(containsString("your scanner?")))
@@ -182,9 +188,9 @@ class LaunchActivityAndroidTest {
     fun lowBatteryFromWakingUpVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
-        makeResetVeroUISucceeding()
+        makeResetVeroUIStepSucceeding()
+        makeWakeUpVeroStepFailing(ScannerLowBatteryException())
 
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(ScannerLowBatteryException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.LOW_BATTERY.title)))
@@ -194,9 +200,9 @@ class LaunchActivityAndroidTest {
     fun unknownBluetoothIssueFromWakingUpVeroStep_shouldShowErrorConfirmDialog() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
-        makeResetVeroUISucceeding()
+        makeResetVeroUIStepSucceeding()
+        makeWakeUpVeroStepFailing(UnknownScannerIssueException())
 
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(UnknownScannerIssueException())
         scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
 
         onView(withText(containsString("your scanner?")))
@@ -371,24 +377,40 @@ class LaunchActivityAndroidTest {
     private fun makeSetupVeroSucceeding() {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepSucceeding()
-        makeResetVeroUISucceeding()
-        makeWakingUpVeroStepSucceeding()
+        makeResetVeroUIStepSucceeding()
+        makeWakeUpVeroStepSucceeding()
     }
 
-    private fun makeResetVeroUISucceeding() {
-        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.complete()
+    private fun makeInitVeroStepSucceeding() {
+        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.complete()
     }
 
     private fun makeConnectToVeroStepSucceeding() {
         whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.complete()
     }
 
-    private fun makeWakingUpVeroStepSucceeding() {
+    private fun makeResetVeroUIStepSucceeding() {
+        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.complete()
+    }
+
+    private fun makeWakeUpVeroStepSucceeding() {
         whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.complete()
     }
 
-    private fun makeInitVeroStepSucceeding() {
-        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.complete()
+    private fun makeInitVeroStepFailing(e: Exception) {
+        whenever(scannerManagerSpy) { initVero() } thenReturn Completable.error(e)
+    }
+
+    private fun makeConnectToVeroStepFailing(e: Exception) {
+        whenever(scannerManagerSpy) { connectToVero() } thenReturn Completable.error(e)
+    }
+
+    private fun makeResetVeroUIStepFailing(e: Exception) {
+        whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.error(e)
+    }
+
+    private fun makeWakeUpVeroStepFailing(e: Exception) {
+        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.error(e)
     }
 
     @After
