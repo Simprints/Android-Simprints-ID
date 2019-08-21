@@ -1,6 +1,5 @@
 package com.simprints.id.activities.consent
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -37,6 +36,5 @@ class ConsentViewModel(private val consentTextManager: ConsentTextManager,
 
     private fun addConsentEvent(consentEvent: ConsentEvent) {
         sessionEventsManager.addEventInBackground(consentEvent)
-        Log.d("Generaleventlive", "Added consent event $consentEvent")
     }
 }
