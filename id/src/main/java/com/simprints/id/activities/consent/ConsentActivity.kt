@@ -48,14 +48,8 @@ class ConsentActivity : AppCompatActivity() {
         viewModel.appRequest.postValue(appRequest)
 
         setupTabs()
-
-        observeGeneralConsentData()
-        observeParentalConsentData()
-        observeParentalConsentExistance()
-
-        addClickListenerToConsentAccept()
-        addClickListenerToConsentDecline()
-        addClickListenerToPrivacyNotice()
+        setupObserversForUi()
+        setupClickListeners()
     }
 
     private fun setupTabs() {
@@ -79,6 +73,12 @@ class ConsentActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupObserversForUi() {
+        observeGeneralConsentData()
+        observeParentalConsentData()
+        observeParentalConsentExistence()
+    }
+
     private fun observeGeneralConsentData() {
         viewModel.generalConsentText.observe(this, Observer {
             generalConsentTextView.text = it
@@ -91,12 +91,18 @@ class ConsentActivity : AppCompatActivity() {
         })
     }
 
-    private fun observeParentalConsentExistance() {
+    private fun observeParentalConsentExistence() {
         viewModel.parentalConsentExists.observe(this, Observer {
             if (it) {
                 tabHost.addTab(parentalConsentTab)
             }
         })
+    }
+
+    private fun setupClickListeners() {
+        addClickListenerToConsentAccept()
+        addClickListenerToConsentDecline()
+        addClickListenerToPrivacyNotice()
     }
 
     private fun addClickListenerToConsentAccept() {
