@@ -101,15 +101,15 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun addClickListenerToConsentAccept() {
         consentAcceptButton.setOnClickListener {
-//            viewModel.consentLiveData.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
-//                getCurrentConsentTab(), ConsentEvent.Result.ACCEPTED))
+            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+                getCurrentConsentTab(), ConsentEvent.Result.ACCEPTED))
         }
     }
 
     private fun addClickListenerToConsentDecline() {
         consentDeclineButton.setOnClickListener {
-//            viewModel.consentLiveData.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
-//                getCurrentConsentTab(), ConsentEvent.Result.DECLINED))
+            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
+                getCurrentConsentTab(), ConsentEvent.Result.DECLINED))
         }
     }
 

@@ -8,10 +8,10 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.request.LoginActivityRequest
 import com.simprints.id.activities.login.response.LoginActivityResponse
-import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
@@ -89,9 +89,9 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     }
 
     override fun openOrchestratorActivity(appRequest: AppRequest) {
-        val intent = Intent(this, OrchestratorActivity::class.java).apply {
+        val intent = Intent(this, ConsentActivity::class.java).apply {
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
-            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+           // addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
         startActivity(intent)
         finish()
