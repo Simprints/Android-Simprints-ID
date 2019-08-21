@@ -40,6 +40,9 @@
         <item>
             Afan Oromo
         </item>
+        <item>
+            Amharic
+        </item>
     </string-array>
     <string-array name="language_values">
         <item>
@@ -80,6 +83,9 @@
         </item>
         <item>
             om
+        </item>
+        <item>
+            am
         </item>
     </string-array>
 

@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.activities.launch
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -47,6 +48,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
     private lateinit var fingerprintRequest: FingerprintRequest
+    private var scannerErrorConfirmationDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,10 +183,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun doVibrate() = vibrate(this)
 
     override fun showDialogForScannerErrorConfirmation(scannerId: String) {
-        buildConfirmScannerErrorAlertDialog(scannerId).also {
-                it.show()
-                logScannerErrorDialogShownToCrashReport()
-            }
+        scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
+            it.show()
+            logScannerErrorDialogShownToCrashReport()
+        }
     }
 
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
@@ -194,6 +196,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
                 onYes = { viewPresenter.handleScannerDisconnectedYesClick() },
                 onNo = { viewPresenter.handleScannerDisconnectedNoClick() }
             )
+
+    override fun dismissScannerErrorConfirmationDialog() {
+        scannerErrorConfirmationDialog?.dismiss()
+    }
 
     private fun logScannerErrorDialogShownToCrashReport() {
         crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
