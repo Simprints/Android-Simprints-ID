@@ -39,7 +39,7 @@ class ConsentViewModelTest {
 
         val generalConsentTestObserver = consentViewModel.generalConsentText.testObserver()
 
-        assertThat(generalConsentTestObserver.observedValues.contains("general_consent")).isTrue()
+        assertThat(generalConsentTestObserver.observedValues.contains(generalConsentText)).isTrue()
     }
 
     @Test
@@ -58,7 +58,7 @@ class ConsentViewModelTest {
         val parentalConsentExistsObserver = consentViewModel.parentalConsentExists.testObserver()
 
         assertThat(parentalConsentExistsObserver.observedValues.contains(true)).isTrue()
-        assertThat(parentalConsentTestObserver.observedValues.contains("parental_consent")).isTrue()
+        assertThat(parentalConsentTestObserver.observedValues.contains(parentalConsentText)).isTrue()
     }
 
     private fun buildAppEnrolRequest() = AppEnrolRequest("project_id", "user_id", "module_id", "")
