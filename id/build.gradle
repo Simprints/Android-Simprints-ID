@@ -97,7 +97,6 @@ android {
     }
 
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
-
 }
 
 buildscript {
