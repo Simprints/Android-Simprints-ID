@@ -13,8 +13,8 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlowFactory,
                                    private val appResponseFactory: AppResponseFactory) : OrchestratorManager {
 
-    override val onGoingStep = MutableLiveData<Step>()
-    override val appResponse = MutableLiveData<AppResponse>()
+    override val onGoingStep = MutableLiveData<Step?>()
+    override val appResponse = MutableLiveData<AppResponse?>()
 
     internal lateinit var modalities: List<Modality>
     internal lateinit var appRequest: AppRequest
@@ -29,6 +29,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
         this.appRequest = appRequest
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
+        resetInternalState()
 
         proceedToNextIntentOrAppResponse()
     }
@@ -37,6 +38,15 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
         modalitiesFlow.handleIntentResult(requestCode, resultCode, data)
         proceedToNextIntentOrAppResponse()
     }
+
+    override fun restoreState(steps: List<Step>) {
+        resetInternalState()
+
+        modalitiesFlow.restoreState(steps)
+        proceedToNextIntentOrAppResponse()
+    }
+
+    override fun getState(): List<Step> = modalitiesFlow.steps
 
     private fun proceedToNextIntentOrAppResponse() {
         with(modalitiesFlow) {
@@ -54,6 +64,7 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
     private fun startStep(it: Step) {
         it.status = ONGOING
         onGoingStep.postValue(it)
+        appResponse.postValue(null)
     }
 
     private fun ModalityFlow.anyStepOnGoing() =
@@ -61,6 +72,12 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
 
     private fun buildAppResponse() {
         val appResponseToReturn = appResponseFactory.buildAppResponse(modalities, appRequest, modalitiesFlow.steps, sessionId)
+        onGoingStep.postValue(null)
         appResponse.postValue(appResponseToReturn)
+    }
+
+    private fun resetInternalState() {
+        appResponse.postValue(null)
+        onGoingStep.postValue(null)
     }
 }

@@ -23,6 +23,9 @@ import timber.log.Timber
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
 
+    protected var isActivityRestored = false
+    protected var requestProcessed = false
+
     abstract val guidSelectionNotifier: GuidSelectionNotifier
 
     override val action: String?

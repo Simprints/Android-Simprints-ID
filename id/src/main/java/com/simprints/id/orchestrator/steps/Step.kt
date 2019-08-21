@@ -2,12 +2,14 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcelable
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 data class Step(val requestCode: Int,
                 val activityName: String,
                 val bundleKey: String,
                 val request: Request,
-                var status: Status) {
+                var status: Status) : Parcelable {
 
     var result: Result? = null
         set(value) {
@@ -22,5 +24,5 @@ data class Step(val requestCode: Int,
     }
 
     interface Request : Parcelable
-    interface Result
+    interface Result : Parcelable
 }

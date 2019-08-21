@@ -13,9 +13,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Co
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
-                             private val faceStepProcessor: FaceStepProcessor) : ModalityFlow {
-
-    override val steps: MutableList<Step> = mutableListOf()
+                             private val faceStepProcessor: FaceStepProcessor) : ModalityFlowBaseImpl() {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
