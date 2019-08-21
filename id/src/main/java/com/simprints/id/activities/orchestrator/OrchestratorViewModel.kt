@@ -8,6 +8,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
+import com.simprints.id.orchestrator.steps.Step
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,8 +22,10 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
     val onGoingStep = orchestratorManager.onGoingStep
 
     val appResponse = Transformations.map(orchestratorManager.appResponse) {
-        orchestratorEventsHelper.addCallbackEventInSessions(it)
-        domainToModuleApiConverter.fromDomainModuleApiAppResponse(it)
+        it?.let {
+            orchestratorEventsHelper.addCallbackEventInSessions(it)
+            domainToModuleApiConverter.fromDomainModuleApiAppResponse(it)
+        }
     }
 
     fun start(appRequest: AppRequest) {
@@ -38,4 +41,11 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
         CoroutineScope(Dispatchers.Main).launch {
             orchestratorManager.handleIntentResult(requestCode, resultCode, data)
         }
+
+    fun restoreState(steps: List<Step>) {
+        orchestratorManager.restoreState(steps)
+    }
+
+    fun getState(): List<Step> = orchestratorManager.getState()
+
 }

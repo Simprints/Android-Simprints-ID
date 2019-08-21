@@ -39,7 +39,19 @@ class OdkActivity : RequestActivity(), OdkContract.View {
             showLauncherScreen()
 
         loadClientApiKoinModules()
-        CoroutineScope(Dispatchers.Main).launch { presenter.start() }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        isActivityRestored = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isActivityRestored && !requestProcessed) {
+            requestProcessed = true
+            CoroutineScope(Dispatchers.Main).launch { presenter.start() }
+        }
     }
 
     override fun returnRegistration(registrationId: String, flowCompletedCheck: Boolean) = Intent().let {
