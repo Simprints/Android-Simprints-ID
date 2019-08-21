@@ -22,11 +22,16 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
-        setSupportActionBar(settingsToolbar)
+        setupActionBar()
 
         fragmentManager.beginTransaction()
             .replace(R.id.prefContent, SettingsPreferenceFragment())
             .commit()
+    }
+
+    private fun setupActionBar() {
+        settingsToolbar.title = getString(R.string.settings_title)
+        setSupportActionBar(settingsToolbar)
     }
 
     override fun onIsMultiPane() = isXLargeTablet()
