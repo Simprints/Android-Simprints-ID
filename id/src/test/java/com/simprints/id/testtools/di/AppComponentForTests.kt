@@ -33,7 +33,7 @@ interface AppComponentForTests : AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
-        fun androidModule(orchestratorModule: OrchestratorModule): Builder
+        fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
 
         fun build(): AppComponentForTests
     }

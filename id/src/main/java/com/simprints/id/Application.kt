@@ -24,7 +24,7 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
-            .androidModule(OrchestratorModule())
+            .orchestratorModule(OrchestratorModule())
             .build()
     }
 
