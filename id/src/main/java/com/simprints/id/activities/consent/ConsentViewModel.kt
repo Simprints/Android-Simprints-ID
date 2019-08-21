@@ -11,7 +11,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 
 class ConsentViewModel(private val consentTextManager: ConsentTextManager,
                        private val sessionEventsManager: SessionEventsManager,
-                       consentEvent: LiveData<ConsentEvent>) : ViewModel() {
+                       private val consentEvent: LiveData<ConsentEvent>) : ViewModel() {
 
     val appRequest by lazy {  MutableLiveData<AppRequest>() }
     var generalConsentText: LiveData<String>
@@ -34,5 +34,10 @@ class ConsentViewModel(private val consentTextManager: ConsentTextManager,
 
     private fun addConsentEvent(consentEvent: ConsentEvent) {
         sessionEventsManager.addEventInBackground(consentEvent)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        consentEvent.removeObserver {  }
     }
 }
