@@ -1,12 +1,7 @@
 package com.simprints.id.data.consent.shortconsent
 
-import android.content.Context
 import androidx.annotation.Keep
 import com.google.gson.annotations.SerializedName
-import com.simprints.id.R
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 
 @Keep
 data class ParentalConsentOptions(
@@ -18,22 +13,4 @@ data class ParentalConsentOptions(
     @SerializedName("consent_collect_yes") var consentCollectYes: Boolean = false,
     @SerializedName("consent_parent_privacy_rights") var consentParentPrivacyRights: Boolean = true,
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
-) {
-
-    fun assembleText(context: Context, appRequest: AppRequest, programName: String, organisationName: String) = StringBuilder().apply {
-        when (appRequest) {
-            is AppIdentifyRequest, is AppVerifyRequest -> {
-                if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
-            }
-            else -> {
-                if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
-                if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
-            }
-        }
-        if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
-        if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
-        if (consentCollectYes) append(context.getString(R.string.consent_collect_yes))
-        if (consentParentPrivacyRights) append(context.getString(R.string.consent_parental_privacy_rights))
-        if (consentParentConfirmation) append(context.getString(R.string.consent_parental_confirmation))
-    }.toString()
-}
+)
