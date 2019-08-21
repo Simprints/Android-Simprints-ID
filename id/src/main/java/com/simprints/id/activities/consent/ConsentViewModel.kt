@@ -1,7 +1,10 @@
 package com.simprints.id.activities.consent
 
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.consent.shortconsent.ConsentTextManager
@@ -11,12 +14,10 @@ class ConsentViewModel(private val consentTextManager: ConsentTextManager,
                        private val sessionEventsManager: SessionEventsManager,
                        consentEvent: LiveData<ConsentEvent>) : ViewModel() {
 
-    val appRequest = MutableLiveData<AppRequest>()
+    val appRequest by lazy {  MutableLiveData<AppRequest>() }
     var generalConsentText: LiveData<String>
     var parentalConsentText: LiveData<String>
     val  parentalConsentExists = consentTextManager.parentalConsentExists()
-
-    val consentLiveData = MediatorLiveData<ConsentEvent>()
 
     var isConsentTabGeneral = true
 
@@ -29,7 +30,7 @@ class ConsentViewModel(private val consentTextManager: ConsentTextManager,
             consentTextManager.getParentalConsentText(it)
         }
 
-        consentLiveData.addSource(consentEvent) {
+        consentEvent.observeForever {
             addConsentEvent(it)
         }
     }
