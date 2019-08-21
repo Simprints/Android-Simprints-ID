@@ -12,6 +12,10 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.ACCEPTED
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.DECLINED
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
+import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.TimeHelper
@@ -67,10 +71,6 @@ class ConsentActivity : AppCompatActivity() {
 
         generalConsentTextView.movementMethod = ScrollingMovementMethod()
         parentalConsentTextView.movementMethod = ScrollingMovementMethod()
-
-        tabHost.setOnTabChangedListener {
-            viewModel.isConsentTabGeneral = (it == GENERAL_CONSENT_TAB_TAG)
-        }
     }
 
     private fun setupObserversForUi() {
@@ -107,21 +107,22 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun addClickListenerToConsentAccept() {
         consentAcceptButton.setOnClickListener {
-            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
-                getCurrentConsentTab(), ConsentEvent.Result.ACCEPTED))
+            consentEvents.postValue(buildConsentEventForResult(ACCEPTED))
         }
     }
 
     private fun addClickListenerToConsentDecline() {
         consentDeclineButton.setOnClickListener {
-            consentEvents.postValue(ConsentEvent(startConsentEventTime, timeHelper.now(),
-                getCurrentConsentTab(), ConsentEvent.Result.DECLINED))
+            consentEvents.postValue(buildConsentEventForResult(DECLINED))
         }
     }
 
+    private fun buildConsentEventForResult(consentResult: ConsentEvent.Result) =
+        ConsentEvent(startConsentEventTime, timeHelper.now(), getCurrentConsentTab(), consentResult)
+
     private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
-        GENERAL_CONSENT_TAB_TAG -> ConsentEvent.Type.INDIVIDUAL
-        PARENTAL_CONSENT_TAB_TAG -> ConsentEvent.Type.PARENTAL
+        GENERAL_CONSENT_TAB_TAG -> INDIVIDUAL
+        PARENTAL_CONSENT_TAB_TAG -> PARENTAL
         else -> throw Exception()
     }
 
