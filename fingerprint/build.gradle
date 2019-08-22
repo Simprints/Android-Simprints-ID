@@ -177,6 +177,10 @@ dependencies {
     // Dagger
     kaptAndroidTest deps.dagger.compiler
 
+    // Koin
+    androidTestImplementation deps.koin.core_ext
+    androidTestImplementation deps.testing.koin
+
     // Android X
     androidTestImplementation deps.testing.androidx.core_testing
     androidTestImplementation deps.testing.androidx.monitor

@@ -18,7 +18,6 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnexpectedScannerException
 import com.simprints.fingerprint.tools.Vibrate
@@ -31,15 +30,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
 class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter,
-                                        component: FingerprintComponent) {
-
-    @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+                                        private val scannerManager: ScannerManager,
+                                        private val crashReportManager: FingerprintCrashReportManager) {
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
@@ -59,8 +55,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
     init {
-        component.inject(this)
-
         view.timeoutBar = initTimeoutBar()
         view.un20WakeupDialog = initUn20Dialog()
     }

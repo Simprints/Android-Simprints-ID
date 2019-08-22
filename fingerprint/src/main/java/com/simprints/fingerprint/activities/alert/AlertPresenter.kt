@@ -9,25 +9,17 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.di.FingerprintComponent
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.inject.Inject
 
 class AlertPresenter(val view: AlertContract.View,
-                     val component: FingerprintComponent,
+                     private val crashReportManager: FingerprintCrashReportManager,
+                     private val sessionManager: FingerprintSessionEventsManager,
+                     private val timeHelper: FingerprintTimeHelper,
                      private val alertType: FingerprintAlert) : AlertContract.Presenter {
 
     private val alertViewModel =  AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var sessionManager: FingerprintSessionEventsManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-
     private val settingsOpenedForPairing = AtomicBoolean(false)
-
-    init {
-        component.inject(this)
-    }
 
     override fun start() {
         logToCrashReport()

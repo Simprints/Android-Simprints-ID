@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.matching
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -16,48 +15,44 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyRe
 import com.simprints.fingerprint.commontesttools.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.commontesttools.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.commontesttools.DEFAULT_USER_ID
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
+import org.koin.test.KoinTest
+import org.koin.test.get
+import org.koin.test.mock.declare
+import org.koin.test.mock.declareMock
 import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class MatchingViewModelTest {
+class MatchingViewModelTest : KoinTest {
 
     @get:Rule val taskExecutorRule = InstantTaskExecutorRule()
 
-    @Inject lateinit var dbManagerMock: FingerprintDbManager
-    @Inject lateinit var crashReportManagerMock: FingerprintCrashReportManager
-
-    private val coreModule: TestFingerprintCoreModule by lazy {
-        TestFingerprintCoreModule(
-            fingerprintDbManagerRule = DependencyRule.MockRule,
-            fingerprintPreferencesManagerRuler = DependencyRule.MockRule,
-            fingerprintSessionEventsManagerRule = DependencyRule.MockRule,
-            fingerprintCrashReportManagerRule = DependencyRule.MockRule
-        )
-    }
+    private val dbManagerMock: FingerprintDbManager = mock()
+    private val crashReportManagerMock: FingerprintCrashReportManager = mock()
 
     private val mockIdentificationLibMatcher: (LibPerson, List<LibPerson>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher =
@@ -93,7 +88,13 @@ class MatchingViewModelTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, null, coreModule).fullSetup()
+        loadFingerprintKoinModules()
+        declare {
+            factory { dbManagerMock }
+            factory { crashReportManagerMock }
+        }
+        declareMock<FingerprintPreferencesManager>()
+        declareMock<FingerprintSessionEventsManager>()
     }
 
     @Test
@@ -258,7 +259,7 @@ class MatchingViewModelTest {
                                         mockLibMatcher: (LibPerson, List<LibPerson>, LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher) =
         createViewModel().apply { start(request, mockLibMatcher) }
 
-    private fun createViewModel() = MatchingViewModel.build(ApplicationProvider.getApplicationContext())
+    private fun createViewModel() = get<MatchingViewModel>()
 
     private fun setupDbManagerLoadCandidates(candidates: List<Person>) {
         whenever(dbManagerMock) { loadPeople(anyNotNull(), anyOrNull(), anyOrNull()) } thenReturn Single.just(candidates)
@@ -268,6 +269,11 @@ class MatchingViewModelTest {
         val candidate = PeopleGeneratorUtils.getRandomPerson(verifyGuid, DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID)
 
         whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(PersonFetchResult(candidate, false))
+    }
+
+    @After
+    fun tearDown() {
+        unloadFingerprintKoinModules()
     }
 
     companion object {

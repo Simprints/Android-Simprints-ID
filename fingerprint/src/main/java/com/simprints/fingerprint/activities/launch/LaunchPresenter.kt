@@ -30,7 +30,6 @@ import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.domain.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
 import com.simprints.fingerprintscanner.ButtonListener
@@ -42,24 +41,21 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
-class LaunchPresenter(component: FingerprintComponent,
-                      private val view: LaunchContract.View,
-                      private val launchRequest: LaunchTaskRequest) : LaunchContract.Presenter {
+class LaunchPresenter(private val view: LaunchContract.View,
+                      private val launchRequest: LaunchTaskRequest,
+                      private val dbManager: FingerprintDbManager,
+                      private val simNetworkUtils: FingerprintSimNetworkUtils,
+                      private val consentDataManager: ConsentDataManager,
+                      private val crashReportManager: FingerprintCrashReportManager,
+                      private val scannerManager: ScannerManager,
+                      private val timeHelper: FingerprintTimeHelper,
+                      private val sessionEventsManager: FingerprintSessionEventsManager,
+                      private val locationProvider: LocationProvider,
+                      private val preferencesManager: FingerprintPreferencesManager,
+                      private val analyticsManager: FingerprintAnalyticsManager) : LaunchContract.Presenter {
 
     private var setupFlow: Disposable? = null
-
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
-    @Inject lateinit var consentDataManager: ConsentDataManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var locationProvider: LocationProvider
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var analyticsManager: FingerprintAnalyticsManager
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -78,12 +74,9 @@ class LaunchPresenter(component: FingerprintComponent,
         }
     }
 
-    init {
-        component.inject(this)
-        startConsentEventTime = timeHelper.now()
-    }
-
     override fun start() {
+        startConsentEventTime = timeHelper.now()
+
         view.setLanguage(launchRequest.language)
         view.setLogoVisibility(launchRequest.logoExists)
         view.initTextsInButtons()
@@ -386,5 +379,11 @@ class LaunchPresenter(component: FingerprintComponent,
         crashReportManager.logMessageForCrashReport(
             FingerprintCrashReportTag.SCANNER_SETUP,
             FingerprintCrashReportTrigger.SCANNER, message = message)
+    }
+
+    override fun logScannerErrorDialogShownToCrashReport() {
+        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
+            FingerprintCrashReportTrigger.SCANNER,
+            message = "Scanner error confirm dialog shown")
     }
 }

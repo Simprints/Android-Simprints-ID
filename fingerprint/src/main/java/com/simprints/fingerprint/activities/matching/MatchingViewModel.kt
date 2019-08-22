@@ -15,25 +15,25 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
-import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
 import com.simprints.fingerprintmatcher.Progress
 import com.simprints.fingerprintmatcher.sourceafis.MatcherEventListener
-import com.simprints.id.Application
 import io.reactivex.Single
 import io.reactivex.SingleEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 import com.simprints.fingerprintmatcher.Person as MatcherPerson
 
-class MatchingViewModel(component: FingerprintComponent) : ViewModel() {
+class MatchingViewModel(private val dbManager: FingerprintDbManager,
+                        private val sessionEventsManager: FingerprintSessionEventsManager,
+                        private val crashReportManager: FingerprintCrashReportManager,
+                        private val preferencesManager: FingerprintPreferencesManager,
+                        private val timeHelper: FingerprintTimeHelper) : ViewModel() {
 
     internal val result = MutableLiveData<FinishResult>()
     internal val progress = MutableLiveData(0)
@@ -43,21 +43,11 @@ class MatchingViewModel(component: FingerprintComponent) : ViewModel() {
     internal val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()
     internal val hasMatchFailed = MutableLiveData<Boolean>()
 
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-
     private lateinit var matchingRequest: MatchingTaskRequest
 
     private lateinit var matchTaskDisposable: Disposable
     private lateinit var libMatcherConstructor: (MatcherPerson, List<MatcherPerson>,
                                                  LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher
-
-    init {
-        component.inject(this)
-    }
 
     @SuppressLint("CheckResult")
     internal fun start(matchingRequest: MatchingTaskRequest,
@@ -155,8 +145,4 @@ class MatchingViewModel(component: FingerprintComponent) : ViewModel() {
         val data: Intent?,
         val finishDelayMillis: Int
     )
-
-    companion object {
-        fun build(app: Application) = MatchingViewModel(FingerprintComponentBuilder.getComponent(app))
-    }
 }

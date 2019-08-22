@@ -15,6 +15,8 @@ import com.google.common.truth.Truth
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.id.Application
 import com.simprints.testtools.android.tryOnUiUntilTimeout
@@ -29,6 +31,7 @@ class RefusalActivityTest {
 
     @Before
     fun setUp() {
+        loadFingerprintKoinModules()
         Intents.init()
     }
 
@@ -127,5 +130,6 @@ class RefusalActivityTest {
     @After
     fun tearDown() {
         Intents.release()
+        unloadFingerprintKoinModules()
     }
 }
