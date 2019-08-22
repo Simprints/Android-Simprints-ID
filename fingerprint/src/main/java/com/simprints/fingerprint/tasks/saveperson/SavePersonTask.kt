@@ -1,21 +1,13 @@
 package com.simprints.fingerprint.tasks.saveperson
 
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.id.data.prefs.PreferencesManager
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-import javax.inject.Inject
 
-class SavePersonTask(component: FingerprintComponent,
-                     private val request: SavePersonTaskRequest) {
-
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var preferencesManager: PreferencesManager
-
-    init {
-        component.inject(this)
-    }
+class SavePersonTask(private val request: SavePersonTaskRequest,
+                     private val dbManager: FingerprintDbManager,
+                     private val preferencesManager: FingerprintPreferencesManager) {
 
     fun savePerson() = SavePersonTaskResult(
         try {

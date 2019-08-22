@@ -16,29 +16,25 @@ import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmSc
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import com.simprints.id.Application
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    private lateinit var launchRequest: LaunchTaskRequest
+    override val viewPresenter: LaunchContract.Presenter by inject { parametersOf(this, launchRequest) }
 
-    override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
@@ -49,16 +45,13 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         setContentView(R.layout.activity_launch)
         logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
-        component.inject(this)
 
-        val launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
+        launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
             ?: throw InvalidRequestForLaunchActivityException()
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        viewPresenter = LaunchPresenter(component, this, launchRequest)
         viewPresenter.start()
     }
 
@@ -180,7 +173,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun showDialogForScannerErrorConfirmation(scannerId: String) {
         scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
-            logScannerErrorDialogShownToCrashReport()
+            viewPresenter.logScannerErrorDialogShownToCrashReport()
         }
     }
 
@@ -194,12 +187,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     override fun dismissScannerErrorConfirmationDialog() {
         scannerErrorConfirmationDialog?.dismiss()
-    }
-
-    private fun logScannerErrorDialogShownToCrashReport() {
-        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
-            FingerprintCrashReportTrigger.SCANNER,
-            message = "Scanner error confirm dialog shown")
     }
 
     companion object {

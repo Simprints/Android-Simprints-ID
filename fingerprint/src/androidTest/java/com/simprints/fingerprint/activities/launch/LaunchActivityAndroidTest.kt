@@ -9,12 +9,11 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -23,18 +22,17 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
 import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
-import com.simprints.fingerprint.testtools.AndroidTestConfig
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
-import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.whenThis
-import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.android.synthetic.main.activity_launch.*
@@ -45,37 +43,33 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.test.KoinTest
+import org.koin.test.mock.declare
 import timber.log.Timber
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-class LaunchActivityAndroidTest {
+@MediumTest
+class LaunchActivityAndroidTest: KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<LaunchActivity>
 
-    @Inject lateinit var scannerManagerSpy: ScannerManager
-    @Inject lateinit var dbManagerMock: FingerprintDbManager
-    @Inject lateinit var simNetworkUtilsMock: FingerprintSimNetworkUtils
-    @Inject lateinit var consentDataManagerMock: ConsentDataManager
-
-    private val fingerprintModule by lazy {
-        TestFingerprintModule(
-            scannerManagerRule = DependencyRule.SpyRule,
-            consentDataManagerRule = DependencyRule.MockRule,
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { DummyBluetoothAdapter() })
-    }
-
-    private val fingerprintCoreModule by lazy {
-        TestFingerprintCoreModule(
-            fingerprintDbManagerRule = DependencyRule.MockRule,
-            fingerprintSimNetworkUtilsRule = DependencyRule.MockRule)
-    }
+    private val scannerManagerSpy: ScannerManager = spy()
+    private val dbManagerMock: FingerprintDbManager = mock()
+    private val simNetworkUtilsMock: FingerprintSimNetworkUtils = mock()
+    private val consentDataManagerMock: ConsentDataManager = mock()
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
+        loadFingerprintKoinModules()
+        declare {
+            factory { scannerManagerSpy }
+            factory { dbManagerMock }
+            factory { simNetworkUtilsMock }
+            factory { consentDataManagerMock }
+            factory<BluetoothComponentAdapter> { DummyBluetoothAdapter() }
+        }
         mockDefaultConsentDataManager(true)
         mockDefaultDbManager()
         scannerManagerSpy.setupScannerManagerMockWithMockedScanner()
@@ -416,6 +410,7 @@ class LaunchActivityAndroidTest {
     @After
     fun tearDown() {
         if (::scenario.isInitialized) scenario.close()
+        unloadFingerprintKoinModules()
     }
 
     companion object {

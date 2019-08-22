@@ -27,34 +27,31 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.testtools.AndroidTestConfig
 import com.simprints.id.Application
-import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
+import org.koin.test.KoinTest
+import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class AlertActivityTest {
+class AlertActivityTest : KoinTest {
 
-    @Inject lateinit var sessionEventManagerMock: FingerprintSessionEventsManager
-
-    private val fingerprintModule by lazy {
-        TestFingerprintCoreModule(
-            fingerprintSessionEventsManagerRule = DependencyRule.MockRule)
-    }
+    private val sessionEventManagerMock: FingerprintSessionEventsManager = mock()
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, fingerprintCoreModule = fingerprintModule).fullSetup()
+        loadFingerprintKoinModules()
+        declare { factory { sessionEventManagerMock } }
         Intents.init()
     }
 
@@ -220,5 +217,6 @@ class AlertActivityTest {
     @After
     fun tearDown() {
         Intents.release()
+        unloadFingerprintKoinModules()
     }
 }

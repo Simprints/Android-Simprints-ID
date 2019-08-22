@@ -20,30 +20,24 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 import kotlin.math.min
 
 class CollectFingerprintsPresenter(private val context: Context,
                                    private val view: CollectFingerprintsContract.View,
                                    private val collectRequest: CollectFingerprintsTaskRequest,
-                                   private val component: FingerprintComponent)
+                                   private val crashReportManager: FingerprintCrashReportManager,
+                                   private val timeHelper: FingerprintTimeHelper,
+                                   private val sessionEventsManager: FingerprintSessionEventsManager,
+                                   private val scannerManager: ScannerManager)
     : CollectFingerprintsContract.Presenter {
-
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
@@ -56,10 +50,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     override var isBusyWithFingerTransitionAnimation = false
     private var lastCaptureStartedAt: Long = 0
     private var confirmDialog: AlertDialog? = null
-
-    init {
-        component.inject(this)
-    }
 
     override fun start() {
         LanguageHelper.setLanguage(context, collectRequest.language)
@@ -83,7 +73,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
-        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, component)
+        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager)
     }
 
     private fun initScanButtonListeners() {

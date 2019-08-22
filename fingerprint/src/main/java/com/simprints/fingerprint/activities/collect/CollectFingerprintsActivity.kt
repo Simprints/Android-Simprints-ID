@@ -18,21 +18,22 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.koin.android.ext.android.get
+import org.koin.core.parameter.parametersOf
 
 class CollectFingerprintsActivity :
     AppCompatActivity(),
     CollectFingerprintsContract.View {
 
+    private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
     override lateinit var viewPager: ViewPagerCustom
@@ -50,16 +51,13 @@ class CollectFingerprintsActivity :
         setContentView(R.layout.activity_collect_fingerprints)
         logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
 
-        val fingerprintRequest: CollectFingerprintsTaskRequest =
-            this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
-                ?: throw InvalidRequestForCollectFingerprintsActivityException()
+        fingerprintRequest = this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
+            ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         configureRightToLeft()
 
-        viewPresenter = CollectFingerprintsPresenter(this, this, fingerprintRequest, component)
+        viewPresenter = get { parametersOf(this, this, fingerprintRequest) }
         initBar()
         initViewFields()
         viewPresenter.start()

@@ -9,9 +9,7 @@ import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
-import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
 sealed class FingerprintTask(
@@ -22,17 +20,10 @@ sealed class FingerprintTask(
     abstract class RunnableTask(
         taskResultKey: String,
         createTaskRequest: () -> TaskRequest
-    ) : FingerprintTask(taskResultKey, createTaskRequest) {
-
-        abstract fun runTask(component: FingerprintComponent, taskRequest: TaskRequest): TaskResult
-    }
+    ) : FingerprintTask(taskResultKey, createTaskRequest)
 
     class SavePerson(savePersonResultKey: String, createSavePersonTaskRequest: () -> SavePersonTaskRequest) :
-        RunnableTask(savePersonResultKey, createSavePersonTaskRequest) {
-
-        override fun runTask(component: FingerprintComponent, taskRequest: TaskRequest): TaskResult =
-            SavePersonTask(component, taskRequest as SavePersonTaskRequest).savePerson()
-    }
+        RunnableTask(savePersonResultKey, createSavePersonTaskRequest)
 
     abstract class ActivityTask(
         taskResultKey: String,

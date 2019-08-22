@@ -1,23 +1,23 @@
 package com.simprints.fingerprint.tasks
 
-import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRunnableTaskRequestException
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.id.Application
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTask
+import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
+import org.koin.core.KoinComponent
+import org.koin.core.get
 
-class RunnableTaskDispatcher(private val component: FingerprintComponent) {
+class RunnableTaskDispatcher: KoinComponent {
 
     fun runTask(task: FingerprintTask.RunnableTask,
                 onResult: (getTaskResult: TaskResult) -> Unit) {
-        val request = task.createTaskRequest()
-        val result = task.runTask(component, request)
+
+        val result: TaskResult = when (val request = task.createTaskRequest()) {
+            is SavePersonTaskRequest -> SavePersonTask(request, get(), get()).savePerson()
+            else -> throw InvalidRunnableTaskRequestException()
+        }
+
         onResult(result)
-    }
-
-    companion object {
-
-        fun build(app: Application) =
-            RunnableTaskDispatcher(FingerprintComponentBuilder.getComponent(app))
     }
 }

@@ -3,23 +3,20 @@ package com.simprints.fingerprint.integration
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collectfingerprint.pressScanUntilDialogIsDisplayedAndClickConfirm
-import com.simprints.fingerprint.activities.collectfingerprint.takeScansAndConfirm
 import com.simprints.fingerprint.activities.launch.setupActivityAndContinue
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.Action
-import com.simprints.fingerprint.testtools.AndroidTestConfig
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -30,31 +27,25 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
+import org.koin.test.KoinTest
+import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class FingerprintFlowsIntegrationTest {
+class FingerprintFlowsIntegrationTest: KoinTest {
 
-    @Inject lateinit var dbManagerMock: FingerprintDbManager
+    private val dbManagerMock: FingerprintDbManager = mock()
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
-    private val fingerprintModule by lazy {
-        TestFingerprintModule(
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { SimulatedBluetoothAdapter(SimulatedScannerManager()) }
-        )
-    }
-
-    private val fingerprintCoreModule by lazy {
-        TestFingerprintCoreModule(
-            fingerprintDbManagerRule = DependencyRule.MockRule)
-    }
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, fingerprintModule, fingerprintCoreModule).fullSetup()
+        loadFingerprintKoinModules()
+        declare {
+            factory<BluetoothComponentAdapter> { SimulatedBluetoothAdapter(SimulatedScannerManager()) }
+            factory { dbManagerMock }
+        }
         setupDbManagerMock()
     }
 
@@ -123,6 +114,7 @@ class FingerprintFlowsIntegrationTest {
     @After
     fun tearDown() {
         if (::scenario.isInitialized) scenario.close()
+        unloadFingerprintKoinModules()
     }
 
     companion object {

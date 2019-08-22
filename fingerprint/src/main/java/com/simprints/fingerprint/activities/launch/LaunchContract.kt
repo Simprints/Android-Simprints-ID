@@ -46,5 +46,6 @@ interface LaunchContract {
         fun onActivityResult()
         fun handleScannerDisconnectedYesClick()
         fun handleScannerDisconnectedNoClick()
+        fun logScannerErrorDialogShownToCrashReport()
     }
 }

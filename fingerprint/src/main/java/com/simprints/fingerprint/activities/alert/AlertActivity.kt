@@ -15,18 +15,18 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class AlertActivity : AppCompatActivity(), AlertContract.View {
 
-    override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
+    override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,19 +34,15 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
-
         alertType = intent.extras?.getParcelable<AlertTaskRequest>(AlertTaskRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
-        if(isNewBluetoothAlert(alertType)) {
+        if (isNewBluetoothAlert(alertType)) {
            setContentView(R.layout.activity_fingerprint_bluetooth_alert)
         } else {
             setContentView(R.layout.activity_fingerprint_alert)
         }
 
-        viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
 

@@ -11,23 +11,18 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
 import com.simprints.fingerprint.data.domain.refusal.toRefusalAnswerForEvent
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import io.reactivex.rxkotlin.subscribeBy
-import javax.inject.Inject
 
 class RefusalPresenter(private val view: RefusalContract.View,
-                       component: FingerprintComponent) : RefusalContract.Presenter {
-
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
+                       private val crashReportManager: FingerprintCrashReportManager,
+                       private val sessionEventsManager: FingerprintSessionEventsManager,
+                       private val timeHelper: FingerprintTimeHelper) : RefusalContract.Presenter {
 
     private var reason: RefusalFormReason = OTHER
     private var refusalStartTime: Long = 0
 
     init {
-        component.inject(this)
         refusalStartTime = timeHelper.now()
     }
 
