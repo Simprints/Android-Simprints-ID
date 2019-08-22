@@ -9,7 +9,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
@@ -19,6 +18,7 @@ import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
@@ -29,7 +29,6 @@ import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedE
 import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
 import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.testtools.common.syntax.*
@@ -48,14 +47,13 @@ import org.koin.test.mock.declare
 import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class LaunchActivityAndroidTest: KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<LaunchActivity>
 
-    private val scannerManagerSpy: ScannerManager = spy()
+    private val scannerManagerSpy: ScannerManager = spy(ScannerManagerImpl(DummyBluetoothAdapter()))
     private val dbManagerMock: FingerprintDbManager = mock()
     private val simNetworkUtilsMock: FingerprintSimNetworkUtils = mock()
     private val consentDataManagerMock: ConsentDataManager = mock()
@@ -64,11 +62,10 @@ class LaunchActivityAndroidTest: KoinTest {
     fun setUp() {
         loadFingerprintKoinModules()
         declare {
-            factory { scannerManagerSpy }
+            single { scannerManagerSpy }
             factory { dbManagerMock }
             factory { simNetworkUtilsMock }
             factory { consentDataManagerMock }
-            factory<BluetoothComponentAdapter> { DummyBluetoothAdapter() }
         }
         mockDefaultConsentDataManager(true)
         mockDefaultDbManager()

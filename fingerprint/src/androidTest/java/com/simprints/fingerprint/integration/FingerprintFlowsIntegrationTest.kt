@@ -10,10 +10,11 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
+import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
@@ -43,7 +44,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun setUp() {
         loadFingerprintKoinModules()
         declare {
-            factory<BluetoothComponentAdapter> { SimulatedBluetoothAdapter(SimulatedScannerManager()) }
+            single<ScannerManager> { ScannerManagerImpl(SimulatedBluetoothAdapter(SimulatedScannerManager())) }
             factory { dbManagerMock }
         }
         setupDbManagerMock()
