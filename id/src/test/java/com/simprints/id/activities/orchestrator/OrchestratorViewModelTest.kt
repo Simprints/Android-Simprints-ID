@@ -9,7 +9,6 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
@@ -40,7 +39,6 @@ class OrchestratorViewModelTest {
 
     @Mock private lateinit var sessionEventsManagerMock: SessionEventsManager
     @Mock private lateinit var orchestratorEventsHelperMock: OrchestratorEventsHelper
-    @Mock private lateinit var preferencesManagerMock: PreferencesManager
     @Mock private lateinit var orchestratorManagerMock: OrchestratorManager
     @Mock private lateinit var domainToModuleApiConverter: DomainToModuleApiAppResponse
     private lateinit var liveDataAppResponse: MutableLiveData<AppResponse>
@@ -63,21 +61,20 @@ class OrchestratorViewModelTest {
         liveDataNextIntent = MutableLiveData()
 
         whenever(domainToModuleApiConverter){ fromDomainModuleApiAppResponse(anyNotNull()) } thenReturn mock()
-        whenever(preferencesManagerMock) { modalities } thenReturn listOf(FACE)
         whenever(sessionEventsManagerMock) { getCurrentSession() } thenReturn Single.just(fakeSession)
         whenever(orchestratorManagerMock) { appResponse } thenReturn liveDataAppResponse
         whenever(orchestratorManagerMock) { onGoingStep } thenReturn liveDataNextIntent
 
-        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, preferencesManagerMock, sessionEventsManagerMock, domainToModuleApiConverter)
+        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter)
     }
 
     @Test
     fun viewModelStart_shouldStartOrchestrator() {
         runBlocking {
-            vm.start(enrolAppRequest)
+            vm.startModalityFlow(enrolAppRequest)
             verifyOnce(orchestratorManagerMock) {
                 runBlocking {
-                    start(listOf(FACE), enrolAppRequest, SOME_SESSION_ID)
+                    initialise(listOf(FACE), enrolAppRequest, SOME_SESSION_ID)
                 }
             }
         }

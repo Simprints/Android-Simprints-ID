@@ -20,7 +20,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
@@ -147,7 +146,7 @@ class OrchestratorManagerImplTest {
     private suspend fun OrchestratorManager.startFlow(
         modalities: List<Modality>,
         request: AppRequest = appEnrolRequest,
-        sessionId: String = "") = start(modalities, request, sessionId)
+        sessionId: String = "") = initialise(modalities, request, sessionId)
 
     private suspend fun OrchestratorManager.progressWitFaceEnrol(requestCode: Int = ENROL.value,
                                                                  response: FaceEnrolResponse? = FaceEnrolResponse(SOME_GUID)) {

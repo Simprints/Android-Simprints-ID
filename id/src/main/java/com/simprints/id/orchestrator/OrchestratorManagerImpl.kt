@@ -22,33 +22,33 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
 
     private lateinit var modalitiesFlow: ModalityFlow
 
-    override suspend fun start(modalities: List<Modality>,
-                               appRequest: AppRequest,
-                               sessionId: String) {
+    override fun initialise(modalities: List<Modality>,
+                                    appRequest: AppRequest,
+                                    sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
 
-        proceedToNextIntentOrAppResponse()
+        proceedToNextStepOrAppResponse()
     }
 
-    override suspend fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(requestCode, resultCode, data)
-        proceedToNextIntentOrAppResponse()
+        proceedToNextStepOrAppResponse()
     }
 
     override fun restoreState(steps: List<Step>) {
         resetInternalState()
 
         modalitiesFlow.restoreState(steps)
-        proceedToNextIntentOrAppResponse()
+        proceedToNextStepOrAppResponse()
     }
 
     override fun getState(): List<Step> = modalitiesFlow.steps
 
-    private fun proceedToNextIntentOrAppResponse() {
+    private fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {
             if (!anyStepOnGoing()) {
                 val potentialNextStep = getNextStepToLaunch()
@@ -63,21 +63,21 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
 
     private fun startStep(it: Step) {
         it.status = ONGOING
-        onGoingStep.postValue(it)
-        appResponse.postValue(null)
+        onGoingStep.value = it
+        appResponse.value = null
     }
 
     private fun ModalityFlow.anyStepOnGoing() =
-        steps.firstOrNull { it.status == ONGOING } != null
+        steps.any { it.status == ONGOING }
 
     private fun buildAppResponse() {
         val appResponseToReturn = appResponseFactory.buildAppResponse(modalities, appRequest, modalitiesFlow.steps, sessionId)
-        onGoingStep.postValue(null)
-        appResponse.postValue(appResponseToReturn)
+        onGoingStep.value = null
+        appResponse.value = appResponseToReturn
     }
 
     private fun resetInternalState() {
-        appResponse.postValue(null)
-        onGoingStep.postValue(null)
+        appResponse.value = null
+        onGoingStep.value = null
     }
 }
