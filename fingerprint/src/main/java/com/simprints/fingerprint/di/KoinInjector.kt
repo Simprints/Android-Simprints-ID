@@ -85,6 +85,7 @@ object KoinInjector {
         factory { appComponent().getTimeHelper() }
         factory { appComponent().getDbManager() }
         factory { appComponent().getSimNetworkUtils() }
+        factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
     }
 
@@ -99,8 +100,8 @@ object KoinInjector {
     }
 
     private fun Module.defineBuildersForDomainClasses() {
-        factory<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
-        factory<ScannerManager> { ScannerManagerImpl(get()) }
+        single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
+        single<ScannerManager> { ScannerManagerImpl(get()) }
 
         factory<ConsentDataManager> { ConsentDataManagerImpl(get(), get()) }
         factory<LocationProvider> { LocationProviderImpl(androidContext()) }
