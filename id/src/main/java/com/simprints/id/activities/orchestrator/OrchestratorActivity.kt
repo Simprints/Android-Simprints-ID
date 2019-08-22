@@ -55,7 +55,7 @@ class OrchestratorActivity : AppCompatActivity() {
         appRequest = this.intent.extras?.getParcelable<AppRequest>(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
-        vm.start(appRequest)
+        vm.startModalityFlow(appRequest)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -79,7 +79,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArray(RESTORE_STATE_KEY, vm.getState().toTypedArray())
+        outState.putParcelableArrayList(RESTORE_STATE_KEY, ArrayList(vm.getState()))
     }
 
     companion object {

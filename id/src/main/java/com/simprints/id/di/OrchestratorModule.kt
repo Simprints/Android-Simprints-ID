@@ -90,6 +90,6 @@ class OrchestratorModule {
                                             orchestratorEventsHelper: OrchestratorEventsHelper,
                                             preferenceManager: PreferencesManager,
                                             sessionEventsManager: SessionEventsManager) =
-        OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager, sessionEventsManager, DomainToModuleApiAppResponse)
+        OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager.modalities, sessionEventsManager, DomainToModuleApiAppResponse)
 
 }
