@@ -1,151 +1,254 @@
 package com.simprints.fingerprint.activities.collectfingerprint
 
 import android.content.Intent
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
-import androidx.test.rule.ActivityTestRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
+import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
+import com.simprints.fingerprint.commontesttools.scanner.*
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.testtools.AndroidTestConfig
-import com.simprints.fingerprint.testtools.ScannerUtils.setupScannerForCollectingFingerprints
-import com.simprints.fingerprint.testtools.collectFingerprintsPressScan
-import com.simprints.fingerprint.testtools.skipFinger
-import com.simprints.fingerprint.testtools.waitForSplashScreenAppearsAndDisappears
-import com.simprints.fingerprintscannermock.MockBluetoothAdapter
-import com.simprints.fingerprintscannermock.MockFinger
-import com.simprints.fingerprintscannermock.MockScannerManager
+import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprintscanner.Scanner
+import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
-import com.simprints.testtools.common.di.DependencyRule
-import org.junit.Assert
+import com.simprints.testtools.common.syntax.failTest
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
+import org.koin.test.KoinTest
+import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class CollectFingerprintsActivityTest {
+class CollectFingerprintsActivityTest: KoinTest {
 
-    @get:Rule val collectFingerprintsRule = ActivityTestRule(CollectFingerprintsActivity::class.java, false, false)
-
-    private var mockBluetoothAdapter: MockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager())
-    @Inject lateinit var scannerManager: ScannerManager
-
-    private val fingerprintModule by lazy {
-        TestFingerprintModule(
-            bluetoothComponentAdapter = DependencyRule.ReplaceRule { mockBluetoothAdapter })
-    }
+    private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, fingerprintModule).fullSetup()
+        loadFingerprintKoinModules()
+    }
+
+    private fun mockScannerManagerWithScanner(scanner: Scanner) {
+        declare {
+            factory<ScannerManager> { ScannerManagerMock(scanner) }
+        }
+    }
+
+    @Test
+    fun twoGoodScansAndThenConfirm_finishesWithCorrectResult() {
+        mockScannerManagerWithScanner(createMockedScanner())
+
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        pressScan()
+        pressScan()
+        checkIfDialogIsDisplayedWithResultAndClickConfirm()
+
+        val result = scenario.result.resultData.run {
+            setExtrasClassLoader(CollectFingerprintsTaskResult::class.java.classLoader)
+            extras?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        }
+
+        assertNotNull(result)
+        assertEquals(2, result?.probe?.fingerprints?.size)
+    }
+
+    @Test
+    fun twoGoodScansAndThenRestart_restartsToBeginning() {
+        mockScannerManagerWithScanner(createMockedScanner())
+
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        pressScan()
+        pressScan()
+        checkIfDialogIsDisplayedAndClickRestart()
+        checkFirstFingerYetToBeScanned()
+
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
+    }
+
+    @Test
+    fun mixedScansAndThenConfirm_finishesWithCorrectResult() {
+        val scanner = createMockedScanner()
+        mockScannerManagerWithScanner(scanner)
+
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        // 1. Good scan
+        scanner.queueGoodFinger(FingerIdentifier.LEFT_THUMB)
+        pressScan()
+
+        // 2. Three bad scans
+        scanner.queueBadFinger(FingerIdentifier.LEFT_INDEX_FINGER)
+        pressScan()
+        pressScan()
+        pressScan()
+        waitForSplashScreenToAppearAndDisappear()
+
+        // 3. Finger skipped
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        // 4. Finger could not be acquired on sensor, two bad scans, and then a good scan
+        scanner.queueFingerNotDetected()
+        pressScan()
+        scanner.queueBadFinger(FingerIdentifier.RIGHT_INDEX_FINGER)
+        pressScan()
+        pressScan()
+        scanner.queueGoodFinger(FingerIdentifier.RIGHT_INDEX_FINGER)
+        pressScan()
+
+        checkIfDialogIsDisplayedWithResultAndClickConfirm("✓ LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n✓ RIGHT INDEX FINGER\n")
+
+        val result = scenario.result.resultData.run {
+            setExtrasClassLoader(CollectFingerprintsTaskResult::class.java.classLoader)
+            extras?.getParcelable<CollectFingerprintsTaskResult>(CollectFingerprintsTaskResult.BUNDLE_KEY)
+        }
+
+        assertNotNull(result)
+        result?.probe?.fingerprints?.let {
+            assertEquals(3, it.size)
+            assertEquals(DEFAULT_GOOD_IMAGE_QUALITY, it[0].qualityScore)
+            assertEquals(FingerIdentifier.LEFT_THUMB, it[0].fingerId)
+            assertEquals(DEFAULT_BAD_IMAGE_QUALITY, it[1].qualityScore)
+            assertEquals(FingerIdentifier.LEFT_INDEX_FINGER, it[1].fingerId)
+            assertEquals(DEFAULT_GOOD_IMAGE_QUALITY, it[2].qualityScore)
+            assertEquals(FingerIdentifier.RIGHT_INDEX_FINGER, it[2].fingerId)
+        }
+    }
+
+    @Test
+    fun onlySkippedFingers_pressConfirm_notAllowedToContinue() {
+        mockScannerManagerWithScanner(createMockedScanner())
+
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+        waitForSplashScreenToAppearAndDisappear()
+
+        skipFinger()
+
+        checkIfDialogIsDisplayedWithResultAndClickConfirm("× LEFT THUMB\n× LEFT INDEX FINGER\n× RIGHT THUMB\n× RIGHT INDEX FINGER\n")
+        checkNoFingersScannedToastIsShown(getCurrentActivity() ?: failTest("No activity found"))
+        checkFirstFingerYetToBeScanned()
+
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
     }
 
     @Test
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(enrolRequestTwoFingers.toIntent())
+        mockScannerManagerWithScanner(createMockedScanner { queueBadFinger() })
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        pressScan()
+        pressScan()
+        pressScan()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
 
-        Assert.assertEquals(3, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(3, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
-    fun threeBadAndMaxReached_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN,
-            MockFinger.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN)))
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(enrolRequestFourFingers.toIntent())
+    fun threeBadScansAndMaxReached_shouldNotAddAFinger() {
+        mockScannerManagerWithScanner(createMockedScanner { queueBadFinger() })
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
-        Assert.assertEquals(4, viewPager?.adapter?.count)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        assertEquals(4, viewPager?.adapter?.count)
 
-        waitForSplashScreenAppearsAndDisappears()
+        pressScan()
+        pressScan()
+        pressScan()
 
-        Assert.assertEquals(4, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        waitForSplashScreenToAppearAndDisappear()
+
+        assertEquals(4, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(
-            MockFinger.NO_FINGER,
-            MockFinger.NO_FINGER,
-            MockFinger.NO_FINGER)))
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(enrolRequestTwoFingers.toIntent())
+        mockScannerManagerWithScanner(createMockedScanner { queueFingerNotDetected() })
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
-        collectFingerprintsPressScan()
+        pressScan()
+        pressScan()
+        pressScan()
 
-        Assert.assertEquals(2, viewPager?.adapter?.count)
-        Assert.assertEquals(0, viewPager?.currentItem)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(2, viewPager?.adapter?.count)
+        assertEquals(0, viewPager?.currentItem)
     }
 
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(enrolRequestTwoFingers.toIntent())
+        mockScannerManagerWithScanner(createMockedScanner())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears()
+        waitForSplashScreenToAppearAndDisappear()
 
-        Assert.assertEquals(3, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(3, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
     }
 
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
-        mockBluetoothAdapter = MockBluetoothAdapter(MockScannerManager(mockFingers = arrayOf(MockFinger.NO_FINGER)))
-        setupScannerForCollectingFingerprints(mockBluetoothAdapter, scannerManager)
-        collectFingerprintsRule.launchActivity(enrolRequestFourFingers.toIntent())
+        mockScannerManagerWithScanner(createMockedScanner())
 
-        val viewPager = getCurrentActivity()?.findViewById<com.simprints.fingerprint.activities.collect.ViewPagerCustom>(R.id.view_pager)
+        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
         skipFinger()
 
-        waitForSplashScreenAppearsAndDisappears()
-        Assert.assertEquals(4, viewPager?.adapter?.count)
-        Assert.assertEquals(1, viewPager?.currentItem)
+        waitForSplashScreenToAppearAndDisappear()
+
+        val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
+        assertEquals(4, viewPager?.adapter?.count)
+        assertEquals(1, viewPager?.currentItem)
+    }
+
+    @After
+    fun tearDown() {
+        if (::scenario.isInitialized) scenario.close()
+        unloadFingerprintKoinModules()
     }
 
     companion object {
         private const val DEFAULT_PROJECT_ID = "some_project_id"
         private const val DEFAULT_USER_ID = "some_user_id"
         private const val DEFAULT_MODULE_ID = "some_module_id"
-        private const val DEFAULT_METADATA = ""
         private const val DEFAULT_LANGUAGE = "en"
+        private val DEFAULT_ACTION = Action.ENROL
         private val FINGER_STATUS_TWO_FINGERS = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
@@ -170,20 +273,14 @@ class CollectFingerprintsActivityTest {
             FingerIdentifier.LEFT_4TH_FINGER to false,
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
-        private const val DEFAULT_LOGO_EXISTS = true
-        private const val DEFAULT_PROGRAM_NAME = "This program"
-        private const val DEFAULT_ORGANISATION_NAME = "This organisation"
 
-        private val enrolRequestTwoFingers = FingerprintEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, FINGER_STATUS_TWO_FINGERS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
+        private fun collectTaskRequest(fingerStatus: Map<FingerIdentifier, Boolean>) =
+            CollectFingerprintsTaskRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID,
+                DEFAULT_ACTION, DEFAULT_LANGUAGE, fingerStatus)
 
-        private val enrolRequestFourFingers = FingerprintEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-            DEFAULT_MODULE_ID, DEFAULT_METADATA, DEFAULT_LANGUAGE, FINGER_STATUS_FOUR_FINGERS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
-
-        private fun FingerprintRequest.toIntent() = Intent().also {
-            it.putExtra(FingerprintRequest.BUNDLE_KEY, this)
+        private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
+            it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, CollectFingerprintsActivity::class.qualifiedName!!)
+            it.putExtra(CollectFingerprintsTaskRequest.BUNDLE_KEY, this)
         }
     }
 }

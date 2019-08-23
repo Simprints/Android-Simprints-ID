@@ -12,7 +12,7 @@ interface RxJavaTest {
 
         // AndroidSchedulers.mainThread() requests Android APi, not available in unit tests
         // Setting a special main Scheduler https://medium.com/@peter.tackage/overriding-rxandroid-schedulers-in-rxjava-2-5561b3d14212
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { _ -> Schedulers.trampoline() }
-        RxJavaPlugins.setIoSchedulerHandler { _ -> Schedulers.trampoline() }
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
     }
 }

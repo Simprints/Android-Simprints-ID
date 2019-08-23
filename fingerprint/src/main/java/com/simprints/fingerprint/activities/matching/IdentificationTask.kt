@@ -1,8 +1,11 @@
 package com.simprints.fingerprint.activities.matching
 
-import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
+import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -13,27 +16,24 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActIdentifyRequest
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingTier
+import com.simprints.fingerprint.data.domain.matching.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
-internal class IdentificationTask(private val view: MatchingContract.View,
-                                  matchingRequest: MatchingActRequest,
-                                  private val dbManager: FingerprintDbManager,
-                                  private val sessionEventsManager: FingerprintSessionEventsManager,
-                                  private val crashReportManager: FingerprintCrashReportManager,
-                                  private val timeHelper: FingerprintTimeHelper,
-                                  private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
+class IdentificationTask(private val viewModel: MatchingViewModel,
+                         matchingRequest: MatchingTaskRequest,
+                         private val dbManager: FingerprintDbManager,
+                         private val sessionEventsManager: FingerprintSessionEventsManager,
+                         private val crashReportManager: FingerprintCrashReportManager,
+                         private val timeHelper: FingerprintTimeHelper,
+                         private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
-    private val matchingIdentifyRequest = matchingRequest as MatchingActIdentifyRequest
+    private val matchingIdentifyRequest = matchingRequest as MatchingTaskIdentifyRequest
 
     companion object {
         const val matchingEndWaitTimeInMillis = 1000
@@ -43,7 +43,8 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
     override fun loadCandidates(): Single<List<Person>> =
         Completable.fromAction {
-            view.setIdentificationProgressLoadingStart()
+            viewModel.hasLoadingBegun.postValue(true)
+            viewModel.progress.postValue(25)
         }.andThen(
             with(matchingIdentifyRequest.queryForIdentifyPool) {
                 dbManager.loadPeople(this.projectId, this.userId, this.moduleId)
@@ -53,17 +54,18 @@ internal class IdentificationTask(private val view: MatchingContract.View,
     override fun handlesCandidatesLoaded(candidates: List<Person>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
-        view.setIdentificationProgressMatchingStart(candidates.size)
+        viewModel.matchBeginningSummary.postValue(MatchingViewModel.IdentificationBeginningSummary(candidates.size))
+        viewModel.progress.postValue(50)
     }
 
     override fun getMatcherType(): LibMatcher.MATCHER_TYPE = LibMatcher.MATCHER_TYPE.SIMAFIS_IDENTIFY
 
     override fun onMatchProgressDo(progress: Int) {
-        view.setIdentificationProgress(progress)
+        // Progress mapped from 0 to 100 to be between 50 and 100
+        viewModel.progress.postValue(progress / 2 + 50)
     }
 
     override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
-        view.setIdentificationProgressReturningStart()
 
         val topCandidates = candidates
             .zip(scores)
@@ -87,10 +89,17 @@ internal class IdentificationTask(private val view: MatchingContract.View,
 
         preferenceManager.lastIdentificationDate = Date()
 
-        val resultData = Intent().putExtra(MatchingActResult.BUNDLE_KEY,
-            MatchingActIdentifyResult(topCandidates))
-        view.doSetResult(Activity.RESULT_OK, resultData)
-        view.setIdentificationProgressFinished(topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches, matchingEndWaitTimeInMillis)
+        val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
+            MatchingTaskIdentifyResult(topCandidates))
+
+        viewModel.progress.postValue(100)
+
+        viewModel.matchFinishedSummary.postValue(MatchingViewModel.IdentificationFinishedSummary(
+            topCandidates.size, tier1Or2Matches, tier3Matches, tier4Matches
+        ))
+        viewModel.result.postValue(MatchingViewModel.FinishResult(
+            ResultCode.OK, resultData, matchingEndWaitTimeInMillis
+        ))
     }
 
     private fun logMessageForCrashReport(message: String) {
