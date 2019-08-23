@@ -22,7 +22,7 @@ data class Finger(val id: FingerIdentifier,
                   var numberOfBadScans: Int = 0) : Comparable<Finger>, Parcelable {
 
     companion object {
-        val NB_OF_FINGERS = 10
+        const val NB_OF_FINGERS = 10
     }
 
     val isGoodScan: Boolean

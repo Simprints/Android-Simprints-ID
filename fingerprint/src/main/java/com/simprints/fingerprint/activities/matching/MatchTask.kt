@@ -4,7 +4,7 @@ import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 
-internal interface MatchTask {
+interface MatchTask {
 
     val matchStartTime: Long
 

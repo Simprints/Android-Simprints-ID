@@ -106,7 +106,8 @@ def koin_version = "2.0.1"
 def koin = [
     core    : "org.koin:koin-core:$koin_version",
     core_ext: "org.koin:koin-core-ext:$koin_version",
-    android : "org.koin:koin-android:$koin_version"
+    android : "org.koin:koin-android:$koin_version",
+    viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
 
@@ -153,7 +154,8 @@ def testing = [
     rx2_idler      : 'com.squareup.rx.idler:rx2-idler:0.9.1',
     coroutines_core: 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1',
     coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1',
-    koin           : "org.koin:koin-test:$koin_version"
+    koin           : "org.koin:koin-test:$koin_version",
+    live_data      : "com.jraska.livedata:testing-ktx:1.1.0"
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
