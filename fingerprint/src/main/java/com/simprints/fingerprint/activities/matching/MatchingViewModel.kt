@@ -16,6 +16,7 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
@@ -113,7 +114,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
     }
 
     private fun handleUnexpectedCallout() {
-        crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Invalid action in MatchingActivity"))
+        crashReportManager.logExceptionOrSafeException(InvalidRequestForMatchingActivityException("Invalid action in MatchingActivity"))
         alert.postValue(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
@@ -121,8 +122,8 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))
     }
 
-    fun dispose() {
-        matchTaskDisposable.dispose()
+    override fun onCleared() {
+        if (::matchTaskDisposable.isInitialized) matchTaskDisposable.dispose()
     }
 
     private fun <T> Single<T>.setMatchingSchedulers() =

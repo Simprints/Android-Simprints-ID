@@ -133,7 +133,6 @@ class MatchingActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        viewModel.dispose()
         super.onDestroy()
         logActivityDestroyed()
     }
