@@ -17,13 +17,17 @@ import com.simprints.id.orchestrator.steps.Step
 
 class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
 
+    companion object {
+        const val FACE_RESPONSE_INDEX = 1
+    }
+
     override fun buildResponse(appRequest: AppRequest,
                                steps: List<Step>,
                                sessionId: String): AppResponse {
 
         val results = steps.map { it.result }
         val fingerResponse = results.first()
-        val faceResponse = results[1]
+        val faceResponse = results[FACE_RESPONSE_INDEX]
 
         if (fingerResponse is FingerprintRefusalFormResponse)
             return buildAppRefusalFormResponse(fingerResponse)

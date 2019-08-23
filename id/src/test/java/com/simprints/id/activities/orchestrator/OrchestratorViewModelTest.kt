@@ -60,12 +60,16 @@ class OrchestratorViewModelTest {
         liveDataAppResponse = MutableLiveData()
         liveDataNextIntent = MutableLiveData()
 
-        whenever(domainToModuleApiConverter){ fromDomainModuleApiAppResponse(anyNotNull()) } thenReturn mock()
+        configureMocks()
+
+        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter)
+    }
+
+    private fun configureMocks() {
+        whenever(domainToModuleApiConverter) { fromDomainModuleApiAppResponse(anyNotNull()) } thenReturn mock()
         whenever(sessionEventsManagerMock) { getCurrentSession() } thenReturn Single.just(fakeSession)
         whenever(orchestratorManagerMock) { appResponse } thenReturn liveDataAppResponse
         whenever(orchestratorManagerMock) { onGoingStep } thenReturn liveDataNextIntent
-
-        vm = OrchestratorViewModel(orchestratorManagerMock, orchestratorEventsHelperMock, listOf(FACE), sessionEventsManagerMock, domainToModuleApiConverter)
     }
 
     @Test
