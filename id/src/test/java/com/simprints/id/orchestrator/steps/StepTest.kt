@@ -10,7 +10,8 @@ class StepTest {
 
     @Test
     fun resultSet_stepShouldUpdateTheState() {
-        val step = Step(0, "someActivityClassName", "bundle_key", mock(), ONGOING)
+        val resultOk = 0
+        val step = Step(resultOk, "someActivityClassName", "bundle_key", mock(), ONGOING)
         step.result = mock()
         assertThat(step.status).isEqualTo(COMPLETED)
     }

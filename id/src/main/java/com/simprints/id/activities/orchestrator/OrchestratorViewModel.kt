@@ -42,6 +42,6 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
         orchestratorManager.restoreState(steps)
     }
 
-    fun getState(): List<Step> = orchestratorManager.getState()
+    fun getStateOfSteps(): List<Step> = orchestratorManager.getState()
 
 }

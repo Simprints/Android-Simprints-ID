@@ -2,8 +2,7 @@ package com.simprints.id.tools.serializers
 
 import com.simprints.id.domain.modality.Modality
 
-// TODO : This should probably be a List<String> instead of Array<String>
-class ModalitiesArraySerializer : Serializer<List<Modality>> {
+class ModalitiesListSerializer : Serializer<List<Modality>> {
 
     override fun serialize(value: List<Modality>): String = StringBuilder().apply {
         value.forEachIndexed { index, language ->

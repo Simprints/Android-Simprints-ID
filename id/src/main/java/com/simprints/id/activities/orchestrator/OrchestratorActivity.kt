@@ -79,7 +79,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList(RESTORE_STATE_KEY, ArrayList(vm.getState()))
+        outState.putParcelableArrayList(RESTORE_STATE_KEY, ArrayList(vm.getStateOfSteps()))
     }
 
     companion object {

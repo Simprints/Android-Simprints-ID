@@ -61,9 +61,9 @@ open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlow
         }
     }
 
-    private fun startStep(it: Step) {
-        it.status = ONGOING
-        onGoingStep.value = it
+    private fun startStep(step: Step) {
+        step.status = ONGOING
+        onGoingStep.value = step
         appResponse.value = null
     }
 
