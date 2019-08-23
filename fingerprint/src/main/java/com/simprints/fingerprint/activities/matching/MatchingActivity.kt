@@ -17,6 +17,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAler
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_matching.*
@@ -54,11 +55,7 @@ class MatchingActivity : AppCompatActivity() {
     private fun observeResult() {
         viewModel.result.observe(this, Observer {
             setResult(it.resultCode.value, it.data)
-            if (it.finishDelayMillis > 0) {
-                Handler().postDelayed({ finish() }, it.finishDelayMillis.toLong())
-            } else {
-                finish()
-            }
+            Handler().postDelayed({ finish() }, it.finishDelayMillis.toLong())
         })
     }
 
@@ -118,10 +115,10 @@ class MatchingActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (ResultCode.fromValue(resultCode)) {
-            ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
-            ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
-            ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-            ResultCode.OK -> {
+            REFUSED -> setResultAndFinish(REFUSED, data)
+            ALERT -> setResultAndFinish(ALERT, data)
+            CANCELLED -> setResultAndFinish(CANCELLED, data)
+            OK -> {
             }
         }
     }

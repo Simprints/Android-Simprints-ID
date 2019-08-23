@@ -25,13 +25,13 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.*
 
-internal class IdentificationTask(private val viewModel: MatchingViewModel,
-                                  matchingRequest: MatchingTaskRequest,
-                                  private val dbManager: FingerprintDbManager,
-                                  private val sessionEventsManager: FingerprintSessionEventsManager,
-                                  private val crashReportManager: FingerprintCrashReportManager,
-                                  private val timeHelper: FingerprintTimeHelper,
-                                  private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
+class IdentificationTask(private val viewModel: MatchingViewModel,
+                         matchingRequest: MatchingTaskRequest,
+                         private val dbManager: FingerprintDbManager,
+                         private val sessionEventsManager: FingerprintSessionEventsManager,
+                         private val crashReportManager: FingerprintCrashReportManager,
+                         private val timeHelper: FingerprintTimeHelper,
+                         private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
     private val matchingIdentifyRequest = matchingRequest as MatchingTaskIdentifyRequest
 

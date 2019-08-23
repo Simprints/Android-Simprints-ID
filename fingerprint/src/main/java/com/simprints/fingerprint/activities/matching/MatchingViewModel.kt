@@ -35,13 +35,13 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                         private val preferencesManager: FingerprintPreferencesManager,
                         private val timeHelper: FingerprintTimeHelper) : ViewModel() {
 
-    internal val result = MutableLiveData<FinishResult>()
-    internal val progress = MutableLiveData(0)
-    internal val alert = MutableLiveData<FingerprintAlert>()
-    internal val hasLoadingBegun = MutableLiveData<Boolean>()
-    internal val matchBeginningSummary = MutableLiveData<IdentificationBeginningSummary>()
-    internal val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()
-    internal val hasMatchFailed = MutableLiveData<Boolean>()
+    val result = MutableLiveData<FinishResult>()
+    val progress = MutableLiveData(0)
+    val alert = MutableLiveData<FingerprintAlert>()
+    val hasLoadingBegun = MutableLiveData<Boolean>()
+    val matchBeginningSummary = MutableLiveData<IdentificationBeginningSummary>()
+    val matchFinishedSummary = MutableLiveData<IdentificationFinishedSummary>()
+    val hasMatchFailed = MutableLiveData<Boolean>()
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
@@ -50,7 +50,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                                                  LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher
 
     @SuppressLint("CheckResult")
-    internal fun start(matchingRequest: MatchingTaskRequest,
+    fun start(matchingRequest: MatchingTaskRequest,
                        libMatcherConstructor: (MatcherPerson, List<MatcherPerson>,
                                                LibMatcher.MATCHER_TYPE, MutableList<Float>, MatcherEventListener, Int) -> LibMatcher = ::LibMatcher) {
         this.matchingRequest = matchingRequest
@@ -112,18 +112,16 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
             }
     }
 
-    private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
-
     private fun handleUnexpectedCallout() {
         crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Invalid action in MatchingActivity"))
         alert.postValue(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
-    internal fun handleBackPressed() {
+    fun handleBackPressed() {
         result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))
     }
 
-    internal fun dispose() {
+    fun dispose() {
         matchTaskDisposable.dispose()
     }
 
@@ -131,16 +129,18 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
 
-    internal data class IdentificationBeginningSummary(val matchSize: Int)
+    private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
 
-    internal data class IdentificationFinishedSummary(
+    data class IdentificationBeginningSummary(val matchSize: Int)
+
+    data class IdentificationFinishedSummary(
         val returnSize: Int,
         val tier1Or2Matches: Int,
         val tier3Matches: Int,
         val tier4Matches: Int
     )
 
-    internal data class FinishResult(
+    data class FinishResult(
         val resultCode: ResultCode,
         val data: Intent?,
         val finishDelayMillis: Int
