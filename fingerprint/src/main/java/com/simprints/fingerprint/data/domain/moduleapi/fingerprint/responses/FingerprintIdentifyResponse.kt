@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses
 
-import com.simprints.fingerprint.data.domain.matching.result.MatchingResult
+import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 

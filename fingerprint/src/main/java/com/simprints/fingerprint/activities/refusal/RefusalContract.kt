@@ -2,13 +2,13 @@ package com.simprints.fingerprint.activities.refusal
 
 import com.simprints.fingerprint.activities.BasePresenter
 import com.simprints.fingerprint.activities.BaseView
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 
 interface RefusalContract {
 
     interface View : BaseView<Presenter> {
 
-        fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult)
+        fun setResultAndFinish(activityResult: Int, refusalResult: RefusalTaskResult)
 
         fun scrollToBottom()
 
