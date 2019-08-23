@@ -1,7 +1,5 @@
 package com.simprints.fingerprint.activities.alert
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -14,43 +12,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
-import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
+import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.data.domain.InternalConstants
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.id.Application
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
-class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallback {
+class AlertActivity : AppCompatActivity(), AlertContract.View {
 
-    @Inject lateinit var orchestrator: Orchestrator
-    override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
-
-    override val context: Context by lazy { this }
+    override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logActivityCreated()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
-
-        alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
+        alertType = intent.extras?.getParcelable<AlertTaskRequest>(AlertTaskRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
-        if(isNewBluetoothAlert(alertType)) {
+        if (isNewBluetoothAlert(alertType)) {
            setContentView(R.layout.activity_fingerprint_bluetooth_alert)
         } else {
             setContentView(R.layout.activity_fingerprint_alert)
         }
 
-        viewPresenter = AlertPresenter(this, component, alertType)
         viewPresenter.start()
     }
 
@@ -101,7 +93,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
 
     override fun startRefusalActivity() {
         startActivityForResult(Intent(this, RefusalActivity::class.java),
-            InternalConstants.RequestIntents.REFUSAL_ACTIVITY_REQUEST)
+            RequestCode.REFUSAL.value)
     }
 
     override fun openBluetoothSettings() {
@@ -116,27 +108,38 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         startActivity(intent)
     }
 
-    override fun finishWithAction(buttonAction: AlertActResult.CloseButtonAction) {
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResult.BUNDLE_KEY, AlertActResult(alertType, buttonAction))
-        })
+    override fun finishWithAction(buttonAction: AlertTaskResult.CloseButtonAction) {
+        val resultCode = when (buttonAction) {
+            AlertTaskResult.CloseButtonAction.CLOSE,
+            AlertTaskResult.CloseButtonAction.BACK -> ResultCode.ALERT
+            AlertTaskResult.CloseButtonAction.TRY_AGAIN -> ResultCode.OK
+        }
 
-        finish()
+        setResultAndFinish(resultCode, Intent().apply {
+            putExtra(AlertTaskResult.BUNDLE_KEY, AlertTaskResult(alertType, buttonAction))
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
+        if (requestCode == RequestCode.REFUSAL.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                }
+            }
+        }
     }
 
-    override fun tryAgain() {}
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResult(it, data)
-        }
+    private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
+        setResult(resultCode.value, data)
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
     }
 }

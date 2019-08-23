@@ -3,18 +3,17 @@ package com.simprints.fingerprint.activities.alert
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import com.simprints.fingerprint.activities.alert.request.AlertActRequest
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
-import com.simprints.fingerprint.data.domain.InternalConstants
+import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
 
 object AlertActivityHelper {
 
     private fun buildAlertIntent(context: Context, alertType: FingerprintAlert) =
         Intent(context, AlertActivity::class.java).apply {
-            putExtra(AlertActRequest.BUNDLE_KEY, AlertActRequest(alertType))
+            putExtra(AlertTaskRequest.BUNDLE_KEY, AlertTaskRequest(alertType))
         }
 
     fun launchAlert(act: Activity, alertType: FingerprintAlert) {
-        act.startActivityForResult(buildAlertIntent(act, alertType), InternalConstants.RequestIntents.ALERT_ACTIVITY_REQUEST)
+        act.startActivityForResult(buildAlertIntent(act, alertType), RequestCode.ALERT.value)
     }
 }
