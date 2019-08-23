@@ -16,15 +16,15 @@ import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 class OrchestratorViewModel(private val orchestrator: Orchestrator,
                             private val runnableTaskDispatcher: RunnableTaskDispatcher) : ViewModel() {
 
-    internal val nextActivityCall = MutableLiveData<ActivityCall>()
-    internal val finishedResult = MutableLiveData<ActivityResult>()
+    val nextActivityCall = MutableLiveData<ActivityCall>()
+    val finishedResult = MutableLiveData<ActivityResult>()
 
-    internal fun start(fingerprintRequest: FingerprintRequest) {
+    fun start(fingerprintRequest: FingerprintRequest) {
         orchestrator.start(fingerprintRequest)
         executeNextTaskOrFinish()
     }
 
-    internal fun handleActivityResult(activityResult: ActivityResult) {
+    fun handleActivityResult(activityResult: ActivityResult) {
         orchestrator.handleActivityTaskResult(
             ResultCode.fromValue(activityResult.resultCode),
             activityResult::toTaskResult
@@ -57,14 +57,14 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
         finishedResult.postValue(finalResult.toActivityResult())
     }
 
-    internal data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
+    data class ActivityCall(val requestCode: Int, val createIntent: (Context) -> Intent)
 
     private fun FingerprintTask.ActivityTask.toActivityCall() =
         ActivityCall(requestCode.value) { context ->
             Intent(context, targetActivity).apply { putExtra(requestBundleKey, createTaskRequest()) }
         }
 
-    internal data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
+    data class ActivityResult(val resultCode: Int, val resultData: Intent?) {
 
         fun toTaskResult(bundleKey: String): TaskResult = resultData?.getParcelableExtra(bundleKey)
             ?: throw NoTaskResultException.inIntent(resultData)
