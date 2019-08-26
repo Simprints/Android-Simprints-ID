@@ -20,7 +20,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {
 
-   override fun processEnrollRequest() = validateAndSendRequest(
+    override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 

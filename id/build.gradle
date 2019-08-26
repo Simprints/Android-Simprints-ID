@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2019.3.0"
-        versionCode 170
+        versionName "2019.3.1"
+        versionCode 175
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -97,7 +97,6 @@ android {
     }
 
     dynamicFeatures = [":fingerprint", ":face", ":clientapi"]
-
 }
 
 buildscript {
@@ -133,12 +132,13 @@ dependencies {
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
+    implementation deps.kotlin.coroutines_android
     implementation deps.androidx.core
     api deps.androidx.multidex
     implementation deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
-    implementation deps.androidx.lifecycle.viewmodel
+    implementation deps.androidx.lifecycle.ktx
     implementation deps.androidx.lifecycle.livedata
     implementation deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview

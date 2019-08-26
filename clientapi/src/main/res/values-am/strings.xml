@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="configuration_error_title">የተግበቦት ስህተት</string>
+    <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
+    <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
+    <string name="configuration_error_message">ሲስተሙ የተግበቦት (%1$s) ስህተት አጋጥሞታል እባክዎትን የሲስተሙን አስተዳደሪ ያነጋግሩ</string>
+    <string name="close">ይዝጉ</string>
+
+</resources>

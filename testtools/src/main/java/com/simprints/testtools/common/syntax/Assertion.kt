@@ -1,10 +1,11 @@
 package com.simprints.testtools.common.syntax
 
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
 import org.junit.Assert
-import com.nhaarman.mockitokotlin2.*
 import org.mockito.Mockito
 import org.mockito.verification.VerificationMode
 
@@ -71,3 +72,8 @@ fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
     .await()
     .assertComplete()
     .assertNoErrors()
+
+fun failTest(message: String?): Nothing {
+    Assert.fail(message)
+    throw Exception(message)
+}

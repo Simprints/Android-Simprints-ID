@@ -9,18 +9,19 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
-
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
-    override lateinit var viewPresenter: RefusalContract.Presenter
+    override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -35,12 +36,9 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
+        logActivityCreated()
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
         setLayoutChangeListeners()
@@ -109,14 +107,14 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.addTextChangedListener(textWatcher)
     }
 
-    override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {
+    override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalTaskResult) {
         setResult(activityResult, getIntentForResultData(refusalResult))
         finish()
     }
 
-    private fun getIntentForResultData(refusalResult: RefusalActResult) =
+    private fun getIntentForResultData(refusalResult: RefusalTaskResult) =
         Intent().putExtra(
-            RefusalActResult.BUNDLE_KEY,
+            RefusalTaskResult.BUNDLE_KEY,
             refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()
@@ -133,5 +131,10 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun showToastForSelectOptionAndSubmit() {
         showToast(R.string.refusal_toast_select_option_submit)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
     }
 }

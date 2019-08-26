@@ -3,12 +3,12 @@ package com.simprints.fingerprint.activities.launch
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import com.google.android.gms.location.LocationRequest
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -28,32 +28,12 @@ import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSim
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActIdentifyResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActResult
-import com.simprints.fingerprint.data.domain.matching.result.MatchingActVerifyResult
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
-import com.simprints.fingerprint.di.FingerprintComponent
-import com.simprints.fingerprint.exceptions.unexpected.MalformedConsentTextException
+import com.simprints.fingerprint.exceptions.unexpected.domain.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -61,24 +41,21 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
-class LaunchPresenter(component: FingerprintComponent,
-                      private val view: LaunchContract.View,
-                      private val fingerprintRequest: FingerprintRequest) : LaunchContract.Presenter {
+class LaunchPresenter(private val view: LaunchContract.View,
+                      private val launchRequest: LaunchTaskRequest,
+                      private val dbManager: FingerprintDbManager,
+                      private val simNetworkUtils: FingerprintSimNetworkUtils,
+                      private val consentDataManager: ConsentDataManager,
+                      private val crashReportManager: FingerprintCrashReportManager,
+                      private val scannerManager: ScannerManager,
+                      private val timeHelper: FingerprintTimeHelper,
+                      private val sessionEventsManager: FingerprintSessionEventsManager,
+                      private val locationProvider: LocationProvider,
+                      private val preferencesManager: FingerprintPreferencesManager,
+                      private val analyticsManager: FingerprintAnalyticsManager) : LaunchContract.Presenter {
 
     private var setupFlow: Disposable? = null
-
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var simNetworkUtils: FingerprintSimNetworkUtils
-    @Inject lateinit var consentDataManager: ConsentDataManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var locationProvider: LocationProvider
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var analyticsManager: FingerprintAnalyticsManager
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -97,14 +74,11 @@ class LaunchPresenter(component: FingerprintComponent,
         }
     }
 
-    init {
-        component.inject(this)
-        startConsentEventTime = timeHelper.now()
-    }
-
     override fun start() {
-        view.setLanguage(fingerprintRequest.language)
-        view.setLogoVisibility(fingerprintRequest.logoExists)
+        startConsentEventTime = timeHelper.now()
+
+        view.setLanguage(launchRequest.language)
+        view.setLogoVisibility(launchRequest.logoExists)
         view.initTextsInButtons()
         view.initConsentTabs()
 
@@ -175,11 +149,11 @@ class LaunchPresenter(component: FingerprintComponent,
             .andThen(tryToFetchGuid())
 
     private fun tryToFetchGuid(): Completable {
-        return if (fingerprintRequest is FingerprintVerifyRequest) {
-            val guid = fingerprintRequest.verifyGuid
+        return if (launchRequest.verifyGuid != null) {
+            val guid = launchRequest.verifyGuid
             val startCandidateSearchTime = timeHelper.now()
             dbManager
-                .loadPerson(fingerprintRequest.projectId, guid)
+                .loadPerson(launchRequest.projectId, guid)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess { personFetchResult ->
@@ -237,7 +211,7 @@ class LaunchPresenter(component: FingerprintComponent,
 
     private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
         if (alert == FingerprintAlert.DISCONNECTED) {
-            view.showDialogForScannerErrorConfirmation(scannerManager.scanner?.scannerId ?: "")
+            view.showDialogForScannerErrorConfirmation(scannerManager.lastPairedScannerId ?: "")
         } else {
             launchAlert(alert)
         }
@@ -284,7 +258,7 @@ class LaunchPresenter(component: FingerprintComponent,
         scannerManager.scanner?.let {
             preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)
             preferencesManager.lastScannerVersion = it.hardwareVersion.toString()
-            analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId?: "")
+            analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId ?: "")
         }
         view.handleSetupFinished()
         scannerManager.scanner?.registerButtonListener(scannerButton)
@@ -305,7 +279,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return generalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -315,7 +289,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return parentalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
     }
 
     override fun handleOnBackPressed() {
@@ -351,63 +325,10 @@ class LaunchPresenter(component: FingerprintComponent,
         scannerManager.disconnectScannerIfNeeded()
     }
 
-    override fun tryAgainFromErrorScreen() {
+    override fun tryAgainFromErrorOrRefusal() {
+        setupFlow?.dispose()
+        view.dismissScannerErrorConfirmationDialog()
         startSetup()
-    }
-
-    override fun tearDownAppWithResult(resultCode: Int, resultData: Intent?) {
-        waitingForConfirmation = false
-        val returnIntent = Intent()
-
-        if (resultCode == Activity.RESULT_OK) {
-            val possibleMatchResult = resultData?.getParcelableExtra<MatchingActResult>(MatchingActResult.BUNDLE_KEY)
-            val possibleCollectResult = resultData?.getParcelableExtra<CollectFingerprintsActResult>(CollectFingerprintsActResult.BUNDLE_KEY)
-            val possibleRefusalForm = resultData?.getParcelableExtra<RefusalActResult>(RefusalActResult.BUNDLE_KEY)
-
-            if (possibleRefusalForm != null) {
-                prepareRefusalForm(returnIntent, possibleRefusalForm)
-            } else {
-                when (fingerprintRequest) {
-                    is FingerprintEnrolRequest -> prepareEnrolResponseIntent(returnIntent, possibleCollectResult)
-                    is FingerprintIdentifyRequest -> prepareIdentifyResponseIntent(returnIntent, possibleMatchResult as MatchingActIdentifyResult?)
-                    is FingerprintVerifyRequest -> prepareVerifyResponseIntent(returnIntent, possibleMatchResult as MatchingActVerifyResult?)
-                }
-            }
-        }
-
-        view.setResultAndFinish(resultCode, returnIntent)
-    }
-
-    private fun prepareRefusalForm(resultData: Intent, possibleRefusalForm: RefusalActResult) {
-        val fingerprintResult = FingerprintRefusalFormResponse(
-            possibleRefusalForm.answer.reason.toFingerprintRefusalFormReason(),
-            possibleRefusalForm.answer.optionalText)
-
-        resultData.putExtra(IFingerprintResponse.BUNDLE_KEY,
-            fromDomainToFingerprintRefusalFormResponse(fingerprintResult))
-    }
-    
-    private fun prepareVerifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActVerifyResult?) {
-        possibleMatchResult?.let {
-            val fingerprintResult = FingerprintVerifyResponse(it.guid, it.confidence, it.tier)
-            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToFingerprintVerifyResponse(fingerprintResult))
-        }
-    }
-
-    private fun prepareIdentifyResponseIntent(resultData: Intent?, possibleMatchResult: MatchingActIdentifyResult?) {
-        possibleMatchResult?.let {
-            val fingerprintResult = FingerprintIdentifyResponse(it.identifications)
-            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY,
-                fromDomainToFingerprintIdentifyResponse(fingerprintResult))
-        }
-    }
-
-    private fun prepareEnrolResponseIntent(resultData: Intent?, possibleCollectFingerprintsActResult: CollectFingerprintsActResult?) {
-        possibleCollectFingerprintsActResult?.let {
-            val fingerprintResult = FingerprintEnrolResponse(it.probe.patientId)
-            resultData?.putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintEnrolResponse(fingerprintResult))
-        }
     }
 
     override fun confirmConsentAndContinueToNextActivity() {
@@ -458,5 +379,11 @@ class LaunchPresenter(component: FingerprintComponent,
         crashReportManager.logMessageForCrashReport(
             FingerprintCrashReportTag.SCANNER_SETUP,
             FingerprintCrashReportTrigger.SCANNER, message = message)
+    }
+
+    override fun logScannerErrorDialogShownToCrashReport() {
+        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
+            FingerprintCrashReportTrigger.SCANNER,
+            message = "Scanner error confirm dialog shown")
     }
 }
