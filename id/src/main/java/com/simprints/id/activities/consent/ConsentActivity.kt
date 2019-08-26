@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
@@ -32,7 +31,6 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
 
-    private val consentEvents = MutableLiveData<ConsentEvent>()
     private var startConsentEventTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,8 +43,6 @@ class ConsentActivity : AppCompatActivity() {
         startConsentEventTime = timeHelper.now()
 
         appRequest = intent.extras?.getParcelable(AppRequest.BUNDLE_KEY) ?: throw InvalidAppRequest()
-
-        viewModelFactory.consentEvents = consentEvents
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConsentViewModel::class.java)
         viewModel.appRequest.postValue(appRequest)
@@ -107,13 +103,13 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun addClickListenerToConsentAccept() {
         consentAcceptButton.setOnClickListener {
-            consentEvents.postValue(buildConsentEventForResult(ACCEPTED))
+            viewModel.addConsentEvent(buildConsentEventForResult(ACCEPTED))
         }
     }
 
     private fun addClickListenerToConsentDecline() {
         consentDeclineButton.setOnClickListener {
-            consentEvents.postValue(buildConsentEventForResult(DECLINED))
+            viewModel.addConsentEvent(buildConsentEventForResult(DECLINED))
         }
     }
 

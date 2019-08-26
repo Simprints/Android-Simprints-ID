@@ -7,7 +7,6 @@ import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
-import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
