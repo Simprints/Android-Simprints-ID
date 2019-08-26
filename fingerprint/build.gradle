@@ -14,7 +14,7 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
-        versionName "2019.1.0-dev0"
+        versionName "2019.3.0-dev0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
@@ -44,6 +44,11 @@ android {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
         animationsDisabled = true
     }
+
+    // https://github.com/mockito/mockito/issues/1376
+    packagingOptions {
+        pickFirst 'mockito-extensions/org.mockito.plugins.MockMaker'
+    }
 }
 
 buildscript {
@@ -71,6 +76,12 @@ repositories {
 }
 
 dependencies {
+    // https://issuetracker.google.com/issues/132906456
+    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
+    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
+    // The following line includes the base module classes.jar into the final one.
+    // To run unit tests from CL: ./gradlew fingerprint:test
+    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/bundleDebugClasses/classes.jar"))
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -100,9 +111,10 @@ dependencies {
     implementation deps.androidx.ui.fragment
     implementation deps.arch_components.work
 
-    // Dagger
-    implementation deps.dagger.core
-    kapt deps.dagger.compiler
+    // Koin
+    implementation deps.koin.core
+    implementation deps.koin.android
+    implementation deps.koin.viewmodel
 
     // RxJava
     implementation deps.rxjava2.permissions
@@ -136,9 +148,6 @@ dependencies {
     // Kotlin
     testImplementation deps.testing.coroutines_test
 
-    // Dagger
-    kaptTest deps.dagger.compiler
-
     // Mockito
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.truth
@@ -158,8 +167,9 @@ dependencies {
         exclude group: 'org.jetbrains.kotlinx'
     }
 
-    // Dagger
-    kaptAndroidTest deps.dagger.compiler
+    // Koin
+    androidTestImplementation deps.koin.core_ext
+    androidTestImplementation deps.testing.koin
 
     // Android X
     androidTestImplementation deps.testing.androidx.core_testing
@@ -169,11 +179,13 @@ dependencies {
     androidTestImplementation deps.testing.androidx.runner
     androidTestImplementation deps.testing.androidx.rules
     androidTestUtil deps.testing.androidx.orchestrator
+    androidTestImplementation deps.testing.live_data
 
     // Mockito
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
+    androidTestCompile deps.testing.mockito.mockito_inline_androidtests
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core
@@ -187,25 +199,4 @@ dependencies {
 
     // Truth
     androidTestImplementation deps.testing.truth
-
-    // TODO : Needed for android test since fingerprint depends on id
-
-    androidTestImplementation deps.playservices.safetynet
-
-    // Retrofit
-    testImplementation deps.retrofit.core
-    testImplementation deps.testing.retrofit
-    androidTestImplementation deps.retrofit.core
-    androidTestImplementation deps.testing.retrofit
-    androidTestImplementation deps.retrofit.adapter
-    androidTestImplementation deps.retrofit.convertergson
-
-    // Realm
-    implementation deps.realm.annotations
-    implementation(deps.realm.kotlin) {
-        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
-    }
-    implementation deps.realm.android
-    kapt deps.realm.annotations_processor
-    compileOnly deps.realm.glassfish_annotation
 }

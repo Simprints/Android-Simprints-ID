@@ -1,51 +1,83 @@
 package com.simprints.id.orchestrator
 
-import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.lifecycle.MutableLiveData
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.modality.ModalityResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modality.ModalityFlowFactory
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
-import com.simprints.id.orchestrator.modality.builders.AppResponseFactory
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 
-open class OrchestratorManagerImpl(private val modality: Modality,
-                                   private val flowModalityFactory: ModalityFlowFactory,
+open class OrchestratorManagerImpl(private val flowModalityFactory: ModalityFlowFactory,
                                    private val appResponseFactory: AppResponseFactory) : OrchestratorManager {
 
+    override val onGoingStep = MutableLiveData<Step?>()
+    override val appResponse = MutableLiveData<AppResponse?>()
+
+    internal lateinit var modalities: List<Modality>
     internal lateinit var appRequest: AppRequest
-    private var sessionId: String = ""
+    internal var sessionId: String = ""
 
-    internal val modalitiesFlow by lazy {
-        flowModalityFactory.buildModalityFlow(appRequest, modality)
-    }
+    private lateinit var modalitiesFlow: ModalityFlow
 
-    @SuppressLint("CheckResult")
-    override fun startFlow(appRequest: AppRequest,
-                           sessionId: String): Observable<ModalityStepRequest> {
-
+    override fun initialise(modalities: List<Modality>,
+                                    appRequest: AppRequest,
+                                    sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
+        this.modalities = modalities
+        modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
+        resetInternalState()
 
-        return modalitiesFlow.modalityStepRequests
+        proceedToNextStepOrAppResponse()
     }
 
-    @SuppressLint("CheckResult")
-    override fun getAppResponse(): Single<AppResponse> =
-        modalitiesFlow.modalityResponses
-            .toList()
-            .map {
-                buildAndEmitFinalResult(it)
+    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        modalitiesFlow.handleIntentResult(requestCode, resultCode, data)
+        proceedToNextStepOrAppResponse()
+    }
+
+    override fun restoreState(steps: List<Step>) {
+        resetInternalState()
+
+        modalitiesFlow.restoreState(steps)
+        proceedToNextStepOrAppResponse()
+    }
+
+    override fun getState(): List<Step> = modalitiesFlow.steps
+
+    private fun proceedToNextStepOrAppResponse() {
+        with(modalitiesFlow) {
+            if (!anyStepOnGoing()) {
+                val potentialNextStep = getNextStepToLaunch()
+                if (potentialNextStep != null) {
+                    startStep(potentialNextStep)
+                } else {
+                    buildAppResponse()
+                }
             }
+        }
+    }
 
-    internal fun buildAndEmitFinalResult(stepsResults: List<ModalityResponse>) =
-        appResponseFactory.buildAppResponse(modality, appRequest, stepsResults, sessionId)
+    private fun startStep(step: Step) {
+        step.status = ONGOING
+        onGoingStep.value = step
+        appResponse.value = null
+    }
 
-    @SuppressLint("CheckResult")
-    override fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
-        modalitiesFlow.handleIntentResponse(requestCode, resultCode, data)
+    private fun ModalityFlow.anyStepOnGoing() =
+        steps.any { it.status == ONGOING }
+
+    private fun buildAppResponse() {
+        val appResponseToReturn = appResponseFactory.buildAppResponse(modalities, appRequest, modalitiesFlow.steps, sessionId)
+        onGoingStep.value = null
+        appResponse.value = appResponseToReturn
+    }
+
+    private fun resetInternalState() {
+        appResponse.value = null
+        onGoingStep.value = null
     }
 }

@@ -25,5 +25,7 @@ interface LibSimprintsContract {
 
     }
 
-    interface Presenter : BasePresenter, RequestContract.Presenter
+    interface Presenter : BasePresenter, RequestContract.Presenter {
+        override suspend fun start()
+    }
 }

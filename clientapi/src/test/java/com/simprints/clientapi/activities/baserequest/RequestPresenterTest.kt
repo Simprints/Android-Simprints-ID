@@ -66,6 +66,7 @@ class ImplRequestPresenter(view: RequestContract.RequestView,
         clientApiSessionEventsManager
     ) {
 
+    override suspend fun start() {}
     override fun handleEnrollResponse(enroll: EnrollResponse) {}
     override fun handleIdentifyResponse(identify: IdentifyResponse) {}
     override fun handleVerifyResponse(verify: VerifyResponse) {}

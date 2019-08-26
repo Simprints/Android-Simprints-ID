@@ -40,11 +40,12 @@ abstract class CheckLoginPresenter(
         } catch (t: Throwable) {
             Timber.e(t)
 
-            syncSchedulerHelper.cancelAllWorkers()
             when (t) {
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
-                is NotSignedInException -> handleNotSignedInUser()
+                is NotSignedInException -> handleNotSignedInUser().also {
+                    syncSchedulerHelper.cancelAllWorkers()
+                }
                 else -> {
                     Timber.e(t)
                     crashReportManager.logExceptionOrSafeException(t)

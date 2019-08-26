@@ -17,7 +17,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.app.DomainToAppResponse.fromDomainToAppErrorResponse
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -28,9 +28,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
-import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -54,9 +52,9 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         component.inject(this)
     }
 
-    @SuppressLint("CheckResult")
     override fun setup() {
         try {
+            addAnalyticsInfoAndProjectId()
             parseAppRequest()
             extractSessionParametersOrThrow()
             addCalloutAndConnectivityEventsInSession(appRequest)
@@ -129,11 +127,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override fun onAlertScreenReturn(alertActResponse: AlertActResponse) {
         val domainErrorResponse = AppErrorResponse(Reason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
-        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(domainErrorResponse))
+        view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(domainErrorResponse))
     }
 
     override fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse) {
-        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(appErrorResponse))
+        view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(appErrorResponse))
     }
 
     private fun extractSessionParametersOrThrow() =
@@ -173,12 +171,22 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         matches the userId from the Intent */
         loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()
 
+    @SuppressLint("CheckResult")
     override fun handleSignedInUser() {
         /** Hack to support multiple users: If all login checks success, then we consider
          *  the userId in the Intent as new signed User */
         loginInfoManager.signedInUserId = appRequest.userId
         remoteConfigFetcher.doFetchInBackgroundAndActivateUsingDefaultCacheTime()
-        addInfoIntoSessionEventsAfterUserSignIn()
+
+        fetchPeopleCountInLocalDatabase().flatMapCompletable { recordCount ->
+            sessionEventsManager.updateSession {
+                it.events.apply {
+                    addAuthorizationEvent(it, AUTHORIZED)
+                }
+                it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                it.databaseInfo.recordCount = recordCount
+            }
+        }.subscribeBy(onError = { it.printStackTrace() })
 
         view.openOrchestratorActivity(appRequest)
 
@@ -195,34 +203,22 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         }
     }
 
-    @SuppressLint("CheckResult")
-    private fun addInfoIntoSessionEventsAfterUserSignIn() {
-        try {
-            Singles.zip(
-                fetchAnalyticsId(),
-                fetchPeopleCountInLocalDatabase(),
-                fetchSessionCountInLocalDatabase()) { gaId: String, peopleDbCount: Int, sessionDbCount: Int ->
-                return@zip Triple(gaId, peopleDbCount, sessionDbCount)
-            }.flatMapCompletable { (gaId, peopleDbCount, sessionDbCount) ->
-                populateSessionWithAnalyticsIdAndDbInfo(gaId, peopleDbCount)
+    internal fun addAnalyticsInfoAndProjectId() =
+        fetchAnalyticsId()
+            .flatMapCompletable { gaId ->
+                sessionEventsManager.updateSession {
+                    val signedInProject = loginInfoManager.getSignedInProjectIdOrEmpty()
+                    if (signedInProject.isNotEmpty()) {
+                        it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+                    }
+                    it.analyticsId = gaId
+                }
             }.subscribeBy(onError = { it.printStackTrace() })
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
-    private fun fetchAnalyticsId(): Single<String> = analyticsManager.analyticsId.onErrorReturn { "" }
+    private fun fetchAnalyticsId() =
+        analyticsManager.analyticsId.onErrorReturn { "" }
+
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
-    private fun fetchSessionCountInLocalDatabase(): Single<Int> = sessionEventsManager.getSessionCount().onErrorReturn { -1 }
-    private fun populateSessionWithAnalyticsIdAndDbInfo(gaId: String, peopleDbCount: Int): Completable =
-        sessionEventsManager.updateSession {
-            it.projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
-            it.analyticsId = gaId
-            it.databaseInfo.recordCount = peopleDbCount
-            it.events.apply {
-                addAuthorizationEvent(it, AUTHORIZED)
-            }
-        }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(

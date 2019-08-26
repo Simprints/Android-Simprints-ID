@@ -40,6 +40,8 @@ interface RequestContract {
 
     interface Presenter {
 
+        suspend fun start()
+
         fun processEnrollRequest()
 
         fun processIdentifyRequest()
