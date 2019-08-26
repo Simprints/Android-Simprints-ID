@@ -33,7 +33,7 @@ class ConsentViewModelTest {
         val consentTextManagerMock = mock<ConsentTextManager>().apply {
             whenever(this) { getGeneralConsentText(any()) } thenReturn generalConsentTextLiveData
         }
-        val consentViewModel = ConsentViewModel(consentTextManagerMock, mock(), mock()).apply {
+        val consentViewModel = ConsentViewModel(consentTextManagerMock, mock()).apply {
             appRequest.value = buildAppEnrolRequest()
         }
 
@@ -50,7 +50,7 @@ class ConsentViewModelTest {
             whenever(this) { getParentalConsentText(any()) } thenReturn parentalConsentTextLiveData
             whenever(this) { parentalConsentExists() } thenReturn MutableLiveData(true)
         }
-        val consentViewModel = ConsentViewModel(consentTextManagerMock, mock(), mock()).apply {
+        val consentViewModel = ConsentViewModel(consentTextManagerMock, mock()).apply {
             appRequest.value = buildAppEnrolRequest()
         }
 
