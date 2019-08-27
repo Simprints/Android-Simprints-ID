@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.simprints.id.domain.moduleapi.app.DomainToAppResponse
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppConfirmationResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.guidselection.GuidSelectionWorker
@@ -37,7 +37,7 @@ class GuidSelectionActivity : AppCompatActivity() {
     }
 
     private fun fromDomainToAppResponse(response: AppResponse): IAppResponse =
-        DomainToAppResponse.fromDomainToAppResponse(response)
+        DomainToModuleApiAppResponse.fromDomainModuleApiAppResponse(response)
 
     private fun buildGuidSelectionWork() = OneTimeWorkRequestBuilder<GuidSelectionWorker>()
         .setInputData(prepareInputData())

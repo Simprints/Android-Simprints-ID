@@ -9,7 +9,6 @@ import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
@@ -20,7 +19,6 @@ import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 
@@ -80,8 +78,6 @@ open class DbManagerImpl(override val local: LocalDbManager,
                         it.printStackTrace()
                     })
             }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
 
     @Suppress("UNUSED_PARAMETER")
     private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.fromAction {
