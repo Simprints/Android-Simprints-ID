@@ -9,28 +9,27 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
 
-object FaceRequestFactory {
+interface FaceRequestFactory {
 
-    fun buildFaceRequest(appRequest: AppRequest): FaceRequest =
-        when (appRequest) {
-            is AppEnrolRequest -> buildFaceEnrolRequest(appRequest)
-            is AppVerifyRequest -> buildFaceVerifyRequest(appRequest)
-            is AppIdentifyRequest -> buildFaceIdentifyRequest(appRequest)
+    fun buildFaceEnrolRequest(projectId: String,
+                              userId: String,
+                              moduleId: String): FaceEnrolRequest
+
+    fun buildFaceVerifyRequest(projectId: String,
+                               userId: String,
+                               moduleId: String): FaceVerifyRequest
+
+    fun buildFaceIdentifyRequest(projectId: String,
+                                 userId: String,
+                                 moduleId: String): FaceIdentifyRequest
+}
+
+fun FaceRequestFactory.buildFaceRequest(appRequest: AppRequest): FaceRequest =
+    with(appRequest) {
+        when (this) {
+            is AppEnrolRequest -> buildFaceEnrolRequest(projectId, userId, moduleId)
+            is AppVerifyRequest -> buildFaceVerifyRequest(projectId, userId, moduleId)
+            is AppIdentifyRequest -> buildFaceIdentifyRequest(projectId, userId, moduleId)
             else -> throw IllegalStateException("Invalid fingerprint request")
         }
-
-    private fun buildFaceEnrolRequest(enrol: AppEnrolRequest): FaceEnrolRequest =
-        with(enrol) {
-            FaceEnrolRequest(projectId, userId, moduleId)
-        }
-
-    private fun buildFaceVerifyRequest(verify: AppVerifyRequest): FaceVerifyRequest =
-        with(verify) {
-            FaceVerifyRequest(projectId, userId, moduleId)
-        }
-
-    private fun buildFaceIdentifyRequest(identify: AppIdentifyRequest): FaceIdentifyRequest =
-        with(identify) {
-            FaceIdentifyRequest(projectId, userId, moduleId)
-        }
-}
+    }

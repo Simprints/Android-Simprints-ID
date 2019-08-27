@@ -1,7 +1,6 @@
 package com.simprints.fingerprint.activities.launch
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -13,58 +12,46 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorBuilder
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.REFUSAL_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FingerprintToDomainRequest.fromFingerprintToDomainRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
-import com.simprints.fingerprint.tools.extensions.Vibrate.vibrate
-import com.simprints.id.Application
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.tools.Vibrate.vibrate
+import com.simprints.fingerprint.tools.extensions.logActivityCreated
+import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.activities.longConsent.LongConsentActivity
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_launch.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCallback {
+class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
-    override val context: Context by lazy { this }
-    @Inject lateinit var orchestrator: Orchestrator
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    private lateinit var launchRequest: LaunchTaskRequest
+    override val viewPresenter: LaunchContract.Presenter by inject { parametersOf(this, launchRequest) }
 
-    override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
 
-    private lateinit var fingerprintRequest: FingerprintRequest
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val component = FingerprintComponentBuilder.getComponent(this.application as Application)
-        component.inject(this)
 
-        val iFingerprintRequest: IFingerprintRequest = this.intent.extras?.getParcelable(IFingerprintRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForFingerprintException()
-        fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
+        launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
+            ?: throw InvalidRequestForLaunchActivityException()
 
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
-        viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
     }
 
@@ -110,15 +97,16 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun onActivityResultReceived() { viewPresenter.onActivityResult() }
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResultAndFinish(it, data)
+        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                    viewPresenter.onActivityResult()
+                    viewPresenter.tryAgainFromErrorOrRefusal()
+                }
+            }
         }
     }
 
@@ -155,22 +143,22 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun onDestroy() {
-        viewPresenter.handleOnDestroy()
         super.onDestroy()
+        logActivityDestroyed()
     }
 
     override fun continueToNextActivity() {
-        val intent = Intent(this, CollectFingerprintsActivity::class.java)
-            .also { it.putExtra(FingerprintRequest.BUNDLE_KEY, fingerprintRequest) }
-        startActivityForResult(intent, COLLECT_FINGERPRINTS_ACTIVITY_REQUEST_CODE)
+        setResultAndFinish(ResultCode.OK, Intent().apply {
+            putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())
+        })
     }
 
     override fun goToRefusalActivity() {
-        startActivityForResult(Intent(this, RefusalActivity::class.java), REFUSAL_ACTIVITY_REQUEST)
+        startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
-    override fun setResultAndFinish(resultCode: Int, resultData: Intent?) {
-        setResult(resultCode, resultData)
+    override fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
+        setResult(resultCode.value, resultData)
         finish()
     }
 
@@ -185,7 +173,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun showDialogForScannerErrorConfirmation(scannerId: String) {
         scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
-            logScannerErrorDialogShownToCrashReport()
+            viewPresenter.logScannerErrorDialogShownToCrashReport()
         }
     }
 
@@ -199,12 +187,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
 
     override fun dismissScannerErrorConfirmationDialog() {
         scannerErrorConfirmationDialog?.dismiss()
-    }
-
-    private fun logScannerErrorDialogShownToCrashReport() {
-        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
-            FingerprintCrashReportTrigger.SCANNER,
-            message = "Scanner error confirm dialog shown")
     }
 
     companion object {

@@ -18,28 +18,24 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.exceptions.unexpected.scanner.UnexpectedScannerException
+import com.simprints.fingerprint.tools.Vibrate
+import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprint.tools.extensions.Vibrate
-import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import javax.inject.Inject
 
 class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter,
-                                        component: FingerprintComponent) {
-
-    @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+                                        private val scannerManager: ScannerManager,
+                                        private val crashReportManager: FingerprintCrashReportManager) {
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
@@ -59,8 +55,6 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
     init {
-        component.inject(this)
-
         view.timeoutBar = initTimeoutBar()
         view.un20WakeupDialog = initUn20Dialog()
     }
@@ -260,9 +254,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun setGoodOrBadScanFingerStatusToCurrentFinger(quality: Int) {
         if (quality >= qualityThreshold) {
-            currentFingerStatus = FingerStatus.GOOD_SCAN
+            currentFingerStatus = GOOD_SCAN
         } else {
-            currentFingerStatus = FingerStatus.BAD_SCAN
+            currentFingerStatus = BAD_SCAN
             presenter.currentFinger().numberOfBadScans += 1
         }
         logMessageForCrashReport("Finger scanned - ${presenter.currentFinger().id} - $currentFingerStatus")
@@ -276,8 +270,12 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         scannerManager.disconnectScannerIfNeeded()
     }
 
+    fun disconnectScannerIfNeeded() {
+        scannerManager.disconnectScannerIfNeeded()
+    }
+
     fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
-        currentFingerStatus = FingerStatus.FINGER_SKIPPED
+        currentFingerStatus = FINGER_SKIPPED
         presenter.currentFinger().numberOfBadScans = CollectFingerprintsPresenter.numberOfBadScansRequiredToAutoAddNewFinger
         presenter.refreshDisplay()
     }

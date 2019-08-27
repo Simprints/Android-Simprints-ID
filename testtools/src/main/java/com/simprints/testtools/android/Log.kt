@@ -6,7 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import timber.log.Timber
 
 fun log(message: String) {
-    Timber.d(String.format("EndToEndTesting: %s", message))
+    Timber.d(String.format("SimprintsAndroidTests: %s", message))
     val b = Bundle()
     b.putString(Instrumentation.REPORT_KEY_STREAMRESULT, "\n" + message)
     InstrumentationRegistry.getInstrumentation().sendStatus(0, b)
