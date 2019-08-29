@@ -6,7 +6,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.*
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
-import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.*
@@ -36,7 +36,7 @@ class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
             return buildAppErrorResponse(fingerResponse)
 
         return when (appRequest) {
-            is AppEnrolRequest -> buildAppEnrolResponse(fingerResponse as FingerprintEnrolResponse, faceResponse as FaceEnrolResponse)
+            is AppEnrolRequest -> buildAppEnrolResponse(fingerResponse as FingerprintEnrolResponse, faceResponse as FaceCaptureResponse)
             is AppIdentifyRequest -> {
                 require(sessionId.isNotEmpty())
                 buildAppIdentifyResponse(fingerResponse as FingerprintIdentifyResponse, faceResponse as FaceIdentifyResponse, sessionId)
@@ -65,6 +65,6 @@ class AppResponseBuilderForFingerFace : AppResponseBuilderForModal {
         AppVerifyResponse(fingerprintResponse.matchingResult.toAppMatchResult())
 
     private fun buildAppEnrolResponse(fingerprintResponse: FingerprintEnrolResponse,
-                                      faceResponse: FaceEnrolResponse): AppEnrolResponse =
+                                      faceResponse: FaceCaptureResponse): AppEnrolResponse =
         AppEnrolResponse(fingerprintResponse.guid)
 }
