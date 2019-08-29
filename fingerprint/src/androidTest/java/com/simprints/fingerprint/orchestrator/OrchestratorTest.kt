@@ -120,7 +120,7 @@ class OrchestratorTest {
             assertTrue(isFinished())
             with(getFinalResult()) {
                 assertEquals(Activity.RESULT_OK, resultCode)
-                assertNotNull(resultData?.extras?.getParcelable<IFingerprintRefusalFormResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintExitFormResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
                     assertEquals(IFingerprintResponseType.REFUSAL, type)
                 })
             }
