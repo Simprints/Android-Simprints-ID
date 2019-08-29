@@ -21,6 +21,8 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
@@ -49,12 +51,15 @@ class OrchestratorModule {
                                         preferenceManager: PreferencesManager): FingerprintStepProcessor =
         FingerprintStepProcessorImpl(fingerprintRequestFactory, ModuleApiToDomainFingerprintResponse, preferenceManager)
 
+    @Provides
+    fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
+
     // ModalFlow [Enrol, Identify, Verify]
     @Provides
     @Named("ModalityFlowEnrol")
     fun provideModalityFlow(fingerprintStepProcessor: FingerprintStepProcessor,
-                            faceStepProcessor: FaceStepProcessor): ModalityFlow =
-        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor)
+                            faceStepProcessor: FaceStepProcessor, coreStepProcessor: CoreStepProcessor): ModalityFlow =
+        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
 
     @Provides
     @Named("ModalityFlowVerify")
