@@ -10,16 +10,19 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerify
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForVerify : AppResponseBuilder {
+class AppResponseBuilderForVerify : AppResponseBuilder, BaseAppResponseBuilder() {
 
     override fun buildAppResponse(modalities: List<Modality>,
                                   appRequest: AppRequest,
                                   steps: List<Step>,
                                   sessionId: String): AppResponse {
+        super.getErrorOrRefusalResponseIfAny(steps)?.let {
+            return it
+        }
 
         val results = steps.map { it.result }
-        val faceResponse = getFaceResponseForVerify(modalities, results)
-        val fingerprintResponse = getFingerprintResponseForVerify(modalities, results)
+        val faceResponse = getFaceResponseForVerify(results)
+        val fingerprintResponse = getFingerprintResponseForVerify(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -35,23 +38,11 @@ class AppResponseBuilderForVerify : AppResponseBuilder {
         }
     }
 
-    private fun getFaceResponseForVerify(modalities: List<Modality>, results: List<Step.Result?>): FaceVerifyResponse? {
-        val index =  modalities.indexOf(Modality.FACE)
-        return if (index > -1) {
-            results[index] as FaceVerifyResponse
-        } else {
-            null
-        }
-    }
+    private fun getFaceResponseForVerify(results: List<Step.Result?>): FaceVerifyResponse? =
+        results.firstOrNull { it is FaceVerifyResponse } as FaceVerifyResponse
 
-    private fun getFingerprintResponseForVerify(modalities: List<Modality>, results: List<Step.Result?>): FingerprintVerifyResponse? {
-        val index =  modalities.indexOf(Modality.FACE)
-        return if (index > -1) {
-            results[index] as FingerprintVerifyResponse
-        } else {
-            null
-        }
-    }
+    private fun getFingerprintResponseForVerify(results: List<Step.Result?>): FingerprintVerifyResponse? =
+        results.firstOrNull{ it is FingerprintVerifyResponse } as FingerprintVerifyResponse
 
     private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceVerifyResponse,
                                                             fingerprintResponse: FingerprintVerifyResponse) =
