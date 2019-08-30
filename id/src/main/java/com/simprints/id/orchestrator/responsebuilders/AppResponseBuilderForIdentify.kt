@@ -10,13 +10,19 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdenti
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForIdentify : AppResponseBuilder {
+class AppResponseBuilderForIdentify : AppResponseBuilder, BaseAppResponseBuilder() {
 
-    override fun buildAppResponse(modalities: List<Modality>, appRequest: AppRequest, steps: List<Step>, sessionId: String): AppResponse {
+    override fun buildAppResponse(modalities: List<Modality>,
+                                  appRequest: AppRequest,
+                                  steps: List<Step>,
+                                  sessionId: String): AppResponse {
+        super.getErrorOrRefusalResponseIfAny(steps)?.let {
+            return it
+        }
 
         val results = steps.map { it.result }
-        val faceResponse = getFaceResponseForIdentify(modalities, results)
-        val fingerprintResponse = getFingerprintResponseForIdentify(modalities, results)
+        val faceResponse = getFaceResponseForIdentify(results)
+        val fingerprintResponse = getFingerprintResponseForIdentify(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -32,23 +38,11 @@ class AppResponseBuilderForIdentify : AppResponseBuilder {
         }
     }
 
-    private fun getFaceResponseForIdentify(modalities: List<Modality>, results: List<Step.Result?>): FaceIdentifyResponse? {
-        val index =  modalities.indexOf(Modality.FACE)
-        return if (index > -1) {
-            results[index] as FaceIdentifyResponse
-        } else {
-            null
-        }
-    }
+    private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceIdentifyResponse? =
+        results.firstOrNull { it is FaceIdentifyResponse } as FaceIdentifyResponse
 
-    private fun getFingerprintResponseForIdentify(modalities: List<Modality>, results: List<Step.Result?>): FingerprintIdentifyResponse? {
-        val index =  modalities.indexOf(Modality.FACE)
-        return if (index > -1) {
-            results[index] as FingerprintIdentifyResponse
-        } else {
-            null
-        }
-    }
+    private fun getFingerprintResponseForIdentify(results: List<Step.Result?>): FingerprintIdentifyResponse? =
+        results.firstOrNull{ it is FingerprintIdentifyResponse } as FingerprintIdentifyResponse
 
     private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceIdentifyResponse,
                                                          fingerprintResponse: FingerprintIdentifyResponse,
@@ -61,5 +55,4 @@ class AppResponseBuilderForIdentify : AppResponseBuilder {
 
     private fun buildAppEnrolResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String) =
         AppIdentifyResponse(faceResponse.identifications.map { it.toAppMatchResult() }, sessionId)
-
 }

@@ -8,16 +8,20 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForEnrol : AppResponseBuilder {
+class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() {
 
     override fun buildAppResponse(modalities: List<Modality>,
                                   appRequest: AppRequest,
                                   steps: List<Step>,
                                   sessionId: String): AppResponse {
 
+        super.getErrorOrRefusalResponseIfAny(steps)?.let {
+            return it
+        }
+
         val results = steps.map { it.result }
-        val faceResponse = getFaceResponseForEnrol(modalities, results)
-        val fingerprintResponse = getFingerprintResponseForEnrol(modalities, results)
+        val faceResponse = getFaceResponseForEnrol(results)
+        val fingerprintResponse = getFingerprintResponseForEnrol(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -33,23 +37,11 @@ class AppResponseBuilderForEnrol : AppResponseBuilder {
         }
     }
 
-    private fun getFaceResponseForEnrol(modalities: List<Modality>, results: List<Step.Result?>): FaceEnrolResponse? {
-        val index =  modalities.indexOf(Modality.FACE)
-        return if (index > -1) {
-            results[index] as FaceEnrolResponse
-        } else {
-            null
-        }
-    }
+    private fun getFaceResponseForEnrol(results: List<Step.Result?>): FaceEnrolResponse? =
+        results.firstOrNull { it is FaceEnrolResponse } as FaceEnrolResponse
 
-    private fun getFingerprintResponseForEnrol(modalities: List<Modality>, results: List<Step.Result?>): FingerprintEnrolResponse? {
-        val index = modalities.indexOf(Modality.FINGER)
-        return if (index > -1) {
-            results[index] as FingerprintEnrolResponse
-        } else {
-            null
-        }
-    }
+    private fun getFingerprintResponseForEnrol(results: List<Step.Result?>): FingerprintEnrolResponse? =
+        results.firstOrNull { it is FingerprintEnrolResponse } as FingerprintEnrolResponse
 
     private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FaceEnrolResponse,
                                                            faceResponse: FingerprintEnrolResponse) =
@@ -58,5 +50,6 @@ class AppResponseBuilderForEnrol : AppResponseBuilder {
     private fun buildAppEnrolResponseForFingerprint(fingerprintResponse: FingerprintEnrolResponse) =
         AppEnrolResponse(fingerprintResponse.guid)
 
-    private fun buildAppEnrolResponseForFace(faceResponse: FaceEnrolResponse) = AppEnrolResponse(faceResponse.guid)
+    private fun buildAppEnrolResponseForFace(faceResponse: FaceEnrolResponse) =
+        AppEnrolResponse(faceResponse.guid)
 }
