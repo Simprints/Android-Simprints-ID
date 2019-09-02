@@ -5,6 +5,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -23,6 +24,7 @@ class ModalityFlowEnrolImplTest {
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
+    @Mock lateinit var coreStepProcessor: CoreStepProcessor
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
 
@@ -36,7 +38,7 @@ class ModalityFlowEnrolImplTest {
         whenever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
 
-        modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor)
+        modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test

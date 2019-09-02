@@ -33,7 +33,7 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
             faceResponse != null -> {
                 buildAppEnrolResponseForFace(faceResponse)
             }
-            else -> throw Throwable("All responses are null")
+            else -> throw Throwable("App responses are null")
         }
     }
 
