@@ -16,6 +16,8 @@ import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmSc
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -43,6 +45,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
+        acquireFingerprintKoinModules()
         logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -145,6 +148,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun onDestroy() {
         super.onDestroy()
         logActivityDestroyed()
+        releaseFingerprintKoinModules()
     }
 
     override fun continueToNextActivity() {

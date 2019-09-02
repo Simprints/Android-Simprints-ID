@@ -29,8 +29,8 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.AlertScreenEvent
-import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.id.Application
 import com.simprints.testtools.common.syntax.mock
@@ -50,7 +50,7 @@ class AlertActivityTest : KoinTest {
 
     @Before
     fun setUp() {
-        loadFingerprintKoinModules()
+        acquireFingerprintKoinModules()
         declare { factory { sessionEventManagerMock } }
         Intents.init()
     }
@@ -217,6 +217,6 @@ class AlertActivityTest : KoinTest {
     @After
     fun tearDown() {
         Intents.release()
-        unloadFingerprintKoinModules()
+        releaseFingerprintKoinModules()
     }
 }
