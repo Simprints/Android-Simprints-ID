@@ -18,7 +18,7 @@ class CoreStepProcessorImpl: CoreStepProcessor {
     //Building normal ConsentStep for now
     override fun buildStepVerify(projectId: String, userId: String,
                                  moduleId: String, metadata: String): Step =
-        buildStepVerify(projectId, userId, moduleId, metadata)
+        buildVerifyStep(projectId, userId, moduleId, metadata)
 
     private fun buildConsentStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         Step(CoreRequestCode.CONSENT.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
