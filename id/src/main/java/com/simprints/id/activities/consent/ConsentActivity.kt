@@ -117,6 +117,7 @@ class ConsentActivity : AppCompatActivity() {
     private fun addClickListenerToConsentDecline() {
         consentDeclineButton.setOnClickListener {
             viewModel.addConsentEvent(buildConsentEventForResult(DECLINED))
+            //TODO: Launch Exit Form
         }
     }
 
