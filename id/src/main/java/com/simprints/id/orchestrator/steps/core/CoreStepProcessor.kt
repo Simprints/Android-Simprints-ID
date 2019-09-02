@@ -6,10 +6,10 @@ import com.simprints.id.orchestrator.steps.Step
 interface CoreStepProcessor {
 
     fun buildStepEnrolOrIdentify(projectId: String, userId: String,
-                                 moduleId: String, metadata: String): List<Step>
+                                 moduleId: String, metadata: String): Step
 
     fun buildStepVerify(projectId: String, userId: String,
-                        moduleId: String, metadata: String): List<Step>
+                        moduleId: String, metadata: String): Step
 
     fun processResult(resultCode: Int, data: Intent?): Step.Result?
 }

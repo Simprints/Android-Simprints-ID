@@ -12,13 +12,13 @@ class CoreStepProcessorImpl: CoreStepProcessor {
         private const val ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
     }
     override fun buildStepEnrolOrIdentify(projectId: String, userId: String,
-                                          moduleId: String, metadata: String): List<Step> =
-        listOf(buildConsentStep(projectId, userId, moduleId, metadata))
+                                          moduleId: String, metadata: String)=
+        buildConsentStep(projectId, userId, moduleId, metadata)
 
+    //Building normal ConsentStep for now
     override fun buildStepVerify(projectId: String, userId: String,
-                                 moduleId: String, metadata: String): List<Step> =
-        listOf(buildVerifyStep(projectId, userId, moduleId, metadata),
-            buildConsentStep(projectId, userId, moduleId, metadata))
+                                 moduleId: String, metadata: String): Step =
+        buildStepVerify(projectId, userId, moduleId, metadata)
 
     private fun buildConsentStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         Step(CoreRequestCode.CONSENT.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
