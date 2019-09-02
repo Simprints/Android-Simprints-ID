@@ -14,7 +14,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse.fromModuleApiToDomainFaceResponse
-import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.Step

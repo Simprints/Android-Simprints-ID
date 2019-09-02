@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.builders
+package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest

@@ -16,7 +16,7 @@ import com.simprints.id.orchestrator.ModalityFlowFactory
 import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
