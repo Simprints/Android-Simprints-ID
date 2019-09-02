@@ -17,8 +17,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.core.CoreStepRequest.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.domain.moduleapi.core.CoreStepResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.orchestrator.steps.core.CoreStepResponse
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
@@ -44,7 +45,7 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        appRequest = intent.extras?.getParcelable("core_step_bundle") ?: throw InvalidAppRequest()
+        appRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConsentViewModel::class.java)
         viewModel.appRequest.postValue(appRequest)
@@ -107,7 +108,7 @@ class ConsentActivity : AppCompatActivity() {
         consentAcceptButton.setOnClickListener {
             viewModel.addConsentEvent(buildConsentEventForResult(ACCEPTED))
             setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra("core_step_bundle", CoreStepResponse(""))
+                putExtra(CORE_STEP_BUNDLE, CoreStepResponse(""))
             })
             finish()
         }
