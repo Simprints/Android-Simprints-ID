@@ -25,7 +25,7 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
-                buildAppEnrolResponseForFingerprintAndFace(faceResponse, fingerprintResponse)
+                buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse, faceResponse)
             }
             fingerprintResponse != null -> {
                 buildAppEnrolResponseForFingerprint(fingerprintResponse)
@@ -43,8 +43,8 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
     private fun getFingerprintResponseForEnrol(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.firstOrNull { it is FingerprintEnrolResponse } as FingerprintEnrolResponse
 
-    private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FaceEnrolResponse,
-                                                           faceResponse: FingerprintEnrolResponse) =
+    private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FingerprintEnrolResponse,
+                                                           faceResponse: FaceEnrolResponse) =
         AppEnrolResponse(fingerprintResponse.guid)
 
     private fun buildAppEnrolResponseForFingerprint(fingerprintResponse: FingerprintEnrolResponse) =
