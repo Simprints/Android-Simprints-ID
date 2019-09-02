@@ -46,8 +46,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.orchestrator.builders.AppResponseFactory
-import com.simprints.id.orchestrator.builders.AppResponseFactoryImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl

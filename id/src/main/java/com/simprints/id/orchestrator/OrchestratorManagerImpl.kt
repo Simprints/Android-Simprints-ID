@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.modality.ModalityFlow
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 
