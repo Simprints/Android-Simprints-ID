@@ -19,8 +19,10 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppEnrolRequest)
-        steps.addAll(buildCoreStepsList())
-        steps.addAll(buildStepsList(appRequest, modalities))
+        with(appRequest) {
+            steps.addAll(buildCoreStepsList(projectId, userId, moduleId, metadata))
+            steps.addAll(buildStepsList(this, modalities))
+        }
     }
 
     private fun buildStepsList(appRequest: AppEnrolRequest, modalities: List<Modality>) =
@@ -48,6 +50,6 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         stepForRequest?.result = result
     }
 
-    private fun buildCoreStepsList() =
-        coreStepProcessor.buildStepEnrolOrIdentify()
+    private fun buildCoreStepsList(projectId: String, userId: String, moduleId: String, metadata: String) =
+        coreStepProcessor.buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
 }

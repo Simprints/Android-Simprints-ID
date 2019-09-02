@@ -1,11 +1,11 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
 import android.os.Parcelable
+import com.simprints.id.domain.moduleapi.core.CoreStepRequest
 import com.simprints.id.domain.moduleapi.face.DomainToModuleApiFaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest
 import com.simprints.id.orchestrator.steps.Step.Request
-import com.simprints.id.orchestrator.steps.core.CoreStepRequest
 
 interface FingerprintRequest: Parcelable, Request
 
