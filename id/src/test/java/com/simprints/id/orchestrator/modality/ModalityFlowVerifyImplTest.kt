@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.verifyAppRequest
@@ -23,6 +24,7 @@ class ModalityFlowVerifyImplTest {
     private lateinit var modalityFlowVerify: ModalityFlowVerifyImpl
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
+    @Mock lateinit var coreStepProcessor: CoreStepProcessor
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
 
@@ -36,7 +38,7 @@ class ModalityFlowVerifyImplTest {
         whenever(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
 
-        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor)
+        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test

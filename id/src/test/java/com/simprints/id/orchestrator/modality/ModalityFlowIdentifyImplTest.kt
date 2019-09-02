@@ -5,6 +5,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -23,6 +24,7 @@ class ModalityFlowIdentifyImplTest {
     private lateinit var modalityFlowIdentify: ModalityFlowIdentifyImpl
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
+    @Mock lateinit var coreStepProcessor: CoreStepProcessor
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
 
@@ -36,7 +38,7 @@ class ModalityFlowIdentifyImplTest {
         whenever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
 
-        modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor)
+        modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test

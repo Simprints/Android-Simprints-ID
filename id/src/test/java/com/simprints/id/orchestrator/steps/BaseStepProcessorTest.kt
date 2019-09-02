@@ -9,7 +9,7 @@ open class BaseStepProcessorTest {
         verifyStep<T>(
             step,
             expectedRequestCode,
-            "com.simprints.fingerprint.activities.launch.LaunchActivity",
+            "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity",
             "FingerprintRequestBundleKey")
 
     protected inline fun <reified T : Parcelable> verifyFaceIntent(step: Step, expectedRequestCode: Int) =
