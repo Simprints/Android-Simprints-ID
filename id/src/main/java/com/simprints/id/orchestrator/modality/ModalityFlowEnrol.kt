@@ -15,14 +15,12 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
 class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                             private val faceEnrolProcessor: FaceStepProcessor,
-                            private val coreStepProcessor: CoreStepProcessor) : ModalityFlowBaseImpl() {
+                            private val coreStepProcessor: CoreStepProcessor) : ModalityFlowBaseImpl(coreStepProcessor) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppEnrolRequest)
-        with(appRequest) {
-            steps.addAll(buildCoreStepsList(projectId, userId, moduleId, metadata))
-            steps.addAll(buildStepsList(this, modalities))
-        }
+        super.startFlow(appRequest, modalities)
+        steps.addAll(buildStepsList(appRequest, modalities))
     }
 
     private fun buildStepsList(appRequest: AppEnrolRequest, modalities: List<Modality>) =
@@ -49,7 +47,4 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         stepForRequest?.result = result
     }
-
-    private fun buildCoreStepsList(projectId: String, userId: String, moduleId: String, metadata: String) =
-        coreStepProcessor.buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
 }
