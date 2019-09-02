@@ -4,4 +4,9 @@ import com.simprints.id.orchestrator.steps.Step
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class CoreStepResponse(val projectId: String): Step.Result
+data class CoreStepResponse(val consentData: ConsentResponse): Step.Result
+
+enum class ConsentResponse {
+    ACCEPTED,
+    DECLINED
+}

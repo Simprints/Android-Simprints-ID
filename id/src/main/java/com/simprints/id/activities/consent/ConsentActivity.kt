@@ -17,8 +17,8 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.core.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.CoreStepRequest.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.CoreStepResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
@@ -108,7 +108,7 @@ class ConsentActivity : AppCompatActivity() {
         consentAcceptButton.setOnClickListener {
             viewModel.addConsentEvent(buildConsentEventForResult(ACCEPTED))
             setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(CORE_STEP_BUNDLE, CoreStepResponse(""))
+                putExtra(CORE_STEP_BUNDLE, ConsentResponse.ACCEPTED)
             })
             finish()
         }
