@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.Companion.isFingerprintResult
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
@@ -36,10 +37,10 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.status == NOT_STARTED }
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        val result = if (isFingerprintResult(requestCode)) {
-            fingerprintStepProcessor.processResult(requestCode, resultCode, data)
-        } else {
-            faceStepProcessor.processResult(requestCode, resultCode, data)
+        val result = when {
+            isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
+            isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
+            else -> super.processResult(requestCode, data)
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
