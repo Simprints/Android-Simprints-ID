@@ -25,7 +25,9 @@ class CoreStepProcessorImpl: CoreStepProcessor {
         CoreStepRequest(projectId = projectId, userId = userId,
             moduleId = moduleId, metadata = metadata), Step.Status.NOT_STARTED)
 
-    private fun buildVerifyStep(projectId: String, userId: String, moduleId: String, metadata: String) = Step(CoreRequestCode.VERIFICATION_CHECK.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
+    //Will be done in the story for adding verification step. Building
+    private fun buildVerifyStep(projectId: String, userId: String, moduleId: String, metadata: String) =
+        Step(CoreRequestCode.VERIFICATION_CHECK.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
         CoreStepRequest(projectId = projectId, userId = userId,
             moduleId = moduleId, metadata = metadata), Step.Status.NOT_STARTED)
 
