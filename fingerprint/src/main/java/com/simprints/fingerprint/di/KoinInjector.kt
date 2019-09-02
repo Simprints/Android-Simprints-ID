@@ -49,12 +49,16 @@ import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import java.util.concurrent.atomic.AtomicInteger
 
 object KoinInjector {
 
+    private val consumers = AtomicInteger(0)
+
     private var koinModule: Module? = null
 
-    fun loadFingerprintKoinModules() {
+    fun acquireFingerprintKoinModules() {
+        consumers.incrementAndGet()
         if (koinModule == null) {
             val module = buildKoinModule()
             loadKoinModules(module)
@@ -62,10 +66,12 @@ object KoinInjector {
         }
     }
 
-    fun unloadFingerprintKoinModules() {
-        koinModule?.let {
-            unloadKoinModules(it)
-            koinModule = null
+    fun releaseFingerprintKoinModules() {
+        if (consumers.decrementAndGet() == 0) {
+            koinModule?.let {
+                unloadKoinModules(it)
+                koinModule = null
+            }
         }
     }
 

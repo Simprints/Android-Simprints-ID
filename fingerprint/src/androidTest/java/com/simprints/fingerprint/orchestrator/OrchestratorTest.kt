@@ -2,6 +2,7 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
@@ -22,6 +23,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskResult
@@ -33,6 +35,7 @@ import java.util.*
 import kotlin.random.Random as Rand
 
 @RunWith(AndroidJUnit4::class)
+@MediumTest
 class OrchestratorTest {
 
     @Test
@@ -139,6 +142,53 @@ class OrchestratorTest {
             with(getFinalResult()) {
                 assertEquals(Activity.RESULT_CANCELED, resultCode)
                 assertNull(resultData?.extras)
+            }
+        }
+    }
+
+    @Test
+    fun newOrchestrator_resumedFromStateAfterStarted_shouldAssumeNewState() {
+        val state = with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintRequest(Action.IDENTIFY))
+            assertNextTaskIs<Launch>()
+            okLaunchResult()
+            assertNextTaskIs<CollectFingerprints>()
+            okCollectResult()
+            getState()
+        }
+
+        with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintRequest(Action.IDENTIFY))
+            restoreState(state)
+            assertNextTaskIs<Matching>()
+            okMatchingIdentifyResult()
+            with(getFinalResult()) {
+                assertEquals(Activity.RESULT_OK, resultCode)
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                    assertEquals(IFingerprintResponseType.IDENTIFY, type)
+                })
+            }
+        }
+    }
+
+    @Test
+    fun newOrchestrator_resumedFromEmptyState_shouldActLikeNew() {
+        val state = OrchestratorState(null)
+
+        with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintRequest(Action.IDENTIFY))
+            restoreState(state)
+            assertNextTaskIs<Launch>()
+            okLaunchResult()
+            assertNextTaskIs<CollectFingerprints>()
+            okCollectResult()
+            assertNextTaskIs<Matching>()
+            okMatchingIdentifyResult()
+            with(getFinalResult()) {
+                assertEquals(Activity.RESULT_OK, resultCode)
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                    assertEquals(IFingerprintResponseType.IDENTIFY, type)
+                })
             }
         }
     }

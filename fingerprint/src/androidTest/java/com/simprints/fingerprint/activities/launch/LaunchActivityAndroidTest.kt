@@ -22,8 +22,8 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.consent.GeneralConsent
 import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
 import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
 import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
@@ -60,7 +60,7 @@ class LaunchActivityAndroidTest: KoinTest {
 
     @Before
     fun setUp() {
-        loadFingerprintKoinModules()
+        acquireFingerprintKoinModules()
         declare {
             single { scannerManagerSpy }
             factory { dbManagerMock }
@@ -407,7 +407,7 @@ class LaunchActivityAndroidTest: KoinTest {
     @After
     fun tearDown() {
         if (::scenario.isInitialized) scenario.close()
-        unloadFingerprintKoinModules()
+        releaseFingerprintKoinModules()
     }
 
     companion object {
