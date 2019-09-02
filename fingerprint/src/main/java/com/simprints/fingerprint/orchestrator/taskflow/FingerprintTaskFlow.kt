@@ -4,14 +4,15 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.orchestrator.models.FinalResult
-import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.models.FinalResult
+import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
+import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 
-abstract class FingerprintTaskFlow {
+abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
 
-    protected val taskResults: MutableMap<String, TaskResult> = mutableMapOf()
+    protected var taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
     protected lateinit var fingerprintTasks: List<FingerprintTask>
     private var currentTaskIndex = 0
@@ -22,8 +23,6 @@ abstract class FingerprintTaskFlow {
     fun isFlowFinished() = isFlowFinishedPrematurely() or isPastFinalTask()
     private fun isFlowFinishedPrematurely() = lastResultCode != ResultCode.OK
     private fun isPastFinalTask() = currentTaskIndex >= fingerprintTasks.size
-
-    abstract fun computeFlow(fingerprintRequest: FingerprintRequest)
 
     fun handleActivityTaskResult(resultCode: ResultCode, getTaskResult: (bundleKey: String) -> TaskResult) {
         (getCurrentTask() as FingerprintTask.ActivityTask).apply {
@@ -62,8 +61,22 @@ abstract class FingerprintTaskFlow {
 
     protected abstract fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult
 
+    fun getState() =
+        FingerprintTaskFlowState(
+            fingerprintRequest, currentTaskIndex, taskResults
+        )
+
     companion object {
         private const val REFUSED = "refused"
         private const val ALERT = "alert"
+
+        fun fromState(fingerprintTaskFlowState: FingerprintTaskFlowState) =
+            with(fingerprintTaskFlowState) {
+                fingerprintRequest.toFingerprintTaskFlow().also {
+                    it.currentTaskIndex = currentTaskIndex
+                    it.taskResults = taskResults
+                }
+            }
+
     }
 }
