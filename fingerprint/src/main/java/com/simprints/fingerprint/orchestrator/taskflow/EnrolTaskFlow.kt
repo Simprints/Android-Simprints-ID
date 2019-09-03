@@ -24,7 +24,7 @@ class EnrolTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlo
 
     private fun FingerprintRequest.createLaunchTaskRequest() =
         LaunchTaskRequest(
-            projectId, this.toAction(), language, logoExists, programName, organizationName
+            language
         )
 
     private fun FingerprintRequest.createCollectFingerprintsTaskRequest() =

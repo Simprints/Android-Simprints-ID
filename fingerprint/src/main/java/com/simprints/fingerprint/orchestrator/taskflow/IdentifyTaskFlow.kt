@@ -27,7 +27,7 @@ class IdentifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTask
 
     private fun FingerprintIdentifyRequest.createLaunchTaskRequest() =
         LaunchTaskRequest(
-            projectId, this.toAction(), language, logoExists, programName, organizationName
+            language
         )
 
     private fun FingerprintIdentifyRequest.createCollectFingerprintsTaskRequest() =

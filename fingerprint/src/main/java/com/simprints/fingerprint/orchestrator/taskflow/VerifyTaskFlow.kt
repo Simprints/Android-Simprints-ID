@@ -26,7 +26,7 @@ class VerifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFl
 
     private fun FingerprintVerifyRequest.createLaunchTaskRequest() =
         LaunchTaskRequest(
-            projectId, this.toAction(), language, logoExists, programName, organizationName
+            language
         )
 
     private fun FingerprintVerifyRequest.createCollectFingerprintsTaskRequest() =
