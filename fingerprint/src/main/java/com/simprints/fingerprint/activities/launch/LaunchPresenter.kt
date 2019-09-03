@@ -32,7 +32,6 @@ class LaunchPresenter(private val view: LaunchContract.View,
     private var setupFlow: Disposable? = null
 
     override fun start() {
-
         view.setLanguage(launchRequest.language)
 
         startSetup()

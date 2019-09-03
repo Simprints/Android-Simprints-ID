@@ -14,14 +14,10 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
-import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
-import com.simprints.fingerprint.data.domain.consent.GeneralConsent
-import com.simprints.fingerprint.data.domain.consent.ParentalConsent
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
@@ -34,7 +30,6 @@ import com.simprints.id.Application
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.activity_launch.*
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
 import org.junit.Assert.assertEquals
