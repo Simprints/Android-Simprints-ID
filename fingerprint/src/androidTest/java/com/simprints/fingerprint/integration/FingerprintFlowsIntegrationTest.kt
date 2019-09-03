@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collectfingerprint.pressScanUntilDialogIsDisplayedAndClickConfirm
-import com.simprints.fingerprint.activities.launch.setupActivityAndContinue
+import com.simprints.fingerprint.activities.collectfingerprint.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -68,7 +68,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun enrolFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
@@ -86,7 +86,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun identifyFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
@@ -102,7 +102,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun verifyFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {

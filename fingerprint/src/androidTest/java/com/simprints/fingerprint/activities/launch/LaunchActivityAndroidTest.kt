@@ -17,7 +17,6 @@ import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMock
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
@@ -27,19 +26,20 @@ import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedExcepti
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.spy
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declare
-import timber.log.Timber
 
 @RunWith(AndroidJUnit4::class)
 class LaunchActivityAndroidTest: KoinTest {
@@ -50,8 +50,6 @@ class LaunchActivityAndroidTest: KoinTest {
 
     private val scannerManagerSpy: ScannerManager = spy(ScannerManagerImpl(DummyBluetoothAdapter()))
     private val dbManagerMock: FingerprintDbManager = mock()
-    private val simNetworkUtilsMock: FingerprintSimNetworkUtils = mock()
-    private val consentDataManagerMock: ConsentDataManager = mock()
 
     @Before
     fun setUp() {
@@ -59,10 +57,7 @@ class LaunchActivityAndroidTest: KoinTest {
         declare {
             single { scannerManagerSpy }
             factory { dbManagerMock }
-            factory { simNetworkUtilsMock }
-            factory { consentDataManagerMock }
         }
-        mockDefaultConsentDataManager(true)
         mockDefaultDbManager()
         scannerManagerSpy.setupScannerManagerMockWithMockedScanner()
     }
@@ -75,7 +70,7 @@ class LaunchActivityAndroidTest: KoinTest {
     fun notScannerFromInitVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepFailing(ScannerNotPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
@@ -84,7 +79,7 @@ class LaunchActivityAndroidTest: KoinTest {
     fun multiScannersPairedFromInitVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepFailing(MultipleScannersPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS.title)))
     }
@@ -94,7 +89,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED.title)))
     }
@@ -104,7 +99,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED.title)))
     }
@@ -114,7 +109,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(ScannerNotPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
@@ -124,7 +119,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -135,7 +130,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -149,7 +144,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -164,7 +159,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUIStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -177,7 +172,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeResetVeroUIStepSucceeding()
         makeWakeUpVeroStepFailing(ScannerLowBatteryException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.LOW_BATTERY.title)))
     }
@@ -189,182 +184,10 @@ class LaunchActivityAndroidTest: KoinTest {
         makeResetVeroUIStepSucceeding()
         makeWakeUpVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
+        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun guidForVerificationNotAvailableLocallyAndPhoneIsOffline_shouldShowAnErrorAlert() {
-        makeSetupVeroSucceeding()
-
-        whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
-        whenever(simNetworkUtilsMock) { isConnected() } thenReturn false
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.VERIFY).toIntent())
-
-        onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE.title)))
-    }
-
-    @Test
-    fun guidForVerificationNotAvailableLocallyAndPhoneIsOnline_shouldShowAnErrorAlert() {
-        makeSetupVeroSucceeding()
-
-        whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
-        whenever(simNetworkUtilsMock) { isConnected() } thenReturn true
-
-        Timber.e("DbManager in test version is : $dbManagerMock")
-        Timber.e("ScannerManager in test version is : $scannerManagerSpy")
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.VERIFY).toIntent())
-
-        onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.GUID_NOT_FOUND_ONLINE.title)))
-    }
-
-    @Test
-    fun enrollmentCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockDefaultConsentDataManager(hasParentalConsent = false)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val defaultGeneralConsentText = GeneralConsent().assembleText(
-                activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-
-            assertEquals(defaultGeneralConsentText, generalConsentText)
-
-            val parentConsentText = activity.parentalConsentTextView.text.toString()
-            assertEquals("", parentConsentText)
-        }
-    }
-
-    @Test
-    fun identifyCallout_showsCorrectGeneralConsentTextAndNoParentalByDefault() {
-        mockDefaultConsentDataManager(hasParentalConsent = false)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.IDENTIFY).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-                launchTaskRequest(Action.IDENTIFY),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultGeneralConsentText, generalConsentText)
-
-            val parentConsentText = activity.parentalConsentTextView.text.toString()
-            assertEquals("", parentConsentText)
-        }
-    }
-
-    @Test
-    fun enrollmentCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockDefaultConsentDataManager(hasParentalConsent = true)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultGeneralConsentText, generalConsentText)
-
-            val parentConsentText = activity.parentalConsentTextView.text.toString()
-            val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultParentalConsentText, parentConsentText)
-        }
-    }
-
-    @Test
-    fun identifyCallout_showsBothConsentsCorrectlyWhenParentalConsentExists() {
-        mockDefaultConsentDataManager(hasParentalConsent = true)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.IDENTIFY).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-                launchTaskRequest(Action.IDENTIFY),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultGeneralConsentText, generalConsentText)
-
-            val parentConsentText = activity.parentalConsentTextView.text.toString()
-            val defaultParentalConsentText = ParentalConsent().assembleText(activity,
-                launchTaskRequest(Action.IDENTIFY),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultParentalConsentText, parentConsentText)
-        }
-    }
-
-    @Test
-    fun malformedConsentJson_showsDefaultConsent() {
-        mockDefaultConsentDataManager(generalConsentOptions = MALFORMED_CONSENT_OPTIONS)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(defaultGeneralConsentText, generalConsentText)
-        }
-    }
-
-    @Test
-    fun extraUnrecognisedConsentOptions_stillShowsCorrectValues() {
-        mockDefaultConsentDataManager(generalConsentOptions = EXTRA_UNRECOGNISED_CONSENT_OPTIONS)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(targetConsentText, generalConsentText)
-        }
-    }
-
-    @Test
-    fun partiallyMissingConsentOptions_stillShowsCorrectValues() {
-        mockDefaultConsentDataManager(generalConsentOptions = PARTIALLY_MISSING_CONSENT_OPTIONS)
-
-        scenario = ActivityScenario.launch(launchTaskRequest(Action.ENROL).toIntent())
-        scenario.onActivity { activity ->
-            val generalConsentText = activity.generalConsentTextView.text.toString()
-            val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(
-                activity,
-                launchTaskRequest(Action.ENROL),
-                DEFAULT_PROGRAM_NAME,
-                DEFAULT_ORGANISATION_NAME)
-            assertEquals(targetConsentText, generalConsentText)
-        }
-    }
-
-    private fun mockDefaultConsentDataManager(hasParentalConsent: Boolean = false,
-                                              generalConsentOptions: String = REMOTE_CONSENT_GENERAL_OPTIONS,
-                                              parentalConsentOptions: String = REMOTE_CONSENT_PARENTAL_OPTIONS) {
-        with(consentDataManagerMock) {
-            whenThis { parentalConsentExists } thenReturn hasParentalConsent
-            whenThis { generalConsentOptionsJson } thenReturn generalConsentOptions
-            whenThis { parentalConsentOptionsJson } thenReturn parentalConsentOptions
-        }
-    }
-
-    private fun makeSetupVeroSucceeding() {
-        makeInitVeroStepSucceeding()
-        makeConnectToVeroStepSucceeding()
-        makeResetVeroUIStepSucceeding()
-        makeWakeUpVeroStepSucceeding()
     }
 
     private fun makeInitVeroStepSucceeding() {
@@ -377,10 +200,6 @@ class LaunchActivityAndroidTest: KoinTest {
 
     private fun makeResetVeroUIStepSucceeding() {
         whenever(scannerManagerSpy) { resetVeroUI() } thenReturn Completable.complete()
-    }
-
-    private fun makeWakeUpVeroStepSucceeding() {
-        whenever(scannerManagerSpy) { wakeUpVero() } thenReturn Completable.complete()
     }
 
     private fun makeInitVeroStepFailing(e: Exception) {
@@ -406,32 +225,13 @@ class LaunchActivityAndroidTest: KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_PROJECT_ID = "some_project_id"
         private const val DEFAULT_LANGUAGE = "en"
-        private const val DEFAULT_LOGO_EXISTS = true
-        private const val DEFAULT_PROGRAM_NAME = "This program"
-        private const val DEFAULT_ORGANISATION_NAME = "This organisation"
-        private const val DEFAULT_VERIFY_GUID = "verify_guid"
 
-        private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
-            DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
-            DEFAULT_ORGANISATION_NAME, if (action == Action.VERIFY) DEFAULT_VERIFY_GUID else null
-        )
+        private fun launchTaskRequest() = LaunchTaskRequest(DEFAULT_LANGUAGE)
 
         private fun LaunchTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, LaunchActivity::class.qualifiedName!!)
             it.putExtra(LaunchTaskRequest.BUNDLE_KEY, this)
         }
-
-        private const val REMOTE_CONSENT_GENERAL_OPTIONS = "{\"consent_enrol_only\":false,\"consent_enrol\":true,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true}"
-        private const val REMOTE_CONSENT_PARENTAL_OPTIONS = "{\"consent_parent_enrol_only\":false,\"consent_parent_enrol\":true,\"consent_parent_id_verify\":true,\"consent_parent_share_data_no\":true,\"consent_parent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_parent_privacy_rights\":true,\"consent_parent_confirmation\":true}"
-
-        private const val MALFORMED_CONSENT_OPTIONS = "gibberish{\"000}\"\""
-
-        private const val EXTRA_UNRECOGNISED_CONSENT_OPTIONS = "{\"consent_enrol_only\":true,\"consent_enrol\":false,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false,\"consent_privacy_rights\":true,\"consent_confirmation\":true,\"this_one_doesnt_exist\":true}"
-        private val EXTRA_UNRECOGNISED_CONSENT_TARGET = GeneralConsent(consentEnrolOnly = true, consentEnrol = false)
-
-        private const val PARTIALLY_MISSING_CONSENT_OPTIONS = "{\"consent_enrol_only\":true,\"consent_enrol\":false,\"consent_id_verify\":true,\"consent_share_data_no\":true,\"consent_share_data_yes\":false,\"consent_collect_yes\":false}"
-        private val PARTIALLY_MISSING_CONSENT_TARGET = GeneralConsent(consentEnrolOnly = true, consentEnrol = false)
     }
 }
