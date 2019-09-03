@@ -59,17 +59,12 @@
     <string name="scanner_confirmation_no">No</string>
     <!-- Loading Messages-->
     <string name="loading">Loading</string>
-    <string name="updating_database">Updating project database…</string>
     <string name="launch_checking_permissions">Checking permissions…</string>
     <string name="launch_bt_connect">Connecting to Vero…</string>
     <string name="launch_wake_un20">Waking up UN20…</string>
     <string name="launch_setup">Setting up Vero…</string>
-    <string name="launch_checking_person_in_db">Checking person is in database…</string>
-    <string name="launch_consent_decline_button">Decline</string>
-    <string name="launch_consent_accept_button">Accept</string>
-    <string name="consent_general_title">General Consent</string>
-    <string name="consent_parental_title">Parental Consent</string>
-    <string name="privacy_notice_text"><u>Privacy Notice</u></string>
+    <string name="launch_finished">Connected</string>
+
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->

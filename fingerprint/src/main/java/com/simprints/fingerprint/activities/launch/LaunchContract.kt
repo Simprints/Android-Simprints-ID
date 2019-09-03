@@ -13,12 +13,8 @@ interface LaunchContract {
     interface View : BaseView<Presenter> {
 
         fun handleSetupProgress(progress: Int, detailsId: Int)
-        fun handleSetupFinished()
 
         fun setLanguage(language: String)
-        fun initTextsInButtons()
-        fun initConsentTabs()
-        fun setLogoVisibility(visible: Boolean)
         fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?)
         fun continueToNextActivity()
         fun goToRefusalActivity()
@@ -27,23 +23,13 @@ interface LaunchContract {
         fun showDialogForScannerErrorConfirmation(scannerId: String)
         fun dismissScannerErrorConfirmationDialog()
 
-        fun setTextToGeneralConsent(generalConsentText: String)
-        fun addParentalConsentTabWithText(parentalConsentText: String)
-        fun isCurrentTabParental(): Boolean
-        fun requestPermissions(permissions: ArrayList<String>): Observable<Permission>
     }
 
     interface Presenter : BasePresenter {
 
-        fun handleOnDestroy()
-        fun handleOnResume()
-        fun handleOnPause()
-
-        fun confirmConsentAndContinueToNextActivity()
         fun handleDeclinePressed()
         fun handleOnBackPressed()
         fun tryAgainFromErrorOrRefusal()
-        fun onActivityResult()
         fun handleScannerDisconnectedYesClick()
         fun handleScannerDisconnectedNoClick()
         fun logScannerErrorDialogShownToCrashReport()
