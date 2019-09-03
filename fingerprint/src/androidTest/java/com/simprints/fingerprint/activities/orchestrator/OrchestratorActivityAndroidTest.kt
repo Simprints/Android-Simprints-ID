@@ -55,7 +55,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
     fun orchestratorActivityCallsNextActivity_returnsWithResult_handlesActivityResult() {
         whenever(orchestratorMock) { isFinished() } thenReturn false
         whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.Launch("launch") {
-            launchTaskRequest(Action.IDENTIFY)
+            launchTaskRequest()
         }
 
         intending(hasExtraWithKey(LaunchTaskRequest.BUNDLE_KEY))
@@ -116,16 +116,8 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_PROJECT_ID = "some_project_id"
         private const val DEFAULT_LANGUAGE = "en"
-        private const val DEFAULT_LOGO_EXISTS = true
-        private const val DEFAULT_PROGRAM_NAME = "This program"
-        private const val DEFAULT_ORGANISATION_NAME = "This organisation"
-        private const val DEFAULT_VERIFY_GUID = "verify_guid"
 
-        private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
-            DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
-            DEFAULT_ORGANISATION_NAME, if (action == Action.VERIFY) DEFAULT_VERIFY_GUID else null
-        )
+        private fun launchTaskRequest() = LaunchTaskRequest(DEFAULT_LANGUAGE)
     }
 }
