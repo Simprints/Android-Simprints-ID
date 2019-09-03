@@ -25,7 +25,7 @@ class CoreStepProcessorImpl: CoreStepProcessor {
         CoreStepRequest(projectId = projectId, userId = userId,
             moduleId = moduleId, metadata = metadata), Step.Status.NOT_STARTED)
 
-    //Will be done in the story for adding verification step. Building
+    //STOPSHIP: Will be done in the story for adding verification step. Building
     private fun buildVerifyStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         Step(CoreRequestCode.VERIFICATION_CHECK.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
         CoreStepRequest(projectId = projectId, userId = userId,
