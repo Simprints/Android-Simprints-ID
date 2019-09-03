@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch
+package com.simprints.fingerprint.activities.connect
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
@@ -21,15 +21,15 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 
-class LaunchViewModel(private val crashReportManager: FingerprintCrashReportManager,
-                      private val scannerManager: ScannerManager,
-                      private val timeHelper: FingerprintTimeHelper,
-                      private val sessionEventsManager: FingerprintSessionEventsManager,
-                      private val preferencesManager: FingerprintPreferencesManager,
-                      private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
+class ConnectViewModel(private val crashReportManager: FingerprintCrashReportManager,
+                       private val scannerManager: ScannerManager,
+                       private val timeHelper: FingerprintTimeHelper,
+                       private val sessionEventsManager: FingerprintSessionEventsManager,
+                       private val preferencesManager: FingerprintPreferencesManager,
+                       private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
 
     val progress = MutableLiveData(0)
-    val message = MutableLiveData(R.string.launch_bt_connect)
+    val message = MutableLiveData(R.string.connect_scanner_bt_connect)
     val vibrate = MutableLiveData<Unit>()
 
     val launchRefusal = MutableLiveData<Unit>()
@@ -59,32 +59,32 @@ class LaunchViewModel(private val crashReportManager: FingerprintCrashReportMana
     }
 
     private fun disconnectVero() =
-        veroTask(15, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
+        veroTask(15, R.string.connect_scanner_bt_connect, scannerManager.disconnectVero()).doOnComplete {
             logMessageForCrashReport("ScannerManager: disconnect")
         }
 
     private fun checkIfBluetoothIsEnabled() =
-        veroTask(30, R.string.launch_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
+        veroTask(30, R.string.connect_scanner_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
             logMessageForCrashReport("ScannerManager: bluetooth is enabled")
         }
 
     private fun initVero() =
-        veroTask(45, R.string.launch_bt_connect, scannerManager.initVero()).doOnComplete {
+        veroTask(45, R.string.connect_scanner_bt_connect, scannerManager.initVero()).doOnComplete {
             logMessageForCrashReport("ScannerManager: init vero")
         }
 
     private fun connectToVero() =
-        veroTask(60, R.string.launch_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() }.doOnComplete {
+        veroTask(60, R.string.connect_scanner_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() }.doOnComplete {
             logMessageForCrashReport("ScannerManager: connectToVero")
         }
 
     private fun resetVeroUI() =
-        veroTask(75, R.string.launch_setup, scannerManager.resetVeroUI()).doOnComplete {
+        veroTask(75, R.string.connect_scanner_setup, scannerManager.resetVeroUI()).doOnComplete {
             logMessageForCrashReport("ScannerManager: resetVeroUI")
         }
 
     private fun wakeUpVero() =
-        veroTask(90, R.string.launch_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() }.doOnComplete {
+        veroTask(90, R.string.connect_scanner_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() }.doOnComplete {
             logMessageForCrashReport("ScannerManager: wakeUpVero")
         }
 
@@ -119,7 +119,7 @@ class LaunchViewModel(private val crashReportManager: FingerprintCrashReportMana
 
     private fun handleSetupFinished() {
         progress.postValue(100)
-        message.postValue(R.string.launch_finished)
+        message.postValue(R.string.connect_scanner_finished)
         vibrate.postValue(Unit)
         scannerManager.scanner?.let {
             preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)

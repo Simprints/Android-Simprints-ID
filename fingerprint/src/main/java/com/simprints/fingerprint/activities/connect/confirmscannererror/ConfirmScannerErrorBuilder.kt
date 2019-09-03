@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch.confirmscannererror
+package com.simprints.fingerprint.activities.connect.confirmscannererror
 
 import android.app.AlertDialog
 import android.content.Context
@@ -24,5 +24,5 @@ class ConfirmScannerErrorBuilder {
         context.getString(R.string.scanner_confirmation_yes)
 
     private fun getErrorTitleText(context: Context, scannerId: String) =
-        context.getString(R.string.scanner_id_comfirmation_message).format(scannerId)
+        context.getString(R.string.scanner_id_confirmation_message).format(scannerId)
 }

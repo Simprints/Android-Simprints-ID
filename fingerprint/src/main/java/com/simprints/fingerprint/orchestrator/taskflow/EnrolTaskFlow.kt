@@ -2,7 +2,7 @@ package com.simprints.fingerprint.orchestrator.taskflow
 
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.toAction
@@ -15,15 +15,15 @@ class EnrolTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlo
     init {
         with(fingerprintRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.ConnectScanner(CONNECT) { createConnectScannerTaskRequest() },
                 FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
                 FingerprintTask.SavePerson(SAVE) { createSavePersonTaskRequest() }
             )
         }
     }
 
-    private fun FingerprintRequest.createLaunchTaskRequest() =
-        LaunchTaskRequest(
+    private fun FingerprintRequest.createConnectScannerTaskRequest() =
+        ConnectScannerTaskRequest(
             language
         )
 
@@ -43,7 +43,7 @@ class EnrolTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlo
         finalResultBuilder.createEnrolResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)
 
     companion object {
-        private const val LAUNCH = "launch"
+        private const val CONNECT = "connect"
         private const val COLLECT = "collect"
         private const val SAVE = "save"
     }

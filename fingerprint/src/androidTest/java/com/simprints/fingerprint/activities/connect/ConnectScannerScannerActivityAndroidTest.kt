@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch
+package com.simprints.fingerprint.activities.connect
 
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
@@ -12,7 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
@@ -42,11 +42,11 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class LaunchActivityAndroidTest: KoinTest {
+class ConnectScannerScannerActivityAndroidTest: KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
-    private lateinit var scenario: ActivityScenario<LaunchActivity>
+    private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
     private val scannerManagerSpy: ScannerManager = spy(ScannerManagerImpl(DummyBluetoothAdapter()))
     private val dbManagerMock: FingerprintDbManager = mock()
@@ -70,7 +70,7 @@ class LaunchActivityAndroidTest: KoinTest {
     fun notScannerFromInitVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepFailing(ScannerNotPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
@@ -79,7 +79,7 @@ class LaunchActivityAndroidTest: KoinTest {
     fun multiScannersPairedFromInitVeroStep_shouldShowAnErrorAlert() {
         makeInitVeroStepFailing(MultipleScannersPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.MULTIPLE_PAIRED_SCANNERS.title)))
     }
@@ -89,7 +89,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_ENABLED.title)))
     }
@@ -99,7 +99,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(BluetoothNotEnabledException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED.title)))
     }
@@ -109,7 +109,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(ScannerNotPairedException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.NOT_PAIRED.title)))
     }
@@ -119,7 +119,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -130,7 +130,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -144,7 +144,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeInitVeroStepSucceeding()
         makeConnectToVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -159,7 +159,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeConnectToVeroStepSucceeding()
         makeResetVeroUIStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -172,7 +172,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeResetVeroUIStepSucceeding()
         makeWakeUpVeroStepFailing(ScannerLowBatteryException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withId(R.id.alertTitle)).check(matches(withText(AlertActivityViewModel.LOW_BATTERY.title)))
     }
@@ -184,7 +184,7 @@ class LaunchActivityAndroidTest: KoinTest {
         makeResetVeroUIStepSucceeding()
         makeWakeUpVeroStepFailing(UnknownScannerIssueException())
 
-        scenario = ActivityScenario.launch(launchTaskRequest().toIntent())
+        scenario = ActivityScenario.launch(connectScannerTaskRequest().toIntent())
 
         onView(withText(containsString("your scanner?")))
             .inRoot(RootMatchers.isDialog()).check(matches(isDisplayed()))
@@ -227,11 +227,11 @@ class LaunchActivityAndroidTest: KoinTest {
     companion object {
         private const val DEFAULT_LANGUAGE = "en"
 
-        private fun launchTaskRequest() = LaunchTaskRequest(DEFAULT_LANGUAGE)
+        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest(DEFAULT_LANGUAGE)
 
-        private fun LaunchTaskRequest.toIntent() = Intent().also {
-            it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, LaunchActivity::class.qualifiedName!!)
-            it.putExtra(LaunchTaskRequest.BUNDLE_KEY, this)
+        private fun ConnectScannerTaskRequest.toIntent() = Intent().also {
+            it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, ConnectScannerActivity::class.qualifiedName!!)
+            it.putExtra(ConnectScannerTaskRequest.BUNDLE_KEY, this)
         }
     }
 }

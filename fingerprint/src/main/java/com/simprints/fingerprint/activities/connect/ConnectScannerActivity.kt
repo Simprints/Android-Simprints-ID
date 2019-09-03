@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch
+package com.simprints.fingerprint.activities.connect
 
 import android.app.AlertDialog
 import android.content.Intent
@@ -9,43 +9,43 @@ import androidx.lifecycle.Observer
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.launch.confirmscannererror.ConfirmScannerErrorBuilder
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
+import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
-import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import kotlinx.android.synthetic.main.activity_launch.*
+import kotlinx.android.synthetic.main.activity_connect_scanner.*
 import org.koin.android.ext.android.inject
 
-class LaunchActivity : AppCompatActivity() {
+class ConnectScannerActivity : AppCompatActivity() {
 
-    private lateinit var launchRequest: LaunchTaskRequest
-    private val viewModel: LaunchViewModel by inject()
+    private lateinit var connectScannerRequest: ConnectScannerTaskRequest
+    private val viewModel: ConnectViewModel by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_launch)
+        setContentView(R.layout.activity_connect_scanner)
         acquireFingerprintKoinModules()
         logActivityCreated()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
-            ?: throw InvalidRequestForLaunchActivityException()
+        connectScannerRequest = this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
+            ?: throw InvalidRequestForConnectScannerActivityException()
 
-        LanguageHelper.setLanguage(this, launchRequest.language)
+        LanguageHelper.setLanguage(this, connectScannerRequest.language)
 
-        viewModel.progress.observe(this, Observer { launchProgressBar.progress = it })
-        viewModel.message.observe(this, Observer { loadingInfoTextView.setText(it) })
+        viewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
+        viewModel.message.observe(this, Observer { connectScannerInfoTextView.setText(it) })
         viewModel.vibrate.observe(this, Observer { vibrate(this) })
 
         viewModel.launchRefusal.observe(this, Observer { goToRefusalActivity() })
@@ -74,7 +74,7 @@ class LaunchActivity : AppCompatActivity() {
 
     private fun continueToNextActivity() {
         setResultAndFinish(ResultCode.OK, Intent().apply {
-            putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())
+            putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())
         })
     }
 

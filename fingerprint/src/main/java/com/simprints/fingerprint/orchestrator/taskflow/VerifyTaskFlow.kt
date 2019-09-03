@@ -2,7 +2,7 @@ package com.simprints.fingerprint.orchestrator.taskflow
 
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
@@ -17,15 +17,15 @@ class VerifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFl
     init {
         with(fingerprintRequest as FingerprintVerifyRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.ConnectScanner(CONNECT) { createConnectScannerTaskRequest() },
                 FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
                 FingerprintTask.Matching(MATCHING) { createMatchingTaskRequest() }
             )
         }
     }
 
-    private fun FingerprintVerifyRequest.createLaunchTaskRequest() =
-        LaunchTaskRequest(
+    private fun FingerprintVerifyRequest.createConnectScannerTaskRequest() =
+        ConnectScannerTaskRequest(
             language
         )
 
@@ -48,7 +48,7 @@ class VerifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFl
         finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
 
     companion object {
-        private const val LAUNCH = "launch"
+        private const val CONNECT = "connect"
         private const val COLLECT = "collect"
         private const val MATCHING = "matching"
     }
