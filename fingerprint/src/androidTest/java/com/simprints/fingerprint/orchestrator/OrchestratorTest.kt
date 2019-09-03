@@ -2,7 +2,6 @@ package com.simprints.fingerprint.orchestrator
 
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
@@ -35,7 +34,6 @@ import java.util.*
 import kotlin.random.Random as Rand
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class OrchestratorTest {
 
     @Test
