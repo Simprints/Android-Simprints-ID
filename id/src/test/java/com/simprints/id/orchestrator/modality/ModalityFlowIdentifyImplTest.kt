@@ -6,6 +6,7 @@ import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CORE_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -27,6 +28,7 @@ class ModalityFlowIdentifyImplTest {
     @Mock lateinit var coreStepProcessor: CoreStepProcessor
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
+    @Mock lateinit var coreStepMock: Step
 
     @Before
     fun setUp() {
@@ -34,9 +36,11 @@ class ModalityFlowIdentifyImplTest {
 
         whenever(fingerprintStepMock) { activityName } thenReturn FINGERPRINT_ACTIVITY_NAME
         whenever(faceStepMock) { activityName } thenReturn FACE_ACTIVITY_NAME
+        whenever(coreStepMock) { activityName } thenReturn CORE_ACTIVITY_NAME
 
         whenever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
+        whenever(coreStepProcessor) { buildStepEnrolOrIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn coreStepMock
 
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
@@ -45,7 +49,7 @@ class ModalityFlowIdentifyImplTest {
     fun identifyForFace_shouldCreateTheRightSteps() {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FACE))
 
-        assertThat(modalityFlowIdentify.steps).hasSize(1)
+        assertThat(modalityFlowIdentify.steps).hasSize(2)
         verifyNever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
@@ -54,7 +58,7 @@ class ModalityFlowIdentifyImplTest {
     fun identifyForFingerprint_shouldCreateTheRightSteps() {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FINGER))
 
-        assertThat(modalityFlowIdentify.steps).hasSize(1)
+        assertThat(modalityFlowIdentify.steps).hasSize(2)
         verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyNever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
@@ -63,19 +67,21 @@ class ModalityFlowIdentifyImplTest {
     fun identifyForFaceFingerprint_shouldCreateTheRightSteps() {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FACE, FINGER))
 
-        assertThat(modalityFlowIdentify.steps).hasSize(2)
+        assertThat(modalityFlowIdentify.steps).hasSize(3)
         verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
-        assertThat(modalityFlowIdentify.steps.first().activityName).isEqualTo(FACE_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FACE_ACTIVITY_NAME)
     }
 
     @Test
     fun identifyForFingerprintFace_shouldCreateTheRightSteps() {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FINGER, FACE))
 
-        assertThat(modalityFlowIdentify.steps).hasSize(2)
+        assertThat(modalityFlowIdentify.steps).hasSize(3)
         verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
-        assertThat(modalityFlowIdentify.steps.first().activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
     }
 }
