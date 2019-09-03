@@ -8,9 +8,7 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
-import com.simprints.fingerprint.activities.launch.LaunchContract
-import com.simprints.fingerprint.activities.launch.LaunchPresenter
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.launch.LaunchViewModel
 import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalContract
@@ -112,14 +110,12 @@ object KoinInjector {
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
             CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get())
         }
-        factory<LaunchContract.Presenter> { (view: LaunchContract.View, request: LaunchTaskRequest) ->
-            LaunchPresenter(view, request, get(), get(), get(), get(), get(), get())
-        }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
         }
 
         viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { LaunchViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
     }
 
