@@ -1,15 +1,15 @@
-package com.simprints.fingerprint.activities.launch.request
+package com.simprints.fingerprint.activities.connect.request
 
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class LaunchTaskRequest(
+class ConnectScannerTaskRequest(
     val language: String
 ) : TaskRequest, Parcelable {
 
     companion object {
-        const val BUNDLE_KEY = "LaunchRequestKey"
+        const val BUNDLE_KEY = "ConnectScannerRequestKey"
     }
 }

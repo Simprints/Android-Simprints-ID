@@ -10,8 +10,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
@@ -54,13 +54,13 @@ class OrchestratorActivityAndroidTest : KoinTest {
     @Test
     fun orchestratorActivityCallsNextActivity_returnsWithResult_handlesActivityResult() {
         whenever(orchestratorMock) { isFinished() } thenReturn false
-        whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.Launch("launch") {
+        whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.ConnectScanner("connect") {
             launchTaskRequest()
         }
 
-        intending(hasExtraWithKey(LaunchTaskRequest.BUNDLE_KEY))
+        intending(hasExtraWithKey(ConnectScannerTaskRequest.BUNDLE_KEY))
             .respondWith(Instrumentation.ActivityResult(ResultCode.OK.value,
-                Intent().putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())))
+                Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())))
 
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
@@ -91,7 +91,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         val orchestratorState = OrchestratorState(FingerprintTaskFlowState(
             mock(),
             2,
-            mutableMapOf("launch" to mock(), "collect" to mock())
+            mutableMapOf("connect" to mock(), "collect" to mock())
         ))
 
         whenever(orchestratorMock) { getState() } thenReturn orchestratorState
@@ -118,6 +118,6 @@ class OrchestratorActivityAndroidTest : KoinTest {
     companion object {
         private const val DEFAULT_LANGUAGE = "en"
 
-        private fun launchTaskRequest() = LaunchTaskRequest(DEFAULT_LANGUAGE)
+        private fun launchTaskRequest() = ConnectScannerTaskRequest(DEFAULT_LANGUAGE)
     }
 }

@@ -2,44 +2,44 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/launchLayout"
+    android:id="@+id/connectScannerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/simprints_blue"
     android:orientation="vertical"
-    tools:context="com.simprints.fingerprint.activities.launch.LaunchActivity"
+    tools:context="com.simprints.fingerprint.activities.connect.ConnectScannerActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <TextView
-        android:id="@+id/loadingInfoTextView"
+        android:id="@+id/connectScannerInfoTextView"
         android:layout_width="411dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="@string/loading"
+        android:text="@string/connect_scanner_loading"
         android:textColor="@color/simprints_white"
         android:visibility="visible"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintBottom_toTopOf="@+id/launchProgressBar"
+        app:layout_constraintBottom_toTopOf="@+id/connectScannerProgressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
-        android:id="@+id/launchProgressBar"
+        android:id="@+id/connectScannerProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:progressDrawable="@drawable/launch_progress_bar"
+        android:progressDrawable="@drawable/connect_scanner_progress_bar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/loadingInfoTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/connectScannerInfoTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
@@ -40,8 +40,8 @@ class OrchestratorTest {
     fun enrolTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
             assertNextTaskIs<SavePerson>()
@@ -60,8 +60,8 @@ class OrchestratorTest {
     fun identifyTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.IDENTIFY))
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
             assertNextTaskIs<Matching>()
@@ -80,8 +80,8 @@ class OrchestratorTest {
     fun verifyTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.VERIFY))
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
             assertNextTaskIs<Matching>()
@@ -97,10 +97,10 @@ class OrchestratorTest {
     }
 
     @Test
-    fun enrolTaskFlow_failsDueToAlertInLaunch_shouldFinishCancelledWithError() {
+    fun enrolTaskFlow_failsDueToAlertInConnectScanner_shouldFinishCancelledWithError() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertNextTaskIs<Launch>()
+            assertNextTaskIs<ConnectScanner>()
             alertResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -113,10 +113,10 @@ class OrchestratorTest {
     }
 
     @Test
-    fun enrolTaskFlow_failsDueToRefusalInLaunch_shouldFinishOkWithRefused() {
+    fun enrolTaskFlow_failsDueToRefusalInConnectScanner_shouldFinishOkWithRefused() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertNextTaskIs<Launch>()
+            assertNextTaskIs<ConnectScanner>()
             refusalResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
@@ -132,8 +132,8 @@ class OrchestratorTest {
     fun enrolTaskFlow_cancelledSomehow_shouldFinishCancelledWithNoData() {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.ENROL))
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             cancelledResult()
             assertTrue(isFinished())
@@ -148,8 +148,8 @@ class OrchestratorTest {
     fun newOrchestrator_resumedFromStateAfterStarted_shouldAssumeNewState() {
         val state = with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.IDENTIFY))
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
             getState()
@@ -176,8 +176,8 @@ class OrchestratorTest {
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.IDENTIFY))
             restoreState(state)
-            assertNextTaskIs<Launch>()
-            okLaunchResult()
+            assertNextTaskIs<ConnectScanner>()
+            okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
             assertNextTaskIs<Matching>()
@@ -196,10 +196,10 @@ class OrchestratorTest {
         assertTrue(getNextTask() is T)
     }
 
-    private fun Orchestrator.okLaunchResult() {
+    private fun Orchestrator.okConnectResult() {
         handleActivityTaskResult(ResultCode.OK) {
-            assertEquals(LaunchTaskResult.BUNDLE_KEY, it)
-            LaunchTaskResult()
+            assertEquals(ConnectScannerTaskResult.BUNDLE_KEY, it)
+            ConnectScannerTaskResult()
         }
     }
 
