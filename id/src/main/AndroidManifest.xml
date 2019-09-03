@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.consent.ConsentActivity"></activity>
+        <activity android:name=".activities.consent.ConsentActivity" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:label="@string/title_activity_front"

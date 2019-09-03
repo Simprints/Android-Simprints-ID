@@ -94,7 +94,7 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
     override fun openOrchestratorActivity(appRequest: AppRequest) {
         val intent = Intent(this, OrchestratorActivity::class.java).apply {
             putExtra(AppRequest.BUNDLE_KEY, appRequest)
-           addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+            addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         }
         startActivity(intent)
         finish()
