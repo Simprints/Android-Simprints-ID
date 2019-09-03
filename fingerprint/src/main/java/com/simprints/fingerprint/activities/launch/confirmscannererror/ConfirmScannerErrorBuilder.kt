@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.launch.confirmScannerError
+package com.simprints.fingerprint.activities.launch.confirmscannererror
 
 import android.app.AlertDialog
 import android.content.Context

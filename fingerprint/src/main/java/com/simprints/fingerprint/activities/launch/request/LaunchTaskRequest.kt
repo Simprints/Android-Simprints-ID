@@ -2,7 +2,6 @@ package com.simprints.fingerprint.activities.launch.request
 
 import android.os.Parcelable
 import com.simprints.fingerprint.orchestrator.task.TaskRequest
-import com.simprints.fingerprint.data.domain.Action
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

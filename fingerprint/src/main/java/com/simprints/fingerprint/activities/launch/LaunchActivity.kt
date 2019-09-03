@@ -3,15 +3,13 @@ package com.simprints.fingerprint.activities.launch
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorBuilder
+import com.simprints.fingerprint.activities.launch.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
@@ -25,12 +23,11 @@ import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_launch.*
 import org.koin.android.ext.android.inject
-import org.koin.core.parameter.parametersOf
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View {
+class LaunchActivity : AppCompatActivity() {
 
     private lateinit var launchRequest: LaunchTaskRequest
-    override val viewPresenter: LaunchContract.Presenter by inject { parametersOf(this, launchRequest) }
+    private val viewModel: LaunchViewModel by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -45,15 +42,19 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
             ?: throw InvalidRequestForLaunchActivityException()
 
-        viewPresenter.start()
-    }
+        LanguageHelper.setLanguage(this, launchRequest.language)
 
-    override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
+        viewModel.progress.observe(this, Observer { launchProgressBar.progress = it })
+        viewModel.message.observe(this, Observer { loadingInfoTextView.setText(it) })
+        viewModel.vibrate.observe(this, Observer { vibrate(this) })
 
-    override fun handleSetupProgress(progress: Int, @StringRes detailsId: Int) {
-        loadingInfoTextView.visibility = View.VISIBLE
-        launchProgressBar.progress = progress
-        loadingInfoTextView.setText(detailsId)
+        viewModel.launchRefusal.observe(this, Observer { goToRefusalActivity() })
+        viewModel.launchAlert.observe(this, Observer { launchAlert(this, it) })
+        viewModel.finish.observe(this, Observer { continueToNextActivity() })
+
+        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { showDialogForScannerErrorConfirmation(it) })
+
+        viewModel.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -63,46 +64,33 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
                 ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
                 ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
                 ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
-                ResultCode.OK -> viewPresenter.tryAgainFromErrorOrRefusal()
+                ResultCode.OK -> {
+                    scannerErrorConfirmationDialog?.dismiss()
+                    viewModel.tryAgainFromErrorOrRefusal()
+                }
             }
         }
     }
 
-    override fun onBackPressed() {
-        viewPresenter.handleOnBackPressed()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
-        releaseFingerprintKoinModules()
-    }
-
-    override fun continueToNextActivity() {
+    private fun continueToNextActivity() {
         setResultAndFinish(ResultCode.OK, Intent().apply {
             putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())
         })
     }
 
-    override fun goToRefusalActivity() {
+    private fun goToRefusalActivity() {
         startActivityForResult(Intent(this, RefusalActivity::class.java), RequestCode.REFUSAL.value)
     }
 
-    override fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
+    private fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
         setResult(resultCode.value, resultData)
         finish()
     }
 
-    override fun doLaunchAlert(fingerprintAlert: FingerprintAlert) {
-        launchAlert(this, fingerprintAlert)
-    }
-
-    override fun doVibrate() = vibrate(this)
-
-    override fun showDialogForScannerErrorConfirmation(scannerId: String) {
+    private fun showDialogForScannerErrorConfirmation(scannerId: String) {
         scannerErrorConfirmationDialog = buildConfirmScannerErrorAlertDialog(scannerId).also {
             it.show()
-            viewPresenter.logScannerErrorDialogShownToCrashReport()
+            viewModel.logScannerErrorDialogShownToCrashReport()
         }
     }
 
@@ -110,11 +98,17 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
         ConfirmScannerErrorBuilder()
             .build(
                 this, scannerId,
-                onYes = { viewPresenter.handleScannerDisconnectedYesClick() },
-                onNo = { viewPresenter.handleScannerDisconnectedNoClick() }
+                onYes = { viewModel.handleScannerDisconnectedYesClick() },
+                onNo = { viewModel.handleScannerDisconnectedNoClick() }
             )
 
-    override fun dismissScannerErrorConfirmationDialog() {
-        scannerErrorConfirmationDialog?.dismiss()
+    override fun onBackPressed() {
+        viewModel.handleOnBackPressed()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logActivityDestroyed()
+        releaseFingerprintKoinModules()
     }
 }

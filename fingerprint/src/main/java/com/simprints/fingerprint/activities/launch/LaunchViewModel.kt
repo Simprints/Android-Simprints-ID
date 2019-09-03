@@ -2,9 +2,10 @@ package com.simprints.fingerprint.activities.launch
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
@@ -20,20 +21,26 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 
-class LaunchPresenter(private val view: LaunchContract.View,
-                      private val launchRequest: LaunchTaskRequest,
-                      private val crashReportManager: FingerprintCrashReportManager,
+class LaunchViewModel(private val crashReportManager: FingerprintCrashReportManager,
                       private val scannerManager: ScannerManager,
                       private val timeHelper: FingerprintTimeHelper,
                       private val sessionEventsManager: FingerprintSessionEventsManager,
                       private val preferencesManager: FingerprintPreferencesManager,
-                      private val analyticsManager: FingerprintAnalyticsManager) : LaunchContract.Presenter {
+                      private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
+
+    val progress = MutableLiveData(0)
+    val message = MutableLiveData(R.string.launch_bt_connect)
+    val vibrate = MutableLiveData<Unit>()
+
+    val launchRefusal = MutableLiveData<Unit>()
+    val launchAlert = MutableLiveData<FingerprintAlert>()
+    val finish = MutableLiveData<Unit>()
+
+    val showScannerErrorDialogWithScannerId = MutableLiveData<String>()
 
     private var setupFlow: Disposable? = null
 
-    override fun start() {
-        view.setLanguage(launchRequest.language)
-
+    fun start() {
         startSetup()
     }
 
@@ -88,7 +95,10 @@ class LaunchPresenter(private val view: LaunchContract.View,
     }
 
     private fun veroTask(progress: Int, @StringRes messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
-        Completable.fromAction { view.handleSetupProgress(progress, messageRes) }
+        Completable.fromAction {
+            this.progress.postValue(progress)
+            this.message.postValue(messageRes)
+        }
             .andThen(task)
             .andThen(Completable.fromAction { callback?.invoke() })
             .doOnError { manageVeroErrors(it) }
@@ -101,51 +111,38 @@ class LaunchPresenter(private val view: LaunchContract.View,
 
     private fun launchScannerAlertOrShowDialog(alert: FingerprintAlert) {
         if (alert == FingerprintAlert.DISCONNECTED) {
-            view.showDialogForScannerErrorConfirmation(scannerManager.lastPairedScannerId ?: "")
+            showScannerErrorDialogWithScannerId.postValue(scannerManager.lastPairedScannerId ?: "")
         } else {
-            launchAlert(alert)
+            launchAlert.postValue(alert)
         }
     }
 
     private fun handleSetupFinished() {
-        view.handleSetupProgress(100, R.string.launch_finished)
-        view.doVibrate()
+        progress.postValue(100)
+        message.postValue(R.string.launch_finished)
+        vibrate.postValue(Unit)
         scannerManager.scanner?.let {
             preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)
             preferencesManager.lastScannerVersion = it.hardwareVersion.toString()
             analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId ?: "")
         }
-        view.continueToNextActivity()
+        finish.postValue(Unit)
     }
 
-    override fun handleOnBackPressed() {
-        handleOnBackOrDeclinePressed()
+    fun handleOnBackPressed() {
+        launchRefusal.postValue(Unit)
     }
 
-    override fun handleDeclinePressed() {
-        handleOnBackOrDeclinePressed()
-    }
-
-    private fun handleOnBackOrDeclinePressed() {
-        view.goToRefusalActivity()
-    }
-
-    override fun tryAgainFromErrorOrRefusal() {
-        setupFlow?.dispose()
-        view.dismissScannerErrorConfirmationDialog()
+    fun tryAgainFromErrorOrRefusal() {
         startSetup()
     }
 
-    private fun launchAlert(alert: FingerprintAlert) {
-        view.doLaunchAlert(alert)
+    fun handleScannerDisconnectedYesClick() {
+        launchAlert.postValue(FingerprintAlert.DISCONNECTED)
     }
 
-    override fun handleScannerDisconnectedYesClick() {
-        launchAlert(FingerprintAlert.DISCONNECTED)
-    }
-
-    override fun handleScannerDisconnectedNoClick() {
-        launchAlert(FingerprintAlert.NOT_PAIRED)
+    fun handleScannerDisconnectedNoClick() {
+        launchAlert.postValue(FingerprintAlert.NOT_PAIRED)
     }
 
     private fun addBluetoothConnectivityEvent() {
@@ -166,10 +163,15 @@ class LaunchPresenter(private val view: LaunchContract.View,
             FingerprintCrashReportTrigger.SCANNER, message = message)
     }
 
-    override fun logScannerErrorDialogShownToCrashReport() {
+    fun logScannerErrorDialogShownToCrashReport() {
         crashReportManager.logMessageForCrashReport(
             FingerprintCrashReportTag.ALERT,
             FingerprintCrashReportTrigger.SCANNER,
             message = "Scanner error confirm dialog shown")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        setupFlow?.dispose()
     }
 }
