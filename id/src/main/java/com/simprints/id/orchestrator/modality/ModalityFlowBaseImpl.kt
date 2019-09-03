@@ -17,10 +17,10 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         with(appRequest) {
             when {
                 this is AppEnrolRequest || this is AppIdentifyRequest -> {
-                    steps.add(buildCoreStepsList(projectId, userId, moduleId, metadata))
+                    steps.add(buildCoreStep(projectId, userId, moduleId, metadata))
                 }
                 this is AppVerifyRequest -> {
-                    steps.add(buildVerifyCoreStepsList(projectId, userId, moduleId, metadata))
+                    steps.add(buildVerifyCoreStep(projectId, userId, moduleId, metadata))
                 }
                 else -> Throwable("invalid AppRequest")
             }
@@ -32,11 +32,11 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.addAll(stepsToRestore)
     }
 
-    private fun buildCoreStepsList(projectId: String, userId: String, moduleId: String, metadata: String) =
+    private fun buildCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         coreStepProcessor.buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
 
 
-    private fun buildVerifyCoreStepsList(projectId: String, userId: String, moduleId: String, metadata: String) =
+    private fun buildVerifyCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         coreStepProcessor.buildStepVerify(projectId, userId, moduleId, metadata)
 
     fun processResult(requestCode: Int, data: Intent?) = coreStepProcessor.processResult(requestCode, data)

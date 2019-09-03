@@ -9,7 +9,7 @@ import com.simprints.id.orchestrator.steps.Step
 class CoreStepProcessorImpl: CoreStepProcessor {
 
     companion object {
-        private const val ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
+        const val CORE_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
     }
     override fun buildStepEnrolOrIdentify(projectId: String, userId: String,
                                           moduleId: String, metadata: String)=
@@ -21,13 +21,13 @@ class CoreStepProcessorImpl: CoreStepProcessor {
         buildVerifyStep(projectId, userId, moduleId, metadata)
 
     private fun buildConsentStep(projectId: String, userId: String, moduleId: String, metadata: String) =
-        Step(CoreRequestCode.CONSENT.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
+        Step(CoreRequestCode.CONSENT.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
         CoreStepRequest(projectId = projectId, userId = userId,
             moduleId = moduleId, metadata = metadata), Step.Status.NOT_STARTED)
 
     //Will be done in the story for adding verification step. Building
     private fun buildVerifyStep(projectId: String, userId: String, moduleId: String, metadata: String) =
-        Step(CoreRequestCode.VERIFICATION_CHECK.value, ACTIVITY_NAME, CORE_STEP_BUNDLE,
+        Step(CoreRequestCode.VERIFICATION_CHECK.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
         CoreStepRequest(projectId = projectId, userId = userId,
             moduleId = moduleId, metadata = metadata), Step.Status.NOT_STARTED)
 
