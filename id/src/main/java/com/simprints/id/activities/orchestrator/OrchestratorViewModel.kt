@@ -16,7 +16,7 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
                             private val sessionEventsManager: SessionEventsManager,
                             private val domainToModuleApiConverter: DomainToModuleApiAppResponse) : ViewModel() {
 
-    val onGoingStep = orchestratorManager.onGoingStep
+    val ongoingStep = orchestratorManager.ongoingStep
 
     val appResponse = Transformations.map(orchestratorManager.appResponse) {
         it?.let {

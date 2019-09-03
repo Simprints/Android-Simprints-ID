@@ -68,7 +68,7 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        vm.onGoingStep.observe(this, observerForNextStep)
+        vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
     }
 

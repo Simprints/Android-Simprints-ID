@@ -13,7 +13,7 @@ import com.simprints.id.orchestrator.steps.Step
  */
 interface OrchestratorManager {
 
-    val onGoingStep: LiveData<Step?>
+    val ongoingStep: LiveData<Step?>
     val appResponse: LiveData<AppResponse?>
 
     fun initialise(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
