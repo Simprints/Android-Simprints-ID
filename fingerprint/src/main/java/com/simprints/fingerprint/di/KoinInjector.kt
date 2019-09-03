@@ -125,7 +125,7 @@ object KoinInjector {
             CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get())
         }
         factory<LaunchContract.Presenter> { (view: LaunchContract.View, request: LaunchTaskRequest) ->
-            LaunchPresenter(view, request, get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+            LaunchPresenter(view, request, get(), get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())

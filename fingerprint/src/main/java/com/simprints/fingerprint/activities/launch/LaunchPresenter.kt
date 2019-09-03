@@ -1,98 +1,47 @@
 package com.simprints.fingerprint.activities.launch
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import com.google.android.gms.location.LocationRequest
-import com.google.gson.JsonSyntaxException
-import com.simprints.core.tools.json.JsonHelper
+import androidx.annotation.StringRes
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.eventData.model.CandidateReadEvent
-import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent
-import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Result.*
-import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.INDIVIDUAL
-import com.simprints.fingerprint.controllers.core.eventData.model.ConsentEvent.Type.PARENTAL
 import com.simprints.fingerprint.controllers.core.eventData.model.ScannerConnectionEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.consent.GeneralConsent
-import com.simprints.fingerprint.data.domain.consent.ParentalConsent
-import com.simprints.fingerprint.exceptions.unexpected.domain.MalformedConsentTextException
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
-import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
-import com.tbruyelle.rxpermissions2.Permission
 import io.reactivex.Completable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 
 class LaunchPresenter(private val view: LaunchContract.View,
                       private val launchRequest: LaunchTaskRequest,
-                      private val dbManager: FingerprintDbManager,
-                      private val simNetworkUtils: FingerprintSimNetworkUtils,
-                      private val consentDataManager: ConsentDataManager,
                       private val crashReportManager: FingerprintCrashReportManager,
                       private val scannerManager: ScannerManager,
                       private val timeHelper: FingerprintTimeHelper,
                       private val sessionEventsManager: FingerprintSessionEventsManager,
-                      private val locationProvider: LocationProvider,
                       private val preferencesManager: FingerprintPreferencesManager,
                       private val analyticsManager: FingerprintAnalyticsManager) : LaunchContract.Presenter {
 
     private var setupFlow: Disposable? = null
 
-    private var startConsentEventTime: Long = 0
-    private val activity = view as Activity
-    private var permissionsAlreadyRequested = false
-
-    // True iff the app is waiting for the user to confirm consent
-    private var waitingForConfirmation = true
-
-    // True iff another activity launched by this activity is running
-    private var launchOutOfFocus = false
-
-    // Scanner button callback
-    private val scannerButton = ButtonListener {
-        if (!launchOutOfFocus) {
-            confirmConsentAndContinueToNextActivity()
-        }
-    }
-
     override fun start() {
-        startConsentEventTime = timeHelper.now()
 
         view.setLanguage(launchRequest.language)
-        view.setLogoVisibility(launchRequest.logoExists)
-        view.initTextsInButtons()
-        view.initConsentTabs()
 
-        setTextToConsentTabs()
-
-        setupFlow?.dispose()
-        setupFlow = startSetup()
+        startSetup()
     }
 
     @SuppressLint("CheckResult")
-    private fun startSetup() =
-        requestPermissionsForLocation(5)
-            .andThen(checkIfVerifyAndGuidExists(15))
-            .andThen(disconnectVero())
+    private fun startSetup() {
+        setupFlow?.dispose()
+        setupFlow = disconnectVero()
             .andThen(checkIfBluetoothIsEnabled())
             .andThen(initVero())
             .andThen(connectToVero())
@@ -101,14 +50,15 @@ class LaunchPresenter(private val view: LaunchContract.View,
             .subscribeBy(onError = { it.printStackTrace() }, onComplete = {
                 handleSetupFinished()
             })
+    }
 
     private fun disconnectVero() =
-        veroTask(30, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
+        veroTask(15, R.string.launch_bt_connect, scannerManager.disconnectVero()).doOnComplete {
             logMessageForCrashReport("ScannerManager: disconnect")
         }
 
     private fun checkIfBluetoothIsEnabled() =
-        veroTask(37, R.string.launch_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
+        veroTask(30, R.string.launch_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
             logMessageForCrashReport("ScannerManager: bluetooth is enabled")
         }
 
@@ -138,70 +88,11 @@ class LaunchPresenter(private val view: LaunchContract.View,
         }
     }
 
-    private fun veroTask(progress: Int, messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
+    private fun veroTask(progress: Int, @StringRes messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
         Completable.fromAction { view.handleSetupProgress(progress, messageRes) }
             .andThen(task)
             .andThen(Completable.fromAction { callback?.invoke() })
             .doOnError { manageVeroErrors(it) }
-
-    private fun checkIfVerifyAndGuidExists(progress: Int): Completable =
-        Completable.fromAction { view.handleSetupProgress(progress, R.string.launch_checking_person_in_db) }
-            .andThen(tryToFetchGuid())
-
-    private fun tryToFetchGuid(): Completable {
-        return if (launchRequest.verifyGuid != null) {
-            val guid = launchRequest.verifyGuid
-            val startCandidateSearchTime = timeHelper.now()
-            dbManager
-                .loadPerson(launchRequest.projectId, guid)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess { personFetchResult ->
-                    handleGuidFound(personFetchResult, guid, startCandidateSearchTime)
-                }.doOnError {
-                    it.printStackTrace()
-                    // For any reason, we show the missing guidFound screen.
-                    saveNotFoundVerificationAndShowAlert(guid, startCandidateSearchTime)
-                }.ignoreElement()
-        } else {
-            Completable.complete()
-        }
-    }
-
-    private fun handleGuidFound(result: PersonFetchResult, guid: String, startCandidateSearchTime: Long) {
-        Timber.d("Setup: GUID found.")
-        val isPersonFromLocalDb = !result.fetchedOnline
-        saveEventForCandidateReadInBackgroundNotFound(
-            guid,
-            startCandidateSearchTime,
-            if (isPersonFromLocalDb) CandidateReadEvent.LocalResult.FOUND else CandidateReadEvent.LocalResult.NOT_FOUND,
-            if (isPersonFromLocalDb) null else CandidateReadEvent.RemoteResult.FOUND)
-    }
-
-    private fun saveNotFoundVerificationAndShowAlert(guid: String, startCandidateSearchTime: Long) {
-        if (simNetworkUtils.isConnected()) {
-            // We've synced with the online dbManager and they're not in the dbManager
-            launchAlert(FingerprintAlert.GUID_NOT_FOUND_ONLINE)
-            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, CandidateReadEvent.RemoteResult.NOT_FOUND)
-        } else {
-            // We're offline but might find the person if we sync
-            launchAlert(FingerprintAlert.GUID_NOT_FOUND_OFFLINE)
-            saveEventForCandidateReadInBackgroundNotFound(guid, startCandidateSearchTime, CandidateReadEvent.LocalResult.NOT_FOUND, null)
-        }
-    }
-
-    private fun saveEventForCandidateReadInBackgroundNotFound(guid: String,
-                                                              startCandidateSearchTime: Long,
-                                                              localResult: CandidateReadEvent.LocalResult,
-                                                              remoteResult: CandidateReadEvent.RemoteResult?) {
-        sessionEventsManager.addEventInBackground(
-            CandidateReadEvent(
-                startCandidateSearchTime,
-                timeHelper.now(),
-                guid,
-                localResult,
-                remoteResult))
-    }
 
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
@@ -217,112 +108,27 @@ class LaunchPresenter(private val view: LaunchContract.View,
         }
     }
 
-    private fun requestPermissionsForLocation(progress: Int): Completable {
-        view.handleSetupProgress(progress, R.string.launch_checking_permissions)
-        val permissionsNeeded = arrayListOf(Manifest.permission.ACCESS_FINE_LOCATION)
-
-        val permissionsToRequest = if (permissionsAlreadyRequested) {
-            0
-        } else {
-            permissionsNeeded.size
-        }
-        val requestForPermissions = view.requestPermissions(permissionsNeeded)
-
-        return requestForPermissions
-            .take(permissionsToRequest.toLong())
-            .toList()
-            .flatMapCompletable { permissions ->
-                collectLocationIfPermitted(permissions)
-                permissionsAlreadyRequested = true
-                Completable.complete()
-            }
-    }
-
-    @SuppressLint("MissingPermission", "CheckResult")
-    private fun collectLocationIfPermitted(permissions: List<Permission>) {
-        if (!permissionsAlreadyRequested &&
-            permissions.first { it.name == Manifest.permission.ACCESS_FINE_LOCATION }.granted) {
-            val req = LocationRequest.create().setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-            locationProvider
-                .getUpdatedLocation(req)
-                .firstOrError()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribeBy(onSuccess = {
-                    sessionEventsManager.addLocationToSessionInBackground(it.latitude, it.longitude)
-                }, onError = { it.printStackTrace() })
-        }
-    }
-
     private fun handleSetupFinished() {
+        view.handleSetupProgress(100, R.string.launch_finished)
+        view.doVibrate()
         scannerManager.scanner?.let {
             preferencesManager.lastScannerUsed = convertAddressToSerial(it.macAddress)
             preferencesManager.lastScannerVersion = it.hardwareVersion.toString()
             analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId ?: "")
         }
-        view.handleSetupFinished()
-        scannerManager.scanner?.registerButtonListener(scannerButton)
-        view.doVibrate()
-    }
-
-    private fun setTextToConsentTabs() {
-        view.setTextToGeneralConsent(getGeneralConsentText())
-        if (consentDataManager.parentalConsentExists) {
-            view.addParentalConsentTabWithText(getParentalConsentText())
-        }
-    }
-
-    private fun getGeneralConsentText(): String {
-        val generalConsent = try {
-            JsonHelper.gson.fromJson(consentDataManager.generalConsentOptionsJson, GeneralConsent::class.java)
-        } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
-            GeneralConsent()
-        }
-        return generalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
-    }
-
-    private fun getParentalConsentText(): String {
-        val parentalConsent = try {
-            JsonHelper.gson.fromJson(consentDataManager.parentalConsentOptionsJson, ParentalConsent::class.java)
-        } catch (e: JsonSyntaxException) {
-            crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
-            ParentalConsent()
-        }
-        return parentalConsent.assembleText(activity, launchRequest, launchRequest.programName, launchRequest.organizationName)
+        view.continueToNextActivity()
     }
 
     override fun handleOnBackPressed() {
-        addConsentEvent(NO_RESPONSE)
         handleOnBackOrDeclinePressed()
     }
 
     override fun handleDeclinePressed() {
-        addConsentEvent(DECLINED)
         handleOnBackOrDeclinePressed()
     }
 
     private fun handleOnBackOrDeclinePressed() {
-        launchOutOfFocus = true
         view.goToRefusalActivity()
-    }
-
-    private fun addConsentEvent(result: ConsentEvent.Result) {
-        sessionEventsManager.addEventInBackground(
-            ConsentEvent(
-                startConsentEventTime,
-                timeHelper.now(),
-                if (view.isCurrentTabParental()) {
-                    PARENTAL
-                } else {
-                    INDIVIDUAL
-                },
-                result))
-    }
-
-
-    override fun handleOnDestroy() {
-        scannerManager.disconnectScannerIfNeeded()
     }
 
     override fun tryAgainFromErrorOrRefusal() {
@@ -331,28 +137,8 @@ class LaunchPresenter(private val view: LaunchContract.View,
         startSetup()
     }
 
-    override fun confirmConsentAndContinueToNextActivity() {
-        addConsentEvent(ACCEPTED)
-        waitingForConfirmation = false
-        view.continueToNextActivity()
-    }
-
     private fun launchAlert(alert: FingerprintAlert) {
-        if (!launchOutOfFocus) {
-            view.doLaunchAlert(alert)
-        }
-    }
-
-    override fun onActivityResult() {
-        launchOutOfFocus = false
-    }
-
-    override fun handleOnResume() {
-        launchOutOfFocus = false
-    }
-
-    override fun handleOnPause() {
-        launchOutOfFocus = true
+        view.doLaunchAlert(alert)
     }
 
     override fun handleScannerDisconnectedYesClick() {
@@ -382,7 +168,8 @@ class LaunchPresenter(private val view: LaunchContract.View,
     }
 
     override fun logScannerErrorDialogShownToCrashReport() {
-        crashReportManager.logMessageForCrashReport(FingerprintCrashReportTag.ALERT,
+        crashReportManager.logMessageForCrashReport(
+            FingerprintCrashReportTag.ALERT,
             FingerprintCrashReportTrigger.SCANNER,
             message = "Scanner error confirm dialog shown")
     }
