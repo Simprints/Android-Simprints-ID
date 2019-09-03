@@ -10,27 +10,6 @@ enum class AlertActivityViewModel(val type: Type,
                                   val rightButton: ButtonAction,
                                   @StringRes val message: Int) {
 
-    // Data errors
-    GUID_NOT_FOUND_ONLINE(
-        type = Type.DataError(
-            title = R.string.verify_guid_not_found_title,
-            hintDrawable = null
-        ),
-        leftButton = ButtonAction.Close,
-        rightButton = ButtonAction.None,
-        message = R.string.verify_guid_not_found_online_message
-    ),
-
-    GUID_NOT_FOUND_OFFLINE(
-        type = Type.DataError(
-            title = R.string.verify_guid_not_found_title,
-            hintDrawable = R.drawable.error_hint_wifi
-        ),
-        leftButton = ButtonAction.TryAgain,
-        rightButton = ButtonAction.WifiSettings,
-        message = R.string.verify_guid_not_found_offline_message
-    ),
-
     // Bluetooth errors
     BLUETOOTH_NOT_SUPPORTED(
         type = Type.BluetoothError(
@@ -101,8 +80,6 @@ enum class AlertActivityViewModel(val type: Type,
     companion object {
         fun fromAlertToAlertViewModel(alertType: FingerprintAlert): AlertActivityViewModel =
             when(alertType) {
-                FingerprintAlert.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-                FingerprintAlert.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
                 FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                 FingerprintAlert.BLUETOOTH_NOT_ENABLED -> BLUETOOTH_NOT_ENABLED
                 FingerprintAlert.NOT_PAIRED -> NOT_PAIRED
@@ -122,12 +99,6 @@ enum class AlertActivityViewModel(val type: Type,
                       @ColorRes val backgroundColor: Int,
                       @DrawableRes val mainDrawable: Int,
                       @DrawableRes val hintDrawable: Int? = null) {
-
-        class DataError(title: Int,
-                        backgroundColor: Int = R.color.simprints_grey,
-                        mainDrawable: Int = R.drawable.error_icon,
-                        hintDrawable: Int? = null)
-            : Type(title, backgroundColor, mainDrawable, hintDrawable)
 
         class BluetoothError(title: Int = R.string.error_occurred_title,
                              backgroundColor: Int = R.color.simprints_blue,

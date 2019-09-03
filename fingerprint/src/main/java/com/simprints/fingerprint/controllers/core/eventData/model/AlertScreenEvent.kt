@@ -14,8 +14,6 @@ fun AlertScreenEvent.fromDomainToCore() =
 
 fun FingerprintAlert.fromFingerprintAlertToAlertTypeEvent(): CoreAlertScreenEventType =
     when (this) {
-        FingerprintAlert.GUID_NOT_FOUND_ONLINE -> CoreAlertScreenEventType.GUID_NOT_FOUND_OFFLINE
-        FingerprintAlert.GUID_NOT_FOUND_OFFLINE -> CoreAlertScreenEventType.GUID_NOT_FOUND_OFFLINE
         FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> CoreAlertScreenEventType.BLUETOOTH_NOT_SUPPORTED
         FingerprintAlert.BLUETOOTH_NOT_ENABLED -> CoreAlertScreenEventType.BLUETOOTH_NOT_ENABLED
         FingerprintAlert.NOT_PAIRED -> CoreAlertScreenEventType.NOT_PAIRED
