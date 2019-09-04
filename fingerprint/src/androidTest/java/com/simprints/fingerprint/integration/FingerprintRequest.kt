@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.id.Application
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.*
 import kotlinx.android.parcel.Parcelize
 

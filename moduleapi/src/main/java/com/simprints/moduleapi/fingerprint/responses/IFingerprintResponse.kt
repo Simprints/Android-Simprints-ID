@@ -15,7 +15,8 @@ interface IFingerprintResponse : Parcelable, IResponse {
 }
 
 enum class IFingerprintResponseType {
-    ENROL,
+    CAPTURE,
+    @Deprecated("To be replaced with CAPTURE") ENROL,
     VERIFY,
     IDENTIFY,
     REFUSAL,

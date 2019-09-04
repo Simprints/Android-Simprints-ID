@@ -31,7 +31,7 @@ class VerifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFl
 
     private fun FingerprintVerifyRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest(
-            projectId, userId, moduleId, this.toAction(), language, fingerStatus
+            projectId, userId, moduleId, this.toAction().activityTitle, language, fingerStatus
         )
 
     private fun FingerprintVerifyRequest.createMatchingTaskRequest() =

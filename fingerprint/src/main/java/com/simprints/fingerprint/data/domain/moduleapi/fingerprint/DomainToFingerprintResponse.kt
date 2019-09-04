@@ -1,11 +1,13 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import android.os.Parcelable
+import com.simprints.fingerprint.activities.collect.models.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.responses.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -15,6 +17,12 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintErrorResponse(error: FingerprintErrorResponse): IFingerprintErrorResponse =
         IFingerprintErrorResponseImpl(fromFingerprintErrorReasonToErrorResponse(error.reason))
 
+    fun fromDomainToFingerprintCaptureResponse(capture: FingerprintCaptureResponse): IFingerprintCaptureResponse =
+        IFingerprintCaptureResponseImpl(capture.fingerprints.map {
+            IFingerprintImpl(it.fingerId.fromDomainToModuleApi(), it.templateBytes, it.qualityScore)
+        })
+
+    @Deprecated("To be replaced with fromDomainToFingerprintCaptureResponse")
     fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
 
     fun fromDomainToFingerprintVerifyResponse(verify: FingerprintVerifyResponse): IFingerprintVerifyResponse {
@@ -27,7 +35,7 @@ object DomainToFingerprintResponse {
 
     fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintRefusalFormResponse {
 
-        val reason = when(refusalResponse.reason) {
+        val reason = when (refusalResponse.reason) {
             FingerprintRefusalFormReason.REFUSED_RELIGION -> IFingerprintRefusalReason.REFUSED_RELIGION
             FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintRefusalReason.REFUSED_DATA_CONCERNS
             FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintRefusalReason.REFUSED_PERMISSION
@@ -68,6 +76,12 @@ private class IFingerprintErrorResponseImpl(override val error: IFingerprintErro
 }
 
 @Parcelize
+private class IFingerprintCaptureResponseImpl(override val fingerprints: List<IFingerprint>) : IFingerprintCaptureResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
+}
+
+@Deprecated("To be replaced with IFingerprintCaptureRequest")
+@Parcelize
 private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ENROL
 }
@@ -95,3 +109,9 @@ private data class IMatchingResultImpl(
     override val guid: String,
     override val confidence: Int,
     override val tier: IFingerprintResponseTier) : Parcelable, IMatchingResult
+
+@Parcelize
+private class IFingerprintImpl(
+    override val fingerId: IFingerIdentifier,
+    override val template: ByteArray,
+    override val qualityScore: Int) : IFingerprint
