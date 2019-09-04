@@ -1,30 +1,24 @@
 package com.simprints.id.orchestrator
 
 import android.content.Intent
+import androidx.lifecycle.LiveData
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.orchestrator.modality.ModalityStepRequest
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.simprints.id.orchestrator.steps.Step
 
 /**
- * Orchestrates the flow of Intents [ModalityStepRequest] to execute a specific modality (Face, Finger, etc...).
- * When all intents are terminates, it merges the results to produce a final AppResponse */
+ * It produces [Step]s to run and finally creates an [AppResponse] to return
+ * to the the ClientApi
+ */
 interface OrchestratorManager {
 
-    /**
-     * Emits [ModalityStepRequest]s with the Intents that needs to be launched
-     * to progress with a specific ModalityFlow
-     */
-    fun startFlow(appRequest: AppRequest, sessionId:String): Observable<ModalityStepRequest>
+    val onGoingStep: LiveData<Step?>
+    val appResponse: LiveData<AppResponse?>
 
-    /**
-     * Emits the final AppResponse when all [ModalityStepRequest]s are completed
-     */
-    fun getAppResponse(): Single<AppResponse>
+    fun initialise(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
+    fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?)
 
-    /**
-     * Handles the results of [ModalityStepRequest] (received from onActivityResult)
-     */
-    fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?)
+    fun restoreState(steps: List<Step>)
+    fun getState(): List<Step>
 }

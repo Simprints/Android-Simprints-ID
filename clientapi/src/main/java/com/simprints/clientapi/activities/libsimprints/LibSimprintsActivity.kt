@@ -8,9 +8,6 @@ import com.simprints.clientapi.di.KoinInjector.unloadClientApiKoinModules
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.identity.DefaultGuidSelectionNotifier
 import com.simprints.libsimprints.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -26,7 +23,6 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
             showLauncherScreen()
 
         loadClientApiKoinModules()
-        CoroutineScope(Dispatchers.Main).launch { presenter.start() }
     }
 
     override fun returnRegistration(registration: Registration,

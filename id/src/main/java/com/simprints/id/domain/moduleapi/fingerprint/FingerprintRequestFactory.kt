@@ -1,9 +1,6 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.FingerIdentifier.*
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -12,78 +9,41 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRe
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
 
+interface FingerprintRequestFactory {
 
-object FingerprintRequestFactory {
+    fun buildFingerprintEnrolRequest(projectId: String,
+                                     userId: String,
+                                     moduleId: String,
+                                     metadata: String,
+                                     prefs: PreferencesManager): FingerprintEnrolRequest
 
-    fun buildFingerprintRequest(appRequest: AppRequest, prefs: PreferencesManager): FingerprintRequest =
-        when (appRequest) {
-            is AppEnrolRequest -> buildFingerprintEnrolRequest(appRequest, prefs)
-            is AppVerifyRequest -> buildFingerprintVerifyRequest(appRequest, prefs)
-            is AppIdentifyRequest -> buildFingerprintIdentifyRequest(appRequest, prefs)
-            else -> throw IllegalStateException("Invalid fingerprint request")
-        }
+    fun buildFingerprintVerifyRequest(projectId: String,
+                                      userId: String,
+                                      moduleId: String,
+                                      metadata: String,
+                                      verifyGuid: String,
+                                      prefs: PreferencesManager): FingerprintVerifyRequest
 
-    private fun buildFingerprintEnrolRequest(enrol: AppEnrolRequest, prefs: PreferencesManager): FingerprintEnrolRequest =
-        with(enrol) {
-            FingerprintEnrolRequest(
-                projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName)
-        }
-
-    private fun buildFingerprintVerifyRequest(verify: AppVerifyRequest, prefs: PreferencesManager): FingerprintVerifyRequest =
-        with(verify) {
-            FingerprintVerifyRequest(
-                projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName,
-                verifyGuid)
-        }
-
-    private fun buildFingerprintIdentifyRequest(
-        identify: AppIdentifyRequest,
-        prefs: PreferencesManager,
-        returnIdCount: Int = 10): FingerprintIdentifyRequest =
-
-        with(identify) {
-            FingerprintIdentifyRequest(
-                projectId, userId, moduleId, metadata,
-                prefs.language,
-                prefs.fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
-                prefs.logoExists,
-                prefs.organizationName,
-                prefs.programName,
-                buildFingerprintMatchGroup(prefs.matchGroup),
-                returnIdCount)
-        }
-
-    private fun buildFingerprintMatchGroup(matchGroup: GROUP): FingerprintMatchGroup =
-        when (matchGroup) {
-            GROUP.GLOBAL -> FingerprintMatchGroup.GLOBAL
-            GROUP.USER -> FingerprintMatchGroup.USER
-            GROUP.MODULE -> FingerprintMatchGroup.MODULE
-        }
-
-    private fun buildFingerprintFingerIdentifier(fingerIdentifier: FingerIdentifier): FingerprintFingerIdentifier =
-        when (fingerIdentifier) {
-            RIGHT_5TH_FINGER -> FingerprintFingerIdentifier.RIGHT_5TH_FINGER
-            RIGHT_4TH_FINGER -> FingerprintFingerIdentifier.RIGHT_4TH_FINGER
-            RIGHT_3RD_FINGER -> FingerprintFingerIdentifier.RIGHT_3RD_FINGER
-            RIGHT_INDEX_FINGER -> FingerprintFingerIdentifier.RIGHT_INDEX_FINGER
-            RIGHT_THUMB -> FingerprintFingerIdentifier.RIGHT_THUMB
-            LEFT_THUMB -> FingerprintFingerIdentifier.LEFT_THUMB
-            LEFT_INDEX_FINGER -> FingerprintFingerIdentifier.LEFT_INDEX_FINGER
-            LEFT_3RD_FINGER -> FingerprintFingerIdentifier.LEFT_3RD_FINGER
-            LEFT_4TH_FINGER -> FingerprintFingerIdentifier.LEFT_4TH_FINGER
-            LEFT_5TH_FINGER -> FingerprintFingerIdentifier.LEFT_5TH_FINGER
-        }
+    fun buildFingerprintIdentifyRequest(projectId: String,
+                                        userId: String,
+                                        moduleId: String,
+                                        metadata: String,
+                                        prefs: PreferencesManager,
+                                        returnIdCount: Int = 10): FingerprintIdentifyRequest
 }
+
+fun FingerprintRequestFactory.buildFingerprintRequestFromAppRequest(appRequest: AppRequest, prefs: PreferencesManager): FingerprintRequest =
+    when (appRequest) {
+        is AppEnrolRequest -> with(appRequest) {
+            buildFingerprintEnrolRequest(projectId, userId, moduleId, metadata, prefs)
+        }
+        is AppVerifyRequest -> with(appRequest) {
+            buildFingerprintVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid, prefs)
+        }
+        is AppIdentifyRequest -> with(appRequest) {
+            buildFingerprintIdentifyRequest(projectId, userId, moduleId, metadata, prefs)
+        }
+        else -> throw IllegalStateException("Invalid fingerprint request")
+    }
+

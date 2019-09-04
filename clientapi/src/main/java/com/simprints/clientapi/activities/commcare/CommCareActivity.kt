@@ -10,9 +10,6 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.libsimprints.Constants
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.Tier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
@@ -44,9 +41,6 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
             showLauncherScreen()
 
         loadClientApiKoinModules()
-        CoroutineScope(Dispatchers.Main).launch {
-            presenter.start()
-        }
     }
 
     override fun returnRegistration(guid: String, flowCompletedCheck: Boolean) = Intent().let {
