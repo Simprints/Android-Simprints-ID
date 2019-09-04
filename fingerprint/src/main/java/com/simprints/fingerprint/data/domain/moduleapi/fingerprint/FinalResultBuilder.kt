@@ -38,6 +38,14 @@ class FinalResultBuilder {
             ))
         })
 
+    fun createCaptureResult(collectFingerprintsTaskResult: CollectFingerprintsTaskResult): FinalResult =
+        FinalResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintCaptureResponse(
+                FingerprintCaptureResponse(collectFingerprintsTaskResult.fingerprints)
+            ))
+        })
+
+    @Deprecated("To be replaced with createCaptureResult")
     fun createEnrolResult(collectFingerprintsTaskResult: CollectFingerprintsTaskResult) =
         FinalResult(Activity.RESULT_OK, Intent().apply {
             putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(

@@ -7,6 +7,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.Fingerpri
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier.*
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup.*
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.*
 import kotlinx.android.parcel.Parcelize
 

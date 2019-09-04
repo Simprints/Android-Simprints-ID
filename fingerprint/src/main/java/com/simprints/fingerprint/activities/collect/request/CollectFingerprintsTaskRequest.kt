@@ -10,7 +10,7 @@ import kotlinx.android.parcel.Parcelize
 class CollectFingerprintsTaskRequest(val projectId: String,
                                      val userId: String,
                                      val moduleId: String,
-                                     val action: Action, // To know which title to show
+                                     val activityTitle: String,
                                      val language: String,
                                      val fingerStatus: Map<FingerIdentifier, Boolean>) : TaskRequest, Parcelable {
 

@@ -8,7 +8,8 @@ interface FingerprintResponse: Parcelable {
 }
 
 enum class FingerprintResponseType {
-    ENROL,
+    CAPTURE,
+    @Deprecated("To be replaced with CAPTURE") ENROL,
     VERIFY,
     IDENTIFY,
     REFUSAL,

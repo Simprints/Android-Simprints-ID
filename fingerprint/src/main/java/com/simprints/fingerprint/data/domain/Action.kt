@@ -9,8 +9,10 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-enum class Action : Parcelable {
-    ENROL, IDENTIFY, VERIFY
+enum class Action(val activityTitle: String) : Parcelable {
+    ENROL("Enrolment"),
+    IDENTIFY("Identification"),
+    VERIFY("Verification")
 }
 
 fun FingerprintRequest.toAction() = when (this) {

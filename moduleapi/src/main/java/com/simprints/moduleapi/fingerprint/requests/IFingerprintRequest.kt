@@ -2,6 +2,7 @@ package com.simprints.moduleapi.fingerprint.requests
 
 import android.os.Parcelable
 import com.simprints.moduleapi.IRequest
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
 
 interface IFingerprintRequest : Parcelable, IRequest {
