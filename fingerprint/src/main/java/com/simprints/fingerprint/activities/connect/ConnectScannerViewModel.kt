@@ -21,18 +21,17 @@ import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 
-class ConnectViewModel(private val crashReportManager: FingerprintCrashReportManager,
-                       private val scannerManager: ScannerManager,
-                       private val timeHelper: FingerprintTimeHelper,
-                       private val sessionEventsManager: FingerprintSessionEventsManager,
-                       private val preferencesManager: FingerprintPreferencesManager,
-                       private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
+class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
+                              private val scannerManager: ScannerManager,
+                              private val timeHelper: FingerprintTimeHelper,
+                              private val sessionEventsManager: FingerprintSessionEventsManager,
+                              private val preferencesManager: FingerprintPreferencesManager,
+                              private val analyticsManager: FingerprintAnalyticsManager) : ViewModel() {
 
-    val progress = MutableLiveData(0)
-    val message = MutableLiveData(R.string.connect_scanner_bt_connect)
+    val progress: MutableLiveData<Int> = MutableLiveData(0)
+    val message: MutableLiveData<Int> = MutableLiveData(R.string.connect_scanner_bt_connect)
     val vibrate = MutableLiveData<Unit>()
 
-    val launchRefusal = MutableLiveData<Unit>()
     val launchAlert = MutableLiveData<FingerprintAlert>()
     val finish = MutableLiveData<Unit>()
 
@@ -59,34 +58,28 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
     }
 
     private fun disconnectVero() =
-        veroTask(15, R.string.connect_scanner_bt_connect, scannerManager.disconnectVero()).doOnComplete {
-            logMessageForCrashReport("ScannerManager: disconnect")
-        }
+        veroTask(computeProgress(1), R.string.connect_scanner_bt_connect, "ScannerManager: disconnect",
+            scannerManager.disconnectVero())
 
     private fun checkIfBluetoothIsEnabled() =
-        veroTask(30, R.string.connect_scanner_bt_connect, scannerManager.checkBluetoothStatus()).doOnComplete {
-            logMessageForCrashReport("ScannerManager: bluetooth is enabled")
-        }
+        veroTask(computeProgress(2), R.string.connect_scanner_bt_connect, "ScannerManager: bluetooth is enabled",
+            scannerManager.checkBluetoothStatus())
 
     private fun initVero() =
-        veroTask(45, R.string.connect_scanner_bt_connect, scannerManager.initVero()).doOnComplete {
-            logMessageForCrashReport("ScannerManager: init vero")
-        }
+        veroTask(computeProgress(3), R.string.connect_scanner_bt_connect, "ScannerManager: init vero",
+            scannerManager.initVero())
 
     private fun connectToVero() =
-        veroTask(60, R.string.connect_scanner_bt_connect, scannerManager.connectToVero()) { addBluetoothConnectivityEvent() }.doOnComplete {
-            logMessageForCrashReport("ScannerManager: connectToVero")
-        }
+        veroTask(computeProgress(4), R.string.connect_scanner_bt_connect, "ScannerManager: connectToVero",
+            scannerManager.connectToVero()) { addBluetoothConnectivityEvent() }
 
     private fun resetVeroUI() =
-        veroTask(75, R.string.connect_scanner_setup, scannerManager.resetVeroUI()).doOnComplete {
-            logMessageForCrashReport("ScannerManager: resetVeroUI")
-        }
+        veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
+            scannerManager.resetVeroUI())
 
     private fun wakeUpVero() =
-        veroTask(90, R.string.connect_scanner_wake_un20, scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() }.doOnComplete {
-            logMessageForCrashReport("ScannerManager: wakeUpVero")
-        }
+        veroTask(computeProgress(6), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
+            scannerManager.wakeUpVero()) { updateBluetoothConnectivityEventWithVeroInfo() }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
         scannerManager.scanner?.let {
@@ -94,7 +87,8 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
         }
     }
 
-    private fun veroTask(progress: Int, @StringRes messageRes: Int, task: Completable, callback: (() -> Unit)? = null): Completable =
+    private fun veroTask(progress: Int, @StringRes messageRes: Int, crashReportMessage: String,
+                         task: Completable, callback: (() -> Unit)? = null): Completable =
         Completable.fromAction {
             this.progress.postValue(progress)
             this.message.postValue(messageRes)
@@ -102,6 +96,9 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
             .andThen(task)
             .andThen(Completable.fromAction { callback?.invoke() })
             .doOnError { manageVeroErrors(it) }
+            .doOnComplete {
+                logMessageForCrashReport(crashReportMessage)
+            }
 
     private fun manageVeroErrors(it: Throwable) {
         it.printStackTrace()
@@ -118,7 +115,7 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
     }
 
     private fun handleSetupFinished() {
-        progress.postValue(100)
+        progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
         vibrate.postValue(Unit)
         scannerManager.scanner?.let {
@@ -127,10 +124,6 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
             analyticsManager.logScannerProperties(it.macAddress ?: "", it.scannerId ?: "")
         }
         finish.postValue(Unit)
-    }
-
-    fun handleOnBackPressed() {
-        launchRefusal.postValue(Unit)
     }
 
     fun tryAgainFromErrorOrRefusal() {
@@ -173,5 +166,10 @@ class ConnectViewModel(private val crashReportManager: FingerprintCrashReportMan
     override fun onCleared() {
         super.onCleared()
         setupFlow?.dispose()
+    }
+
+    companion object {
+        private const val NUMBER_OF_STEPS = 7
+        private fun computeProgress(step: Int) = step * 100 / NUMBER_OF_STEPS
     }
 }
