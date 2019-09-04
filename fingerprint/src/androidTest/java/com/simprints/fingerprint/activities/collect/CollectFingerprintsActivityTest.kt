@@ -1,12 +1,10 @@
-package com.simprints.fingerprint.activities.collectfingerprint
+package com.simprints.fingerprint.activities.collect
 
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
-import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
