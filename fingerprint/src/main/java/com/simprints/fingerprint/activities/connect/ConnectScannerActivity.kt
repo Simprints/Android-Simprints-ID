@@ -27,7 +27,7 @@ import org.koin.android.ext.android.inject
 class ConnectScannerActivity : AppCompatActivity() {
 
     private lateinit var connectScannerRequest: ConnectScannerTaskRequest
-    private val viewModel: ConnectViewModel by inject()
+    private val viewModel: ConnectScannerViewModel by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -44,17 +44,22 @@ class ConnectScannerActivity : AppCompatActivity() {
 
         LanguageHelper.setLanguage(this, connectScannerRequest.language)
 
+        observeScannerEvents()
+        observeLifecycleEvents()
+
+        viewModel.start()
+    }
+
+    private fun observeScannerEvents() {
         viewModel.progress.observe(this, Observer { connectScannerProgressBar.progress = it })
         viewModel.message.observe(this, Observer { connectScannerInfoTextView.setText(it) })
         viewModel.vibrate.observe(this, Observer { vibrate(this) })
+        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { showDialogForScannerErrorConfirmation(it) })
+    }
 
-        viewModel.launchRefusal.observe(this, Observer { goToRefusalActivity() })
+    private fun observeLifecycleEvents() {
         viewModel.launchAlert.observe(this, Observer { launchAlert(this, it) })
         viewModel.finish.observe(this, Observer { continueToNextActivity() })
-
-        viewModel.showScannerErrorDialogWithScannerId.observe(this, Observer { showDialogForScannerErrorConfirmation(it) })
-
-        viewModel.start()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -103,7 +108,7 @@ class ConnectScannerActivity : AppCompatActivity() {
             )
 
     override fun onBackPressed() {
-        viewModel.handleOnBackPressed()
+        goToRefusalActivity()
     }
 
     override fun onDestroy() {
