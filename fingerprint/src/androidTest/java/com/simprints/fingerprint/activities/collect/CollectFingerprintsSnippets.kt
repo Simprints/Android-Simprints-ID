@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collectfingerprint
+package com.simprints.fingerprint.activities.collect
 
 import android.app.Activity
 import androidx.test.espresso.Espresso.onView

@@ -5,8 +5,8 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
-import com.simprints.fingerprint.activities.collectfingerprint.pressScanUntilDialogIsDisplayedAndClickConfirm
-import com.simprints.fingerprint.activities.collectfingerprint.waitUntilCollectFingerprintsIsDisplayed
+import com.simprints.fingerprint.activities.collect.pressScanUntilDialogIsDisplayedAndClickConfirm
+import com.simprints.fingerprint.activities.collect.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
