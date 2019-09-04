@@ -17,7 +17,7 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.moduleapi.app.DomainToAppResponse.fromDomainToAppErrorResponse
+import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse.fromDomainToModuleApiAppErrorResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -127,11 +127,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
 
     override fun onAlertScreenReturn(alertActResponse: AlertActResponse) {
         val domainErrorResponse = AppErrorResponse(Reason.fromDomainAlertTypeToAppErrorType(alertActResponse.alertType))
-        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(domainErrorResponse))
+        view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(domainErrorResponse))
     }
 
     override fun onLoginScreenErrorReturn(appErrorResponse: AppErrorResponse) {
-        view.setResultErrorAndFinish(fromDomainToAppErrorResponse(appErrorResponse))
+        view.setResultErrorAndFinish(fromDomainToModuleApiAppErrorResponse(appErrorResponse))
     }
 
     private fun extractSessionParametersOrThrow() =
