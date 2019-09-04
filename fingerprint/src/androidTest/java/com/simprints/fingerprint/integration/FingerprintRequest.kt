@@ -4,13 +4,13 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.id.Application
-import com.simprints.id.orchestrator.modality.flows.FingerprintModalityFlow
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.moduleapi.fingerprint.requests.*
 import kotlinx.android.parcel.Parcelize
 
 fun createFingerprintRequestIntent(action: Action): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
-        FingerprintModalityFlow.fingerprintActivityClassName)
+        FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY, when (action) {
         Action.ENROL -> TestFingerprintEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
             DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
