@@ -9,7 +9,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequestType.VERIFY as ModuleAp
 data class FaceVerifyRequest(val projectId: String,
                              val userId: String,
                              val moduleId: String,
-                             override val type: FaceRequestType = VERIFY) : FaceRequest
+                             override val type: FaceRequestType = VERIFY) : FaceRequest()
 
 fun FaceVerifyRequest.fromDomainToModuleApi(): IFaceVerifyRequest = FaceVerifyRequestImpl()
 

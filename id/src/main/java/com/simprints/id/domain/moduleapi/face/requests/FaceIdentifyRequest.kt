@@ -10,7 +10,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequestType.IDENTIFY as Module
 data class FaceIdentifyRequest(val projectId: String,
                                val userId: String,
                                val moduleId: String,
-                               override val type: FaceRequestType = IDENTIFY) : FaceRequest
+                               override val type: FaceRequestType = IDENTIFY) : FaceRequest()
 
 fun FaceIdentifyRequest.fromDomainToModuleApi(): IFaceIdentifyRequest = FaceIdentifyRequestImpl()
 

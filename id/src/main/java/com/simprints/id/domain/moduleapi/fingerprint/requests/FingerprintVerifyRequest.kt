@@ -13,5 +13,5 @@ data class FingerprintVerifyRequest(val projectId: String,
                                     val logoExists: Boolean,
                                     val programName: String,
                                     val organizationName: String,
-                                    val verifyGuid: String) : FingerprintRequest
+                                    val verifyGuid: String) : FingerprintRequest()
 

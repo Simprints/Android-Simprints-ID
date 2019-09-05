@@ -1,10 +1,14 @@
 package com.simprints.id.domain.moduleapi.face.responses
 
 import android.os.Parcelable
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.orchestrator.steps.Step.Result
 import com.simprints.moduleapi.face.responses.*
 
-interface FaceResponse : Parcelable, Result {
+abstract class FaceResponse : Parcelable, Result {
+
+    override fun toJson(): String = JsonHelper.toJson(this)
+
     companion object {
         const val BUNDLE_KEY = "FaceResponseBundleKey"
     }

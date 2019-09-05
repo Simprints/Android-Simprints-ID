@@ -1,10 +1,13 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses
 
 import android.os.Parcelable
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.orchestrator.steps.Step.Result
 
-interface FingerprintResponse: Parcelable, Result {
-    val type: FingerprintTypeResponse
+abstract class FingerprintResponse: Parcelable, Result {
+    abstract val type: FingerprintTypeResponse
+
+    override fun toJson(): String = JsonHelper.toJson(this)
 
     companion object {
         const val BUNDLE_KEY = "FingerprintResponseBundleKey"

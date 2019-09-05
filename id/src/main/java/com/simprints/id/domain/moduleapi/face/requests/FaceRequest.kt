@@ -1,11 +1,14 @@
 package com.simprints.id.domain.moduleapi.face.requests
 
 import android.os.Parcelable
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequestType.*
 import com.simprints.id.orchestrator.steps.Step.Request
 
-interface FaceRequest: Parcelable, Request {
-    val type: FaceRequestType
+abstract class FaceRequest: Parcelable, Request {
+    abstract val type: FaceRequestType
+
+    override fun toJson(): String = JsonHelper.toJson(this)
 }
 
 enum class FaceRequestType {

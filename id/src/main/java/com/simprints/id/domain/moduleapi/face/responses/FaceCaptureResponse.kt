@@ -7,7 +7,9 @@ import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FaceCaptureResponse(val capturingResult: List<FaceCaptureResult>) : Parcelable, FaceResponse
+data class FaceCaptureResponse(
+    val capturingResult: List<FaceCaptureResult>
+) : Parcelable, FaceResponse()
 
 fun IFaceCaptureResponse.fromModuleApiToDomain(): FaceCaptureResponse =
     FaceCaptureResponse(capturingResult.map { it.fromModuleApiToDomain() })
