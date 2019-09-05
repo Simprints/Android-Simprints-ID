@@ -10,6 +10,7 @@ object ModuleApiToDomainFingerprintResponse {
 
     fun fromModuleApiToDomainFingerprintResponse(fingerprintResponse: IFingerprintResponse): FingerprintResponse =
         when (fingerprintResponse.type) {
+            IFingerprintResponseType.CAPTURE -> TODO("Implement processing capture response")
             IFingerprintResponseType.ENROL -> fromModuleApiToFingerprintEnrolResponse(fingerprintResponse as IFingerprintEnrolResponse)
             IFingerprintResponseType.VERIFY -> fromModuleApiToFingerprintVerifyResponse(fingerprintResponse as IFingerprintVerifyResponse)
             IFingerprintResponseType.IDENTIFY -> fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse as IFingerprintIdentifyResponse)

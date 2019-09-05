@@ -9,14 +9,12 @@ object FingerprintToDomainRequest {
 
     fun fromFingerprintToDomainRequest(iFingerprintRequest: IFingerprintRequest): FingerprintRequest =
         when (iFingerprintRequest) {
-            is IFingerprintEnrolRequest ->
-                fromFingerprintToDomainEnrolRequest(iFingerprintRequest)
+            is IFingerprintCaptureRequest ->
+                fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
             is IFingerprintVerifyRequest ->
                 fromFingerprintToDomainVerifyRequest(iFingerprintRequest)
             is IFingerprintIdentifyRequest ->
                 fromFingerprintToDomainIdentifyRequest(iFingerprintRequest)
-            is IFingerprintCaptureRequest ->
-                fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
         }
 
@@ -36,15 +34,6 @@ object FingerprintToDomainRequest {
                 projectId, userId, moduleId, metadata, language,
                 fingerStatus.mapKeys { it.key.toDomainClass() },
                 logoExists, programName, organizationName, verifyGuid)
-        }
-
-
-    private fun fromFingerprintToDomainEnrolRequest(iFingerprintRequest: IFingerprintEnrolRequest): FingerprintEnrolRequest =
-        with(iFingerprintRequest) {
-            FingerprintEnrolRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, programName, organizationName)
         }
 
     private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
