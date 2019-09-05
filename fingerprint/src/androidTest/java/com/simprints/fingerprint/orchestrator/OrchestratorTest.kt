@@ -17,6 +17,7 @@ import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
@@ -35,20 +36,18 @@ import kotlin.random.Random as Rand
 class OrchestratorTest {
 
     @Test
-    fun enrolTaskFlow_allResultsOk_shouldFinishSuccessfully() {
+    fun captureTaskFlow_allResultsOk_shouldFinishSuccessfully() {
         with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintRequest(Action.ENROL))
+            start(createFingerprintCaptureRequest())
             assertNextTaskIs<ConnectScanner>()
             okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
             okCollectResult()
-            assertNextTaskIs<SavePerson>()
-            okSavePersonResult()
             assertTrue(isFinished())
             with(getFinalResult()) {
                 assertEquals(Activity.RESULT_OK, resultCode)
-                assertNotNull(resultData?.extras?.getParcelable<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                    assertEquals(IFingerprintResponseType.ENROL, type)
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                    assertEquals(IFingerprintResponseType.CAPTURE, type)
                 })
             }
         }
@@ -95,9 +94,9 @@ class OrchestratorTest {
     }
 
     @Test
-    fun enrolTaskFlow_failsDueToAlertInConnectScanner_shouldFinishCancelledWithError() {
+    fun captureTaskFlow_failsDueToAlertInConnectScanner_shouldFinishCancelledWithError() {
         with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintRequest(Action.ENROL))
+            start(createFingerprintCaptureRequest())
             assertNextTaskIs<ConnectScanner>()
             alertResult()
             assertTrue(isFinished())
@@ -111,9 +110,9 @@ class OrchestratorTest {
     }
 
     @Test
-    fun enrolTaskFlow_failsDueToRefusalInConnectScanner_shouldFinishOkWithRefused() {
+    fun captureTaskFlow_failsDueToRefusalInConnectScanner_shouldFinishOkWithRefused() {
         with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintRequest(Action.ENROL))
+            start(createFingerprintCaptureRequest())
             assertNextTaskIs<ConnectScanner>()
             refusalResult()
             assertTrue(isFinished())
@@ -127,9 +126,9 @@ class OrchestratorTest {
     }
 
     @Test
-    fun enrolTaskFlow_cancelledSomehow_shouldFinishCancelledWithNoData() {
+    fun captureTaskFlow_cancelledSomehow_shouldFinishCancelledWithNoData() {
         with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintRequest(Action.ENROL))
+            start(createFingerprintCaptureRequest())
             assertNextTaskIs<ConnectScanner>()
             okConnectResult()
             assertNextTaskIs<CollectFingerprints>()
@@ -204,7 +203,7 @@ class OrchestratorTest {
     private fun Orchestrator.okCollectResult() {
         handleActivityTaskResult(ResultCode.OK) {
             assertEquals(CollectFingerprintsTaskResult.BUNDLE_KEY, it)
-            CollectFingerprintsTaskResult(PeopleGeneratorUtils.getRandomPerson())
+            CollectFingerprintsTaskResult(List(2) { PeopleGeneratorUtils.getRandomFingerprint() }, PeopleGeneratorUtils.getRandomPerson())
         }
     }
 
@@ -224,12 +223,6 @@ class OrchestratorTest {
             val score = Rand.nextInt(100)
             MatchingTaskVerifyResult(UUID.randomUUID().toString(), score, MatchingTier.computeTier(score.toFloat()))
         }
-    }
-
-    private fun Orchestrator.okSavePersonResult() {
-        handleRunnableTaskResult(
-            SavePersonTaskResult(true)
-        )
     }
 
     private fun Orchestrator.alertResult() {
@@ -261,6 +254,7 @@ class OrchestratorTest {
         private const val DEFAULT_LOGO_EXISTS = true
         private const val DEFAULT_PROGRAM_NAME = "This program"
         private const val DEFAULT_ORGANISATION_NAME = "This organisation"
+        private const val DEFAULT_ACTIVITY_TITLE = "Enrolment"
         private const val DEFAULT_VERIFY_GUID = "verify_guid"
         private const val DEFAULT_NUMBER_OF_ID_RETURNS = 10
         private val DEFAULT_MATCH_GROUP = MatchGroup.GLOBAL
@@ -277,11 +271,11 @@ class OrchestratorTest {
             FingerIdentifier.LEFT_5TH_FINGER to false
         )
 
+        private fun createFingerprintCaptureRequest() =
+            FingerprintCaptureRequest(DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS, DEFAULT_ACTIVITY_TITLE)
+
         private fun createFingerprintRequest(action: Action) =
             when (action) {
-                Action.ENROL -> FingerprintEnrolRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
-                    DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-                    DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME)
                 Action.IDENTIFY -> FingerprintIdentifyRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
                     DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
                     DEFAULT_LOGO_EXISTS, DEFAULT_ORGANISATION_NAME, DEFAULT_PROGRAM_NAME,
