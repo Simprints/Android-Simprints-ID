@@ -99,7 +99,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.longConsent.LongConsentActivity"
+            android:name=".activities.longConsent.PricvacyNoticeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity

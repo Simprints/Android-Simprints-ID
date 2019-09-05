@@ -22,7 +22,7 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
 import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
-import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
 import io.reactivex.Observable
@@ -67,7 +67,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
 
     private fun setClickListenerToPrivacyNotice() {
         privacyNoticeText.setOnClickListener {
-            startActivity(Intent(this, LongConsentActivity::class.java))
+            startActivity(Intent(this, PricvacyNoticeActivity::class.java))
         }
     }
 
