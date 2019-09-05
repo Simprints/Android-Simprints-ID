@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.ACCEPTED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.DECLINED
@@ -138,7 +138,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun startPrivacyNoticeActivity() {
-        startActivity(Intent(this, LongConsentActivity::class.java))
+        startActivity(Intent(this, PricvacyNoticeActivity::class.java))
     }
 
     companion object {

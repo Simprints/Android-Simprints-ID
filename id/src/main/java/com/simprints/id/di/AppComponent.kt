@@ -20,7 +20,7 @@ import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.activities.longConsent.LongConsentActivity
+import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -71,7 +71,7 @@ interface AppComponent {
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
-    fun inject(longConsentActivity: LongConsentActivity)
+    fun inject(pricvacyNoticeActivity: PricvacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)
