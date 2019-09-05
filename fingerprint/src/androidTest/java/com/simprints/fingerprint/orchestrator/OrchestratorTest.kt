@@ -24,7 +24,6 @@ import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
-import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskResult
 import com.simprints.moduleapi.fingerprint.responses.*
 import org.junit.Assert.*
 import org.junit.Test
