@@ -6,9 +6,9 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 
-data class GeneralConsentData(val generalConsentOptions: GeneralConsentOptions,
-                              val programName: String,
-                              val organizationName: String) {
+data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsentOptions,
+                                       val programName: String,
+                                       val organizationName: String) {
 
     fun assembleText(context: Context, appRequest: AppRequest) = StringBuilder().apply {
         filterAppRequestForConsent(appRequest, context)

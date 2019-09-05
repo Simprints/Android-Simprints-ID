@@ -30,7 +30,7 @@ class ConsentTextManagerImpl(private val context: Context,
     }
 
     private fun getGeneralConsentData() =
-        GeneralConsentData(getGeneralConsentOptions(),
+        GeneralConsentDataGenerator(getGeneralConsentOptions(),
             programName, organizationName)
 
     private fun getGeneralConsentOptions() = try {
@@ -41,7 +41,7 @@ class ConsentTextManagerImpl(private val context: Context,
     }
 
     private fun getParentalConsentData() =
-        ParentalConsentData(consentDataManager.parentalConsentExists,
+        ParentalConsentDataGenerator(consentDataManager.parentalConsentExists,
             getParentalConsentOptions(),
             programName, organizationName)
 

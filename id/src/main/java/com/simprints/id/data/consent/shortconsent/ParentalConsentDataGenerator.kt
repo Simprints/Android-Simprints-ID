@@ -6,10 +6,10 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 
-data class ParentalConsentData(val parentalConsentExists: Boolean,
-                               val parentalConsentOptions: ParentalConsentOptions,
-                               val programName: String,
-                               val organizationName: String) {
+data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
+                                        val parentalConsentOptions: ParentalConsentOptions,
+                                        val programName: String,
+                                        val organizationName: String) {
 
     fun assembleText(context: Context, appRequest: AppRequest) = StringBuilder().apply {
         filterAppRequestForParentalConsent(appRequest, context)
