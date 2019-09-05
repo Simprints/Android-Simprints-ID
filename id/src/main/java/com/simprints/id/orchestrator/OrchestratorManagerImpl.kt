@@ -13,13 +13,12 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 
 open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
-    private val appResponseFactory: AppResponseFactory
+    private val appResponseFactory: AppResponseFactory,
+    private val hotCache: HotCache
 ) : OrchestratorManager {
 
     override val ongoingStep = MutableLiveData<Step?>()
     override val appResponse = MutableLiveData<AppResponse?>()
-
-    private val hotCache = HotCache()
 
     internal lateinit var modalities: List<Modality>
     internal lateinit var appRequest: AppRequest
@@ -44,18 +43,19 @@ open class OrchestratorManagerImpl(
         proceedToNextStepOrAppResponse()
     }
 
-    override fun restoreState(steps: List<Step>) {
+    override fun restoreState() {
         resetInternalState()
-
-        modalitiesFlow.restoreState(steps)
+        hotCache.load()?.let(modalitiesFlow::restoreState)
         proceedToNextStepOrAppResponse()
     }
 
-    override fun getState(): List<Step> = modalitiesFlow.steps
+    override fun clearState() {
+        hotCache.clear()
+    }
 
     private fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {
-            if (!anyStepOnGoing()) {
+            if (!anyStepOngoing()) {
                 val potentialNextStep = getNextStepToLaunch()
                 if (potentialNextStep != null) {
                     startStep(potentialNextStep)
@@ -73,7 +73,7 @@ open class OrchestratorManagerImpl(
         hotCache.save(step)
     }
 
-    private fun ModalityFlow.anyStepOnGoing() =
+    private fun ModalityFlow.anyStepOngoing() =
         steps.any { it.status == ONGOING }
 
     private fun buildAppResponse() {

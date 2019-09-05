@@ -8,7 +8,7 @@ import com.simprints.moduleapi.face.requests.IFaceRequestType.CAPTURE as ModuleA
 
 @Parcelize
 data class FaceCaptureRequest(val nFaceSamplesToCapture: Int,
-                              override val type: FaceRequestType = CAPTURE) : FaceRequest
+                              override val type: FaceRequestType = CAPTURE) : FaceRequest()
 
 fun FaceCaptureRequest.fromDomainToModuleApi(): IFaceCaptureRequest =
     IFaceCaptureRequestImpl(nFaceSamplesToCapture)

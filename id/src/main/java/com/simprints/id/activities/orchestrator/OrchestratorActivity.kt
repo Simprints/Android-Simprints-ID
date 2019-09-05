@@ -26,6 +26,8 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var timeHelper: TimeHelper
 
+    private var isRestored = false
+
     private val observerForNextStep = Observer<Step?> {
         it?.let {
             with(Intent().setClassName(packageName, it.activityName)) {
@@ -60,29 +62,22 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-
-        savedInstanceState?.getParcelableArrayList<Step>(RESTORE_STATE_KEY)?.let {
-            vm.restoreState(it)
-        }
+        isRestored = true
     }
 
     override fun onResume() {
         super.onResume()
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
+
+        if (isRestored)
+            vm.restoreState()
+        else
+            vm.clearState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(requestCode, resultCode, data)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList(RESTORE_STATE_KEY, ArrayList(vm.getStateOfSteps()))
-    }
-
-    companion object {
-        const val RESTORE_STATE_KEY = "state"
     }
 }

@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import android.content.SharedPreferences
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
@@ -16,6 +17,8 @@ import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.orchestrator.builders.AppResponseFactory
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
@@ -76,8 +79,9 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorManager(modalityFlowFactory: ModalityFlowFactory,
-                                   appResponseFactory: AppResponseFactory): OrchestratorManager =
-        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory)
+                                   appResponseFactory: AppResponseFactory,
+                                   hotCache: HotCache): OrchestratorManager =
+        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache)
 
     @Provides
     fun provideOrchestratorEventsHelper(sessionEventsManager: SessionEventsManager,
@@ -90,5 +94,8 @@ class OrchestratorModule {
                                             preferenceManager: PreferencesManager,
                                             sessionEventsManager: SessionEventsManager) =
         OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager.modalities, sessionEventsManager, DomainToModuleApiAppResponse)
+
+    @Provides
+    fun provideHotCache(preferences: SharedPreferences) : HotCache = HotCacheImpl(preferences)
 
 }
