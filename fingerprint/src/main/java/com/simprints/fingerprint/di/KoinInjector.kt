@@ -29,7 +29,6 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
-import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
@@ -99,7 +98,6 @@ object KoinInjector {
         single<ScannerManager> { ScannerManagerImpl(get()) }
 
         factory { FinalResultBuilder() }
-        factory { RunnableTaskDispatcher() }
         factory { Orchestrator(get()) }
     }
 
@@ -114,7 +112,7 @@ object KoinInjector {
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { OrchestratorViewModel(get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
     }
