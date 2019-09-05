@@ -5,7 +5,6 @@ import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTa
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 
@@ -27,7 +26,7 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
 
     private fun FingerprintCaptureRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest( // TODO : Remove project, user, module from task request once Identify & Verify removed
-            "", "", "", this.toAction().activityTitle, language, fingerStatus
+            "", "", "", activityTitle, language, fingerStatus
         )
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =

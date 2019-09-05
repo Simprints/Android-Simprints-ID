@@ -19,8 +19,10 @@ import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
-import com.simprints.testtools.common.syntax.*
-import io.reactivex.Completable
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.anyOrNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenThis
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -60,26 +62,23 @@ class FingerprintFlowsIntegrationTest: KoinTest {
             whenThis { loadPeople(anyNotNull(), anyOrNull(), anyOrNull()) } thenReturn Single.just(
                 PeopleGeneratorUtils.getRandomPeople(NUMBER_OF_PEOPLE_IN_DB)
             )
-            whenThis { savePerson(anyNotNull()) } thenReturn Completable.complete()
         }
     }
 
     @Test
-    fun enrolFlow_finishesSuccessfully() {
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
+    fun captureFlow_finishesSuccessfully() {
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
-            resultData.setExtrasClassLoader(IFingerprintEnrolResponse::class.java.classLoader)
+            resultData.setExtrasClassLoader(IFingerprintCaptureResponse::class.java.classLoader)
             assertEquals(Activity.RESULT_OK, resultCode)
-            assertNotNull(resultData?.extras?.getParcelable<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                assertEquals(IFingerprintResponseType.ENROL, type)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.CAPTURE, type)
             })
         }
-
-        verifyOnce(dbManagerMock) { savePerson(anyNotNull()) }
     }
 
     @Test
