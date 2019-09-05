@@ -22,9 +22,6 @@ object DomainToFingerprintResponse {
             IFingerprintImpl(it.fingerId.fromDomainToModuleApi(), it.templateBytes, it.qualityScore)
         })
 
-    @Deprecated("To be replaced with fromDomainToFingerprintCaptureResponse")
-    fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
-
     fun fromDomainToFingerprintVerifyResponse(verify: FingerprintVerifyResponse): IFingerprintVerifyResponse {
         val matchingResult = IMatchingResultImpl(verify.guid, verify.confidence, toIFingerprintResponseTier(verify.tier))
         return IFingerprintVerifyResponseImpl(matchingResult)
@@ -78,12 +75,6 @@ private class IFingerprintErrorResponseImpl(override val error: IFingerprintErro
 @Parcelize
 private class IFingerprintCaptureResponseImpl(override val fingerprints: List<IFingerprint>) : IFingerprintCaptureResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
-}
-
-@Deprecated("To be replaced with IFingerprintCaptureRequest")
-@Parcelize
-private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ENROL
 }
 
 @Parcelize

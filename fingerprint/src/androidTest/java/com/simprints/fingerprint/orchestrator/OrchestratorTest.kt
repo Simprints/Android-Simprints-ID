@@ -17,7 +17,6 @@ import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup

@@ -14,7 +14,7 @@ class RunnableTaskDispatcher: KoinComponent {
                 onResult: (getTaskResult: TaskResult) -> Unit) {
 
         val result: TaskResult = when (val request = task.createTaskRequest()) {
-            is SavePersonTaskRequest -> SavePersonTask(request, get(), get()).savePerson()
+            is SavePersonTaskRequest -> SavePersonTask(request, get()).savePerson()
             else -> throw InvalidRunnableTaskRequestException()
         }
 
