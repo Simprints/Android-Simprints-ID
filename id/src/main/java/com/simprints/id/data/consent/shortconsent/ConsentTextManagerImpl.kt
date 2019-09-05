@@ -17,16 +17,16 @@ class ConsentTextManagerImpl(private val context: Context,
     private val parentalConsentText = MutableLiveData<String>()
     private val parentalConsentExists = MutableLiveData(false)
 
-    override fun getGeneralConsentText(appRequest: AppRequest) = generalConsentText.also {
-        it.postValue(getGeneralConsentData().assembleText(context, appRequest))
+    override fun getGeneralConsentText(appRequest: AppRequest) = generalConsentText.apply {
+        postValue(getGeneralConsentData().assembleText(context, appRequest))
     }
 
-    override fun parentalConsentExists() = parentalConsentExists.also {
-        it.postValue(consentDataManager.parentalConsentExists)
+    override fun parentalConsentExists() = parentalConsentExists.apply {
+        postValue(consentDataManager.parentalConsentExists)
     }
 
-    override fun getParentalConsentText(appRequest: AppRequest) = parentalConsentText.also {
-        it.postValue(getParentalConsentData().assembleText(context, appRequest))
+    override fun getParentalConsentText(appRequest: AppRequest) = parentalConsentText.apply {
+        postValue(getParentalConsentData().assembleText(context, appRequest))
     }
 
     private fun getGeneralConsentData() =
