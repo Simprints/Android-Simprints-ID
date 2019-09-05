@@ -22,6 +22,11 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 
 class ModalityFlowEnrolImplTest {
 
+    companion object {
+        const val NUMBER_STEPS_FACE_OR_FINGER = 2
+        const val NUMBER_STEPS_FACE_AND_FINGER = 3
+    }
+
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
@@ -49,7 +54,7 @@ class ModalityFlowEnrolImplTest {
     fun enrolForFace_shouldCreateTheRightSteps() {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE))
 
-        assertThat(modalityFlowEnrol.steps).hasSize(2)
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
         verifyNever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
@@ -58,7 +63,7 @@ class ModalityFlowEnrolImplTest {
     fun enrolForFingerprint_shouldCreateTheRightSteps() {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER))
 
-        assertThat(modalityFlowEnrol.steps).hasSize(2)
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyNever(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
@@ -67,7 +72,7 @@ class ModalityFlowEnrolImplTest {
     fun enrolForFaceFingerprint_shouldCreateTheRightSteps() {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE, FINGER))
 
-        assertThat(modalityFlowEnrol.steps).hasSize(3)
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
@@ -78,7 +83,7 @@ class ModalityFlowEnrolImplTest {
     fun enrolForFingerprintFace_shouldCreateTheRightSteps() {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER, FACE))
 
-        assertThat(modalityFlowEnrol.steps).hasSize(3)
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)

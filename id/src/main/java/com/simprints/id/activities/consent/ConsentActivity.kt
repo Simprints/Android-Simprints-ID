@@ -41,8 +41,7 @@ class ConsentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_consent)
 
-        val component = (application as Application).component
-        component.inject(this)
+        injectDependencies()
 
         startConsentEventTime = timeHelper.now()
 
@@ -54,6 +53,11 @@ class ConsentActivity : AppCompatActivity() {
         setupTabs()
         setupObserversForUi()
         setupClickListeners()
+    }
+
+    private fun injectDependencies() {
+        val component = (application as Application).component
+        component.inject(this)
     }
 
     private fun setupTabs() {

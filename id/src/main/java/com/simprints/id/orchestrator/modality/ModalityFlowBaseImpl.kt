@@ -14,13 +14,13 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
-        with(appRequest) {
-            when {
-                this is AppEnrolRequest || this is AppIdentifyRequest -> {
-                    steps.add(buildCoreStep(projectId, userId, moduleId, metadata))
+        appRequest.let {
+            when (it) {
+                is AppEnrolRequest, is AppIdentifyRequest -> {
+                    steps.add(buildCoreStep(it.projectId, it.userId, it.moduleId, it.metadata))
                 }
-                this is AppVerifyRequest -> {
-                    steps.add(buildVerifyCoreStep(projectId, userId, moduleId, metadata))
+                is AppVerifyRequest -> {
+                    steps.add(buildVerifyCoreStep(it.projectId, it.userId, it.moduleId, it.metadata))
                 }
                 else -> Throwable("invalid AppRequest")
             }
