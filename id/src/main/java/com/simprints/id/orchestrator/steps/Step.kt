@@ -1,9 +1,11 @@
 package com.simprints.id.orchestrator.steps
 
 import android.os.Parcelable
+import com.google.gson.JsonParseException
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
@@ -87,7 +89,15 @@ data class Step(val requestCode: Int,
         }
 
         private fun JsonReader.parseRequest(): Request {
-            TODO()
+            val faceCapture = FaceCaptureRequest.tryParse(this)
+
+            val possibleRequests = listOf<Request?>(
+                faceCapture
+            )
+
+            return possibleRequests.first {
+                it != null
+            } ?: throw JsonParseException("Could not parse JSON into request")
         }
 
         private fun JsonReader.parseResult(): Result? {
