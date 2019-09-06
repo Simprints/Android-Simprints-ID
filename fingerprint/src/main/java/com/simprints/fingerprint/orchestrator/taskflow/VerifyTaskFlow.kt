@@ -2,7 +2,7 @@ package com.simprints.fingerprint.orchestrator.taskflow
 
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
@@ -12,21 +12,21 @@ import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 
-class VerifyTaskFlow : FingerprintTaskFlow() {
+class VerifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlow(fingerprintRequest) {
 
-    override fun computeFlow(fingerprintRequest: FingerprintRequest) {
+    init {
         with(fingerprintRequest as FingerprintVerifyRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
+                FingerprintTask.ConnectScanner(CONNECT) { createConnectScannerTaskRequest() },
                 FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() },
                 FingerprintTask.Matching(MATCHING) { createMatchingTaskRequest() }
             )
         }
     }
 
-    private fun FingerprintVerifyRequest.createLaunchTaskRequest() =
-        LaunchTaskRequest(
-            projectId, this.toAction(), language, logoExists, programName, organizationName
+    private fun FingerprintVerifyRequest.createConnectScannerTaskRequest() =
+        ConnectScannerTaskRequest(
+            language
         )
 
     private fun FingerprintVerifyRequest.createCollectFingerprintsTaskRequest() =
@@ -48,7 +48,7 @@ class VerifyTaskFlow : FingerprintTaskFlow() {
         finalResultBuilder.createVerifyResult(taskResults[MATCHING] as MatchingTaskVerifyResult)
 
     companion object {
-        private const val LAUNCH = "launch"
+        private const val CONNECT = "connect"
         private const val COLLECT = "collect"
         private const val MATCHING = "matching"
     }

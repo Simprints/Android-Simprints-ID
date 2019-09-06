@@ -8,15 +8,11 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
-import com.simprints.fingerprint.activities.launch.LaunchContract
-import com.simprints.fingerprint.activities.launch.LaunchPresenter
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
+import com.simprints.fingerprint.activities.connect.ConnectScannerViewModel
 import com.simprints.fingerprint.activities.matching.MatchingViewModel
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorViewModel
 import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
-import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
-import com.simprints.fingerprint.controllers.consentdata.ConsentDataManagerImpl
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -27,12 +23,8 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
-import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
-import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtilsImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.controllers.locationprovider.LocationProvider
-import com.simprints.fingerprint.controllers.locationprovider.LocationProviderImpl
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
@@ -42,19 +34,22 @@ import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
-import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import java.util.concurrent.atomic.AtomicInteger
 
 object KoinInjector {
 
+    private val consumers = AtomicInteger(0)
+
     private var koinModule: Module? = null
 
-    fun loadFingerprintKoinModules() {
+    fun acquireFingerprintKoinModules() {
+        consumers.incrementAndGet()
         if (koinModule == null) {
             val module = buildKoinModule()
             loadKoinModules(module)
@@ -62,10 +57,12 @@ object KoinInjector {
         }
     }
 
-    fun unloadFingerprintKoinModules() {
-        koinModule?.let {
-            unloadKoinModules(it)
-            koinModule = null
+    fun releaseFingerprintKoinModules() {
+        if (consumers.decrementAndGet() == 0) {
+            koinModule?.let {
+                unloadKoinModules(it)
+                koinModule = null
+            }
         }
     }
 
@@ -84,7 +81,6 @@ object KoinInjector {
         factory { appComponent().getCrashReportManager() }
         factory { appComponent().getTimeHelper() }
         factory { appComponent().getDbManager() }
-        factory { appComponent().getSimNetworkUtils() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
     }
@@ -96,15 +92,11 @@ object KoinInjector {
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
-        factory<FingerprintSimNetworkUtils> { FingerprintSimNetworkUtilsImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
         single<ScannerManager> { ScannerManagerImpl(get()) }
-
-        factory<ConsentDataManager> { ConsentDataManagerImpl(get(), get()) }
-        factory<LocationProvider> { LocationProviderImpl(androidContext()) }
 
         factory { FinalResultBuilder() }
         factory { RunnableTaskDispatcher() }
@@ -118,14 +110,12 @@ object KoinInjector {
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
             CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get())
         }
-        factory<LaunchContract.Presenter> { (view: LaunchContract.View, request: LaunchTaskRequest) ->
-            LaunchPresenter(view, request, get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
-        }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
         }
 
         viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
     }
 

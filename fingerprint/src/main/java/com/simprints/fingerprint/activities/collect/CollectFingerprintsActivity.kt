@@ -18,6 +18,8 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -49,6 +51,7 @@ class CollectFingerprintsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
+        acquireFingerprintKoinModules()
         logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -188,5 +191,6 @@ class CollectFingerprintsActivity :
         viewPresenter.disconnectScannerIfNeeded()
         super.onDestroy()
         logActivityDestroyed()
+        releaseFingerprintKoinModules()
     }
 }
