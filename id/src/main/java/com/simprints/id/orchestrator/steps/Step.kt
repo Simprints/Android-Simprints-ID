@@ -9,6 +9,7 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import kotlinx.android.parcel.Parcelize
@@ -90,10 +91,9 @@ data class Step(val requestCode: Int,
 
         private fun JsonReader.parseRequest(): Request {
             val faceCapture = FaceCaptureRequest.tryParse(this)
+            val fingerprintEnrol = FingerprintEnrolRequest.tryParse(this)
 
-            val possibleRequests = listOf<Request?>(
-                faceCapture
-            )
+            val possibleRequests = listOf(faceCapture, fingerprintEnrol)
 
             return possibleRequests.first {
                 it != null
