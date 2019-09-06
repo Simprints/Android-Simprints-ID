@@ -33,9 +33,7 @@ class FingerprintSessionEventsManagerImpl(private val sessionEventsManager: Sess
 
     private fun fromDomainToCore(event: Event): CoreEvent? =
         when (event.type) {
-            CANDIDATE_READ -> (event as CandidateReadEvent).fromDomainToCore()
             REFUSAL_RESPONSE -> (event as RefusalEvent).fromDomainToCore()
-            CONSENT -> (event as ConsentEvent).fromDomainToCore()
             FINGERPRINT_CAPTURE -> (event as FingerprintCaptureEvent).fromDomainToCore()
             ONE_TO_ONE_MATCH -> (event as OneToOneMatchEvent).fromDomainToCore()
             ONE_TO_MANY_MATCH -> (event as OneToManyMatchEvent).fromDomainToCore()

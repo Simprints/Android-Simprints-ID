@@ -3,7 +3,7 @@ package com.simprints.fingerprint.orchestrator.domain
 enum class RequestCode(val value: Int) {
 
     // Activities started normally in orchestrator flow
-    LAUNCH(201),
+    CONNECT(201),
     COLLECT(202),
     MATCHING(203),
 

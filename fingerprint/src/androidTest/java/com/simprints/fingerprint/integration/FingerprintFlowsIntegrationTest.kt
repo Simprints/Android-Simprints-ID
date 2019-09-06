@@ -3,9 +3,10 @@ package com.simprints.fingerprint.integration
 import android.app.Activity
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.LargeTest
 import androidx.test.rule.GrantPermissionRule
-import com.simprints.fingerprint.activities.collectfingerprint.pressScanUntilDialogIsDisplayedAndClickConfirm
-import com.simprints.fingerprint.activities.launch.setupActivityAndContinue
+import com.simprints.fingerprint.activities.collect.pressScanUntilDialogIsDisplayedAndClickConfirm
+import com.simprints.fingerprint.activities.collect.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -13,8 +14,8 @@ import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchR
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
-import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.moduleapi.fingerprint.responses.*
@@ -32,6 +33,7 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
+@LargeTest
 class FingerprintFlowsIntegrationTest: KoinTest {
 
     private val dbManagerMock: FingerprintDbManager = mock()
@@ -42,7 +44,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
 
     @Before
     fun setUp() {
-        loadFingerprintKoinModules()
+        acquireFingerprintKoinModules()
         declare {
             single<ScannerManager> { ScannerManagerImpl(SimulatedBluetoothAdapter(SimulatedScannerManager())) }
             factory { dbManagerMock }
@@ -66,7 +68,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun enrolFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
@@ -84,7 +86,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun identifyFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
@@ -100,7 +102,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     fun verifyFlow_finishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
 
-        setupActivityAndContinue()
+        waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
         with(scenario.result) {
@@ -115,7 +117,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     @After
     fun tearDown() {
         if (::scenario.isInitialized) scenario.close()
-        unloadFingerprintKoinModules()
+        releaseFingerprintKoinModules()
     }
 
     companion object {

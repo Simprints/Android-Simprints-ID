@@ -73,7 +73,7 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun handleBackPressed() {
-        if (alertType == UNEXPECTED_ERROR || alertType == GUID_NOT_FOUND_ONLINE) {
+        if (alertType == UNEXPECTED_ERROR) {
             view.finishWithAction(BACK)
         } else {
             view.startRefusalActivity()

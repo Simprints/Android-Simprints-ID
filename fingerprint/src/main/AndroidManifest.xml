@@ -39,7 +39,7 @@
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.simprints.fingerprint.activities.launch.LaunchActivity"
+            android:name="com.simprints.fingerprint.activities.connect.ConnectScannerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

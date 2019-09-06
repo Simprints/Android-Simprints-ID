@@ -3,9 +3,9 @@ package com.simprints.fingerprint.orchestrator.task
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.launch.LaunchActivity
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
+import com.simprints.fingerprint.activities.connect.ConnectScannerActivity
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
@@ -34,14 +34,14 @@ sealed class FingerprintTask(
         val resultBundleKey: String
     ) : FingerprintTask(taskResultKey, createTaskRequest)
 
-    class Launch(taskResultKey: String, createLaunchTaskRequest: () -> LaunchTaskRequest) :
+    class ConnectScanner(taskResultKey: String, createConnectScannerTaskRequest: () -> ConnectScannerTaskRequest) :
         ActivityTask(
             taskResultKey,
-            createLaunchTaskRequest,
-            LaunchActivity::class.java,
-            RequestCode.LAUNCH,
-            LaunchTaskRequest.BUNDLE_KEY,
-            LaunchTaskResult.BUNDLE_KEY
+            createConnectScannerTaskRequest,
+            ConnectScannerActivity::class.java,
+            RequestCode.CONNECT,
+            ConnectScannerTaskRequest.BUNDLE_KEY,
+            ConnectScannerTaskResult.BUNDLE_KEY
         )
 
     class CollectFingerprints(taskResultKey: String, createCollectFingerprintsTaskRequest: () -> CollectFingerprintsTaskRequest) :
