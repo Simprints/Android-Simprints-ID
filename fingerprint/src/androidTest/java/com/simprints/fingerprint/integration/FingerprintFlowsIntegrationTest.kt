@@ -40,7 +40,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
 
     private val dbManagerMock: FingerprintDbManager = mock()
 
-    @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
