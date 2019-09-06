@@ -7,19 +7,20 @@ import com.simprints.id.orchestrator.steps.Step
 
 class HotCacheImpl(private val preferences: SharedPreferences) : HotCache {
 
-    private val gson by lazy {
-        GsonBuilder().also(::registerStepAdapter).create()
-    }
+    private val gson = GsonBuilder().also(::registerStepAdapter).create()
 
     private val steps by lazy { preferences.getStringSet(KEY_STEPS, null)?.toMutableSet() }
 
-    override fun save(step: Step) {
-        val encryptedStep = encrypt(step)
-        steps?.add(encryptedStep)
-        preferences.edit().putStringSet(KEY_STEPS, steps).apply()
+    override fun save(step: Step?) {
+        step?.let {
+            encrypt(it).also { encryptedStep ->
+                steps?.add(encryptedStep)
+                preferences.edit()?.putStringSet(KEY_STEPS, steps)?.apply()
+            }
+        }
     }
 
-    override fun load() = steps?.map { decrypt(it) }
+    override fun load() = steps?.mapNotNull { decrypt(it) }
 
     override fun clear() {
         preferences.edit().putStringSet(KEY_STEPS, null).apply()
@@ -30,9 +31,11 @@ class HotCacheImpl(private val preferences: SharedPreferences) : HotCache {
         return Base64.encodeToString(json.toByteArray(), Base64.DEFAULT)
     }
 
-    private fun decrypt(encryptedJson: String): Step {
-        val json = String(Base64.decode(encryptedJson, Base64.DEFAULT))
-        return gson.fromJson(json, Step::class.java)
+    private fun decrypt(encryptedJson: String?): Step? {
+        return encryptedJson?.let {
+            val json = String(Base64.decode(it, Base64.DEFAULT))
+            gson.fromJson(json, Step::class.java)
+        }
     }
 
     private fun registerStepAdapter(gsonBuilder: GsonBuilder) {

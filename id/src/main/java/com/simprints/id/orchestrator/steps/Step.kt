@@ -42,8 +42,8 @@ data class Step(val requestCode: Int,
     }
 
     class JsonAdapter : TypeAdapter<Step>() {
-        override fun read(input: JsonReader): Step {
-            val step: Step
+        override fun read(input: JsonReader): Step? {
+            var step: Step? = null
 
             with(input) {
                 var requestCode = -1
@@ -66,13 +66,14 @@ data class Step(val requestCode: Int,
                     }
                 }
 
-                step = Step(requestCode, activityName, bundleKey, request!!, status).also {
-                    it.result = response
+                request?.let {
+                    step = Step(requestCode, activityName, bundleKey, request, status).also {
+                        it.result = response
+                    }
                 }
-
-                endObject()
             }
 
+            input.endObject()
             return step
         }
 
