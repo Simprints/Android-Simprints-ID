@@ -44,7 +44,7 @@ import org.koin.test.mock.declare
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerScannerActivityAndroidTest: KoinTest {
 
-    @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
