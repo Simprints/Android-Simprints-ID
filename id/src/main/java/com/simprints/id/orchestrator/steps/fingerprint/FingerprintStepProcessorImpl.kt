@@ -19,7 +19,7 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
                                    private val prefs: PreferencesManager) : FingerprintStepProcessor {
 
     companion object {
-        const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.launch.LaunchActivity"
+        const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }
 
     override fun buildStepEnrol(projectId: String,

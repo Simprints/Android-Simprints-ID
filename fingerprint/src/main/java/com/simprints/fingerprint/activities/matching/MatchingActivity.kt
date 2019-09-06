@@ -15,6 +15,8 @@ import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
@@ -31,6 +33,7 @@ class MatchingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        acquireFingerprintKoinModules()
         logActivityCreated()
 
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
@@ -135,5 +138,6 @@ class MatchingActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         logActivityDestroyed()
+        releaseFingerprintKoinModules()
     }
 }
