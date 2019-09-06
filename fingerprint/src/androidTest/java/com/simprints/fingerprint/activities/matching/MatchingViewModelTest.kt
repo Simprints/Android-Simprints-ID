@@ -22,8 +22,8 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.EVENT
 import com.simprints.fingerprintmatcher.LibMatcher
@@ -88,7 +88,7 @@ class MatchingViewModelTest : KoinTest {
 
     @Before
     fun setUp() {
-        loadFingerprintKoinModules()
+        acquireFingerprintKoinModules()
         declare {
             factory { dbManagerMock }
             factory { crashReportManagerMock }
@@ -273,7 +273,7 @@ class MatchingViewModelTest : KoinTest {
 
     @After
     fun tearDown() {
-        unloadFingerprintKoinModules()
+        releaseFingerprintKoinModules()
     }
 
     companion object {

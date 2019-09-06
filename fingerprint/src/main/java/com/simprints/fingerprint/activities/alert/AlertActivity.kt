@@ -15,6 +15,8 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.logActivityCreated
@@ -30,6 +32,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        acquireFingerprintKoinModules()
         logActivityCreated()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -141,5 +144,6 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun onDestroy() {
         super.onDestroy()
         logActivityDestroyed()
+        releaseFingerprintKoinModules()
     }
 }
