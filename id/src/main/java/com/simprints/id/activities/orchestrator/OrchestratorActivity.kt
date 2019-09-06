@@ -54,7 +54,7 @@ class OrchestratorActivity : AppCompatActivity() {
         (application as Application).component.inject(this)
         super.onCreate(savedInstanceState)
 
-        appRequest = this.intent.extras?.getParcelable<AppRequest>(APP_REQUEST_BUNDLE_KEY)
+        appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
         vm.startModalityFlow(appRequest)
