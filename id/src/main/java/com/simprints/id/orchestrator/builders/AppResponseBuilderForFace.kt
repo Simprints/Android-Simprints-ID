@@ -45,8 +45,8 @@ class AppResponseBuilderForFace : AppResponseBuilderForModal {
     private fun buildAppIdentifyResponse(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse =
         AppIdentifyResponse(faceResponse.identifications.map { it.toAppMatchResult() }, sessionId)
 
-    private fun buildAppVerifyResponse(FaceResponse: FaceVerifyResponse): AppVerifyResponse =
-        AppVerifyResponse(FaceResponse.matchingResult.toAppMatchResult())
+    private fun buildAppVerifyResponse(faceResponse: FaceVerifyResponse): AppVerifyResponse =
+        AppVerifyResponse(faceResponse.matchingResult.toAppMatchResult())
 
     private fun buildAppEnrolResponse(faceResponse: FaceCaptureResponse): AppEnrolResponse {
         //TODO(Save in the db and build an app Enrol response) //STOPSHIP
