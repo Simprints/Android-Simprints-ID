@@ -13,9 +13,9 @@ import com.simprints.fingerprint.data.domain.toAction
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 
-class IdentifyTaskFlow : FingerprintTaskFlow() {
+class IdentifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlow(fingerprintRequest) {
 
-    override fun computeFlow(fingerprintRequest: FingerprintRequest) {
+    init {
         with(fingerprintRequest as FingerprintIdentifyRequest) {
             fingerprintTasks = listOf(
                 FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },
