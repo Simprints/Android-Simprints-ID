@@ -3,6 +3,7 @@ package com.simprints.fingerprint.orchestrator
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.orchestrator.taskflow.FingerprintTaskFlow
 import com.simprints.fingerprint.orchestrator.taskflow.toFingerprintTaskFlow
@@ -28,4 +29,15 @@ class Orchestrator(private val finalResultBuilder: FinalResultBuilder) {
     fun getNextTask() = taskFlow.getCurrentTask()
 
     fun getFinalResult() = taskFlow.getFinalResult(finalResultBuilder)
+
+    fun restoreState(orchestratorState: OrchestratorState) {
+        if (orchestratorState.fingerprintTaskFlowState != null) {
+            taskFlow = FingerprintTaskFlow.fromState(orchestratorState.fingerprintTaskFlowState)
+        }
+    }
+
+    fun getState(): OrchestratorState =
+        OrchestratorState(
+            if (::taskFlow.isInitialized) taskFlow.getState() else null
+        )
 }
