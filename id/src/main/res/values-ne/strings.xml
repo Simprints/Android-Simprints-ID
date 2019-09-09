@@ -25,12 +25,12 @@
     <string name="short_consent">सिम्प्रिन्ट्सले तपाइँको औंलाको छाप र स्थानबाट तपाइँको सहि पहिचान गर्दछ र यसबाट हामीलाई तपाइंको जानकारी भेटाउन सजिलो हुन्छ | यसमा तपाइँलाइ अफ्ठ्यारो लाग्छ भने मलाई भन्न सक्नुहुन्छ | लाग्दैन भने कृपया आफ्नो देब्रे बुढी औंला यो स्क्यानरमा राख्नुहोस |</string>
     <string name="confirm_consent">आफ्नो सहमति जनाउन यहाँ थिच्नुहोस</string>
     <!-- Loading Messages-->
-    <string name="loading">लोड हुँदै</string>
+    <string name="connect_scanner_loading">लोड हुँदै</string>
     <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै…</string>
     <string name="launch_checking_permissions">"अनुमति जाँच गर्दै… "</string>
-    <string name="launch_bt_connect">Vero जडान…</string>
-    <string name="launch_wake_un20">" UN20 उठ्दै…"</string>
-    <string name="launch_setup">ঠিককরা Vero</string>
+    <string name="connect_scanner_bt_connect">Vero जडान…</string>
+    <string name="connect_scanner_wake_un20">" UN20 उठ्दै…"</string>
+    <string name="connect_scanner_setup">ঠিককরা Vero</string>
     <string name="launch_checking_person_in_db">डेटाबेसमा व्यक्तिको खोजी गर्दै …</string>
 
 

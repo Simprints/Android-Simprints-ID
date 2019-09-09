@@ -9,6 +9,7 @@ import com.simprints.fingerprint.exceptions.unexpected.result.NoTaskResultExcept
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
+import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
@@ -23,6 +24,12 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
         orchestrator.start(fingerprintRequest)
         executeNextTaskOrFinish()
     }
+
+    fun restoreState(orchestratorState: OrchestratorState) {
+        orchestrator.restoreState(orchestratorState)
+    }
+
+    fun getState() = orchestrator.getState()
 
     fun handleActivityResult(activityResult: ActivityResult) {
         orchestrator.handleActivityTaskResult(

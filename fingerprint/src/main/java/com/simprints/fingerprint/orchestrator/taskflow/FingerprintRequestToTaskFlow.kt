@@ -8,8 +8,8 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
     when (this) {
-        is FingerprintEnrolRequest -> EnrolTaskFlow()
-        is FingerprintIdentifyRequest -> IdentifyTaskFlow()
-        is FingerprintVerifyRequest -> VerifyTaskFlow()
+        is FingerprintEnrolRequest -> EnrolTaskFlow(this)
+        is FingerprintIdentifyRequest -> IdentifyTaskFlow(this)
+        is FingerprintVerifyRequest -> VerifyTaskFlow(this)
         else -> throw InvalidRequestForFingerprintException("Could not get task flow for request")
-    }.also { it.computeFlow(this) }
+    }
