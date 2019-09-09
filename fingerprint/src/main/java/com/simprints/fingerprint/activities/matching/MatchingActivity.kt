@@ -8,22 +8,20 @@ import android.os.Handler
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_matching.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class MatchingActivity : AppCompatActivity() {
+class MatchingActivity : FingerprintActivity() {
 
     private val viewModel: MatchingViewModel by viewModel()
 
@@ -31,7 +29,6 @@ class MatchingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logActivityCreated()
 
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
@@ -130,10 +127,5 @@ class MatchingActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         viewModel.handleBackPressed()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
     }
 }

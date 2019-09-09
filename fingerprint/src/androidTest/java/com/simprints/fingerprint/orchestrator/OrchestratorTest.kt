@@ -26,6 +26,7 @@ import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskResult
 import com.simprints.moduleapi.fingerprint.responses.*
+import com.simprints.testtools.common.syntax.failTest
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -139,6 +140,31 @@ class OrchestratorTest {
             with(getFinalResult()) {
                 assertEquals(Activity.RESULT_CANCELED, resultCode)
                 assertNull(resultData?.extras)
+            }
+        }
+    }
+
+    @Test
+    fun newOrchestrator_resumedFromStateAfterStarted_shouldAssumeNewState() {
+        val state = with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintRequest(Action.IDENTIFY))
+            assertNextTaskIs<Launch>()
+            okLaunchResult()
+            assertNextTaskIs<CollectFingerprints>()
+            okCollectResult()
+            getState()
+        }
+
+        with(Orchestrator(FinalResultBuilder())) {
+            start(createFingerprintRequest(Action.IDENTIFY))
+            restoreState(state ?: failTest("Orchestrator state is null"))
+            assertNextTaskIs<Matching>()
+            okMatchingIdentifyResult()
+            with(getFinalResult()) {
+                assertEquals(Activity.RESULT_OK, resultCode)
+                assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                    assertEquals(IFingerprintResponseType.IDENTIFY, type)
+                })
             }
         }
     }

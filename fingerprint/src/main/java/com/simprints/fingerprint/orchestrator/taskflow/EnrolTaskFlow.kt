@@ -10,9 +10,9 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
-class EnrolTaskFlow : FingerprintTaskFlow() {
+class EnrolTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTaskFlow(fingerprintRequest) {
 
-    override fun computeFlow(fingerprintRequest: FingerprintRequest) {
+    init {
         with(fingerprintRequest) {
             fingerprintTasks = listOf(
                 FingerprintTask.Launch(LAUNCH) { createLaunchTaskRequest() },

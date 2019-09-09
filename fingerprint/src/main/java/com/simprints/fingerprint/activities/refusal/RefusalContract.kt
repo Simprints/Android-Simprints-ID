@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.refusal
 
-import com.simprints.fingerprint.activities.BasePresenter
-import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.activities.base.BasePresenter
+import com.simprints.fingerprint.activities.base.BaseView
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 
 interface RefusalContract {
