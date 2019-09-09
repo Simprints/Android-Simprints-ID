@@ -7,7 +7,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
-    when (this) {
+    when (this) { // TODO : use safer method (either store type in enum or sealed class)
         is FingerprintEnrolRequest -> EnrolTaskFlow(this)
         is FingerprintIdentifyRequest -> IdentifyTaskFlow(this)
         is FingerprintVerifyRequest -> VerifyTaskFlow(this)

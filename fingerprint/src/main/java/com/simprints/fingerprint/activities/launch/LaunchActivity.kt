@@ -7,23 +7,19 @@ import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
 import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForLaunchActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.tbruyelle.rxpermissions2.Permission
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -32,7 +28,7 @@ import kotlinx.android.synthetic.main.activity_launch.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class LaunchActivity : AppCompatActivity(), LaunchContract.View {
+class LaunchActivity : FingerprintActivity(), LaunchContract.View {
 
     private lateinit var launchRequest: LaunchTaskRequest
     override val viewPresenter: LaunchContract.Presenter by inject { parametersOf(this, launchRequest) }
@@ -45,8 +41,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
-        acquireFingerprintKoinModules()
-        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         launchRequest = this.intent.extras?.getParcelable(LaunchTaskRequest.BUNDLE_KEY) as LaunchTaskRequest?
@@ -143,12 +137,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View {
     override fun onPause() {
         super.onPause()
         viewPresenter.handleOnPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
-        releaseFingerprintKoinModules()
     }
 
     override fun continueToNextActivity() {
