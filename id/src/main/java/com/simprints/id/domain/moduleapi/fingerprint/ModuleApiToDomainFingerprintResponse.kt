@@ -13,7 +13,7 @@ object ModuleApiToDomainFingerprintResponse {
             IFingerprintResponseType.ENROL -> fromModuleApiToFingerprintEnrolResponse(fingerprintResponse as IFingerprintEnrolResponse)
             IFingerprintResponseType.VERIFY -> fromModuleApiToFingerprintVerifyResponse(fingerprintResponse as IFingerprintVerifyResponse)
             IFingerprintResponseType.IDENTIFY -> fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse as IFingerprintIdentifyResponse)
-            IFingerprintResponseType.REFUSAL -> fromModuleApiToFingerprintRefusalResponse(fingerprintResponse as IFingerprintRefusalFormResponse)
+            IFingerprintResponseType.REFUSAL -> fromModuleApiToFingerprintRefusalResponse(fingerprintResponse as IFingerprintExitFormResponse)
             IFingerprintResponseType.ERROR -> fromModuleApiToFingerprintErrorResponse(fingerprintResponse as IFingerprintErrorResponse)
         }
 
@@ -39,16 +39,16 @@ object ModuleApiToDomainFingerprintResponse {
     private fun fromFingerprintToDomainMatchingResult(matchingResult: IMatchingResult): FingerprintMatchingResult =
         FingerprintMatchingResult(matchingResult.guid, matchingResult.confidence, fromFingerprintToDomainTier(matchingResult.tier))
 
-    private fun fromModuleApiToFingerprintRefusalResponse(fingerprintResponse: IFingerprintRefusalFormResponse): FingerprintResponse {
+    private fun fromModuleApiToFingerprintRefusalResponse(fingerprintResponse: IFingerprintExitFormResponse): FingerprintResponse {
 
         val reason = when(fingerprintResponse.reason) {
-            IFingerprintRefusalReason.REFUSED_RELIGION -> FingerprintRefusalFormReason.REFUSED_RELIGION
-            IFingerprintRefusalReason.REFUSED_DATA_CONCERNS -> FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS
-            IFingerprintRefusalReason.REFUSED_PERMISSION -> FingerprintRefusalFormReason.REFUSED_PERMISSION
-            IFingerprintRefusalReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
-            IFingerprintRefusalReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
-            IFingerprintRefusalReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
-            IFingerprintRefusalReason.OTHER -> FingerprintRefusalFormReason.OTHER
+            IFingerprintExitReason.REFUSED_RELIGION -> FingerprintRefusalFormReason.REFUSED_RELIGION
+            IFingerprintExitReason.REFUSED_DATA_CONCERNS -> FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS
+            IFingerprintExitReason.REFUSED_PERMISSION -> FingerprintRefusalFormReason.REFUSED_PERMISSION
+            IFingerprintExitReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
+            IFingerprintExitReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
+            IFingerprintExitReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
+            IFingerprintExitReason.OTHER -> FingerprintRefusalFormReason.OTHER
         }
 
         return FingerprintRefusalFormResponse(reason, fingerprintResponse.extra)
