@@ -4,8 +4,8 @@ import android.app.ProgressDialog
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import com.simprints.fingerprint.activities.BasePresenter
-import com.simprints.fingerprint.activities.BaseView
+import com.simprints.fingerprint.activities.base.BasePresenter
+import com.simprints.fingerprint.activities.base.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult

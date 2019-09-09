@@ -31,13 +31,9 @@ class Orchestrator(private val finalResultBuilder: FinalResultBuilder) {
     fun getFinalResult() = taskFlow.getFinalResult(finalResultBuilder)
 
     fun restoreState(orchestratorState: OrchestratorState) {
-        if (orchestratorState.fingerprintTaskFlowState != null) {
-            taskFlow = FingerprintTaskFlow.fromState(orchestratorState.fingerprintTaskFlowState)
-        }
+        taskFlow = FingerprintTaskFlow.fromState(orchestratorState.fingerprintTaskFlowState)
     }
 
-    fun getState(): OrchestratorState =
-        OrchestratorState(
-            if (::taskFlow.isInitialized) taskFlow.getState() else null
-        )
+    fun getState(): OrchestratorState? =
+        if (::taskFlow.isInitialized) OrchestratorState(taskFlow.getState()) else null
 }
