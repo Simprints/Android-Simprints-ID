@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Simprints ID</string>
-    <string name="launch_consent_accept_button">Fudhadheera</string>
-    <string name="launch_consent_decline_button">Hin fudhanne</string>
-    <string name="consent_enrol">%1$s keessatti sigalmeessuu fi gara fula duraatti ragaa kee adda sibaasuuf mallattoon qubaakee na barbaachisa.&#160;</string>
-    <string name="consent_parental_enrol">%1$s keessatti daa\’ima kee galmeessuu fi gara fula duraatti odeeffanno daa\’ima kee adda baasuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
-    <string name="consent_id_verify">Odeeffannoo kee %1$s keessaa barbaadee argachuuf mallattoon qubaakee na barbaachisa.&#160;</string>
-    <string name="consent_parental_id_verify">Odeeffannoo daa\’ima kee %1$s keessaa barbaadee argachuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
-    <string name="consent_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \‘UK-based nonprofit\’ qofatu fayyadama.&#160;</string>
-    <string name="consent_parental_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \'UK-based nonprofit\' qofatu fayyadama.&#160;</string>
-    <string name="consent_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
-    <string name="consent_parental_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan daa\’ima kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
-    <string name="consent_confirmation">Mallattoo qubakee fayyadamuu nadanda’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin dabalataa qaba\".</string>
-    <string name="consent_general_title">Waliigaltee</string>
-    <string name="consent_parental_title">Waliigaltee maatii</string>
-    <string name="consent_parental_confirmation">Mallattoo qubaa mucaa kee fayyadamuu nadanda\’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin qaba\”.</string>
     <string name="cancel_button">Addaan kuti</string>
     <string name="close">Cufi</string>
     <string name="confirm">Mirkaneessi</string>
@@ -27,10 +13,9 @@
     <string name="l_3_finger_name">Quba bitaa 3ffaa</string>
     <string name="l_4_finger_name">Quba bitaa 4ffaa</string>
     <string name="l_5_finger_name">Quba bitaa 5ffaa</string>
-    <string name="launch_bt_connect">Veroo qunnamsiisii</string>
-    <string name="launch_checking_permissions">Eeyyama mirkanessaa jira</string>
-    <string name="launch_setup">Veroo mijeessii</string>
-    <string name="launch_wake_un20">UN20 dammaksii</string>
+    <string name="connect_scanner_bt_connect">Veroo qunnamsiisii</string>
+    <string name="connect_scanner_setup">Veroo mijeessii</string>
+    <string name="connect_scanner_wake_un20">UN20 dammaksii</string>
     <string name="loading_candidates">Maamila fe\'aa</string>
     <string name="matching_fingerprints">Ashaaraa qubaa wal-simsiisaa jira.</string>
     <string name="missing_finger"><u>Mallattoo quba hin fudhatamne</u></string>
@@ -55,7 +40,7 @@
     <string name="returning_results">Gara firii isaatti dibisii</string>
     <string name="scanner_confirmation_no">Lakkii</string>
     <string name="scanner_confirmation_yes">Eyyee</string>
-    <string name="scanner_id_comfirmation_message">Iskanara keetii %1$s?</string>
+    <string name="scanner_id_confirmation_message">Iskanara keetii %1$s?</string>
     <string name="scanner_not_working">Iskaanariin hin hojjeetu</string>
     <string name="title_fingerprint">Ashaaraa Qubaa</string>
     <string name="try_again_label">Irra deebi\'ii yaali</string>
@@ -76,7 +61,6 @@
     <string name="good_scan_message">Scan\' gaarii</string>
     <string name="l_1_finger_name">Abuudduu bitaa</string>
     <string name="l_2_finger_name">Quba bitaa quba guddaa</string>
-    <string name="launch_checking_person_in_db">Namni daataa beezii fayyadamaa jiraachuu mirkaneeffachaa jira.</string>
     <string name="low_battery_title">Hammi charjii tiriikaa(battery) gadi-aanaa dha.</string>
     <string name="multiple_scanners_found_message">Iskaanariin tokkoo ol bilbila waliin quunnamanii jiru, maaloo skaanarii hin barbaachisne bilbila waliin akka wal hin quunnamne taasisi.</string>
     <string name="please_scan">Maaloo \'scan\' godhi</string>

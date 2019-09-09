@@ -1,20 +1,18 @@
-package com.simprints.fingerprint.activities.collectfingerprint
+package com.simprints.fingerprint.activities.collect
 
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
-import com.simprints.fingerprint.activities.collect.ViewPagerCustom
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
-import com.simprints.fingerprint.di.KoinInjector.loadFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.unloadFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
+import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprintscanner.Scanner
 import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
@@ -35,7 +33,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Before
     fun setUp() {
-        loadFingerprintKoinModules()
+        acquireFingerprintKoinModules()
     }
 
     private fun mockScannerManagerWithScanner(scanner: Scanner) {
@@ -240,7 +238,7 @@ class CollectFingerprintsActivityTest: KoinTest {
     @After
     fun tearDown() {
         if (::scenario.isInitialized) scenario.close()
-        unloadFingerprintKoinModules()
+        releaseFingerprintKoinModules()
     }
 
     companion object {
