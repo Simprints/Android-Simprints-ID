@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse

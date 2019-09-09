@@ -25,7 +25,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
             with(appRequest) {
                 when (it) {
                     Modality.FINGER -> fingerprintStepProcessor.buildStepEnrol(projectId, userId, moduleId, metadata)
-                    Modality.FACE -> faceEnrolProcessor.buildStepEnrol(projectId, userId, moduleId)
+                    Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
                 }
             }
         }

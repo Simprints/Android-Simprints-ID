@@ -8,7 +8,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
@@ -42,7 +41,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
-        FaceStepProcessorImpl(faceRequestFactory, ModuleApiToDomainFaceResponse)
+        FaceStepProcessorImpl(faceRequestFactory)
 
     @Provides
     fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
