@@ -22,10 +22,10 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask.*
 import com.simprints.moduleapi.fingerprint.responses.*
+import com.simprints.testtools.common.syntax.failTest
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -154,7 +154,7 @@ class OrchestratorTest {
 
         with(Orchestrator(FinalResultBuilder())) {
             start(createFingerprintRequest(Action.IDENTIFY))
-            restoreState(state)
+            restoreState(state ?: failTest("Orchestrator state is null"))
             assertNextTaskIs<Matching>()
             okMatchingIdentifyResult()
             with(getFinalResult()) {
@@ -165,29 +165,6 @@ class OrchestratorTest {
             }
         }
     }
-
-    @Test
-    fun newOrchestrator_resumedFromEmptyState_shouldActLikeNew() {
-        val state = OrchestratorState(null)
-
-        with(Orchestrator(FinalResultBuilder())) {
-            start(createFingerprintRequest(Action.IDENTIFY))
-            restoreState(state)
-            assertNextTaskIs<ConnectScanner>()
-            okConnectResult()
-            assertNextTaskIs<CollectFingerprints>()
-            okCollectResult()
-            assertNextTaskIs<Matching>()
-            okMatchingIdentifyResult()
-            with(getFinalResult()) {
-                assertEquals(Activity.RESULT_OK, resultCode)
-                assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                    assertEquals(IFingerprintResponseType.IDENTIFY, type)
-                })
-            }
-        }
-    }
-
     private inline fun <reified T : FingerprintTask> Orchestrator.assertNextTaskIs() {
         assertFalse(isFinished())
         assertTrue(getNextTask() is T)

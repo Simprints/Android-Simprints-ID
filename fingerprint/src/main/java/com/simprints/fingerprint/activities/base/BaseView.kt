@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities
+package com.simprints.fingerprint.activities.base
 
 interface BaseView<T> {
 

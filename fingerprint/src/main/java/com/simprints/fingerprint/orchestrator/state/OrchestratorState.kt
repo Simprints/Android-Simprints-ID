@@ -5,5 +5,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class OrchestratorState(
-    val fingerprintTaskFlowState: FingerprintTaskFlowState?
+    val fingerprintTaskFlowState: FingerprintTaskFlowState
 ): Parcelable
