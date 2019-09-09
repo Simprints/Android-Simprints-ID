@@ -35,12 +35,12 @@ class AppResponseBuilderForFace : AppResponseBuilderForModal {
         }
     }
 
-    private fun buildAppIdentifyResponse(FaceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse =
-        AppIdentifyResponse(FaceResponse.identifications.map { it.toAppMatchResult() }, sessionId)
+    private fun buildAppIdentifyResponse(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse =
+        AppIdentifyResponse(faceResponse.identifications.map { it.toAppMatchResult() }, sessionId)
 
-    private fun buildAppVerifyResponse(FaceResponse: FaceVerifyResponse): AppVerifyResponse =
-        AppVerifyResponse(FaceResponse.matchingResult.toAppMatchResult())
+    private fun buildAppVerifyResponse(faceResponse: FaceVerifyResponse): AppVerifyResponse =
+        AppVerifyResponse(faceResponse.matchingResult.toAppMatchResult())
 
-    private fun buildAppEnrolResponse(FaceResponse: FaceEnrolResponse): AppEnrolResponse =
-        AppEnrolResponse(FaceResponse.guid)
+    private fun buildAppEnrolResponse(faceResponse: FaceEnrolResponse): AppEnrolResponse =
+        AppEnrolResponse(faceResponse.guid)
 }
