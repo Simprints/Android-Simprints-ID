@@ -68,11 +68,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        app:layout_goneMarginTop="40dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine">
+        app:layout_constraintTop_toBottomOf="@+id/simprintsLogoWithTagLine"
+        app:layout_goneMarginTop="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -90,47 +90,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:id="@+id/general"
+                <TextView
+                    android:id="@+id/generalConsentTextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:scrollbars="vertical"
+                    android:text="@string/short_consent"
+                    android:textColor="@color/simprints_white"
+                    android:textSize="20sp"
+                    app:autoSizeMaxTextSize="25sp" />
 
-                    <TextView
-                        android:id="@+id/generalConsentTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_horizontal"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:paddingTop="10dp"
-                        android:scrollbars="vertical"
-                        android:text="@string/short_consent"
-                        android:textColor="@color/simprints_white"
-                        android:textSize="20sp"
-                        app:autoSizeMaxTextSize="25sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/parental"
+                <TextView
+                    android:id="@+id/parentalConsentTextView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/parentalConsentTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center_horizontal"
-                        android:paddingLeft="10dp"
-                        android:paddingTop="10dp"
-                        android:paddingRight="10dp"
-                        android:scrollbars="vertical"
-                        android:text=""
-                        android:textColor="@color/simprints_white"
-                        android:textSize="20sp"
-                        app:autoSizeMaxTextSize="25sp" />
-                </LinearLayout>
+                    android:gravity="center_horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingRight="10dp"
+                    android:scrollbars="vertical"
+                    android:text=""
+                    android:textColor="@color/simprints_white"
+                    android:textSize="20sp"
+                    app:autoSizeMaxTextSize="25sp" />
 
             </FrameLayout>
         </LinearLayout>
