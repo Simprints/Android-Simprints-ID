@@ -1,7 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync
 
 import com.nhaarman.mockitokotlin2.any
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager

@@ -2,7 +2,6 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
@@ -11,6 +10,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -26,7 +26,7 @@ import java.io.Reader
 import java.util.*
 
 class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
-                       val local: LocalDbManager,
+                       private val syncInfoLocalDataSource: SyncInfoLocalDataSource,
                        val personRemoteDataSource: PersonRemoteDataSource,
                        val timeHelper: TimeHelper,
                        private val downSyncDao: DownSyncDao) : DownSyncTask {
@@ -141,7 +141,7 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
     private fun fetchDbSyncInfoFromRealmAndMigrateIt(): DownSyncStatus? {
         return try {
-            val dbSyncInfo = local.getDbSyncInfo(subSyncScope).blockingGet()
+            val dbSyncInfo = syncInfoLocalDataSource.load(subSyncScope)
             val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
 
             val newDownSyncStatus =
@@ -151,7 +151,7 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                     ?: DownSyncStatus(subSyncScope, dbSyncInfo.lastKnownPatientId, dbSyncInfo.lastKnownPatientUpdatedAt.time)
 
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
-            local.deleteSyncInfo(subSyncScope)
+            syncInfoLocalDataSource.delete(subSyncScope)
             newDownSyncStatus
         } catch (t: Throwable) {
             if (t is NoSuchDbSyncInfoException) {

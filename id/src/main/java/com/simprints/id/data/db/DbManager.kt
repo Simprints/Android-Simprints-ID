@@ -1,13 +1,13 @@
 package com.simprints.id.data.db
 
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.remote.RemoteProjectManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
@@ -16,7 +16,7 @@ import io.reactivex.Single
 interface DbManager {
 
     val personLocalDataSource: PersonLocalDataSource
-    val local: LocalDbManager
+    val projectLocalDataSource: ProjectLocalDataSource
     val remote: RemoteDbManager
     val personRemoteDataSource: PersonRemoteDataSource
     val remoteProjectManager: RemoteProjectManager

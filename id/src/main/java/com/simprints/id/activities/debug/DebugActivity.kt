@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.prefs.PreferencesManager
@@ -21,7 +20,7 @@ import javax.inject.Inject
 class DebugActivity : AppCompatActivity() {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var localDbManager: LocalDbManager
+    //@Inject lateinit var localDbManager: LocalDbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private lateinit var viewModel: DebugContract.Presenter

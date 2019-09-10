@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.remote.network
 
 import com.google.gson.JsonElement
-import com.simprints.id.domain.Project
+import com.simprints.id.data.db.project.domain.Project
 import com.simprints.core.network.NetworkConstants
 import io.reactivex.Single
 import retrofit2.Response

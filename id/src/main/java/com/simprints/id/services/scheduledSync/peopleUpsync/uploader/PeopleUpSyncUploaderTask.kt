@@ -9,14 +9,19 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
+import com.simprints.id.tools.extensions.bufferedChunks
 import io.reactivex.Flowable
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
+@InternalCoroutinesApi
 class PeopleUpSyncUploaderTask(
     private val loginInfoManager: LoginInfoManager,
     private val personLocalDataSource: PersonLocalDataSource,
@@ -54,9 +59,17 @@ class PeopleUpSyncUploaderTask(
     }
 
     private fun getPeopleToSyncInBatches(): Flowable<List<Person>> = Flowable.fromPublisher { publisher ->
-        runBlocking {
-            personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).collect {
-                publisher.onNext(listOf(it))
+        GlobalScope.launch {
+            try {
+
+                personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).bufferedChunks(batchSize).onEach {
+                    publisher.onNext(it)
+                }
+
+                publisher.onComplete()
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                publisher.onError(t)
             }
         }
     }

@@ -9,8 +9,7 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.DbSyncInfo
+import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
 import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
