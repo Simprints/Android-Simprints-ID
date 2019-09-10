@@ -12,15 +12,15 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 
 @RunWith(AndroidJUnit4::class)
-class ParcelisedObjectTest {
+class ParcelableConverterTest {
 
-    private lateinit var parcelisedObject: ParcelisedObject
+    private lateinit var converter: ParcelableConverter
 
     @Test
     fun withParcelableInput_shouldConvertToByteArray() {
-        parcelisedObject = ParcelisedObject(getParcelable())
-        val bytes = parcelisedObject.toBytes()
-        parcelisedObject.recycle()
+        converter = ParcelableConverter(getParcelable())
+        val bytes = converter.toBytes()
+        converter.recycle()
 
         assertThat(bytes, notNullValue())
         assertThat(bytes.size, greaterThan(0))
@@ -29,9 +29,9 @@ class ParcelisedObjectTest {
     @Test
     fun withByteArrayInput_shouldConvertToParcel() {
         val bytes = prepareByteArray()
-        parcelisedObject = ParcelisedObject(bytes)
-        val parcel = parcelisedObject.getParcel()
-        parcelisedObject.recycle()
+        converter = ParcelableConverter(bytes)
+        val parcel = converter.getParcel()
+        converter.recycle()
 
         assertThat(parcel, notNullValue())
     }
@@ -56,9 +56,9 @@ class ParcelisedObjectTest {
     }
 
     private fun prepareByteArray(): ByteArray {
-        parcelisedObject = ParcelisedObject(getParcelable())
-        val bytes = parcelisedObject.toBytes()
-        parcelisedObject.recycle()
+        converter = ParcelableConverter(getParcelable())
+        val bytes = converter.toBytes()
+        converter.recycle()
         return bytes
     }
 
