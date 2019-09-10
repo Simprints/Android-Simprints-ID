@@ -2,17 +2,17 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.remote.RemoteProjectManager
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -22,11 +22,14 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSource,
-                         override val local: LocalDbManager,
+                         override var projectLocalDataSource: ProjectLocalDataSource,
                          override val remote: RemoteDbManager,
                          private val loginInfoManager: LoginInfoManager,
                          private val preferencesManager: PreferencesManager,
@@ -89,37 +92,39 @@ open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSour
     }
 
     override fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult> =
-        Single.fromCallable {
-            runBlocking {
-                personLocalDataSource.load(PersonLocalDataSource.Query(patientId = guid))
-                    .toList().first()
+        Single.create<Person> {
+            GlobalScope.launch {
+                try {
+                    it.onSuccess(personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).first())
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    it.onError(t)
+                }
             }
         }
-        .map { PersonFetchResult(it, false) }
-        .onErrorResumeNext {
-            personRemoteDataSource
-                .downloadPerson(guid, projectId)
-                .map { person ->
-                    PersonFetchResult(person, true)
-                }
-        }
+            .map { PersonFetchResult(it, false) }
+            .onErrorResumeNext {
+                personRemoteDataSource
+                    .downloadPerson(guid, projectId)
+                    .map { person ->
+                        PersonFetchResult(person, true)
+                    }
+            }
 
     override fun loadPeople(projectId: String, userId: String?, moduleId: String?): Single<List<Person>> =
         Single.create {
-            try {
-                val people = runBlocking {
-                    personLocalDataSource.load(PersonLocalDataSource.Query(projectId, userId = userId, moduleId = moduleId)).toList()
+            GlobalScope.launch {
+                try {
+                    it.onSuccess(personLocalDataSource.load(PersonLocalDataSource.Query(projectId, userId = userId, moduleId = moduleId)).toList())
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    it.onError(t)
                 }
-
-                it.onSuccess(people)
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                it.onError(t)
             }
         }
 
     override fun loadProject(projectId: String): Single<Project> =
-        local.loadProjectFromLocal(projectId)
+        Single.just(projectLocalDataSource.load(projectId))
             .doAfterSuccess {
                 refreshProjectInfoWithServer(projectId)
             }
@@ -129,7 +134,7 @@ open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSour
 
     override fun refreshProjectInfoWithServer(projectId: String): Single<Project> =
         remoteProjectManager.loadProjectFromRemote(projectId).flatMap {
-            local.saveProjectIntoLocal(it)
+            Completable.fromAction { projectLocalDataSource.save(it) }
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
 

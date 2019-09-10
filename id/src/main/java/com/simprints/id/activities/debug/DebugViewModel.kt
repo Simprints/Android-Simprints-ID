@@ -1,7 +1,6 @@
 package com.simprints.id.activities.debug
 
 import androidx.lifecycle.MutableLiveData
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import javax.inject.Inject
@@ -9,7 +8,7 @@ import javax.inject.Inject
 class DebugViewModel(component: AppComponent) : DebugContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var localDbManager: LocalDbManager
+    //@Inject lateinit var localDbManager: LocalDbManager
 
     override val stateLiveData: MutableLiveData<DebugActivity.State> = MutableLiveData()
 

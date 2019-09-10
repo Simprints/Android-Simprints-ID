@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.remote.project
+package com.simprints.id.data.db.project.remote
 
 import com.google.gson.JsonElement
+import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.remote.network.ProjectRemoteInterface
-import com.simprints.id.domain.Project
 import io.reactivex.Single
 
 

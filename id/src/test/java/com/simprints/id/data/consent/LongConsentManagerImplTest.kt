@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

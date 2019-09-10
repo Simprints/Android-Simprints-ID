@@ -3,7 +3,6 @@ package com.simprints.id.services.scheduledSync.peopleDownSync
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager

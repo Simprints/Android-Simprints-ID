@@ -52,7 +52,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
     private fun <R> useRealmInstance(block: (Realm) -> R): R =
         Realm.getInstance(config).use(block)
 
-    override suspend fun insertOrUpdate(people: List<Person>) {
+    override fun insertOrUpdate(people: List<Person>) {
         useRealmInstance { realm ->
             realm.executeTransaction {
                 it.insertOrUpdate(people.map(Person::toRealmPerson))
@@ -60,19 +60,16 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override suspend fun load(query: PersonLocalDataSource.Query): Flow<Person> {
-        val realm = Realm.getInstance(config)
-        return realm.use {
+    override fun load(query: PersonLocalDataSource.Query): Flow<Person> =
+        Realm.getInstance(config).use {
             it.buildQueryForPerson(query)
                 .findAll()
-                .map {
-                    it.toDomainPerson()
-                }
+                .map { it.toDomainPerson() }
                 .asFlow()
         }
-    }
 
-    override suspend fun delete(query: PersonLocalDataSource.Query) {
+
+    override fun delete(query: PersonLocalDataSource.Query) {
         val realm = Realm.getInstance(config)
         realm.use {
             it.buildQueryForPerson(query)
@@ -81,7 +78,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
-    override suspend fun count(query: PersonLocalDataSource.Query): Int =
+    override fun count(query: PersonLocalDataSource.Query): Int =
         useRealmInstance { realm ->
             realm.buildQueryForPerson(query).count().toInt()
         }

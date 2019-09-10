@@ -19,19 +19,21 @@ import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.local.models.ProjectLocalDataSourceImpl
+import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.RemoteProjectManagerImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -80,20 +82,6 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideLocalDbManager(ctx: Context,
-                                   secureDataManager: SecureDataManager,
-                                   loginInfoManager: LoginInfoManager): LocalDbManager =
-        RealmDbManagerImpl(ctx, secureDataManager, loginInfoManager)
-
-    @Provides
-    @Singleton
-    open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
-                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
-
-    @Provides
-    @Singleton
     open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager = FirebaseManagerImpl(loginInfoManager)
 
     @Provides
@@ -111,7 +99,7 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideDbManager(personLocalDataSource: PersonLocalDataSource,
-                              localDbManager: LocalDbManager,
+                              projectLocalDataSource: ProjectLocalDataSource,
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
@@ -122,7 +110,7 @@ open class AppModule {
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(personLocalDataSource, localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, personRemoteDataSource, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
+        DbManagerImpl(personLocalDataSource, projectLocalDataSource, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, personRemoteDataSource, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton
@@ -234,11 +222,31 @@ open class AppModule {
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
+    open fun provideSyncInfoLocalDataSource(ctx: Context,
+                                            secureDataManager: SecureDataManager,
+                                            loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
+        SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+
+    @Provides
+    open fun provideProjectLocalDataSource(ctx: Context,
+                                           secureDataManager: SecureDataManager,
+                                           loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
+        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+
+
+    @Provides
+    open fun providePersonLocalDataSource(ctx: Context,
+                                          secureDataManager: SecureDataManager,
+                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
+        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+
+
+    @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
-                                 localDbManager: LocalDbManager,
+                                 syncInfoLocalDataSource: SyncInfoLocalDataSource,
                                  personRemoteDataSource: PersonRemoteDataSource,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, localDbManager, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
 
     @Provides
     @Singleton

@@ -13,12 +13,11 @@ import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.local.room.UpSyncStatus
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.RemoteProjectManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.domain.PeopleCount

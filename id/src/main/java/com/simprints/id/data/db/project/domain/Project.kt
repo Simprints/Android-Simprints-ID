@@ -1,4 +1,4 @@
-package com.simprints.id.domain
+package com.simprints.id.data.db.project.domain
 
 import androidx.annotation.Keep
 
