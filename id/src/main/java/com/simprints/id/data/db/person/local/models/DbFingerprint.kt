@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.person.local
+package com.simprints.id.data.db.person.local.models
 
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.Fingerprint

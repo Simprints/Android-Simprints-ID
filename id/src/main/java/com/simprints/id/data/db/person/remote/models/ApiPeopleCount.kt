@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.models
+package com.simprints.id.data.db.person.remote.models
 
 import androidx.annotation.Keep
 import com.simprints.id.domain.PeopleCount

@@ -1,8 +1,7 @@
-package com.simprints.id.domain.fingerprint
+package com.simprints.id.data.db.person.domain
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.id.FingerIdentifier
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
