@@ -29,7 +29,7 @@ class ConsentActivity : AppCompatActivity() {
     private lateinit var viewModel: ConsentViewModel
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
-    private lateinit var appRequest: AppRequest
+    private lateinit var appRequestRecieved: AppRequest
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
@@ -44,10 +44,10 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        appRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        appRequestRecieved = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(ConsentViewModel::class.java)
-        viewModel.appRequest.postValue(appRequest)
+        viewModel = ViewModelProviders.of(this, viewModelFactory.apply { appRequest = appRequestRecieved })
+            .get(ConsentViewModel::class.java)
 
         setupTabs()
         setupObserversForUi()
