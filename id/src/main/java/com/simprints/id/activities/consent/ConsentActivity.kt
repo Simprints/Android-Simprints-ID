@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.View
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -12,8 +13,6 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.ACCEPTED
-import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Result.DECLINED
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -52,7 +51,6 @@ class ConsentActivity : AppCompatActivity() {
 
         setupTabs()
         setupObserversForUi()
-        setupClickListeners()
     }
 
     private fun injectDependencies() {
@@ -103,27 +101,21 @@ class ConsentActivity : AppCompatActivity() {
         })
     }
 
-    private fun setupClickListeners() {
-        addClickListenerToConsentAccept()
-        addClickListenerToConsentDecline()
-        addClickListenerToPrivacyNotice()
+    fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(CORE_STEP_BUNDLE, CoreStepResponse(ConsentResponse.ACCEPTED))
+        })
+        finish()
     }
 
-    private fun addClickListenerToConsentAccept() {
-        consentAcceptButton.setOnClickListener {
-            viewModel.addConsentEvent(buildConsentEventForResult(ACCEPTED))
-            setResult(Activity.RESULT_OK, Intent().apply {
-                putExtra(CORE_STEP_BUNDLE, CoreStepResponse(ConsentResponse.ACCEPTED))
-            })
-            finish()
-        }
+    fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
+        //STOPSHIP: Launch Exit Form and decide on creating a separate OrchestratorManager for core
     }
 
-    private fun addClickListenerToConsentDecline() {
-        consentDeclineButton.setOnClickListener {
-            viewModel.addConsentEvent(buildConsentEventForResult(DECLINED))
-            //STOPSHIP: Launch Exit Form and decide on creating a separate OrchestratorManager for core
-        }
+    fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
+        startPrivacyNoticeActivity()
     }
 
     private fun buildConsentEventForResult(consentResult: ConsentEvent.Result) =
@@ -133,12 +125,6 @@ class ConsentActivity : AppCompatActivity() {
         GENERAL_CONSENT_TAB_TAG -> INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> PARENTAL
         else -> throw Exception()
-    }
-
-    private fun addClickListenerToPrivacyNotice() {
-        privacyNoticeText.setOnClickListener {
-            startPrivacyNoticeActivity()
-        }
     }
 
     private fun startPrivacyNoticeActivity() {
