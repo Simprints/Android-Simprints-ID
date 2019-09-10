@@ -1,10 +1,8 @@
 package com.simprints.id.orchestrator.modality
 
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
@@ -14,19 +12,10 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     override val steps: MutableList<Step> = mutableListOf()
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
-        appRequest.let {
-            when (it) {
-                is AppEnrolRequest -> {
-                    steps.add(buildCoreStep(ConsentType.ENROL))
-                }
-                is AppIdentifyRequest -> {
-                    steps.add(buildCoreStep(ConsentType.IDENTIFY))
-                }
-                is AppVerifyRequest -> {
-                    steps.add(buildVerifyCoreStep())
-                }
-                else -> Throwable("invalid AppRequest")
-            }
+        when (appRequest.type) {
+            AppRequestType.ENROL -> steps.add(buildCoreStep(ConsentType.ENROL))
+            AppRequestType.IDENTIFY -> steps.add(buildCoreStep(ConsentType.IDENTIFY))
+            AppRequestType.VERIFY -> steps.add(buildVerifyCoreStep())
         }
     }
 

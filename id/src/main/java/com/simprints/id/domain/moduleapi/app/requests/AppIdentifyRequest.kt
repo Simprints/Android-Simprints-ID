@@ -8,6 +8,8 @@ data class AppIdentifyRequest(override val projectId: String,
                               override val userId: String,
                               override val moduleId: String,
                               override val metadata: String) : AppRequest {
+    override val type: AppRequestType
+        get() = AppRequestType.IDENTIFY
 
     constructor(appRequest: IAppIdentifyRequest) : this(
         appRequest.projectId,
@@ -16,5 +18,3 @@ data class AppIdentifyRequest(override val projectId: String,
         appRequest.metadata
     )
 }
-
-fun AppRequest.isIdentifyRequest() = this is AppIdentifyRequest
