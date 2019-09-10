@@ -5,7 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.livedata.testObserver
@@ -33,7 +34,7 @@ class ConsentViewModelTest {
         val consentTextManagerMock = mock<ConsentRepository>().apply {
             whenever(this) { getGeneralConsentText(any()) } thenReturn generalConsentTextLiveData
         }
-        val consentViewModel = ConsentViewModel(buildAppEnrolRequest(), consentTextManagerMock, mock())
+        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mock())
 
         val generalConsentTestObserver = consentViewModel.generalConsentText.testObserver()
 
@@ -48,7 +49,7 @@ class ConsentViewModelTest {
             whenever(this) { getParentalConsentText(any()) } thenReturn parentalConsentTextLiveData
             whenever(this) { parentalConsentExists() } thenReturn MutableLiveData(true)
         }
-        val consentViewModel = ConsentViewModel(buildAppEnrolRequest(), consentTextManagerMock, mock())
+        val consentViewModel = ConsentViewModel(buildAskConsentRequest(), consentTextManagerMock, mock())
 
         val parentalConsentTestObserver = consentViewModel.parentalConsentText.testObserver()
         val parentalConsentExistsObserver = consentViewModel.parentalConsentExists.testObserver()
@@ -57,5 +58,6 @@ class ConsentViewModelTest {
         assertThat(parentalConsentTestObserver.observedValues.contains(parentalConsentText)).isTrue()
     }
 
-    private fun buildAppEnrolRequest() = AppEnrolRequest("project_id", "user_id", "module_id", "")
+    private fun buildAskConsentRequest() =
+        AskConsentRequest(ConsentType.ENROL)
 }

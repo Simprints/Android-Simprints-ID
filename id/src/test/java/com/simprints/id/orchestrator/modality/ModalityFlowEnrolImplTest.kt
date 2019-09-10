@@ -45,7 +45,7 @@ class ModalityFlowEnrolImplTest {
 
         whenever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
-        whenever(coreStepProcessor) { buildStepConsent(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn coreStepMock
+        whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
 
         modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
