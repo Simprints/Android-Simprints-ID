@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CountTaskTest {
 
-    private val remotePeopleManagerMock: RemotePeopleManager = mock()
+    private val personRemoteDataSourceMock: PersonRemoteDataSource = mock()
     private val localDbManagerMock: LocalDbManager = mock()
     private val dbManagerMock: DbManager = mock()
     private val preferencesManagerMock: PreferencesManager = mock()
@@ -64,7 +64,7 @@ class CountTaskTest {
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: List<PeopleCount>,
                                                              peopleInLocalDb: Int): TestObserver<List<PeopleCount>> {
 
-        whenever(remotePeopleManagerMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
+        whenever(personRemoteDataSourceMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
         whenever(localDbManagerMock.getPeopleCountFromLocal(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleInLocalDb))
         whenever(preferencesManagerMock.syncGroup).thenReturn(GROUP.GLOBAL)
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0"))

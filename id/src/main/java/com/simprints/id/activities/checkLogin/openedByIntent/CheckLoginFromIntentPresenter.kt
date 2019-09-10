@@ -13,7 +13,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.En
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType
@@ -30,13 +30,16 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
                                     val deviceId: String,
-                                    component: AppComponent) : CheckLoginPresenter(view, component), CheckLoginFromIntentContract.Presenter {
+                                    component: AppComponent) :
+    CheckLoginPresenter(view, component),
+    CheckLoginFromIntentContract.Presenter {
 
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
 
@@ -44,7 +47,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private var setupFailed: Boolean = false
 
     @Inject lateinit var sessionEventsManager: SessionEventsManager
-    @Inject lateinit var dbManager: LocalDbManager
+    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     internal lateinit var appRequest: AppRequest
 
@@ -218,7 +221,11 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
 
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = dbManager.getPeopleCountFromLocal().onErrorReturn { -1 }
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = Single.fromCallable {
+        runBlocking {
+            personLocalDataSource.count()
+        }
+    }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(

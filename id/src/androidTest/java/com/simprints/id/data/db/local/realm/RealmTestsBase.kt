@@ -3,9 +3,9 @@ package com.simprints.id.data.db.local.realm
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.DbPerson
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.local.models.DbPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.domain.Person
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import java.io.File

@@ -1,11 +1,11 @@
 package com.simprints.id.data.db.remote.network
 
 import com.simprints.core.network.NetworkConstants
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.ApiModes
-import com.simprints.id.data.db.remote.models.ApiModes.*
-import com.simprints.id.data.db.remote.models.ApiPeopleCount
-import com.simprints.id.data.db.remote.models.ApiPostPerson
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiModes
+import com.simprints.id.data.db.person.remote.models.ApiModes.*
+import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
+import com.simprints.id.data.db.person.remote.models.ApiPostPerson
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response

@@ -10,7 +10,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -82,12 +82,12 @@ class TestAppModule(app: Application,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
                                   sessionEventsManager: SessionEventsManager,
-                                  remotePeopleManager: RemotePeopleManager,
+                                  personRemoteDataSource: PersonRemoteDataSource,
                                   remoteProjectManager: RemoteProjectManager,
                                   timeHelper: TimeHelper,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
                                   database: SyncStatusDatabase): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database) }
+        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, personRemoteDataSource, remoteProjectManager, timeHelper, peopleUpSyncMaster, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -122,7 +122,7 @@ class TestAppModule(app: Application,
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
 
-    override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager =
+    override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
         remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
 
     override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager =
@@ -143,8 +143,8 @@ class TestAppModule(app: Application,
     override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask =
         countTaskRule.resolveDependency { super.provideCountTask(dbManager, syncStatusDatabase) }
 
-    override fun provideDownSyncTask(localDbManager: LocalDbManager, remotePeopleManager: RemotePeopleManager, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
-        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase) }
+    override fun provideDownSyncTask(localDbManager: LocalDbManager, personRemoteDataSource: PersonRemoteDataSource, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
+        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, personRemoteDataSource, timeHelper, syncStatusDatabase) }
 
     override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper =
         syncSchedulerHelperRule.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }

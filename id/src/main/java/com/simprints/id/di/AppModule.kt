@@ -22,10 +22,12 @@ import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
 import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
@@ -85,6 +87,13 @@ open class AppModule {
 
     @Provides
     @Singleton
+    open fun providePersonLocalDataSource(ctx: Context,
+                                          secureDataManager: SecureDataManager,
+                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
+        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+
+    @Provides
+    @Singleton
     open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager = FirebaseManagerImpl(loginInfoManager)
 
     @Provides
@@ -101,18 +110,19 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideDbManager(localDbManager: LocalDbManager,
+    open fun provideDbManager(personLocalDataSource: PersonLocalDataSource,
+                              localDbManager: LocalDbManager,
                               remoteDbManager: RemoteDbManager,
                               secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               sessionEventsManager: SessionEventsManager,
-                              remotePeopleManager: RemotePeopleManager,
+                              personRemoteDataSource: PersonRemoteDataSource,
                               remoteProjectManager: RemoteProjectManager,
                               timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
                               database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
+        DbManagerImpl(personLocalDataSource, localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, personRemoteDataSource, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
 
     @Provides
     @Singleton
@@ -224,14 +234,15 @@ open class AppModule {
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
-    open fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                 remotePeopleManager: RemotePeopleManager,
+    open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
+                                 localDbManager: LocalDbManager,
+                                 personRemoteDataSource: PersonRemoteDataSource,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase.downSyncDao)
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, localDbManager, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
 
     @Provides
     @Singleton
-    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
+    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
 
     @Provides
     @Singleton

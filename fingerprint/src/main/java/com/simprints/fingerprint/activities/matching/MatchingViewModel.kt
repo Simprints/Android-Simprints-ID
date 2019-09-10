@@ -81,6 +81,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                     matchTask.handleMatchResult(it.candidates, it.scores)
                 },
                 onError = {
+                    it.printStackTrace()
                     crashReportManager.logExceptionOrSafeException(it)
                     hasMatchFailed.postValue(true)
                     result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))

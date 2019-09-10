@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.models
+package com.simprints.id.data.db.person.remote.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
@@ -6,11 +6,11 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
-import com.simprints.id.data.db.local.realm.models.toDomainPerson
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.local.models.toDomainPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.domain.Person
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith

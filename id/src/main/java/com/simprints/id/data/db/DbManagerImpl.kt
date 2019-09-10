@@ -4,13 +4,14 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Person
 import com.simprints.id.domain.Project
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -21,13 +22,16 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 
-open class DbManagerImpl(override val local: LocalDbManager,
+open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSource,
+                         override val local: LocalDbManager,
                          override val remote: RemoteDbManager,
                          private val loginInfoManager: LoginInfoManager,
                          private val preferencesManager: PreferencesManager,
                          private val sessionEventsManager: SessionEventsManager,
-                         override val remotePeopleManager: RemotePeopleManager,
+                         override val personRemoteDataSource: PersonRemoteDataSource,
                          override val remoteProjectManager: RemoteProjectManager,
                          private val timeHelper: TimeHelper,
                          private val peopleUpSyncMaster: PeopleUpSyncMaster,
@@ -63,7 +67,7 @@ open class DbManagerImpl(override val local: LocalDbManager,
     }
 
     override fun savePerson(person: Person): Completable =
-        local.insertOrUpdatePersonInLocal(person.apply { toSync = true })
+        Completable.fromCallable { runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) } }
             .doOnComplete {
                 sessionEventsManager
                     .updateSession {
@@ -84,18 +88,35 @@ open class DbManagerImpl(override val local: LocalDbManager,
         peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
     }
 
-    override fun loadPerson(projectId:String, guid: String): Single<PersonFetchResult> =
-        local.loadPersonFromLocal(guid).map { PersonFetchResult(it, false) }
-            .onErrorResumeNext {
-                remotePeopleManager
-                    .downloadPerson(guid, projectId)
-                    .map { person ->
-                        PersonFetchResult(person, true)
-                    }
+    override fun loadPerson(projectId: String, guid: String): Single<PersonFetchResult> =
+        Single.fromCallable {
+            runBlocking {
+                personLocalDataSource.load(PersonLocalDataSource.Query(patientId = guid))
+                    .toList().first()
             }
+        }
+        .map { PersonFetchResult(it, false) }
+        .onErrorResumeNext {
+            personRemoteDataSource
+                .downloadPerson(guid, projectId)
+                .map { person ->
+                    PersonFetchResult(person, true)
+                }
+        }
 
     override fun loadPeople(projectId: String, userId: String?, moduleId: String?): Single<List<Person>> =
-        local.loadPeopleFromLocal(projectId, userId = userId, moduleId = moduleId)
+        Single.create {
+            try {
+                val people = runBlocking {
+                    personLocalDataSource.load(PersonLocalDataSource.Query(projectId, userId = userId, moduleId = moduleId)).toList()
+                }
+
+                it.onSuccess(people)
+            } catch (t: Throwable) {
+                t.printStackTrace()
+                it.onError(t)
+            }
+        }
 
     override fun loadProject(projectId: String): Single<Project> =
         local.loadProjectFromLocal(projectId)
@@ -113,9 +134,9 @@ open class DbManagerImpl(override val local: LocalDbManager,
         }.trace("refreshProjectInfoWithServer")
 
     override fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
-        remotePeopleManager.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
+        personRemoteDataSource.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
             getPeopleCountFromLocalForSyncScope(syncScope).map { peopleCountsInLocal ->
-               calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote, peopleCountsInLocal)
+                calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote, peopleCountsInLocal)
             }
         }
 
@@ -124,25 +145,27 @@ open class DbManagerImpl(override val local: LocalDbManager,
         peopleCountInRemote.map { remotePeopleCount ->
             val localCount = peopleCountsInLocal.find {
                 it.projectId == remotePeopleCount.projectId &&
-                it.userId == remotePeopleCount.userId &&
-                it.moduleId == remotePeopleCount.moduleId &&
-                it.modes?.joinToString() == remotePeopleCount.modes?.joinToString()
+                    it.userId == remotePeopleCount.userId &&
+                    it.moduleId == remotePeopleCount.moduleId &&
+                    it.modes?.joinToString() == remotePeopleCount.modes?.joinToString()
             }?.count ?: 0
 
             remotePeopleCount.copy(count = remotePeopleCount.count - localCount)
         }
-    
+
     override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
-            syncScope.toSubSyncScopes().map {
-                PeopleCount(it.projectId,
-                    it.userId,
-                    it.moduleId,
-                    syncScope.modes,
-                    local.getPeopleCountFromLocal(
-                        projectId = it.projectId,
-                        userId = it.userId,
-                        moduleId = it.moduleId).blockingGet())
+            runBlocking {
+                syncScope.toSubSyncScopes().map {
+                    PeopleCount(it.projectId,
+                        it.userId,
+                        it.moduleId,
+                        syncScope.modes,
+                        personLocalDataSource.count(PersonLocalDataSource.Query(
+                            projectId = it.projectId,
+                            userId = it.userId,
+                            moduleId = it.moduleId)))
+                }
             }
         )
 }

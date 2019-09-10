@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.local.realm
 
-import com.simprints.id.data.db.local.realm.models.DbFingerprint
-import com.simprints.id.data.db.local.realm.models.DbPerson
+import com.simprints.id.data.db.person.local.models.DbFingerprint
+import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.local.realm.models.DbProject
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
 import com.simprints.id.data.db.local.realm.oldschemas.PeopleSchemaV5

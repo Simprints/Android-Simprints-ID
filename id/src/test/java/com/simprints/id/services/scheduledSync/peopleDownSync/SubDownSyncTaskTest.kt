@@ -11,17 +11,17 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.realm.models.DbSyncInfo
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.toApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.toApiGetPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -64,7 +64,7 @@ class SubDownSyncTaskTest {
     @Inject lateinit var syncScopeBuilderSpy: SyncScopesBuilder
 
     private val remoteDbManagerSpy: RemoteDbManager = spy(FirebaseManagerImpl(mock()))
-    private val remotePeopleManagerSpy: RemotePeopleManager = spy()
+    private val personRemoteDataSourceSpy: PersonRemoteDataSource = spy()
     private val downSyncDao: DownSyncDao = mock()
 
     private val module by lazy {
@@ -82,7 +82,7 @@ class SubDownSyncTaskTest {
         whenever(remoteDbManagerSpy.getCurrentToken()).thenReturn(Single.just(""))
         mockServer.start()
         setupApi()
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
+        whenever(personRemoteDataSourceSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
     }
 
     @Test
@@ -132,7 +132,7 @@ class SubDownSyncTaskTest {
 
         mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         val testObserver = sync.execute(subScope).test()
         testObserver.awaitTerminalEvent()
         testObserver.assertError { true }
@@ -157,7 +157,7 @@ class SubDownSyncTaskTest {
             lastPatientUpdatedAt = lastPatientUpdateAtFromRoom,
             totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -187,7 +187,7 @@ class SubDownSyncTaskTest {
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -225,7 +225,7 @@ class SubDownSyncTaskTest {
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
         whenever(downSyncDao) { updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture()) } thenDoNothing {}
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(localDbMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         verifyExactly(batches, localDbMock) { insertOrUpdatePeopleInLocal(anyNotNull()) }

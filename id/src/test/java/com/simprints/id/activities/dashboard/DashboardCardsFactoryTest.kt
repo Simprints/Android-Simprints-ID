@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.SyncStatusDatabase
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.remote.project.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -42,7 +42,7 @@ class DashboardCardsFactoryTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remotePeopleManagerMock: RemotePeopleManager
+    @Inject lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
     @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -155,7 +155,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
+        mockNPeopleForSyncRequest(personRemoteDataSourceMock, getMockListOfPeopleCountWithCounter(0))
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -170,7 +170,7 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
-        mockNPeopleForSyncRequest(remotePeopleManagerMock, getMockListOfPeopleCountWithCounter(0))
+        mockNPeopleForSyncRequest(personRemoteDataSourceMock, getMockListOfPeopleCountWithCounter(0))
         mockNLocalPeople(localDbManagerMock, 0)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
@@ -192,8 +192,8 @@ class DashboardCardsFactoryTest {
     private fun getMockListOfPeopleCountWithCounter(counter: Int) =
         listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 
-    private fun mockNPeopleForSyncRequest(remotePeopleManager: RemotePeopleManager, peopleCounts: List<PeopleCount>) {
-        whenever(remotePeopleManager.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
+    private fun mockNPeopleForSyncRequest(personRemoteDataSource: PersonRemoteDataSource, peopleCounts: List<PeopleCount>) {
+        whenever(personRemoteDataSource.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
     }
 
     private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {

@@ -4,10 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DebugViewModel(component: AppComponent) : DebugContract.Presenter {
@@ -24,19 +20,19 @@ class DebugViewModel(component: AppComponent) : DebugContract.Presenter {
     val state = DebugActivity.State()
 
     override fun refresh() {
-        state.nPeople.clear()
-        GlobalScope.launch {
-            localDbManager.loadPeopleFromLocalRx().map { person ->
-                val subScope = state.nPeople.keys.findLast { person.projectId == it.projectId && person.userId == it.userId && person.moduleId == it.moduleId }
-                subScope?.let {
-                    state.nPeople[it] = (state.nPeople[it] ?: 0) + 1
-                }?: state.nPeople.put(SubSyncScope(person.projectId, person.userId, person.moduleId), 1)
-                person
-            }.buffer(500)
-            .map {
-                stateLiveData.postValue(state)
-                it}
-            .subscribeBy(onError = { it.printStackTrace() }, onComplete = { })
-        }
+//        state.nPeople.clear()
+//        GlobalScope.launch {
+//            localDbManager.loadPeopleFromLocalRx().map { person ->
+//                val subScope = state.nPeople.keys.findLast { person.projectId == it.projectId && person.userId == it.userId && person.moduleId == it.moduleId }
+//                subScope?.let {
+//                    state.nPeople[it] = (state.nPeople[it] ?: 0) + 1
+//                }?: state.nPeople.put(SubSyncScope(person.projectId, person.userId, person.moduleId), 1)
+//                person
+//            }.buffer(500)
+//            .map {
+//                stateLiveData.postValue(state)
+//                it}
+//            .subscribeBy(onError = { it.printStackTrace() }, onComplete = { })
+//        }
     }
 }

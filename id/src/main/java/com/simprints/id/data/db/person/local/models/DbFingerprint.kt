@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.local.realm.models
+package com.simprints.id.data.db.person.local
 
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.Fingerprint
 import io.realm.RealmObject
 
 open class DbFingerprint (
@@ -13,7 +13,8 @@ open class DbFingerprint (
 fun DbFingerprint.toDomainFingerprint(): Fingerprint =
     Fingerprint(
         fingerId = FingerIdentifier.values()[fingerId],
-        isoTemplateBytes = template ?: throw IllegalArgumentException("Unexpected null fingerprint template")
+        isoTemplateBytes = template
+            ?: throw IllegalArgumentException("Unexpected null fingerprint template")
     )
 
 fun Fingerprint.toRealmFingerprint(): DbFingerprint =

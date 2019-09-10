@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.remote.models
+package com.simprints.id.data.db.person.remote.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.JsonObject
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
