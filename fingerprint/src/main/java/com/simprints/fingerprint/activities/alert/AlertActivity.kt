@@ -8,32 +8,26 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.*
 import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class AlertActivity : AppCompatActivity(), AlertContract.View {
+class AlertActivity : FingerprintActivity(), AlertContract.View {
 
     private lateinit var alertType: FingerprintAlert
     override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        acquireFingerprintKoinModules()
-        logActivityCreated()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -139,11 +133,5 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
         setResult(resultCode.value, data)
         finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
-        releaseFingerprintKoinModules()
     }
 }
