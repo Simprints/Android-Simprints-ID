@@ -4,27 +4,23 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.connect.confirmscannererror.ConfirmScannerErrorBuilder
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
-import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
-import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForConnectScannerActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_connect_scanner.*
 import org.koin.android.ext.android.inject
 
-class ConnectScannerActivity : AppCompatActivity() {
+class ConnectScannerActivity : FingerprintActivity() {
 
     private lateinit var connectScannerRequest: ConnectScannerTaskRequest
     private val viewModel: ConnectScannerViewModel by inject()
@@ -34,8 +30,6 @@ class ConnectScannerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect_scanner)
-        acquireFingerprintKoinModules()
-        logActivityCreated()
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -109,11 +103,5 @@ class ConnectScannerActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         goToRefusalActivity()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
-        releaseFingerprintKoinModules()
     }
 }
