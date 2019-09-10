@@ -14,7 +14,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
 class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                                private val faceStepProcessor: FaceStepProcessor,
-                               coreStepProcessor: CoreStepProcessor) : ModalityFlowBaseImpl(coreStepProcessor) {
+                               private val coreStepProcessor: CoreStepProcessor) : ModalityFlowBaseImpl(coreStepProcessor) {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -41,7 +41,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         val result = when {
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
-            else -> super.processResult(requestCode, data)
+            else -> coreStepProcessor.processResult(requestCode, data)
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
