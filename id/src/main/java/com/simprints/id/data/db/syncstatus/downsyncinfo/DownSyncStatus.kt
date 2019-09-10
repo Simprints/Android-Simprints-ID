@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.local.room
+package com.simprints.id.data.db.syncstatus.downsyncinfo
 
 import androidx.room.Entity
 import androidx.room.Ignore

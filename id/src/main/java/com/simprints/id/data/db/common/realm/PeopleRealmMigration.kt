@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.local.realm
+package com.simprints.id.data.db.common.realm
 
 import com.simprints.id.data.db.person.local.models.DbFingerprint
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
-import com.simprints.id.data.db.local.realm.oldschemas.PeopleSchemaV5
+import com.simprints.id.data.db.common.realm.oldschemas.PeopleSchemaV5
 import com.simprints.id.domain.Constants
 import io.realm.*
 import io.realm.annotations.RealmModule
