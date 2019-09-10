@@ -1,6 +1,6 @@
 package com.simprints.id.orchestrator.steps
 
-import com.simprints.id.domain.moduleapi.core.CoreStepRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
@@ -14,7 +14,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
         with(enrolAppRequest) {
             val step = CoreStepProcessorImpl().buildStepConsent(projectId, userId, moduleId, metadata)
 
-            verifyCoreIntent<CoreStepRequest>(step, CoreRequestCode.CONSENT.value)
+            verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
         }
     }
 
@@ -23,7 +23,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
         with(identifyAppRequest) {
             val step = CoreStepProcessorImpl().buildStepConsent(projectId, userId, moduleId, metadata)
 
-            verifyCoreIntent<CoreStepRequest>(step, CoreRequestCode.CONSENT.value)
+            verifyCoreIntent<AskConsentRequest>(step, CoreRequestCode.CONSENT.value)
         }
     }
 

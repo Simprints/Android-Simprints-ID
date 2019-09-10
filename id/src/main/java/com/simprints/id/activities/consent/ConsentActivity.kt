@@ -15,10 +15,10 @@ import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.core.ConsentResponse
-import com.simprints.id.domain.moduleapi.core.CoreStepRequest.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.CoreStepResponse
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
+import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
@@ -29,7 +29,7 @@ class ConsentActivity : AppCompatActivity() {
     private lateinit var viewModel: ConsentViewModel
     private lateinit var generalConsentTab: TabHost.TabSpec
     private lateinit var parentalConsentTab: TabHost.TabSpec
-    private lateinit var appRequestRecieved: AppRequest
+    private lateinit var askConsentRequestReceived: AskConsentRequest
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
@@ -44,9 +44,9 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        appRequestRecieved = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        askConsentRequestReceived = intent.extras?.getParcelable(CONSENT_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory.apply { appRequest = appRequestRecieved })
+        viewModel = ViewModelProviders.of(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
 
         setupTabs()
@@ -104,7 +104,7 @@ class ConsentActivity : AppCompatActivity() {
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, CoreStepResponse(ConsentResponse.ACCEPTED))
+            putExtra(CONSENT_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
         finish()
     }

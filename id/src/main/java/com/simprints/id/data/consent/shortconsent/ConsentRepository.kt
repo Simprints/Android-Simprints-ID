@@ -1,11 +1,11 @@
 package com.simprints.id.data.consent.shortconsent
 
 import androidx.lifecycle.LiveData
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 
 interface ConsentRepository {
 
-    fun getGeneralConsentText(appRequest: AppRequest): LiveData<String>
+    fun getGeneralConsentText(askConsentRequest: AskConsentRequest): LiveData<String>
     fun parentalConsentExists(): LiveData<Boolean>
-    fun getParentalConsentText(appRequest: AppRequest): LiveData<String>
+    fun getParentalConsentText(askConsentRequest: AskConsentRequest): LiveData<String>
 }

@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.consent.shortconsent.ConsentRepository
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 
-class ConsentViewModel(appRequest: AppRequest,
+class ConsentViewModel(askConsentRequest: AskConsentRequest,
                        consentTextManager: ConsentRepository,
                        private val sessionEventsManager: SessionEventsManager) : ViewModel() {
 
-    var generalConsentText: LiveData<String> = consentTextManager.getGeneralConsentText(appRequest)
-    var parentalConsentText: LiveData<String> = consentTextManager.getParentalConsentText(appRequest)
+    var generalConsentText: LiveData<String> = consentTextManager.getGeneralConsentText(askConsentRequest)
+    var parentalConsentText: LiveData<String> = consentTextManager.getParentalConsentText(askConsentRequest)
     val  parentalConsentExists = consentTextManager.parentalConsentExists()
 
     fun addConsentEvent(consentEvent: ConsentEvent) {
