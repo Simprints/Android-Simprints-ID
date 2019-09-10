@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.syncinfo.local
+package com.simprints.id.data.db.syncinfo.local.models
 
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.domain.GROUP
