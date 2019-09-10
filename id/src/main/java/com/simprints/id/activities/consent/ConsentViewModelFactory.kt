@@ -3,10 +3,10 @@ package com.simprints.id.activities.consent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.consent.shortconsent.ConsentTextManager
+import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 
-class ConsentViewModelFactory(private val consentTextManager: ConsentTextManager,
+class ConsentViewModelFactory(private val consentTextManager: ConsentRepository,
                               private val sessionEventsManager: SessionEventsManager) : ViewModelProvider.Factory {
 
     lateinit var appRequest: AppRequest

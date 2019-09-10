@@ -5,8 +5,8 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.remoteConfig.RemoteConfigPrimitivePreference
 
-class ConsentDataManagerImpl(prefs: ImprovedSharedPreferences,
-                             remoteConfigWrapper: RemoteConfigWrapper) : ConsentDataManager {
+class ConsentLocalDataSourceImpl(prefs: ImprovedSharedPreferences,
+                                 remoteConfigWrapper: RemoteConfigWrapper) : ConsentLocalDataSource {
     companion object {
 
         const val PARENTAL_CONSENT_EXISTS_KEY = "ConsentParentalExists"
