@@ -2,27 +2,22 @@ package com.simprints.id.data.consent.shortconsent
 
 import android.content.Context
 import com.simprints.id.R
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 
 data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsentOptions,
                                        val programName: String,
                                        val organizationName: String) {
 
-    fun assembleText(context: Context, appRequest: AppRequest) = StringBuilder().apply {
-        filterAppRequestForConsent(appRequest, context)
+    fun assembleText(context: Context, askConsentRequest: AskConsentRequest) = StringBuilder().apply {
+        filterAppRequestForConsent(askConsentRequest, context)
         filterForDataSharingOptions(context)
     }.toString()
 
-    private fun StringBuilder.filterAppRequestForConsent(appRequest: AppRequest, context: Context) {
-        when (appRequest) {
-            is AppIdentifyRequest, is AppVerifyRequest -> {
-                appendTextForConsentVerifyOrIdentify(context)
-            }
-            else -> {
-                appendTextForConsentEnrol(context)
-            }
+    private fun StringBuilder.filterAppRequestForConsent(askConsentRequest: AskConsentRequest, context: Context) {
+        when (askConsentRequest.consentType) {
+            ConsentType.ENROL -> appendTextForConsentEnrol(context)
+            ConsentType.IDENTIFY, ConsentType.VERIFY -> appendTextForConsentVerifyOrIdentify(context)
         }
     }
 

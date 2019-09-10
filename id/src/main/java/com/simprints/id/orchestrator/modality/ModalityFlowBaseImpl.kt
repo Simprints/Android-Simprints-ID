@@ -5,6 +5,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 
@@ -15,11 +16,14 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         appRequest.let {
             when (it) {
-                is AppEnrolRequest, is AppIdentifyRequest -> {
-                    steps.add(buildCoreStep(it.projectId, it.userId, it.moduleId, it.metadata))
+                is AppEnrolRequest -> {
+                    steps.add(buildCoreStep(ConsentType.ENROL))
+                }
+                is AppIdentifyRequest -> {
+                    steps.add(buildCoreStep(ConsentType.IDENTIFY))
                 }
                 is AppVerifyRequest -> {
-                    steps.add(buildVerifyCoreStep(it.projectId, it.userId, it.moduleId, it.metadata))
+                    steps.add(buildVerifyCoreStep())
                 }
                 else -> Throwable("invalid AppRequest")
             }
@@ -31,10 +35,10 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         steps.addAll(stepsToRestore)
     }
 
-    private fun buildCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
-        coreStepProcessor.buildStepConsent(projectId, userId, moduleId, metadata)
+    private fun buildCoreStep(consentType: ConsentType) =
+        coreStepProcessor.buildStepConsent(consentType)
 
 
-    private fun buildVerifyCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
-        coreStepProcessor.buildStepVerify(projectId, userId, moduleId, metadata)
+    private fun buildVerifyCoreStep() =
+        coreStepProcessor.buildStepVerify()
 }

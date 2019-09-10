@@ -2,28 +2,23 @@ package com.simprints.id.data.consent.shortconsent
 
 import android.content.Context
 import com.simprints.id.R
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 
 data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
                                         val parentalConsentOptions: ParentalConsentOptions,
                                         val programName: String,
                                         val organizationName: String) {
 
-    fun assembleText(context: Context, appRequest: AppRequest) = StringBuilder().apply {
-        filterAppRequestForParentalConsent(appRequest, context)
+    fun assembleText(context: Context, askConsentRequest: AskConsentRequest) = StringBuilder().apply {
+        filterAppRequestForParentalConsent(askConsentRequest, context)
         extractDataSharingOptions(context)
     }.toString()
 
-    private fun StringBuilder.filterAppRequestForParentalConsent(appRequest: AppRequest, context: Context) {
-        when (appRequest) {
-            is AppIdentifyRequest, is AppVerifyRequest -> {
-                appendTextForEnrolOrIdentify(context)
-            }
-            else -> {
-                appendTextForParentalEnrol(context)
-            }
+    private fun StringBuilder.filterAppRequestForParentalConsent(askConsentRequest: AskConsentRequest, context: Context) {
+        when (askConsentRequest.consentType) {
+            ConsentType.ENROL -> appendTextForParentalEnrol(context)
+            ConsentType.IDENTIFY, ConsentType.VERIFY -> appendTextForIdentifyOrVerify(context)
         }
     }
 
@@ -32,7 +27,7 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
         if (parentalConsentOptions.consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
     }
 
-    private fun StringBuilder.appendTextForEnrolOrIdentify(context: Context) {
+    private fun StringBuilder.appendTextForIdentifyOrVerify(context: Context) {
         if (parentalConsentOptions.consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
     }
 

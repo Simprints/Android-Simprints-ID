@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 
 class ConsentRepositoryImpl(private val context: Context,
                             private val consentLocalDataSource: ConsentLocalDataSource,
@@ -17,16 +17,16 @@ class ConsentRepositoryImpl(private val context: Context,
     private val parentalConsentText = MutableLiveData<String>()
     private val parentalConsentExists = MutableLiveData(false)
 
-    override fun getGeneralConsentText(appRequest: AppRequest) = generalConsentText.apply {
-        postValue(getGeneralConsentData().assembleText(context, appRequest))
+    override fun getGeneralConsentText(askConsentRequest: AskConsentRequest) = generalConsentText.apply {
+        postValue(getGeneralConsentData().assembleText(context, askConsentRequest))
     }
 
     override fun parentalConsentExists() = parentalConsentExists.apply {
         postValue(consentLocalDataSource.parentalConsentExists)
     }
 
-    override fun getParentalConsentText(appRequest: AppRequest) = parentalConsentText.apply {
-        postValue(getParentalConsentData().assembleText(context, appRequest))
+    override fun getParentalConsentText(askConsentRequest: AskConsentRequest) = parentalConsentText.apply {
+        postValue(getParentalConsentData().assembleText(context, askConsentRequest))
     }
 
     private fun getGeneralConsentData() =
