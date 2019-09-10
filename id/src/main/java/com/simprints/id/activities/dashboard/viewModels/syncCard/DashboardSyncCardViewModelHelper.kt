@@ -16,7 +16,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.runBlocking
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -124,7 +123,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
 
     private fun updateTotalUpSyncCount(): Completable =
-        Single.just(runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) })
+        Single.just(personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)))
             .flatMapCompletable {
                 viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()

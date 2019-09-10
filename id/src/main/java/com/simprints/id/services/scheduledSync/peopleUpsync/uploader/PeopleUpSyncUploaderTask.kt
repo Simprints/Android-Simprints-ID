@@ -1,11 +1,11 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import com.google.firebase.FirebaseNetworkException
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
@@ -15,7 +15,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
 
@@ -53,7 +52,7 @@ class PeopleUpSyncUploaderTask(
     }
 
     private fun thereArePeopleToSync(): Boolean {
-        val peopleToSyncCount = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) }
+        val peopleToSyncCount = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
         Timber.d("$peopleToSyncCount people to up-sync")
         return peopleToSyncCount > 0
     }
@@ -101,9 +100,7 @@ class PeopleUpSyncUploaderTask(
 
     private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
-        runBlocking {
-            personLocalDataSource.insertOrUpdate(updatedPeople)
-        }
+        personLocalDataSource.insertOrUpdate(updatedPeople)
     }
 
     private fun updateLastUpSyncTime() {

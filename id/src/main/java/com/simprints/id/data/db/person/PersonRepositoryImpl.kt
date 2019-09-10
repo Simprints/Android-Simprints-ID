@@ -5,7 +5,6 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Single
-import kotlinx.coroutines.runBlocking
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource) : PersonRepository {
@@ -19,8 +18,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
 
     override fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
-            runBlocking {
-                syncScope.toSubSyncScopes().map {
+            syncScope.toSubSyncScopes().map {
                     PeopleCount(it.projectId,
                         it.userId,
                         it.moduleId,
@@ -30,7 +28,6 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                             userId = it.userId,
                             moduleId = it.moduleId)))
                 }
-            }
         )
 
 
