@@ -7,11 +7,11 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 
-class ConsentTextManagerImpl(private val context: Context,
-                             private val consentDataManager: ConsentDataManager,
-                             private val crashReportManager: CrashReportManager,
-                             private val programName: String,
-                             private val organizationName: String) : ConsentTextManager {
+class ConsentRepositoryImpl(private val context: Context,
+                            private val consentLocalDataSource: ConsentLocalDataSource,
+                            private val crashReportManager: CrashReportManager,
+                            private val programName: String,
+                            private val organizationName: String) : ConsentRepository {
 
     private val generalConsentText = MutableLiveData<String>()
     private val parentalConsentText = MutableLiveData<String>()
@@ -22,7 +22,7 @@ class ConsentTextManagerImpl(private val context: Context,
     }
 
     override fun parentalConsentExists() = parentalConsentExists.apply {
-        postValue(consentDataManager.parentalConsentExists)
+        postValue(consentLocalDataSource.parentalConsentExists)
     }
 
     override fun getParentalConsentText(appRequest: AppRequest) = parentalConsentText.apply {
@@ -34,19 +34,19 @@ class ConsentTextManagerImpl(private val context: Context,
             programName, organizationName)
 
     private fun getGeneralConsentOptions() = try {
-        JsonHelper.gson.fromJson(consentDataManager.generalConsentOptionsJson, GeneralConsentOptions::class.java)
+        JsonHelper.gson.fromJson(consentLocalDataSource.generalConsentOptionsJson, GeneralConsentOptions::class.java)
     } catch (e: JsonSyntaxException) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed General Consent Text Error", e))
         GeneralConsentOptions()
     }
 
     private fun getParentalConsentData() =
-        ParentalConsentDataGenerator(consentDataManager.parentalConsentExists,
+        ParentalConsentDataGenerator(consentLocalDataSource.parentalConsentExists,
             getParentalConsentOptions(),
             programName, organizationName)
 
     private fun getParentalConsentOptions() = try {
-        JsonHelper.gson.fromJson(consentDataManager.parentalConsentOptionsJson, ParentalConsentOptions::class.java)
+        JsonHelper.gson.fromJson(consentLocalDataSource.parentalConsentOptionsJson, ParentalConsentOptions::class.java)
     } catch (e: JsonSyntaxException) {
         crashReportManager.logExceptionOrSafeException(Exception("Malformed Parental Consent Text Error", e))
         ParentalConsentOptions()

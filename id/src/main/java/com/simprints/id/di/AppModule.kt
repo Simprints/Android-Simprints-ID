@@ -18,10 +18,10 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionE
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
-import com.simprints.id.data.consent.shortconsent.ConsentDataManager
-import com.simprints.id.data.consent.shortconsent.ConsentDataManagerImpl
-import com.simprints.id.data.consent.shortconsent.ConsentTextManager
-import com.simprints.id.data.consent.shortconsent.ConsentTextManagerImpl
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
+import com.simprints.id.data.consent.shortconsent.ConsentRepository
+import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.local.LocalDbManager
@@ -262,19 +262,19 @@ open class AppModule {
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
 
     @Provides
-    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentDataManager =
-        ConsentDataManagerImpl(prefs, remoteConfigWrapper)
+    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
+        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
 
     @Provides
     open fun provideConsentTextManager(context: Context,
-                                       consentDataManager: ConsentDataManager,
+                                       consentLocalDataSource: ConsentLocalDataSource,
                                        crashReportManager: CrashReportManager,
-                                       preferencesManager: PreferencesManager) : ConsentTextManager =
-        ConsentTextManagerImpl(context, consentDataManager, crashReportManager,
+                                       preferencesManager: PreferencesManager) : ConsentRepository =
+        ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
             preferencesManager.programName, preferencesManager.organizationName)
 
     @Provides
-    open fun provideConsentViewModelFactory(consentTextManager: ConsentTextManager,
+    open fun provideConsentViewModelFactory(consentTextManager: ConsentRepository,
                                             sessionEventsManager: SessionEventsManager,
                                             timeHelper: TimeHelper) =
         ConsentViewModelFactory(consentTextManager, sessionEventsManager)

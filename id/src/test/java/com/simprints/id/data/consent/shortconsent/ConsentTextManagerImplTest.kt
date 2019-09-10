@@ -31,10 +31,10 @@ class ConsentTextManagerImplTest {
     @Test
     fun getGeneralConsentText_shouldReturnCorrectGeneralConsentText() {
 
-        val consentDataManagerMock = mock<ConsentDataManager>().apply {
+        val consentDataManagerMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { generalConsentOptionsJson } thenReturn JsonHelper.toJson(GeneralConsentOptions())
         }
-        val consentTextManager = ConsentTextManagerImpl(context,
+        val consentTextManager = ConsentRepositoryImpl(context,
             consentDataManagerMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME)
 
         val generalConsentText =
@@ -46,10 +46,10 @@ class ConsentTextManagerImplTest {
     @Test
     fun getParentalConsentText_shouldReturnCorrectParentalConsentText() {
 
-        val consentDataManagerMock = mock<ConsentDataManager>().apply {
+        val consentDataManagerMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentOptionsJson } thenReturn JsonHelper.toJson(ParentalConsentOptions())
         }
-        val consentTextManager = ConsentTextManagerImpl(context,
+        val consentTextManager = ConsentRepositoryImpl(context,
             consentDataManagerMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME)
 
         val parentalConsentText =
@@ -60,10 +60,10 @@ class ConsentTextManagerImplTest {
 
     @Test
     fun parentalConsentExists_shouldReturnValueFromConsentDataManager() {
-        val consentDataManagerMock = mock<ConsentDataManager>().apply {
+        val consentDataManagerMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentExists } thenReturn true
         }
-        val consentTextManager = ConsentTextManagerImpl(context,
+        val consentTextManager = ConsentRepositoryImpl(context,
             consentDataManagerMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME)
 
         val parentalConsentExists = consentTextManager.parentalConsentExists().value
