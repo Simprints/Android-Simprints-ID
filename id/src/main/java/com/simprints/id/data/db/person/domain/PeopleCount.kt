@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.peoplecount
+package com.simprints.id.data.db.person.domain
 
 import androidx.annotation.Keep
 import com.simprints.id.domain.modality.Modes

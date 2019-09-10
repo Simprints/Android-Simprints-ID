@@ -1,6 +1,6 @@
-package com.simprints.id.data.db.local.realm
+package com.simprints.id.data.db.common.realm
 
-import com.simprints.id.data.db.local.realm.PeopleRealmMigration.Companion.REALM_SCHEMA_VERSION
+import com.simprints.id.data.db.common.realm.PeopleRealmMigration.Companion.REALM_SCHEMA_VERSION
 import io.realm.RealmConfiguration
 
 object PeopleRealmConfig {
