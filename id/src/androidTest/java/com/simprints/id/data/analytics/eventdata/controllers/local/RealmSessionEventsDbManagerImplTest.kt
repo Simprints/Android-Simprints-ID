@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.eventdata.controllers.local
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
-import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.TimeHelper

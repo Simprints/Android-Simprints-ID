@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote
+package com.simprints.id.data.db.common
 
 import com.auth0.jwt.JWT
 import com.google.android.gms.tasks.Tasks

@@ -4,8 +4,8 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.network.PipeSeparatorWrapperForURLListParam
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
+import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Call

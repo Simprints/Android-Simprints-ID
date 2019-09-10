@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.network
+package com.simprints.id.data.db.project.remote
 
 import com.google.gson.JsonElement
 import com.simprints.id.data.db.project.domain.Project

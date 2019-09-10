@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.state
 import com.simprints.core.network.NetworkConstants
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.testtools.common.retrofit.createMockBehaviorService
 import com.simprints.testtools.common.syntax.whenever

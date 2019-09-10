@@ -1,7 +1,6 @@
 package com.simprints.id.data.secure
 
 import android.util.Base64
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException

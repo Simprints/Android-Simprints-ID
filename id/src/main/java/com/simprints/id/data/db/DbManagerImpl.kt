@@ -2,17 +2,17 @@ package com.simprints.id.data.db
 
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.RemoteProjectManager
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.PeopleCount
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -137,40 +137,4 @@ open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSour
             Completable.fromAction { projectLocalDataSource.save(it) }
                 .andThen(Single.just(it))
         }.trace("refreshProjectInfoWithServer")
-
-    override fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
-        personRemoteDataSource.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
-            getPeopleCountFromLocalForSyncScope(syncScope).map { peopleCountsInLocal ->
-                calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote, peopleCountsInLocal)
-            }
-        }
-
-    private fun calculateDifferenceBetweenRemoteAndLocal(peopleCountInRemote: List<PeopleCount>,
-                                                         peopleCountsInLocal: List<PeopleCount>): List<PeopleCount> =
-        peopleCountInRemote.map { remotePeopleCount ->
-            val localCount = peopleCountsInLocal.find {
-                it.projectId == remotePeopleCount.projectId &&
-                    it.userId == remotePeopleCount.userId &&
-                    it.moduleId == remotePeopleCount.moduleId &&
-                    it.modes?.joinToString() == remotePeopleCount.modes?.joinToString()
-            }?.count ?: 0
-
-            remotePeopleCount.copy(count = remotePeopleCount.count - localCount)
-        }
-
-    override fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
-        Single.just(
-            runBlocking {
-                syncScope.toSubSyncScopes().map {
-                    PeopleCount(it.projectId,
-                        it.userId,
-                        it.moduleId,
-                        syncScope.modes,
-                        personLocalDataSource.count(PersonLocalDataSource.Query(
-                            projectId = it.projectId,
-                            userId = it.userId,
-                            moduleId = it.moduleId)))
-                }
-            }
-        )
 }

@@ -49,7 +49,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
 @Singleton
 interface AppComponent {
 
@@ -59,6 +59,7 @@ interface AppComponent {
         fun application(app: Application): Builder
 
         fun appModule(appModule: AppModule): Builder
+        fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder

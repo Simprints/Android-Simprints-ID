@@ -1,8 +1,8 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import com.google.firebase.FirebaseNetworkException
-import com.simprints.id.data.db.local.room.UpSyncDao
-import com.simprints.id.data.db.local.room.UpSyncStatus
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource

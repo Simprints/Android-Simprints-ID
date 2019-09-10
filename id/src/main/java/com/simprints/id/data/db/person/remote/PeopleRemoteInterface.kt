@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.remote.network
+package com.simprints.id.data.db.person.remote
 
 import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
-import com.simprints.id.data.db.person.remote.models.ApiModes.*
+import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
 import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
 import io.reactivex.Single

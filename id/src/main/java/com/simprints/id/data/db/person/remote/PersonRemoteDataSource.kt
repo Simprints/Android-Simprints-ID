@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.person.remote
 
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable

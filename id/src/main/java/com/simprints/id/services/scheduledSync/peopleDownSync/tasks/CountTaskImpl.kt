@@ -1,10 +1,10 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 
-class CountTaskImpl(private val dbManager: DbManager) : CountTask {
+class CountTaskImpl(private val personRepository: PersonRepository) : CountTask {
 
     override fun execute(syncScope: SyncScope) =
-        dbManager.getPeopleCountToDownSync(syncScope)
+        personRepository.countToDownSync(syncScope)
 }

@@ -2,14 +2,14 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.local.room.DownSyncDao
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.getStatusId
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.toDomainPerson
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException

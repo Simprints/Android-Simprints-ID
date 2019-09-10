@@ -1,6 +1,5 @@
 package com.simprints.id.data.loginInfo
 
-import com.simprints.id.data.db.ProjectIdProvider
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 
 interface LoginInfoManager: ProjectIdProvider {
