@@ -32,7 +32,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     }
 
     private fun buildCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
-        coreStepProcessor.buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
+        coreStepProcessor.buildStepConsent(projectId, userId, moduleId, metadata)
 
 
     private fun buildVerifyCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
