@@ -13,6 +13,9 @@ interface AppRequestParamAction {
 }
 
 interface AppRequest : AppBaseRequest, AppRequestParamAction, Parcelable {
+
+    val type: AppRequestType
+
     companion object {
         const val BUNDLE_KEY = "ApiRequest"
 
@@ -24,4 +27,10 @@ interface AppRequest : AppBaseRequest, AppRequestParamAction, Parcelable {
                 else -> throw IllegalArgumentException("Invalid appRequest")
             }
     }
+}
+
+enum class AppRequestType {
+    ENROL,
+    IDENTIFY,
+    VERIFY
 }
