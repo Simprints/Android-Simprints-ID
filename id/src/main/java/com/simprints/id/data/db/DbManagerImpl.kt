@@ -3,7 +3,6 @@ package com.simprints.id.data.db
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.EnrolmentEvent
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -14,7 +13,6 @@ import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.trace
@@ -26,7 +24,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSource,
                          override var projectLocalDataSource: ProjectLocalDataSource,
@@ -70,7 +67,7 @@ open class DbManagerImpl(override var personLocalDataSource: PersonLocalDataSour
     }
 
     override fun savePerson(person: Person): Completable =
-        Completable.fromCallable { runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) } }
+        Completable.fromCallable { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) }
             .doOnComplete {
                 sessionEventsManager
                     .updateSession {

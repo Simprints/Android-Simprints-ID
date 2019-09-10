@@ -222,9 +222,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
         analyticsManager.analyticsId.onErrorReturn { "" }
 
     private fun fetchPeopleCountInLocalDatabase(): Single<Int> = Single.fromCallable {
-        runBlocking {
-            personLocalDataSource.count()
-        }
+        personLocalDataSource.count()
     }
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
