@@ -4,7 +4,8 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FingerprintEnrolResponse(val guid: String): FingerprintResponse() {
+data class FingerprintEnrolResponse(val guid: String): FingerprintResponse {
 
     @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.ENROL
+
 }

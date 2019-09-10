@@ -10,9 +10,11 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.cache.HotCacheImpl
@@ -133,16 +135,33 @@ class OrchestratorManagerImplTest {
         verifyOnce(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
 
     private fun prepareModalFlowForFaceEnrol() {
-        whenever(modalityFlowMock) { getNextStepToLaunch() } thenAnswer Answer { mockSteps.firstOrNull { it.status == NOT_STARTED } }
-        mockSteps.add(Step(CAPTURE.value, FaceStepProcessorImpl.ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, mock(), NOT_STARTED))
+        whenever(modalityFlowMock) {
+            getNextStepToLaunch()
+        } thenAnswer {
+            mockSteps.firstOrNull { it.status == NOT_STARTED }
+        }
+
+        val nFaceSamplesToCapture = 3
+        val request = FaceCaptureRequest(nFaceSamplesToCapture)
+
+        mockSteps.add(
+            Step(
+                CAPTURE.value,
+                FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                IFaceRequest.BUNDLE_KEY,
+                request,
+                NOT_STARTED
+            )
+        )
     }
 
     private fun buildOrchestratorManager(): OrchestratorManager {
         val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
-        val preferencesMock = mock<SharedPreferences>()
-        val hotCache = HotCacheImpl(preferencesMock)
+        val preferences = mock<SharedPreferences>()
+        val keystoreManager = mock<KeystoreManager>()
+        val hotCache = HotCacheImpl(preferences, keystoreManager)
 
         return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache)
     }
