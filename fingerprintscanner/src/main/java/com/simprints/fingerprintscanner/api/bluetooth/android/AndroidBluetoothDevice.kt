@@ -1,19 +1,18 @@
-package com.simprints.fingerprintscannermock.record
+package com.simprints.fingerprintscanner.api.bluetooth.android
 
 import android.bluetooth.BluetoothDevice
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentDevice
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
 import java.util.*
 
-class AndroidRecordBluetoothDevice(private val device: BluetoothDevice,
-                                   private val fileWithFakeBytes: String?): BluetoothComponentDevice {
+class AndroidBluetoothDevice(private val device: BluetoothDevice): BluetoothComponentDevice {
 
     override val name: String = device.name
 
     override fun isBonded(): Boolean = device.bondState == BluetoothDevice.BOND_BONDED
 
     override fun createRfcommSocketToServiceRecord(uuid: UUID): BluetoothComponentSocket =
-            AndroidRecordBluetoothSocket(device.createRfcommSocketToServiceRecord(uuid), fileWithFakeBytes)
+            AndroidBluetoothSocket(device.createRfcommSocketToServiceRecord(uuid))
 
     override val address: String = device.address
 }

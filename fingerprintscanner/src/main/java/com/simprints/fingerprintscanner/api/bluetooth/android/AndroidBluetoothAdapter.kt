@@ -1,23 +1,22 @@
-package com.simprints.fingerprintscannermock.record
+package com.simprints.fingerprintscanner.api.bluetooth.android
 
 import android.bluetooth.BluetoothAdapter
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentDevice
 
-class AndroidRecordBluetoothAdapter(private val adapter: BluetoothAdapter?,
-                                    private val fileWithFakeBytes: String?): BluetoothComponentAdapter {
+class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : BluetoothComponentAdapter {
 
     override fun isNull(): Boolean = adapter == null
 
     override fun isEnabled(): Boolean = adapter!!.isEnabled
 
     override fun getRemoteDevice(macAddress: String): BluetoothComponentDevice =
-            AndroidRecordBluetoothDevice(adapter!!.getRemoteDevice(macAddress), fileWithFakeBytes)
+            AndroidBluetoothDevice(adapter!!.getRemoteDevice(macAddress))
 
     override fun cancelDiscovery(): Boolean = adapter!!.cancelDiscovery()
 
     override fun getBondedDevices(): Set<BluetoothComponentDevice> =
             adapter!!.bondedDevices
-                    .map { AndroidRecordBluetoothDevice(it, fileWithFakeBytes) }
+                    .map { AndroidBluetoothDevice(it) }
                     .toSet()
 }

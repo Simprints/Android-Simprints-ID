@@ -22,10 +22,10 @@ import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedExce
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnexpectedScannerException
 import com.simprints.fingerprint.tools.Vibrate
 import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
-import com.simprints.fingerprintscanner.ButtonListener
-import com.simprints.fingerprintscanner.SCANNER_ERROR
-import com.simprints.fingerprintscanner.SCANNER_ERROR.*
-import com.simprints.fingerprintscanner.ScannerCallback
+import com.simprints.fingerprintscanner.v1.ButtonListener
+import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
+import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
+import com.simprints.fingerprintscanner.v1.ScannerCallback
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers

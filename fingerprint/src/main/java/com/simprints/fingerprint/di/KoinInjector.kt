@@ -30,8 +30,8 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.api.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel

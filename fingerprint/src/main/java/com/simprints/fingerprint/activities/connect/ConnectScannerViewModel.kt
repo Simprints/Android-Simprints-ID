@@ -16,7 +16,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.tools.extensions.getUcVersionString
-import com.simprints.fingerprintscanner.ScannerUtils.convertAddressToSerial
+import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy

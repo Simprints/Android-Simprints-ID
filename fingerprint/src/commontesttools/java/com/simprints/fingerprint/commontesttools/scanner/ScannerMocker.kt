@@ -3,10 +3,10 @@ package com.simprints.fingerprint.commontesttools.scanner
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGeneratorUtils
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
-import com.simprints.fingerprintscanner.SCANNER_ERROR
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprintscanner.enums.UN20_STATE
+import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
+import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprintscanner.v1.ScannerCallback
+import com.simprints.fingerprintscanner.v1.enums.UN20_STATE
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.setupMock
