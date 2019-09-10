@@ -3,7 +3,7 @@ package com.simprints.id.tools
 import android.os.Parcel
 import android.os.Parcelable
 
-internal class ParcelisedObject {
+internal class ParcelableConverter {
 
     private val parcel = Parcel.obtain()
 
