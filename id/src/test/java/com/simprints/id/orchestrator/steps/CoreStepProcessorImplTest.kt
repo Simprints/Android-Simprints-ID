@@ -12,7 +12,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldBuildRightStepForEnrol() {
         with(enrolAppRequest) {
-            val step = CoreStepProcessorImpl().buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
+            val step = CoreStepProcessorImpl().buildStepConsent(projectId, userId, moduleId, metadata)
 
             verifyCoreIntent<CoreStepRequest>(step, CoreRequestCode.CONSENT.value)
         }
@@ -21,7 +21,7 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldBuildRightStepForIdentify() {
         with(identifyAppRequest) {
-            val step = CoreStepProcessorImpl().buildStepEnrolOrIdentify(projectId, userId, moduleId, metadata)
+            val step = CoreStepProcessorImpl().buildStepConsent(projectId, userId, moduleId, metadata)
 
             verifyCoreIntent<CoreStepRequest>(step, CoreRequestCode.CONSENT.value)
         }

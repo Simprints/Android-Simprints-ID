@@ -11,8 +11,8 @@ class CoreStepProcessorImpl: CoreStepProcessor {
     companion object {
         const val CORE_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
     }
-    override fun buildStepEnrolOrIdentify(projectId: String, userId: String,
-                                          moduleId: String, metadata: String)=
+    override fun buildStepConsent(projectId: String, userId: String,
+                                  moduleId: String, metadata: String)=
         buildConsentStep(projectId, userId, moduleId, metadata)
 
     //Building normal ConsentStep for now
