@@ -1,8 +1,8 @@
-package com.simprints.id.data.db.remote.models
+package com.simprints.id.data.db.person.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.Fingerprint
 import com.simprints.core.tools.EncodingUtils
 
 @Keep

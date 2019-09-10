@@ -1,4 +1,4 @@
-package com.simprints.id
+package com.simprints.id.data.db.person.domain
 
 enum class FingerIdentifier {
     RIGHT_5TH_FINGER,

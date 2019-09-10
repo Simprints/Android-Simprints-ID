@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.models
+package com.simprints.id.data.db.person.remote.models
 
 import io.realm.internal.Keep
 
