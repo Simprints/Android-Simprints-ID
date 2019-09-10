@@ -1,6 +1,5 @@
 package com.simprints.id.orchestrator.modality
 
-import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
@@ -38,6 +37,4 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun buildVerifyCoreStep(projectId: String, userId: String, moduleId: String, metadata: String) =
         coreStepProcessor.buildStepVerify(projectId, userId, moduleId, metadata)
-
-    fun processResult(requestCode: Int, data: Intent?) = coreStepProcessor.processResult(requestCode, data)
 }
