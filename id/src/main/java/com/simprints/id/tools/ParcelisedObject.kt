@@ -3,11 +3,11 @@ package com.simprints.id.tools
 import android.os.Parcel
 import android.os.Parcelable
 
-internal class ParcelisedObject<T: Parcelable> {
+internal class ParcelisedObject {
 
     private val parcel = Parcel.obtain()
 
-    constructor(parcelable: T) {
+    constructor(parcelable: Parcelable) {
         val flags = 0
         parcelable.writeToParcel(parcel, flags)
     }
