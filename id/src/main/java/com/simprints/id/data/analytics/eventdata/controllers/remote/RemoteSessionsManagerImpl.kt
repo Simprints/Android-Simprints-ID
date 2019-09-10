@@ -1,8 +1,7 @@
-package com.simprints.id.data.db.remote.sessions
+package com.simprints.id.data.analytics.eventdata.controllers.remote
 
 import com.simprints.core.network.SimApiClient
-import com.simprints.id.data.analytics.eventdata.controllers.remote.SessionsRemoteInterface
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.common.RemoteDbManager
 import io.reactivex.Single
 
 

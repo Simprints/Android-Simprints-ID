@@ -17,9 +17,9 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.state.LoginStateMocker
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager

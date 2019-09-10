@@ -11,11 +11,11 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.person.local.models.toDomainPerson
 import com.simprints.id.data.db.person.local.models.toRealmPerson
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.toDomainPerson
 import com.simprints.id.data.db.person.remote.models.toApiGetPerson
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException

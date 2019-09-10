@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools
 
 import android.util.Base64
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.secure.LocalDbKey
 
 object DefaultTestConstants {
     const val DEFAULT_PROJECT_ID = "vkbpRLfHvpQqaeoxZgyx"

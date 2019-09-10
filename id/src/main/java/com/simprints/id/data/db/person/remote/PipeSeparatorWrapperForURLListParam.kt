@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote.network
+package com.simprints.id.data.db.person.remote
 
 //it wraps a list to print the values of it separated by |
 //Required by Retrofit to send params as moduleId=module1|module2

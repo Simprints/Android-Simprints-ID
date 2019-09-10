@@ -9,7 +9,7 @@ import androidx.work.workDataOf
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope

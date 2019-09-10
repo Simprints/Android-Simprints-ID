@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.person.remote.models
 
 import androidx.annotation.Keep
-import com.simprints.id.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 
 @Keep

@@ -1,11 +1,11 @@
-package com.simprints.id.data.db.local.room
+package com.simprints.id.data.db.syncstatus.upsyncinfo
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.simprints.id.data.db.local.room.UpSyncStatus.Companion.UP_SYNC_STATUS_CONST_ID
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus.Companion.UP_SYNC_STATUS_CONST_ID
 
 @Dao
 interface UpSyncDao {

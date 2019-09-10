@@ -7,8 +7,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.project.remote.RemoteProjectManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl

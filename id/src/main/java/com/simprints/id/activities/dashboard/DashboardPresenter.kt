@@ -6,8 +6,7 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher

@@ -1,8 +1,8 @@
 package com.simprints.id.data.db.person.local
 
 import android.content.Context
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.PeopleRealmConfig
+import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toDomainPerson

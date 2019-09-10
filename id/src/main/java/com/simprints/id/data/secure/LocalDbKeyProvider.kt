@@ -1,6 +1,5 @@
-package com.simprints.id.data.db.local
+package com.simprints.id.data.secure
 
-import com.simprints.id.data.db.local.models.LocalDbKey
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 
 interface LocalDbKeyProvider {

@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.remote
+package com.simprints.id.data.db.common
 
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import io.reactivex.Completable

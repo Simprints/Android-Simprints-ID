@@ -1,15 +1,13 @@
 package com.simprints.id.data.db
 
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.RemoteProjectManager
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.domain.PeopleCount
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -34,9 +32,4 @@ interface DbManager {
     fun loadProject(projectId: String): Single<Project>
 
     fun refreshProjectInfoWithServer(projectId: String): Single<Project>
-
-    fun getPeopleCountFromLocalForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>>
-
-    fun getPeopleCountToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
-
 }

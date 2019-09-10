@@ -8,7 +8,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.remote.RemoteDbManager
+import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.testtools.TestApplication

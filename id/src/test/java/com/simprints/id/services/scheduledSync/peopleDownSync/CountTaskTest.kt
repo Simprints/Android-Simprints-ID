@@ -7,7 +7,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl

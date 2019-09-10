@@ -15,25 +15,23 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.common.FirebaseManagerImpl
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
-import com.simprints.id.data.db.project.local.models.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.RemoteProjectManager
 import com.simprints.id.data.db.project.remote.RemoteProjectManagerImpl
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -215,30 +213,10 @@ open class AppModule {
         SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
 
     @Provides
-    open fun provideCountTask(dbManager: DbManager,
-                              syncStatusDatabase: SyncStatusDatabase): CountTask = CountTaskImpl(dbManager)
+    open fun provideCountTask(personRepository: PersonRepository): CountTask = CountTaskImpl(personRepository)
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
-
-    @Provides
-    open fun provideSyncInfoLocalDataSource(ctx: Context,
-                                            secureDataManager: SecureDataManager,
-                                            loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
-
-    @Provides
-    open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureDataManager,
-                                           loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
-
-
-    @Provides
-    open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
-                                          loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
 
 
     @Provides
