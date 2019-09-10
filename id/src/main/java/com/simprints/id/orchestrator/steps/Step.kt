@@ -1,25 +1,20 @@
 package com.simprints.id.orchestrator.steps
 
+import android.os.Parcel
 import android.os.Parcelable
-import com.google.gson.JsonParseException
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
-data class Step(val requestCode: Int,
-                val activityName: String,
-                val bundleKey: String,
-                val request: Request,
-                var status: Status) : Parcelable {
+data class Step(
+    val requestCode: Int,
+    val activityName: String,
+    val bundleKey: String,
+    val request: Request,
+    var status: Status
+) : Parcelable {
 
     var result: Result? = null
         set(value) {
@@ -29,91 +24,43 @@ data class Step(val requestCode: Int,
             }
         }
 
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+        dest?.run {
+            writeInt(requestCode)
+            writeString(activityName)
+            writeString(bundleKey)
+            writeParcelable(request, 0)
+            writeSerializable(status)
+            writeParcelable(result, 0)
+        }
+    }
+
+    override fun describeContents() = 0
+
+    companion object CREATOR : Parcelable.Creator<Step> {
+        override fun createFromParcel(source: Parcel): Step {
+            val requestCode = source.readInt()
+            val activityName = source.readString()!!
+            val bundleKey = source.readString()!!
+            val request = source.readParcelable<Request>(Request::class.java.classLoader)!!
+            val status = source.readSerializable() as Status
+            val result = source.readParcelable<Result>(Result::class.java.classLoader)
+
+            return Step(requestCode, activityName, bundleKey, request, status).also {
+                it.result = result
+            }
+        }
+
+        override fun newArray(size: Int): Array<Step?> = arrayOfNulls(size)
+    }
+
     enum class Status {
         NOT_STARTED, ONGOING, COMPLETED
     }
 
-    interface Request : Parcelable {
-        fun toJson(): String
-    }
+    interface Request : Parcelable
 
-    interface Result : Parcelable {
-        fun toJson(): String
-    }
-
-    class JsonAdapter : TypeAdapter<Step>() {
-        override fun read(input: JsonReader): Step? {
-            var step: Step? = null
-
-            with(input) {
-                var requestCode = -1
-                var activityName = ""
-                var bundleKey = ""
-                var request: Request? = null
-                var response: Result? = null
-                var status: Status = Status.NOT_STARTED
-
-                beginObject()
-
-                while (hasNext()) {
-                    when (nextName()) {
-                        FIELD_REQUEST_CODE -> requestCode = nextInt()
-                        FIELD_ACTIVITY_NAME -> activityName = nextString()
-                        FIELD_BUNDLE_KEY -> bundleKey = nextString()
-                        FIELD_REQUEST -> request = parseRequest()
-                        FIELD_RESULT -> response = parseResult()
-                        FIELD_STATUS -> status = Status.valueOf(nextString())
-                    }
-                }
-
-                request?.let {
-                    step = Step(requestCode, activityName, bundleKey, request, status).also {
-                        it.result = response
-                    }
-                }
-            }
-
-            input.endObject()
-            return step
-        }
-
-        override fun write(output: JsonWriter, value: Step) {
-            with(output) {
-                beginObject()
-                name(FIELD_REQUEST_CODE).value(value.requestCode)
-                name(FIELD_ACTIVITY_NAME).value(value.activityName)
-                name(FIELD_BUNDLE_KEY).value(value.bundleKey)
-                name(FIELD_REQUEST).value(value.request.toJson())
-                value.result?.let { name(FIELD_RESULT).value(it.toJson()) }
-                name(FIELD_STATUS).value(value.status.name)
-                endObject()
-            }
-        }
-
-        private fun JsonReader.parseRequest(): Request {
-            val faceCapture = FaceCaptureRequest.tryParse(this)
-            val fingerprintEnrol = FingerprintEnrolRequest.tryParse(this)
-
-            val possibleRequests = listOf(faceCapture, fingerprintEnrol)
-
-            return possibleRequests.first {
-                it != null
-            } ?: throw JsonParseException("Could not parse JSON into request")
-        }
-
-        private fun JsonReader.parseResult(): Result? {
-            TODO()
-        }
-
-        private companion object {
-            const val FIELD_REQUEST_CODE = "requestCode"
-            const val FIELD_ACTIVITY_NAME = "activityName"
-            const val FIELD_BUNDLE_KEY = "bundleKey"
-            const val FIELD_REQUEST = "request"
-            const val FIELD_RESULT = "result"
-            const val FIELD_STATUS = "status"
-        }
-    }
+    interface Result : Parcelable
 }
 
 fun Step.Request.fromDomainToModuleApi(): Parcelable =

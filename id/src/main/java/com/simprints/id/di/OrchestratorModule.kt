@@ -6,6 +6,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
@@ -89,13 +90,25 @@ class OrchestratorModule {
         OrchestratorEventsHelperImpl(sessionEventsManager, timeHelper)
 
     @Provides
-    fun provideOrchestratorViewModelFactory(orchestratorManager: OrchestratorManager,
-                                            orchestratorEventsHelper: OrchestratorEventsHelper,
-                                            preferenceManager: PreferencesManager,
-                                            sessionEventsManager: SessionEventsManager) =
-        OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager.modalities, sessionEventsManager, DomainToModuleApiAppResponse)
+    fun provideOrchestratorViewModelFactory(
+        orchestratorManager: OrchestratorManager,
+        orchestratorEventsHelper: OrchestratorEventsHelper,
+        preferenceManager: PreferencesManager,
+        sessionEventsManager: SessionEventsManager
+    ): OrchestratorViewModelFactory {
+        return OrchestratorViewModelFactory(
+            orchestratorManager,
+            orchestratorEventsHelper,
+            preferenceManager.modalities,
+            sessionEventsManager,
+            DomainToModuleApiAppResponse
+        )
+    }
 
     @Provides
-    fun provideHotCache(preferences: SharedPreferences) : HotCache = HotCacheImpl(preferences)
+    fun provideHotCache(
+        preferences: SharedPreferences,
+        keystoreManager: KeystoreManager
+    ): HotCache = HotCacheImpl(preferences, keystoreManager)
 
 }

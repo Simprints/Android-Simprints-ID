@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class FaceCaptureResponse(
     val capturingResult: List<FaceCaptureResult>
-) : Parcelable, FaceResponse()
+) : Parcelable, FaceResponse
 
 fun IFaceCaptureResponse.fromModuleApiToDomain(): FaceCaptureResponse =
     FaceCaptureResponse(capturingResult.map { it.fromModuleApiToDomain() })

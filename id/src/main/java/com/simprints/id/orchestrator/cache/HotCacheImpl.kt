@@ -1,15 +1,14 @@
 package com.simprints.id.orchestrator.cache
 
 import android.content.SharedPreferences
-import android.util.Base64
-import com.google.gson.GsonBuilder
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.tools.ParcelisedObject
 
-class HotCacheImpl(private val preferences: SharedPreferences) : HotCache {
+class HotCacheImpl(private val preferences: SharedPreferences,
+                   private val keystoreManager: KeystoreManager) : HotCache {
 
-    private val gson = GsonBuilder().also(::registerStepAdapter).create()
-
-    private val steps by lazy { preferences.getStringSet(KEY_STEPS, null)?.toMutableSet() }
+    private val steps = preferences.getStringSet(KEY_STEPS, null)?.toMutableSet()
 
     override fun save(step: Step?) {
         step?.let {
@@ -27,19 +26,20 @@ class HotCacheImpl(private val preferences: SharedPreferences) : HotCache {
     }
 
     private fun encrypt(step: Step): String {
-        val json = gson.toJson(step)
-        return Base64.encodeToString(json.toByteArray(), Base64.DEFAULT)
+        val parcelisedObject = ParcelisedObject(step)
+        val string = String(parcelisedObject.toBytes())
+        parcelisedObject.recycle()
+        return keystoreManager.encryptString(string)
     }
 
-    private fun decrypt(encryptedJson: String?): Step? {
-        return encryptedJson?.let {
-            val json = String(Base64.decode(it, Base64.DEFAULT))
-            gson.fromJson(json, Step::class.java)
+    private fun decrypt(encryptedStep: String?): Step? {
+        return encryptedStep?.let {
+            val bytes = keystoreManager.decryptString(it).toByteArray()
+            val parcelisedObject = ParcelisedObject<Step>(bytes)
+            val parcel = parcelisedObject.getParcel()
+            parcelisedObject.recycle()
+            Step.createFromParcel(parcel)
         }
-    }
-
-    private fun registerStepAdapter(gsonBuilder: GsonBuilder) {
-        gsonBuilder.registerTypeAdapter(Step::class.java, Step.JsonAdapter())
     }
 
     private companion object {

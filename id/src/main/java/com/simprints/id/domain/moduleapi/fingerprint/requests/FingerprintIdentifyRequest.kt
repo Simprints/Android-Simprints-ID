@@ -15,5 +15,5 @@ data class FingerprintIdentifyRequest(val projectId: String,
                                       val programName: String,
                                       val organizationName: String,
                                       val matchGroup: FingerprintMatchGroup,
-                                      val returnIdCount: Int) : FingerprintRequest()
+                                      val returnIdCount: Int) : FingerprintRequest
 

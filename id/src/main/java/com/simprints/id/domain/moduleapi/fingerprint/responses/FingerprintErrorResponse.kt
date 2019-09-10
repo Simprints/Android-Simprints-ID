@@ -8,7 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class FingerprintErrorResponse(
     val fingerprintErrorReason: FingerprintErrorReason
-): FingerprintResponse() {
+): FingerprintResponse {
 
     @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.ENROL
 }

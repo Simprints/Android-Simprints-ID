@@ -9,24 +9,15 @@ import com.simprints.moduleapi.face.requests.IFaceEnrolRequest
 import com.simprints.moduleapi.face.requests.IFaceIdentifyRequest
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.requests.IFaceVerifyRequest
-import java.security.InvalidParameterException
 
 object FaceToDomainRequest {
 
+    // TODO: temporary implementation
     fun fromFaceToDomainRequest(faceRequest: IFaceRequest): FaceRequest =
         when (faceRequest) {
-            is IFaceEnrolRequest ->
-                with(faceRequest) {
-                    FaceEnrolRequest(projectId, moduleId, userId)
-                }
-            is IFaceIdentifyRequest ->
-                with(faceRequest) {
-                    FaceIdentifyRequest(projectId, moduleId, userId)
-                }
-            is IFaceVerifyRequest ->
-                with(faceRequest) {
-                    FaceVerifyRequest(projectId, moduleId, userId)
-                }
+            is IFaceEnrolRequest -> FaceEnrolRequest("projectId", "userId", "moduleId")
+            is IFaceIdentifyRequest -> FaceIdentifyRequest("", "", "")
+            is IFaceVerifyRequest -> FaceVerifyRequest("", "", "")
             else -> throw InvalidFaceRequestException()
         }
 }

@@ -7,6 +7,6 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class FingerprintVerifyResponse(
     val matchingResult: FingerprintMatchingResult
-) : FingerprintResponse() {
+) : FingerprintResponse {
     @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.VERIFY
 }

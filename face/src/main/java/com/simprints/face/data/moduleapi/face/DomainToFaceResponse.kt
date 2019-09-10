@@ -10,6 +10,8 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier
 import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier.*
 import com.simprints.face.exceptions.InvalidFaceResponseException
 import com.simprints.moduleapi.face.responses.*
+import com.simprints.moduleapi.face.responses.entities.IFaceMatchingResult
+import com.simprints.moduleapi.face.responses.entities.IFaceTier
 import kotlinx.android.parcel.Parcelize
 
 object DomainToFaceResponse {
@@ -24,7 +26,7 @@ object DomainToFaceResponse {
                 fromDomainToFaceIdentifyResponse(fingerprintResponse)
             else -> throw InvalidFaceResponseException()
         }
-    
+
     private fun fromDomainToFaceEnrolResponse(enrol: FaceEnrolResponse): IFaceEnrolResponse = IFaceEnrolResponseImpl(enrol.guid)
 
     private fun fromDomainToFaceVerifyResponse(verify: FaceVerifyResponse): IFaceVerifyResponse {
@@ -52,16 +54,26 @@ object DomainToFaceResponse {
         }
 }
 
+// TODO: temporary implementation
 @Parcelize
-private class IFaceEnrolResponseImpl(override val guid: String) : IFaceEnrolResponse
+private class IFaceEnrolResponseImpl(
+    override val guid: String,
+    override val type: IFaceResponseType = IFaceResponseType.CAPTURE
+) : IFaceEnrolResponse
 
+// TODO: temporary implementation
 @Parcelize
 private class IFaceIdentifyResponseImpl(
-    override val identifications: List<IFaceMatchingResult>) : IFaceIdentifyResponse
+    override val identifications: List<IFaceMatchingResult>,
+    override val type: IFaceResponseType = IFaceResponseType.IDENTIFY
+) : IFaceIdentifyResponse
 
-
+// TODO: temporary implementation
 @Parcelize
-private class IFaceVerifyResponseImpl(override val matchingResult: IFaceMatchingResult) : IFaceVerifyResponse
+private class IFaceVerifyResponseImpl(
+    override val matchingResult: IFaceMatchingResult,
+    override val type: IFaceResponseType = IFaceResponseType.VERIFY
+) : IFaceVerifyResponse
 
 @Parcelize
 private data class IFaceMatchingResultImpl(
