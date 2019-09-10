@@ -42,7 +42,7 @@ class ModalityFlowIdentifyImplTest {
 
         whenever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
-        whenever(coreStepProcessor) { buildStepConsent(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn coreStepMock
+        whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
 
         modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }

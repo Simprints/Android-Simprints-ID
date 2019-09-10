@@ -4,7 +4,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
@@ -38,7 +39,7 @@ class ConsentTextManagerImplTest {
             consentDataManagerMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME)
 
         val generalConsentText =
-            consentTextManager.getGeneralConsentText(AppEnrolRequest(PROJECT_ID, USER_ID, MODULE_ID, "")).value
+            consentTextManager.getGeneralConsentText(AskConsentRequest(ConsentType.ENROL)).value
 
         assertThat(generalConsentText).isEqualTo(GENERAL_CONSENT_ENROL_TEXT)
     }
@@ -53,7 +54,7 @@ class ConsentTextManagerImplTest {
             consentDataManagerMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME)
 
         val parentalConsentText =
-            consentTextManager.getParentalConsentText(AppEnrolRequest(PROJECT_ID, USER_ID, MODULE_ID, "")).value
+            consentTextManager.getParentalConsentText(AskConsentRequest(ConsentType.ENROL)).value
 
         assertThat(parentalConsentText).isEqualTo(PARENTAL_CONSENT_ENROL_TEXT)
     }
