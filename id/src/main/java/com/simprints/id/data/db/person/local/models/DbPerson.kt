@@ -1,7 +1,7 @@
-package com.simprints.id.data.db.local.realm.models
+package com.simprints.id.data.db.person.local
 
-import com.simprints.id.domain.Person
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.Fingerprint
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList
 import io.realm.RealmObject

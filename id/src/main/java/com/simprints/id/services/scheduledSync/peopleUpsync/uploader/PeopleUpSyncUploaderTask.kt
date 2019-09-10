@@ -1,24 +1,26 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import com.google.firebase.FirebaseNetworkException
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
 import com.simprints.id.data.db.local.room.UpSyncStatus
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import io.reactivex.Flowable
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
-class PeopleUpSyncUploaderTask (
+class PeopleUpSyncUploaderTask(
     private val loginInfoManager: LoginInfoManager,
-    private val localDbManager: LocalDbManager,
-    private val remotePeopleManager: RemotePeopleManager,
+    private val personLocalDataSource: PersonLocalDataSource,
+    private val personRemoteDataSource: PersonRemoteDataSource,
     private val projectId: String,
     /*private val userId: String,*/
     private val batchSize: Int,
@@ -46,16 +48,18 @@ class PeopleUpSyncUploaderTask (
     }
 
     private fun thereArePeopleToSync(): Boolean {
-        val peopleToSyncCount = localDbManager
-            .getPeopleCountFromLocal(/*userId = userId, */toSync = true)
-            .blockingGet()
+        val peopleToSyncCount = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) }
         Timber.d("$peopleToSyncCount people to up-sync")
         return peopleToSyncCount > 0
     }
 
-    private fun getPeopleToSyncInBatches(): Flowable<List<Person>> =
-        localDbManager.loadPeopleFromLocalRx(/*userId = userId, */toSync = true)
-            .buffer(batchSize)
+    private fun getPeopleToSyncInBatches(): Flowable<List<Person>> = Flowable.fromPublisher { publisher ->
+        runBlocking {
+            personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).collect {
+                publisher.onNext(listOf(it))
+            }
+        }
+    }
 
     private fun upSyncBatch(people: List<Person>) {
         uploadPeople(people)
@@ -67,7 +71,7 @@ class PeopleUpSyncUploaderTask (
 
     private fun uploadPeople(people: List<Person>) =
         try {
-            remotePeopleManager
+            personRemoteDataSource
                 .uploadPeople(projectId, people)
                 .blockingAwait()
         } catch (exception: IOException) {
@@ -84,9 +88,9 @@ class PeopleUpSyncUploaderTask (
 
     private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
-        localDbManager
-            .insertOrUpdatePeopleInLocal(updatedPeople)
-            .blockingAwait()
+        runBlocking {
+            personLocalDataSource.insertOrUpdate(updatedPeople)
+        }
     }
 
     private fun updateLastUpSyncTime() {

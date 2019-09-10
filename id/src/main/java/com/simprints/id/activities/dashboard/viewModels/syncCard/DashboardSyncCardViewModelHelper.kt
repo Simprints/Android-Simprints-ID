@@ -2,9 +2,9 @@ package com.simprints.id.activities.dashboard.viewModels.syncCard
 
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.UpSyncStatus
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -16,6 +16,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.runBlocking
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -25,7 +26,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        isDownSyncRunning: Boolean) {
 
     @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
@@ -123,7 +124,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
 
     private fun updateTotalUpSyncCount(): Completable =
-        localDbManager.getPeopleCountFromLocal(toSync = true)
+        Single.just(runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)) })
             .flatMapCompletable {
                 viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()

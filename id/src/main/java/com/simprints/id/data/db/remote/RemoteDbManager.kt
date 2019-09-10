@@ -3,7 +3,6 @@ package com.simprints.id.data.db.remote
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import io.reactivex.Completable
 import io.reactivex.Single
-import com.simprints.id.domain.Person as LibPerson
 
 interface RemoteDbManager {
 

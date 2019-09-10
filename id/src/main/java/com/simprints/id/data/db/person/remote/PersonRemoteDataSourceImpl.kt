@@ -1,13 +1,16 @@
-package com.simprints.id.data.db.remote.people
+package com.simprints.id.data.db.person.remote
 
 import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.remote.FirebaseManagerImpl
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.*
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.toApiPostPerson
+import com.simprints.id.data.db.person.remote.models.toDomainPeopleCount
+import com.simprints.id.data.db.person.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
 import com.simprints.id.data.db.remote.network.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.domain.PeopleCount
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -20,7 +23,7 @@ import retrofit2.HttpException
 import java.io.IOException
 
 
-open class RemotePeopleManagerImpl(private val remoteDbManager: RemoteDbManager) : RemotePeopleManager {
+open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager) : PersonRemoteDataSource {
 
     override fun downloadPerson(patientId: String, projectId: String): Single<Person> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->

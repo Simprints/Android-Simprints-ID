@@ -4,9 +4,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.local.realm.models.DbPerson
-import com.simprints.id.data.db.local.realm.models.toDomainPerson
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.DbPerson
+import com.simprints.id.data.db.person.local.models.toDomainPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.testtools.common.syntax.mock

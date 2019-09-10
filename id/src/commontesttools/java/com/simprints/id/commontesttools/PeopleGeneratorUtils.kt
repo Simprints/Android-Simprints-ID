@@ -1,7 +1,7 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.domain.Fingerprint
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*

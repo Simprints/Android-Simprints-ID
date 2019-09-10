@@ -3,9 +3,9 @@ package com.simprints.id.services.scheduledSync.peopleUpsync
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.UpSyncDao
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
@@ -20,7 +20,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private val loginInfoManager: LoginInfoManager = mock()
     private val localDbManager: LocalDbManager = mock()
-    private val remotePeopleManager: RemotePeopleManager = mock()
+    private val personRemoteDataSource: PersonRemoteDataSource = mock()
     private val upSyncDao: UpSyncDao = mock()
 
     private val projectIdToSync = "projectIdToSync"
@@ -28,7 +28,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val batchSize = 2
 
     private val task = PeopleUpSyncUploaderTask(
-        loginInfoManager, localDbManager, remotePeopleManager,
+        loginInfoManager, localDbManager, personRemoteDataSource,
         projectIdToSync, /*userIdToSync, */batchSize, upSyncDao // TODO: uncomment userId when multitenancy is properly implemented
     )
 
@@ -70,7 +70,7 @@ class PeopleUpSyncUploaderTaskTest {
     fun simprintsInternalServerException_shouldWrapInTransientSyncFailureException() {
         mockSignedInUser(projectIdToSync, userIdToSync)
         mockSuccessfulLocalPeopleQueries(listOf(notYetSyncedPerson1))
-        whenever(remotePeopleManager.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)))
+        whenever(personRemoteDataSource.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)))
             .thenThrow(SimprintsInternalServerException())
 
         assertThrows<TransientSyncFailureException> {
@@ -162,7 +162,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private fun mockSuccessfulPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
-            whenever(remotePeopleManager.uploadPeople(projectIdToSync, batch)).thenReturn(Completable.complete())
+            whenever(personRemoteDataSource.uploadPeople(projectIdToSync, batch)).thenReturn(Completable.complete())
         }
     }
 
@@ -184,7 +184,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private fun verifyPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
-            verifyOnce(remotePeopleManager) { uploadPeople(projectIdToSync, batch) }
+            verifyOnce(personRemoteDataSource) { uploadPeople(projectIdToSync, batch) }
         }
     }
 

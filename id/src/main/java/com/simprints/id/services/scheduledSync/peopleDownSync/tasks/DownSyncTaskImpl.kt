@@ -6,10 +6,11 @@ import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.db.local.room.DownSyncDao
 import com.simprints.id.data.db.local.room.DownSyncStatus
 import com.simprints.id.data.db.local.room.getStatusId
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.toDomainPerson
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.toDomainPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -17,14 +18,16 @@ import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
 import java.io.Reader
 import java.util.*
 
-class DownSyncTaskImpl(val localDbManager: LocalDbManager,
-                       val remotePeopleManager: RemotePeopleManager,
+class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
+                       val local: LocalDbManager,
+                       val personRemoteDataSource: PersonRemoteDataSource,
                        val timeHelper: TimeHelper,
                        private val downSyncDao: DownSyncDao) : DownSyncTask {
 
@@ -43,7 +46,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
         this.subSyncScope = subSyncScope
         val syncNeeded = syncNeeded()
         return if (syncNeeded) {
-            remotePeopleManager.getPeopleApiClient()
+            personRemoteDataSource.getPeopleApiClient()
                 .makeDownSyncApiCallAndGetResponse()
                 .setupJsonReaderFromResponse()
                 .createPeopleObservableFromJsonReader()
@@ -110,7 +113,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
             Completable.fromAction {
-                localDbManager.insertOrUpdatePeopleInLocal(batchOfPeople.map { it.toDomainPerson() }).blockingAwait()
+                runBlocking { personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.toDomainPerson() }) }
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
@@ -138,7 +141,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
     private fun getLastPatientUpdatedAtFromRealmAndMigrateIt(): Long? = fetchDbSyncInfoFromRealmAndMigrateIt()?.lastPatientUpdatedAt
     private fun fetchDbSyncInfoFromRealmAndMigrateIt(): DownSyncStatus? {
         return try {
-            val dbSyncInfo = localDbManager.getDbSyncInfo(subSyncScope).blockingGet()
+            val dbSyncInfo = local.getDbSyncInfo(subSyncScope).blockingGet()
             val currentDownSyncStatus = downSyncDao.getDownSyncStatusForId(getDownSyncId())
 
             val newDownSyncStatus =
@@ -148,7 +151,7 @@ class DownSyncTaskImpl(val localDbManager: LocalDbManager,
                     ?: DownSyncStatus(subSyncScope, dbSyncInfo.lastKnownPatientId, dbSyncInfo.lastKnownPatientUpdatedAt.time)
 
             downSyncDao.insertOrReplaceDownSyncStatus(newDownSyncStatus)
-            localDbManager.deleteSyncInfo(subSyncScope)
+            local.deleteSyncInfo(subSyncScope)
             newDownSyncStatus
         } catch (t: Throwable) {
             if (t is NoSuchDbSyncInfoException) {

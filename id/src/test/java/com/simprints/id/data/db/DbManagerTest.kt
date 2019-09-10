@@ -10,15 +10,15 @@ import com.simprints.testtools.common.di.DependencyRule.*
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.toDomainPerson
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.toDomainPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.toDomainPerson
-import com.simprints.id.data.db.remote.models.toApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.toDomainPerson
+import com.simprints.id.data.db.person.remote.models.toApiGetPerson
 import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.PeopleApiServiceMock
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -56,7 +56,7 @@ class DbManagerTest {
 
     @Inject lateinit var localDbManagerSpy: LocalDbManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
-    @Inject lateinit var remotePeopleManagerSpy: RemotePeopleManager
+    @Inject lateinit var personRemoteDataSourceSpy: PersonRemoteDataSource
     @Inject lateinit var sessionEventsLocalDbManagerSpy: SessionEventsLocalDbManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
     @Inject lateinit var dbManager: DbManager
@@ -125,7 +125,7 @@ class DbManagerTest {
         testObserver.assertNoErrors()
             .assertValue { personFetchResult -> personFetchResult.fetchedOnline }
 
-        verifyOnce(remotePeopleManagerSpy) { downloadPerson(person.patientId, person.projectId) }
+        verifyOnce(personRemoteDataSourceSpy) { downloadPerson(person.patientId, person.projectId) }
     }
 
     @Test
@@ -157,7 +157,7 @@ class DbManagerTest {
         }.toDomainPerson()
 
         val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
+        whenever(personRemoteDataSourceSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
 
         val testObservable = dbManager.savePerson(fakePerson).test()
 
@@ -183,7 +183,7 @@ class DbManagerTest {
         testObserver.awaitTerminalEvent()
         testObserver.assertError(DownloadingAPersonWhoDoesntExistOnServerException::class.java)
 
-        verifyOnce(remotePeopleManagerSpy) { downloadPerson(person.patientId, person.projectId) }
+        verifyOnce(personRemoteDataSourceSpy) { downloadPerson(person.patientId, person.projectId) }
     }
 
     @Test
@@ -191,14 +191,14 @@ class DbManagerTest {
         val person = PeopleGeneratorUtils.getRandomPerson()
 
         val poorNetworkClientMock: PeopleRemoteInterface = PeopleApiServiceMock(createMockBehaviorService(apiClient.retrofit, 100, PeopleRemoteInterface::class.java))
-        whenever(remotePeopleManagerSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
+        whenever(personRemoteDataSourceSpy) { getPeopleApiClient() } thenReturn Single.just(poorNetworkClientMock)
 
         val testObserver = dbManager.loadPerson(person.projectId, person.patientId).test()
 
         testObserver.awaitTerminalEvent()
         testObserver.assertError(IOException::class.java)
 
-        verifyOnce(remotePeopleManagerSpy) { downloadPerson(person.patientId, person.projectId) }
+        verifyOnce(personRemoteDataSourceSpy) { downloadPerson(person.patientId, person.projectId) }
     }
 
     @After

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 import com.simprints.fingerprintmatcher.Person as PersonMatcher
-import com.simprints.id.domain.Person as PersonCore
+import com.simprints.id.data.db.person.domain.Person as PersonCore
 
 @Parcelize
 data class Person(

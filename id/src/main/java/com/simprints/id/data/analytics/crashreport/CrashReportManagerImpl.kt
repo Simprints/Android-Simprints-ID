@@ -2,7 +2,7 @@ package com.simprints.id.data.analytics.crashreport
 
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS

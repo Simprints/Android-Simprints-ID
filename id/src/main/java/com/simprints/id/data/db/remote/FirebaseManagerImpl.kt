@@ -8,7 +8,6 @@ import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
 import io.reactivex.Completable
 import io.reactivex.Single
 import timber.log.Timber
-import com.simprints.id.domain.Person as LibPerson
 
 open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteDbManager {
 
