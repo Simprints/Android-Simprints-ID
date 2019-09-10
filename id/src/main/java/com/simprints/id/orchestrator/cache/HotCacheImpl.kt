@@ -35,7 +35,7 @@ class HotCacheImpl(private val preferences: SharedPreferences,
     private fun decrypt(encryptedStep: String?): Step? {
         return encryptedStep?.let {
             val bytes = keystoreManager.decryptString(it).toByteArray()
-            val parcelisedObject = ParcelisedObject<Step>(bytes)
+            val parcelisedObject = ParcelisedObject(bytes)
             val parcel = parcelisedObject.getParcel()
             parcelisedObject.recycle()
             Step.createFromParcel(parcel)
