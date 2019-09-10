@@ -10,11 +10,11 @@ import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedExcepti
 import com.simprints.fingerprint.exceptions.unexpected.scanner.BluetoothNotSupportedException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.NullScannerException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
-import com.simprints.fingerprintscanner.SCANNER_ERROR
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprintscanner.ScannerUtils
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
+import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprintscanner.v1.ScannerCallback
+import com.simprints.fingerprintscanner.v1.ScannerUtils
+import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 

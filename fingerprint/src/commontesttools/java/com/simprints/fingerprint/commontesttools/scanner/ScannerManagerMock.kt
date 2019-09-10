@@ -2,7 +2,7 @@ package com.simprints.fingerprint.commontesttools.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.v1.Scanner
 import io.reactivex.Completable
 
 class ScannerManagerMock(override var scanner: Scanner?,

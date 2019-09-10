@@ -13,7 +13,7 @@ import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
-import com.simprints.fingerprintscanner.Scanner
+import com.simprints.fingerprintscanner.v1.Scanner
 import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.syntax.failTest
