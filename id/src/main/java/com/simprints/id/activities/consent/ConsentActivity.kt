@@ -11,10 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.exitform.CoreExitFormActivity
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
@@ -33,6 +35,7 @@ class ConsentActivity : AppCompatActivity() {
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     private var startConsentEventTime: Long = 0
 
@@ -112,6 +115,9 @@ class ConsentActivity : AppCompatActivity() {
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
         //STOPSHIP: Launch Exit Form and decide on creating a separate OrchestratorManager for core
+        if (preferencesManager.modalities.size > 1) {
+            startCoreExitFormActivity()
+        }
     }
 
     fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
@@ -129,6 +135,10 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun startPrivacyNoticeActivity() {
         startActivity(Intent(this, PricvacyNoticeActivity::class.java))
+    }
+
+    private fun startCoreExitFormActivity() {
+        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), 12)
     }
 
     companion object {

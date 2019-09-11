@@ -420,5 +420,18 @@
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
+    <string name="title_activity_exit_form">ExitFormActivity</string>
 
+    <!--Exit form-->
+    <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
+    <string name="refusal_toast_submit">Please submit form</string>
+    <string name="refusal_religious_concerns">Religious concerns</string>
+    <string name="refusal_data_concerns">Does not want to give data</string>
+    <string name="refusal_does_not_have_permission">Does not have permission</string>
+    <string name="refusal_app_not_working">App not working</string>
+    <string name="refusal_person_not_present">Person not present</string>
+    <string name="refusal_too_young">Too young</string>
+    <string name="refusal_other">Other</string>
+    <string name="beneficiary_refused">Beneficiary refused</string>
+    <string name="scanner_not_working">Scanner not working</string>
 </resources>
