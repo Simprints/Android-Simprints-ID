@@ -50,9 +50,14 @@ class OrchestratorManagerImplTest {
     private lateinit var modalityFlowMock: ModalityFlow
     private lateinit var orchestrator: OrchestratorManager
     private val mockSteps = mutableListOf<Step>()
-    val modalities = listOf(FACE)
+    private val modalities = listOf(FACE)
 
-    private val appEnrolRequest = AppEnrolRequest("some_project_id", "some_user_id", "some_module_id", "some_metadata")
+    private val appEnrolRequest = AppEnrolRequest(
+        "some_project_id",
+        "some_user_id",
+        "some_module_id",
+        "some_metadata"
+    )
 
     @Before
     fun setUp() {
@@ -71,36 +76,35 @@ class OrchestratorManagerImplTest {
         orchestrator = buildOrchestratorManager()
         prepareModalFlowForFaceEnrol()
 
-        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME)).respondWith(ActivityResult(Activity.RESULT_OK, null))
+        intending(toPackage(FaceStepProcessorImpl.ACTIVITY_CLASS_NAME))
+            .respondWith(ActivityResult(Activity.RESULT_OK, null))
     }
 
     @Test
     fun orchestratorStarts_shouldGetFirstStepFromModalityFlow() {
-        with(orchestrator) {
-            runBlocking {
-                startFlowForEnrol(modalities)
-            }
-
-            verifyOrchestratorGotNextStepFromModalityFlow()
+        runBlocking {
+            orchestrator.startFlowForEnrol(modalities)
         }
+
+        verifyOrchestratorGotNextStepFromModalityFlow()
     }
 
     @Test
     fun modalityFlowCompletes_orchestratorShouldTryToBuildAppResponse() {
-        with(orchestrator) {
-            runBlocking {
+        runBlocking {
+            with(orchestrator) {
                 startFlowForEnrol(modalities)
                 progressWitFaceCapture()
             }
-
-            verifyOrchestratorTriedToBuildFinalAppResponse()
         }
+
+        verifyOrchestratorTriedToBuildFinalAppResponse()
     }
 
     @Test
     fun modalityFlowReceivesAWrongResult_orchestratorShouldNotGoAhead() {
-        with(orchestrator) {
-            runBlocking {
+        runBlocking {
+            with(orchestrator) {
                 startFlowForEnrol(modalities)
                 progressWitFaceCapture(WRONG_REQUEST_CODE, null)
             }
@@ -122,6 +126,12 @@ class OrchestratorManagerImplTest {
         }
     }
 
+    @After
+    fun tearDown() {
+        Intents.release()
+        stopKoin()
+    }
+
     private fun verifyOrchestratorGotNextStepFromModalityFlow(nTimes: Int = 1) =
         verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
@@ -129,10 +139,14 @@ class OrchestratorManagerImplTest {
         verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
-        verifyNever(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyNever(appResponseFactoryMock) {
+            buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+        }
 
     private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
-        verifyOnce(appResponseFactoryMock) { buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(appResponseFactoryMock) {
+            buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+        }
 
     private fun prepareModalFlowForFaceEnrol() {
         whenever(modalityFlowMock) {
@@ -170,11 +184,14 @@ class OrchestratorManagerImplTest {
         modalities: List<Modality>,
         sessionId: String = "") = initialise(modalities, appEnrolRequest, sessionId)
 
-    private fun OrchestratorManager.progressWitFaceCapture(requestCode: Int = CAPTURE.value,
-                                                           response: IFaceCaptureResponse? = IFaceCaptureResponseImpl(emptyList())) {
-
+    private fun OrchestratorManager.progressWitFaceCapture(
+        requestCode: Int = CAPTURE.value,
+        response: IFaceCaptureResponse? = IFaceCaptureResponseImpl(emptyList())
+    ) {
         response?.let {
-            mockSteps.firstOrNull { it.status == ONGOING }?.result = it.fromModuleApiToDomain()
+            mockSteps.firstOrNull { step ->
+                step.status == ONGOING
+            }?.result = it.fromModuleApiToDomain()
         }
 
         handleIntentResult(
@@ -187,9 +204,4 @@ class OrchestratorManagerImplTest {
         private const val WRONG_REQUEST_CODE = 1
     }
 
-    @After
-    fun tearDown() {
-        Intents.release()
-        stopKoin()
-    }
 }
