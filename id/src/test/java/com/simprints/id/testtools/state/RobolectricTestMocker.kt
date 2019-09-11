@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
-import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.db.project.domain.Project
@@ -26,7 +26,7 @@ object RobolectricTestMocker {
 
     const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 
-    fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: RemoteProjectManager): RobolectricTestMocker {
+    fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: ProjectRemoteDataSource): RobolectricTestMocker {
         val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
         val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
         whenever { localDbManagerMock.loadProjectFromLocal(anyNotNull()) } thenReturn Single.just(project)

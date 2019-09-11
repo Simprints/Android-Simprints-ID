@@ -1,21 +1,25 @@
 package com.simprints.id.data.db.person.local
 
 import android.content.Context
-import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toDomainPerson
 import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
+import com.simprints.id.tools.extensions.await
+import com.simprints.id.tools.extensions.transactAwait
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.RealmQuery
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.withContext
 
 @FlowPreview
 class PersonLocalDataSourceImpl(private val appContext: Context,
@@ -49,37 +53,39 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
 
-    private fun <R> useRealmInstance(block: (Realm) -> R): R =
-        Realm.getInstance(config).use(block)
-
-    override fun insertOrUpdate(people: List<Person>) {
-        useRealmInstance { realm ->
-            realm.executeTransaction {
-                it.insertOrUpdate(people.map(Person::toRealmPerson))
+    override suspend fun insertOrUpdate(people: List<Person>) {
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use { realm ->
+                realm.transactAwait {
+                    it.insertOrUpdate(people.map(Person::toRealmPerson))
+                }
             }
         }
     }
 
-    override fun load(query: PersonLocalDataSource.Query): Flow<Person> =
-        Realm.getInstance(config).use {
-            it.buildQueryForPerson(query)
-                .findAll()
-                .map { it.toDomainPerson() }
-                .asFlow()
+    override suspend fun load(query: PersonLocalDataSource.Query): Flow<Person> =
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use {
+                it.buildQueryForPerson(query)
+                    .await()
+                    .map { it.toDomainPerson() }
+                    .asFlow()
+            }
         }
 
 
-    override fun delete(query: PersonLocalDataSource.Query) {
-        val realm = Realm.getInstance(config)
-        realm.use {
-            it.buildQueryForPerson(query)
-                .findAll()
-                .deleteAllFromRealm()
+    override suspend fun delete(query: PersonLocalDataSource.Query) {
+        withContext(Dispatchers.Main) {
+            Realm.getInstance(config).use {
+                it.buildQueryForPerson(query)
+                    .await()
+                    .deleteAllFromRealm()
+            }
         }
     }
 
     override fun count(query: PersonLocalDataSource.Query): Int =
-        useRealmInstance { realm ->
+        Realm.getInstance(config).use { realm ->
             realm.buildQueryForPerson(query).count().toInt()
         }
 

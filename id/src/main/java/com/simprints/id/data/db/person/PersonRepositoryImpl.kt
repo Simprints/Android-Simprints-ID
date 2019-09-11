@@ -1,13 +1,18 @@
 package com.simprints.id.data.db.person
 
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Single
+import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
-                           val personLocalDataSource: PersonLocalDataSource) : PersonRepository {
+                           val personLocalDataSource: PersonLocalDataSource) :
+    PersonRepository,
+    PersonLocalDataSource by personLocalDataSource,
+    PersonRemoteDataSource by personRemoteDataSource {
 
     override fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
         personRemoteDataSource.getDownSyncPeopleCount(syncScope).flatMap { peopleCountInRemote ->
@@ -19,15 +24,15 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
-                    PeopleCount(it.projectId,
-                        it.userId,
-                        it.moduleId,
-                        syncScope.modes,
-                        personLocalDataSource.count(PersonLocalDataSource.Query(
-                            projectId = it.projectId,
-                            userId = it.userId,
-                            moduleId = it.moduleId)))
-                }
+                PeopleCount(it.projectId,
+                    it.userId,
+                    it.moduleId,
+                    syncScope.modes,
+                    personLocalDataSource.count(PersonLocalDataSource.Query(
+                        projectId = it.projectId,
+                        userId = it.userId,
+                        moduleId = it.moduleId)))
+            }
         )
 
 
@@ -42,5 +47,14 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             }?.count ?: 0
 
             remotePeopleCount.copy(count = remotePeopleCount.count - localCount)
+        }
+
+    override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
+        try {
+            val person = personLocalDataSource.load(PersonLocalDataSource.Query(patientId = patientId)).first()
+            PersonFetchResult(person, false)
+        } catch (t: Throwable) {
+            val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
+            PersonFetchResult(person, true)
         }
 }

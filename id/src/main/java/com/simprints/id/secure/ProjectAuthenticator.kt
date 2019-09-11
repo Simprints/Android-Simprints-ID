@@ -4,6 +4,7 @@ import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -26,6 +27,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
     @Inject lateinit var dbManager: DbManager
     @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
     @Inject lateinit var longConsentManager: LongConsentManager
@@ -98,7 +100,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
-            dbManager.remoteProjectManager.loadProjectRemoteConfigSettingsJsonString(projectId)
+            projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =

@@ -5,7 +5,7 @@ import com.simprints.id.data.db.project.domain.Project
 import io.reactivex.Single
 
 
-interface RemoteProjectManager {
+interface ProjectRemoteDataSource {
 
     fun loadProjectFromRemote(projectId: String): Single<Project>
     fun loadProjectRemoteConfigSettingsJsonString(projectId: String): Single<JsonElement>

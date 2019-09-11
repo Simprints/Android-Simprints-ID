@@ -10,7 +10,7 @@ import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -82,7 +82,7 @@ class TestAppModule(app: Application,
                                   preferencesManager: PreferencesManager,
                                   sessionEventsManager: SessionEventsManager,
                                   personRemoteDataSource: PersonRemoteDataSource,
-                                  remoteProjectManager: RemoteProjectManager,
+                                  remoteProjectManager: ProjectRemoteDataSource,
                                   timeHelper: TimeHelper,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
                                   database: SyncStatusDatabase): DbManager =
@@ -124,7 +124,7 @@ class TestAppModule(app: Application,
     override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
         remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
 
-    override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager =
+    override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
         remoteProjectManagerRule.resolveDependency { super.provideRemoteProjectManager(remoteDbManager) }
 
     override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =

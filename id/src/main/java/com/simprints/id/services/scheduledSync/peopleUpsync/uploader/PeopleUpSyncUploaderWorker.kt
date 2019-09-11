@@ -7,13 +7,16 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,7 +49,9 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         )
 
         return try {
-            task.execute()
+            GlobalScope.launch(Dispatchers.IO) {
+                task.execute()
+            }
             logMessageForCrashReport("PeopleUpSyncUploaderWorker - success")
             Result.success()
         } catch (exception: TransientSyncFailureException) {

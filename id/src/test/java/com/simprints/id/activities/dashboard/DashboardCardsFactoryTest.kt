@@ -9,7 +9,7 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
@@ -42,7 +42,7 @@ class DashboardCardsFactoryTest {
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
-    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
+    @Inject lateinit var remoteProjectManagerMock: ProjectRemoteDataSource
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
