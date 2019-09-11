@@ -40,7 +40,7 @@ data class Step(
     companion object CREATOR : Parcelable.Creator<Step> {
         override fun createFromParcel(source: Parcel): Step {
             val requestCode = source.readInt()
-            val activityName = source.readString()!!
+            val activityName = source.readString()!! // FIXME: null pointer
             val bundleKey = source.readString()!!
             val request = source.readParcelable<Request>(Request::class.java.classLoader)!!
             val status = source.readSerializable() as Status
