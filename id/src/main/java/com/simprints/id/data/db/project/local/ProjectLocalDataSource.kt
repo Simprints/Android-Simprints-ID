@@ -5,8 +5,8 @@ import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 
 interface ProjectLocalDataSource {
 
-    fun save(project: Project)
+    suspend fun save(project: Project)
 
     /** @throws NoSuchStoredProjectException */
-    fun load(projectId: String): Project
+    suspend fun load(projectId: String): Project
 }

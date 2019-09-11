@@ -132,7 +132,7 @@ dependencies {
     implementation deps.dagger.core
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
-    implementation deps.kotlin.coroutines_android
+    api deps.kotlin.coroutines_android
     implementation deps.androidx.core
     api deps.androidx.multidex
     implementation deps.androidx.appcompat

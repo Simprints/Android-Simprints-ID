@@ -10,7 +10,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
@@ -51,7 +51,7 @@ class ProjectAuthenticatorTest {
 
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
+    @Inject lateinit var remoteProjectManagerMock: ProjectRemoteDataSource
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
 

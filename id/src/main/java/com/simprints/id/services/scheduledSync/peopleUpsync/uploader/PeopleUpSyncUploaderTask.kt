@@ -15,6 +15,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
 
@@ -100,7 +101,7 @@ class PeopleUpSyncUploaderTask(
 
     private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
-        personLocalDataSource.insertOrUpdate(updatedPeople)
+        runBlocking { personLocalDataSource.insertOrUpdate(updatedPeople) }
     }
 
     private fun updateLastUpSyncTime() {

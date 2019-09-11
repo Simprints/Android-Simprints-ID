@@ -17,7 +17,7 @@ import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.remote.RemoteProjectManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.db.person.domain.PeopleCount
@@ -53,7 +53,7 @@ class DashboardSyncCardViewModelTest {
     var rule: TestRule = InstantTaskExecutorRule()
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
+    @Inject lateinit var remoteProjectManagerMock: ProjectRemoteDataSource
     @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
     @Inject lateinit var dbManagerMock: DbManager

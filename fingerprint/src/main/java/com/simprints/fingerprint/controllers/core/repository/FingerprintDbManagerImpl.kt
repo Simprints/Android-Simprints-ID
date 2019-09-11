@@ -1,26 +1,37 @@
 package com.simprints.fingerprint.controllers.core.repository
 
+import com.simprints.core.tools.completableWithSuspend
+import com.simprints.core.tools.singleWithSuspend
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToCore
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import io.reactivex.Completable
 import io.reactivex.Single
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 
-class FingerprintDbManagerImpl(private val dbManager: DbManager): FingerprintDbManager {
+class FingerprintDbManagerImpl(private val personRepository: PersonRepository) : FingerprintDbManager {
 
     override fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult> =
-        dbManager.loadPerson(projectId, verifyGuid).map {
-            PersonFetchResult.fromCoreToDomain(it)
+        singleWithSuspend {
+            val corePersonFetch = runBlocking { personRepository.loadFromRemoteIfNeeded(projectId = projectId, patientId = verifyGuid) }
+            PersonFetchResult.fromCoreToDomain(corePersonFetch)
         }
 
     override fun savePerson(person: Person): Completable =
-        dbManager.savePerson(person.fromDomainToCore())
+        completableWithSuspend {
+            person.toSync = true
+            personRepository.insertOrUpdate(listOf(person.fromDomainToCore()))
+            //TODO: ToBeRemoted
+        }
 
     override fun loadPeople(projectId: String,
                             userId: String?,
                             moduleId: String?): Single<List<Person>> =
-        dbManager.loadPeople(projectId, userId, moduleId).map { corePersonList ->
-            corePersonList.map { Person.fromCoreToDomain(it) }
+        singleWithSuspend {
+            val peopleList = personRepository.load(PersonLocalDataSource.Query(projectId = projectId, userId = userId, moduleId = moduleId))
+            peopleList.toList().map { Person.fromCoreToDomain(it) }
         }
 }

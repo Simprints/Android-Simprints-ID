@@ -13,8 +13,8 @@ interface PersonLocalDataSource {
                 val toSync: Boolean? = null,
                 val sortBy: Map<String, Sort>? = null)
 
-    fun insertOrUpdate(people: List<Person>)
-    fun load(query: Query): Flow<Person>
-    fun delete(query: Query)
+    suspend fun insertOrUpdate(people: List<Person>)
+    suspend fun load(query: Query): Flow<Person>
+    suspend fun delete(query: Query)
     fun count(query: Query = Query()): Int
 }
