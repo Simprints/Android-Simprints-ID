@@ -55,12 +55,12 @@
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
     <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
     <!-- Loading Messages-->
-    <string name="loading">Loading</string>
+    <string name="connect_scanner_loading">Loading</string>
     <string name="updating_database">Updating project database…</string>
     <string name="launch_checking_permissions">Checking permissions…</string>
-    <string name="launch_bt_connect">Connecting to Vero…</string>
-    <string name="launch_wake_un20">Waking up UN20…</string>
-    <string name="launch_setup">Setting up Vero…</string>
+    <string name="connect_scanner_bt_connect">Connecting to Vero…</string>
+    <string name="connect_scanner_wake_un20">Waking up UN20…</string>
+    <string name="connect_scanner_setup">Setting up Vero…</string>
     <string name="launch_checking_person_in_db">Checking person is in database…</string>
     <string name="launch_consent_decline_button">Decline</string>
     <string name="launch_consent_accept_button">Accept</string>

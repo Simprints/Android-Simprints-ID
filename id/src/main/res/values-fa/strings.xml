@@ -30,12 +30,12 @@
     <string name="short_consent">سمپرنت (Simprints) توانست تا معلومات شما را دریافت کند. در صورتیکه اشتباه است و یا در مورد آن سوال دارید برایم بگویید. در غیر آن شصت راست خود را به شکل هموار بالای سنسور بگذارید</string>
     <string name="confirm_consent">برای رضایت در اینجا کلیک کنید</string>
     <!-- Loading Messages-->
-    <string name="loading">در حال آماده شدن</string>
+    <string name="connect_scanner_loading">در حال آماده شدن</string>
     <string name="updating_database">دیتابیس در حال اپدیت است…</string>
     <string name="launch_checking_permissions">اجازه چک کردن</string>
-    <string name="launch_bt_connect">در حال تماس با Vero..</string>
-    <string name="launch_wake_un20">بر حال کردن UN20..</string>
-    <string name="launch_setup">آماده ساختن Vero..</string>
+    <string name="connect_scanner_bt_connect">در حال تماس با Vero..</string>
+    <string name="connect_scanner_wake_un20">بر حال کردن UN20..</string>
+    <string name="connect_scanner_setup">آماده ساختن Vero..</string>
     <string name="launch_checking_person_in_db">شخص مذکور ثبت دیتابیس است</string>
 
 

@@ -7,11 +7,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
@@ -19,7 +17,7 @@ import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
-class RefusalActivity : AppCompatActivity(), RefusalContract.View {
+class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
@@ -36,7 +34,6 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        logActivityCreated()
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -131,10 +128,5 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
 
     override fun showToastForSelectOptionAndSubmit() {
         showToast(R.string.refusal_toast_select_option_submit)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logActivityDestroyed()
     }
 }

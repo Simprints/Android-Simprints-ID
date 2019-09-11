@@ -13,6 +13,8 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
     buildTypes {
         releaseWithLogfile {
@@ -23,6 +25,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
     }
 }
 
@@ -63,4 +70,16 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation deps.androidx.appcompat
+
+    // Android X
+    androidTestImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestUtil deps.testing.androidx.orchestrator
+
+    // Espresso
+    androidTestImplementation deps.testing.espresso.core
 }

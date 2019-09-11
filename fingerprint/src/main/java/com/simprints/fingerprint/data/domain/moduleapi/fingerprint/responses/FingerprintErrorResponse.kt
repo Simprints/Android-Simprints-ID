@@ -22,12 +22,10 @@ enum class FingerprintErrorReason {
     companion object {
         fun fromFingerprintAlertToErrorResponse(fingerprintAlert: FingerprintAlert): FingerprintErrorResponse =
             when (fingerprintAlert) {
-                FingerprintAlert.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
                 FingerprintAlert.BLUETOOTH_NOT_SUPPORTED -> BLUETOOTH_NOT_SUPPORTED
                 FingerprintAlert.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
 
                 //User can not leave these alerts, so Fingerprint module should not produce any error response for them.
-                FingerprintAlert.GUID_NOT_FOUND_OFFLINE,
                 FingerprintAlert.BLUETOOTH_NOT_ENABLED,
                 FingerprintAlert.NOT_PAIRED,
                 FingerprintAlert.MULTIPLE_PAIRED_SCANNERS,
