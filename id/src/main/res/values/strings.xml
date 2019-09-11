@@ -238,7 +238,7 @@
     <!-- Button Labels -->
     <string name="button_submit">Submit</string>
     <string name="button_scan_prints">Scan Fingerprints</string>
-     <!-- Text Prompt -->
+    <!-- Text Prompt -->
     <string name="hint_other_reason">Additional Information</string>
 
 
