@@ -9,12 +9,12 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
@@ -22,15 +22,13 @@ import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestFor
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
-import com.simprints.fingerprint.tools.extensions.logActivityCreated
-import com.simprints.fingerprint.tools.extensions.logActivityDestroyed
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.koin.android.ext.android.get
 import org.koin.core.parameter.parametersOf
 
 class CollectFingerprintsActivity :
-    AppCompatActivity(),
+    FingerprintActivity(),
     CollectFingerprintsContract.View {
 
     private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
@@ -49,7 +47,6 @@ class CollectFingerprintsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
-        logActivityCreated()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         fingerprintRequest = this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
@@ -187,6 +184,5 @@ class CollectFingerprintsActivity :
     override fun onDestroy() {
         viewPresenter.disconnectScannerIfNeeded()
         super.onDestroy()
-        logActivityDestroyed()
     }
 }

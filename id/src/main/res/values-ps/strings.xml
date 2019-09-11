@@ -25,12 +25,12 @@
     <string name="short_consent">سمپرنټ (Simprints) وکولې شو څو ستاسو معلومات پیدا کړي. که چیرې دغه معلومات غلط دی او یا تاسو یې په اړه پوښتنه لرئ نو ما ته ووایاست، له هغه پرته، د خپل کیڼ لاس غټه ګوته په هوار ډول په سنسور کېږدئ</string>
     <string name="confirm_consent">د رضایت لپاره دلته کلیک وکړئ</string>
     <!-- Loading Messages-->
-    <string name="loading">د آماده کیدو پر حال</string>
+    <string name="connect_scanner_loading">د آماده کیدو پر حال</string>
     <string name="updating_database">ډیټابیس د تجدید یا اپدیټ په حال کی ده…</string>
     <string name="launch_checking_permissions">د چک کولو اجازه</string>
-    <string name="launch_bt_connect">له Veroسره د اړیکې په حال کې</string>
-    <string name="launch_wake_un20">د .... برابرول</string>
-    <string name="launch_setup">د .... آماده کول</string>
+    <string name="connect_scanner_bt_connect">له Veroسره د اړیکې په حال کې</string>
+    <string name="connect_scanner_wake_un20">د .... برابرول</string>
+    <string name="connect_scanner_setup">د .... آماده کول</string>
     <string name="launch_checking_person_in_db">د دی چک کول چې کس په دیټابیس کې شامل دی</string>
 
 
