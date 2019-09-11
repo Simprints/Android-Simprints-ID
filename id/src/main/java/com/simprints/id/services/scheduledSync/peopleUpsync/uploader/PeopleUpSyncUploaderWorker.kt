@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
@@ -13,16 +13,14 @@ import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
 @InternalCoroutinesApi
-class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var personLocaDataSource: PersonLocalDataSource
@@ -38,7 +36,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         inputData.getString(USER_ID_KEY) ?: throw IllegalArgumentException("User Id required")
     }*/
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result = coroutineScope {
         injectDependencies()
         logMessageForCrashReport("PeopleUpSyncUploaderWorker - running")
 
@@ -48,10 +46,8 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
             newSyncStatusDatabase.upSyncDao
         )
 
-        return try {
-            GlobalScope.launch(Dispatchers.IO) {
-                task.execute()
-            }
+        return@coroutineScope try {
+            task.execute()
             logMessageForCrashReport("PeopleUpSyncUploaderWorker - success")
             Result.success()
         } catch (exception: TransientSyncFailureException) {

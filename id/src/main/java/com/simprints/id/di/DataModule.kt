@@ -15,6 +15,7 @@ import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import dagger.Module
 import dagger.Provides
 
@@ -40,8 +41,9 @@ open class DataModule {
 
     @Provides
     open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
-                                     personRemoteDataSource: PersonRemoteDataSource): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource)
+                                     personRemoteDataSource: PersonRemoteDataSource,
+                                     peopleUpSyncMaster: PeopleUpSyncMaster): PersonRepository =
+        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, peopleUpSyncMaster)
 
 
     @Provides
