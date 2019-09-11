@@ -10,11 +10,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.tools.extensions.bufferedChunks
-import io.reactivex.Flowable
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
@@ -37,40 +34,19 @@ class PeopleUpSyncUploaderTask(
      * the sync to fail.
      */
 
-    fun execute() {
+    suspend fun execute() {
         checkUserIsSignedIn()
 
-        while (thereArePeopleToSync()) {
-            getPeopleToSyncInBatches()
-                .blockingForEach(::upSyncBatch)
-        }
+        personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
+            .bufferedChunks(batchSize)
+            .collect {
+                upSyncBatch(it)
+            }
     }
 
     private fun checkUserIsSignedIn() {
         if (projectId != loginInfoManager.signedInProjectId /*|| userId != loginInfoManager.signedInUserId*/) {
             throw IllegalStateException("Only people enrolled by the currently signed in user can be up-synced")
-        }
-    }
-
-    private fun thereArePeopleToSync(): Boolean {
-        val peopleToSyncCount = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
-        Timber.d("$peopleToSyncCount people to up-sync")
-        return peopleToSyncCount > 0
-    }
-
-    private fun getPeopleToSyncInBatches(): Flowable<List<Person>> = Flowable.fromPublisher { publisher ->
-        GlobalScope.launch {
-            try {
-
-                personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).bufferedChunks(batchSize).onEach {
-                    publisher.onNext(it)
-                }
-
-                publisher.onComplete()
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                publisher.onError(t)
-            }
         }
     }
 

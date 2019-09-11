@@ -43,9 +43,9 @@ def support = [
     material: "com.google.android.material:material:1.1.0-alpha03"
 ]
 
-def work_version = "1.0.0-beta05"
+def work_version = "2.2.0"
 def arch_components = [
-    work: "android.arch.work:work-runtime-ktx:$work_version"
+    work: "androidx.work:work-runtime-ktx:$work_version"
 ]
 
 def playservices_version = "16.0.0"
@@ -141,7 +141,7 @@ def testing = [
     ],
     dagger         : "com.github.fabioCollini.daggermock:daggermock:0.8.4",
     dagger_kotlin  : "com.github.fabioCollini.daggermock:daggermock-kotlin:0.8.4",
-    work           : "android.arch.work:work-testing:$work_version",
+    work           : "androidx.work:work-testing:$work_version",
     retrofit       : "com.squareup.retrofit2:retrofit-mock:$retrofit_version",
 
     //https://developer.android.com/jetpack/androidx/releases/test

@@ -46,35 +46,4 @@ open class DbManagerImpl(private var projectRepository: ProjectRepository,
         syncStatusDatabase.upSyncDao.deleteAll()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
-
-    //TODO: Move this logic to the caller = Orchestrator
-//    override fun savePerson(person: Person): Completable =
-//        Completable.create {
-//            runBlocking {
-//                try {
-//                    personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
-//                    it.onComplete()
-//                } catch (t: Throwable) {
-//                    t.printStackTrace()
-//                    it.onError(t)
-//                }
-//            }
-//        }.doOnComplete {
-//            sessionEventsManager
-//                .updateSession {
-//                    it.addEvent(EnrolmentEvent(
-//                        timeHelper.now(),
-//                        person.patientId
-//                    ))
-//                }
-//                .andThen(scheduleUpsync(person.projectId, person.userId))
-//                .subscribeOn(Schedulers.io())
-//                .subscribeBy(onComplete = {}, onError = {
-//                    it.printStackTrace()
-//                })
-//        }
-//    @Suppress("UNUSED_PARAMETER")
-//    private fun scheduleUpsync(projectId: String, userId: String): Completable = Completable.fromAction {
-//        peopleUpSyncMaster.schedule(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
-//    }
 }

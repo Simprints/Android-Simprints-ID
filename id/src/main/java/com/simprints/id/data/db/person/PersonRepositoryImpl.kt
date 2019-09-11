@@ -2,14 +2,17 @@ package com.simprints.id.data.db.person
 
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
 import kotlinx.coroutines.flow.first
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
-                           val personLocalDataSource: PersonLocalDataSource) :
+                           val personLocalDataSource: PersonLocalDataSource,
+                           private val peopleUpSyncMaster: PeopleUpSyncMaster) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
@@ -57,4 +60,22 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
             PersonFetchResult(person, true)
         }
+
+
+    override suspend fun saveAndUpload(person: Person) {
+        personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
+        scheduleUpsync(person.projectId, person.userId)
+// StopShip: Add event back in the caller when `saveAndUpload` is invoked by Orchestrator (instead of Fingerprint)
+//        sessionEventsManager
+//            .updateSession {
+//                it.addEvent(EnrolmentEvent(
+//                    timeHelper.now(),
+//                    person.patientId
+//                ))
+//            }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    private fun scheduleUpsync(projectId: String, userId: String) =
+        peopleUpSyncMaster.schedule(projectId/*, userId*/)
 }

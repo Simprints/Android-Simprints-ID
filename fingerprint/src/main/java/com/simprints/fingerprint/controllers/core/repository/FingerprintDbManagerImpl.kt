@@ -23,8 +23,7 @@ class FingerprintDbManagerImpl(private val personRepository: PersonRepository) :
     override fun savePerson(person: Person): Completable =
         completableWithSuspend {
             person.toSync = true
-            personRepository.insertOrUpdate(listOf(person.fromDomainToCore()))
-            //TODO: ToBeRemoted
+            personRepository.saveAndUpload(person.fromDomainToCore())
         }
 
     override fun loadPeople(projectId: String,
