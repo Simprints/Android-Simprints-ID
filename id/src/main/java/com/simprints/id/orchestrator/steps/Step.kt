@@ -30,7 +30,7 @@ data class Step(
             writeString(activityName)
             writeString(bundleKey)
             writeParcelable(request, 0)
-            writeSerializable(status)
+            writeString(status.name)
             writeParcelable(result, 0)
         }
     }
@@ -40,10 +40,10 @@ data class Step(
     companion object CREATOR : Parcelable.Creator<Step> {
         override fun createFromParcel(source: Parcel): Step {
             val requestCode = source.readInt()
-            val activityName = source.readString()!! // FIXME: null pointer
+            val activityName = source.readString()!!
             val bundleKey = source.readString()!!
             val request = source.readParcelable<Request>(Request::class.java.classLoader)!!
-            val status = source.readSerializable() as Status
+            val status = Status.valueOf(source.readString()!!)
             val result = source.readParcelable<Result>(Result::class.java.classLoader)
 
             return Step(requestCode, activityName, bundleKey, request, status).also {

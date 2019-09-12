@@ -12,16 +12,17 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
         val stepCopy = step.copy()
         val stepWithEncodedResult = processStep(stepCopy, Operation.ENCODE)
         val converter = ParcelableConverter(stepWithEncodedResult)
+        val encodedString = String(converter.toBytes())
         converter.recycle()
-        return String(converter.toBytes())
+        return encodedString
     }
 
     override fun decode(encodedStep: String?): Step? {
         return encodedStep?.let {
             val converter = ParcelableConverter(it.toByteArray())
             val parcel = converter.getParcel()
-            converter.recycle()
             val stepWithEncodedResult = Step.createFromParcel(parcel)
+            converter.recycle()
             processStep(stepWithEncodedResult, Operation.DECODE)
         }
     }
