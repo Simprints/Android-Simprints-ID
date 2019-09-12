@@ -10,7 +10,7 @@ object Un20MessageProtocol: MessageProtocol {
     override val HEADER_INDICES: IntRange = 0..5
     override val LENGTH_INDICES_IN_HEADER: IntRange = 2..5
 
-    override fun getMessageLengthFromHeader(header: ByteArray): Int =
+    override fun getDataLengthFromHeader(header: ByteArray): Int =
         header.extract({ int },
             LENGTH_INDICES_IN_HEADER
         )

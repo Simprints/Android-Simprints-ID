@@ -88,7 +88,7 @@ fun Int.toByteArray(): ByteArray {
 }
 
 /** @throws IndexOutOfBoundsException */
-fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null, byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN): T =
+fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null, byteOrder: ByteOrder): T =
     ByteBuffer.wrap(
         if (position != null)
             this.sliceArray(position)
