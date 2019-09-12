@@ -1,18 +1,24 @@
 package com.simprints.fingerprintscanner.v2
 
-import com.simprints.fingerprintscanner.v2.message.Message
-import com.simprints.fingerprintscanner.v2.message.toMessageStream
-import com.simprints.fingerprintscanner.v2.message.vero.VeroMessageProtocol
-import com.simprints.fingerprintscanner.v2.message.vero.VeroResponseParser
-import com.simprints.fingerprintscanner.v2.packets.*
+import com.simprints.fingerprintscanner.v2.domain.message.Message
+import com.simprints.fingerprintscanner.v2.domain.packet.*
+import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroResponseAccumulator
+import com.simprints.fingerprintscanner.v2.incoming.message.parsers.VeroResponseParser
+import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
+import com.simprints.fingerprintscanner.v2.incoming.packet.ByteArrayToPacketAccumulator
+import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
+import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.incoming.packet.toPacketStream
 import com.simprints.fingerprintscanner.v2.tools.*
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -54,7 +60,8 @@ class RxJavaTest {
     fun packetBuilderTest() {
         assertHexStringsEqual(
             "10 A0 03 00 0F 1F 2F ",
-            PacketBuilder().buildPacket(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F)).bytes.toHexString()
+
+            PacketParser().parse(PacketProtocol.buildPacketBytes(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
         )
     }
 
@@ -98,7 +105,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
+            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -132,7 +139,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
+            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -166,7 +173,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
+            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -371,10 +378,9 @@ class RxJavaTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        val router = PacketRouter()
+        val router = PacketRouter(ByteArrayToPacketAccumulator(PacketParser()))
 
-        router.configureIncomingPacketStream(inputStream.toPacketStream())
-        router.connect()
+        router.connect(inputStream)
 
         val testSubscriber1 = TestSubscriber<Packet>()
         val testSubscriber2 = TestSubscriber<Packet>()
@@ -387,10 +393,10 @@ class RxJavaTest {
         router.incomingPacketChannels[Un20Command]
             ?.take(11)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber3)
 
-        val pb = PacketBuilder()
-        val bytes1 = pb.buildPacket(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F)).bytes.toHexString()
-        val bytes2 = pb.buildPacket(VeroEvent, AndroidDevice, byteArrayOf(0x0F, 0x1F)).bytes.toHexString()
-        val bytes3 = pb.buildPacket(Un20Command, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F)).bytes.toHexString()
+        val pb = PacketParser()
+        val bytes1 = pb.parse(PacketProtocol.buildPacketBytes(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
+        val bytes2 = pb.parse(PacketProtocol.buildPacketBytes(VeroEvent, AndroidDevice, byteArrayOf(0x0F, 0x1F))).bytes.toHexString()
+        val bytes3 = pb.parse(PacketProtocol.buildPacketBytes(Un20Command, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F))).bytes.toHexString()
 
         outputStream.writeBytes((bytes1 + bytes2 + bytes3).repeat(600))
 
@@ -426,6 +432,10 @@ class RxJavaTest {
 
     private fun OutputStream.writeBytes(byteString: String) = writeBytes(hexStringToByteArray(byteString))
     private fun OutputStream.writeBytes(bytes: ByteArray) = this.write(bytes)
+
+    private fun InputStream.toPacketStream(): Flowable<Packet> = this
+        .toFlowable()
+        .toPacketStream(ByteArrayToPacketAccumulator(PacketParser()))
 
     private fun print(any: Any) = println(any)
 }
