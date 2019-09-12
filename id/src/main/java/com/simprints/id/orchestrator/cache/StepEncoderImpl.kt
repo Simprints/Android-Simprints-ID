@@ -47,7 +47,7 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
                     val tmpTemplateString = String(template)
                     val processedTemplate = when (operation) {
                         Operation.ENCODE -> keystoreManager.encryptString(tmpTemplateString)
-                        else -> keystoreManager.decryptString(tmpTemplateString)
+                        Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
                     }.toByteArray()
 
                     val faceSample = result.copy(template = processedTemplate)
@@ -65,7 +65,7 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     ): FingerprintEnrolResponse {
         val processedGuid = when (operation) {
             Operation.ENCODE -> keystoreManager.encryptString(response.guid)
-            else -> keystoreManager.decryptString(response.guid)
+            Operation.DECODE -> keystoreManager.decryptString(response.guid)
         }
 
         return response.copy(guid = processedGuid)
