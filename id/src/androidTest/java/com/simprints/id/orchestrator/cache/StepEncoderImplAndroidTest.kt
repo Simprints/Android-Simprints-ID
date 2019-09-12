@@ -62,8 +62,8 @@ class StepEncoderImplAndroidTest {
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(fingerprintEnrolRequest))
             assertThat(status, `is`(Step.Status.COMPLETED))
-            assertThat(result, `is`(fingerprintEnrolResult))
-        } ?: failTest("The decoded step must not be null")
+            assertThat(getResult(), `is`(fingerprintEnrolResult))
+        } ?: failTest(MESSAGE_NULL_DECODED_STEP)
     }
 
     @Test
@@ -80,8 +80,8 @@ class StepEncoderImplAndroidTest {
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(faceCaptureRequest))
             assertThat(status, `is`(Step.Status.COMPLETED))
-            assertThat(result, `is`(faceCaptureResponse))
-        } ?: failTest("The decoded step must not be null")
+            assertThat(getResult(), `is`(faceCaptureResponse))
+        } ?: failTest(MESSAGE_NULL_DECODED_STEP)
     }
 
     @After
@@ -94,10 +94,9 @@ class StepEncoderImplAndroidTest {
         ACTIVITY_NAME,
         BUNDLE_KEY,
         request,
-        Step.Status.COMPLETED
-    ).also {
-        it.result = result
-    }
+        Step.Status.COMPLETED,
+        result
+    )
 
     private fun mockFingerprintEnrolRequest(): Step.Request = FingerprintEnrolRequest(
         "projectId",
@@ -120,7 +119,7 @@ class StepEncoderImplAndroidTest {
     }
 
     private fun mockFaceCaptureResponse(): Step.Result {
-        val template = UUID.randomUUID().toString().toByteArray()
+        val template = "abcd1234".toByteArray()
 
         return FaceCaptureResponse(listOf(
             FaceCaptureResult(
@@ -138,6 +137,7 @@ class StepEncoderImplAndroidTest {
         private const val REQUEST_CODE = 123
         private const val ACTIVITY_NAME = "com.simprints.id.MyActivity"
         private const val BUNDLE_KEY = "BUNDLE_KEY"
+        private const val MESSAGE_NULL_DECODED_STEP = "The decoded step must not be null"
     }
 
 }
