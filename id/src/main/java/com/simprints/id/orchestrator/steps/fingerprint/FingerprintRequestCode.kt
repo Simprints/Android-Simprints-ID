@@ -9,7 +9,7 @@ enum class FingerprintRequestCode(val value: Int) {
     VERIFY(FINGERPRINT_REQUEST_CODE + 3);
 
     companion object {
-        fun isFingerprintResult(requestCode: Int) = values().map { it.value }.contains(requestCode)
+        fun isFingerprintResult(requestCode: Int) = values().any { it.value == requestCode }
     }
 }
 
