@@ -1,5 +1,7 @@
 package com.simprints.id.activities.exitform
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,9 +11,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.exitform.result.CoreExitFormResult
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.GO_BACK
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.exitform.ExitFormReason.*
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_core_exit_form.*
@@ -27,6 +33,7 @@ class CoreExitFormActivity : AppCompatActivity() {
     @Inject lateinit var coreExitFormViewModelFactory: CoreExitFormViewModelFactory
 
     private var exitFormStartTime: Long = 0
+    private var exitFormReason = OTHER
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -88,32 +95,32 @@ class CoreExitFormActivity : AppCompatActivity() {
     private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
         when (optionIdentifier) {
             R.id.rbReligiousConcerns -> {
-                viewModel.handleReligiousConcernsRadioClick()
+                exitFormReason = REFUSED_RELIGION
                 logRadioOptionForCrashReport("Religious Concerns")
             }
             R.id.rbDataConcerns -> {
-                viewModel.handleDataConcernsRadioClick()
+                exitFormReason = REFUSED_DATA_CONCERNS
                 logRadioOptionForCrashReport("Data Concerns")
             }
             R.id.rbPersonNotPresent -> {
-                viewModel.handlePersonNotPresentRadioClick()
+                exitFormReason = REFUSED_NOT_PRESENT
                 logRadioOptionForCrashReport("Person not present")
             }
             R.id.rbTooYoung -> {
-                viewModel.handleTooYoungRadioClick()
+                exitFormReason = REFUSED_YOUNG
                 logRadioOptionForCrashReport("Too young")
             }
             R.id.rbDoesNotHavePermission -> {
-                viewModel.handleDoesNotHavePermissionRadioClick()
+                exitFormReason = REFUSED_PERMISSION
                 logRadioOptionForCrashReport("Does not have permission")
             }
             R.id.rbAppNotWorking -> {
-                viewModel.handleAppNotWorkingRadioClick()
+                exitFormReason = SCANNER_NOT_WORKING
                 setFocusOnExitReasonAndDisableSubmit()
                 logRadioOptionForCrashReport("App not working")
             }
             R.id.rbOther -> {
-                viewModel.handleOtherRadioOptionClick()
+                exitFormReason = OTHER
                 setFocusOnExitReasonAndDisableSubmit()
                 logRadioOptionForCrashReport("Other")
             }
@@ -121,15 +128,27 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        
+        setResultAndFinish(GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText())
-        //Set Result And Finish
+        viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), exitFormReason)
+        setResultAndFinish(SUBMIT)
+    }
+
+    private fun setResultAndFinish(exitFormAction: CoreExitFormResult.Action) {
+        setResult(Activity.RESULT_OK, getIntentForResult(exitFormAction))
+        finish()
     }
 
     private fun getExitFormText() = refusalText.text.toString()
+
+    private fun getIntentForResult(exitFormAction: CoreExitFormResult.Action) =
+        Intent().putExtra(CoreExitFormResult.BUNDLE_KEY, buildExitFormResult(exitFormAction))
+
+    private fun buildExitFormResult(exitFormAction: CoreExitFormResult.Action) =
+        CoreExitFormResult(exitFormAction,
+        CoreExitFormResult.Answer(exitFormReason, getExitFormText()))
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
         btSubmitRefusalForm.isEnabled = false
