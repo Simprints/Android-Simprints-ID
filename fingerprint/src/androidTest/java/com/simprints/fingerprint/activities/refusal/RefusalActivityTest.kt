@@ -77,7 +77,7 @@ class RefusalActivityTest {
 
         onView(withId(R.id.btSubmitRefusalForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
-        onView(withId(R.id.refusalText)).perform(typeText("Reason for other"))
+        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"))
         tryOnUiUntilTimeout(1000, 200) {
             onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
         }
@@ -89,7 +89,7 @@ class RefusalActivityTest {
         val scenario = launchRefusalActivity()
 
         onView(withId(R.id.rbReligiousConcerns)).perform(click())
-        onView(withId(R.id.refusalText)).perform(typeText(refusalReasonText))
+        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText))
         onView(withId(R.id.btSubmitRefusalForm)).perform(click())
 
         verifyIntentReturned(scenario.result, RefusalTaskResult.Action.SUBMIT,

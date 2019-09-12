@@ -3,9 +3,10 @@ package com.simprints.id.orchestrator.steps.core
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
+import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.Step
 
 class CoreStepProcessorImpl: CoreStepProcessor {
@@ -30,5 +31,11 @@ class CoreStepProcessorImpl: CoreStepProcessor {
             FetchGUIDRequest(), Step.Status.NOT_STARTED)
 
     override fun processResult(resultCode: Int, data: Intent?): Step.Result? =
-        data?.getParcelableExtra<AskConsentResponse>(CONSENT_STEP_BUNDLE)
+        when (resultCode) {
+            CoreResponseCode.CONSENT.value -> data?.getParcelableExtra<AskConsentResponse>(CONSENT_STEP_BUNDLE)
+            CoreResponseCode.EXIT_FORM.value -> data?.getParcelableExtra<CoreExitFormResponse>(CONSENT_STEP_BUNDLE)
+            CoreResponseCode.FETCH_GUID.value -> TODO("Will be implemented with verification check")
+            CoreResponseCode.ERROR.value -> TODO("Will be implemented with verification check")
+            else -> throw IllegalStateException("Invalid result code from core step processor")
+        }
 }

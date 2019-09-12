@@ -1,6 +1,5 @@
 package com.simprints.id.activities.consent
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -12,6 +11,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.exitform.CoreExitFormActivity
+import com.simprints.id.activities.exitform.result.CoreExitFormResult
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_SUBMIT
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
@@ -21,7 +23,9 @@ import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
@@ -106,7 +110,7 @@ class ConsentActivity : AppCompatActivity() {
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
-        setResult(Activity.RESULT_OK, Intent().apply {
+        setResult(CoreResponseCode.CONSENT.value, Intent().apply {
             putExtra(CONSENT_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
         finish()
@@ -114,7 +118,6 @@ class ConsentActivity : AppCompatActivity() {
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
-        //STOPSHIP: Launch Exit Form and decide on creating a separate OrchestratorManager for core
         if (preferencesManager.modalities.size > 1) {
             startCoreExitFormActivity()
         }
@@ -139,6 +142,20 @@ class ConsentActivity : AppCompatActivity() {
 
     private fun startCoreExitFormActivity() {
         startActivityForResult(Intent(this, CoreExitFormActivity::class.java), 12)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_CODE_SUBMIT) {
+            setResult(CoreResponseCode.EXIT_FORM.value, buildExitFormResponse(data))
+            finish()
+        }
+    }
+
+    private fun buildExitFormResponse(data: Intent?) = Intent().apply {
+        data?.getParcelableExtra<CoreExitFormResult>(BUNDLE_KEY)?.let {
+            putExtra(CONSENT_STEP_BUNDLE, CoreExitFormResponse(it.answer.reason, it.answer.optionalText))
+        }
     }
 
     companion object {

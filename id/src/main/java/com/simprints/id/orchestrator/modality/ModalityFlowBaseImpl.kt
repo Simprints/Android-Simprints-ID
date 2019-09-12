@@ -1,9 +1,11 @@
 package com.simprints.id.orchestrator.modality
 
+import android.content.Intent
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 
@@ -30,4 +32,11 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun buildVerifyCoreStep() =
         coreStepProcessor.buildStepVerify()
+
+    fun processResult(resultCode: Int, data: Intent?) =
+        coreStepProcessor.processResult(resultCode, data).also { coreResult ->
+            if (coreResult is CoreExitFormResponse) {
+                steps.map { it.status = Step.Status.COMPLETED }
+            }
+        }
 }

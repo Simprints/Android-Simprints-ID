@@ -1,6 +1,5 @@
 package com.simprints.id.activities.exitform
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -14,6 +13,8 @@ import com.simprints.id.R
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.GO_BACK
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.SUBMIT
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_GO_BACK
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -65,7 +66,7 @@ class CoreExitFormActivity : AppCompatActivity() {
 
     private fun setRadioGroupListener() {
         refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
-            refusalText.removeTextChangedListener(textWatcher)
+            exitFormText.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableRefusalText()
             handleRadioOptionIdentifierClick(optionIdentifier)
@@ -89,7 +90,7 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     private fun enableRefusalText() {
-        refusalText.isEnabled = true
+        exitFormText.isEnabled = true
     }
 
     private fun handleRadioOptionIdentifierClick(optionIdentifier: Int) {
@@ -128,37 +129,37 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(GO_BACK)
+        setResultAndFinish(RESULT_CODE_GO_BACK, GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), exitFormReason)
-        setResultAndFinish(SUBMIT)
+        setResultAndFinish(RESULT_CODE_SUBMIT, SUBMIT)
     }
 
-    private fun setResultAndFinish(exitFormAction: CoreExitFormResult.Action) {
-        setResult(Activity.RESULT_OK, getIntentForResult(exitFormAction))
+    private fun setResultAndFinish(resultCode: Int, exitFormAction: CoreExitFormResult.Action) {
+        setResult(resultCode, getIntentForResult(exitFormAction))
         finish()
     }
 
-    private fun getExitFormText() = refusalText.text.toString()
+    private fun getExitFormText() = exitFormText.text.toString()
 
     private fun getIntentForResult(exitFormAction: CoreExitFormResult.Action) =
         Intent().putExtra(CoreExitFormResult.BUNDLE_KEY, buildExitFormResult(exitFormAction))
 
     private fun buildExitFormResult(exitFormAction: CoreExitFormResult.Action) =
         CoreExitFormResult(exitFormAction,
-        CoreExitFormResult.Answer(exitFormReason, getExitFormText()))
+            CoreExitFormResult.Answer(exitFormReason, getExitFormText()))
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
         btSubmitRefusalForm.isEnabled = false
-        refusalText.requestFocus()
+        exitFormText.requestFocus()
         setTextChangeListenerOnExitText()
-        inputMethodManager.showSoftInput(refusalText, InputMethodManager.SHOW_IMPLICIT)
+        inputMethodManager.showSoftInput(exitFormText, InputMethodManager.SHOW_IMPLICIT)
     }
 
     private fun setTextChangeListenerOnExitText() {
-        refusalText.addTextChangedListener(textWatcher)
+        exitFormText.addTextChangedListener(textWatcher)
     }
 
     override fun onBackPressed() {

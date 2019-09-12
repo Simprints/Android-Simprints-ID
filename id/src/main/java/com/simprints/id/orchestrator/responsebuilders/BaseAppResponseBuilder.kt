@@ -1,9 +1,11 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.exitform.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppRefusalFormResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
@@ -17,6 +19,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
         val results = steps.map { it.result }
 
         return when {
+            results.any { it is CoreExitFormResponse } -> {
+                buildAppExitFormResponse(results.find { it is CoreExitFormResponse } as CoreExitFormResponse)
+            }
             results.any { it is FingerprintErrorResponse } -> {
                 buildAppErrorResponse(results.find { it is FingerprintErrorResponse } as FingerprintErrorResponse)
             }
@@ -28,6 +33,10 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             }
         }
     }
+
+    private fun buildAppExitFormResponse(coreExitFormResponse: CoreExitFormResponse) =
+        AppRefusalFormResponse(RefusalFormAnswer(coreExitFormResponse.reason.toAppRefusalFormReason(),
+            coreExitFormResponse.optionalText))
 
     private fun buildAppErrorResponse(fingerprintErrorResponse: FingerprintErrorResponse) =
         AppErrorResponse(fingerprintErrorResponse.fingerprintErrorReason.toAppErrorReason())
