@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.message
 
-class MessageParser {
+interface MessageParser {
 
-    fun parse(bytes: ByteArray) = Message(bytes)
+    fun parse(bytes: ByteArray): Message
 }

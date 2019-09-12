@@ -11,7 +11,7 @@ object VeroMessageProtocol: MessageProtocol {
     override val HEADER_INDICES: IntRange = 0..3
     override val LENGTH_INDICES_IN_HEADER: IntRange = 2..3
 
-    override fun getMessageLengthFromHeader(header: ByteArray): Int =
+    override fun getDataLengthFromHeader(header: ByteArray): Int =
         header.extract({ short },
             LENGTH_INDICES_IN_HEADER
         ).unsignedToInt()

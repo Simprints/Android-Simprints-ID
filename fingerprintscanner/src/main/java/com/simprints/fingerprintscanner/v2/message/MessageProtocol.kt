@@ -1,8 +1,6 @@
 package com.simprints.fingerprintscanner.v2.message
 
 import com.simprints.fingerprintscanner.v2.tools.Protocol
-import com.simprints.fingerprintscanner.v2.tools.extract
-import java.nio.ByteBuffer
 
 interface MessageProtocol: Protocol {
 
@@ -11,8 +9,8 @@ interface MessageProtocol: Protocol {
 
     val HEADER_SIZE: Int
 
-    fun getMessageLengthFromHeader(header: ByteArray): Int
+    fun getDataLengthFromHeader(header: ByteArray): Int
 
-    fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null): T =
-        extract(getType, position, byteOrder)
+    fun getTotalLengthFromHeader(header: ByteArray): Int =
+        getDataLengthFromHeader(header) + HEADER_SIZE
 }

@@ -20,28 +20,21 @@ object PacketProtocol: Protocol {
     fun getDestinationFromHeader(header: ByteArray): Int =
         header.extract({ get() }, DESTINATION_INDICES_IN_HEADER).unsignedToInt()
 
-    fun getPacketLengthFromHeader(header: ByteArray): Int =
+    fun getTotalLengthFromHeader(header: ByteArray): Int =
+        getPayloadLengthFromHeader(header) + HEADER_SIZE
+
+    fun getPayloadLengthFromHeader(header: ByteArray): Int =
         header.extract({ short }, LENGTH_INDICES_IN_HEADER).unsignedToInt()
 
     fun getHeaderBytes(bytes: ByteArray): ByteArray =
         bytes.slice(HEADER_INDICES).toByteArray()
 
-    fun getBodyBytes(bytes: ByteArray): ByteArray =
+    fun getPayloadBytes(bytes: ByteArray): ByteArray =
         bytes.slice(HEADER_INDICES.last + 1 until bytes.size).toByteArray()
 
-    fun buildPacketBytes(source: Channel, destination: Channel, body: ByteArray): ByteArray {
-        val length = HEADER_SIZE + body.size
+    fun buildPacketBytes(source: Channel, destination: Channel, payload: ByteArray): ByteArray {
+        val length = payload.size
         val header = byteArrayOf(source.id.toByte(), destination.id.toByte()) + length.toShort().toByteArray()
-        return header + body
+        return header + payload
     }
 }
-
-sealed class Channel(val id: Int)
-
-sealed class OutgoingChannel(id: Int) : Channel(id)
-sealed class IncomingChannel(id: Int) : Channel(id)
-
-object VeroCommand : IncomingChannel(0x10)
-object VeroEvent : IncomingChannel(0x11)
-object FmsCommand : IncomingChannel(0x20)
-object AndroidDevice : OutgoingChannel(0xA0)

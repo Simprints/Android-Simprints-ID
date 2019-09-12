@@ -3,6 +3,7 @@ package com.simprints.fingerprintscanner.v2
 import com.simprints.fingerprintscanner.v2.message.Message
 import com.simprints.fingerprintscanner.v2.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.message.vero.VeroMessageProtocol
+import com.simprints.fingerprintscanner.v2.message.vero.VeroResponseParser
 import com.simprints.fingerprintscanner.v2.packets.*
 import com.simprints.fingerprintscanner.v2.tools.*
 import io.reactivex.Completable
@@ -52,7 +53,7 @@ class RxJavaTest {
     @Test
     fun packetBuilderTest() {
         assertHexStringsEqual(
-            "10 A0 07 00 0F 1F 2F ",
+            "10 A0 03 00 0F 1F 2F ",
             PacketBuilder().buildPacket(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F)).bytes.toHexString()
         )
     }
@@ -76,7 +77,7 @@ class RxJavaTest {
             .observeOn(Schedulers.trampoline())
             .subscribe(testSubscriber)
 
-        val bytes = "10 A0 05 00 F0   10 A0 07 00 F0 F1 F2   10 A0 06 00 F0 F1 ".repeat(600)
+        val bytes = "10 A0 01 00 F0   10 A0 03 00 F0 F1 F2   10 A0 02 00 F0 F1 ".repeat(600)
         outputStream.writeBytes(bytes)
 
         testSubscriber.awaitTerminalEvent()
@@ -97,7 +98,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol)
+            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -107,8 +108,8 @@ class RxJavaTest {
             .subscribe(testSubscriber)
 
         val bytes =
-            "10 A0 08 00 CC DD 0C 00    10 A0 09 00 F0 F1 F2 F3 F4   10 A0 07 00 F5 F6 F7".repeat(600)
-        val messageBytes = "CC DD 0C 00 F0 F1 F2 F3 F4 F5 F6 F7 ".repeat(600)
+            "10 A0 04 00 CC DD 08 00    10 A0 05 00 F0 F1 F2 F3 F4   10 A0 03 00 F5 F6 F7".repeat(600)
+        val messageBytes = "CC DD 08 00 F0 F1 F2 F3 F4 F5 F6 F7 ".repeat(600)
         outputStream.writeBytes(bytes)
 
         testSubscriber.awaitTerminalEvent()
@@ -131,7 +132,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol)
+            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -141,8 +142,8 @@ class RxJavaTest {
             .subscribe(testSubscriber)
 
         val bytes =
-            "10 A0 13 00 CC DD 06 00 F0 F2 CC DD 04 00 CC DD 05 00 F0  10 A0 0F 00 CC DD 04 00 CC DD 07 00 F0 F1 F2".repeat(600)
-        val messageBytes = "CC DD 06 00 F0 F2  CC DD 04 00  CC DD 05 00 F0  CC DD 04 00  CC DD 07 00 F0 F1 F2".repeat(600)
+            "10 A0 0F 00 CC DD 02 00 F0 F2 CC DD 00 00 CC DD 01 00 F0  10 A0 0B 00 CC DD 00 00 CC DD 03 00 F0 F1 F2".repeat(600)
+        val messageBytes = "CC DD 02 00 F0 F2  CC DD 00 00  CC DD 01 00 F0  CC DD 00 00  CC DD 03 00 F0 F1 F2".repeat(600)
         outputStream.writeBytes(bytes)
 
         testSubscriber.awaitTerminalEvent()
@@ -165,7 +166,7 @@ class RxJavaTest {
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroMessageProtocol)
+            .toMessageStream(VeroMessageProtocol, VeroResponseParser())
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -175,8 +176,8 @@ class RxJavaTest {
             .subscribe(testSubscriber)
 
         val bytes =
-            "10 A0 08 00 CC DD 05 00  10 A0 08 00 F0 CC DD 07  10 A0 08 00 00 F0 F1 F2".repeat(600)
-        val messageBytes = "CC DD 05 00 F0  CC DD 07 00 F0 F1 F2".repeat(600)
+            "10 A0 04 00 CC DD 01 00  10 A0 04 00 F0 CC DD 03  10 A0 04 00 00 F0 F1 F2".repeat(600)
+        val messageBytes = "CC DD 01 00 F0  CC DD 03 00 F0 F1 F2".repeat(600)
         outputStream.writeBytes(bytes)
 
         testSubscriber.awaitTerminalEvent()
@@ -205,7 +206,7 @@ class RxJavaTest {
         fun sendMessageAndQueueReply() {
             Completable.fromAction {
                 Thread.sleep(1000)
-                val bytes = "10 A0 05 00 F0   10 A0 07 00 F0 F1 F2   10 A0 06 00 F0 F1 ".repeat(600)
+                val bytes = "10 A0 01 00 F0   10 A0 03 00 F0 F1 F2   10 A0 02 00 F0 F1 ".repeat(600)
                 outputStream.writeBytes(bytes)
             }.subscribeOn(Schedulers.io()).observeOn(Schedulers.trampoline()).subscribe()
         }
@@ -221,7 +222,7 @@ class RxJavaTest {
         testObserver.awaitTerminalEvent()
         print("Final messages: ${testObserver.values().map { it.bytes.toHexString() }}")
         assertHexStringsEqual(
-            "10 A0 05 00 F0   10 A0 07 00 F0 F1 F2   10 A0 06 00 F0 F1 ",
+            "10 A0 01 00 F0   10 A0 03 00 F0 F1 F2   10 A0 02 00 F0 F1 ",
             testObserver.values().map { it.bytes.toHexString() }.reduce { a, b -> a + b })
     }
 
@@ -239,7 +240,7 @@ class RxJavaTest {
 
         val testSubscriber = TestSubscriber<Packet>()
 
-        val bytes = "10 A0 06 00 F0 F1 "
+        val bytes = "10 A0 02 00 F0 F1 "
 
         Completable.fromAction {
             outputStream.writeBytes(bytes.repeat(600))
@@ -274,7 +275,7 @@ class RxJavaTest {
         val testSubscriber1 = TestSubscriber<Packet>()
         val testSubscriber2 = TestSubscriber<Packet>()
 
-        val bytes = "10 A0 06 00 F0 F1 "
+        val bytes = "10 A0 02 00 F0 F1 "
 
         publishedFlowable
             .take(7)
@@ -320,9 +321,9 @@ class RxJavaTest {
         val testSubscriber1 = TestSubscriber<Packet>()
         val testSubscriber2 = TestSubscriber<Packet>()
 
-        val bytes1 = "10 A0 07 00 F0 F1 F2 "
-        val bytes2 = "20 A0 06 00 F0 F1 "
-        val bytes3 = "30 A0 05 00 F0 "
+        val bytes1 = "10 A0 03 00 F0 F1 F2 "
+        val bytes2 = "20 A0 02 00 F0 F1 "
+        val bytes3 = "30 A0 01 00 F0 "
 
         val source1Flowable = publishedFlowable
             .filter { it.source == 0x10 }
@@ -383,13 +384,13 @@ class RxJavaTest {
             ?.take(7)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber1)
         router.incomingPacketChannels[VeroEvent]
             ?.take(5)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber2)
-        router.incomingPacketChannels[FmsCommand]
+        router.incomingPacketChannels[Un20Command]
             ?.take(11)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber3)
 
         val pb = PacketBuilder()
         val bytes1 = pb.buildPacket(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F)).bytes.toHexString()
         val bytes2 = pb.buildPacket(VeroEvent, AndroidDevice, byteArrayOf(0x0F, 0x1F)).bytes.toHexString()
-        val bytes3 = pb.buildPacket(FmsCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F)).bytes.toHexString()
+        val bytes3 = pb.buildPacket(Un20Command, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F)).bytes.toHexString()
 
         outputStream.writeBytes((bytes1 + bytes2 + bytes3).repeat(600))
 
