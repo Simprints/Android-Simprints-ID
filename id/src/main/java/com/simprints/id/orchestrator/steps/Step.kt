@@ -8,21 +8,22 @@ import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprin
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 
-data class Step(
+class Step(
     val requestCode: Int,
     val activityName: String,
     val bundleKey: String,
     val request: Request,
-    var status: Status
+    var status: Status,
+    private var result: Result? = null
 ) : Parcelable {
 
-    var result: Result? = null
-        set(value) {
-            field = value
-            if (field != null) {
-                status = COMPLETED
-            }
-        }
+    fun getResult() = result
+
+    fun setResult(result: Result?) {
+        this.result = result
+        if (result != null)
+            status = COMPLETED
+    }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
         dest?.run {

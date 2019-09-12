@@ -18,7 +18,7 @@ class AppResponseBuilderForFinger : AppResponseBuilderForModal {
                                steps: List<Step>,
                                sessionId: String): AppResponse {
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val fingerResponse = results.first()
 
         if (fingerResponse is FingerprintRefusalFormResponse)

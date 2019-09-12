@@ -9,8 +9,7 @@ import com.simprints.id.tools.ParcelableConverter
 class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncoder {
 
     override fun encode(step: Step): String {
-        val stepCopy = step.copy()
-        val stepWithEncodedResult = processStep(stepCopy, Operation.ENCODE)
+        val stepWithEncodedResult = processStep(step, Operation.ENCODE)
         val converter = ParcelableConverter(stepWithEncodedResult)
         val encodedString = String(converter.toBytes())
         converter.recycle()
@@ -28,13 +27,13 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     }
 
     private fun processStep(step: Step, operation: Operation): Step {
-        val result = step.result
-        return step.also {
-            it.result = when (result) {
+        val result = step.getResult()
+        return step.apply {
+            setResult(when (result) {
                 is FaceCaptureResponse -> handleFaceCaptureResponse(result, operation)
                 is FingerprintEnrolResponse -> handleFingerprintEnrolResponse(result, operation)
                 else -> result
-            }
+            })
         }
     }
 
