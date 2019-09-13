@@ -26,10 +26,7 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSourceImpl
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -219,14 +216,6 @@ open class AppModule {
                                  personRemoteDataSource: PersonRemoteDataSource,
                                  timeHelper: TimeHelper,
                                  syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
-
-    @Provides
-    @Singleton
-    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
-
-    @Provides
-    @Singleton
-    open fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource = ProjectRemoteDataSourceImpl(remoteDbManager)
 
     @Provides
     @Singleton

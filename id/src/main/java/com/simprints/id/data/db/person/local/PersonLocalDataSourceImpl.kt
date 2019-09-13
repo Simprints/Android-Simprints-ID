@@ -63,6 +63,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         }
     }
 
+    //STOPSHIP: Write test to check if realm stop flows (otherwise buffer would fail)
     override suspend fun load(query: PersonLocalDataSource.Query): Flow<Person> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
@@ -72,7 +73,6 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
                     .asFlow()
             }
         }
-
 
     override suspend fun delete(query: PersonLocalDataSource.Query) {
         withContext(Dispatchers.Main) {

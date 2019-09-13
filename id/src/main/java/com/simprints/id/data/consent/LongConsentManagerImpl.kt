@@ -12,7 +12,7 @@ import java.io.BufferedReader
 import java.io.File
 
 
-class LongConsentManagerImpl(absolutePath: String,
+open class LongConsentManagerImpl(absolutePath: String,
                              private val loginInfoManager: LoginInfoManager,
                              private val crashReportManager: CrashReportManager) : LongConsentManager {
 

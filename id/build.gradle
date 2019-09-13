@@ -202,6 +202,7 @@ dependencies {
     testImplementation deps.testing.espresso.intents
     testImplementation deps.testing.espresso.contrib
     testImplementation deps.testing.truth
+    testImplementation deps.testing.mockito.core
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
     testImplementation deps.testing.mockk
@@ -210,7 +211,9 @@ dependencies {
     testImplementation deps.testing.work
     testImplementation deps.testing.coroutines_test
     kaptTest deps.dagger.compiler
-    testImplementation project(':testtools')
+    testImplementation(project(':testtools')) {
+        exclude group: 'org.mockito:mockito-android'
+    }
 
     // Android test
     androidTestImplementation(project(':fingerprintscannermock')) {

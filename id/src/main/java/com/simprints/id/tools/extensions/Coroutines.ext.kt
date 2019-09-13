@@ -19,20 +19,25 @@ suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = chann
         "Max chunk size should be greater than 0 but was $maxChunkSize"
     }
     val buffer = ArrayList<T>(maxChunkSize)
-    collect {
-        buffer += it
-        if (buffer.size < maxChunkSize) {
-            val offered = offer(buffer.toList())
-            if (offered) {
+
+    try {
+        collect {
+            buffer += it
+            if (buffer.size == maxChunkSize) {
+                send(buffer.toList())
                 buffer.clear()
             }
-        } else {
-            send(buffer.toList())
-            buffer.clear()
         }
-    }
-    if (buffer.size > 0)
+    } finally {
         send(buffer.toList())
+        buffer.clear()
+    }
+
+//    this@bufferedChunks.onCompletion {
+//        send(buffer.toList())
+//        buffer.clear()
+//    }
+
 }.buffer(1)
 
 suspend fun <E : Any> Channel<E>.consumeEachBlock(maxBlockSize: Int, consumer: (List<E>) -> Unit) {

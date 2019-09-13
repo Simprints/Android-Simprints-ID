@@ -1,19 +1,18 @@
 package com.simprints.id.activities.dashboard
 
 import com.simprints.core.tools.AndroidResourcesHelper
+import com.simprints.core.tools.singleWithSuspend
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import io.reactivex.Single
-import kotlinx.coroutines.runBlocking
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -46,13 +45,8 @@ class DashboardCardsFactory(private val component: AppComponent) {
     ).filterNotNull()
 
     private fun createProjectInfoCard(position: Int = 0): Single<DashboardCardViewModel> =
-        Single.create<Project> {
-            try {
-                it.onSuccess(runBlocking { projectRepository.loadAndRefreshCache(loginInfoManager.getSignedInProjectIdOrEmpty()) })
-            } catch (t: Throwable) {
-                t.printStackTrace()
-                it.onError(t)
-            }
+        singleWithSuspend {
+            projectRepository.loadAndRefreshCache(loginInfoManager.getSignedInProjectIdOrEmpty())
         }.map {
             DashboardCardViewModel(DashboardCardType.PROJECT_INFO,
                 position,
