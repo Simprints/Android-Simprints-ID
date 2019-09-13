@@ -1,10 +1,8 @@
-package com.simprints.id.data.db.common.realm
+package com.simprints.id.data.db.person.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toDomainPerson
 import com.simprints.id.data.db.person.local.models.toRealmPerson
@@ -24,7 +22,7 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class RealmManagerTests : RealmTestsBase() {
+class PersonLocalDataSourceTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var personLocalDataSource: PersonLocalDataSource
@@ -92,7 +90,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(userId = fakePerson.moduleId)) }
+        val count = personLocalDataSource.count(PersonLocalDataSource.Query(moduleId = fakePerson.moduleId))
         assertEquals(count, 1)
     }
 
@@ -114,22 +112,26 @@ class RealmManagerTests : RealmTestsBase() {
     }
 
     @Test
-    fun insertOrUpdatePerson_ShouldSucceed() {
+    fun insertOrUpdatePerson_ShouldSucceed() = runBlocking {
         val fakePerson = getFakePerson()
-        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
 
-        assertEquals(realm.where(DbPerson::class.java).count(), 1)
-        assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+        realm.executeTransaction {
+            assertEquals(realm.where(DbPerson::class.java).count(), 1)
+            assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+        }
     }
 
     @Test
-    fun insertOrUpdateSamePerson_ShouldNotSaveTwoPeople() {
+    fun insertOrUpdateSamePerson_ShouldNotSaveTwoPeople() = runBlocking {
         val fakePerson = getFakePerson()
-        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
-        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
 
-        assertEquals(realm.where(DbPerson::class.java).count(), 1)
-        assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+        realm.executeTransaction {
+            assertEquals(realm.where(DbPerson::class.java).count(), 1)
+            assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+        }
     }
 
     @Test

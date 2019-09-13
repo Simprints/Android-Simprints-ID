@@ -1,7 +1,8 @@
-package com.simprints.id.data.db.common.realm
+package com.simprints.id.data.db.person.local
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toRealmPerson
