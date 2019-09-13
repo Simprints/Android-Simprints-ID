@@ -4,6 +4,7 @@ import android.app.Instrumentation
 import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
@@ -42,17 +43,17 @@ class CoreExitFormActivityTest {
         onView(ViewMatchers.withId(R.id.rbTooYoung)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         onView(ViewMatchers.withId(R.id.rbOther)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
         onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
     }
 
     @Test
     fun chooseAnOptionInRefusal_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
         onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).perform(ViewActions.click())
         onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
@@ -61,20 +62,20 @@ class CoreExitFormActivityTest {
     fun chooseOtherOption_shouldNotEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
         onView(ViewMatchers.withId(R.id.rbOther)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
     }
 
     @Test
     fun chooseOtherOptionAndEnterText_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
         onView(ViewMatchers.withId(R.id.rbOther)).perform(ViewActions.click())
         onView(ViewMatchers.withId(R.id.exitFormText)).perform(ViewActions.typeText("Reason for other"))
         tryOnUiUntilTimeout(1000, 200) {
-            onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+            onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
         }
     }
 
@@ -85,7 +86,8 @@ class CoreExitFormActivityTest {
 
         onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).perform(ViewActions.click())
         onView(ViewMatchers.withId(R.id.exitFormText)).perform(ViewActions.typeText(refusalReasonText))
-        onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).perform(ViewActions.click())
+        Espresso.pressBackUnconditionally()
+        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).perform(ViewActions.click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.SUBMIT,
             ExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormResult.RESULT_CODE_SUBMIT)
