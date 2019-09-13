@@ -67,7 +67,7 @@ android {
 
     applicationVariants.all { variant ->
         if (variant.buildType.name == "release" ||
-                variant.buildType.name == "releaseWithLogfile") {
+            variant.buildType.name == "releaseWithLogfile") {
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyDdGdHCjfLY6z3zZSBrSHvjvNjh6K6Dhmw\"")
         } else if (variant.buildType.name == "debug") {
             buildConfigField("String", "ANDROID_AUTH_API_KEY", "\"AIzaSyCxPFr61OtOyAsVoXKSSSBo-C4Jk1QHc7I\"")
@@ -172,9 +172,6 @@ dependencies {
     implementation deps.rxjava2.android
     implementation deps.rxjava2.core
     implementation deps.rxjava2.kotlin
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.google.android.material:material:1.0.0'
     kapt deps.androidx.lifecycle.compiler
     kapt deps.androidx.room.compiler
     kapt deps.dagger.compiler

@@ -40,7 +40,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         val result = when {
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
-            else -> super.processResult(requestCode, data)
+            else -> super.processResult(resultCode = resultCode, data = data)
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }

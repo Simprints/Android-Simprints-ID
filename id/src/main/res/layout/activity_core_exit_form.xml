@@ -19,11 +19,11 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/whySkipFingerprintingText"
+            android:id="@+id/whySkipBiometricsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:text="@string/why_did_you_skip_fingerprinting"
+            android:text="@string/why_did_you_skip_biometrics"
             android:textAlignment="center"
             android:textColor="@color/simprints_white"
             android:textSize="25sp" />
@@ -120,13 +120,13 @@
             android:weightSum="2">
 
             <Button
-                android:id="@+id/btScanFingerprints"
+                android:id="@+id/btGoBack"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="70dp"
                 android:onClick="handleGoBackClick"
-                android:text="Go Back"
+                android:text="@string/exit_form_go_back"
                 tools:ignore="ButtonStyle" />
 
             <Button
