@@ -5,9 +5,11 @@ import com.simprints.id.orchestrator.steps.Step.Result
 import com.simprints.moduleapi.face.responses.*
 
 interface FaceResponse : Parcelable, Result {
+
     companion object {
         const val BUNDLE_KEY = "FaceResponseBundleKey"
     }
+
 }
 
 fun IFaceResponse.fromModuleApiToDomain(): FaceResponse =
