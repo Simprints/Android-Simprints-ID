@@ -164,8 +164,10 @@ class DashboardActivityAndroidTest {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_sync_now)))
         }
 
+        waitOnSystem(5000)
+
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
-            .check(matches(withText("${runBlocking { peopleInDb.count() }}")))
+            .check(matches(withText("${runBlocking { personLocalDataSource.count() }}")))
 
         onView(withId(R.id.dashboardCardSyncDownloadText))
             .check(matches(withText("0")))
