@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.cache
+package com.simprints.id.orchestrator.cache.crypto
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse

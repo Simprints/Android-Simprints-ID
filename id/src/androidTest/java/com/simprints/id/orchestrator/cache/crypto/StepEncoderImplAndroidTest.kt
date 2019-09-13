@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.cache
+package com.simprints.id.orchestrator.cache.crypto
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.core.images.SecuredImageRef
