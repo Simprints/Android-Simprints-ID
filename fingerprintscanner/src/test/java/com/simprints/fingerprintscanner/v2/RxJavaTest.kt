@@ -1,9 +1,10 @@
 package com.simprints.fingerprintscanner.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.Message
+import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.packet.*
-import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroResponseAccumulator
-import com.simprints.fingerprintscanner.v2.incoming.message.parsers.VeroResponseParser
+import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.PacketToMessageAccumulator
+import com.simprints.fingerprintscanner.v2.incoming.message.parsers.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.ByteArrayToPacketAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
@@ -98,14 +99,14 @@ class RxJavaTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        val testSubscriber = TestSubscriber<Message>()
+        val testSubscriber = TestSubscriber<TestMessage>()
 
         inputStream
             .toPacketStream()
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
+            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -132,14 +133,14 @@ class RxJavaTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        val testSubscriber = TestSubscriber<Message>()
+        val testSubscriber = TestSubscriber<TestMessage>()
 
         inputStream
             .toPacketStream()
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
+            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -166,14 +167,14 @@ class RxJavaTest {
         val inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        val testSubscriber = TestSubscriber<Message>()
+        val testSubscriber = TestSubscriber<TestMessage>()
 
         inputStream
             .toPacketStream()
             .doOnNext { packet ->
                 print("On packet next : ${packet.bytes.toHexString()}")
             }
-            .toMessageStream(VeroResponseAccumulator(VeroResponseParser()))
+            .toMessageStream(TestMessageAccumulator(TestMessageParser()))
             .doOnNext { message ->
                 print("On message next : ${message.bytes.toHexString()}")
             }
@@ -438,4 +439,13 @@ class RxJavaTest {
         .toPacketStream(ByteArrayToPacketAccumulator(PacketParser()))
 
     private fun print(any: Any) = println(any)
+
+    class TestMessage(val bytes: ByteArray) : IncomingMessage
+    class TestMessageParser : MessageParser<TestMessage> {
+
+        override fun parse(bytes: ByteArray): TestMessage = TestMessage(bytes)
+    }
+
+    class TestMessageAccumulator(testMessageParser: TestMessageParser) :
+        PacketToMessageAccumulator<TestMessage>(VeroMessageProtocol, testMessageParser)
 }
