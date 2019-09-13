@@ -1,12 +1,27 @@
 package com.simprints.id.orchestrator.steps
 
+import android.content.Intent
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
+import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
+import org.junit.After
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
+@RunWith(AndroidJUnit4::class)
 class CoreStepProcessorImplTest: BaseStepProcessorTest() {
+
+    private val coreStepProcessor = CoreStepProcessorImpl()
 
     @Test
     fun stepProcessorShouldBuildRightStepForEnrol() {
@@ -23,4 +38,28 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     }
 
     //TODO: Add verify test once implemented
+
+    @Test
+    fun stepProcessorShouldProcessConsentResult() {
+        val consentData: Intent =
+            Intent().putExtra(CONSENT_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
+        val result = coreStepProcessor.processResult(CoreResponseCode.CONSENT.value, consentData)
+
+        assertThat(result).isInstanceOf(AskConsentResponse::class.java)
+    }
+
+    @Test
+    fun stepProcessorShouldProcessExitFormResult() {
+        val exitFormData = Intent().apply {
+            putExtra(CONSENT_STEP_BUNDLE, CoreExitFormResponse(ExitFormReason.OTHER, "optional_text"))
+        }
+        val result = coreStepProcessor.processResult(CoreResponseCode.EXIT_FORM.value, exitFormData)
+
+        assertThat(result).isInstanceOf(CoreExitFormResponse::class.java)
+    }
+
+    @After
+    fun tearDown() {
+        stopKoin()
+    }
 }
