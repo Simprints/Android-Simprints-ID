@@ -5,9 +5,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.orchestrator.steps.Step
 
-class FaceCaptureResponseProcessor(
+class FaceCaptureResponseEncoder(
     keystoreManager: KeystoreManager
-) : ResponseProcessor(keystoreManager) {
+) : ResponseEncoder(keystoreManager) {
 
     override fun process(response: Step.Result?, operation: Operation): Step.Result {
         require(response is FaceCaptureResponse)

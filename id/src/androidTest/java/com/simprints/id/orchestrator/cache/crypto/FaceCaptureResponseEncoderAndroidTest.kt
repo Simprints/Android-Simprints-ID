@@ -12,12 +12,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import java.util.*
 
-class FaceCaptureResponseProcessorAndroidTest {
+class FaceCaptureResponseEncoderAndroidTest {
 
     private val processor by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val keystoreManager = KeystoreManagerImpl(context)
-        FaceCaptureResponseProcessor(keystoreManager)
+        FaceCaptureResponseEncoder(keystoreManager)
     }
 
     @Test
