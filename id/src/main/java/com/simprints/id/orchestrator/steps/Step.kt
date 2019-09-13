@@ -8,7 +8,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprin
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 
-class Step(
+data class Step(
     val requestCode: Int,
     val activityName: String,
     val bundleKey: String,
