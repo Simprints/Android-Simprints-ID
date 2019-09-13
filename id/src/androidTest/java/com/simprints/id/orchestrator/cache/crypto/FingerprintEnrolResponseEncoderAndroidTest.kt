@@ -8,12 +8,12 @@ import org.hamcrest.MatcherAssert
 import org.junit.Test
 import java.util.*
 
-class FingerprintEnrolResponseProcessorAndroidTest {
+class FingerprintEnrolResponseEncoderAndroidTest {
 
     private val processor by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val keystoreManager = KeystoreManagerImpl(context)
-        FingerprintEnrolResponseProcessor(keystoreManager)
+        FingerprintEnrolResponseEncoder(keystoreManager)
     }
 
     @Test
