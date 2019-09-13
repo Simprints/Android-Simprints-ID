@@ -9,7 +9,8 @@ import com.simprints.id.tools.ParcelableConverter
 class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncoder {
 
     override fun encode(step: Step): String {
-        val stepWithEncodedResult = processStep(step, Operation.ENCODE)
+        val stepCopy = step.copy()
+        val stepWithEncodedResult = processStep(stepCopy, Operation.ENCODE)
         val converter = ParcelableConverter(stepWithEncodedResult)
         val encodedString = String(converter.toBytes())
         converter.recycle()
