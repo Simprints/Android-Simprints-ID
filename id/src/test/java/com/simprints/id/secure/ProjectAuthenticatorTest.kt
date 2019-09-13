@@ -8,10 +8,12 @@ import com.nhaarman.mockitokotlin2.any
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.state.setupFakeKeyStore
-import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
@@ -31,6 +33,7 @@ import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Before
@@ -49,9 +52,10 @@ class ProjectAuthenticatorTest {
 
     private lateinit var apiClient: SimApiClient<SecureApiInterface>
 
-    @Inject lateinit var localDbManagerMock: LocalDbManager
+    private val projectRemoteDataSourceMock: ProjectRemoteDataSource = mock()
+    private val projectLocalDAtaSourceMock: ProjectLocalDataSource = mock()
+
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteProjectManagerMock: ProjectRemoteDataSource
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
     @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
 
@@ -61,9 +65,7 @@ class ProjectAuthenticatorTest {
     private val module by lazy {
         TestAppModule(
             app,
-            localDbManagerRule = MockRule,
             remoteDbManagerRule = MockRule,
-            remoteProjectManagerRule = MockRule,
             loginInfoManagerRule = MockRule,
             syncSchedulerHelperRule = MockRule,
             peopleUpSyncMasterRule = MockRule,
@@ -71,13 +73,23 @@ class ProjectAuthenticatorTest {
         )
     }
 
+    private val dataModule by lazy {
+        TestDataModule(
+            projectLocalDataSourceRule = ReplaceRule { projectLocalDAtaSourceMock },
+            projectRemoteDataSourceRule = ReplaceRule { projectRemoteDataSourceMock }
+        )
+    }
+
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
 
-        RobolectricTestMocker
-            .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        runBlocking {
+            RobolectricTestMocker
+                .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+                .mockLoadProject(projectRemoteDataSourceMock, projectLocalDAtaSourceMock)
+
+        }
 
         whenever(remoteSessionsManagerMock.getSessionsApiClient()).thenReturn(Single.create { it.onError(IllegalStateException()) })
 

@@ -14,8 +14,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestPreferencesModule(var remoteConfigRule: DependencyRule = RealRule,
-                            var settingsPreferencesManagerRule: DependencyRule = RealRule)
-    : PreferencesModule() {
+                            var settingsPreferencesManagerRule: DependencyRule = RealRule) : PreferencesModule() {
 
     override fun provideRemoteConfig(): FirebaseRemoteConfig =
         remoteConfigRule.resolveDependency { super.provideRemoteConfig() }

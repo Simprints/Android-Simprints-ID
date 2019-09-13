@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
+import com.simprints.core.tools.completableWithSuspend
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
@@ -18,9 +19,6 @@ import com.simprints.id.tools.TimeHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
@@ -114,23 +112,16 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
 
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
-            Completable.create {
-                GlobalScope.launch(Dispatchers.IO) {
-                    try {
-                        personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.toDomainPerson() })
-                        Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
-                        decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
-                        updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
-                        updateLastKnownPatientId(batchOfPeople.last().id)
-                        updateDownSyncTimestampOnBatchDownload()
-                        it.onComplete()
-                    } catch (t: Throwable) {
-                        t.printStackTrace()
-                        it.onError(t)
-                    }
-                }
+            completableWithSuspend {
+                personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.toDomainPerson() })
+                Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
+                decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
+                updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
+                updateLastKnownPatientId(batchOfPeople.last().id)
+                updateDownSyncTimestampOnBatchDownload()
             }
         }
+
 
     private fun finishDownload() {
         Timber.d("Download finished")

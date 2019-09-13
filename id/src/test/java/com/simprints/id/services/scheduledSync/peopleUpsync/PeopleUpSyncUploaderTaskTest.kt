@@ -1,24 +1,31 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync
 
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
+import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
+import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import io.reactivex.Completable
-import io.reactivex.Flowable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import java.util.*
 
 class PeopleUpSyncUploaderTaskTest {
 
     private val loginInfoManager: LoginInfoManager = mock()
-    private val localDbManager: LocalDbManager = mock()
+    private val personLocalDataSource: PersonLocalDataSource = mockk()
     private val personRemoteDataSource: PersonRemoteDataSource = mock()
     private val upSyncDao: UpSyncDao = mock()
 
@@ -27,7 +34,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val batchSize = 2
 
     private val task = PeopleUpSyncUploaderTask(
-        loginInfoManager, localDbManager, personRemoteDataSource,
+        loginInfoManager, personLocalDataSource, personRemoteDataSource,
         projectIdToSync, /*userIdToSync, */batchSize, upSyncDao // TODO: uncomment userId when multitenancy is properly implemented
     )
 
@@ -45,12 +52,20 @@ class PeopleUpSyncUploaderTaskTest {
     private val syncedPerson2 = notYetSyncedPerson2.copy(toSync = false)
     private val syncedPerson3 = notYetSyncedPerson3.copy(toSync = false)
 
+    @Before
+    fun setUp() {
+        UnitTestConfig(this)
+            .coroutinesMainThread()
+    }
+
     @Test
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
         mockSignedInUser(differentProjectId, userIdToSync)
 
-        assertThrows<IllegalStateException> {
-            task.execute()
+        runBlocking {
+            assertThrows<IllegalStateException> {
+                task.execute()
+            }
         }
     }
 
@@ -72,8 +87,10 @@ class PeopleUpSyncUploaderTaskTest {
         whenever(personRemoteDataSource.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)))
             .thenThrow(SimprintsInternalServerException())
 
-        assertThrows<TransientSyncFailureException> {
-            task.execute()
+        runBlocking {
+            assertThrows<TransientSyncFailureException> {
+                task.execute()
+            }
         }
     }
 
@@ -135,7 +152,9 @@ class PeopleUpSyncUploaderTaskTest {
         mockSuccessfulLocalPeopleUpdates(*expectedLocalUpdates)
         mockSyncStatusModel()
 
-        task.execute()
+        runBlocking {
+            task.execute()
+        }
 
         verifyLocalPeopleQueries(*localQueryResults)
         verifyPeopleUploads(*expectedUploadBatches)
@@ -148,26 +167,18 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Person>) {
-        queryResults
-            .fold(whenever(localDbManager.getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true))) { ongoingStub, queryResult ->
-                ongoingStub.thenReturn(Single.just(queryResult.size))
-            }
-            .thenReturn(Single.just(0))
-        queryResults
-            .fold(whenever(localDbManager.loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true))) { ongoingStub, queryResult ->
-                ongoingStub.thenReturn(Flowable.fromIterable(queryResult))
-            }
+        coEvery { personLocalDataSource.load(any()) } coAnswers {
+            queryResults.fold(emptyList<Person>()) { aggr, new -> aggr + new }.toList().asFlow()
+        }
     }
 
     private fun mockSuccessfulPeopleUploads(vararg batches: List<Person>) {
-        batches.forEach { batch ->
-            whenever(personRemoteDataSource.uploadPeople(projectIdToSync, batch)).thenReturn(Completable.complete())
-        }
+        whenever(personRemoteDataSource.uploadPeople(anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
     }
 
     private fun mockSuccessfulLocalPeopleUpdates(vararg updates: List<Person>) {
         updates.forEach { update ->
-            whenever(localDbManager.insertOrUpdatePeopleInLocal(update)).thenReturn(Completable.complete())
+            coEvery { personLocalDataSource.insertOrUpdate(any()) } returns Unit
         }
     }
 
@@ -176,9 +187,11 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
-
-        verifyExactly(queryResults.size + 1, localDbManager) { getPeopleCountFromLocal(/*userId = userIdToSync, */toSync = true) }
-        verifyExactly(queryResults.size, localDbManager) { loadPeopleFromLocalRx(/*userId = userIdToSync, */toSync = true) }
+        coVerify(exactly = 1) {
+            personLocalDataSource.load(withArg {
+                assertThat(it.toSync).isEqualTo(true)
+            })
+        }
     }
 
     private fun verifyPeopleUploads(vararg batches: List<Person>) {
@@ -189,7 +202,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private fun verifyLocalPeopleUpdates(vararg updates: List<Person>) {
         updates.forEach { update ->
-            verifyOnce(localDbManager) { insertOrUpdatePeopleInLocal(update) }
+            coVerify(exactly = 1) { personLocalDataSource.insertOrUpdate(update) }
         }
     }
 }

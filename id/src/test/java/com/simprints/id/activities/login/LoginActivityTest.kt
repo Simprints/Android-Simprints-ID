@@ -51,7 +51,6 @@ class LoginActivityTest {
 
     private val module by lazy {
         TestAppModule(app,
-            localDbManagerRule = MockRule,
             dbManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule,
             crashReportManagerRule = MockRule)

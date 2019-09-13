@@ -5,13 +5,16 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -33,10 +36,7 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestAppModule(app: Application,
-                    var localDbManagerRule: DependencyRule = RealRule,
                     var remoteDbManagerRule: DependencyRule = RealRule,
-                    var remotePeopleManagerRule: DependencyRule = RealRule,
-                    var remoteProjectManagerRule: DependencyRule = RealRule,
                     var remoteSessionsManagerRule: DependencyRule = RealRule,
                     var dbManagerRule: DependencyRule = RealRule,
                     var secureDataManagerRule: DependencyRule = RealRule,
@@ -58,11 +58,6 @@ class TestAppModule(app: Application,
                     var syncSchedulerHelperRule: DependencyRule = RealRule,
                     var downSyncManagerRule: DependencyRule = RealRule) : AppModule() {
 
-    override fun provideLocalDbManager(ctx: Context,
-                                       secureDataManager: SecureDataManager,
-                                       loginInfoManager: LoginInfoManager): LocalDbManager  =
-        localDbManagerRule.resolveDependency { super.provideLocalDbManager(ctx, secureDataManager, loginInfoManager) }
-
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }
 
@@ -75,18 +70,13 @@ class TestAppModule(app: Application,
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
-    override fun provideDbManager(localDbManager: LocalDbManager,
+    override fun provideDbManager(projectRepository: ProjectRepository,
                                   remoteDbManager: RemoteDbManager,
-                                  secureDataManager: SecureDataManager,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
-                                  sessionEventsManager: SessionEventsManager,
-                                  personRemoteDataSource: PersonRemoteDataSource,
-                                  remoteProjectManager: ProjectRemoteDataSource,
-                                  timeHelper: TimeHelper,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
                                   database: SyncStatusDatabase): DbManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(localDbManager, remoteDbManager, secureDataManager, loginInfoManager, preferencesManager, sessionEventsManager, personRemoteDataSource, remoteProjectManager, timeHelper, peopleUpSyncMaster, database) }
+        dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,
@@ -121,12 +111,6 @@ class TestAppModule(app: Application,
     override fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager): LongConsentManager =
         longConsentManagerRule.resolveDependency { super.provideLongConsentManager(ctx, loginInfoManager, crashReportManager) }
 
-    override fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
-        remotePeopleManagerRule.resolveDependency { super.provideRemotePeopleManager(remoteDbManager) }
-
-    override fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
-        remoteProjectManagerRule.resolveDependency { super.provideRemoteProjectManager(remoteDbManager) }
-
     override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
         remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
 
@@ -139,11 +123,15 @@ class TestAppModule(app: Application,
     override fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
         syncScopesBuilderRule.resolveDependency { super.provideSyncScopesBuilder(loginInfoManager, preferencesManager) }
 
-    override fun provideCountTask(dbManager: DbManager, syncStatusDatabase: SyncStatusDatabase): CountTask =
-        countTaskRule.resolveDependency { super.provideCountTask(dbManager, syncStatusDatabase) }
+    override fun provideCountTask(personRepository: PersonRepository): CountTask =
+        countTaskRule.resolveDependency { super.provideCountTask(personRepository) }
 
-    override fun provideDownSyncTask(localDbManager: LocalDbManager, personRemoteDataSource: PersonRemoteDataSource, timeHelper: TimeHelper, syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
-        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(localDbManager, personRemoteDataSource, timeHelper, syncStatusDatabase) }
+    override fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
+                                     syncInfoLocalDataSource: SyncInfoLocalDataSource,
+                                     personRemoteDataSource: PersonRemoteDataSource,
+                                     timeHelper: TimeHelper,
+                                     syncStatusDatabase: SyncStatusDatabase): DownSyncTask =
+        downSyncTaskRule.resolveDependency { super.provideDownSyncTask(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase) }
 
     override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper =
         syncSchedulerHelperRule.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }

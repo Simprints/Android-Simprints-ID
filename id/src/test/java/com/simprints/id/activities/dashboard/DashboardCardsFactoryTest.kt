@@ -3,29 +3,33 @@ package com.simprints.id.activities.dashboard
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
-import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.di.DependencyRule.MockRule
 import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.wheneverOnSuspend
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -41,25 +45,29 @@ class DashboardCardsFactoryTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
-    @Inject lateinit var remoteProjectManagerMock: ProjectRemoteDataSource
-    @Inject lateinit var localDbManagerMock: LocalDbManager
+    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+
+    private var personRepositoryMock: PersonRepository = mock()
+    private var projectRepositoryMock: ProjectRepository = mock()
+
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
 
     private val module by lazy {
         TestAppModule(app,
             remoteDbManagerRule = MockRule,
-            remotePeopleManagerRule = MockRule,
-            remoteProjectManagerRule = MockRule,
-            localDbManagerRule = MockRule,
             syncStatusDatabaseRule = MockRule)
+    }
+
+    private val dataModule by lazy {
+        TestDataModule(
+            projectRepositoryRule = DependencyRule.ReplaceRule { projectRepositoryMock }
+        )
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
 
         whenever(syncStatusDatabase.downSyncDao).thenReturn(mock())
         whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
@@ -68,29 +76,30 @@ class DashboardCardsFactoryTest {
         whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
         whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
 
-        RobolectricTestMocker
-            .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
-            .setUserLogInState(true, getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
-            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+
+        runBlocking {
+            wheneverOnSuspend(projectRepositoryMock) { loadAndRefreshCache(anyNotNull()) } thenOnBlockingReturn
+                Project().apply {
+                    id = "some_id"
+                    name = "some_name"
+                    description = "some_description"
+                    creator = "some_creator"
+                }
+
+            RobolectricTestMocker
+                .initLogInStateMock(getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), remoteDbManagerMock)
+                .setUserLogInState(true, getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME), userId = "userId")
+                .mockLoadProject(projectRepositoryMock, projectRepositoryMock)
+        }
     }
 
     @Test
     fun shouldCreateTheProjectCard_onlyWhenItHasAValidProject() {
         val factory = DashboardCardsFactory(app.component)
 
-        val card = getCardIfCreated(factory, "project name")
-        Assert.assertEquals(card?.description, "project desc")
-
-        whenever(localDbManagerMock.loadProjectFromLocal(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
-        whenever(remoteProjectManagerMock.loadProjectFromRemote(anyNotNull())).thenReturn(Single.error(Exception("force failing")))
-
         val testObserver = Single.merge(factory.createCards()).test()
         testObserver.awaitTerminalEvent()
-        try {
-            testObserver.values().first { it.type == DashboardCardType.LOCAL_DB }
-        } catch (e: Exception) {
-            Assert.assertTrue(true)
-        }
+        testObserver.assertNoErrors()
     }
 
     @Test
@@ -154,7 +163,7 @@ class DashboardCardsFactoryTest {
                                                                deleteEvent: () -> Unit,
                                                                cardTitle: String) {
         val event = createEvent()
-        mockNPeopleForSyncRequest(personRemoteDataSourceMock, getMockListOfPeopleCountWithCounter(0))
+        mockNPeopleForSyncRequest(personRepositoryMock, getMockListOfPeopleCountWithCounter(0))
 
         var card = getCardIfCreated(
             cardsFactory,
@@ -169,8 +178,8 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getCardIfCreated(cardsFactory: DashboardCardsFactory, title: String?): DashboardCardViewModel.State? {
-        mockNPeopleForSyncRequest(personRemoteDataSourceMock, getMockListOfPeopleCountWithCounter(0))
-        mockNLocalPeople(localDbManagerMock, 0)
+        mockNPeopleForSyncRequest(personRepositoryMock, getMockListOfPeopleCountWithCounter(0))
+        mockNLocalPeople(personRepositoryMock, 0)
 
         val testObserver = Single.merge(cardsFactory.createCards()).test()
         testObserver.awaitTerminalEvent()
@@ -195,7 +204,7 @@ class DashboardCardsFactoryTest {
         whenever(personRemoteDataSource.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
     }
 
-    private fun mockNLocalPeople(localDbManager: LocalDbManager, nLocalPeople: Int) {
-        whenever(localDbManager.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(nLocalPeople))
+    private fun mockNLocalPeople(personRepositoryMock: PersonRepository, nLocalPeople: Int) {
+        wheneverOnSuspend(personRepositoryMock) { count(anyNotNull()) } thenOnBlockingReturn nLocalPeople
     }
 }

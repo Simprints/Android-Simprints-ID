@@ -109,6 +109,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
             personRepository.countToDownSync(syncScope)
                 .map { peopleCounts -> peopleCounts.sumBy { it.count } }
         } ?: Single.just(0))
+
         .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
         .ignoreElement()
         .subscribeOn(Schedulers.io())
