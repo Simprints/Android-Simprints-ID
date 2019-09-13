@@ -27,13 +27,13 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     }
 
     private fun processStep(step: Step, operation: Operation): Step {
-        val result = step.getResult()
-        return step.apply {
-            setResult(when (result) {
+        val result = step.result
+        return step.also {
+            it.result = when (result) {
                 is FaceCaptureResponse -> handleFaceCaptureResponse(result, operation)
                 is FingerprintEnrolResponse -> handleFingerprintEnrolResponse(result, operation)
                 else -> result
-            })
+            }
         }
     }
 

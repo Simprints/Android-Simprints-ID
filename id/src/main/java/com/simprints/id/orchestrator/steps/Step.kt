@@ -13,16 +13,17 @@ class Step(
     val activityName: String,
     val bundleKey: String,
     val request: Request,
-    var status: Status,
-    private var result: Result? = null
+    var result: Result? = null,
+    private var status: Status
 ) : Parcelable {
 
-    fun getResult() = result
+    fun getStatus(): Status {
+        updateStatusBasedOnResult()
+        return status
+    }
 
-    fun setResult(result: Result?) {
-        this.result = result
-        if (result != null)
-            status = COMPLETED
+    fun setStatus(status: Status) {
+        this.status = status
     }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
@@ -38,6 +39,11 @@ class Step(
 
     override fun describeContents() = 0
 
+    private fun updateStatusBasedOnResult() {
+        if (result != null)
+            setStatus(COMPLETED)
+    }
+
     companion object CREATOR : Parcelable.Creator<Step> {
         override fun createFromParcel(source: Parcel): Step {
             val requestCode = source.readInt()
@@ -47,9 +53,7 @@ class Step(
             val status = Status.valueOf(source.readString()!!)
             val result = source.readParcelable<Result>(Result::class.java.classLoader)
 
-            return Step(requestCode, activityName, bundleKey, request, status).also {
-                it.result = result
-            }
+            return Step(requestCode, activityName, bundleKey, request, result, status)
         }
 
         override fun newArray(size: Int): Array<Step?> = arrayOfNulls(size)

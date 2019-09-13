@@ -67,14 +67,14 @@ open class OrchestratorManagerImpl(
     }
 
     private fun startStep(step: Step) {
-        step.status = ONGOING
+        step.setStatus(ONGOING)
         ongoingStep.value = step
         appResponse.value = null
         hotCache.save(step)
     }
 
     private fun ModalityFlow.anyStepOngoing() =
-        steps.any { it.status == ONGOING }
+        steps.any { it.getStatus() == ONGOING }
 
     private fun buildAppResponse() {
         val cachedSteps = hotCache.load()

@@ -25,7 +25,7 @@ class AppResponseBuilderForFaceFinger : AppResponseBuilderForModal {
                                steps: List<Step>,
                                sessionId: String): AppResponse {
 
-        val results = steps.map { it.getResult() }
+        val results = steps.map { it.result }
         val faceResponse = results.first()
         val fingerResponse = results[FINGER_RESPONSE_INDEX]
 
