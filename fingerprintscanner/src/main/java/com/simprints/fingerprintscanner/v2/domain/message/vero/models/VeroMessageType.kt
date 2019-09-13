@@ -25,4 +25,10 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     SET_POWER_LED_STATE(0x41, 0x30);
 
     fun getBytes() = byteArrayOf(majorByte, minorByte)
+
+    companion object {
+        fun fromBytes(bytes: ByteArray) = values().find {
+            it.majorByte == bytes[0] && it.minorByte == bytes[1]
+        } ?: TODO()
+    }
 }
