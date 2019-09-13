@@ -25,6 +25,7 @@ import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
@@ -141,7 +142,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun startCoreExitFormActivity() {
-        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), 12)
+        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
