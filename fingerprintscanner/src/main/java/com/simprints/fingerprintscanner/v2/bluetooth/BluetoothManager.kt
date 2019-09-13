@@ -3,7 +3,6 @@ package com.simprints.fingerprintscanner.v2.bluetooth
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import com.simprints.fingerprintscanner.v2.scanner.Scanner
 import com.simprints.fingerprintscanner.v2.tools.hexStringToByteArray
 import com.simprints.fingerprintscanner.v2.tools.single
 import io.reactivex.Single
