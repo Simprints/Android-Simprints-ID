@@ -17,15 +17,16 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.state.LoginStateMocker
-import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -41,6 +42,7 @@ import com.simprints.testtools.android.waitOnSystem
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matchers
 import org.junit.Assert.fail
@@ -69,8 +71,8 @@ class DashboardActivityAndroidTest {
 
     @Inject lateinit var secureDataManagerSpy: SecureDataManager
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
-    @Inject lateinit var personRemoteDataSourceSpy: PersonRemoteDataSource
-    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var personRemoteRemoteDataSource: PersonRemoteDataSource
+    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var downSyncManager: DownSyncManager
@@ -163,7 +165,7 @@ class DashboardActivityAndroidTest {
         }
 
         onView(withId(R.id.dashboardCardSyncTotalLocalText))
-            .check(matches(withText("${localDbManager.getPeopleCountFromLocal().blockingGet()}")))
+            .check(matches(withText("${runBlocking { peopleInDb.count() }}")))
 
         onView(withId(R.id.dashboardCardSyncDownloadText))
             .check(matches(withText("0")))
@@ -231,7 +233,7 @@ class DashboardActivityAndroidTest {
     private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
-            personRemoteDataSourceSpy.uploadPeople(testProject.id, it).retry(3)
+            personRemoteRemoteDataSource.uploadPeople(testProject.id, it).retry(3)
         }
         val t = Completable.merge(requests).blockingGet()
         t?.let {
@@ -240,7 +242,7 @@ class DashboardActivityAndroidTest {
         }
 
         peopleInDb.addAll(PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_DB_PER_MODULE, syncScope, listOf(true)))
-        localDbManager.insertOrUpdatePeopleInLocal(peopleInDb).blockingAwait()
+        runBlocking { personLocalDataSource.insertOrUpdate(peopleInDb) }
     }
 
     private fun mockBeingSignedIn() {

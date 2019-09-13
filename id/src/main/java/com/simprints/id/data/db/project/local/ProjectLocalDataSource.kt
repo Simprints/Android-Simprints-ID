@@ -7,6 +7,5 @@ interface ProjectLocalDataSource {
 
     suspend fun save(project: Project)
 
-    /** @throws NoSuchStoredProjectException */
-    suspend fun load(projectId: String): Project
+    suspend fun load(projectId: String): Project?
 }

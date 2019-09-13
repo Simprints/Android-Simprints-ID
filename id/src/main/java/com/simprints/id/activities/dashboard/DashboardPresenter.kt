@@ -62,8 +62,11 @@ class DashboardPresenter(private val view: DashboardContract.View,
         ).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeBy(
-            onComplete = { handleCardsCreated() },
+            onComplete = {
+                handleCardsCreated()
+            },
             onError = {
+                it.printStackTrace()
                 handleCardsCreationFailed()
             })
     }

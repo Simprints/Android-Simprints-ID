@@ -13,6 +13,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import java.text.DateFormat
 import java.util.*
 import javax.inject.Inject
@@ -46,7 +47,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
 
     private fun createProjectInfoCard(position: Int = 0): Single<DashboardCardViewModel> =
         singleWithSuspend {
-            projectRepository.loadAndRefreshCache(loginInfoManager.getSignedInProjectIdOrEmpty())
+            runBlocking { projectRepository.loadAndRefreshCache(loginInfoManager.getSignedInProjectIdOrEmpty()) }
         }.map {
             DashboardCardViewModel(DashboardCardType.PROJECT_INFO,
                 position,

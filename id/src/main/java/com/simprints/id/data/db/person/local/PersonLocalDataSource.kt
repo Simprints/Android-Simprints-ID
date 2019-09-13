@@ -14,7 +14,7 @@ interface PersonLocalDataSource {
                 val sortBy: Map<String, Sort>? = null)
 
     suspend fun insertOrUpdate(people: List<Person>)
-    suspend fun load(query: Query): Flow<Person>
+    suspend fun load(query: Query? = null): Flow<Person>
     suspend fun delete(query: Query)
     fun count(query: Query = Query()): Int
 }

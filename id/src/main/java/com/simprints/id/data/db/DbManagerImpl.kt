@@ -1,5 +1,6 @@
 package com.simprints.id.data.db
 
+import com.simprints.core.tools.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
@@ -9,7 +10,6 @@ import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
-import kotlinx.coroutines.runBlocking
 
 open class DbManagerImpl(private var projectRepository: ProjectRepository,
                          private val remote: RemoteDbManager,
@@ -21,7 +21,9 @@ open class DbManagerImpl(private var projectRepository: ProjectRepository,
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
         remote.signInToRemoteDb(token.value)
             .andThen(storeCredentials(userId, projectId))
-            .andThen(Completable.fromAction { runBlocking { projectRepository.loadAndRefreshCache(projectId) } })
+            .andThen(completableWithSuspend {
+                projectRepository.loadAndRefreshCache(projectId) ?: throw Exception("project not found")
+            })
             .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")
 

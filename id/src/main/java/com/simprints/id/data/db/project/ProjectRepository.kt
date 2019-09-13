@@ -6,5 +6,5 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 
 interface ProjectRepository: ProjectLocalDataSource, ProjectRemoteDataSource {
 
-    suspend fun loadAndRefreshCache(projectId: String): Project
+    suspend fun loadAndRefreshCache(projectId: String): Project?
 }

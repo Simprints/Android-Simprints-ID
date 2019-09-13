@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withContext
 
 @FlowPreview
@@ -64,13 +65,14 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
     }
 
     //STOPSHIP: Write test to check if realm stop flows (otherwise buffer would fail)
-    override suspend fun load(query: PersonLocalDataSource.Query): Flow<Person> =
+    override suspend fun load(query: PersonLocalDataSource.Query?): Flow<Person> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
                 it.buildQueryForPerson(query)
                     .await()
-                    .map { it.toDomainPerson() }
-                    .asFlow()
+                    ?.map { it.toDomainPerson() }
+                    ?.asFlow()
+                    ?: flowOf()
             }
         }
 
@@ -78,8 +80,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
                 it.buildQueryForPerson(query)
-                    .await()
-                    .deleteAllFromRealm()
+                    .await()?.deleteAllFromRealm()
             }
         }
     }
@@ -89,14 +90,16 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             realm.buildQueryForPerson(query).count().toInt()
         }
 
-    private fun Realm.buildQueryForPerson(query: PersonLocalDataSource.Query): RealmQuery<DbPerson> =
+    private fun Realm.buildQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =
         where(DbPerson::class.java)
             .apply {
-                query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                query.patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
-                query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
-                query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
-                query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
-                query.sortBy?.let { this.sort(it.keys.toTypedArray(), it.values.toTypedArray()) }
+                query?.let { query ->
+                    query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
+                    query.patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
+                    query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
+                    query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
+                    query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
+                    query.sortBy?.let { this.sort(it.keys.toTypedArray(), it.values.toTypedArray()) }
+                }
             }
 }

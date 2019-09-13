@@ -8,13 +8,31 @@ import kotlin.coroutines.resumeWithException
 inline fun <reified T> List<T>.toRealmList(): RealmList<T> =
     RealmList(*this.toTypedArray())
 
-private suspend fun <T: RealmObject, S: RealmQuery<T>> findAllAwait(query: S): RealmResults<T> = suspendCancellableCoroutine { continuation ->
-    val listener = RealmChangeListener<RealmResults<T>> { t -> continuation.resume(t) }
-    query.findAllAsync().addChangeListener(listener)
+private suspend fun <T: RealmObject, S: RealmQuery<T>> findAllAwait(query: S): RealmResults<T>? = suspendCancellableCoroutine { continuation ->
+    val result =  query.findAllAsync()
+
+    val listener = RealmChangeListener<RealmResults<T>> { t ->
+        if(t.isLoaded) {
+            if (t.isValid) {
+                continuation.resume(t)
+            } else {
+                continuation.resume(null)
+            }
+        }
+    }
+    result.addChangeListener(listener)
 }
 
 private suspend fun <T: RealmObject, S: RealmQuery<T>> findFirstAwait(query: S): T? = suspendCancellableCoroutine { continuation ->
-    val listener = RealmChangeListener { t: T? -> continuation.resume(t) }
+    val listener = RealmChangeListener { t: T? ->
+        if(t?.isLoaded == true) {
+            if (t.isValid) {
+                continuation.resume(t)
+            } else {
+                continuation.resume(null)
+            }
+        }
+    }
     query.findFirstAsync().addChangeListener(listener)
 }
 

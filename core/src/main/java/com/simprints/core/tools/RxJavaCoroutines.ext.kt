@@ -15,10 +15,10 @@ fun completableWithSuspend(block: suspend () -> Unit): Completable =
         }
     }
 
-fun <T> singleWithSuspend(block: suspend () -> T) =
+fun <T> singleWithSuspend(block: suspend () -> T?) =
     Single.create<T> {
         try {
-            it.onSuccess(runBlocking { block() })
+            it.onSuccess(runBlocking { block() }!!)
         } catch (t: Throwable) {
             t.printStackTrace()
             it.onError(t)
