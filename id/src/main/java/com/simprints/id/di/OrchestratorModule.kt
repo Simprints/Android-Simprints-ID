@@ -20,8 +20,8 @@ import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.StepEncoder
-import com.simprints.id.orchestrator.cache.StepEncoderImpl
+import com.simprints.id.orchestrator.cache.crypto.StepEncoder
+import com.simprints.id.orchestrator.cache.crypto.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl

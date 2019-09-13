@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.cache
 
 import android.content.SharedPreferences
+import com.simprints.id.orchestrator.cache.crypto.StepEncoder
 import com.simprints.id.orchestrator.steps.Step
 
 class HotCacheImpl(private val preferences: SharedPreferences,
