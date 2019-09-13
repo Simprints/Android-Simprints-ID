@@ -130,7 +130,7 @@
                 tools:ignore="ButtonStyle" />
 
             <Button
-                android:id="@+id/btSubmitRefusalForm"
+                android:id="@+id/btSubmitExitForm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

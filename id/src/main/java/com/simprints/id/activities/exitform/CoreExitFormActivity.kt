@@ -82,11 +82,11 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     private fun enableSubmitButton() {
-        btSubmitRefusalForm.isEnabled = true
+        btSubmitExitForm.isEnabled = true
     }
 
     private fun disableSubmitButton() {
-        btSubmitRefusalForm.isEnabled = false
+        btSubmitExitForm.isEnabled = false
     }
 
     private fun enableRefusalText() {
@@ -152,7 +152,7 @@ class CoreExitFormActivity : AppCompatActivity() {
             CoreExitFormResult.Answer(exitFormReason, getExitFormText()))
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
-        btSubmitRefusalForm.isEnabled = false
+        btSubmitExitForm.isEnabled = false
         exitFormText.requestFocus()
         setTextChangeListenerOnExitText()
         inputMethodManager.showSoftInput(exitFormText, InputMethodManager.SHOW_IMPLICIT)
@@ -163,7 +163,7 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (btSubmitRefusalForm.isEnabled) {
+        if (btSubmitExitForm.isEnabled) {
             showToast(R.string.refusal_toast_submit)
         } else {
             showToast(R.string.refusal_toast_select_option_submit)
