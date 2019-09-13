@@ -1,8 +1,8 @@
 package com.simprints.fingerprintscanner.v2.incoming.message.parsers
 
-import com.simprints.fingerprintscanner.v2.domain.message.Message
+import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
 
-class VeroResponseParser: MessageParser {
+class VeroResponseParser: MessageParser<VeroResponse> {
 
-    override fun parse(bytes: ByteArray): Message = Message(bytes)
+    override fun parse(bytes: ByteArray): VeroResponse = TODO()
 }

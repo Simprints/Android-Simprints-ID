@@ -1,6 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.message.vero
 
 import com.simprints.fingerprintscanner.v2.domain.message.MessageProtocol
+import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessageType
+import com.simprints.fingerprintscanner.v2.tools.toByteArray
 import com.simprints.fingerprintscanner.v2.tools.unsignedToInt
 import java.nio.ByteOrder
 
@@ -15,4 +17,10 @@ object VeroMessageProtocol: MessageProtocol {
         header.extract({ short },
             LENGTH_INDICES_IN_HEADER
         ).unsignedToInt()
+
+    fun buildMessageBytes(veroMessageType: VeroMessageType, data: ByteArray): ByteArray {
+        val length = data.size
+        val header = veroMessageType.getBytes() + length.toShort().toByteArray()
+        return header + data
+    }
 }

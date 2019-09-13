@@ -1,3 +1,10 @@
 package com.simprints.fingerprintscanner.v2.domain.message
 
-class Message(val bytes: ByteArray)
+interface Message
+
+interface OutgoingMessage: Message {
+
+    fun getBytes(): ByteArray
+}
+
+interface IncomingMessage: Message
