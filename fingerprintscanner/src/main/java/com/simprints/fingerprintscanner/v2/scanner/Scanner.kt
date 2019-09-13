@@ -1,8 +1,11 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
 import android.bluetooth.BluetoothSocket
+import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
+import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
+import io.reactivex.Single
 
 class Scanner(
     private val messageInputStream: MessageInputStream,
@@ -23,4 +26,8 @@ class Scanner(
         messageOutputStream.disconnect()
         socket.close()
     }
+
+    private inline fun <reified R: IncomingMessage> sendCommandAndReceiveResponse(command: OutgoingMessage): Single<R> =
+        messageOutputStream.sendMessage(command)
+            .andThen(messageInputStream.recieveResponse())
 }
