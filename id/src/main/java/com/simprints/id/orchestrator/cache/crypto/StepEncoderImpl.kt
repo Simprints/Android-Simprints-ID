@@ -29,51 +29,13 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     private fun processStep(step: Step, operation: Operation): Step {
         val result = step.result
         return step.also {
-            it.result = when (result) {
-                is FaceCaptureResponse -> handleFaceCaptureResponse(result, operation)
-                is FingerprintEnrolResponse -> handleFingerprintEnrolResponse(result, operation)
-                else -> result
+            val responseProcessor = when (result) {
+                is FaceCaptureResponse -> FaceCaptureResponseProcessor(keystoreManager)
+                is FingerprintEnrolResponse -> FingerprintEnrolResponseProcessor(keystoreManager)
+                else -> null
             }
+            it.result = responseProcessor?.process(result, operation)
         }
-    }
-
-    private fun handleFaceCaptureResponse(
-        response: FaceCaptureResponse,
-        operation: Operation
-    ): FaceCaptureResponse {
-        val capturingResult = response.capturingResult.map {
-            it.apply {
-                result?.template?.let { template ->
-                    val tmpTemplateString = String(template)
-                    val processedTemplate = when (operation) {
-                        Operation.ENCODE -> keystoreManager.encryptString(tmpTemplateString)
-                        Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
-                    }.toByteArray()
-
-                    val faceSample = result.copy(template = processedTemplate)
-                    copy(result = faceSample)
-                }
-            }
-        }
-
-        return response.copy(capturingResult = capturingResult)
-    }
-
-    private fun handleFingerprintEnrolResponse(
-        response: FingerprintEnrolResponse,
-        operation: Operation
-    ): FingerprintEnrolResponse {
-        val processedGuid = when (operation) {
-            Operation.ENCODE -> keystoreManager.encryptString(response.guid)
-            Operation.DECODE -> keystoreManager.decryptString(response.guid)
-        }
-
-        return response.copy(guid = processedGuid)
-    }
-
-    private enum class Operation {
-        ENCODE,
-        DECODE
     }
 
 }
