@@ -11,12 +11,19 @@ object VeroMessageProtocol: MessageProtocol {
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
     override val HEADER_SIZE: Int = 4
     override val HEADER_INDICES: IntRange = 0..3
+    val MESSAGE_TYPE_INDICES_IN_HEADER: IntRange = 0..1
     override val LENGTH_INDICES_IN_HEADER: IntRange = 2..3
 
     override fun getDataLengthFromHeader(header: ByteArray): Int =
         header.extract({ short },
             LENGTH_INDICES_IN_HEADER
         ).unsignedToInt()
+
+    fun getMessageType(messageBytes: ByteArray): VeroMessageType =
+        VeroMessageType.fromBytes(messageBytes.sliceArray(MESSAGE_TYPE_INDICES_IN_HEADER))
+
+    fun getDataBytes(messageBytes: ByteArray): ByteArray =
+        messageBytes.sliceArray(HEADER_SIZE..messageBytes.size)
 
     fun buildMessageBytes(veroMessageType: VeroMessageType, data: ByteArray): ByteArray {
         val length = data.size

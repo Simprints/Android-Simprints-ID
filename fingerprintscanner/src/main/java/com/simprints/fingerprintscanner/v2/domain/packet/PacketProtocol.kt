@@ -8,6 +8,8 @@ object PacketProtocol: Protocol {
 
     override val byteOrder: ByteOrder = ByteOrder.LITTLE_ENDIAN
 
+    const val MAX_PAYLOAD_SIZE = 1020
+
     val HEADER_INDICES = 0..3
     private val SOURCE_INDICES_IN_HEADER = 0..0
     private val DESTINATION_INDICES_IN_HEADER = 1..1
