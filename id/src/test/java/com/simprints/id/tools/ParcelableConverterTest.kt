@@ -43,7 +43,7 @@ class ParcelableConverterTest {
         assertThat(step.activityName, `is`(ACTIVITY_NAME))
         assertThat(step.bundleKey, `is`(BUNDLE_KEY))
         assertThat(step.request, `is`(request))
-        assertThat(step.status, `is`(Step.Status.COMPLETED))
+        assertThat(step.getStatus(), `is`(Step.Status.COMPLETED))
         assertThat(step.result, `is`(result))
     }
 
@@ -68,8 +68,9 @@ class ParcelableConverterTest {
             ACTIVITY_NAME,
             BUNDLE_KEY,
             request,
+            result,
             Step.Status.COMPLETED
-        ).also { it.result = result }
+        )
     }
 
     private fun mockRequest(): Step.Request = FingerprintEnrolRequest(

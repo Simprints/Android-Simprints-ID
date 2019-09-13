@@ -61,8 +61,8 @@ class StepEncoderImplAndroidTest {
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(fingerprintEnrolRequest))
-            assertThat(status, `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), `is`(fingerprintEnrolResult))
+            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
+            assertThat(result, `is`(fingerprintEnrolResult))
         } ?: failTest(MESSAGE_NULL_DECODED_STEP)
     }
 
@@ -79,8 +79,8 @@ class StepEncoderImplAndroidTest {
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(faceCaptureRequest))
-            assertThat(status, `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), `is`(faceCaptureResponse))
+            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
+            assertThat(result, `is`(faceCaptureResponse))
         } ?: failTest(MESSAGE_NULL_DECODED_STEP)
     }
 
@@ -94,8 +94,8 @@ class StepEncoderImplAndroidTest {
         ACTIVITY_NAME,
         BUNDLE_KEY,
         request,
-        Step.Status.COMPLETED,
-        result
+        result,
+        Step.Status.COMPLETED
     )
 
     private fun mockFingerprintEnrolRequest(): Step.Request = FingerprintEnrolRequest(

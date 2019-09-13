@@ -152,7 +152,7 @@ class OrchestratorManagerImplTest {
         whenever(modalityFlowMock) {
             getNextStepToLaunch()
         } thenAnswer {
-            mockSteps.firstOrNull { it.status == NOT_STARTED }
+            mockSteps.firstOrNull { it.getStatus() == NOT_STARTED }
         }
 
         val nFaceSamplesToCapture = 3
@@ -164,7 +164,7 @@ class OrchestratorManagerImplTest {
                 FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
                 IFaceRequest.BUNDLE_KEY,
                 request,
-                NOT_STARTED
+                status = NOT_STARTED
             )
         )
     }
@@ -190,7 +190,7 @@ class OrchestratorManagerImplTest {
     ) {
         response?.let {
             mockSteps.firstOrNull { step ->
-                step.status == ONGOING
+                step.getStatus() == ONGOING
             }?.result = it.fromModuleApiToDomain()
         }
 
