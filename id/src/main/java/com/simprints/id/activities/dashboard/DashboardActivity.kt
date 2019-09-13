@@ -25,10 +25,8 @@ import javax.inject.Inject
 
 class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
-    @Inject
-    lateinit var preferences: PreferencesManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1

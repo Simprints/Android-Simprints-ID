@@ -9,7 +9,6 @@ import com.simprints.id.data.db.project.local.models.toRealmProject
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.safe.data.db.NoSuchStoredProjectException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.awaitFirst
 import com.simprints.id.tools.extensions.transactAwait
@@ -46,13 +45,12 @@ class ProjectLocalDataSourceImpl(private val appContext: Context,
         PeopleRealmConfig.get(localDbKey.projectId, localDbKey.value, localDbKey.projectId)
 
 
-    override suspend fun load(projectId: String): Project =
+    override suspend fun load(projectId: String): Project? =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
                 realm.where(DbProject::class.java).equalTo(PROJECT_ID_FIELD, projectId)
                     .awaitFirst()
-                    ?.let { realm.copyFromRealm(it).toDomainProject() }
-                    ?: throw NoSuchStoredProjectException()
+                    ?.let { it.toDomainProject() }
             }
         }
 

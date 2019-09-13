@@ -3,14 +3,19 @@ package com.simprints.id.data.db.common.realm
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
-import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toDomainPerson
+import com.simprints.id.data.db.person.local.models.toRealmPerson
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -22,7 +27,7 @@ import java.util.*
 class RealmManagerTests : RealmTestsBase() {
 
     private lateinit var realm: Realm
-    private lateinit var realmManager: RealmDbManagerImpl
+    private lateinit var personLocalDataSource: PersonLocalDataSource
 
     private val loginInfoManagerMock = mock<LoginInfoManager>().apply {
         whenever(this) { getSignedInProjectIdOrEmpty() }
@@ -36,13 +41,13 @@ class RealmManagerTests : RealmTestsBase() {
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
-        realmManager = RealmDbManagerImpl(testContext, secureDataManagerMock, loginInfoManagerMock)
+        personLocalDataSource = PersonLocalDataSourceImpl(testContext, secureDataManagerMock, loginInfoManagerMock)
     }
 
     @Test
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
-        val countNewRealm = realmManager.getPeopleCountFromLocal().blockingGet()
+        val countNewRealm = runBlocking { personLocalDataSource.count() }
         assertEquals(countNewRealm, 1)
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
@@ -51,9 +56,9 @@ class RealmManagerTests : RealmTestsBase() {
             whenever(this) { getLocalDbKeyOrThrow(DefaultTestConstants.DEFAULT_PROJECT_ID) }
                 .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
         }
-        val differentRealmManager = RealmDbManagerImpl(testContext, differentSecureDataManagerMock, loginInfoManagerMock)
+        val differentRealmManager = PersonLocalDataSourceImpl(testContext, differentSecureDataManagerMock, loginInfoManagerMock)
 
-        val count = differentRealmManager.getPeopleCountFromLocal().blockingGet()
+        val count = runBlocking { differentRealmManager.count() }
         assertEquals(count, 0)
     }
 
@@ -61,7 +66,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun getPeopleCountFromLocal_ShouldReturnOne() {
         saveFakePerson(realm, getFakePerson())
 
-        val count = realmManager.getPeopleCountFromLocal().blockingGet()
+        val count = runBlocking { personLocalDataSource.count() }
         assertEquals(count, 1)
     }
 
@@ -69,7 +74,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun getPeopleCountFromLocal_ShouldReturnMany() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal().blockingGet()
+        val count = runBlocking { personLocalDataSource.count() }
         assertEquals(count, 20)
     }
 
@@ -78,7 +83,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(userId = fakePerson.userId).blockingGet()
+        val count = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(userId = fakePerson.userId)) }
         assertEquals(count, 1)
     }
 
@@ -87,7 +92,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(moduleId = fakePerson.moduleId).blockingGet()
+        val count = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(userId = fakePerson.moduleId)) }
         assertEquals(count, 1)
     }
 
@@ -95,7 +100,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun getPeopleCountFromLocalByProjectId_ShouldReturnAll() {
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal().blockingGet()
+        val count = runBlocking { personLocalDataSource.count() }
         assertEquals(count, 20)
     }
 
@@ -104,14 +109,14 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = realmManager.getPeopleCountFromLocal(patientId = fakePerson.patientId).blockingGet()
+        val count = runBlocking { personLocalDataSource.count(PersonLocalDataSource.Query(patientId = fakePerson.patientId)) }
         assertEquals(count, 1)
     }
 
     @Test
     fun insertOrUpdatePerson_ShouldSucceed() {
         val fakePerson = getFakePerson()
-        realmManager.insertOrUpdatePersonInLocal(fakePerson.toDomainPerson()).blockingAwait()
+        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
 
         assertEquals(realm.where(DbPerson::class.java).count(), 1)
         assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
@@ -120,8 +125,8 @@ class RealmManagerTests : RealmTestsBase() {
     @Test
     fun insertOrUpdateSamePerson_ShouldNotSaveTwoPeople() {
         val fakePerson = getFakePerson()
-        realmManager.insertOrUpdatePersonInLocal(fakePerson.toDomainPerson()).blockingAwait()
-        realmManager.insertOrUpdatePersonInLocal(fakePerson.toDomainPerson()).blockingAwait()
+        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
+        runBlocking { personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson())) }
 
         assertEquals(realm.where(DbPerson::class.java).count(), 1)
         assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
@@ -132,7 +137,8 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
-        val people = realmManager.loadPeopleFromLocal().blockingGet()
+        val people = runBlocking { personLocalDataSource.load().toList() }
+
         listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
     }
 
@@ -141,7 +147,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(userId = fakePerson.userId).blockingGet()
+        val people = runBlocking { personLocalDataSource.load(PersonLocalDataSource.Query(userId = fakePerson.userId)).toList() }
         listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
     }
 
@@ -150,7 +156,7 @@ class RealmManagerTests : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val people = realmManager.loadPeopleFromLocal(moduleId = fakePerson.moduleId).blockingGet()
+        val people = runBlocking { personLocalDataSource.load(PersonLocalDataSource.Query(moduleId = fakePerson.moduleId)).toList() }
         listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
     }
 
@@ -158,7 +164,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncTrue_ShouldLoadAllPeople() {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = true).blockingGet()
+        val people = runBlocking { personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).toList() }
         assertEquals(people.size, 20)
     }
 
@@ -166,7 +172,7 @@ class RealmManagerTests : RealmTestsBase() {
     fun loadPeopleFromLocalByToSyncFalse_ShouldLoadNoPeople() {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
-        val people = realmManager.loadPeopleFromLocal(toSync = false).blockingGet()
+        val people = runBlocking { personLocalDataSource.load(PersonLocalDataSource.Query(toSync = false)).toList() }
         assertEquals(people.size, 0)
     }
 }

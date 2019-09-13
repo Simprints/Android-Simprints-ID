@@ -15,18 +15,25 @@ class ProjectRepositoryImpl(private val projectLocalDataSource: ProjectLocalData
     ProjectLocalDataSource by projectLocalDataSource,
     ProjectRemoteDataSource by projectRemoteDataSource {
 
-    override suspend fun loadAndRefreshCache(projectId: String): Project {
+    override suspend fun loadAndRefreshCache(projectId: String): Project? {
         val trace = performanceTracker.newTrace("refreshProjectInfoWithServer").apply { start() }
-        return projectLocalDataSource.load(projectId).also {
+        val projectInLocal = projectLocalDataSource.load(projectId)
+        return projectInLocal?.also {
             GlobalScope.launch(Dispatchers.IO) {
-                refreshCache(projectId)
+                fetchAndUpdateCache(projectId)
                 trace.stop()
             }
+        } ?: fetchAndUpdateCache(projectId).also {
+            trace.stop()
         }
     }
 
-    private suspend fun refreshCache(projectId: String) {
-        val project = projectRemoteDataSource.loadProjectFromRemote(projectId).blockingGet() //TODO: transform remote in coroutines
-        projectLocalDataSource.save(project)
+    private suspend fun fetchAndUpdateCache(projectId: String): Project? = try {
+        projectRemoteDataSource.loadProjectFromRemote(projectId).blockingGet().also {
+            projectLocalDataSource.save(it)
+        }
+    } catch (t: Throwable) {
+        t.printStackTrace()
+        null
     }
 }
