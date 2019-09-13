@@ -43,7 +43,7 @@ class CoreExitFormActivityTest {
         onView(ViewMatchers.withId(R.id.rbOther)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.btScanFingerprints)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
     }
@@ -54,7 +54,7 @@ class CoreExitFormActivityTest {
 
         onView(ViewMatchers.withId(R.id.btSubmitRefusalForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
         onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.btScanFingerprints)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+        onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
     }
 
     @Test
@@ -95,7 +95,7 @@ class CoreExitFormActivityTest {
     fun pressScanFingerprint_shouldFinishWithRightResultWithDefaultRefusalFormReason() {
         val scenario = launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btScanFingerprints)).perform(ViewActions.click())
+        onView(ViewMatchers.withId(R.id.btGoBack)).perform(ViewActions.click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.GO_BACK,
             ExitFormReason.OTHER, "", CoreExitFormResult.RESULT_CODE_GO_BACK)
