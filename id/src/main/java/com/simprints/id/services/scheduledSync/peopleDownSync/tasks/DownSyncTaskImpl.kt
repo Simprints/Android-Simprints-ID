@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
-import com.simprints.core.tools.completableWithSuspend
+import com.simprints.core.tools.coroutines.completableWithSuspend
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface

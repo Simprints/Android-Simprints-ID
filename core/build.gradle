@@ -55,6 +55,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation deps.kotlin.coroutines_core
 
+    implementation deps.testing.espresso.idling
     implementation deps.timber.core
     implementation deps.retrofit.core
     implementation deps.retrofit.adapter

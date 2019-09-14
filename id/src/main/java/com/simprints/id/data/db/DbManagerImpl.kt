@@ -1,6 +1,6 @@
 package com.simprints.id.data.db
 
-import com.simprints.core.tools.completableWithSuspend
+import com.simprints.core.tools.coroutines.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
@@ -22,7 +22,8 @@ open class DbManagerImpl(private var projectRepository: ProjectRepository,
         remote.signInToRemoteDb(token.value)
             .andThen(storeCredentials(userId, projectId))
             .andThen(completableWithSuspend {
-                projectRepository.loadAndRefreshCache(projectId) ?: throw Exception("project not found")
+                projectRepository.loadAndRefreshCache(projectId)
+                    ?: throw Exception("project not found")
             })
             .andThen(resumePeopleUpSync(projectId, userId))
             .trace("signInToRemoteDb")

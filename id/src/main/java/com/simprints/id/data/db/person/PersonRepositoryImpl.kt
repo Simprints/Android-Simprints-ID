@@ -76,6 +76,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun scheduleUpsync(projectId: String, userId: String) =
+    private fun scheduleUpsync(projectId: String, userId: String) {
         peopleUpSyncMaster.schedule(projectId/*, userId*/)
+    }
 }
