@@ -150,6 +150,7 @@ dependencies {
     implementation deps.playservices.places
     implementation deps.playservices.safetynet
     implementation deps.jwt.core
+
     api deps.firebase.database
     api deps.firebase.core
     api deps.firebase.auth

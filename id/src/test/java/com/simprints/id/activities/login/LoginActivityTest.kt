@@ -9,6 +9,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.secure.ProjectAuthenticator
@@ -38,12 +41,6 @@ import javax.inject.Inject
 @RunWith(AndroidJUnit4::class)
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest {
-
-    companion object {
-        const val DEFAULT_PROJECT_ID = "some_project_id"
-        const val DEFAULT_PROJECT_SECRET = "some_project_secret"
-        const val DEFAULT_USER_ID = "some_user_id"
-    }
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 

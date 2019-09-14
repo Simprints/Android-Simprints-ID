@@ -7,6 +7,7 @@ import com.simprints.id.data.secure.LocalDbKey
 object DefaultTestConstants {
     const val DEFAULT_PROJECT_ID = "vkbpRLfHvpQqaeoxZgyx"
     const val DEFAULT_MODULE_ID = "the_one_and_only_module"
+    const val DEFAULT_MODULE_ID_2 = "the_one_and_only_module2"
     const val DEFAULT_USER_ID = "the_lone_user"
     const val DEFAULT_PROJECT_SECRET = "3xDCW0IL/m7nNBWPlVQljh4RzZgcho3Gp7WEj07YqgSER6ESXeY8tVczlNsxubug7co45/PsfG7JiC9oo/U54w=="
 

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.repository
 
-import com.simprints.core.tools.completableWithSuspend
-import com.simprints.core.tools.singleWithSuspend
+import com.simprints.core.tools.coroutines.completableWithSuspend
+import com.simprints.core.tools.coroutines.singleWithSuspend
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.data.domain.person.fromDomainToCore

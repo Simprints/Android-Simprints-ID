@@ -52,6 +52,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.*
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMasterImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -85,8 +86,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun providePeopleUpSyncMaster() =
-        PeopleUpSyncMaster(
+    open fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
+        PeopleUpSyncMasterImpl(
             PeopleUpSyncUploaderMaster(),
             PeopleUpSyncPeriodicFlusherMaster()
         )
