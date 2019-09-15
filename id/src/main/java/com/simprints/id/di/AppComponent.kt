@@ -28,7 +28,7 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -104,7 +104,7 @@ interface AppComponent {
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(orchestratorActivity: OrchestratorActivity)
 
-    fun getDbManager(): DbManager
+    fun getDbManager(): SignerManager
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper

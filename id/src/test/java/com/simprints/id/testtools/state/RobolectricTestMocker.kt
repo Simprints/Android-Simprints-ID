@@ -49,7 +49,7 @@ object RobolectricTestMocker {
         }
         whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
         whenever { remoteDbManagerMock.getCurrentToken() } thenReturn Single.just("")
-        whenever { remoteDbManagerMock.signInToRemoteDb(anyNotNull()) } thenReturn Completable.complete()
+        whenever { remoteDbManagerMock.signIn(anyNotNull()) } thenReturn Completable.complete()
         return this
     }
 

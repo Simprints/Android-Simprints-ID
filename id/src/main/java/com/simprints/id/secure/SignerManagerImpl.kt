@@ -1,9 +1,10 @@
-package com.simprints.id.data.db
+package com.simprints.id.secure
 
 import com.simprints.core.tools.coroutines.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
@@ -11,22 +12,23 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
-open class DbManagerImpl(private var projectRepository: ProjectRepository,
-                         private val remote: RemoteDbManager,
-                         private val loginInfoManager: LoginInfoManager,
-                         private val preferencesManager: PreferencesManager,
-                         private val peopleUpSyncMaster: PeopleUpSyncMaster,
-                         private val syncStatusDatabase: SyncStatusDatabase) : DbManager {
+open class SignerManagerImpl(private var projectRepository: ProjectRepository,
+                             private val remote: RemoteDbManager,
+                             private val loginInfoManager: LoginInfoManager,
+                             private val preferencesManager: PreferencesManager,
+                             private val peopleUpSyncMaster: PeopleUpSyncMaster,
+                             private val downSyncDao: DownSyncDao,
+                             private val upSyncDao: UpSyncDao) : SignerManager {
 
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
-        remote.signInToRemoteDb(token.value)
+        remote.signIn(token.value)
             .andThen(storeCredentials(userId, projectId))
             .andThen(completableWithSuspend {
                 projectRepository.loadAndRefreshCache(projectId)
                     ?: throw Exception("project not found")
             })
             .andThen(resumePeopleUpSync(projectId, userId))
-            .trace("signInToRemoteDb")
+            .trace("signIn")
 
     private fun storeCredentials(userId: String, projectId: String) =
         Completable.fromAction {
@@ -44,9 +46,9 @@ open class DbManagerImpl(private var projectRepository: ProjectRepository,
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
         peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
         loginInfoManager.cleanCredentials()
-        remote.signOutOfRemoteDb()
-        syncStatusDatabase.downSyncDao.deleteAll()
-        syncStatusDatabase.upSyncDao.deleteAll()
+        remote.signOut()
+        downSyncDao.deleteAll()
+        upSyncDao.deleteAll()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 }

@@ -19,8 +19,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessio
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.DbManagerImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
@@ -42,6 +40,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.builders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -99,8 +99,8 @@ open class AppModule {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
-                              database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database)
+                              database: SyncStatusDatabase): SignerManager =
+        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database.downSyncDao, database.upSyncDao)
 
     @Provides
     @Singleton
