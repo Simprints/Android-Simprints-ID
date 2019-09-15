@@ -13,12 +13,12 @@ import com.simprints.id.orchestrator.steps.Step
  */
 interface OrchestratorManager {
 
-    val onGoingStep: LiveData<Step?>
+    val ongoingStep: LiveData<Step?>
     val appResponse: LiveData<AppResponse?>
 
     fun initialise(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
     fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?)
 
-    fun restoreState(steps: List<Step>)
-    fun getState(): List<Step>
+    fun restoreState()
+    fun clearState()
 }

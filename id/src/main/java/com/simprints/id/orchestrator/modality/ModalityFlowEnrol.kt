@@ -28,14 +28,14 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
             with(appRequest) {
                 when (it) {
                     Modality.FINGER -> fingerprintStepProcessor.buildStepEnrol(projectId, userId, moduleId, metadata)
-                    Modality.FACE -> faceEnrolProcessor.buildStepEnrol(projectId, userId, moduleId)
+                    Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
                 }
             }
         }
 
-    override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.status == NOT_STARTED }
+    override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceEnrolProcessor.processResult(requestCode, resultCode, data)
@@ -43,6 +43,6 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
-        stepForRequest?.result = result
+        return stepForRequest?.also { it.result = result }
     }
 }
