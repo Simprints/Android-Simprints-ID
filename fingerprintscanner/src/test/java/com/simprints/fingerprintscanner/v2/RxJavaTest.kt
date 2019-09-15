@@ -443,7 +443,7 @@ class RxJavaTest {
     class TestMessage(val bytes: ByteArray) : IncomingMessage
     class TestMessageParser : MessageParser<TestMessage> {
 
-        override fun parse(bytes: ByteArray): TestMessage = TestMessage(bytes)
+        override fun parse(messageBytes: ByteArray): TestMessage = TestMessage(messageBytes)
     }
 
     class TestMessageAccumulator(testMessageParser: TestMessageParser) :

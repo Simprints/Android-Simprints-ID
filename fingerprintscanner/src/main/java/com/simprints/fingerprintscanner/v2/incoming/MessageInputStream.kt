@@ -41,7 +41,7 @@ class MessageInputStream(
         packetRouter.disconnect()
     }
 
-    inline fun <reified R : IncomingMessage> recieveResponse(): Single<R> =
+    inline fun <reified R : IncomingMessage> receiveResponse(): Single<R> =
         when (R::class) {
             VeroResponse::class -> veroResponses
             Un20Response::class -> un20Responses

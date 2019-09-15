@@ -8,9 +8,9 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessag
 
 class VeroEventParser : MessageParser<VeroEvent> {
 
-    override fun parse(bytes: ByteArray): VeroEvent =
-        VeroMessageProtocol.getDataBytes(bytes).let { data ->
-            when (VeroMessageProtocol.getMessageType(bytes)) {
+    override fun parse(messageBytes: ByteArray): VeroEvent =
+        VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
+            when (VeroMessageProtocol.getMessageType(messageBytes)) {
                 VeroMessageType.UN20_STATE_CHANGE -> Un20StateChangeEvent.fromBytes(data)
                 VeroMessageType.TRIGGER_BUTTON_PRESSED -> TriggerButtonPressedEvent.fromBytes(data)
                 VeroMessageType.GET_FIRMWARE_VERSION,

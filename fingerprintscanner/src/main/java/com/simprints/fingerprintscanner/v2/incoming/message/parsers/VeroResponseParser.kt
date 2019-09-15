@@ -7,9 +7,9 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessag
 
 class VeroResponseParser : MessageParser<VeroResponse> {
 
-    override fun parse(bytes: ByteArray): VeroResponse =
-        VeroMessageProtocol.getDataBytes(bytes).let { data ->
-            when (VeroMessageProtocol.getMessageType(bytes)) {
+    override fun parse(messageBytes: ByteArray): VeroResponse =
+        VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
+            when (VeroMessageProtocol.getMessageType(messageBytes)) {
                 GET_FIRMWARE_VERSION -> GetFirmwareVersionResponse.fromBytes(data)
                 GET_UN20_ON -> GetUn20OnResponse.fromBytes(data)
                 SET_UN20_ON -> SetUn20OnResponse.fromBytes(data)
