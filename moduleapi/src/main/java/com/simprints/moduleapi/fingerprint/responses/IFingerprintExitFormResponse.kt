@@ -1,12 +1,12 @@
 package com.simprints.moduleapi.fingerprint.responses
 
-interface IFingerprintRefusalFormResponse : IFingerprintResponse {
+interface IFingerprintExitFormResponse : IFingerprintResponse {
 
-    val reason: IFingerprintRefusalReason
+    val reason: IFingerprintExitReason
     val extra: String
 }
 
-enum class IFingerprintRefusalReason {
+enum class IFingerprintExitReason {
     REFUSED_RELIGION,
     REFUSED_DATA_CONCERNS,
     REFUSED_PERMISSION,

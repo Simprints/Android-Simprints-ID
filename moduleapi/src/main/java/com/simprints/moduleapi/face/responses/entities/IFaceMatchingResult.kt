@@ -1,4 +1,4 @@
-package com.simprints.moduleapi.face.responses
+package com.simprints.moduleapi.face.responses.entities
 
 import android.os.Parcelable
 
