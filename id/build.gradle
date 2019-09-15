@@ -139,6 +139,7 @@ dependencies {
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.lifecycle.ktx
+    implementation deps.androidx.lifecycle.ext
     implementation deps.androidx.lifecycle.livedata
     implementation deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview

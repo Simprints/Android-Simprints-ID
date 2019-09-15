@@ -15,4 +15,6 @@ data class FaceIdentifyRequest(val projectId: String,
 fun FaceIdentifyRequest.fromDomainToModuleApi(): IFaceIdentifyRequest = FaceIdentifyRequestImpl()
 
 @Parcelize
-private data class FaceIdentifyRequestImpl(override val type: IFaceRequestType = ModuleApiIdentifyRequestType) : IFaceIdentifyRequest
+private data class FaceIdentifyRequestImpl(
+    override val type: IFaceRequestType = ModuleApiIdentifyRequestType
+) : IFaceIdentifyRequest

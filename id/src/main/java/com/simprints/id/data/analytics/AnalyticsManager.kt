@@ -8,7 +8,7 @@ interface AnalyticsManager {
 
     val analyticsId: Single<String>
 
-    fun logCallout(idRequest: AppRequest)
+    fun logCallout(appRequest: AppRequest)
 
     fun logUserProperties(userId: String, projectId: String, moduleId: String, deviceId: String)
     fun logGuidSelectionWorker(projectId: String, sessionId: String, deviceId: String, selectedGuid: String, callbackSent: Boolean)

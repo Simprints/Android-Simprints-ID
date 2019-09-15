@@ -91,4 +91,20 @@
     <string name="dashboard_card_sync_last_sync">ያለፈው ግንኙነት: %1$s</string>
     <string name="settings_too_many_modules_toast">የተሳሳተ ምርጫ ፡ካሉት ምዕራፎች ውስጥ ከ %1$d በላይ መምረጥ አይችሉም</string>
     <string name="settings_title">ማስተካከያ</string>
+
+    <string name="consent_enrol">እርስዎን %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራዎትን መጠቀም እፈልጋለሁ.&#160;</string>
+    <string name="consent_parental_enrol">እርስዎን ልጅ %1$s ላይ በማካተት ለወደፊቱ መለየት ይቻል ዘንድ የጣት አሻራውን መጠቀም እፈልጋለሁ.&#160;</string>
+    <string name="consent_parental_id_verify">የእርስዎን ልጅበሚመለከት %1$s ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራውን  መጠቀም እፈልጋለሁ.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s ሲምፕሪንት ከተባለው ድርጅት ጋር የጣት አሻራ መረጃ እና አሁን ስላሉበት አድራሻ መረጃ የማግኘት ፈቃድ አለዎት.&#160;</string>
+    <string name="consent_parental_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና ልጁን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
+    <string name="consent_parental_confirmation">ልጁን የጣት አሻራ መጠቀም እችላለሁ? እባክዎትን እስማማለሁ፣ አልስማማም፣ ጥያቄ አለኝ በማለት ይመልሱ.</string>
+    <string name="consent_id_verify">እርስዎን በሚመለከት %1$s ት ላይ የሰፈሩ መረጃዎችን ማግኘት ይቻል ዘንድ  የጣት አሻራዎትን መጠቀም እፈልጋለሁ.&#160;</string>
+    <string name="consent_share_data_yes">%1$s ሲምፕሪንት የተባለው ድርጅት ስለእርስዎ የጣት አሻራ እና አድራሻዎ መረጃ ይኖኖራቸዋል.&#160;</string>
+    <string name="consent_privacy_rights">ከተስማሙ ፈቃድዎትን መቀየር እና እርስዎን በሚመለከት ያለው መረጃ እንዲሰረዝ መጠየቅ ይችላሉ.&#160;</string>
+    <string name="consent_confirmation">የጣት አሻራዎትን መጠቀም እችላለሁ? እባክዎትን እስማማለሁ ወይም አልስማማም ወይም ጥያቄ አለኝ ይበሉ.</string>
+    <string name="launch_consent_decline_button">አለመቀበል</string>
+    <string name="launch_consent_accept_button">መቀበል</string>
+    <string name="consent_general_title">ፈቃደኝነት</string>
+    <string name="consent_parental_title">የወላጅ ፈቃደኝነት</string>
+    <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
 </resources>
