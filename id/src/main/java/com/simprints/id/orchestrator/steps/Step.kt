@@ -72,5 +72,6 @@ fun Step.Request.fromDomainToModuleApi(): Parcelable =
     when (this) {
         is FingerprintRequest -> fromDomainToModuleApiFingerprintRequest(this)
         is FaceRequest -> fromDomainToModuleApi()
-        else -> throw Throwable("Invalid Request")
+        is CoreRequest -> this
+        else -> throw Throwable("Invalid Request $this")
     }
