@@ -6,6 +6,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
+import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -19,6 +20,10 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessio
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
+import com.simprints.id.data.consent.shortconsent.ConsentRepository
+import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
@@ -30,6 +35,7 @@ import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -37,8 +43,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.orchestrator.builders.AppResponseFactory
-import com.simprints.id.orchestrator.builders.AppResponseFactoryImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -235,5 +241,23 @@ open class AppModule {
                                          sessionEventsManager: SessionEventsManager): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
+
+    @Provides
+    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
+        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
+
+    @Provides
+    open fun provideConsentTextManager(context: Context,
+                                       consentLocalDataSource: ConsentLocalDataSource,
+                                       crashReportManager: CrashReportManager,
+                                       preferencesManager: PreferencesManager) : ConsentRepository =
+        ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
+            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language)
+
+    @Provides
+    open fun provideConsentViewModelFactory(consentTextManager: ConsentRepository,
+                                            sessionEventsManager: SessionEventsManager,
+                                            timeHelper: TimeHelper) =
+        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
 }
 

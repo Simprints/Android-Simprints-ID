@@ -19,12 +19,19 @@ open class BaseStepProcessorTest {
             "com.simprints.face.activities.FaceCaptureActivity",
             "FaceRequestBundleKey")
 
+    protected inline fun <reified T : Parcelable> verifyCoreIntent(step: Step, expectedRequestCode: Int) =
+        verifyStep<T>(
+            step,
+            expectedRequestCode,
+            "com.simprints.id.activities.consent.ConsentActivity",
+            "core_step_bundle")
+
     protected inline fun <reified T : Parcelable> verifyStep(step: Step, expectedRequestCode: Int, activityName: String, bundleKey: String) {
         assertThat(step.activityName).isEqualTo(activityName)
         assertThat(step.requestCode).isEqualTo(expectedRequestCode)
         assertThat(step.bundleKey).isEqualTo(bundleKey)
         assertThat(step.request).isInstanceOf(T::class.java)
         assertThat(step.result).isNull()
-        assertThat(step.status).isEqualTo(Step.Status.NOT_STARTED)
+        assertThat(step.getStatus()).isEqualTo(Step.Status.NOT_STARTED)
     }
 }
