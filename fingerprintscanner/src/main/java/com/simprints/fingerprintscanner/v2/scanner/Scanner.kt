@@ -29,5 +29,5 @@ class Scanner(
 
     private inline fun <reified R: IncomingMessage> sendCommandAndReceiveResponse(command: OutgoingMessage): Single<R> =
         messageOutputStream.sendMessage(command)
-            .andThen(messageInputStream.recieveResponse())
+            .andThen(messageInputStream.receiveResponse())
 }

@@ -60,7 +60,7 @@ fun ByteArray.toHexString() = StringBuilder().apply {
 fun Byte.unsignedToInt() = (this + Byte.MAX_VALUE - Byte.MIN_VALUE + 1) % (Byte.MAX_VALUE - Byte.MIN_VALUE + 1)
 fun Short.unsignedToInt() = (this + Short.MAX_VALUE - Short.MIN_VALUE + 1) % (Short.MAX_VALUE - Short.MIN_VALUE + 1)
 
-fun Short.toByteArray(): ByteArray {
+fun Short.toByteArray(): ByteArray { // TODO : This assumes little-endian
     val value = this.unsignedToInt()
     val bytes = ByteArray(2)
     bytes[0] = (value and 0xFFFF).toByte()
