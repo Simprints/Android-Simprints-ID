@@ -6,8 +6,8 @@ import io.reactivex.Single
 
 interface RemoteDbManager {
 
-    fun signInToRemoteDb(token: String): Completable
-    fun signOutOfRemoteDb()
+    fun signIn(token: String): Completable
+    fun signOut()
 
     /** @throws DifferentProjectIdSignedInException */
     fun isSignedIn(projectId: String, userId: String): Boolean

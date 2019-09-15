@@ -15,14 +15,14 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
         FirebaseAuth.getInstance()
     }
 
-    override fun signInToRemoteDb(token: String): Completable =
+    override fun signIn(token: String): Completable =
         Completable.fromAction {
             cacheTokenClaims(token)
             val result = Tasks.await(firebaseAuth.signInWithCustomToken(token))
             Timber.d(result.user.uid)
         }
 
-    override fun signOutOfRemoteDb() {
+    override fun signOut() {
         clearCachedTokenClaims()
         firebaseAuth.signOut()
     }

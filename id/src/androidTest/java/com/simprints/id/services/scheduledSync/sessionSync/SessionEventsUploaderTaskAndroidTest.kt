@@ -304,7 +304,7 @@ class SessionEventsUploaderTaskAndroidTest {
         }
 
     private fun signOut() {
-        remoteDbManagerSpy.signOutOfRemoteDb()
+        remoteDbManagerSpy.signOut()
     }
 
     private fun mockBeingSignedIn() {

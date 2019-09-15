@@ -7,7 +7,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -75,7 +75,7 @@ class TestAppModule(app: Application,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
-                                  database: SyncStatusDatabase): DbManager =
+                                  database: SyncStatusDatabase): SignerManager =
         dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,

@@ -263,6 +263,6 @@ class DashboardActivityAndroidTest {
     }
 
     private fun signOut() {
-        remoteDbManagerSpy.signOutOfRemoteDb()
+        remoteDbManagerSpy.signOut()
     }
 }
