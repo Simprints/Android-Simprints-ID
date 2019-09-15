@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.incoming.message.parsers
 
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.messages.responses.*
+import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessageType.*
 
 class VeroResponseParser : MessageParser<VeroResponse> {

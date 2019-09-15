@@ -2,8 +2,8 @@ package com.simprints.fingerprintscanner.v2.incoming.message.parsers
 
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
-import com.simprints.fingerprintscanner.v2.domain.message.vero.messages.events.TriggerButtonPressedEvent
-import com.simprints.fingerprintscanner.v2.domain.message.vero.messages.events.Un20StateChangeEvent
+import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
+import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessageType
 
 class VeroEventParser : MessageParser<VeroEvent> {

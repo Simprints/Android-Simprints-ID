@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.incoming.message.parsers
 
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20MessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
-import com.simprints.fingerprintscanner.v2.domain.message.un20.messages.responses.*
+import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20MessageType
 
 class Un20ResponseParser : MessageParser<Un20Response> {
