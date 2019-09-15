@@ -62,12 +62,11 @@ class LoginActivityTest {
 
     @Test
     fun shouldUserIdPreFilled() {
-        val userId = "some_user_id"
 
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val activity = controller.get()
         val userIdInEditText = activity.loginEditTextUserId.text.toString()
-        assertEquals(userIdInEditText, userId)
+        assertEquals(userIdInEditText, DEFAULT_USER_ID)
     }
 
     @Test
@@ -78,9 +77,9 @@ class LoginActivityTest {
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
-            loginEditTextUserId.setText("some_user_id")
-            loginEditTextProjectId.setText("some_project_id")
-            loginEditTextProjectSecret.setText("some_project_secret")
+            loginEditTextUserId.setText(DEFAULT_USER_ID)
+            loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
+            loginEditTextProjectSecret.setText(DEFAULT_PROJECT_SECRET)
             loginButtonSignIn.performClick()
         }
 
