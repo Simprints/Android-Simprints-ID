@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.id.domain.moduleapi.core.requests.CoreRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
