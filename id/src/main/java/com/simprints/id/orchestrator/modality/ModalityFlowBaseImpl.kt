@@ -36,7 +36,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     fun processResult(resultCode: Int, data: Intent?) =
         coreStepProcessor.processResult(resultCode, data).also { coreResult ->
             if (coreResult is CoreExitFormResponse) {
-                steps.map { it.status = Step.Status.COMPLETED }
+                steps.map { it.setStatus(Step.Status.COMPLETED)  }
             }
         }
 }
