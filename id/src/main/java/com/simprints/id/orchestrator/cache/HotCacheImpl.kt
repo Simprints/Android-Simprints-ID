@@ -16,11 +16,11 @@ class HotCacheImpl(private val preferences: SharedPreferences,
             } ?: true
 
             if (stepNotInCache) {
-                stepEncoder.encode(it).also { encodedStep ->
-                    val encodedStepWithId = "${it.id}$SEPARATOR$encodedStep"
-                    steps?.add(encodedStepWithId)
-                    preferences.edit()?.putStringSet(KEY_STEPS, steps)?.apply()
-                }
+                addStepToCache(step)
+            } else {
+                val cachedStepString = steps?.find { cachedStep -> cachedStep.contains(step.id) }
+                steps?.remove(cachedStepString)
+                addStepToCache(step)
             }
         }
     }
@@ -32,6 +32,14 @@ class HotCacheImpl(private val preferences: SharedPreferences,
 
     override fun clear() {
         preferences.edit().putStringSet(KEY_STEPS, null).apply()
+    }
+
+    private fun addStepToCache(step: Step) {
+        stepEncoder.encode(step).also { encodedStep ->
+            val encodedStepWithId = "${step.id}$SEPARATOR$encodedStep"
+            steps?.add(encodedStepWithId)
+            preferences.edit()?.putStringSet(KEY_STEPS, steps)?.apply()
+        }
     }
 
     private companion object {
