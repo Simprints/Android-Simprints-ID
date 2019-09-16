@@ -1,6 +1,5 @@
 package com.simprints.id.tools
 
-import android.os.Parcelable
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
@@ -16,7 +15,7 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class ParcelableConverterTest {
 
-    private lateinit var converter: ParcelableConverter
+    private lateinit var converter: StepConverter
 
     private val guid = UUID.randomUUID().toString()
 
@@ -33,8 +32,8 @@ class ParcelableConverterTest {
         val bytes = mockByteArray()
         val request = mockRequest()
         val result = mockResult()
-        converter = ParcelableConverter(bytes)
-        val parcel = converter.getParcel()
+        converter = StepConverter(bytes)
+        val parcel = converter.toParcel()
         val step = Step.createFromParcel(parcel)
         converter.recycle()
 
@@ -53,23 +52,23 @@ class ParcelableConverterTest {
     }
 
     private fun mockByteArray(): ByteArray {
-        converter = ParcelableConverter(mockParcelable())
+        converter = StepConverter(mockParcelable())
         val bytes = converter.toBytes()
         converter.recycle()
         return bytes
     }
 
-    private fun mockParcelable(): Parcelable {
+    private fun mockParcelable(): Step {
         val request = mockRequest()
         val result = mockResult()
 
         return Step(
-            REQUEST_CODE,
-            ACTIVITY_NAME,
-            BUNDLE_KEY,
-            request,
-            result,
-            Step.Status.COMPLETED
+            requestCode = REQUEST_CODE,
+            activityName = ACTIVITY_NAME,
+            bundleKey = BUNDLE_KEY,
+            request = request,
+            result = result,
+            status = Step.Status.COMPLETED
         )
     }
 

@@ -20,7 +20,7 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     override fun decode(encodedStep: String?): Step? {
         return encodedStep?.let {
             val converter = ParcelableConverter(it.toByteArray())
-            val parcel = converter.getParcel()
+            val parcel = converter.toParcel()
             val stepWithEncodedResult = Step.createFromParcel(parcel)
             converter.recycle()
             processStep(stepWithEncodedResult, Operation.DECODE)
@@ -30,12 +30,12 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     private fun processStep(step: Step, operation: Operation): Step {
         val result = step.result
         return step.also {
-            val responseProcessor = when (result) {
+            val responseEncoder = when (result) {
                 is FaceCaptureResponse -> FaceCaptureResponseEncoder(keystoreManager)
                 is FingerprintEnrolResponse -> FingerprintEnrolResponseEncoder(keystoreManager)
                 else -> null
             }
-            it.result = responseProcessor?.process(result, operation)
+            it.result = responseEncoder?.process(result, operation)
         }
     }
 
