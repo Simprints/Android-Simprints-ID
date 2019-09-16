@@ -17,7 +17,6 @@ import com.simprints.id.orchestrator.ModalityFlowFactory
 import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.builders.AppResponseFactory
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.crypto.StepEncoder
@@ -26,6 +25,9 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
@@ -54,24 +56,29 @@ class OrchestratorModule {
                                         preferenceManager: PreferencesManager): FingerprintStepProcessor =
         FingerprintStepProcessorImpl(fingerprintRequestFactory, ModuleApiToDomainFingerprintResponse, preferenceManager)
 
+    @Provides
+    fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
+
     // ModalFlow [Enrol, Identify, Verify]
     @Provides
     @Named("ModalityFlowEnrol")
     fun provideModalityFlow(fingerprintStepProcessor: FingerprintStepProcessor,
-                            faceStepProcessor: FaceStepProcessor): ModalityFlow =
-        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor)
+                            faceStepProcessor: FaceStepProcessor, coreStepProcessor: CoreStepProcessor): ModalityFlow =
+        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
 
     @Provides
     @Named("ModalityFlowVerify")
     fun provideModalityFlowVerify(fingerprintStepProcessor: FingerprintStepProcessor,
-                                  faceStepProcessor: FaceStepProcessor): ModalityFlow =
-        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor)
+                                  faceStepProcessor: FaceStepProcessor,
+                                  coreStepProcessor: CoreStepProcessor): ModalityFlow =
+        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
 
     @Provides
     @Named("ModalityFlowIdentify")
     fun provideModalityFlowIdentify(fingerprintStepProcessor: FingerprintStepProcessor,
-                                    faceStepProcessor: FaceStepProcessor): ModalityFlow =
-        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor)
+                                    faceStepProcessor: FaceStepProcessor,
+                                    coreStepProcessor: CoreStepProcessor): ModalityFlow =
+        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
 
     // Orchestration
     @Provides

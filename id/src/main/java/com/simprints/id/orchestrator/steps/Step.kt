@@ -2,6 +2,7 @@ package com.simprints.id.orchestrator.steps
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.id.domain.moduleapi.core.requests.CoreRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
@@ -76,5 +77,6 @@ fun Step.Request.fromDomainToModuleApi(): Parcelable =
     when (this) {
         is FingerprintRequest -> fromDomainToModuleApiFingerprintRequest(this)
         is FaceRequest -> fromDomainToModuleApi()
-        else -> throw Throwable("Invalid Request")
+        is CoreRequest -> this
+        else -> throw Throwable("Invalid Request $this")
     }

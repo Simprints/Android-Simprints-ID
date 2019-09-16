@@ -14,7 +14,7 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.1.0-alpha02"
+def androidx_lifecycle_version = "2.1.0"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
@@ -29,7 +29,8 @@ def androidx = [
         livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
         compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version",
-        ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha01"
+        ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_lifecycle_version",
+        ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
     ],
     ui       : [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta1",

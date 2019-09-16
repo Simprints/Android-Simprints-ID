@@ -9,7 +9,7 @@ open class BaseStepProcessorTest {
         verifyStep<T>(
             step,
             expectedRequestCode,
-            "com.simprints.fingerprint.activities.launch.LaunchActivity",
+            "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity",
             "FingerprintRequestBundleKey")
 
     protected inline fun <reified T : Parcelable> verifyFaceIntent(step: Step, expectedRequestCode: Int) =
@@ -18,6 +18,13 @@ open class BaseStepProcessorTest {
             expectedRequestCode,
             "com.simprints.face.activities.FaceCaptureActivity",
             "FaceRequestBundleKey")
+
+    protected inline fun <reified T : Parcelable> verifyCoreIntent(step: Step, expectedRequestCode: Int) =
+        verifyStep<T>(
+            step,
+            expectedRequestCode,
+            "com.simprints.id.activities.consent.ConsentActivity",
+            "core_step_bundle")
 
     protected inline fun <reified T : Parcelable> verifyStep(step: Step, expectedRequestCode: Int, activityName: String, bundleKey: String) {
         assertThat(step.activityName).isEqualTo(activityName)
