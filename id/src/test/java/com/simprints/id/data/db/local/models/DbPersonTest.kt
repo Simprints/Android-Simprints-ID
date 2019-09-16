@@ -9,19 +9,15 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomFaceSample
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomFingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DbPersonTest {
 
     @Test
-    fun buildRlPersonWithoutFingerprint() {
+    fun fromDomainToDbModel() {
         val fingerprintSample = getRandomFingerprintSample()
         val faceSample = getRandomFaceSample()
 
