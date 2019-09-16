@@ -15,7 +15,6 @@ import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -63,7 +62,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenOneRecordSaved_countShouldReturnOne() = runBlockingTest {
+    fun givenOneRecordSaved_countShouldReturnOne() = runBlocking {
         saveFakePerson(realm, getFakePerson())
 
         val count = personLocalDataSource.count()
@@ -71,7 +70,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_countShouldReturnMany() = runBlockingTest {
+    fun givenManyPeopleSaved_countShouldReturnMany() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count()
@@ -79,7 +78,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_countByUserIdShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenManyPeopleSaved_countByUserIdShouldReturnTheRightTotal() = runBlocking {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
@@ -97,7 +96,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_countByProjectIdShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenManyPeopleSaved_countByProjectIdShouldReturnTheRightTotal() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count()
@@ -105,7 +104,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_countByPatientIdShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenManyPeopleSaved_countByPatientIdShouldReturnTheRightTotal() = runBlocking {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
@@ -114,7 +113,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun insertOrUpdatePerson_shouldSucceed() = runBlockingTest {
+    fun insertOrUpdatePerson_shouldSucceed() = runBlocking {
         val fakePerson = getFakePerson()
         personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
 
@@ -125,7 +124,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun insertOrUpdateSamePerson_shouldSaveOnlyAPerson() = runBlockingTest {
+    fun insertOrUpdateSamePerson_shouldSaveOnlyAPerson() = runBlocking {
         val fakePerson = getFakePerson()
         personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
         personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
@@ -137,7 +136,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadShouldReturnThem() = runBlockingTest {
+    fun givenManyPeopleSaved_loadShouldReturnThem() = runBlocking {
         val fakePerson = getFakePerson()
         saveFakePerson(realm, fakePerson)
 
@@ -147,7 +146,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByUserIdShouldReturnTheRightPeople() = runBlockingTest {
+    fun givenManyPeopleSaved_loadByUserIdShouldReturnTheRightPeople() = runBlocking {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
@@ -156,7 +155,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByModuleIdShouldReturnTheRightPeople() = runBlockingTest {
+    fun givenManyPeopleSaved_loadByModuleIdShouldReturnTheRightPeople() = runBlocking {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
@@ -165,7 +164,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByToSyncShouldReturnTheRightPeople() = runBlockingTest {
+    fun givenManyPeopleSaved_loadByToSyncShouldReturnTheRightPeople() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).toList()
@@ -173,7 +172,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     }
 
     @Test
-    fun givenManyPeopleSaved_loadByToNoSyncShouldReturnTheRightPeople() = runBlockingTest {
+    fun givenManyPeopleSaved_loadByToNoSyncShouldReturnTheRightPeople() = runBlocking {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(toSync = false)).toList()
