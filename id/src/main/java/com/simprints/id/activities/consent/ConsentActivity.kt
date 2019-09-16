@@ -18,7 +18,6 @@ import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
-import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
@@ -40,7 +39,6 @@ class ConsentActivity : AppCompatActivity() {
 
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var preferencesManager: PreferencesManager
 
     private var startConsentEventTime: Long = 0
 

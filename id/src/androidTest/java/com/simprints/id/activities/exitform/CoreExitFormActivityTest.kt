@@ -6,18 +6,19 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.data.exitform.ExitFormReason
 import com.simprints.testtools.android.tryOnUiUntilTimeout
-import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,47 +36,47 @@ class CoreExitFormActivityTest {
     fun launchRefusalActivity_shouldDisplayAllOptionsAndButtons() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbDataConcerns)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbDoesNotHavePermission)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbAppNotWorking)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbPersonNotPresent)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbTooYoung)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.rbOther)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(withId(R.id.rbReligiousConcerns)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbDataConcerns)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbDoesNotHavePermission)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbAppNotWorking)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbPersonNotPresent)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbTooYoung)).check(matches(isDisplayed()))
+        onView(withId(R.id.rbOther)).check(matches(isDisplayed()))
 
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(isDisplayed()))
+        onView(withId(R.id.btGoBack)).check(matches(isDisplayed()))
 
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun chooseAnOptionInRefusal_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
-        onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.btGoBack)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
+        onView(withId(R.id.rbReligiousConcerns)).perform(click())
+        onView(withId(R.id.btGoBack)).check(matches(isEnabled()))
     }
 
     @Test
     fun chooseOtherOption_shouldNotEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
-        onView(ViewMatchers.withId(R.id.rbOther)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
+        onView(withId(R.id.rbOther)).perform(click())
+        onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun chooseOtherOptionAndEnterText_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(CoreMatchers.not(ViewMatchers.isEnabled())))
-        onView(ViewMatchers.withId(R.id.rbOther)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.exitFormText)).perform(ViewActions.typeText("Reason for other"))
+        onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
+        onView(withId(R.id.rbOther)).perform(click())
+        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"))
         tryOnUiUntilTimeout(1000, 200) {
-            onView(ViewMatchers.withId(R.id.btSubmitExitForm)).check(ViewAssertions.matches(ViewMatchers.isEnabled()))
+            onView(withId(R.id.btSubmitExitForm)).check(matches(isEnabled()))
         }
     }
 
@@ -84,10 +85,10 @@ class CoreExitFormActivityTest {
         val refusalReasonText = "Reason for refusal"
         val scenario = launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.rbReligiousConcerns)).perform(ViewActions.click())
-        onView(ViewMatchers.withId(R.id.exitFormText)).perform(ViewActions.typeText(refusalReasonText))
+        onView(withId(R.id.rbReligiousConcerns)).perform(click())
+        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText))
         Espresso.pressBackUnconditionally()
-        onView(ViewMatchers.withId(R.id.btSubmitExitForm)).perform(ViewActions.click())
+        onView(withId(R.id.btSubmitExitForm)).perform(click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.SUBMIT,
             ExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormResult.EXIT_FORM_RESULT_CODE_SUBMIT)
@@ -97,7 +98,7 @@ class CoreExitFormActivityTest {
     fun pressScanFingerprint_shouldFinishWithRightResultWithDefaultRefusalFormReason() {
         val scenario = launchCoreExitFormActivity()
 
-        onView(ViewMatchers.withId(R.id.btGoBack)).perform(ViewActions.click())
+        onView(withId(R.id.btGoBack)).perform(click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.GO_BACK,
             ExitFormReason.OTHER, "", CoreExitFormResult.EXIT_FORM_RESULT_CODE_GO_BACK)
@@ -108,15 +109,15 @@ class CoreExitFormActivityTest {
                                      exitReason: ExitFormReason,
                                      exitFormText: String,
                                      expectedResultCode: Int) {
-        Truth.assertThat(result.resultCode).isEqualTo(expectedResultCode)
+        assertThat(result.resultCode).isEqualTo(expectedResultCode)
 
         result.resultData.setExtrasClassLoader(CoreExitFormResult::class.java.classLoader)
         val response = result.resultData.getParcelableExtra<CoreExitFormResult>(CoreExitFormResult.BUNDLE_KEY)
 
-        Truth.assertThat(response).isInstanceOf(CoreExitFormResult::class.java)
-        Truth.assertThat(response.action).isEqualTo(action)
-        Truth.assertThat(response.answer.reason).isEqualTo(exitReason)
-        Truth.assertThat(response.answer.optionalText).isEqualTo(exitFormText)
+        assertThat(response).isInstanceOf(CoreExitFormResult::class.java)
+        assertThat(response.action).isEqualTo(action)
+        assertThat(response.answer.reason).isEqualTo(exitReason)
+        assertThat(response.answer.optionalText).isEqualTo(exitFormText)
     }
 
 
