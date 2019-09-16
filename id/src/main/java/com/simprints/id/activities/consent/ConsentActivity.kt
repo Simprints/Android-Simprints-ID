@@ -14,6 +14,10 @@ import com.simprints.id.activities.exitform.CoreExitFormActivity
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.faceexitform.FaceExitFormActivity
+import com.simprints.id.activities.faceexitform.result.FaceExitFormResult
+import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormResult
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormResult.Companion.FINGERPRINT_EXIT_FORM_BUNDLE_KEY
@@ -23,12 +27,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.*
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
@@ -145,15 +147,14 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun startExitFormActivity() {
-//        if (isSingleModality()) {
-//            when(preferencesManager.modalities.first()) {
-//                Modality.FINGER -> startFingerprintExitFormActivity()
-//                Modality.FACE -> TODO()
-//            }
-//        } else {
-//            startCoreExitFormActivity()
-//        }
-        startFingerprintExitFormActivity()
+        if (isSingleModality()) {
+            when(preferencesManager.modalities.first()) {
+                Modality.FINGER -> startFingerprintExitFormActivity()
+                Modality.FACE -> startFaceExitFormActivity()
+            }
+        } else {
+            startCoreExitFormActivity()
+        }
     }
 
     private fun isSingleModality() = preferencesManager.modalities.size == 1
@@ -166,6 +167,10 @@ class ConsentActivity : AppCompatActivity() {
         startActivityForResult(Intent(this, FingerprintExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
     }
 
+    private fun startFaceExitFormActivity() {
+        startActivityForResult(Intent(this, FaceExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
@@ -176,6 +181,9 @@ class ConsentActivity : AppCompatActivity() {
             FINGERPRINT_EXIT_FORM_RESULT_CODE_SUBMIT -> {
                 setResult(CoreResponseCode.FINGERPRINT_EXIT_FORM.value, buildFingerprintExitFormResponse(data))
                 finish()
+            }
+            FACE_EXIT_FORM_RESULT_CODE_SUBMIT -> {
+                setResult(CoreResponseCode.FACE_EXIT_FORM.value, buildFaceExitFormResponse(data))
             }
         }
     }
@@ -192,6 +200,11 @@ class ConsentActivity : AppCompatActivity() {
         }
     }
 
+    private fun buildFaceExitFormResponse(data: Intent?) = Intent().apply {
+        data?.getParcelableExtra<FaceExitFormResult>(FACE_EXIT_FORM_BUNDLE_KEY)?.let {
+            putExtra(CONSENT_STEP_BUNDLE, FaceExitFormResponse(it.answer.reason, it.answer.optionalText))
+        }
+    }
     override fun onBackPressed() {
         startExitFormActivity()
     }
