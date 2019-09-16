@@ -90,7 +90,7 @@ class CoreExitFormActivityTest {
         onView(ViewMatchers.withId(R.id.btSubmitExitForm)).perform(ViewActions.click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.SUBMIT,
-            ExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormResult.RESULT_CODE_SUBMIT)
+            ExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormResult.EXIT_FORM_RESULT_CODE_SUBMIT)
     }
 
     @Test
@@ -100,7 +100,7 @@ class CoreExitFormActivityTest {
         onView(ViewMatchers.withId(R.id.btGoBack)).perform(ViewActions.click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.GO_BACK,
-            ExitFormReason.OTHER, "", CoreExitFormResult.RESULT_CODE_GO_BACK)
+            ExitFormReason.OTHER, "", CoreExitFormResult.EXIT_FORM_RESULT_CODE_GO_BACK)
     }
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,

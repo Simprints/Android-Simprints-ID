@@ -13,7 +13,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.exitform.CoreExitFormActivity
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_SUBMIT
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
@@ -147,7 +147,7 @@ class ConsentActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_CODE_SUBMIT) {
+        if (resultCode == EXIT_FORM_RESULT_CODE_SUBMIT) {
             setResult(CoreResponseCode.EXIT_FORM.value, buildExitFormResponse(data))
             finish()
         }

@@ -13,8 +13,8 @@ import com.simprints.id.R
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.GO_BACK
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.SUBMIT
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_GO_BACK
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.RESULT_CODE_SUBMIT
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_GO_BACK
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -129,12 +129,12 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(RESULT_CODE_GO_BACK, GO_BACK)
+        setResultAndFinish(EXIT_FORM_RESULT_CODE_GO_BACK, GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), exitFormReason)
-        setResultAndFinish(RESULT_CODE_SUBMIT, SUBMIT)
+        setResultAndFinish(EXIT_FORM_RESULT_CODE_SUBMIT, SUBMIT)
     }
 
     private fun setResultAndFinish(resultCode: Int, exitFormAction: CoreExitFormResult.Action) {
