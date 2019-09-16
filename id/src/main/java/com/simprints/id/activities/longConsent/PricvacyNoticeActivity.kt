@@ -9,10 +9,10 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.tools.extensions.showToast
-import kotlinx.android.synthetic.main.activity_long_consent.*
+import kotlinx.android.synthetic.main.activity_privacy_notice.*
 import javax.inject.Inject
 
-class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
+class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
     @Inject lateinit var preferences: PreferencesManager
 
@@ -23,7 +23,7 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
         val component = (application as Application).component.also { it.inject(this) }
         LanguageHelper.setLanguage(this, preferences.language)
-        setContentView(R.layout.activity_long_consent)
+        setContentView(R.layout.activity_privacy_notice)
 
         initActionBar()
 
