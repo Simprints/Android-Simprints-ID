@@ -1,14 +1,15 @@
 package com.simprints.id.di
 
+import android.content.SharedPreferences
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
@@ -16,11 +17,15 @@ import com.simprints.id.orchestrator.ModalityFlowFactory
 import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
-import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.cache.HotCache
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.crypto.StepEncoder
+import com.simprints.id.orchestrator.cache.crypto.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -44,7 +49,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
-        FaceStepProcessorImpl(faceRequestFactory, ModuleApiToDomainFaceResponse)
+        FaceStepProcessorImpl(faceRequestFactory)
 
     @Provides
     fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
@@ -84,8 +89,9 @@ class OrchestratorModule {
 
     @Provides
     fun provideOrchestratorManager(modalityFlowFactory: ModalityFlowFactory,
-                                   appResponseFactory: AppResponseFactory): OrchestratorManager =
-        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory)
+                                   appResponseFactory: AppResponseFactory,
+                                   hotCache: HotCache): OrchestratorManager =
+        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache)
 
     @Provides
     fun provideOrchestratorEventsHelper(sessionEventsManager: SessionEventsManager,
@@ -93,10 +99,30 @@ class OrchestratorModule {
         OrchestratorEventsHelperImpl(sessionEventsManager, timeHelper)
 
     @Provides
-    fun provideOrchestratorViewModelFactory(orchestratorManager: OrchestratorManager,
-                                            orchestratorEventsHelper: OrchestratorEventsHelper,
-                                            preferenceManager: PreferencesManager,
-                                            sessionEventsManager: SessionEventsManager) =
-        OrchestratorViewModelFactory(orchestratorManager, orchestratorEventsHelper, preferenceManager.modalities, sessionEventsManager, DomainToModuleApiAppResponse)
+    fun provideOrchestratorViewModelFactory(
+        orchestratorManager: OrchestratorManager,
+        orchestratorEventsHelper: OrchestratorEventsHelper,
+        preferenceManager: PreferencesManager,
+        sessionEventsManager: SessionEventsManager
+    ): OrchestratorViewModelFactory {
+        return OrchestratorViewModelFactory(
+            orchestratorManager,
+            orchestratorEventsHelper,
+            preferenceManager.modalities,
+            sessionEventsManager,
+            DomainToModuleApiAppResponse
+        )
+    }
+
+    @Provides
+    fun provideHotCache(
+        preferences: SharedPreferences,
+        stepEncoder: StepEncoder
+    ): HotCache = HotCacheImpl(preferences, stepEncoder)
+
+    @Provides
+    fun provideStepEncoder(
+        keystoreManager: KeystoreManager
+    ): StepEncoder = StepEncoderImpl(keystoreManager)
 
 }

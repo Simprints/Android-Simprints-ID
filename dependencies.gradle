@@ -14,7 +14,7 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.1.0-alpha02"
+def androidx_lifecycle_version = "2.1.0"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
@@ -29,7 +29,8 @@ def androidx = [
         livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
         compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version",
-        ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-alpha01"
+        ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_lifecycle_version",
+        ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
     ],
     ui       : [
         constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta1",
@@ -107,9 +108,9 @@ def rxjava2 = [
 // Koin, Service Location
 def koin_version = "2.0.1"
 def koin = [
-    core    : "org.koin:koin-core:$koin_version",
-    core_ext: "org.koin:koin-core-ext:$koin_version",
-    android : "org.koin:koin-android:$koin_version",
+    core     : "org.koin:koin-core:$koin_version",
+    core_ext : "org.koin:koin-core-ext:$koin_version",
+    android  : "org.koin:koin-android:$koin_version",
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
@@ -131,6 +132,7 @@ def testing = [
         kotlin                     : "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0",
         mockito_inline_androidtests: "com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0" //Mockito-inline works only in unit tests. Required to mock final attributes in android tests
     ],
+    mockk          : "io.mockk:mockk:1.9",
     mockwebserver  : "com.squareup.okhttp3:mockwebserver:3.10.0",
     espresso       : [
         core   : "androidx.test.espresso:espresso-core:$espresso_version",

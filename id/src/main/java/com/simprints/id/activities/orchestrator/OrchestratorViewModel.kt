@@ -8,7 +8,6 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.steps.Step
 
 class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager,
                             private val orchestratorEventsHelper: OrchestratorEventsHelper,
@@ -16,7 +15,7 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
                             private val sessionEventsManager: SessionEventsManager,
                             private val domainToModuleApiConverter: DomainToModuleApiAppResponse) : ViewModel() {
 
-    val onGoingStep = orchestratorManager.onGoingStep
+    val ongoingStep = orchestratorManager.ongoingStep
 
     val appResponse = Transformations.map(orchestratorManager.appResponse) {
         it?.let {
@@ -38,10 +37,12 @@ class OrchestratorViewModel(private val orchestratorManager: OrchestratorManager
     fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) =
         orchestratorManager.handleIntentResult(requestCode, resultCode, data)
 
-    fun restoreState(steps: List<Step>) {
-        orchestratorManager.restoreState(steps)
+    fun restoreState() {
+        orchestratorManager.restoreState()
     }
 
-    fun getStateOfSteps(): List<Step> = orchestratorManager.getState()
+    fun clearState() {
+        orchestratorManager.clearState()
+    }
 
 }

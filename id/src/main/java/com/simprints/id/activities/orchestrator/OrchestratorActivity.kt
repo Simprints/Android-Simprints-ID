@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -25,6 +25,8 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var timeHelper: TimeHelper
+
+    private var isRestored = false
 
     private val observerForNextStep = Observer<Step?> {
         it?.let {
@@ -52,7 +54,7 @@ class OrchestratorActivity : AppCompatActivity() {
         (application as Application).component.inject(this)
         super.onCreate(savedInstanceState)
 
-        appRequest = this.intent.extras?.getParcelable<AppRequest>(APP_REQUEST_BUNDLE_KEY)
+        appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
         vm.startModalityFlow(appRequest)
@@ -60,29 +62,22 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-
-        savedInstanceState?.getParcelableArrayList<Step>(RESTORE_STATE_KEY)?.let {
-            vm.restoreState(it)
-        }
+        isRestored = true
     }
 
     override fun onResume() {
         super.onResume()
-        vm.onGoingStep.observe(this, observerForNextStep)
+        vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
+
+        if (isRestored)
+            vm.restoreState()
+        else
+            vm.clearState()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(requestCode, resultCode, data)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelableArrayList(RESTORE_STATE_KEY, ArrayList(vm.getStateOfSteps()))
-    }
-
-    companion object {
-        const val RESTORE_STATE_KEY = "state"
     }
 }

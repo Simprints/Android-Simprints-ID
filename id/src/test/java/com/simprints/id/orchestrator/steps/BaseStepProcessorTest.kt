@@ -32,6 +32,6 @@ open class BaseStepProcessorTest {
         assertThat(step.bundleKey).isEqualTo(bundleKey)
         assertThat(step.request).isInstanceOf(T::class.java)
         assertThat(step.result).isNull()
-        assertThat(step.status).isEqualTo(Step.Status.NOT_STARTED)
+        assertThat(step.getStatus()).isEqualTo(Step.Status.NOT_STARTED)
     }
 }

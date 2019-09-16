@@ -5,7 +5,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.id.domain.moduleapi.face.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
@@ -29,10 +28,10 @@ class AppResponseBuilderForIdentify : AppResponseBuilder, BaseAppResponseBuilder
                 buildAppIdentifyResponseForFaceAndFinger(faceResponse, fingerprintResponse, sessionId)
             }
             fingerprintResponse != null -> {
-                buildAppEnrolResponseForFingerprint(fingerprintResponse, sessionId)
+                buildAppIdentifyResponseForFingerprint(fingerprintResponse, sessionId)
             }
             faceResponse != null -> {
-                buildAppEnrolResponseForFace(faceResponse, sessionId)
+                buildAppIdentifyResponseForFace(faceResponse, sessionId)
             }
             else -> throw Throwable("All responses are null")
         }
@@ -42,17 +41,18 @@ class AppResponseBuilderForIdentify : AppResponseBuilder, BaseAppResponseBuilder
         results.firstOrNull { it is FaceIdentifyResponse } as FaceIdentifyResponse
 
     private fun getFingerprintResponseForIdentify(results: List<Step.Result?>): FingerprintIdentifyResponse? =
-        results.firstOrNull{ it is FingerprintIdentifyResponse } as FingerprintIdentifyResponse
+        results.firstOrNull { it is FingerprintIdentifyResponse } as FingerprintIdentifyResponse
 
     private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceIdentifyResponse,
                                                          fingerprintResponse: FingerprintIdentifyResponse,
                                                          sessionId: String) =
         AppIdentifyResponse(fingerprintResponse.identifications.map { it.toAppMatchResult() }, sessionId)
 
-    private fun buildAppEnrolResponseForFingerprint(fingerprintResponse: FingerprintIdentifyResponse,
-                                                    sessionId: String) =
+    private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintIdentifyResponse,
+                                                       sessionId: String) =
         AppIdentifyResponse(fingerprintResponse.identifications.map { it.toAppMatchResult() }, sessionId)
 
-    private fun buildAppEnrolResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String) =
-        AppIdentifyResponse(faceResponse.identifications.map { it.toAppMatchResult() }, sessionId)
+    private fun buildAppIdentifyResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse {
+        TODO("Not implemented yet")
+    }
 }
