@@ -11,14 +11,14 @@ import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
-import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.toApiGetPerson
+import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.domain.Person
@@ -37,7 +37,6 @@ import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.mockserver.assertPathUrlParam
 import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -47,7 +46,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.*
-import org.mockito.Mockito
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 import java.util.*
@@ -194,7 +192,7 @@ class SubDownSyncTaskTest {
         mockDbDependencies(syncLocalDataSourceMock, personLocalDataSourceMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
         whenever(syncLocalDataSourceMock) { load(subScope) } thenReturn
-            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)
+            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).fromDomainToDb(), null)
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
         whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
@@ -263,7 +261,7 @@ class SubDownSyncTaskTest {
     }
 
     private fun prepareResponseForSubScope(subSyncScope: SubSyncScope, nPeople: Int) =
-        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.toApiGetPerson() }.sortedBy { it.updatedAt }
+        getRandomPeople(nPeople, subSyncScope, listOf(false)).map { it.fromDomainToGetApi() }.sortedBy { it.updatedAt }
 
     private fun setupApi() {
         PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()

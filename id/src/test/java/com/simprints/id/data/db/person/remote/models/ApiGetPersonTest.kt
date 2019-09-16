@@ -8,8 +8,8 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
-import com.simprints.id.data.db.person.local.models.toDomainPerson
-import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.fromDbToDomain
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.db.person.domain.Person
 import org.junit.Assert
 import org.junit.Test
@@ -24,12 +24,12 @@ class ApiGetPersonTest {
 
     @Test
     fun buildApiPersonFromDbPerson() {
-        val dbPerson = PeopleGeneratorUtils.getRandomPerson("patientId", idFingerprints = arrayOf(
+        val dbPerson = PeopleGeneratorUtils.getRandomPerson("patientId", fingerprintSamples = arrayOf(
             FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB),
             FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
-        )).toRealmPerson()
+        )).fromDomainToDb()
 
-        val apiPerson = dbPerson.toDomainPerson().toApiGetPerson()
+        val apiPerson = dbPerson.fromDbToDomain().fromDomainToGetApi()
 
         Assert.assertEquals(apiPerson.id, dbPerson.patientId)
         Assert.assertEquals(apiPerson.userId, dbPerson.userId)
@@ -37,18 +37,18 @@ class ApiGetPersonTest {
         Assert.assertEquals(apiPerson.updatedAt, dbPerson.updatedAt)
         Assert.assertEquals(apiPerson.moduleId, dbPerson.moduleId)
         Assert.assertEquals(apiPerson.projectId, dbPerson.projectId)
-        Assert.assertEquals(apiPerson.fingerprints?.size, dbPerson.fingerprints.size)
+        Assert.assertEquals(apiPerson.fingerprints?.size, dbPerson.fingerprintSamples.size)
     }
 
     @Test
     fun buildApiPersonFromDomainPerson() {
         val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            listOf(
+            fingerprintSamples = listOf(
                 FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.LEFT_THUMB),
                 FingerprintGeneratorUtils.generateRandomFingerprint(FingerIdentifier.RIGHT_THUMB)
             ))
 
-        val apiPerson = domainPerson.toApiGetPerson()
+        val apiPerson = domainPerson.fromDomainToGetApi()
 
         Assert.assertEquals(apiPerson.id, domainPerson.patientId)
         Assert.assertEquals(apiPerson.userId, "userId")
@@ -56,7 +56,7 @@ class ApiGetPersonTest {
         Assert.assertNull(apiPerson.updatedAt)
         Assert.assertEquals(apiPerson.moduleId, "moduleId")
         Assert.assertEquals(apiPerson.projectId, "projectId")
-        Assert.assertEquals(apiPerson.fingerprints?.size, domainPerson.fingerprints.size)
+        Assert.assertEquals(apiPerson.fingerprints?.size, domainPerson.fingerprintSamples.size)
     }
 
     @Test
@@ -79,7 +79,7 @@ class ApiGetPersonTest {
 
     @Test
     fun serialiseApiPerson_skipUnwantedFields() {
-        val apiPerson = PeopleGeneratorUtils.getRandomPerson().toApiGetPerson()
+        val apiPerson = PeopleGeneratorUtils.getRandomPerson().fromDomainToGetApi()
         val jsonString = JsonHelper.toJson(apiPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
