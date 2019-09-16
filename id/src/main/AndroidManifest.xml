@@ -18,6 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.fingerprintexitform.FingerprintExitFormActivity" />
         <activity
             android:name=".activities.exitform.CoreExitFormActivity"
             android:label="@string/title_activity_exit_form"

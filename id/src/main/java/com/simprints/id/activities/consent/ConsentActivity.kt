@@ -14,6 +14,10 @@ import com.simprints.id.activities.exitform.CoreExitFormActivity
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
+import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormResult
+import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormResult.Companion.FINGERPRINT_EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormResult.Companion.FINGERPRINT_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
@@ -24,6 +28,7 @@ import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Compani
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
@@ -119,7 +124,7 @@ class ConsentActivity : AppCompatActivity() {
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
-        startCoreExitFormActivity()
+        startExitFormActivity()
     }
 
     fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
@@ -139,15 +144,39 @@ class ConsentActivity : AppCompatActivity() {
         startActivity(Intent(this, PricvacyNoticeActivity::class.java))
     }
 
+    private fun startExitFormActivity() {
+//        if (isSingleModality()) {
+//            when(preferencesManager.modalities.first()) {
+//                Modality.FINGER -> startFingerprintExitFormActivity()
+//                Modality.FACE -> TODO()
+//            }
+//        } else {
+//            startCoreExitFormActivity()
+//        }
+        startFingerprintExitFormActivity()
+    }
+
+    private fun isSingleModality() = preferencesManager.modalities.size == 1
+
     private fun startCoreExitFormActivity() {
         startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
     }
 
+    private fun startFingerprintExitFormActivity() {
+        startActivityForResult(Intent(this, FingerprintExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == EXIT_FORM_RESULT_CODE_SUBMIT) {
-            setResult(CoreResponseCode.EXIT_FORM.value, buildExitFormResponse(data))
-            finish()
+        when (resultCode) {
+            EXIT_FORM_RESULT_CODE_SUBMIT -> {
+                setResult(CoreResponseCode.CORE_EXIT_FORM.value, buildExitFormResponse(data))
+                finish()
+            }
+            FINGERPRINT_EXIT_FORM_RESULT_CODE_SUBMIT -> {
+                setResult(CoreResponseCode.FINGERPRINT_EXIT_FORM.value, buildFingerprintExitFormResponse(data))
+                finish()
+            }
         }
     }
 
@@ -157,8 +186,14 @@ class ConsentActivity : AppCompatActivity() {
         }
     }
 
+    private fun buildFingerprintExitFormResponse(data: Intent?) = Intent().apply {
+        data?.getParcelableExtra<FingerprintExitFormResult>(FINGERPRINT_EXIT_FORM_BUNDLE_KEY)?.let {
+            putExtra(CONSENT_STEP_BUNDLE, FingerprintExitFormResponse(it.answer.reason, it.answer.optionalText))
+        }
+    }
+
     override fun onBackPressed() {
-        startCoreExitFormActivity()
+        startExitFormActivity()
     }
 
     companion object {
