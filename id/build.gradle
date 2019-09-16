@@ -139,6 +139,7 @@ dependencies {
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
     implementation deps.androidx.lifecycle.ktx
+    implementation deps.androidx.lifecycle.ext
     implementation deps.androidx.lifecycle.livedata
     implementation deps.androidx.ui.constraintlayout
     implementation deps.androidx.ui.cardview
@@ -204,6 +205,8 @@ dependencies {
     testImplementation deps.testing.truth
     testImplementation deps.testing.mockito.inline
     testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.mockk
+
     testImplementation deps.testing.mockwebserver
     testImplementation deps.testing.work
     testImplementation deps.testing.coroutines_test

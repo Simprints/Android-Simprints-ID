@@ -35,9 +35,9 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         }
 
     override fun getNextStepToLaunch(): Step? =
-        steps.firstOrNull { it.status == NOT_STARTED }
+        steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
@@ -45,6 +45,6 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
-        stepForRequest?.result = result
+        return stepForRequest?.also { it.result = result }
     }
 }

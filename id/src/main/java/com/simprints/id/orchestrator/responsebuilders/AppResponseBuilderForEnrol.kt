@@ -4,7 +4,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceEnrolResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 
@@ -20,8 +20,8 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
         }
 
         val results = steps.map { it.result }
-        val faceResponse = getFaceResponseForEnrol(results)
-        val fingerprintResponse = getFingerprintResponseForEnrol(results)
+        val faceResponse = getFaceCaptureResponse(results)
+        val fingerprintResponse = getFingerprintCaptureResponse(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -37,19 +37,20 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
         }
     }
 
-    private fun getFaceResponseForEnrol(results: List<Step.Result?>): FaceEnrolResponse? =
-        results.firstOrNull { it is FaceEnrolResponse } as FaceEnrolResponse
+    private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
+        results.firstOrNull { it is FaceCaptureResponse } as FaceCaptureResponse?
 
-    private fun getFingerprintResponseForEnrol(results: List<Step.Result?>): FingerprintEnrolResponse? =
+    private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.firstOrNull { it is FingerprintEnrolResponse } as FingerprintEnrolResponse
 
     private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FingerprintEnrolResponse,
-                                                           faceResponse: FaceEnrolResponse) =
+                                                           faceResponse: FaceCaptureResponse) =
         AppEnrolResponse(fingerprintResponse.guid)
 
     private fun buildAppEnrolResponseForFingerprint(fingerprintResponse: FingerprintEnrolResponse) =
         AppEnrolResponse(fingerprintResponse.guid)
 
-    private fun buildAppEnrolResponseForFace(faceResponse: FaceEnrolResponse) =
-        AppEnrolResponse(faceResponse.guid)
+    private fun buildAppEnrolResponseForFace(faceResponse: FaceCaptureResponse): AppEnrolResponse {
+        TODO("Not implemented yet")
+    }
 }

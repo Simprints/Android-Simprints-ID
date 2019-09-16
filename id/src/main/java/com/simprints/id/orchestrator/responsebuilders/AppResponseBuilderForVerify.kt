@@ -5,7 +5,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
-import com.simprints.id.domain.moduleapi.face.responses.entities.toAppMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
@@ -42,7 +41,7 @@ class AppResponseBuilderForVerify : AppResponseBuilder, BaseAppResponseBuilder()
         results.firstOrNull { it is FaceVerifyResponse } as FaceVerifyResponse
 
     private fun getFingerprintResponseForVerify(results: List<Step.Result?>): FingerprintVerifyResponse? =
-        results.firstOrNull{ it is FingerprintVerifyResponse } as FingerprintVerifyResponse
+        results.firstOrNull { it is FingerprintVerifyResponse } as FingerprintVerifyResponse
 
     private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceVerifyResponse,
                                                             fingerprintResponse: FingerprintVerifyResponse) =
@@ -51,6 +50,7 @@ class AppResponseBuilderForVerify : AppResponseBuilder, BaseAppResponseBuilder()
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintVerifyResponse) =
         AppVerifyResponse(fingerprintResponse.matchingResult.toAppMatchResult())
 
-    private fun buildAppVerifyResponseForFace(faceResponse: FaceVerifyResponse) =
-        AppVerifyResponse(faceResponse.matchingResult.toAppMatchResult())
+    private fun buildAppVerifyResponseForFace(faceResponse: FaceVerifyResponse): AppVerifyResponse {
+        TODO("Not implemented yet")
+    }
 }
