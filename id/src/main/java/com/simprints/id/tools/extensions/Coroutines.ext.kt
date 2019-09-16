@@ -32,12 +32,6 @@ suspend fun <T> Flow<T>.bufferedChunks(maxChunkSize: Int): Flow<List<T>> = chann
         send(buffer.toList())
         buffer.clear()
     }
-
-//    this@bufferedChunks.onCompletion {
-//        send(buffer.toList())
-//        buffer.clear()
-//    }
-
 }.buffer(1)
 
 suspend fun <E : Any> Channel<E>.consumeEachBlock(maxBlockSize: Int, consumer: (List<E>) -> Unit) {

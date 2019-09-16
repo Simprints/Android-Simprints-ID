@@ -28,6 +28,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import com.simprints.fingerprintmatcher.Person as MatcherPerson
 
 class MatchingViewModel(private val dbManager: FingerprintDbManager,
@@ -81,7 +82,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                     matchTask.handleMatchResult(it.candidates, it.scores)
                 },
                 onError = {
-                    it.printStackTrace()
+                    Timber.e(it)
                     crashReportManager.logExceptionOrSafeException(it)
                     hasMatchFailed.postValue(true)
                     result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))

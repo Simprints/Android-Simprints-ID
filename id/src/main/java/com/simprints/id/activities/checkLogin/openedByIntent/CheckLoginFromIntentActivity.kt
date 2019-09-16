@@ -23,29 +23,19 @@ import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
 import com.simprints.moduleapi.app.responses.IAppErrorResponse
 import com.simprints.moduleapi.app.responses.IAppResponse
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 // App launched when user open SimprintsID using a client app (by intent)
-open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View, CoroutineScope {
+open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromIntentContract.View {
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
-    private lateinit var job: Job
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
-        job = Job()
 
         val component = (application as Application).component
         component.inject(this)
@@ -53,7 +43,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
         LanguageHelper.setLanguage(this, preferencesManager.language)
 
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
-
 
         viewPresenter.setup()
         viewPresenter.start()

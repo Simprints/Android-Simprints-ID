@@ -1,8 +1,9 @@
 package com.simprints.id.data.db.person.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
+import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.toDomainPerson
 import com.simprints.id.data.db.person.local.models.toRealmPerson
@@ -30,10 +31,10 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
 
     private val loginInfoManagerMock = mock<LoginInfoManager>().apply {
         whenever(this) { getSignedInProjectIdOrEmpty() }
-            .thenReturn(DefaultTestConstants.DEFAULT_PROJECT_ID)
+            .thenReturn(DEFAULT_PROJECT_ID)
     }
     private val secureDataManagerMock = mock<SecureDataManager>().apply {
-        whenever(this) { getLocalDbKeyOrThrow(DefaultTestConstants.DEFAULT_PROJECT_ID) }
+        whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
             .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
     }
 
@@ -52,7 +53,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
         val differentSecureDataManagerMock = mock<SecureDataManager>().apply {
-            whenever(this) { getLocalDbKeyOrThrow(DefaultTestConstants.DEFAULT_PROJECT_ID) }
+            whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
                 .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
         }
         val differentLocalDataSource = PersonLocalDataSourceImpl(testContext, differentSecureDataManagerMock, loginInfoManagerMock)
