@@ -15,7 +15,7 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class ParcelableConverterTest {
 
-    private lateinit var converter: StepConverter
+    private lateinit var converter: ParcelableConverter
 
     private val guid = UUID.randomUUID().toString()
 
@@ -32,7 +32,7 @@ class ParcelableConverterTest {
         val bytes = mockByteArray()
         val request = mockRequest()
         val result = mockResult()
-        converter = StepConverter(bytes)
+        converter = ParcelableConverter(bytes)
         val parcel = converter.toParcel()
         val step = Step.createFromParcel(parcel)
         converter.recycle()
@@ -52,7 +52,7 @@ class ParcelableConverterTest {
     }
 
     private fun mockByteArray(): ByteArray {
-        converter = StepConverter(mockParcelable())
+        converter = ParcelableConverter(mockParcelable())
         val bytes = converter.toBytes()
         converter.recycle()
         return bytes
