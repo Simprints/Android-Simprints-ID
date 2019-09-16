@@ -1,19 +1,14 @@
 package com.simprints.id.activities.exitform
 
 import android.app.Instrumentation
-import android.content.Intent
 import androidx.test.core.app.ActivityScenario
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.data.exitform.ExitFormReason
@@ -86,8 +81,7 @@ class CoreExitFormActivityTest {
         val scenario = launchCoreExitFormActivity()
 
         onView(withId(R.id.rbReligiousConcerns)).perform(click())
-        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText))
-        Espresso.pressBackUnconditionally()
+        onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText), closeSoftKeyboard())
         onView(withId(R.id.btSubmitExitForm)).perform(click())
 
         verifyIntentReturned(scenario.result, CoreExitFormResult.Action.SUBMIT,
@@ -122,8 +116,5 @@ class CoreExitFormActivityTest {
 
 
     private fun launchCoreExitFormActivity(): ActivityScenario<CoreExitFormActivity> =
-        ActivityScenario.launch(Intent().apply {
-            setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
-                CoreExitFormActivity::class.qualifiedName!!)
-        })
+        ActivityScenario.launch(CoreExitFormActivity::class.java)
 }

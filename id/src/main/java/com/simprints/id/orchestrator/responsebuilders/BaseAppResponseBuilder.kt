@@ -1,10 +1,10 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.id.data.exitform.toAppRefusalFormReason
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppRefusalFormResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
+import com.simprints.id.domain.moduleapi.app.responses.entities.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
@@ -35,7 +35,7 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
     }
 
     private fun buildAppExitFormResponse(coreExitFormResponse: CoreExitFormResponse) =
-        AppRefusalFormResponse(RefusalFormAnswer(coreExitFormResponse.reason.toAppRefusalFormReason(),
+        AppRefusalFormResponse(RefusalFormAnswer(coreExitFormResponse.reason.fromDomainToModuleApi(),
             coreExitFormResponse.optionalText))
 
     private fun buildAppErrorResponse(fingerprintErrorResponse: FingerprintErrorResponse) =
