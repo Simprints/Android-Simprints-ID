@@ -30,7 +30,6 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -221,9 +220,7 @@ class CheckLoginFromIntentPresenter(val view: CheckLoginFromIntentContract.View,
     private fun fetchAnalyticsId() =
         analyticsManager.analyticsId.onErrorReturn { "" }
 
-    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = Single.fromCallable {
-        personLocalDataSource.count()
-    }
+    private fun fetchPeopleCountInLocalDatabase(): Single<Int> = Single.just(personLocalDataSource.count())
 
     private fun addAuthorizationEvent(session: SessionEvents, result: AuthorizationEvent.Result) {
         session.addEvent(AuthorizationEvent(

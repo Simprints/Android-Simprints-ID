@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.person.local
+package com.simprints.id.data.db
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
