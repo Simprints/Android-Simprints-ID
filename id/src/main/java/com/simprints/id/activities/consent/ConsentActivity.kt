@@ -119,9 +119,7 @@ class ConsentActivity : AppCompatActivity() {
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
-        if (preferencesManager.modalities.size > 1) {
-            startCoreExitFormActivity()
-        }
+        startCoreExitFormActivity()
     }
 
     fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
@@ -134,7 +132,7 @@ class ConsentActivity : AppCompatActivity() {
     private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
         GENERAL_CONSENT_TAB_TAG -> INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> PARENTAL
-        else -> throw Exception()
+        else -> throw IllegalStateException("Invalid consent tab selected")
     }
 
     private fun startPrivacyNoticeActivity() {
