@@ -159,6 +159,10 @@ class ConsentActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        startCoreExitFormActivity()
+    }
+
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
