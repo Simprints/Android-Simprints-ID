@@ -11,10 +11,10 @@ data class ApiGetPerson(val id: String,
                         val moduleId: String,
                         val createdAt: Date?,
                         val updatedAt: Date?,
-                        val fingerprints: List<ApiFingerprint>? = null,
+                        val fingerprints: List<ApiFingerprintSample>? = null,
                         var faces: List<ApiFace>? = null)
 
-fun Person.toApiGetPerson(): ApiGetPerson =
+fun Person.fromDomainToGetApi(): ApiGetPerson =
     ApiGetPerson(
         id = patientId,
         projectId = projectId,
@@ -22,10 +22,10 @@ fun Person.toApiGetPerson(): ApiGetPerson =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = fingerprints.map { it.toApiFingerprint() }
+        fingerprints = fingerprintSamples.map { it.fromDomainToApi() }
     )
 
-fun ApiGetPerson.toDomainPerson(): Person =
+fun ApiGetPerson.fromGetApiToDomain(): Person =
     Person(
         patientId = id,
         projectId = projectId,
@@ -33,6 +33,6 @@ fun ApiGetPerson.toDomainPerson(): Person =
         moduleId = moduleId,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        fingerprints = fingerprints?.map { it.toDomainFingerprint() } ?: emptyList(),
+        fingerprintSamples = fingerprints?.map { it.fromApiToDomain() } ?: emptyList(),
         toSync = false
     )
