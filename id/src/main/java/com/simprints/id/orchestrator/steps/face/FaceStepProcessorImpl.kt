@@ -36,8 +36,15 @@ class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory) 
             buildStep(VERIFY, this)
         }
 
-    private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest): Step =
-        Step(requestCode.value, ACTIVITY_CLASS_NAME, IFaceRequest.BUNDLE_KEY, request, status = Step.Status.NOT_STARTED)
+    private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest): Step {
+        return Step(
+            requestCode = requestCode.value,
+            activityName = ACTIVITY_CLASS_NAME,
+            bundleKey = IFaceRequest.BUNDLE_KEY,
+            request = request,
+            status = Step.Status.NOT_STARTED
+        )
+    }
 
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): Step.Result? =
         if (isFaceResult(requestCode)) {
