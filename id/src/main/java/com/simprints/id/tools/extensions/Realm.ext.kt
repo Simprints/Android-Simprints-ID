@@ -11,10 +11,10 @@ inline fun <reified T> List<T>.toRealmList(): RealmList<T> =
 private suspend fun <T: RealmObject, S: RealmQuery<T>> findAllAwait(query: S): RealmResults<T>? = suspendCancellableCoroutine { continuation ->
     val result =  query.findAllAsync()
 
-    val listener = RealmChangeListener<RealmResults<T>> { t ->
-        if(t.isLoaded) {
-            if (t.isValid) {
-                continuation.resume(t)
+    val listener = RealmChangeListener<RealmResults<T>> { queryResults ->
+        if(queryResults.isLoaded) {
+            if (queryResults.isValid) {
+                continuation.resume(queryResults)
             } else {
                 continuation.resume(null)
             }
@@ -24,10 +24,10 @@ private suspend fun <T: RealmObject, S: RealmQuery<T>> findAllAwait(query: S): R
 }
 
 private suspend fun <T: RealmObject, S: RealmQuery<T>> findFirstAwait(query: S): T? = suspendCancellableCoroutine { continuation ->
-    val listener = RealmChangeListener { t: T? ->
-        if(t?.isLoaded == true) {
-            if (t.isValid) {
-                continuation.resume(t)
+    val listener = RealmChangeListener { queryResult: T? ->
+        if(queryResult?.isLoaded == true) {
+            if (queryResult.isValid) {
+                continuation.resume(queryResult)
             } else {
                 continuation.resume(null)
             }

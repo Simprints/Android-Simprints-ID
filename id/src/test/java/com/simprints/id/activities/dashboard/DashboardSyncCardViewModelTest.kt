@@ -280,8 +280,8 @@ class DashboardSyncCardViewModelTest {
         }
     }
 
-    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+    private fun getMockListOfPeopleCountWithCounter(countOfPeople: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), countOfPeople))
 
     private fun createViewModelDashboardToTest() =
         DashboardSyncCardViewModel(
