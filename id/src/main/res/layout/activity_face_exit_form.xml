@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.simprints.id.activities.exitform.CoreExitFormActivity">
+    tools:context="com.simprints.id.activities.faceexitform.FaceExitFormActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +29,7 @@
             android:textSize="25sp" />
 
         <RadioGroup
-            android:id="@+id/faceRefusalRadioGroup"
+            android:id="@+id/faceExitFormRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp">
@@ -110,7 +110,7 @@
             android:padding="4dp" />
 
         <LinearLayout
-            android:id="@+id/faceRefusalButtonsLayout"
+            android:id="@+id/faceExitFormButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
