@@ -7,6 +7,7 @@ import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
@@ -39,7 +40,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
             CoreResponseCode.CONSENT.value -> data?.getParcelableExtra<AskConsentResponse>(CONSENT_STEP_BUNDLE)
             CoreResponseCode.CORE_EXIT_FORM.value -> data?.getParcelableExtra<CoreExitFormResponse>(CONSENT_STEP_BUNDLE)
             CoreResponseCode.FINGERPRINT_EXIT_FORM.value -> data?.getParcelableExtra<FingerprintExitFormResponse>(CONSENT_STEP_BUNDLE)
-            CoreResponseCode.FACE_EXIT_FORM.value -> TODO("Will be implemented with face exit form")
+            CoreResponseCode.FACE_EXIT_FORM.value -> data?.getParcelableExtra<FaceExitFormResponse>(CONSENT_STEP_BUNDLE)
             CoreResponseCode.FETCH_GUID.value -> TODO("Will be implemented with verification check")
             CoreResponseCode.ERROR.value -> TODO("Will be implemented with verification check")
             else -> throw IllegalStateException("Invalid result code from core step processor")
