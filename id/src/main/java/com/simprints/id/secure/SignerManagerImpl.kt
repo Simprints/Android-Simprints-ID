@@ -1,6 +1,6 @@
 package com.simprints.id.secure
 
-import com.simprints.core.tools.coroutines.completableWithSuspend
+import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao

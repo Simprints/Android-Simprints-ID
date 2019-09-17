@@ -1,4 +1,4 @@
-package com.simprints.core.tools.coroutines
+package com.simprints.core.tools.extentions
 
 import io.reactivex.Completable
 import io.reactivex.Single
