@@ -22,15 +22,14 @@ class PeopleRealmMigrationTest {
         private const val ASSET_FOLDER_FOR_REALM_DB = "realm"
         private const val DB_V6_FILENAME = "db_v6.realm"
         private const val DB_V6_KEY = "KEWsuk0UdOawjyBtjSTMAv6D8o126b6zB+uDR8okr7UVpIe1+btEsZ/KtFRkkVlLp9SgsdC5P8VF\nfLvNHeiE0g==\n"
+        private const val PACKAGE_NAME = "com.simprints.id.test"
     }
-
-    val packageName = "com.simprints.id.test"
 
     @Test
     fun migrateFromV6ToV7() {
 
         val app = ApplicationProvider.getApplicationContext<Application>()
-        val resources = app.packageManager.getResourcesForApplication(packageName)
+        val resources = app.packageManager.getResourcesForApplication(PACKAGE_NAME)
         val dbFileV6 = copyRealmFromAssets(app, resources.assets)
 
         Realm.init(app)
