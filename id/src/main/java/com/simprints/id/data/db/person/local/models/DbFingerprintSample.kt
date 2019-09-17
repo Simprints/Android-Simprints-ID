@@ -11,25 +11,30 @@ open class DbFingerprintSample(
     @PrimaryKey
     @Required
     var id: String = "",
-    var fingerIdentifier: String = "",
+
+    var fingerIdentifier: Int = -1,
+
+    @Required
     var template: ByteArray = byteArrayOf(),
-    var imageRef: String? = null,
-    var qualityScore: Int = -1
+
+    var templateQualityScore: Int = -1,
+
+    var imageRef: String? = null
 ) : RealmObject()
 
 fun DbFingerprintSample.fromDbToDomain(): FingerprintSample =
     FingerprintSample(
-        fingerIdentifier = FingerIdentifier.valueOf(fingerIdentifier),
+        fingerIdentifier = FingerIdentifier.values()[fingerIdentifier],
         template = template,
         imageRef = imageRef?.let { SecuredImageRef(it) },
-        templateQualityScore = qualityScore
+        templateQualityScore = templateQualityScore
     )
 
 fun FingerprintSample.fromDomainToDb(): DbFingerprintSample =
     DbFingerprintSample(
         id,
-        fingerIdentifier.name,
+        fingerIdentifier.ordinal,
         template,
-        imageRef?.uri,
-        templateQualityScore
+        templateQualityScore,
+        imageRef?.uri
     )
