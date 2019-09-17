@@ -3,6 +3,7 @@ package com.simprints.id.testtools.di
 import com.simprints.id.Application
 import com.simprints.id.activities.alert.AlertActivityTest
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivityTest
+import com.simprints.id.activities.consent.ConsentActivityTest
 import com.simprints.id.activities.dashboard.DashboardCardsFactoryTest
 import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.activities.login.LoginActivityTest
@@ -54,4 +55,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
+    fun inject(consentActivityTest: ConsentActivityTest)
 }
