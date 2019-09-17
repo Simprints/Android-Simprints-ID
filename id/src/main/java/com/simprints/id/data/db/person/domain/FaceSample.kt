@@ -12,5 +12,7 @@ open class FaceSample(
     open val imageRef: SecuredImageRef?) : Parcelable {
 
     @IgnoredOnParcel
-    open val id: String = UUID.nameUUIDFromBytes(template).toString()
+    open val id: String by lazy {
+        UUID.nameUUIDFromBytes(template).toString()
+    }
 }

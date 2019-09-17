@@ -14,5 +14,7 @@ open class FingerprintSample(
     open val imageRef: SecuredImageRef? = null) : Parcelable {
 
     @IgnoredOnParcel
-    open val id: String = UUID.nameUUIDFromBytes(template).toString()
+    open val id: String by lazy {
+        UUID.nameUUIDFromBytes(template).toString()
+    }
 }
