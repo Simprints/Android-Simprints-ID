@@ -37,13 +37,13 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Step? {
-        super.processResult(data)
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceEnrolProcessor.processResult(requestCode, resultCode, data)
             else -> throw IllegalStateException("Invalid result from intent")
         }
+        completeAllStepsIfExitFormHappened(data)
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         return stepForRequest?.also { it.result = result }

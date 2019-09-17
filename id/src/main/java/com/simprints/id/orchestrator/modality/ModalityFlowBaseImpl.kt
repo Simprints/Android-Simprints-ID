@@ -33,7 +33,7 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private fun buildVerifyCoreStep() =
         coreStepProcessor.buildStepVerify()
 
-    fun processResult(data: Intent?) =
+    fun completeAllStepsIfExitFormHappened(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
             if (coreResult is CoreExitFormResponse) {
                 steps.forEach { it.setStatus(Step.Status.COMPLETED)  }
