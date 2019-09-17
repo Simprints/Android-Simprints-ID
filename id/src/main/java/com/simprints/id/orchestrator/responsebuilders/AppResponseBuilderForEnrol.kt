@@ -38,10 +38,10 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
-        results.firstOrNull { it is FaceCaptureResponse } as FaceCaptureResponse?
+        results.filterIsInstance(FaceCaptureResponse::class.java).lastOrNull()
 
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
-        results.firstOrNull { it is FingerprintEnrolResponse } as FingerprintEnrolResponse
+        results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
 
     private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FingerprintEnrolResponse,
                                                            faceResponse: FaceCaptureResponse) =
