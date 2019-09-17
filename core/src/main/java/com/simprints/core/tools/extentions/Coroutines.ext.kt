@@ -1,5 +1,6 @@
-package com.simprints.core.tools.coroutines
+package com.simprints.core.tools.extentions
 
+import com.simprints.core.tools.coroutines.EspressoIdlingResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job

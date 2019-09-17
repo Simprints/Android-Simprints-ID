@@ -38,10 +38,10 @@ class AppResponseBuilderForIdentify : AppResponseBuilder, BaseAppResponseBuilder
     }
 
     private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceIdentifyResponse? =
-        results.firstOrNull { it is FaceIdentifyResponse } as FaceIdentifyResponse
+        results.filterIsInstance(FaceIdentifyResponse::class.java).lastOrNull()
 
     private fun getFingerprintResponseForIdentify(results: List<Step.Result?>): FingerprintIdentifyResponse? =
-        results.firstOrNull { it is FingerprintIdentifyResponse } as FingerprintIdentifyResponse
+        results.filterIsInstance(FingerprintIdentifyResponse::class.java).lastOrNull()
 
     private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceIdentifyResponse,
                                                          fingerprintResponse: FingerprintIdentifyResponse,
