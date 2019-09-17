@@ -1,7 +1,7 @@
 package com.simprints.id.activities.dashboard
 
 import com.simprints.core.tools.AndroidResourcesHelper
-import com.simprints.core.tools.coroutines.singleWithSuspend
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
