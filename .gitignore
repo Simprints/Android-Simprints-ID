@@ -71,4 +71,4 @@ fastlane/
 lint/
 
 id/src/androidTest/assets/realm
-~id/src/androidTest/assets/realm/db_v6.realm
+!id/src/androidTest/assets/realm/db_v6.realm
