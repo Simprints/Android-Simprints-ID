@@ -39,7 +39,7 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         val result = when {
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceEnrolProcessor.processResult(requestCode, resultCode, data)
-            else -> super.processResult(resultCode = resultCode, data = data)
+            else -> super.processResult(data = data)
         }
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
