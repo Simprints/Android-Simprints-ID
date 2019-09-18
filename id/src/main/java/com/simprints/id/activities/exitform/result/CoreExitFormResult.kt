@@ -16,7 +16,7 @@ class CoreExitFormResult(val action: Action, val answer: Answer) : Parcelable {
 
     companion object {
         const val BUNDLE_KEY = "ExitActResultBundleKey"
-        const val EXIT_FORM_RESULT_CODE_SUBMIT = 201
-        const val EXIT_FORM_RESULT_CODE_GO_BACK = 202
+        const val CORE_EXIT_FORM_RESULT_CODE_SUBMIT = 201
+        const val CORE_EXIT_FORM_RESULT_CODE_GO_BACK = 202
     }
 }

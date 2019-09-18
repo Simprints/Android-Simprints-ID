@@ -6,6 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class FingerprintExitFormResult(val action: Action, val answer: Answer) : Parcelable {
+
     @Parcelize
     class Answer(val reason: FingerprintExitFormReason = FingerprintExitFormReason.OTHER,
                  val optionalText: String = "") : Parcelable

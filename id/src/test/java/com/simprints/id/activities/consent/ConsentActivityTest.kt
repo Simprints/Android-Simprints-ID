@@ -13,6 +13,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -95,6 +96,6 @@ class ConsentActivityTest {
     private fun createRoboConsentActivity(intent: Intent) = createActivity<ConsentActivity>(intent)
 
     private fun getIntentForConsentAct() = Intent().apply {
-        putExtra(AskConsentRequest.CONSENT_STEP_BUNDLE, AskConsentRequest(ConsentType.ENROL))
+        putExtra(CORE_STEP_BUNDLE, AskConsentRequest(ConsentType.ENROL))
     }
 }

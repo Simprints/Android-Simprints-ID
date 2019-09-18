@@ -2,8 +2,6 @@ package com.simprints.id.activities.faceexitform
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +15,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
+import com.simprints.id.tools.extensions.showToast
+import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
 import org.jetbrains.anko.inputMethodManager
 import javax.inject.Inject
@@ -27,15 +27,8 @@ class FaceExitFormActivity : AppCompatActivity() {
 
     @Inject lateinit var crashReportManager: CrashReportManager
 
-    private val textWatcher = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(exitFormTextCharSequence: CharSequence, start: Int, before: Int, count: Int) {
-            handleTextChangedInExitForm(exitFormTextCharSequence.toString())
-        }
-
-        override fun afterTextChanged(s: Editable) {
-        }
+    private val textWatcher = textWatcherOnChange {
+        handleTextChangedInExitForm(it)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,6 +122,7 @@ class FaceExitFormActivity : AppCompatActivity() {
         faceExitFormText.addTextChangedListener(textWatcher)
     }
 
+    //STOPSHIP: Go Back and Submit functionalities are flipped
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
         setResultAndFinish(FACE_EXIT_FORM_RESULT_CODE_GO_BACK, FaceExitFormResult.Action.GO_BACK)
     }
@@ -147,6 +141,15 @@ class FaceExitFormActivity : AppCompatActivity() {
 
     private fun buildExitFormResult(exitFormAction: FaceExitFormResult.Action) =
         FaceExitFormResult(exitFormAction, FaceExitFormResult.Answer(faceExitFormReason, getExitFormText()))
+
+
+    override fun onBackPressed() {
+        if (faceBtSubmitExitForm.isEnabled) {
+            showToast(R.string.refusal_toast_submit)
+        } else {
+            showToast(R.string.refusal_toast_select_option_submit)
+        }
+    }
 
     private fun logRadioOptionForCrashReport(option: String) {
         logMessageForCrashReport("Radio option $option clicked")
