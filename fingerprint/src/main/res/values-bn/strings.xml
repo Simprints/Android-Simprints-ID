@@ -4,8 +4,8 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="register_title">\" তালিকাভুক্ত করণ\"</string>
-    <string name="identify_title">\" সনাক্তকরণ\"</string>
+    <string name="register_title">তালিকাভুক্ত করণ</string>
+    <string name="identify_title">সনাক্তকরণ</string>
     <string name="update_title">হালনাগাদ</string>
     <string name="verify_title">যাচাই করুন</string>
     <string name="help_title">সাহায্য</string>
@@ -192,9 +192,9 @@
         <b><u>Development Worker Consent</u></b>\n\n
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
     </string>
-    <string name="bluetooth_error_pair_scanner_and_device_message">\"১। স্ক্যানার চালু আছে কিনা চেক করুন। ২। \"\"সেটিংস\"\" চাপুন। ৩। সংযুক্ত স্ক্যানার অসংযুক্ত করুন। ৪। স্ক্যানার এবং ট্যাব সংযুক্ত করুন। ৫। \"\"সিমপ্রিন্টস এ ফেরত যান\"\" চাপুন।\"</string>
+    <string name="bluetooth_error_pair_scanner_and_device_message">১। স্ক্যানার চালু আছে কিনা চেক করুন। ২। \"সেটিংস\" চাপুন। ৩। সংযুক্ত স্ক্যানার অসংযুক্ত করুন। ৪। স্ক্যানার এবং ট্যাব সংযুক্ত করুন। ৫। \"সিমপ্রিন্টস এ ফেরত যান\" চাপুন।</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">স্ক্যানার এবং ট্যাব সংযুক্ত করুন</string>
-    <string name="confirm">\" নিশ্চিত করুন\"</string>
+    <string name="confirm">নিশ্চিত করুন</string>
     <string name="confirm_fingers_dialog_title">আঙ্গুলের ছাপ নেয়া সম্পন্ন হয়েছে</string>
     <string name="consent_confirmation">আমি কি আপনার আঙ্গুলের ছাপ ব্যবহার করতে পারি? অনুগ্রহ করে বলুন- \"আমি অনুমতি দিচ্ছি\", \" আমি প্রত্যাখ্যান করছি\" অথবা \"আমার প্রশ্ন আছে\"।</string>
     <string name="consent_enrol">আমি আপনাার আঙ্গুলের ছাপ ব্যবহার করে আপনাকে এসেনশিয়াল হেল্‌থ কেয়ার প্রোগ্রাম এ নিবন্ধন করতে চাই এবং ভবিষ্যতে তা দিয়ে আপনাকে সনাক্ত করতে চাই।</string>
@@ -205,9 +205,9 @@
     <string name="consent_share_data_yes">%1$s ব্র্যাক এবং সিমপ্রিন্টস (একটি যুক্তরাজ্য ভিত্তিক অলাভজনক প্রতিষ্ঠান) আপনার আঙ্গুলের ছাপ সম্পর্কিত তথ্য ও আপনার বর্তমান ঠিকানা সংগ্রহ করতে পারবে।</string>
     <string name="finger_skipped_message">আঙ্গুুলের ছাপ নেয়া হয়নি</string>
     <string name="get_ready">প্রস্তুত হোন</string>
-    <string name="launch_consent_accept_button">\" গ্রহণ করুন\"</string>
-    <string name="launch_consent_decline_button">\" প্রত্যাখ্যান করুন\"</string>
-    <string name="loading_candidates">"অংশগ্রহণকারীদের তথ্য লোড হচ্ছে "</string>
+    <string name="launch_consent_accept_button">গ্রহণ করুন</string>
+    <string name="launch_consent_decline_button"> প্রত্যাখ্যান করুন</string>
+    <string name="loading_candidates">অংশগ্রহণকারীদের তথ্য লোড হচ্ছে</string>
     <string name="matching_fingerprints">আঙ্গুলের ছাপ মেলানো হচ্ছে</string>
     <string name="missing_finger"><u>আঙুল অনুপস্থিত</u></string>
     <string name="no_finger_detected_message">আঙ্গুল সনাক্ত করা যাচ্ছেনা</string>
@@ -226,7 +226,7 @@
     <string name="returning_results">ফলাফল আসছে</string>
     <string name="scanner_confirmation_no">না</string>
     <string name="scanner_confirmation_yes">হ্যা</string>
-    <string name="scanner_error_turn_scanner_on_message">\"১। স্ক্যানার চালু করুন। ২। \"\"আবার চেষ্টা করুন\"\" চাপুন। \"</string>
+    <string name="scanner_error_turn_scanner_on_message">১। স্ক্যানার চালু করুন। ২। \"আবার চেষ্টা করুন\" চাপুন।</string>
     <string name="scanner_id_comfirmation_message">%1$s কি আপনার স্ক্যানার?</string>
     <string name="scanner_error_turn_scanner_on_title">স্ক্যানার চালু করুন</string>
     <string name="title_fingerprint">আঙ্গুলের ছাপ</string>
