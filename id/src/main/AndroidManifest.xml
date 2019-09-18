@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
     <application
         android:name=".Application"
         android:allowBackup="false"
@@ -19,6 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity
+            android:name=".activities.exitform.CoreExitFormActivity"
+            android:label="@string/title_activity_exit_form"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.consent.ConsentActivity" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"

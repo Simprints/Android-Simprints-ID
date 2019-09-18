@@ -22,7 +22,7 @@ internal class ParcelableConverter {
 
     fun toBytes(): ByteArray = parcel.marshall()
 
-    fun getParcel(): Parcel = parcel.apply {
+    fun toParcel(): Parcel = parcel.apply {
         setDataPosition(0)
     }
 
