@@ -1,13 +1,14 @@
 package com.simprints.id.data.db.common
 
-import com.auth0.jwt.JWT
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
+import com.simprints.id.secure.JwtTokenHelper.Companion.extractAsJson
 import io.reactivex.Completable
 import io.reactivex.Single
 import timber.log.Timber
+
 
 open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteDbManager {
 
@@ -48,9 +49,9 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     }
 
     private fun cacheTokenClaims(token: String) {
-        val claims = JWT.decode(token).claims
-        loginInfoManager.projectIdTokenClaim = claims[projectIdClaim]?.asString()
-        loginInfoManager.userIdTokenClaim = claims[userIdClaim]?.asString()
+        val tokenPayloadJson = extractAsJson(token)
+        loginInfoManager.projectIdTokenClaim = tokenPayloadJson?.getString(TOKEN_PROJECT_ID_CLAIM)
+        loginInfoManager.userIdTokenClaim = tokenPayloadJson?.getString(TOKEN_USER_ID_CLAIM)
     }
 
     private fun clearCachedTokenClaims() {
@@ -58,8 +59,9 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     }
 
     companion object {
-        private const val projectIdClaim = "projectId"
-        private const val userIdClaim = "userId"
+        private const val TOKEN_PROJECT_ID_CLAIM = "projectId"
+        private const val TOKEN_USER_ID_CLAIM = "userId"
+
         const val RETRY_ATTEMPTS_FOR_NETWORK_CALLS = 5L
     }
 }
