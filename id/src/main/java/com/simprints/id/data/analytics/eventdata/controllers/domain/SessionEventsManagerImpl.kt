@@ -8,7 +8,7 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.session.*
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.Person
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent

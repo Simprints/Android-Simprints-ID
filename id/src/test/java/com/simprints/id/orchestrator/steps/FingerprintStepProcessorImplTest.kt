@@ -25,14 +25,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 @RunWith(AndroidJUnit4::class)
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
-    @Mock lateinit var preferencesManagerMock: PreferencesManager
-    @Mock lateinit var converterModuleApiToDomainMock: ModuleApiToDomainFingerprintResponse
+    private lateinit var preferencesManagerMock: PreferencesManager
+    private lateinit var converterModuleApiToDomainMock: ModuleApiToDomainFingerprintResponse
 
     private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
@@ -43,7 +41,9 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        preferencesManagerMock = mock()
+        converterModuleApiToDomainMock = mock()
+
         with(preferencesManagerMock) {
             whenever(language) thenReturn "en"
             whenever(fingerStatus) thenReturn emptyMap()

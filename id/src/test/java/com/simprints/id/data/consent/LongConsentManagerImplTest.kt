@@ -3,12 +3,11 @@ package com.simprints.id.data.consent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.local.LocalDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.spy
 import com.simprints.testtools.common.syntax.whenever
@@ -26,13 +25,11 @@ class LongConsentManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
-    @Inject lateinit var localDbManagerMock: LocalDbManager
     @Inject lateinit var loginInfoManagerMock: LoginInfoManager
 
     private val module by lazy {
         TestAppModule(
             app,
-            localDbManagerRule = DependencyRule.MockRule,
             loginInfoManagerRule = DependencyRule.MockRule
         )
     }

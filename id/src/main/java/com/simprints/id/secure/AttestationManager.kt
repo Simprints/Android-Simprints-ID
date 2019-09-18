@@ -14,7 +14,7 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
 
-class AttestationManager {
+open class AttestationManager {
 
     fun requestAttestation(safetyNetClient: SafetyNetClient, nonce: Nonce): Single<AttestToken> {
         return Single.fromCallable<AttestToken> {

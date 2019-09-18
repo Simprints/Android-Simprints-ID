@@ -30,7 +30,7 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -51,7 +51,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
 @Singleton
 interface AppComponent {
 
@@ -61,6 +61,7 @@ interface AppComponent {
         fun application(app: Application): Builder
 
         fun appModule(appModule: AppModule): Builder
+        fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
@@ -106,11 +107,10 @@ interface AppComponent {
     fun inject(coreExitFormActivity: CoreExitFormActivity)
     fun inject(orchestratorActivity: OrchestratorActivity)
 
-
-    fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
+    fun getPersonRepository(): PersonRepository
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getSimNetworkUtils(): SimNetworkUtils

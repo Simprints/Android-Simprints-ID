@@ -7,17 +7,18 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SEC
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
+import com.simprints.id.data.db.project.domain.Project
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.secure.SecureDataManagerImpl
-import com.simprints.id.domain.Project
-import com.simprints.id.secure.cryptography.Hasher
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.whenever
+import com.simprints.testtools.common.syntax.wheneverOnSuspend
 import io.reactivex.Completable
 import io.reactivex.Single
 import okhttp3.mockwebserver.MockWebServer
@@ -28,13 +29,15 @@ object RobolectricTestMocker {
 
     const val SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID = "SHARED_PREFS_FOR_MOCK_FIREBASE_TOKEN_VALID"
 
-    fun mockLoadProject(localDbManagerMock: LocalDbManager, remoteProjectManagerMock: RemoteProjectManager): RobolectricTestMocker {
+    suspend fun mockLoadProject(projectRemoteDataSource: ProjectRemoteDataSource,
+                                projectLocalDataSource: ProjectLocalDataSource): RobolectricTestMocker {
+
         val project = Project().apply { id = "project id"; name = "project name"; description = "project desc" }
         val projectSettings: JsonObject = JsonObject().apply { addProperty("key", "value") }
-        whenever { localDbManagerMock.loadProjectFromLocal(anyNotNull()) } thenReturn Single.just(project)
-        whenever { remoteProjectManagerMock.loadProjectFromRemote(anyNotNull()) } thenReturn Single.just(project)
-        whenever { localDbManagerMock.saveProjectIntoLocal(anyNotNull()) } thenReturn Completable.complete()
-        whenever { remoteProjectManagerMock.loadProjectRemoteConfigSettingsJsonString(anyNotNull()) } thenReturn Single.just(projectSettings)
+        wheneverOnSuspend(projectLocalDataSource) { load(anyNotNull()) } thenOnBlockingReturn project
+        wheneverOnSuspend(projectRemoteDataSource) { loadProjectFromRemote(anyNotNull()) } thenOnBlockingReturn Single.just(project)
+        wheneverOnSuspend(projectLocalDataSource) { save(anyNotNull()) } thenOnBlockingReturn Unit
+        wheneverOnSuspend(projectRemoteDataSource) { loadProjectRemoteConfigSettingsJsonString(anyNotNull()) } thenOnBlockingReturn Single.just(projectSettings)
         return this
     }
 
@@ -46,7 +49,7 @@ object RobolectricTestMocker {
         }
         whenever { remoteDbManagerMock.isSignedIn(anyNotNull(), anyNotNull()) } thenAnswer answer
         whenever { remoteDbManagerMock.getCurrentToken() } thenReturn Single.just("")
-        whenever { remoteDbManagerMock.signInToRemoteDb(anyNotNull()) } thenReturn Completable.complete()
+        whenever { remoteDbManagerMock.signIn(anyNotNull()) } thenReturn Completable.complete()
         return this
     }
 
@@ -68,15 +71,15 @@ object RobolectricTestMocker {
         return this
     }
 
-    fun setupLocalAndRemoteManagersForApiTesting(localDbManagerSpy: LocalDbManager,
+    fun setupLocalAndRemoteManagersForApiTesting(personRepository: PersonRepository,
                                                  remoteDbManagerSpy: RemoteDbManager,
                                                  sessionEventsLocalDbManagerMock: SessionEventsLocalDbManager,
                                                  mockServer: MockWebServer? = null): RobolectricTestMocker {
 
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
-        whenever { localDbManagerSpy.insertOrUpdatePersonInLocal(anyNotNull()) } thenReturn Completable.complete()
-        whenever { localDbManagerSpy.loadPersonFromLocal(anyNotNull()) } thenReturn Single.error(IllegalStateException())
-        whenever { localDbManagerSpy.getPeopleCountFromLocal(anyOrNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
+        wheneverOnSuspend(personRepository) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
+        wheneverOnSuspend(personRepository) { load(anyNotNull()) } thenOnBlockingThrow IllegalStateException::class.java
+        wheneverOnSuspend(personRepository) { localCountForSyncScope(anyNotNull()) } thenOnBlockingReturn Single.error(IllegalStateException())
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 
