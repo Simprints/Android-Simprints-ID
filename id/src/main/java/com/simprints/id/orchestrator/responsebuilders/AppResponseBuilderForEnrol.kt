@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
@@ -22,6 +23,14 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
         val results = steps.map { it.result }
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
+
+        val isFingerprintAndFace = fingerprintResponse != null && faceResponse != null
+        val isFingerprintOnly = fingerprintResponse != null
+        val isFaceOnly = faceResponse != null
+
+        val person: Person = buildPerson(fingerprintResponse, faceResponse)
+
+        return buildAppEnrolResponse(person)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -51,6 +60,8 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
         AppEnrolResponse(fingerprintResponse.guid)
 
     private fun buildAppEnrolResponseForFace(faceResponse: FaceCaptureResponse): AppEnrolResponse {
-        TODO("Not implemented yet")
+        val person = buildPerson(faceResponse)
+        repo.saveAndUpload(person)
+        AppEnrolResponse(person.patientId)
     }
 }
