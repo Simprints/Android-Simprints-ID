@@ -65,7 +65,6 @@ class SubDownSyncTaskTest {
     private lateinit var remotePeopleApi: PeopleRemoteInterface
 
     @Inject lateinit var syncScopeBuilderSpy: SyncScopesBuilder
-    @Inject lateinit var projectLocalDataSourceMock: ProjectLocalDataSource
 
     private val remoteDbManagerSpy: RemoteDbManager = spy(FirebaseManagerImpl(mock()))
     private val personRemoteDataSourceSpy: PersonRemoteDataSource = spy()
