@@ -4,7 +4,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.unexpected.RemoteDbNotSignedInException
-import com.simprints.id.secure.JwtTokenHelper.Companion.extractAsJson
+import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import io.reactivex.Completable
 import io.reactivex.Single
 import timber.log.Timber
@@ -49,9 +49,15 @@ open class FirebaseManagerImpl(val loginInfoManager: LoginInfoManager) : RemoteD
     }
 
     private fun cacheTokenClaims(token: String) {
-        val tokenPayloadJson = extractAsJson(token)
-        loginInfoManager.projectIdTokenClaim = tokenPayloadJson?.getString(TOKEN_PROJECT_ID_CLAIM)
-        loginInfoManager.userIdTokenClaim = tokenPayloadJson?.getString(TOKEN_USER_ID_CLAIM)
+        extractTokenPayloadAsJson(token)?.let {
+            if (it.has(TOKEN_PROJECT_ID_CLAIM)) {
+                loginInfoManager.projectIdTokenClaim = it.getString(TOKEN_PROJECT_ID_CLAIM)
+            }
+
+            if (it.has(TOKEN_USER_ID_CLAIM)) {
+                loginInfoManager.userIdTokenClaim = it.getString(TOKEN_USER_ID_CLAIM)
+            }
+        }
     }
 
     private fun clearCachedTokenClaims() {
