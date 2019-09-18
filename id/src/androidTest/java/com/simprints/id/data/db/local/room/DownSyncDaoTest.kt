@@ -4,6 +4,10 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import org.junit.After
 import org.junit.Assert.assertNull
 import org.junit.Before

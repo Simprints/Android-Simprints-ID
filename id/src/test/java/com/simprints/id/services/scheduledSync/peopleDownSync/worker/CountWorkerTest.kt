@@ -6,10 +6,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -18,6 +18,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorke
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker.Companion.COUNT_WORKER_SCOPE_INPUT
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
+import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
@@ -51,15 +52,19 @@ class CountWorkerTest {
 
     private val module by lazy {
         TestAppModule(app,
-            localDbManagerRule = DependencyRule.MockRule,
             crashReportManagerRule = DependencyRule.MockRule,
             countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
         )
     }
 
+    private val dataModule by lazy {
+        TestDataModule(projectLocalDataSourceRule = DependencyRule.MockRule)
+    }
+
+
     @Before
     fun setUp() {
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
 
         MockitoAnnotations.initMocks(this)
         countWorker = CountWorker(context, workParams)

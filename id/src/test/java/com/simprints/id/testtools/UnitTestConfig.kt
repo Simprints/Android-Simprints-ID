@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.firebase.FirebaseApp
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
@@ -17,12 +18,12 @@ import io.fabric.sdk.android.Fabric
 class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
-    private val preferencesModule: TestPreferencesModule? = null
+    private val preferencesModule: TestPreferencesModule? = null,
+    private val dataModule: TestDataModule? = null
 ): BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
-            localDbManagerRule = DependencyRule.MockRule,
             sessionEventsLocalDbManagerRule = DependencyRule.MockRule)
     }
 
@@ -73,6 +74,7 @@ class UnitTestConfig<T : Any>(
             .application(app)
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
+            .dataModule(dataModule ?: TestDataModule())
             .build()
 
         app.component = testAppComponent

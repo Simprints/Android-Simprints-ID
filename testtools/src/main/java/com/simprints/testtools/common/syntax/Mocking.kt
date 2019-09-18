@@ -46,6 +46,17 @@ class InfixStubberOnSuspend<T : Any, R>(private val obj: T, private val methodCa
         obj.stub {
             this.onBlocking(methodCall).thenReturn(value)
         }
+
+    infix fun <T : Exception> thenOnBlockingThrow(e: Class<T>) =
+        obj.stub {
+            this.onBlocking(methodCall).thenThrow(e)
+        }
+
+    infix fun thenOnBlockingAnswer(answer: Answer<*>) =
+        obj.stub {
+            this.onBlocking(methodCall).thenAnswer(answer)
+        }
+
 }
 
 /**

@@ -3,7 +3,7 @@ package com.simprints.id.di
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher

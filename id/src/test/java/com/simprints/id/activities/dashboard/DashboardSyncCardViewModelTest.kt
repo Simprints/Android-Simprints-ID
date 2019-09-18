@@ -8,20 +8,19 @@ import com.google.common.truth.Truth
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
-import com.simprints.testtools.common.di.DependencyRule.MockRule
-import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.id.commontesttools.di.TestAppModule
+import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.local.room.UpSyncStatus
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.domain.PeopleCount
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.domain.PeopleCount
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -30,11 +29,15 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
 import com.simprints.id.tools.TimeHelper
+import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule.MockRule
+import com.simprints.testtools.common.di.DependencyRule.SpyRule
 import com.simprints.testtools.common.livedata.testObserver
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.testtools.unit.robolectric.getSharedPreferences
 import io.reactivex.Single
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,11 +56,12 @@ class DashboardSyncCardViewModelTest {
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
-    @Inject lateinit var remoteProjectManagerMock: RemoteProjectManager
-    @Inject lateinit var localDbManagerMock: LocalDbManager
+    private var remoteDbManagerMock: RemoteDbManager = mock()
+    private var projectRepositoryMock: ProjectRepository = mock()
+    private var personRepositoryMock: PersonRepository = mock()
+    private var localDataSourceMock: PersonLocalDataSource = mock()
+
     @Inject lateinit var preferencesManagerSpy: PreferencesManager
-    @Inject lateinit var dbManagerMock: DbManager
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
     @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
     @Inject lateinit var timeHelper: TimeHelper
@@ -75,25 +79,33 @@ class DashboardSyncCardViewModelTest {
         )
     }
 
+    private val dataModule by lazy {
+        TestDataModule(
+            projectRepositoryRule = DependencyRule.ReplaceRule { projectRepositoryMock },
+            personLocalDataSource = DependencyRule.ReplaceRule { localDataSourceMock },
+            personRepositoryRule = DependencyRule.ReplaceRule { personRepositoryMock }
+        )
+    }
+
     private val module by lazy {
         TestAppModule(app,
             dbManagerRule = MockRule,
-            remoteDbManagerRule = MockRule,
-            remoteProjectManagerRule = MockRule,
-            localDbManagerRule = MockRule,
+            remoteDbManagerRule = DependencyRule.ReplaceRule { remoteDbManagerMock },
             downSyncManagerRule = MockRule)
     }
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, preferencesModule).fullSetup()
+        UnitTestConfig(this, module, preferencesModule, dataModule).fullSetup()
 
         val sharedPref = getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME)
 
-        RobolectricTestMocker
-            .initLogInStateMock(sharedPref, remoteDbManagerMock)
-            .setUserLogInState(true, sharedPref)
-            .mockLoadProject(localDbManagerMock, remoteProjectManagerMock)
+        runBlocking {
+            RobolectricTestMocker
+                .initLogInStateMock(sharedPref, remoteDbManagerMock)
+                .setUserLogInState(true, sharedPref)
+                .mockLoadProject(projectRepositoryMock, projectRepositoryMock)
+        }
 
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to true))
     }
@@ -111,7 +123,7 @@ class DashboardSyncCardViewModelTest {
         Truth.assert_().that(lastState?.peopleInDb).isEqualTo(1)
         Truth.assert_().that(lastState?.peopleToUpload).isEqualTo(2)
         Truth.assert_().that(lastState?.peopleToDownload).isEqualTo(3)
-        verifyOnce(dbManagerMock) { getPeopleCountToDownSync(anyNotNull()) }
+        verifyOnce(personRepositoryMock) { localCountForSyncScope(anyNotNull()) }
     }
 
     @Test
@@ -227,7 +239,8 @@ class DashboardSyncCardViewModelTest {
 
     @Test
     fun manualTriggerIsOff_shouldNotShowTheSyncButton() {
-        mockCounters(getMockListOfPeopleCountWithCounter(1), 2,
+        mockCounters(
+            getMockListOfPeopleCountWithCounter(1), 2,
             getMockListOfPeopleCountWithCounter(3))
         whenever(preferencesManagerSpy.peopleDownSyncTriggers).thenReturn(mapOf(PeopleDownSyncTrigger.MANUAL to false))
         insertASyncWorkInfoEvent(SyncState.NOT_RUNNING)
@@ -255,20 +268,20 @@ class DashboardSyncCardViewModelTest {
 
     private fun mockCounters(peopleInDb: List<PeopleCount>? = null, peopleToUpload: Int? = null, peopleToDownload: List<PeopleCount>? = null) {
         peopleToUpload?.let {
-            whenever(localDbManagerMock.getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(Single.just(peopleToUpload))
+            wheneverOnSuspend(localDataSourceMock) { count(anyNotNull()) } thenOnBlockingReturn (it)
         }
 
         peopleInDb?.let {
-            whenever(dbManagerMock.getPeopleCountFromLocalForSyncScope(anyNotNull())).thenReturn(Single.just(peopleInDb))
+            whenever(personRepositoryMock) { localCountForSyncScope(anyNotNull()) } thenReturn Single.just(it)
         }
 
         peopleToDownload?.let {
-            whenever(dbManagerMock.getPeopleCountToDownSync(anyNotNull())).thenReturn(Single.just(peopleToDownload))
+            whenever(personRepositoryMock) { countToDownSync(anyNotNull()) } thenReturn Single.just(it)
         }
     }
 
-    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+    private fun getMockListOfPeopleCountWithCounter(countOfPeople: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), countOfPeople))
 
     private fun createViewModelDashboardToTest() =
         DashboardSyncCardViewModel(
@@ -294,15 +307,14 @@ class DashboardSyncCardViewModelTest {
     }
 
     private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {
-        verifyExactly(requiredCallsToInitTotalCounter, localDbManagerMock) { getPeopleCountFromLocal(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull()) }
+        verifyExactly(requiredCallsToInitTotalCounter, localDataSourceMock) { count(anyNotNull()) }
     }
 
     private fun verifyCalculateNPatientsToDownSyncWasCalled(times: Int) {
-        verifyExactly(times, dbManagerMock) { getPeopleCountToDownSync(anyNotNull()) }
-
+        verifyExactly(times, personRepositoryMock) { countToDownSync(anyNotNull()) }
     }
 
     private fun verifyGetPeopleCountFromLocalForSyncScopeWasCalled(requiredCallToInitAndUpdateUpSyncCounter: Int) {
-        verifyExactly(requiredCallToInitAndUpdateUpSyncCounter, dbManagerMock) { getPeopleCountFromLocalForSyncScope(anyNotNull()) }
+        verifyExactly(requiredCallToInitAndUpdateUpSyncCounter, personRepositoryMock) { localCountForSyncScope(anyNotNull()) }
     }
 }
