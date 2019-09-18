@@ -6,4 +6,4 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class FaceExitFormResponse(val reason: FaceExitFormReason = FaceExitFormReason.OTHER,
-                           val optionalText: String = "") : Parcelable, CoreResponse
+                           val optionalText: String = "") : Parcelable, CoreResponse(CoreResponseType.FACE_EXIT_FORM)

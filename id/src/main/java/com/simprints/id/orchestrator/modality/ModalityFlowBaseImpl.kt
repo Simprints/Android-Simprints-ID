@@ -6,6 +6,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.FaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
@@ -33,10 +34,15 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private fun buildVerifyCoreStep() =
         coreStepProcessor.buildStepVerify()
 
-    fun processResult(resultCode: Int, data: Intent?) =
-        coreStepProcessor.processResult(resultCode, data).also { coreResult ->
-            if (coreResult is CoreExitFormResponse || coreResult is FingerprintExitFormResponse) {
-                steps.map { it.setStatus(Step.Status.COMPLETED)  }
+    fun completeAllStepsIfExitFormHappened(data: Intent?) =
+        coreStepProcessor.processResult(data).also { coreResult ->
+            if (isExitFormResponse(coreResult)) {
+                steps.forEach { it.setStatus(Step.Status.COMPLETED)  }
             }
         }
+
+    private fun isExitFormResponse(coreResult: Step.Result?) =
+        coreResult is CoreExitFormResponse ||
+            coreResult is FingerprintExitFormResponse ||
+            coreResult is FaceExitFormResponse
 }

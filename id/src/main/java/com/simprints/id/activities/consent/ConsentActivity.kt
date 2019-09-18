@@ -29,8 +29,8 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEve
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.*
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
@@ -59,7 +59,7 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        askConsentRequestReceived = intent.extras?.getParcelable(CONSENT_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
@@ -119,7 +119,7 @@ class ConsentActivity : AppCompatActivity() {
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
         setResult(CoreResponseCode.CONSENT.value, Intent().apply {
-            putExtra(CONSENT_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
+            putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
         finish()
     }
@@ -190,26 +190,26 @@ class ConsentActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildExitFormResponse(data: Intent?) = Intent().apply {
+    private fun buildCoreExitFormResponse(data: Intent?) = Intent().apply {
         data?.getParcelableExtra<CoreExitFormResult>(BUNDLE_KEY)?.let {
-            putExtra(CONSENT_STEP_BUNDLE, CoreExitFormResponse(it.answer.reason, it.answer.optionalText))
+            putExtra(CORE_STEP_BUNDLE, CoreExitFormResponse(it.answer.reason, it.answer.optionalText))
         }
     }
 
     private fun buildFingerprintExitFormResponse(data: Intent?) = Intent().apply {
         data?.getParcelableExtra<FingerprintExitFormResult>(FINGERPRINT_EXIT_FORM_BUNDLE_KEY)?.let {
-            putExtra(CONSENT_STEP_BUNDLE, FingerprintExitFormResponse(it.answer.reason, it.answer.optionalText))
+            putExtra(CORE_STEP_BUNDLE, FingerprintExitFormResponse(it.answer.reason, it.answer.optionalText))
         }
     }
 
     private fun buildFaceExitFormResponse(data: Intent?) = Intent().apply {
         data?.getParcelableExtra<FaceExitFormResult>(FACE_EXIT_FORM_BUNDLE_KEY)?.let {
-            putExtra(CONSENT_STEP_BUNDLE, FaceExitFormResponse(it.answer.reason, it.answer.optionalText))
+            putExtra(CORE_STEP_BUNDLE, FaceExitFormResponse(it.answer.reason, it.answer.optionalText))
         }
     }
 
     private fun setResultAndFinish(resultCode: Int, data: Intent?) {
-        setResult(resultCode, buildExitFormResponse(data))
+        setResult(resultCode, buildCoreExitFormResponse(data))
         finish()
     }
 

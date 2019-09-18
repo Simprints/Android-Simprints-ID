@@ -6,4 +6,4 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class FingerprintExitFormResponse(val reason: FingerprintExitFormReason = FingerprintExitFormReason.OTHER,
-                                  val optionalText: String = "") : Parcelable, CoreResponse
+                                  val optionalText: String = "") : Parcelable, CoreResponse(CoreResponseType.FINGERPRINT_EXIT_FORM)
