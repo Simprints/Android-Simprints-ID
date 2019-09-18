@@ -7,6 +7,7 @@ import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
+import com.simprints.id.activities.exitform.CoreExitFormViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -278,5 +279,9 @@ open class AppModule {
                                             sessionEventsManager: SessionEventsManager,
                                             timeHelper: TimeHelper) =
         ConsentViewModelFactory(consentTextManager, sessionEventsManager)
+
+    @Provides
+    open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
+        CoreExitFormViewModelFactory(sessionEventsManager)
 }
 
