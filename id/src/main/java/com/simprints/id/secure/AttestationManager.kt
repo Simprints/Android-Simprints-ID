@@ -9,7 +9,7 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
-import com.simprints.id.secure.JwtTokenHelper.Companion.extractAsJson
+import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
@@ -37,7 +37,7 @@ open class AttestationManager {
     }
 
     private fun checkForErrorClaimAndThrow(safetyNetResponse: SafetyNetApi.AttestationResponse) {
-        extractAsJson(safetyNetResponse.jwsResult)?.let {
+        extractTokenPayloadAsJson(safetyNetResponse.jwsResult)?.let {
             if (it.has(SAFETYNET_TOKEN_ERROR_FILED)) {
                 throw SafetyNetException(reason = INVALID_CLAIMS)
             }

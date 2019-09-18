@@ -6,7 +6,7 @@ import org.json.JSONObject
 class JwtTokenHelper {
 
     companion object {
-        fun extractAsJson(jwtToken: String): JSONObject? {
+        fun extractTokenPayloadAsJson(jwtToken: String): JSONObject? {
             //the JWT (JSON WEB TOKEN) is just a 3 base64 encoded parts concatenated by a . character
             val jwtParts = extractingJWTParts(jwtToken)
 
