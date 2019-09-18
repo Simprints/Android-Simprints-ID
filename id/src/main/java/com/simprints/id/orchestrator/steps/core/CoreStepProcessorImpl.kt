@@ -2,13 +2,10 @@ package com.simprints.id.orchestrator.steps.core
 
 import android.content.Intent
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
-import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.FaceExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.*
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.VERIFICATION_CHECK
@@ -27,22 +24,22 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         buildVerifyStep()
 
     private fun buildConsentStep(consentType: ConsentType) =
-        Step(CONSENT.value, CORE_ACTIVITY_NAME, CONSENT_STEP_BUNDLE,
+        Step(CONSENT.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
             AskConsentRequest(consentType), status = Step.Status.NOT_STARTED)
 
     //STOPSHIP: Will be done in the story for adding verification step. Building
     private fun buildVerifyStep() =
-        Step(VERIFICATION_CHECK.value, CORE_ACTIVITY_NAME, CONSENT_STEP_BUNDLE,
+        Step(VERIFICATION_CHECK.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
             FetchGUIDRequest(), status = Step.Status.NOT_STARTED)
 
-    override fun processResult(resultCode: Int, data: Intent?): Step.Result? =
-        when (resultCode) {
-            CoreResponseCode.CONSENT.value -> data?.getParcelableExtra<AskConsentResponse>(CONSENT_STEP_BUNDLE)
-            CoreResponseCode.CORE_EXIT_FORM.value -> data?.getParcelableExtra<CoreExitFormResponse>(CONSENT_STEP_BUNDLE)
-            CoreResponseCode.FINGERPRINT_EXIT_FORM.value -> data?.getParcelableExtra<FingerprintExitFormResponse>(CONSENT_STEP_BUNDLE)
-            CoreResponseCode.FACE_EXIT_FORM.value -> data?.getParcelableExtra<FaceExitFormResponse>(CONSENT_STEP_BUNDLE)
-            CoreResponseCode.FETCH_GUID.value -> TODO("Will be implemented with verification check")
-            CoreResponseCode.ERROR.value -> TODO("Will be implemented with verification check")
-            else -> throw IllegalStateException("Invalid result code from core step processor")
+    override fun processResult(data: Intent?): Step.Result? =
+        data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.also { coreResponse ->
+            when (coreResponse.type) {
+                CoreResponseType.CONSENT -> data.getParcelableExtra<AskConsentResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.CORE_EXIT_FORM -> data.getParcelableExtra<CoreExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.FINGERPRINT_EXIT_FORM -> data.getParcelableExtra<FingerprintExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.FACE_EXIT_FORM -> data.getParcelableExtra<FaceExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.FETCH_GUID -> TODO("Will be implemented with verification check")
+            }
         }
 }
