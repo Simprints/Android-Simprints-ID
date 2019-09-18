@@ -13,7 +13,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.exitform.CoreExitFormActivity
 import com.simprints.id.activities.exitform.result.CoreExitFormResult
 import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_BUNDLE_KEY
@@ -178,8 +178,8 @@ class ConsentActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
-            EXIT_FORM_RESULT_CODE_SUBMIT -> {
-                setResultAndFinish(CoreResponseCode.CORE_EXIT_FORM.value, data)
+            CORE_EXIT_FORM_RESULT_CODE_SUBMIT -> {
+                setResultAndFinish(CoreResponseCode.CORE_EXIT_FORM.value, buildCoreExitFormResponse(data))
             }
             FINGERPRINT_EXIT_FORM_RESULT_CODE_SUBMIT -> {
                 setResultAndFinish(CoreResponseCode.FINGERPRINT_EXIT_FORM.value, buildFingerprintExitFormResponse(data))
@@ -209,7 +209,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun setResultAndFinish(resultCode: Int, data: Intent?) {
-        setResult(resultCode, buildCoreExitFormResponse(data))
+        setResult(resultCode, data)
         finish()
     }
 
