@@ -91,7 +91,8 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
             request.projectId,
             request.userId,
             request.moduleId,
-            createdAt = Date(TimeHelperImpl().now())
+            createdAt = Date(TimeHelperImpl().now()),
+            fingerprintSamples = extractFingerprintSamples(fingerprintResponse)
         )
     }
 
@@ -103,12 +104,14 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
             request.projectId,
             request.userId,
             request.moduleId,
-            createdAt = Date(TimeHelperImpl().now())
+            createdAt = Date(TimeHelperImpl().now()),
+            faceSamples = extractFaceSamples(faceResponse)
         )
     }
 
     private fun extractFingerprintSamples(fingerprintResponse: FingerprintEnrolResponse): List<FingerprintSample> {
-        TODO("awaiting implementation on fingerprint side")
+        // TODO: awaiting implementation on fingerprint side
+        return emptyList()
     }
 
     private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
