@@ -97,9 +97,9 @@ class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() 
 
     private fun buildPersonFromFace(request: AppEnrolRequest,
                                     faceResponse: FaceCaptureResponse): Person {
-        val patientId = faceResponse.capturingResult.last().result?.faceId
+        val patientId = faceResponse.capturingResult.last().result?.faceId ?: throw Throwable("Patient ID is null")
         return Person(
-            patientId!!,
+            patientId,
             request.projectId,
             request.userId,
             request.moduleId,
