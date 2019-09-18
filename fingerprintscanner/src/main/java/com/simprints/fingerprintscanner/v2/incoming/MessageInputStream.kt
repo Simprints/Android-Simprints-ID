@@ -4,17 +4,16 @@ import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
+import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.Un20ResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroEventAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.filterCast
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.InputStream
-import com.simprints.fingerprintscanner.v2.domain.packet.Un20Command as Un20ResponseChannel
-import com.simprints.fingerprintscanner.v2.domain.packet.VeroCommand as VeroResponseChannel
-import com.simprints.fingerprintscanner.v2.domain.packet.VeroEvent as VeroEventChannel
 
 class MessageInputStream(
     private val packetRouter: PacketRouter,
@@ -29,11 +28,11 @@ class MessageInputStream(
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels[VeroResponseChannel]?.toMessageStream(veroResponseAccumulator)
+        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)
             ?: throw TODO()
-        veroEvents = packetRouter.incomingPacketChannels[VeroEventChannel]?.toMessageStream(veroEventAccumulator)
+        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)
             ?: throw TODO()
-        un20Responses = packetRouter.incomingPacketChannels[Un20ResponseChannel]?.toMessageStream(un20ResponseAccumulator)
+        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)
             ?: throw TODO()
     }
 
@@ -47,6 +46,6 @@ class MessageInputStream(
             Un20Response::class -> un20Responses
             else -> TODO()
         }
+            .filterCast<R>()
             .firstOrError()
-            .map { it as R }
 }

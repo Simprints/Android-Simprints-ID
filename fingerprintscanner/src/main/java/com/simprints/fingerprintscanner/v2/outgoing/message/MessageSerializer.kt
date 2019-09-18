@@ -3,12 +3,10 @@ package com.simprints.fingerprintscanner.v2.outgoing.message
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroCommand
-import com.simprints.fingerprintscanner.v2.domain.packet.AndroidDevice
+import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
-import com.simprints.fingerprintscanner.v2.domain.packet.Un20Command as Un20CommandChannel
-import com.simprints.fingerprintscanner.v2.domain.packet.VeroCommand as VeroCommandChannel
 
 class MessageSerializer(val packetParser: PacketParser) {
 
@@ -20,12 +18,12 @@ class MessageSerializer(val packetParser: PacketParser) {
             .map { it.toByteArray() }
             .map {
                 val destination = when (message) {
-                    is VeroCommand -> VeroCommandChannel
-                    is Un20Command -> Un20CommandChannel
+                    is VeroCommand -> Channel.Remote.VeroServer
+                    is Un20Command -> Channel.Remote.Un20Server
                     else -> TODO()
                 }
 
-                PacketProtocol.buildPacketBytes(AndroidDevice, destination, it)
+                PacketProtocol.buildPacketBytes(Channel.Local.AndroidDevice, destination, it)
             }
             .map { packetParser.parse(it) }
 }

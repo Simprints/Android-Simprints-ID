@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.incoming.packet
 
-import com.simprints.fingerprintscanner.v2.domain.packet.IncomingChannel
+import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.tools.toFlowable
@@ -16,10 +16,10 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
     private lateinit var inputStream: InputStream
 
     private lateinit var incomingPackets: ConnectableFlowable<Packet>
-    lateinit var incomingPacketChannels: Map<IncomingChannel, ConnectableFlowable<Packet>>
+    lateinit var incomingPacketChannels: Map<Channel.Remote, ConnectableFlowable<Packet>>
 
     private lateinit var incomingPacketsDisposable: Disposable
-    private lateinit var incomingPacketChannelsDisposable: Map<IncomingChannel, Disposable>
+    private lateinit var incomingPacketChannelsDisposable: Map<Channel.Remote, Disposable>
 
     override fun connect(inputStream: InputStream) {
         this.inputStream = inputStream
@@ -30,7 +30,7 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
 
     private fun configureIncomingPacketStream(rawPacketStream: Flowable<Packet>) {
         incomingPackets = rawPacketStream.subscribeAndPublish()
-        incomingPacketChannels = IncomingChannel::class.values().associateWith {
+        incomingPacketChannels = Channel.Remote::class.values().associateWith {
             incomingPackets.filterChannel(it).subscribeAndPublish()
         }
     }
@@ -45,8 +45,8 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
         incomingPacketChannelsDisposable.forEach { it.value.dispose() }
     }
 
-    private fun ConnectableFlowable<Packet>.filterChannel(channel: IncomingChannel) =
-        filter { packet -> packet.source == channel.id }
+    private fun ConnectableFlowable<Packet>.filterChannel(channel: Channel.Remote) =
+        filter { packet -> packet.source == channel.id.value }
 
     private fun Flowable<Packet>.subscribeAndPublish() =
         this.subscribeOn(Schedulers.io()).publish()
