@@ -10,5 +10,5 @@ interface CoreStepProcessor {
 
     fun buildStepVerify(): Step
 
-    fun processResult(resultCode: Int, data: Intent?): Step.Result?
+    fun processResult(data: Intent?): Step.Result?
 }
