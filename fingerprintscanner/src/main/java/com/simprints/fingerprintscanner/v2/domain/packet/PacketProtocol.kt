@@ -17,11 +17,11 @@ object PacketProtocol: Protocol {
 
     val HEADER_SIZE = HEADER_INDICES.size()
 
-    fun getSourceFromHeader(header: ByteArray): Int =
-        header.extract({ get() }, SOURCE_INDICES_IN_HEADER).unsignedToInt()
+    fun getSourceFromHeader(header: ByteArray): Byte =
+        header.extract({ get() }, SOURCE_INDICES_IN_HEADER)
 
-    fun getDestinationFromHeader(header: ByteArray): Int =
-        header.extract({ get() }, DESTINATION_INDICES_IN_HEADER).unsignedToInt()
+    fun getDestinationFromHeader(header: ByteArray): Byte =
+        header.extract({ get() }, DESTINATION_INDICES_IN_HEADER)
 
     fun getTotalLengthFromHeader(header: ByteArray): Int =
         getPayloadLengthFromHeader(header) + HEADER_SIZE
@@ -37,7 +37,7 @@ object PacketProtocol: Protocol {
 
     fun buildPacketBytes(source: Channel, destination: Channel, payload: ByteArray): ByteArray {
         val length = payload.size
-        val header = byteArrayOf(source.id.toByte(), destination.id.toByte()) + length.toShort().toByteArray()
+        val header = byteArrayOf(source.id.value, destination.id.value) + length.toShort().toByteArray()
         return header + payload
     }
 }

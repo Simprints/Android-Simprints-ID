@@ -2,7 +2,9 @@ package com.simprints.fingerprintscanner.v2
 
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
-import com.simprints.fingerprintscanner.v2.domain.packet.*
+import com.simprints.fingerprintscanner.v2.domain.packet.Channel
+import com.simprints.fingerprintscanner.v2.domain.packet.Packet
+import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.PacketToMessageAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.parsers.MessageParser
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
@@ -62,7 +64,7 @@ class RxJavaTest {
         assertHexStringsEqual(
             "10 A0 03 00 0F 1F 2F ",
 
-            PacketParser().parse(PacketProtocol.buildPacketBytes(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
+            PacketParser().parse(PacketProtocol.buildPacketBytes(Channel.Remote.VeroServer, Channel.Local.AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
         )
     }
 
@@ -334,12 +336,12 @@ class RxJavaTest {
         val bytes3 = "30 A0 01 00 F0 "
 
         val source1Flowable = publishedFlowable
-            .filter { it.source == 0x10 }
+            .filter { it.source == 0x10.toByte() }
             .subscribeOn(Schedulers.io())
             .publish()
 
         val source2Flowable = publishedFlowable
-            .filter { it.source == 0x20 }
+            .filter { it.source == 0x20.toByte() }
             .subscribeOn(Schedulers.io())
             .publish()
 
@@ -387,17 +389,17 @@ class RxJavaTest {
         val testSubscriber2 = TestSubscriber<Packet>()
         val testSubscriber3 = TestSubscriber<Packet>()
 
-        router.incomingPacketChannels[VeroCommand]
+        router.incomingPacketChannels[Channel.Remote.VeroServer]
             ?.take(7)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber1)
-        router.incomingPacketChannels[VeroEvent]
+        router.incomingPacketChannels[Channel.Remote.VeroEvent]
             ?.take(5)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber2)
-        router.incomingPacketChannels[Un20Command]
+        router.incomingPacketChannels[Channel.Remote.Un20Server]
             ?.take(11)?.subscribeOn(Schedulers.io())?.subscribeWith(testSubscriber3)
 
         val pb = PacketParser()
-        val bytes1 = pb.parse(PacketProtocol.buildPacketBytes(VeroCommand, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
-        val bytes2 = pb.parse(PacketProtocol.buildPacketBytes(VeroEvent, AndroidDevice, byteArrayOf(0x0F, 0x1F))).bytes.toHexString()
-        val bytes3 = pb.parse(PacketProtocol.buildPacketBytes(Un20Command, AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F))).bytes.toHexString()
+        val bytes1 = pb.parse(PacketProtocol.buildPacketBytes(Channel.Remote.VeroServer, Channel.Local.AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F))).bytes.toHexString()
+        val bytes2 = pb.parse(PacketProtocol.buildPacketBytes(Channel.Remote.VeroEvent, Channel.Local.AndroidDevice, byteArrayOf(0x0F, 0x1F))).bytes.toHexString()
+        val bytes3 = pb.parse(PacketProtocol.buildPacketBytes(Channel.Remote.Un20Server, Channel.Local.AndroidDevice, byteArrayOf(0x0F, 0x1F, 0x2F, 0x3F))).bytes.toHexString()
 
         outputStream.writeBytes((bytes1 + bytes2 + bytes3).repeat(600))
 

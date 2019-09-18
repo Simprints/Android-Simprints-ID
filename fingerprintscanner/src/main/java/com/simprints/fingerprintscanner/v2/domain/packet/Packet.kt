@@ -4,7 +4,7 @@ class Packet(
     val bytes: ByteArray,
     val header: ByteArray,
     val payload: ByteArray,
-    val source: Int,
-    val destination: Int,
+    val source: Byte,
+    val destination: Byte,
     val payloadLength: Int
 )
