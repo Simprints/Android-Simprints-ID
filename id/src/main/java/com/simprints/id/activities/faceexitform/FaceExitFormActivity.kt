@@ -9,8 +9,6 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_BUNDLE_KEY
-import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_RESULT_CODE_GO_BACK
-import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -107,6 +105,8 @@ class FaceExitFormActivity : AppCompatActivity() {
                 logRadioOptionForCrashReport("Other")
             }
         }
+        //STOPSHIP: Remove on actual implementation
+        faceRbReligiousConcerns.isChecked = true
     }
 
     private fun getExitFormText() = faceExitFormText.text.toString()
@@ -122,17 +122,17 @@ class FaceExitFormActivity : AppCompatActivity() {
         faceExitFormText.addTextChangedListener(textWatcher)
     }
 
-    //STOPSHIP: Go Back and Submit functionalities are flipped
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(FACE_EXIT_FORM_RESULT_CODE_GO_BACK, FaceExitFormResult.Action.GO_BACK)
+        setResultAndFinish(FaceExitFormResult.FACE_EXIT_FORM_RESULT_CODE_GO_BACK, FaceExitFormResult.Action.GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(FACE_EXIT_FORM_RESULT_CODE_SUBMIT, FaceExitFormResult.Action.SUBMIT)
+        setResultAndFinish(FaceExitFormResult.FACE_EXIT_FORM_RESULT_CODE_SUBMIT, FaceExitFormResult.Action.SUBMIT)
     }
 
     private fun setResultAndFinish(resultCode: Int, exitFormAction: FaceExitFormResult.Action) {
         setResult(resultCode, getIntentForAction(exitFormAction))
+        finish()
     }
 
     private fun getIntentForAction(exitFormAction: FaceExitFormResult.Action) = Intent().apply {
