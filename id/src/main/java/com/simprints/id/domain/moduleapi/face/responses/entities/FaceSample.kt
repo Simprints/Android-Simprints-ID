@@ -5,6 +5,7 @@ import com.simprints.core.images.SecuredImageRef
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.face.responses.entities.IFaceSample
 import kotlinx.android.parcel.Parcelize
+import com.simprints.id.data.db.person.domain.FaceSample as DomainFaceSample
 
 @Parcelize
 data class FaceSample (
@@ -31,6 +32,8 @@ data class FaceSample (
         result = 31 * result + imageRef.hashCode()
         return result
     }
+
+    fun toDomain() = DomainFaceSample(template, imageRef)
 }
 
 fun IFaceSample.fromModuleApiToDomain() =
