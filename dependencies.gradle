@@ -65,11 +65,6 @@ def firebase = [
     storage : "com.google.firebase:firebase-storage:16.0.5",
 ]
 
-def jwt_version = "3.8.1"
-def jwt = [
-    core: "com.auth0:java-jwt:$jwt_version"
-]
-
 def crashlytics = [
     core: "com.crashlytics.sdk.android:crashlytics:2.9.9@aar",
     ndk : "com.crashlytics.sdk.android:crashlytics-ndk:2.0.5@aar"
@@ -196,6 +191,5 @@ ext.deps = [
     testing        : testing,
     realm          : realm,
     commons_io     : commons_io,
-    koin           : koin,
-    jwt            : jwt
+    koin           : koin
 ]

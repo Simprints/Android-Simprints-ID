@@ -84,7 +84,7 @@ class LoginPresenter(val view: LoginContract.View,
                     handleSignInSuccess(suppliedProjectId, suppliedUserId)
                 },
                 onError = { e ->
-                    e.printStackTrace()
+                    Timber.e(e)
                     handleSignInError(e, suppliedProjectId, suppliedUserId)
                 })
     }
