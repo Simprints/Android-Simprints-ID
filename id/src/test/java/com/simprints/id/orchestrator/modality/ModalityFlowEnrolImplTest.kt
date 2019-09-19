@@ -6,7 +6,7 @@ import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CORE_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -41,7 +41,7 @@ class ModalityFlowEnrolImplTest {
 
         whenever(fingerprintStepMock) { activityName } thenReturn FINGERPRINT_ACTIVITY_NAME
         whenever(faceStepMock) { activityName } thenReturn FACE_ACTIVITY_NAME
-        whenever(coreStepMock) { activityName } thenReturn CORE_ACTIVITY_NAME
+        whenever(coreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
         whenever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
@@ -75,7 +75,7 @@ class ModalityFlowEnrolImplTest {
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildCaptureStep() }
-        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowEnrol.steps[1].activityName).isEqualTo(FACE_ACTIVITY_NAME)
     }
 
@@ -85,7 +85,7 @@ class ModalityFlowEnrolImplTest {
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
-        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowEnrol.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
     }
 }

@@ -8,6 +8,7 @@ import kotlinx.android.parcel.Parcelize
 open class CoreResponse(val type: CoreResponseType): Parcelable, Step.Result {
     companion object {
         const val CORE_STEP_BUNDLE = "core_step_bundle"
+        const val VERIFY_STEP_BUNDLE = "verify_step_bundle"
     }
 }
 
