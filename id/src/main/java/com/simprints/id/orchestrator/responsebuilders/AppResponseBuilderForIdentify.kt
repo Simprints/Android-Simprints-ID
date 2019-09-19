@@ -9,7 +9,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdenti
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForIdentify : AppResponseBuilder, BaseAppResponseBuilder() {
+class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
 
     override fun buildAppResponse(modalities: List<Modality>,
                                   appRequest: AppRequest,
