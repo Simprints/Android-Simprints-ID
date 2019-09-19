@@ -10,7 +10,10 @@ open class DbFaceSample(
     @PrimaryKey
     @Required
     var id: String = "",
+
+    @Required
     var template: ByteArray = byteArrayOf(),
+
     var imageRef: String? = null
 ) : RealmObject()
 
