@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.R
+import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.data.db.PersonSource
 import com.simprints.id.data.db.PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
 import com.simprints.id.data.db.PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
+import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -38,8 +40,8 @@ class FetchGuidActivity : AppCompatActivity() {
 
     private fun launchAlertIfPersonFetchFailed(personSource: PersonSource) {
         when(personSource) {
-            NOT_FOUND_IN_LOCAL_AND_REMOTE -> TODO("Launch dismissible alert")
-            NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> TODO("Launch try again alert")
+            NOT_FOUND_IN_LOCAL_AND_REMOTE -> launchAlert(this, AlertType.GUID_NOT_FOUND_ONLINE)
+            NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR -> launchAlert(this, AlertType.GUID_NOT_FOUND_OFFLINE)
             else -> {  }
         }
     }
