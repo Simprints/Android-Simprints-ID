@@ -10,13 +10,13 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
-import com.simprints.core.tools.LanguageHelper
+import com.simprints.id.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -43,6 +43,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
     @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +52,8 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
-        LanguageHelper.setLanguage(this, matchingRequest.language)
-
         setContentView(R.layout.activity_matching)
+        setTextInLayout()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val extras = intent.extras
@@ -64,6 +64,10 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         }
 
         viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, preferencesManager, timeHelper)
+    }
+
+    private fun setTextInLayout() {
+        matching_please_wait.text = androidResourcesHelper.getString(R.string.please_wait)
     }
 
     override fun onResume() {

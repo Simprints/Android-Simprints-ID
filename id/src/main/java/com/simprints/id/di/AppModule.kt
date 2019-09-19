@@ -3,8 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
-import com.simprints.core.tools.AndroidResourcesHelper
-import com.simprints.core.tools.AndroidResourcesHelperImpl
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -63,10 +62,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.Peop
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.RandomGeneratorImpl
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -174,8 +170,10 @@ open class AppModule {
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
-        AndroidResourcesHelperImpl(ctx)
+    fun provideAndroidResourcesHelper(ctx: Context, preferencesManager: PreferencesManager): AndroidResourcesHelper {
+        val prefsWithLanguage = LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
+        return AndroidResourcesHelperImpl(prefsWithLanguage)
+    }
 
     @Provides
     @Singleton

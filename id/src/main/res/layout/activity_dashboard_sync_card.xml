@@ -22,10 +22,10 @@
             android:padding="8dp">
 
             <TextView
+                android:id="@+id/dashboardCardEnrolTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@string/dashboard_card_enrolment_info"
                 android:layout_alignParentStart="true"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -40,7 +40,6 @@
                 android:background="@drawable/button_rounded_corners"
                 android:fontFamily="@font/muli"
                 android:padding="8dp"
-                android:text="@string/dashboard_card_sync_now"
                 android:textColor="@color/simprints_white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -66,11 +65,11 @@
                     android:textSize="18sp" />
 
                 <TextView
+                    android:id="@+id/dashboardCardSyncTotalLocalTextLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:gravity="center"
-                    android:text="@string/dashboard_card_available_on_phone"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -96,11 +95,11 @@
                     android:textSize="18sp" />
 
                 <TextView
+                    android:id="@+id/dashboardCardSyncUploadTextLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:gravity="center"
-                    android:text="@string/dashboard_card_to_upload"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -127,11 +126,11 @@
                     android:textSize="18sp" />
 
                 <TextView
+                    android:id="@+id/dashboardCardSyncDownloadTextLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:gravity="center"
-                    android:text="@string/dashboard_card_to_download"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

@@ -103,10 +103,7 @@ class LaunchPresenter(component: FingerprintComponent,
     }
 
     override fun start() {
-        view.setLanguage(fingerprintRequest.language)
         view.setLogoVisibility(fingerprintRequest.logoExists)
-        view.initTextsInButtons()
-        view.initConsentTabs()
 
         setTextToConsentTabs()
 

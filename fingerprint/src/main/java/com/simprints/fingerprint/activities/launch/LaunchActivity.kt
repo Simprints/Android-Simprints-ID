@@ -9,7 +9,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -18,6 +17,7 @@ import com.simprints.fingerprint.activities.launch.confirmScannerError.ConfirmSc
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
@@ -42,6 +42,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override val context: Context by lazy { this }
     @Inject lateinit var orchestrator: Orchestrator
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     override lateinit var viewPresenter: LaunchContract.Presenter
     private lateinit var generalConsentTab: TabHost.TabSpec
@@ -61,11 +62,24 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
             ?: throw InvalidRequestForFingerprintException()
         fingerprintRequest = fromFingerprintToDomainRequest(iFingerprintRequest)
 
+        setTextInLayout()
+        initConsentTabs()
         setButtonClickListeners()
         setClickListenerToPrivacyNotice()
 
         viewPresenter = LaunchPresenter(component, this, fingerprintRequest)
         viewPresenter.start()
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
+            consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+            loadingInfoTextView.text = getString(R.string.loading)
+            generalConsentTextView.text = getString(R.string.short_consent)
+            privacyNoticeText.text = getString(R.string.privacy_notice_text)
+            simprintsLogoWithTagLine.contentDescription = getString(R.string.launch_background_description)
+        }
     }
 
     override fun onResume() {
@@ -82,13 +96,6 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
         privacyNoticeText.setOnClickListener {
             startActivity(Intent(this, LongConsentActivity::class.java))
         }
-    }
-
-    override fun setLanguage(language: String) = LanguageHelper.setLanguage(this, language)
-
-    override fun initTextsInButtons() {
-        consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
-        consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
     }
 
     override fun setLogoVisibility(visible: Boolean) {
@@ -114,7 +121,10 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     override fun tryAgain() = viewPresenter.tryAgainFromErrorScreen()
-    override fun onActivityResultReceived() { viewPresenter.onActivityResult() }
+    override fun onActivityResultReceived() {
+        viewPresenter.onActivityResult()
+    }
+
     override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
     override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
         resultCode?.let {
@@ -122,10 +132,13 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
         }
     }
 
-    override fun initConsentTabs() {
+    fun initConsentTabs() {
         tabHost.setup()
-        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_general_title)).setContent(R.id.generalConsentTextView)
-        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(getString(R.string.consent_parental_title)).setContent(R.id.parentalConsentTextView)
+        val generalConsentTabText = androidResourcesHelper.getString(R.string.consent_general_title)
+        val parentalConsentTabText = androidResourcesHelper.getString(R.string.consent_parental_title)
+
+        generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG).setIndicator(generalConsentTabText).setContent(R.id.generalConsentTextView)
+        parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG).setIndicator(parentalConsentTabText).setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
 
