@@ -13,13 +13,12 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelperImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-class AppResponseBuilderForEnrol : BaseAppResponseBuilder() {
+class AppResponseBuilderForEnrol(
+    private val personCreationCallback: PersonCreationCallback
+) : BaseAppResponseBuilder() {
 
     @Inject
     lateinit var personRepository: PersonRepository
@@ -38,7 +37,7 @@ class AppResponseBuilderForEnrol : BaseAppResponseBuilder() {
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
         val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        saveAndUpload(person)
+        personCreationCallback.onPersonCreated(person)
 
         return buildAppEnrolResponse(person)
     }
@@ -49,17 +48,14 @@ class AppResponseBuilderForEnrol : BaseAppResponseBuilder() {
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
 
-    private fun saveAndUpload(person: Person?) {
-        CoroutineScope(Dispatchers.Default).launch {
-            if (person != null)
-                personRepository.saveAndUpload(person)
-        }
-    }
-
     private fun buildAppEnrolResponse(person: Person?): AppEnrolResponse {
         if (person == null)
             throw Throwable("App responses are null")
         return AppEnrolResponse(person.patientId)
+    }
+
+    interface PersonCreationCallback {
+        fun onPersonCreated(person: Person?)
     }
 
     object PersonBuilder {

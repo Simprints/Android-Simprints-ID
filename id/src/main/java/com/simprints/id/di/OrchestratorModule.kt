@@ -13,10 +13,7 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
-import com.simprints.id.orchestrator.ModalityFlowFactory
-import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
-import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.OrchestratorManagerImpl
+import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.crypto.StepEncoder
@@ -25,6 +22,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseBuilderForEnrol
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
@@ -124,5 +122,9 @@ class OrchestratorModule {
     fun provideStepEncoder(
         keystoreManager: KeystoreManager
     ): StepEncoder = StepEncoderImpl(keystoreManager)
+
+    @Provides
+    fun providePersonCreationCallback(): AppResponseBuilderForEnrol.PersonCreationCallback =
+        PersonCreationCallbackImpl()
 
 }

@@ -11,6 +11,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRe
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,7 +19,7 @@ import org.junit.Test
 
 class AppResponseBuilderForEnrolTest {
 
-    private val responseBuilder = AppResponseBuilderForEnrol()
+    private val responseBuilder = AppResponseBuilderForEnrol(personCreationCallback = mock())
 
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppEnrolResponse() {
