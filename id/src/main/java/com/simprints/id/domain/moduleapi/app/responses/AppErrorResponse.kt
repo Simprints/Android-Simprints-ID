@@ -24,6 +24,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID_SIGNED_IN
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
+                    AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+                    AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_ONLINE //STOPSHIP: Fix me, should not return for this alert
                 }
         }
     }
