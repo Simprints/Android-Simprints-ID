@@ -47,7 +47,6 @@ class ConsentActivityTest {
 
     private val module by lazy {
         TestAppModule(app,
-            localDbManagerRule = DependencyRule.MockRule,
             dbManagerRule = DependencyRule.MockRule,
             sessionEventsLocalDbManagerRule = DependencyRule.MockRule,
             crashReportManagerRule = DependencyRule.MockRule)
