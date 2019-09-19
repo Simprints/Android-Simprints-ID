@@ -4,8 +4,8 @@ import android.content.Context
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
-import com.simprints.id.data.db.person.local.models.toDomainPerson
-import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.fromDbToDomain
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
@@ -58,7 +58,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realm ->
                 realm.transactAwait {
-                    it.insertOrUpdate(people.map(Person::toRealmPerson))
+                    it.insertOrUpdate(people.map(Person::fromDomainToDb))
                 }
             }
         }
@@ -69,7 +69,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             Realm.getInstance(config).use {
                 it.buildQueryForPerson(query)
                     .await()
-                    ?.map { it.toDomainPerson() }
+                    ?.map { it.fromDbToDomain() }
                     ?.asFlow()
                     ?: flowOf()
             }
