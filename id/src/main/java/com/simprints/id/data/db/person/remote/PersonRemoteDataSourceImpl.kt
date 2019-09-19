@@ -6,9 +6,9 @@ import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.toApiPostPerson
+import com.simprints.id.data.db.person.remote.models.fromDomainToPostApi
 import com.simprints.id.data.db.person.remote.models.toDomainPeopleCount
-import com.simprints.id.data.db.person.remote.models.toDomainPerson
+import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -34,12 +34,12 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                         else -> throw it
                     }
                 }
-                .map(ApiGetPerson::toDomainPerson)
+                .map(ApiGetPerson::fromGetApiToDomain)
         }
 
     override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
         getPeopleApiClient().flatMapCompletable {
-            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::toApiPostPerson)))
+            it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi)))
                 .retry(::retryCriteria)
                 .trace("uploadPatientBatch")
                 .handleResult(::defaultResponseErrorHandling)

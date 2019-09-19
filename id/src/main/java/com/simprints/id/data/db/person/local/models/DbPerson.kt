@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.person.local.models
 
-import com.simprints.id.data.db.person.domain.Fingerprint
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.tools.extensions.toRealmList
 import io.realm.RealmList
@@ -30,10 +31,14 @@ open class DbPerson(
     var toSync: Boolean = false,
 
     @Required
-    var fingerprints: RealmList<DbFingerprint> = RealmList()
+    var fingerprintSamples: RealmList<DbFingerprintSample> = RealmList(),
+
+    @Required
+    var faceSamples: RealmList<DbFaceSample> = RealmList()
+
 ) : RealmObject()
 
-fun DbPerson.toDomainPerson(): Person =
+fun DbPerson.fromDbToDomain(): Person =
     Person(
         patientId = patientId,
         projectId = projectId,
@@ -42,10 +47,11 @@ fun DbPerson.toDomainPerson(): Person =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        fingerprints = fingerprints.map(DbFingerprint::toDomainFingerprint)
+        fingerprintSamples = fingerprintSamples.map(DbFingerprintSample::fromDbToDomain),
+        faceSamples = faceSamples.map(DbFaceSample::fromDbToDomain)
     )
 
-fun Person.toRealmPerson(): DbPerson =
+fun Person.fromDomainToDb(): DbPerson =
     DbPerson(
         patientId = patientId,
         projectId = projectId,
@@ -54,5 +60,6 @@ fun Person.toRealmPerson(): DbPerson =
         createdAt = createdAt,
         updatedAt = updatedAt,
         toSync = toSync,
-        fingerprints = fingerprints.map(Fingerprint::toRealmFingerprint).toRealmList()
+        fingerprintSamples = fingerprintSamples.map(FingerprintSample::fromDomainToDb).toRealmList(),
+        faceSamples = faceSamples.map(FaceSample::fromDomainToDb).toRealmList()
     )
