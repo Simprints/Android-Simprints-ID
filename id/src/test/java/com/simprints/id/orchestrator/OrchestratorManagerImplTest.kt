@@ -160,10 +160,10 @@ class OrchestratorManagerImplTest {
 
         mockSteps.add(
             Step(
-                CAPTURE.value,
-                FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
-                IFaceRequest.BUNDLE_KEY,
-                request,
+                requestCode = CAPTURE.value,
+                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                bundleKey = IFaceRequest.BUNDLE_KEY,
+                request = request,
                 status = NOT_STARTED
             )
         )

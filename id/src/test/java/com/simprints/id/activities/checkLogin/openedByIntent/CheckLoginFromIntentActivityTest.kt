@@ -39,7 +39,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //    @Inject lateinit var remoteDbManagerMock: RemoteDbManager
 //    @Inject lateinit var localDbManagerMock: LocalDbManager
 //    @Inject lateinit var crashReportManagerMock: CrashReportManager
-//    @Inject lateinit var dbManager: DbManager
+//    @Inject lateinit var signerManager: SignerManager
 //
 //    private val module by lazy {
 //        TestAppModule(app,
@@ -61,7 +61,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //            .setupLocalAndRemoteManagersForApiTesting(localDbManagerMock, remoteDbManagerMock, sessionEventsLocalDbManagerMock)
 //            .initLogInStateMock(sharedPrefs, remoteDbManagerMock)
 //
-//        dbManager.initialiseDb()
+//        signerManager.initialiseDb()
 //    }
 //
 //    @Test

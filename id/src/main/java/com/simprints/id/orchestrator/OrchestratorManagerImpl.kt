@@ -45,7 +45,7 @@ open class OrchestratorManagerImpl(
 
     override fun restoreState() {
         resetInternalState()
-        hotCache.load()?.let(modalitiesFlow::restoreState)
+        hotCache.load().let(modalitiesFlow::restoreState)
         proceedToNextStepOrAppResponse()
     }
 
@@ -78,7 +78,7 @@ open class OrchestratorManagerImpl(
 
     private fun buildAppResponse() {
         val cachedSteps = hotCache.load()
-        val steps: List<Step> = if (cachedSteps.isNullOrEmpty()) {
+        val steps: List<Step> = if (cachedSteps.isEmpty()) {
             modalitiesFlow.steps
         } else {
             cachedSteps

@@ -9,7 +9,6 @@ import com.simprints.id.activities.dashboard.DashboardSyncCardViewModelTest
 import com.simprints.id.activities.login.LoginActivityTest
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragmentTest
 import com.simprints.id.data.consent.LongConsentManagerImplTest
-import com.simprints.id.data.db.DbManagerTest
 import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectAuthenticatorTest
@@ -24,14 +23,16 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class, DataModule::class])
 interface AppComponentForTests : AppComponent {
-    @Component.Builder interface Builder {
+    @Component.Builder
+    interface Builder {
 
         @BindsInstance
         fun application(app: Application): Builder
 
         fun appModule(appModule: AppModule): Builder
+        fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
@@ -43,7 +44,6 @@ interface AppComponentForTests : AppComponent {
     fun inject(loginActivityTest: LoginActivityTest)
     fun inject(dashboardCardsFactoryTest: DashboardCardsFactoryTest)
     fun inject(projectSecretManagerTest: ProjectSecretManagerTest)
-    fun inject(dbManagerTest: DbManagerTest)
     fun inject(projectAuthenticatorTest: ProjectAuthenticatorTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)

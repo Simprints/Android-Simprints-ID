@@ -9,19 +9,22 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.models.DbSyncInfo
-import com.simprints.id.data.db.local.realm.models.toRealmPerson
-import com.simprints.id.data.db.local.room.DownSyncDao
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.getStatusId
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.models.ApiGetPerson
-import com.simprints.id.data.db.remote.models.toApiGetPerson
-import com.simprints.id.data.db.remote.network.PeopleRemoteInterface
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.domain.Person
+import com.simprints.id.commontesttools.di.TestDataModule
+import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
+import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
+import com.simprints.id.data.db.common.FirebaseManagerImpl
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.toApiGetPerson
+import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.project.local.ProjectLocalDataSource
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -64,7 +67,7 @@ class SubDownSyncTaskTest {
     @Inject lateinit var syncScopeBuilderSpy: SyncScopesBuilder
 
     private val remoteDbManagerSpy: RemoteDbManager = spy(FirebaseManagerImpl(mock()))
-    private val remotePeopleManagerSpy: RemotePeopleManager = spy()
+    private val personRemoteDataSourceSpy: PersonRemoteDataSource = spy()
     private val downSyncDao: DownSyncDao = mock()
 
     private val module by lazy {
@@ -73,16 +76,21 @@ class SubDownSyncTaskTest {
             syncStatusDatabaseRule = DependencyRule.SpyRule)
     }
 
+    private val dataModule by lazy {
+        TestDataModule(projectLocalDataSourceRule = DependencyRule.MockRule)
+    }
+
+
     @Before
     fun setUp() {
         ShadowLog.stream = System.out
 
-        UnitTestConfig(this, module).fullSetup()
+        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
 
         whenever(remoteDbManagerSpy.getCurrentToken()).thenReturn(Single.just(""))
         mockServer.start()
         setupApi()
-        whenever(remotePeopleManagerSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
+        whenever(personRemoteDataSourceSpy.getPeopleApiClient()).thenReturn(Single.just(remotePeopleApi))
     }
 
     @Test
@@ -122,7 +130,8 @@ class SubDownSyncTaskTest {
 
     @Test
     fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
-        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+        val personLocalDataSourceMock = mock<PersonLocalDataSource>()
+        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
         val nPeopleToDownload = 499
         val scope = SyncScope(projectId = "projectIDTest", userId = null, moduleIds = null)
         val subScope = scope.toSubSyncScopes().first()
@@ -130,9 +139,9 @@ class SubDownSyncTaskTest {
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
 
-        mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
+        mockDbDependencies(syncLocalDataSourceMock, personLocalDataSourceMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         val testObserver = sync.execute(subScope).test()
         testObserver.awaitTerminalEvent()
         testObserver.assertError { true }
@@ -145,19 +154,23 @@ class SubDownSyncTaskTest {
         val lastPatientIdFromRoom = "lastPatientId"
         val lastPatientUpdateAtFromRoom = 123123123L
 
-        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+        val personLocalDataSourceMock = mock<PersonLocalDataSource>()
+        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
         val subScope = scope.toSubSyncScopes().first()
         doReturnScopeFromBuilder(scope)
 
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
 
-        mockDbDependencies(localDbMock, DownSyncStatus(
-            subScope, lastPatientId = lastPatientIdFromRoom,
-            lastPatientUpdatedAt = lastPatientUpdateAtFromRoom,
-            totalToDownload = nPeopleToDownload))
+        mockDbDependencies(
+            syncLocalDataSourceMock,
+            personLocalDataSourceMock,
+            DownSyncStatus(
+                subScope, lastPatientId = lastPatientIdFromRoom,
+                lastPatientUpdatedAt = lastPatientUpdateAtFromRoom,
+                totalToDownload = nPeopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -173,13 +186,14 @@ class SubDownSyncTaskTest {
         val lastPatientId = "lastPatientId"
         val lastPatientUpdateAt = Date()
 
-        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+        val personLocalDataSourceMock = mock<PersonLocalDataSource>()
+        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
         val subScope = scope.toSubSyncScopes().first()
         doReturnScopeFromBuilder(scope)
-        mockDbDependencies(localDbMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
+        mockDbDependencies(syncLocalDataSourceMock, personLocalDataSourceMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
 
-        whenever(localDbMock.getDbSyncInfo(subScope)).thenReturn(Single.just(
-            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)))
+        whenever(syncLocalDataSourceMock) { load(subScope) } thenReturn
+            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).toRealmPerson(), null)
 
         val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
         whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
@@ -187,7 +201,7 @@ class SubDownSyncTaskTest {
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         val peopleRequestUrl = mockServer.takeRequest().requestUrl
@@ -199,7 +213,7 @@ class SubDownSyncTaskTest {
         Assert.assertEquals(downSyncStatusAfterRealmMigration.id, downSyncDao.getStatusId(subScope))
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientUpdatedAt, lastPatientUpdateAt.time)
         Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientId, lastPatientId)
-        verifyAtLeast(1, localDbMock) { deleteSyncInfo(anyNotNull()) }
+        verifyBlockingAtLeast(1, syncLocalDataSourceMock) { delete(anyNotNull()) }
     }
 
     private fun runDownSyncAndVerifyConditions(
@@ -208,27 +222,31 @@ class SubDownSyncTaskTest {
         lastPatientId: String? = null,
         lastPatientUpdateAt: Long? = null) {
 
-        val localDbMock = Mockito.mock(LocalDbManager::class.java)
+        val personLocalDataSourceMock = mock<PersonLocalDataSource>()
+        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
         val batches = calculateCorrectNumberOfBatches(nPeopleToDownload)
         val subScope = scope.toSubSyncScopes().first()
         doReturnScopeFromBuilder(scope)
         val peopleToDownload = prepareResponseForSubScope(subScope, nPeopleToDownload)
         mockServer.enqueue(mockSuccessfulResponseForDownloadPatients(peopleToDownload))
-        mockDbDependencies(localDbMock, DownSyncStatus(subScope,
-            totalToDownload = nPeopleToDownload,
-            lastPatientId = lastPatientId,
-            lastPatientUpdatedAt = lastPatientUpdateAt))
+        mockDbDependencies(
+            syncLocalDataSourceMock,
+            personLocalDataSourceMock,
+            DownSyncStatus(subScope,
+                totalToDownload = nPeopleToDownload,
+                lastPatientId = lastPatientId,
+                lastPatientUpdatedAt = lastPatientUpdateAt))
 
         val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(argForInsertOrUpdateInLocalDb.capture())).thenReturn(Completable.complete())
+        wheneverOnSuspend(personLocalDataSourceMock) { insertOrUpdate(argForInsertOrUpdateInLocalDb.capture()) } thenOnBlockingReturn Unit
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
         whenever(downSyncDao) { updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture()) } thenDoNothing {}
 
-        val sync = DownSyncTaskImpl(localDbMock, remotePeopleManagerSpy, TimeHelperImpl(), downSyncDao)
+        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
-        verifyExactly(batches, localDbMock) { insertOrUpdatePeopleInLocal(anyNotNull()) }
+        verifyBlockingExactly(batches, personLocalDataSourceMock) { insertOrUpdate(anyNotNull()) }
         verifyExactly(batches, downSyncDao) { updateLastPatientId(anyString(), anyString()) }
         verifyExactly(batches + 1, downSyncDao) { updateLastSyncTime(anyString(), anyLong()) }
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
@@ -253,11 +271,12 @@ class SubDownSyncTaskTest {
     }
 
     private fun mockDbDependencies(
-        localDbMock: LocalDbManager,
+        syncInfoLocalDataSourceMock: SyncInfoLocalDataSource,
+        personLocalDataSourceMock: PersonLocalDataSource,
         downSyncStatus: DownSyncStatus? = null) {
 
-        doNothingForInsertPeopleToLocalDb(localDbMock)
-        doNothingForRealmMigration(localDbMock)
+        doNothingForInsertPeopleToLocalDb(personLocalDataSourceMock)
+        doNothingForRealmMigration(syncInfoLocalDataSourceMock)
         doReturnDownSyncStatusFromRoom(downSyncStatus)
         doNothingForDownStatusInRoom()
     }
@@ -275,12 +294,12 @@ class SubDownSyncTaskTest {
     }
 
 
-    private fun doNothingForRealmMigration(localDbMock: LocalDbManager) {
-        whenever(localDbMock.getDbSyncInfo(anyNotNull())).thenReturn(Single.error(NoSuchDbSyncInfoException("no RlInfo")))
+    private fun doNothingForRealmMigration(syncInfoLocalDataSourceMock: SyncInfoLocalDataSource) {
+        wheneverOnSuspend(syncInfoLocalDataSourceMock) { load(anyNotNull()) } thenOnBlockingThrow NoSuchDbSyncInfoException::class.java
     }
 
-    private fun doNothingForInsertPeopleToLocalDb(localDbMock: LocalDbManager) {
-        whenever(localDbMock.insertOrUpdatePeopleInLocal(anyNotNull())).thenReturn(Completable.complete())
+    private fun doNothingForInsertPeopleToLocalDb(personLocalDataSourceMock: PersonLocalDataSource) {
+        wheneverOnSuspend(personLocalDataSourceMock) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
     }
 
     private fun mockSuccessfulResponseForDownloadPatients(patients: List<ApiGetPerson>): MockResponse? {

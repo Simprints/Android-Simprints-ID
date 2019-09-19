@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
-import com.simprints.id.data.db.local.room.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.text.DateFormat
 import java.util.*
