@@ -43,7 +43,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.orchestrator.responsebuilders.AppResponseBuilderForEnrol
+import com.simprints.id.orchestrator.PersonCreationCallbackImpl
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
@@ -230,9 +230,8 @@ open class AppModule {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideAppResponseBuilderFactory(
-        personCreationCallback: AppResponseBuilderForEnrol.PersonCreationCallback
-    ): AppResponseFactory = AppResponseFactoryImpl(personCreationCallback)
+    open fun provideAppResponseBuilderFactory(repository: PersonRepository): AppResponseFactory
+        = AppResponseFactoryImpl(PersonCreationCallbackImpl(repository))
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
