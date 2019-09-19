@@ -1,22 +1,26 @@
 package com.simprints.id.data.db.common.realm
 
-import com.simprints.id.data.db.person.local.models.DbFingerprint
+import com.simprints.id.data.db.common.realm.oldschemas.PeopleSchemaV5
+import com.simprints.id.data.db.common.realm.oldschemas.PeopleSchemaV6
+import com.simprints.id.data.db.common.realm.oldschemas.PeopleSchemaV7
+import com.simprints.id.data.db.person.local.models.DbFaceSample
+import com.simprints.id.data.db.person.local.models.DbFingerprintSample
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
-import com.simprints.id.data.db.common.realm.oldschemas.PeopleSchemaV5
 import com.simprints.id.domain.Constants
 import io.realm.*
+import io.realm.FieldAttribute.REQUIRED
 import io.realm.annotations.RealmModule
 import java.util.*
 
 internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
-    
-    @RealmModule(classes = [DbFingerprint::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
+
+    @RealmModule(classes = [DbFingerprintSample::class, DbFaceSample::class, DbPerson::class, DbProject::class, DbSyncInfo::class])
     class PeopleModule
 
     companion object {
-        const val REALM_SCHEMA_VERSION: Long = 6
+        const val REALM_SCHEMA_VERSION: Long = 7
 
         const val PERSON_TABLE: String = "DbPerson"
         const val FINGERPRINT_TABLE: String = "DbFingerprint"
@@ -59,6 +63,7 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
                 3 -> migrateTo4(realm.schema)
                 4 -> migrateTo5(realm.schema)
                 5 -> migrateTo6(realm.schema)
+                6 -> migrateTo7(realm.schema)
             }
         }
     }
@@ -157,11 +162,37 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
         schema.rename(PeopleSchemaV5.SYNC_INFO_TABLE, SYNC_INFO_TABLE)
     }
 
+    private fun migrateTo7(schema: RealmSchema) {
+        with(PeopleSchemaV7) {
+            val faceSamplesScheme = schema.create(FACE_TABLE)
+                .addNewField<String>(FACE_FIELD_ID, REQUIRED)
+                .addNewField<ByteArray>(FACE_FIELD_TEMPLATE, REQUIRED)
+                .addNewField<String>(FACE_FIELD_IMAGEREF)
+
+            schema.rename(PeopleSchemaV6.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
+                .addNewField<String>(FINGERPRINT_FIELD_ID, REQUIRED)
+                .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_FINGER_IDENTIFIER, FINGERPRINT_FIELD_FINGER_IDENTIFIER)
+                .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE, FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE)
+                .addNewField<String>(FINGERPRINT_FIELD_IMAGEREF)
+                .markAsRequired(FINGERPRINT_FIELD_TEMPLATE)
+
+            schema.get(PERSON_TABLE)
+                ?.renameField(PeopleSchemaV6.PERSON_FIELD_FINGERPRINT_SAMPLES, PERSON_FIELD_FINGERPRINT_SAMPLES)
+                ?.addRealmListField(PERSON_FIELD_FACE_SAMPLES, faceSamplesScheme)
+        }
+    }
+
+    private inline fun <reified T> RealmObjectSchema.addNewField(name: String, vararg attributes: FieldAttribute): RealmObjectSchema =
+        this.addField(name, T::class.java, *attributes)
+
     private fun RealmObjectSchema.addStringAndMakeRequired(name: String): RealmObjectSchema =
         this.addField(name, String::class.java).setRequired(name, true)
 
     private fun RealmObjectSchema.addDateAndMakeRequired(name: String): RealmObjectSchema =
         this.addField(name, Date::class.java).setRequired(name, true)
+
+    private fun RealmObjectSchema.markAsRequired(name: String): RealmObjectSchema =
+        this.setRequired(name, true)
 
     override fun hashCode(): Int {
         return PeopleRealmMigration.hashCode()
