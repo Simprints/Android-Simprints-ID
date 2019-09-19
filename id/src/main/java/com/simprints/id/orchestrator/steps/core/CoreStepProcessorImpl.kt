@@ -8,6 +8,7 @@ import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.VERIFY_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.CoreResponseType
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
@@ -16,30 +17,31 @@ import com.simprints.id.orchestrator.steps.core.CoreRequestCode.VERIFICATION_CHE
 class CoreStepProcessorImpl : CoreStepProcessor {
 
     companion object {
-        const val CORE_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
+        const val CONSENT_ACTIVITY_NAME = "com.simprints.id.activities.consent.ConsentActivity"
+        const val VERIFY_ACTIVITY_NAME = "com.simprints.id.activities.fetchguid.FetchGuidActivity"
     }
 
     override fun buildStepConsent(consentType: ConsentType) =
         buildConsentStep(consentType)
 
     //Building normal ConsentStep for now
-    override fun buildStepVerify(): Step =
-        buildVerifyStep()
+    override fun buildStepVerify(projectId: String, verifyGuid: String): Step =
+        buildVerifyStep(projectId, verifyGuid)
 
     private fun buildConsentStep(consentType: ConsentType) = Step(
         requestCode = CONSENT.value,
-        activityName = CORE_ACTIVITY_NAME,
+        activityName = CONSENT_ACTIVITY_NAME,
         bundleKey = CORE_STEP_BUNDLE,
         request = AskConsentRequest(consentType),
         status = Step.Status.NOT_STARTED
     )
 
     //STOPSHIP: Will be done in the story for adding verification step. Building
-    private fun buildVerifyStep() = Step(
+    private fun buildVerifyStep(projectId: String, verifyGuid: String) = Step(
         requestCode = VERIFICATION_CHECK.value,
-        activityName = CORE_ACTIVITY_NAME,
-        bundleKey = CORE_STEP_BUNDLE,
-        request = FetchGUIDRequest(),
+        activityName = VERIFY_ACTIVITY_NAME,
+        bundleKey = VERIFY_STEP_BUNDLE,
+        request = FetchGUIDRequest(projectId, verifyGuid),
         status = Step.Status.NOT_STARTED
     )
 
@@ -51,5 +53,4 @@ class CoreStepProcessorImpl : CoreStepProcessor {
                 CoreResponseType.FETCH_GUID -> TODO("Will be implemented with verification check")
             }
         }
-
 }

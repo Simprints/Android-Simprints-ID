@@ -8,7 +8,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companio
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImplTest.Companion.NUMBER_STEPS_FACE_OR_FINGER
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
-import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CORE_ACTIVITY_NAME
+import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl.Companion.CONSENT_ACTIVITY_NAME
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -38,7 +38,7 @@ class ModalityFlowIdentifyImplTest {
 
         whenever(fingerprintStepMock) { activityName } thenReturn FINGERPRINT_ACTIVITY_NAME
         whenever(faceStepMock) { activityName } thenReturn FACE_ACTIVITY_NAME
-        whenever(coreStepMock) { activityName } thenReturn CORE_ACTIVITY_NAME
+        whenever(coreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
         whenever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
@@ -72,7 +72,7 @@ class ModalityFlowIdentifyImplTest {
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
-        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FACE_ACTIVITY_NAME)
     }
 
@@ -83,7 +83,7 @@ class ModalityFlowIdentifyImplTest {
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
-        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CORE_ACTIVITY_NAME)
+        assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
     }
 }
