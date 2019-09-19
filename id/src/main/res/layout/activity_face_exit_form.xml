@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/refusalScrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,27 +13,75 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.simprints.id.activities.faceexitform.FaceExitFormActivity">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/whySkipFaceText"
+        <EditText
+            android:id="@+id/faceExitFormText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:text="@string/why_did_you_skip_face"
-            android:textAlignment="center"
-            android:textColor="@color/simprints_white"
-            android:textSize="25sp" />
+            android:layout_marginTop="15dp"
+            android:background="@color/simprints_white"
+            android:enabled="false"
+            android:gravity="top|start"
+            android:hint="@string/hint_other_reason"
+            android:imeOptions="actionDone"
+            android:inputType="textMultiLine"
+            android:maxLength="100"
+            android:maxLines="4"
+            android:minHeight="100dp"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/faceExitFormRadioGroup" />
+
+        <LinearLayout
+            android:id="@+id/faceRefusalButtonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/faceExitFormText">
+
+            <Button
+                android:id="@+id/faceBtGoBack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="70dp"
+                android:onClick="handleGoBackClick"
+                android:text="@string/exit_form_go_back"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/faceBtSubmitExitForm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:minHeight="70dp"
+                android:onClick="handleSubmitClick"
+                android:text="@string/button_submit"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
 
         <RadioGroup
             android:id="@+id/faceExitFormRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp">
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/whySkipFaceText">
 
             <RadioButton
                 android:id="@+id/faceRbReligiousConcerns"
@@ -92,55 +141,17 @@
 
         </RadioGroup>
 
-        <EditText
-            android:id="@+id/faceExitFormText"
+        <TextView
+            android:id="@+id/whySkipFaceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@color/simprints_white"
-            android:enabled="false"
-            android:gravity="top|start"
-            android:hint="@string/hint_other_reason"
-            android:imeOptions="actionDone"
-            android:inputType="textMultiLine"
-            android:maxLength="100"
-            android:maxLines="4"
-            android:minHeight="100dp"
-            android:padding="4dp" />
-
-        <LinearLayout
-            android:id="@+id/faceExitFormButtonsLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:weightSum="2">
-
-            <Button
-                android:id="@+id/faceBtGoBack"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:minHeight="70dp"
-                android:onClick="handleGoBackClick"
-                android:text="@string/exit_form_go_back"
-                tools:ignore="ButtonStyle" />
-
-            <Button
-                android:id="@+id/faceBtSubmitExitForm"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:enabled="false"
-                android:onClick="handleSubmitClick"
-                android:minHeight="70dp"
-                android:text="@string/button_submit"
-                tools:ignore="ButtonStyle" />
-
-        </LinearLayout>
-    </LinearLayout>
+            android:text="@string/why_did_you_skip_face"
+            android:textAlignment="center"
+            android:textColor="@color/simprints_white"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
