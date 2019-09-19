@@ -42,8 +42,7 @@ class PeopleUpSyncUploaderTaskTest {
 //    private val differentUserId = "differentUserId" // TODO: uncomment userId when multitenancy is properly implemented
 
     private val notYetSyncedPerson1 = Person(
-        "patientId1", "projectId", "userId", "moduleId",
-        emptyList(), Date(1), null, true
+        "patientId1", "projectId", "userId", "moduleId", Date(1), null, true
     )
     private val notYetSyncedPerson2 = notYetSyncedPerson1.copy(patientId = "patientId2")
     private val notYetSyncedPerson3 = notYetSyncedPerson1.copy(patientId = "patientId3")

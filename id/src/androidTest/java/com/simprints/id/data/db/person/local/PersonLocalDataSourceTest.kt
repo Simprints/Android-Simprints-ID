@@ -5,8 +5,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
 import com.simprints.id.data.db.person.local.models.DbPerson
-import com.simprints.id.data.db.person.local.models.toDomainPerson
-import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.fromDbToDomain
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
@@ -115,7 +115,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     @Test
     fun insertOrUpdatePerson_shouldSucceed() = runBlocking {
         val fakePerson = getFakePerson()
-        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
 
         realm.executeTransaction {
             assertEquals(realm.where(DbPerson::class.java).count(), 1)
@@ -126,8 +126,8 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     @Test
     fun insertOrUpdateSamePerson_shouldSaveOnlyAPerson() = runBlocking {
         val fakePerson = getFakePerson()
-        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
-        personLocalDataSource.insertOrUpdate(listOf(fakePerson.toDomainPerson()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
 
         realm.executeTransaction {
             assertEquals(realm.where(DbPerson::class.java).count(), 1)
@@ -142,7 +142,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
 
         val people = personLocalDataSource.load().toList()
 
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
+        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
     }
 
     @Test
@@ -151,7 +151,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(userId = fakePerson.userId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
+        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
     }
 
     @Test
@@ -160,7 +160,7 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(moduleId = fakePerson.moduleId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.toRealmPerson())) }
+        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
     }
 
     @Test

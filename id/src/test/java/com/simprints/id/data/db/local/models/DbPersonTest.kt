@@ -1,70 +1,44 @@
 package com.simprints.id.data.db.local.models
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.commontesttools.FingerprintGeneratorUtils
-import com.simprints.id.data.db.person.local.models.toRealmPerson
-import com.simprints.id.data.db.person.domain.Fingerprint
+import com.google.common.truth.Truth.assertThat
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomFaceSample
+import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomFingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import org.junit.Assert
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DbPersonTest {
 
     @Test
-    fun buildRlPersonWithoutFingerprint() {
-        val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            emptyList())
+    fun fromDomainToDbModel() {
+        val fingerprintSample = getRandomFingerprintSample()
+        val faceSample = getRandomFaceSample()
 
-        val dbPerson = domainPerson.toRealmPerson()
+        val domainPerson = Person(
+            "guid", DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID, Date(0), Date(1), true,
+            listOf(fingerprintSample),
+            listOf(faceSample)
+        )
 
-        Assert.assertEquals(dbPerson.patientId, "guid")
-        Assert.assertEquals(dbPerson.userId, "userId")
-        Assert.assertNull(dbPerson.createdAt)
-        Assert.assertNull(dbPerson.updatedAt)
-        Assert.assertEquals(dbPerson.moduleId, "moduleId")
-        Assert.assertEquals(dbPerson.projectId, "projectId")
-        Assert.assertTrue(dbPerson.fingerprints.isEmpty())
-        Assert.assertTrue(dbPerson.toSync)
-    }
+        val dbPerson = domainPerson.fromDomainToDb()
 
-    @Test
-    fun buildRlPersonWithFingerprint() {
-        val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            listOf(Fingerprint(FingerIdentifier.LEFT_3RD_FINGER, FingerprintGeneratorUtils.generateRandomFingerprint().templateBytes)))
-
-        val dbPerson = domainPerson.toRealmPerson()
-
-        Assert.assertEquals(dbPerson.patientId, "guid")
-        Assert.assertEquals(dbPerson.userId, "userId")
-        Assert.assertNull(dbPerson.createdAt)
-        Assert.assertNull(dbPerson.updatedAt)
-        Assert.assertEquals(dbPerson.moduleId, "moduleId")
-        Assert.assertEquals(dbPerson.projectId, "projectId")
-        Assert.assertEquals(dbPerson.fingerprints.first()!!.fingerId, FingerIdentifier.LEFT_3RD_FINGER.ordinal)
-        Assert.assertTrue(dbPerson.toSync)
-    }
-
-    @Test
-    fun buildRlPersonFromACompleteFbPerson() {
-        val domainPerson = Person("guid", "projectId", "userId", "moduleId",
-            emptyList(), Date(0), Date(1), false)
-
-        val dbPerson = domainPerson.toRealmPerson()
-
-        Assert.assertEquals(dbPerson.patientId, "guid")
-        Assert.assertEquals(dbPerson.userId, "userId")
-        Assert.assertEquals(dbPerson.createdAt, Date(0))
-        Assert.assertEquals(dbPerson.updatedAt, Date(1))
-        Assert.assertEquals(dbPerson.moduleId, "moduleId")
-        Assert.assertEquals(dbPerson.projectId, "projectId")
-        Assert.assertFalse(dbPerson.toSync)
+        with(dbPerson) {
+            assertThat(patientId).isEqualTo("guid")
+            assertThat(userId).isEqualTo(DEFAULT_USER_ID)
+            assertThat(createdAt).isEqualTo(Date(0))
+            assertThat(updatedAt).isEqualTo(Date(1))
+            assertThat(moduleId).isEqualTo(DEFAULT_MODULE_ID)
+            assertThat(projectId).isEqualTo(DEFAULT_PROJECT_ID)
+            assertThat(fingerprintSamples.first()?.id).isEqualTo(fingerprintSample.id)
+            assertThat(faceSamples.first()?.id).isEqualTo(faceSample.id)
+            assertThat(toSync).isTrue()
+        }
     }
 }
