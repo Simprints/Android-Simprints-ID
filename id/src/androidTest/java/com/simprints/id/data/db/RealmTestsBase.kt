@@ -5,7 +5,7 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.person.local.models.DbPerson
-import com.simprints.id.data.db.person.local.models.toRealmPerson
+import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.db.person.domain.Person
 import io.realm.Realm
 import io.realm.RealmConfiguration
@@ -33,13 +33,13 @@ open class RealmTestsBase {
         deleteRealmFiles(config)
     }
 
-    protected fun getFakePerson(): DbPerson = PeopleGeneratorUtils.getRandomPerson().toRealmPerson()
+    protected fun getFakePerson(): DbPerson = PeopleGeneratorUtils.getRandomPerson().fromDomainToDb()
 
     protected fun saveFakePerson(realm: Realm, fakePerson: DbPerson): DbPerson =
         fakePerson.also { realm.executeTransaction { realm -> realm.insertOrUpdate(fakePerson) } }
 
     protected fun saveFakePeople(realm: Realm, people: List<Person>): List<Person> =
-        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.toRealmPerson() }) } }
+        people.also { realm.executeTransaction { realm -> realm.insertOrUpdate(people.map { person -> person.fromDomainToDb() }) } }
 
     protected fun DbPerson.deepEquals(other: DbPerson): Boolean = when {
         this.patientId != other.patientId -> false
