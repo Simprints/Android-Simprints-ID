@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-class AppResponseBuilderForEnrol : AppResponseBuilder, BaseAppResponseBuilder() {
+class AppResponseBuilderForEnrol : BaseAppResponseBuilder() {
 
     @Inject
     lateinit var personRepository: PersonRepository
