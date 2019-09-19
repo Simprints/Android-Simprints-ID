@@ -6,11 +6,10 @@ import com.simprints.id.orchestrator.responsebuilders.AppResponseBuilderForEnrol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class PersonCreationCallbackImpl : AppResponseBuilderForEnrol.PersonCreationCallback {
-
-    @Inject lateinit var repository: PersonRepository
+class PersonCreationCallbackImpl(
+    private val repository: PersonRepository
+) : AppResponseBuilderForEnrol.PersonCreationCallback {
 
     override fun onPersonCreated(person: Person?) {
         CoroutineScope(Dispatchers.Default).launch {
