@@ -230,8 +230,13 @@ open class AppModule {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideAppResponseBuilderFactory(repository: PersonRepository): AppResponseFactory
-        = AppResponseFactoryImpl(PersonCreationCallbackImpl(repository))
+    open fun provideAppResponseBuilderFactory(
+        repository: PersonRepository,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ): AppResponseFactory = AppResponseFactoryImpl(
+        PersonCreationCallbackImpl(repository, sessionEventsManager, timeHelper)
+    )
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
