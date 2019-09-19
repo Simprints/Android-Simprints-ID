@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -47,7 +47,7 @@ class OrchestratorActivity : AppCompatActivity() {
     }
 
     private val vm: OrchestratorViewModel by lazy {
-        ViewModelProviders.of(this, orchestratorViewModelFactory).get(OrchestratorViewModel::class.java)
+        ViewModelProvider(this, orchestratorViewModelFactory).get(OrchestratorViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

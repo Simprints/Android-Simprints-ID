@@ -23,14 +23,22 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     override fun buildStepVerify(): Step =
         buildVerifyStep()
 
-    private fun buildConsentStep(consentType: ConsentType) =
-        Step(CONSENT.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
-            AskConsentRequest(consentType), status = Step.Status.NOT_STARTED)
+    private fun buildConsentStep(consentType: ConsentType) = Step(
+        requestCode = CONSENT.value,
+        activityName = CORE_ACTIVITY_NAME,
+        bundleKey = CORE_STEP_BUNDLE,
+        request = AskConsentRequest(consentType),
+        status = Step.Status.NOT_STARTED
+    )
 
     //STOPSHIP: Will be done in the story for adding verification step. Building
-    private fun buildVerifyStep() =
-        Step(VERIFICATION_CHECK.value, CORE_ACTIVITY_NAME, CORE_STEP_BUNDLE,
-            FetchGUIDRequest(), status = Step.Status.NOT_STARTED)
+    private fun buildVerifyStep() = Step(
+        requestCode = VERIFICATION_CHECK.value,
+        activityName = CORE_ACTIVITY_NAME,
+        bundleKey = CORE_STEP_BUNDLE,
+        request = FetchGUIDRequest(),
+        status = Step.Status.NOT_STARTED
+    )
 
     override fun processResult(data: Intent?): Step.Result? =
         data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.also { coreResponse ->
@@ -42,4 +50,5 @@ class CoreStepProcessorImpl : CoreStepProcessor {
                 CoreResponseType.FETCH_GUID -> TODO("Will be implemented with verification check")
             }
         }
+
 }

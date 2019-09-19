@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import com.simprints.id.domain.fingerprint.Fingerprint as FingerprintCore
+import com.simprints.id.data.db.person.domain.Fingerprint as FingerprintCore
 import com.simprints.fingerprintmatcher.Fingerprint as FingerprintMatcher
 
 @Parcelize

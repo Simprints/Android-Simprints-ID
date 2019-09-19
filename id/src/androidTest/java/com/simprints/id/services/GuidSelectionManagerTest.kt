@@ -1,38 +1,5 @@
 package com.simprints.id.services
 
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
-import com.simprints.id.Application
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.state.LoginStateMocker
-import com.simprints.id.commontesttools.state.mockSessionEventsManager
-import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
-import com.simprints.id.data.analytics.eventdata.models.domain.events.GuidSelectionEvent
-import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.prefs.PreferencesManagerImpl
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.domain.moduleapi.app.requests.AppIdentityConfirmationRequest
-import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
-import com.simprints.testtools.common.syntax.mock
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
-import org.junit.runner.RunWith
-import javax.inject.Inject
-
 //TODO: Test only GuidSelectionManager. Currently it's testing SessionEventsLocalDbManager.
 //@RunWith(AndroidJUnit4::class)
 //@LargeTest
