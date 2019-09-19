@@ -8,7 +8,9 @@ import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseFactoryImpl : AppResponseFactory {
+class AppResponseFactoryImpl(
+    private val personCreationCallback: AppResponseBuilderForEnrol.PersonCreationCallback
+) : AppResponseFactory {
 
     override fun buildAppResponse(modalities: List<Modality>,
                                   appRequest: AppRequest,
@@ -19,7 +21,7 @@ class AppResponseFactoryImpl : AppResponseFactory {
          * are placeholders for when we will introduce the FaceModality
          */
         when (appRequest) {
-            is AppEnrolRequest -> AppResponseBuilderForEnrol()
+            is AppEnrolRequest -> AppResponseBuilderForEnrol(personCreationCallback)
             is AppIdentifyRequest -> AppResponseBuilderForIdentify()
             is AppVerifyRequest -> AppResponseBuilderForVerify()
             else -> null
