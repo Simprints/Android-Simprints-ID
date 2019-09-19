@@ -7,7 +7,7 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.toDomainPerson
+import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
@@ -113,7 +113,7 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
             completableWithSuspend {
-                personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.toDomainPerson() })
+                personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.fromGetApiToDomain() })
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
