@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.extractPotentialAlertScreenResponse
@@ -39,8 +38,6 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
         val component = (application as Application).component
         component.inject(this)
-
-        LanguageHelper.setLanguage(this, preferencesManager.language)
 
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 

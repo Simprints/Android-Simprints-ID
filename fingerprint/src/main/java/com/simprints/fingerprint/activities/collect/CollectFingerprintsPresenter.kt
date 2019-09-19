@@ -14,6 +14,7 @@ import com.simprints.fingerprint.activities.collect.indicators.CollectFingerprin
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -33,6 +34,7 @@ import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
+import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -50,6 +52,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
@@ -68,8 +71,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     override fun start() {
-        LanguageHelper.setLanguage(context, fingerprintRequest.language)
-
         initFingerDisplayHelper(view)
         initIndicatorsHelper(context, view)
         initScanningHelper(context, view)
@@ -325,7 +326,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
-        confirmDialog = ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
+        confirmDialog = ConfirmFingerprintsDialog(context, androidResourcesHelper, createMapForScannedFingers(),
             callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
             .create().also {

@@ -5,11 +5,13 @@ import com.simprints.fingerprint.activities.alert.AlertActivity
 import com.simprints.fingerprint.activities.alert.AlertPresenter
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity
 import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
+import com.simprints.fingerprint.activities.collect.SplashScreenActivity
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
 import com.simprints.fingerprint.activities.launch.LaunchActivity
 import com.simprints.fingerprint.activities.launch.LaunchPresenter
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.MatchingPresenter
+import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
 import com.simprints.id.di.AppComponent
@@ -36,4 +38,6 @@ interface FingerprintComponent {
     fun inject(collectFingerprintsActivity: CollectFingerprintsActivity)
     fun inject(launchActivity: LaunchActivity)
     fun inject(alertActivity: AlertActivity)
+    fun inject(refusalActivity: RefusalActivity)
+    fun inject(splashScreenActivity: SplashScreenActivity)
 }

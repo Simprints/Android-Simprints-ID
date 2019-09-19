@@ -14,9 +14,6 @@ interface LaunchContract {
         fun handleSetupProgress(progress: Int, detailsId: Int)
         fun handleSetupFinished()
 
-        fun setLanguage(language: String)
-        fun initTextsInButtons()
-        fun initConsentTabs()
         fun setLogoVisibility(visible: Boolean)
         fun setResultAndFinish(resultCode: Int, resultData: Intent?)
         fun continueToNextActivity()

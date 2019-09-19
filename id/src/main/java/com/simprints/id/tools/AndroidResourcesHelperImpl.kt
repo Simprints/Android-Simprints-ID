@@ -1,4 +1,4 @@
-package com.simprints.core.tools
+package com.simprints.id.tools
 
 import android.content.Context
 import android.content.res.Resources
@@ -79,6 +79,7 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
     }
 
     override fun getString(res: Int): String = context.getString(res)
-
+    override fun getString(resId: Int, vararg formatArgs: Any): String = context.getString(resId, formatArgs)
+    override fun getStringArray(res: Int): Array<String> = context.resources.getStringArray(res)
     override fun getDrawable(res: Int): Drawable? = ContextCompat.getDrawable(context, res)
 }
