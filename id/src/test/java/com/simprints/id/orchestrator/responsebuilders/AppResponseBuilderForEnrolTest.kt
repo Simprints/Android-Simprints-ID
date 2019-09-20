@@ -31,7 +31,7 @@ class AppResponseBuilderForEnrolTest {
         )
 
         assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID))
+        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
     }
 
     @Test
@@ -44,7 +44,6 @@ class AppResponseBuilderForEnrolTest {
         )
 
         assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID))
     }
 
     @Test
@@ -57,7 +56,7 @@ class AppResponseBuilderForEnrolTest {
         )
 
         assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID))
+        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
     }
 
     @Test
@@ -106,7 +105,7 @@ class AppResponseBuilderForEnrolTest {
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
             request = request,
-            result = FingerprintEnrolResponse(EXPECTED_GUID),
+            result = FingerprintEnrolResponse(EXPECTED_GUID_FINGERPRINT),
             status = Step.Status.COMPLETED
         )
     }
@@ -117,7 +116,7 @@ class AppResponseBuilderForEnrolTest {
             listOf(
                 FaceCaptureResult(
                     index = 0,
-                    result = FaceSample(EXPECTED_GUID, EXPECTED_GUID.toByteArray(), null)
+                    result = FaceSample("faceId", "faceId".toByteArray(), null)
                 )
             )
         )
@@ -133,7 +132,7 @@ class AppResponseBuilderForEnrolTest {
     }
 
     private companion object {
-        const val EXPECTED_GUID = "expected-guid"
+        const val EXPECTED_GUID_FINGERPRINT = "expected-guid"
     }
 
 }
