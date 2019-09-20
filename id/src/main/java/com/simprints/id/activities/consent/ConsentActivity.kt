@@ -10,10 +10,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.exitform.CoreExitFormActivity
-import com.simprints.id.activities.exitform.result.CoreExitFormResult
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult
 import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_BUNDLE_KEY

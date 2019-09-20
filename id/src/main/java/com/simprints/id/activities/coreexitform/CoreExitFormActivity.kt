@@ -1,4 +1,4 @@
-package com.simprints.id.activities.exitform
+package com.simprints.id.activities.coreexitform
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,11 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.exitform.result.CoreExitFormResult
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.GO_BACK
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Action.SUBMIT
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_GO_BACK
-import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Action.GO_BACK
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Action.SUBMIT
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_GO_BACK
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger

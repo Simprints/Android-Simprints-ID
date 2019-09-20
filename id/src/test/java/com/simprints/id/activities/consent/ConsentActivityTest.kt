@@ -3,7 +3,7 @@ package com.simprints.id.activities.consent
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.activities.exitform.CoreExitFormActivity
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.commontesttools.di.TestAppModule

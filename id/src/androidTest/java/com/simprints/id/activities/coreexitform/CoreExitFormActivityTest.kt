@@ -1,4 +1,4 @@
-package com.simprints.id.activities.exitform
+package com.simprints.id.activities.coreexitform
 
 import android.app.Instrumentation
 import androidx.test.core.app.ActivityScenario
@@ -10,7 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.exitform.result.CoreExitFormResult
+import com.simprints.id.activities.coreexitform.result.CoreExitFormResult
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.hamcrest.CoreMatchers.not

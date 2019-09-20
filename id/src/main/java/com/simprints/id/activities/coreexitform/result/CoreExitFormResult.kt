@@ -1,4 +1,4 @@
-package com.simprints.id.activities.exitform.result
+package com.simprints.id.activities.coreexitform.result
 
 import android.os.Parcelable
 import com.simprints.id.data.exitform.CoreExitFormReason
