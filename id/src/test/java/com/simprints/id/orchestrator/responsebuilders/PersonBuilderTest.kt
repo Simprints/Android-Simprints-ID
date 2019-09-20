@@ -6,7 +6,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.testtools.common.syntax.assertThrows
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
@@ -21,15 +21,13 @@ class PersonBuilderTest {
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, null)
 
-        assertThat(person, notNullValue())
-        require(person != null)
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
             assertThat(fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
-            assertThat(faceSamples, `is`(emptyList()))   
+            assertThat(faceSamples, `is`(emptyList()))
         }
     }
 
@@ -41,8 +39,6 @@ class PersonBuilderTest {
         val person = personBuilder.buildPerson(request, null, faceResponse)
         val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
 
-        assertThat(person, notNullValue())
-        require(person != null)
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID))
             assertThat(projectId, `is`(request.projectId))
@@ -66,8 +62,6 @@ class PersonBuilderTest {
         val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse)
         val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
 
-        assertThat(person, notNullValue())
-        require(person != null)
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID))
             assertThat(projectId, `is`(request.projectId))
@@ -83,12 +77,12 @@ class PersonBuilderTest {
     }
 
     @Test
-    fun withNoResponses_shouldReturnNull() {
+    fun withNoResponses_shouldThrowException() {
         val request = mockRequest()
 
-        val person = personBuilder.buildPerson(request, null, null)
-
-        assertThat(person, nullValue())
+        assertThrows<Throwable> {
+            personBuilder.buildPerson(request, null, null)
+        }
     }
 
     @Test

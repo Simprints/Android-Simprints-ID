@@ -11,10 +11,9 @@ class PersonCreationCallbackImpl(
     private val repository: PersonRepository
 ) : AppResponseBuilderForEnrol.PersonCreationCallback {
 
-    override fun onPersonCreated(person: Person?) {
+    override fun onPersonCreated(person: Person) {
         CoroutineScope(Dispatchers.Default).launch {
-            if (person != null)
-                repository.saveAndUpload(person)
+            repository.saveAndUpload(person)
         }
     }
 
