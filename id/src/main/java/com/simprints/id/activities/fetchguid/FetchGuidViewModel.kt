@@ -2,19 +2,19 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.simprints.id.data.db.PersonSource
+import androidx.lifecycle.viewModelScope
+import com.simprints.id.data.db.PersonFetchResult.PersonSource
 import com.simprints.id.data.db.person.PersonRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val personRepository: PersonRepository) : ViewModel() {
 
     var personFetch = MutableLiveData<PersonSource>()
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
-        val personFetchResult = runBlocking {
-            personRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
+        viewModelScope.launch {
+            val personFetchResult = personRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
+            personFetch.postValue(personFetchResult.personSource)
         }
-
-        personFetch.value = personFetchResult.personSource
     }
 }

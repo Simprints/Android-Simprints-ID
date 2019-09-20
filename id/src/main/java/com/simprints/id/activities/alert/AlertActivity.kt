@@ -79,7 +79,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType))
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.CLOSE))
         })
 
         finish()
