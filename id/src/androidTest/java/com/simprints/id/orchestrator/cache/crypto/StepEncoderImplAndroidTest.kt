@@ -90,12 +90,12 @@ class StepEncoderImplAndroidTest {
     }
 
     private fun buildStep(request: Step.Request, result: Step.Result): Step = Step(
-        REQUEST_CODE,
-        ACTIVITY_NAME,
-        BUNDLE_KEY,
-        request,
-        result,
-        Step.Status.COMPLETED
+        requestCode = REQUEST_CODE,
+        activityName = ACTIVITY_NAME,
+        bundleKey = BUNDLE_KEY,
+        request = request,
+        result = result,
+        status = Step.Status.COMPLETED
     )
 
     private fun mockFingerprintEnrolRequest(): Step.Request = FingerprintEnrolRequest(
