@@ -22,7 +22,7 @@ class PersonBuilderTest {
         val person = personBuilder.buildPerson(request, fingerprintResponse, null)
 
         with(person) {
-            assertThat(patientId, `is`(EXPECTED_GUID))
+            assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
@@ -40,7 +40,6 @@ class PersonBuilderTest {
         val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
 
         with(person) {
-            assertThat(patientId, `is`(EXPECTED_GUID))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
@@ -63,7 +62,7 @@ class PersonBuilderTest {
         val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
 
         with(person) {
-            assertThat(patientId, `is`(EXPECTED_GUID))
+            assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
@@ -99,14 +98,14 @@ class PersonBuilderTest {
         "projectId", "userId", "moduleId", "metadata"
     )
 
-    private fun mockFingerprintResponse() = FingerprintEnrolResponse(EXPECTED_GUID)
+    private fun mockFingerprintResponse() = FingerprintEnrolResponse(EXPECTED_GUID_FINGERPRINT)
 
     private fun mockFaceResponse(): FaceCaptureResponse {
         return FaceCaptureResponse(
             listOf(
                 FaceCaptureResult(
                     index = 0,
-                    result = FaceSample(EXPECTED_GUID, EXPECTED_GUID.toByteArray(), null)
+                    result = FaceSample("faceId", "faceId".toByteArray(), null)
                 )
             )
         )
@@ -124,7 +123,7 @@ class PersonBuilderTest {
     }
 
     private companion object {
-        const val EXPECTED_GUID = "expected-guid"
+        const val EXPECTED_GUID_FINGERPRINT = "expected-guid"
     }
 
 }

@@ -101,8 +101,7 @@ class AppResponseBuilderForEnrol(
 
         private fun buildPersonFromFace(request: AppEnrolRequest,
                                         faceResponse: FaceCaptureResponse): Person {
-            val patientId = faceResponse.capturingResult.last().result?.faceId
-                ?: throw Throwable("Patient ID is null")
+            val patientId = UUID.randomUUID().toString()
             return Person(
                 patientId,
                 request.projectId,
