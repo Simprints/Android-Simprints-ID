@@ -1,7 +1,5 @@
 package com.simprints.id.orchestrator.responsebuilders
 
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
@@ -18,12 +16,9 @@ import com.simprints.id.tools.TimeHelper
 import java.util.*
 
 class AppResponseBuilderForEnrol(
-    repository: PersonRepository,
-    sessionEventsManager: SessionEventsManager,
+    private val enrolmentHelper: EnrolmentHelper,
     private val timeHelper: TimeHelper
 ) : BaseAppResponseBuilder() {
-
-    private val enrolmentHelper = EnrolmentHelper(repository, sessionEventsManager, timeHelper)
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
                                           appRequest: AppRequest,

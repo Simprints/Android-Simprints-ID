@@ -23,8 +23,7 @@ import org.junit.Test
 class AppResponseBuilderForEnrolTest {
 
     private val responseBuilder = AppResponseBuilderForEnrol(
-        repository = mock(),
-        sessionEventsManager = mock(),
+        enrolmentHelper = mock(),
         timeHelper = mock()
     )
 
