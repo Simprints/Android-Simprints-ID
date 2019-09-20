@@ -7,8 +7,8 @@ import com.simprints.id.orchestrator.steps.Step
 
 interface AppResponseBuilder {
 
-    fun buildAppResponse(modalities: List<Modality>,
-                         appRequest: AppRequest,
-                         steps: List<Step>,
-                         sessionId: String): AppResponse
+    suspend fun buildAppResponse(modalities: List<Modality>,
+                                 appRequest: AppRequest,
+                                 steps: List<Step>,
+                                 sessionId: String): AppResponse
 }
