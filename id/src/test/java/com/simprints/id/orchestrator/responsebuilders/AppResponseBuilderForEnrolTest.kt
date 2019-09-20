@@ -22,7 +22,11 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class AppResponseBuilderForEnrolTest {
 
-    private val responseBuilder = AppResponseBuilderForEnrol(repository = mock())
+    private val responseBuilder = AppResponseBuilderForEnrol(
+        repository = mock(),
+        sessionEventsManager = mock(),
+        timeHelper = mock()
+    )
 
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppEnrolResponse() {

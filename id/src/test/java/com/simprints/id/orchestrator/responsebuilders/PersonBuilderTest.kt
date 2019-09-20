@@ -6,7 +6,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.assertThrows
+import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -14,13 +16,14 @@ import org.junit.Test
 class PersonBuilderTest {
 
     private val personBuilder = AppResponseBuilderForEnrol.PersonBuilder
+    private val timeHelper: TimeHelper = mock()
 
     @Test
     fun withFingerprintResponse_shouldBuildPerson() {
         val request = mockRequest()
         val fingerprintResponse = mockFingerprintResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, null)
+        val person = personBuilder.buildPerson(request, fingerprintResponse, null, timeHelper)
 
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
@@ -37,7 +40,7 @@ class PersonBuilderTest {
         val request = mockRequest()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, null, faceResponse)
+        val person = personBuilder.buildPerson(request, null, faceResponse, timeHelper)
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 val imageRef = it.result?.imageRef
@@ -64,7 +67,7 @@ class PersonBuilderTest {
         val fingerprintResponse = mockFingerprintResponse()
         val faceResponse = mockFaceResponse()
 
-        val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse)
+        val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 val imageRef = it.result?.imageRef
@@ -91,7 +94,7 @@ class PersonBuilderTest {
         val request = mockRequest()
 
         assertThrows<Throwable> {
-            personBuilder.buildPerson(request, null, null)
+            personBuilder.buildPerson(request, null, null, timeHelper)
         }
     }
 

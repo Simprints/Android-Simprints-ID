@@ -230,8 +230,11 @@ open class AppModule {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideAppResponseBuilderFactory(repository: PersonRepository): AppResponseFactory
-        = AppResponseFactoryImpl(repository)
+    open fun provideAppResponseBuilderFactory(
+        repository: PersonRepository,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ): AppResponseFactory = AppResponseFactoryImpl(repository, sessionEventsManager, timeHelper)
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
@@ -251,7 +254,7 @@ open class AppModule {
     open fun provideConsentTextManager(context: Context,
                                        consentLocalDataSource: ConsentLocalDataSource,
                                        crashReportManager: CrashReportManager,
-                                       preferencesManager: PreferencesManager) : ConsentRepository =
+                                       preferencesManager: PreferencesManager): ConsentRepository =
         ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
             preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language)
 
