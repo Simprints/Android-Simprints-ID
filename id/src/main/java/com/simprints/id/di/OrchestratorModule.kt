@@ -5,6 +5,7 @@ import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
@@ -13,10 +14,7 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
-import com.simprints.id.orchestrator.ModalityFlowFactory
-import com.simprints.id.orchestrator.ModalityFlowFactoryImpl
-import com.simprints.id.orchestrator.OrchestratorManager
-import com.simprints.id.orchestrator.OrchestratorManagerImpl
+import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
 import com.simprints.id.orchestrator.cache.crypto.StepEncoder
@@ -124,5 +122,12 @@ class OrchestratorModule {
     fun provideStepEncoder(
         keystoreManager: KeystoreManager
     ): StepEncoder = StepEncoderImpl(keystoreManager)
+
+    @Provides
+    fun provideEnrolmentHelper(
+        repository: PersonRepository,
+        sessionEventsManager: SessionEventsManager,
+        timeHelper: TimeHelper
+    ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionEventsManager, timeHelper)
 
 }

@@ -44,6 +44,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
@@ -231,10 +232,9 @@ open class AppModule {
 
     @Provides
     open fun provideAppResponseBuilderFactory(
-        repository: PersonRepository,
-        sessionEventsManager: SessionEventsManager,
+        enrolmentHelper: EnrolmentHelper,
         timeHelper: TimeHelper
-    ): AppResponseFactory = AppResponseFactoryImpl(repository, sessionEventsManager, timeHelper)
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
