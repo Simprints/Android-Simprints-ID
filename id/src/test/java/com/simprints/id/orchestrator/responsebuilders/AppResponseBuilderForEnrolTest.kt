@@ -12,62 +12,73 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolR
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AppResponseBuilderForEnrolTest {
 
-    private val responseBuilder = AppResponseBuilderForEnrol(personCreationCallback = mock())
+    private val responseBuilder = AppResponseBuilderForEnrol(repository = mock())
 
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppEnrolResponse() {
-        val modalities = listOf(Modality.FINGER)
-        val steps = mockSteps(modalities)
+        runBlockingTest {
+            val modalities = listOf(Modality.FINGER)
+            val steps = mockSteps(modalities)
 
-        val response = responseBuilder.buildAppResponse(
-            modalities, mockRequest(), steps, "sessionId"
-        )
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
 
-        assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
+            assertThat(response, instanceOf(AppEnrolResponse::class.java))
+            assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
+        }
     }
 
     @Test
     fun withFaceOnlySteps_shouldBuildAppEnrolResponse() {
-        val modalities = listOf(Modality.FACE)
-        val steps = mockSteps(modalities)
+        runBlockingTest {
+            val modalities = listOf(Modality.FACE)
+            val steps = mockSteps(modalities)
 
-        val response = responseBuilder.buildAppResponse(
-            modalities, mockRequest(), steps, "sessionId"
-        )
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
 
-        assertThat(response, instanceOf(AppEnrolResponse::class.java))
+            assertThat(response, instanceOf(AppEnrolResponse::class.java))
+        }
     }
 
     @Test
     fun withFingerprintAndFaceSteps_shouldBuildAppEnrolResponse() {
-        val modalities = listOf(Modality.FINGER, Modality.FACE)
-        val steps = mockSteps(modalities)
+        runBlockingTest {
+            val modalities = listOf(Modality.FINGER, Modality.FACE)
+            val steps = mockSteps(modalities)
 
-        val response = responseBuilder.buildAppResponse(
-            modalities, mockRequest(), steps, "sessionId"
-        )
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
 
-        assertThat(response, instanceOf(AppEnrolResponse::class.java))
-        assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
+            assertThat(response, instanceOf(AppEnrolResponse::class.java))
+            assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
+        }
     }
 
     @Test
     fun withInvalidSteps_shouldThrowException() {
-        val modalities = emptyList<Modality>()
-        val steps = mockSteps(modalities)
+        runBlockingTest {
+            val modalities = emptyList<Modality>()
+            val steps = mockSteps(modalities)
 
-        assertThrows<Throwable> {
-            responseBuilder.buildAppResponse(
-                modalities, mockRequest(), steps, "sessionId"
-            )
+            assertThrows<Throwable> {
+                responseBuilder.buildAppResponse(
+                    modalities, mockRequest(), steps, "sessionId"
+                )
+            }
         }
     }
 

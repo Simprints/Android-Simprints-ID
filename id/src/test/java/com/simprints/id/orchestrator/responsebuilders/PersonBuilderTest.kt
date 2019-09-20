@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
@@ -37,7 +38,12 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, null, faceResponse)
-        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.fromModuleApiToDb()!! }
+        val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
+            it.result?.template?.let { template ->
+                val imageRef = it.result?.imageRef
+                FaceSample(template, imageRef)
+            }
+        }
 
         with(person) {
             assertThat(projectId, `is`(request.projectId))
@@ -59,7 +65,12 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.fromModuleApiToDb()!! }
+        val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
+            it.result?.template?.let { template ->
+                val imageRef = it.result?.imageRef
+                FaceSample(template, imageRef)
+            }
+        }
 
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
@@ -84,16 +95,6 @@ class PersonBuilderTest {
         }
     }
 
-    @Test
-    fun withNullFaceSample_shouldThrowException() {
-        val request = mockRequest()
-        val faceResponse = mockFaceResponseWithNullSample()
-
-        assertThrows<Throwable> {
-            personBuilder.buildPerson(request, null, faceResponse)
-        }
-    }
-
     private fun mockRequest() = AppEnrolRequest(
         "projectId", "userId", "moduleId", "metadata"
     )
@@ -106,17 +107,6 @@ class PersonBuilderTest {
                 FaceCaptureResult(
                     index = 0,
                     result = FaceCaptureSample("faceId", "faceId".toByteArray(), null)
-                )
-            )
-        )
-    }
-
-    private fun mockFaceResponseWithNullSample(): FaceCaptureResponse {
-        return FaceCaptureResponse(
-            listOf(
-                FaceCaptureResult(
-                    index = 0,
-                    result = null
                 )
             )
         )
