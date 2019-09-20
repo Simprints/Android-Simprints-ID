@@ -1,6 +1,5 @@
 package com.simprints.id.activities.consent
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -11,15 +10,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
+import com.simprints.id.activities.exitform.CoreExitFormActivity
+import com.simprints.id.activities.exitform.result.CoreExitFormResult
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.BUNDLE_KEY
+import com.simprints.id.activities.exitform.result.CoreExitFormResult.Companion.EXIT_FORM_RESULT_CODE_SUBMIT
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
-import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest.Companion.CONSENT_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.TimeHelper
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
@@ -44,7 +50,7 @@ class ConsentActivity : AppCompatActivity() {
 
         startConsentEventTime = timeHelper.now()
 
-        askConsentRequestReceived = intent.extras?.getParcelable(CONSENT_STEP_BUNDLE) ?: throw InvalidAppRequest()
+        askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         viewModel = ViewModelProviders.of(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
@@ -103,15 +109,15 @@ class ConsentActivity : AppCompatActivity() {
 
     fun handleConsentAcceptClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.ACCEPTED))
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(CONSENT_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
+        setResult(CoreResponseCode.CONSENT.value, Intent().apply {
+            putExtra(CORE_STEP_BUNDLE, AskConsentResponse(ConsentResponse.ACCEPTED))
         })
         finish()
     }
 
     fun handleConsentDeclineClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addConsentEvent(buildConsentEventForResult(ConsentEvent.Result.DECLINED))
-        //STOPSHIP: Launch Exit Form and decide on creating a separate OrchestratorManager for core
+        startCoreExitFormActivity()
     }
 
     fun handlePrivacyNoticeClick(@Suppress("UNUSED_PARAMETER")view: View) {
@@ -124,11 +130,33 @@ class ConsentActivity : AppCompatActivity() {
     private fun getCurrentConsentTab() = when(tabHost.currentTabTag) {
         GENERAL_CONSENT_TAB_TAG -> INDIVIDUAL
         PARENTAL_CONSENT_TAB_TAG -> PARENTAL
-        else -> throw Exception()
+        else -> throw IllegalStateException("Invalid consent tab selected")
     }
 
     private fun startPrivacyNoticeActivity() {
         startActivity(Intent(this, PricvacyNoticeActivity::class.java))
+    }
+
+    private fun startCoreExitFormActivity() {
+        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == EXIT_FORM_RESULT_CODE_SUBMIT) {
+            setResult(CoreResponseCode.EXIT_FORM.value, buildExitFormResponse(data))
+            finish()
+        }
+    }
+
+    private fun buildExitFormResponse(data: Intent?) = Intent().apply {
+        data?.getParcelableExtra<CoreExitFormResult>(BUNDLE_KEY)?.let {
+            putExtra(CORE_STEP_BUNDLE, CoreExitFormResponse(it.answer.reason, it.answer.optionalText))
+        }
+    }
+
+    override fun onBackPressed() {
+        startCoreExitFormActivity()
     }
 
     companion object {
