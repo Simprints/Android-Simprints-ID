@@ -21,6 +21,7 @@ open class RequestLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         (application as Application).component.inject(this)
         app = application as Application
+        title = androidResourcesHelper.getString(R.string.requestLogin_title)
 
         setContentView(R.layout.activity_front)
         setTextInLayout()

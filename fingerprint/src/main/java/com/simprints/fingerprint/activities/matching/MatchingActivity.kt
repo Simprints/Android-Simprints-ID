@@ -10,7 +10,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.id.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -27,6 +26,7 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
 import com.simprints.id.Application
+import com.simprints.id.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -90,7 +90,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun setIdentificationProgressLoadingStart() =
         runOnUiThread {
-            tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getString(R.string.loading_candidates)
             setIdentificationProgress(25)
         }
 

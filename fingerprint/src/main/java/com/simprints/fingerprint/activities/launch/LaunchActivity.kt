@@ -105,7 +105,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     override fun handleSetupProgress(progress: Int, detailsId: Int) {
         loadingInfoTextView.visibility = View.VISIBLE
         launchProgressBar.progress = progress
-        loadingInfoTextView.setText(detailsId)
+        loadingInfoTextView.text = androidResourcesHelper.getString(detailsId)
     }
 
     override fun handleSetupFinished() {
@@ -203,7 +203,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
     }
 
     private fun buildConfirmScannerErrorAlertDialog(scannerId: String) =
-        ConfirmScannerErrorBuilder()
+        ConfirmScannerErrorBuilder(androidResourcesHelper)
             .build(
                 this, scannerId,
                 onYes = { viewPresenter.handleScannerDisconnectedYesClick() },

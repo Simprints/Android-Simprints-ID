@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
@@ -34,7 +33,6 @@ import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
-import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
 import java.util.*
@@ -82,7 +80,8 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            fingerprintRequest.fingerStatus)
+            fingerprintRequest.fingerStatus,
+            androidResourcesHelper)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -140,7 +139,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         }
 
     private fun buildQueryForIdentifyPool(request: FingerprintIdentifyRequest): QueryForIdentifyPool =
-        when(request.matchGroup) {
+        when (request.matchGroup) {
             MatchGroup.GLOBAL -> QueryForIdentifyPool(request.projectId)
             MatchGroup.USER -> QueryForIdentifyPool(request.projectId, userId = request.userId)
             MatchGroup.MODULE -> QueryForIdentifyPool(request.projectId, moduleId = request.moduleId)
@@ -208,9 +207,9 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun getTitle(): String =
         when (fingerprintRequest) {
-            is FingerprintEnrolRequest -> context.getString(R.string.register_title)
-            is FingerprintIdentifyRequest -> context.getString(R.string.identify_title)
-            is FingerprintVerifyRequest -> context.getString(R.string.verify_title)
+            is FingerprintEnrolRequest -> androidResourcesHelper.getString(R.string.register_title)
+            is FingerprintIdentifyRequest -> androidResourcesHelper.getString(R.string.identify_title)
+            is FingerprintVerifyRequest -> androidResourcesHelper.getString(R.string.verify_title)
             else -> ""
         }
 
@@ -338,7 +337,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
         mutableMapOf<String, Boolean>().also { mapOfScannedFingers ->
             activeFingers.forEach {
-                mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
+                mapOfScannedFingers[androidResourcesHelper.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
             }
         }
 

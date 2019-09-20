@@ -27,6 +27,7 @@ class SettingsActivity : AppCompatPreferenceActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
         (application as Application).component.inject(this)
+        title = androidResourcesHelper.getString(R.string.title_activity_settings)
 
         setupActionBar()
 

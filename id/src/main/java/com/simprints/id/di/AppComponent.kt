@@ -23,6 +23,7 @@ import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
@@ -106,6 +107,7 @@ interface AppComponent {
     fun inject(settingsActivity: SettingsActivity)
     fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
     fun inject(settingsAboutFragment: SettingsAboutFragment)
+    fun inject(settingsAboutActivity: SettingsAboutActivity)
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
