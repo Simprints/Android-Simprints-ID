@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.responsebuilders
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.testtools.common.syntax.assertThrows
 import org.hamcrest.CoreMatchers.`is`
@@ -37,7 +37,7 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, null, faceResponse)
-        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
+        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.fromModuleApiToDb()!! }
 
         with(person) {
             assertThat(projectId, `is`(request.projectId))
@@ -59,7 +59,7 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.toDomain()!! }
+        val expectedFaceSamples = faceResponse.capturingResult.map { it.result?.fromModuleApiToDb()!! }
 
         with(person) {
             assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
@@ -105,7 +105,7 @@ class PersonBuilderTest {
             listOf(
                 FaceCaptureResult(
                     index = 0,
-                    result = FaceSample("faceId", "faceId".toByteArray(), null)
+                    result = FaceCaptureSample("faceId", "faceId".toByteArray(), null)
                 )
             )
         )

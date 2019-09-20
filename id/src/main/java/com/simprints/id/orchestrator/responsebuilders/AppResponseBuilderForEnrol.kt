@@ -119,7 +119,10 @@ class AppResponseBuilderForEnrol(
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
             return faceResponse.capturingResult.mapNotNull {
-                it.result?.toDomain()
+                val imageRef = it.result?.imageRef
+                it.result?.template?.let { template ->
+                    FaceSample(template, imageRef)
+                }
             }
         }
     }
