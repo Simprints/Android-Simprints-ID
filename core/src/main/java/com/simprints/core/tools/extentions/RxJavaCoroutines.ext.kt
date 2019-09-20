@@ -5,17 +5,9 @@ import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 
 fun completableWithSuspend(block: suspend () -> Unit): Completable =
-    Completable.create {
-        try {
-            runBlocking { block() }
-            it.onComplete()
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            it.onError(t)
-        }
-    }
+    Completable.fromAction { runBlocking { block() } }
 
-fun <T> singleWithSuspend(block: suspend () -> T?) =
+fun <T> singleWithSuspend(block: suspend () -> T?): Single<T> =
     Single.create<T> {
         try {
             it.onSuccess(runBlocking { block() }!!)

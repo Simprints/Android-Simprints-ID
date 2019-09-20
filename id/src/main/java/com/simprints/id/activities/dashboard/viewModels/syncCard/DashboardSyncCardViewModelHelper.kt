@@ -25,7 +25,6 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        isDownSyncRunning: Boolean) {
 
     @Inject lateinit var personRepository: PersonRepository
-    @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
@@ -124,7 +123,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
 
     private fun updateTotalUpSyncCount(): Completable =
-        Single.just(personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true)))
+        Single.just(personRepository.count(PersonLocalDataSource.Query(toSync = true)))
             .flatMapCompletable {
                 viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()

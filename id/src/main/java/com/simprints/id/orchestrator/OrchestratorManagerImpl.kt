@@ -26,9 +26,9 @@ open class OrchestratorManagerImpl(
 
     private lateinit var modalitiesFlow: ModalityFlow
 
-    override fun initialise(modalities: List<Modality>,
-                            appRequest: AppRequest,
-                            sessionId: String) {
+    override suspend fun initialise(modalities: List<Modality>,
+                                    appRequest: AppRequest,
+                                    sessionId: String) {
         this.sessionId = sessionId
         this.appRequest = appRequest
         this.modalities = modalities
@@ -38,14 +38,14 @@ open class OrchestratorManagerImpl(
         proceedToNextStepOrAppResponse()
     }
 
-    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override suspend fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
         modalitiesFlow.handleIntentResult(requestCode, resultCode, data)?.let(hotCache::save)
         proceedToNextStepOrAppResponse()
     }
 
-    override fun restoreState() {
+    override suspend fun restoreState() {
         resetInternalState()
-        hotCache.load()?.let(modalitiesFlow::restoreState)
+        hotCache.load().let(modalitiesFlow::restoreState)
         proceedToNextStepOrAppResponse()
     }
 
@@ -53,7 +53,7 @@ open class OrchestratorManagerImpl(
         hotCache.clear()
     }
 
-    private fun proceedToNextStepOrAppResponse() {
+    private suspend fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {
             if (!anyStepOngoing()) {
                 val potentialNextStep = getNextStepToLaunch()
@@ -76,9 +76,9 @@ open class OrchestratorManagerImpl(
     private fun ModalityFlow.anyStepOngoing() =
         steps.any { it.getStatus() == ONGOING }
 
-    private fun buildAppResponse() {
+    private suspend fun buildAppResponse() {
         val cachedSteps = hotCache.load()
-        val steps: List<Step> = if (cachedSteps.isNullOrEmpty()) {
+        val steps: List<Step> = if (cachedSteps.isEmpty()) {
             modalitiesFlow.steps
         } else {
             cachedSteps
