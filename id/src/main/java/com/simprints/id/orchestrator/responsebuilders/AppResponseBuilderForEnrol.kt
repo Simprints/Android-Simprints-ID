@@ -11,22 +11,19 @@ import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelperImpl
 import java.util.*
-import javax.inject.Inject
 
 class AppResponseBuilderForEnrol(
-    private val personCreationCallback: PersonCreationCallback
+    private val repository: PersonRepository
 ) : BaseAppResponseBuilder() {
 
-    @Inject
-    lateinit var personRepository: PersonRepository
-
-    override fun buildAppResponse(modalities: List<Modality>,
-                                  appRequest: AppRequest,
-                                  steps: List<Step>,
-                                  sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(modalities: List<Modality>,
+                                          appRequest: AppRequest,
+                                          steps: List<Step>,
+                                          sessionId: String): AppResponse {
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }
@@ -37,7 +34,7 @@ class AppResponseBuilderForEnrol(
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
         val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        personCreationCallback.onPersonCreated(person)
+        EnrolmentHelper(repository).saveAndUpload(person)
 
         return AppEnrolResponse(person.patientId)
     }
@@ -47,10 +44,6 @@ class AppResponseBuilderForEnrol(
 
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
-
-    interface PersonCreationCallback {
-        fun onPersonCreated(person: Person)
-    }
 
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,

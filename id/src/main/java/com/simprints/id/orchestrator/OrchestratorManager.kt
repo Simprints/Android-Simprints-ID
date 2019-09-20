@@ -16,9 +16,9 @@ interface OrchestratorManager {
     val ongoingStep: LiveData<Step?>
     val appResponse: LiveData<AppResponse?>
 
-    fun initialise(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
-    fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?)
+    suspend fun initialise(modalities: List<Modality>, appRequest: AppRequest, sessionId: String)
+    suspend fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?)
 
-    fun restoreState()
+    suspend fun restoreState()
     fun clearState()
 }
