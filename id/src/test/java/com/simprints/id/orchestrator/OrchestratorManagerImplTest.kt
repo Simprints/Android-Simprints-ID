@@ -27,8 +27,11 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
+import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.testtools.common.syntax.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -38,8 +41,8 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
-import com.simprints.moduleapi.face.responses.IFaceResponse.Companion.BUNDLE_KEY as FACE_BUNDLE_KEY
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class OrchestratorManagerImplTest {
 
@@ -140,12 +143,16 @@ class OrchestratorManagerImplTest {
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {
-            buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+            runBlockingTest {
+                buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+            }
         }
 
     private fun verifyOrchestratorTriedToBuildFinalAppResponse() =
         verifyOnce(appResponseFactoryMock) {
-            buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+            runBlockingTest {
+                buildAppResponse(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull())
+            }
         }
 
     private fun prepareModalFlowForFaceEnrol() {
@@ -160,10 +167,10 @@ class OrchestratorManagerImplTest {
 
         mockSteps.add(
             Step(
-                CAPTURE.value,
-                FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
-                IFaceRequest.BUNDLE_KEY,
-                request,
+                requestCode = CAPTURE.value,
+                activityName = FaceStepProcessorImpl.ACTIVITY_CLASS_NAME,
+                bundleKey = IFaceRequest.BUNDLE_KEY,
+                request = request,
                 status = NOT_STARTED
             )
         )
@@ -182,7 +189,9 @@ class OrchestratorManagerImplTest {
 
     private fun OrchestratorManager.startFlowForEnrol(
         modalities: List<Modality>,
-        sessionId: String = "") = initialise(modalities, appEnrolRequest, sessionId)
+        sessionId: String = "") = runBlockingTest {
+        initialise(modalities, appEnrolRequest, sessionId)
+    }
 
     private fun OrchestratorManager.progressWitFaceCapture(
         requestCode: Int = CAPTURE.value,
@@ -194,10 +203,12 @@ class OrchestratorManagerImplTest {
             }?.result = it.fromModuleApiToDomain()
         }
 
-        handleIntentResult(
-            requestCode,
-            Activity.RESULT_OK,
-            Intent().putExtra(FACE_BUNDLE_KEY, response))
+        runBlockingTest {
+            handleIntentResult(
+                requestCode,
+                Activity.RESULT_OK,
+                Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))
+        }
     }
 
     companion object {

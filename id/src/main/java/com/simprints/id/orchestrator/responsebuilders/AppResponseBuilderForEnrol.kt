@@ -11,22 +11,19 @@ import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelperImpl
 import java.util.*
-import javax.inject.Inject
 
 class AppResponseBuilderForEnrol(
-    private val personCreationCallback: PersonCreationCallback
+    private val repository: PersonRepository
 ) : BaseAppResponseBuilder() {
 
-    @Inject
-    lateinit var personRepository: PersonRepository
-
-    override fun buildAppResponse(modalities: List<Modality>,
-                                  appRequest: AppRequest,
-                                  steps: List<Step>,
-                                  sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(modalities: List<Modality>,
+                                          appRequest: AppRequest,
+                                          steps: List<Step>,
+                                          sessionId: String): AppResponse {
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }
@@ -37,9 +34,9 @@ class AppResponseBuilderForEnrol(
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
         val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        personCreationCallback.onPersonCreated(person)
+        EnrolmentHelper(repository).saveAndUpload(person)
 
-        return buildAppEnrolResponse(person)
+        return AppEnrolResponse(person.patientId)
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
@@ -48,34 +45,24 @@ class AppResponseBuilderForEnrol(
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
 
-    private fun buildAppEnrolResponse(person: Person?): AppEnrolResponse {
-        if (person == null)
-            throw Throwable("App responses are null")
-        return AppEnrolResponse(person.patientId)
-    }
-
-    interface PersonCreationCallback {
-        fun onPersonCreated(person: Person?)
-    }
-
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,
                         fingerprintResponse: FingerprintEnrolResponse?,
-                        faceResponse: FaceCaptureResponse?): Person? {
-            val isFingerprintAndFace = fingerprintResponse != null && faceResponse != null
-            val isFingerprintOnly = fingerprintResponse != null
-            val isFaceOnly = faceResponse != null
-
+                        faceResponse: FaceCaptureResponse?): Person {
             return when {
-                isFingerprintAndFace -> buildPersonFromFingerprintAndFace(
-                    request, fingerprintResponse!!, faceResponse!!
-                )
+                fingerprintResponse != null && faceResponse != null -> {
+                    buildPersonFromFingerprintAndFace(request, fingerprintResponse, faceResponse)
+                }
 
-                isFingerprintOnly -> buildPersonFromFingerprint(request, fingerprintResponse!!)
+                fingerprintResponse != null -> {
+                    buildPersonFromFingerprint(request, fingerprintResponse)
+                }
 
-                isFaceOnly -> buildPersonFromFace(request, faceResponse!!)
+                faceResponse != null -> {
+                    buildPersonFromFace(request, faceResponse)
+                }
 
-                else -> null
+                else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
             }
         }
 
@@ -107,8 +94,7 @@ class AppResponseBuilderForEnrol(
 
         private fun buildPersonFromFace(request: AppEnrolRequest,
                                         faceResponse: FaceCaptureResponse): Person {
-            val patientId = faceResponse.capturingResult.last().result?.faceId
-                ?: throw Throwable("Patient ID is null")
+            val patientId = UUID.randomUUID().toString()
             return Person(
                 patientId,
                 request.projectId,
@@ -125,8 +111,11 @@ class AppResponseBuilderForEnrol(
         }
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
-            return faceResponse.capturingResult.map {
-                it.result?.toDomain() ?: throw Throwable("Face samples are null")
+            return faceResponse.capturingResult.mapNotNull {
+                val imageRef = it.result?.imageRef
+                it.result?.template?.let { template ->
+                    FaceSample(template, imageRef)
+                }
             }
         }
     }
