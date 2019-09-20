@@ -6,8 +6,8 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.FaceExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.FingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 
@@ -43,6 +43,6 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
 
     private fun isExitFormResponse(coreResult: Step.Result?) =
         coreResult is CoreExitFormResponse ||
-            coreResult is FingerprintExitFormResponse ||
-            coreResult is FaceExitFormResponse
+            coreResult is CoreFingerprintExitFormResponse ||
+            coreResult is CoreFaceExitFormResponse
 }
