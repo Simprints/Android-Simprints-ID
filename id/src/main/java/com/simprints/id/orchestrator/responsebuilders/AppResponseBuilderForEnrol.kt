@@ -14,6 +14,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolR
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import java.util.*
 
 class AppResponseBuilderForEnrol(
@@ -105,7 +106,7 @@ class AppResponseBuilderForEnrol(
             )
         }
 
-        private fun extractFingerprintSamples(fingerprintResponse: FingerprintEnrolResponse): List<FingerprintSample> {
+        private fun extractFingerprintSamples(fingerprintResponse: IFingerprintCaptureResponse): List<FingerprintSample> {
             // TODO: awaiting implementation on fingerprint side
             return emptyList()
         }
