@@ -1,4 +1,4 @@
-package com.simprints.id.activities.exitform
+package com.simprints.id.activities.coreexitform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
