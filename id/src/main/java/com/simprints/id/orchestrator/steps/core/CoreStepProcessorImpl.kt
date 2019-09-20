@@ -4,12 +4,8 @@ import android.content.Intent
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
-import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse
+import com.simprints.id.domain.moduleapi.core.response.*
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.VERIFY_STEP_BUNDLE
-import com.simprints.id.domain.moduleapi.core.response.CoreResponseType
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.CONSENT
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.VERIFICATION_CHECK
@@ -36,11 +32,10 @@ class CoreStepProcessorImpl : CoreStepProcessor {
         status = Step.Status.NOT_STARTED
     )
 
-    //STOPSHIP: Will be done in the story for adding verification step. Building
     private fun buildVerifyStep(projectId: String, verifyGuid: String) = Step(
         requestCode = VERIFICATION_CHECK.value,
         activityName = VERIFY_ACTIVITY_NAME,
-        bundleKey = VERIFY_STEP_BUNDLE,
+        bundleKey = CORE_STEP_BUNDLE,
         request = FetchGUIDRequest(projectId, verifyGuid),
         status = Step.Status.NOT_STARTED
     )
@@ -50,7 +45,7 @@ class CoreStepProcessorImpl : CoreStepProcessor {
             when (coreResponse.type) {
                 CoreResponseType.CONSENT -> data.getParcelableExtra<AskConsentResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.EXIT_FORM -> data.getParcelableExtra<CoreExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.FETCH_GUID -> TODO("Will be implemented with verification check")
+                CoreResponseType.FETCH_GUID -> data.getParcelableExtra<FetchGUIDResponse>(CORE_STEP_BUNDLE)
             }
         }
 }

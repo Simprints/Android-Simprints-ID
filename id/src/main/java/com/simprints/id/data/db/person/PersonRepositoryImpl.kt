@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.person
 
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.PersonSource.*
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.*
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
