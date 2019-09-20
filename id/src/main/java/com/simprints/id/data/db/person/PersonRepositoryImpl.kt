@@ -61,11 +61,10 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             PersonFetchResult(person, true)
         }
 
-
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
         scheduleUpsync(person.projectId, person.userId)
-// StopShip: Add event back in the caller when `saveAndUpload` is invoked by Orchestrator (instead of Fingerprint)
+// STOPSHIP: Add event back in the caller when `saveAndUpload` is invoked by Orchestrator (instead of Fingerprint)
 //        sessionEventsManager
 //            .updateSession {
 //                it.addEvent(EnrolmentEvent(

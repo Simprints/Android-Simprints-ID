@@ -230,8 +230,8 @@ open class AppModule {
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideAppResponseBuilderFactory(): AppResponseFactory = AppResponseFactoryImpl()
-
+    open fun provideAppResponseBuilderFactory(repository: PersonRepository): AppResponseFactory
+        = AppResponseFactoryImpl(repository)
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
@@ -264,5 +264,6 @@ open class AppModule {
     @Provides
     open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
         CoreExitFormViewModelFactory(sessionEventsManager)
+
 }
 
