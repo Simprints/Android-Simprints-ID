@@ -6,7 +6,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -124,7 +124,7 @@ class StepEncoderImplAndroidTest {
         return FaceCaptureResponse(listOf(
             FaceCaptureResult(
                 index = 1,
-                result = FaceSample(
+                result = FaceCaptureSample(
                     "face_id",
                     template,
                     SecuredImageRef("uri")
