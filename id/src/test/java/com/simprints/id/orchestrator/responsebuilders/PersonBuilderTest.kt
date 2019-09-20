@@ -23,12 +23,14 @@ class PersonBuilderTest {
 
         assertThat(person, notNullValue())
         require(person != null)
-        assertThat(person.patientId, `is`(EXPECTED_GUID))
-        assertThat(person.projectId, `is`(request.projectId))
-        assertThat(person.moduleId, `is`(request.moduleId))
-        assertThat(person.userId, `is`(request.userId))
-        assertThat(person.fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
-        assertThat(person.faceSamples, `is`(emptyList()))
+        with(person) {
+            assertThat(patientId, `is`(EXPECTED_GUID))
+            assertThat(projectId, `is`(request.projectId))
+            assertThat(moduleId, `is`(request.moduleId))
+            assertThat(userId, `is`(request.userId))
+            assertThat(fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
+            assertThat(faceSamples, `is`(emptyList()))   
+        }
     }
 
     @Test
@@ -41,15 +43,17 @@ class PersonBuilderTest {
 
         assertThat(person, notNullValue())
         require(person != null)
-        assertThat(person.patientId, `is`(EXPECTED_GUID))
-        assertThat(person.projectId, `is`(request.projectId))
-        assertThat(person.moduleId, `is`(request.moduleId))
-        assertThat(person.userId, `is`(request.userId))
-        assertThat(person.fingerprintSamples, `is`(emptyList()))
-        person.faceSamples.forEachIndexed { index, faceSample ->
-            assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
-            assertThat(faceSample.imageRef?.uri, `is`(expectedFaceSamples[index].imageRef?.uri))
-            assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+        with(person) {
+            assertThat(patientId, `is`(EXPECTED_GUID))
+            assertThat(projectId, `is`(request.projectId))
+            assertThat(moduleId, `is`(request.moduleId))
+            assertThat(userId, `is`(request.userId))
+            assertThat(fingerprintSamples, `is`(emptyList()))
+            faceSamples.forEachIndexed { index, faceSample ->
+                assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
+                assertThat(faceSample.imageRef?.uri, `is`(expectedFaceSamples[index].imageRef?.uri))
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+            }
         }
     }
 
@@ -64,15 +68,17 @@ class PersonBuilderTest {
 
         assertThat(person, notNullValue())
         require(person != null)
-        assertThat(person.patientId, `is`(EXPECTED_GUID))
-        assertThat(person.projectId, `is`(request.projectId))
-        assertThat(person.moduleId, `is`(request.moduleId))
-        assertThat(person.userId, `is`(request.userId))
-        assertThat(person.fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
-        person.faceSamples.forEachIndexed { index, faceSample ->
-            assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
-            assertThat(faceSample.imageRef?.uri, `is`(expectedFaceSamples[index].imageRef?.uri))
-            assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+        with(person) {
+            assertThat(patientId, `is`(EXPECTED_GUID))
+            assertThat(projectId, `is`(request.projectId))
+            assertThat(moduleId, `is`(request.moduleId))
+            assertThat(userId, `is`(request.userId))
+            assertThat(fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
+            faceSamples.forEachIndexed { index, faceSample ->
+                assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
+                assertThat(faceSample.imageRef?.uri, `is`(expectedFaceSamples[index].imageRef?.uri))
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+            }
         }
     }
 
