@@ -118,8 +118,8 @@ class AppResponseBuilderForEnrol(
         }
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
-            return faceResponse.capturingResult.map {
-                it.result?.toDomain() ?: throw Throwable("Face samples are null")
+            return faceResponse.capturingResult.mapNotNull {
+                it.result?.toDomain()
             }
         }
     }
