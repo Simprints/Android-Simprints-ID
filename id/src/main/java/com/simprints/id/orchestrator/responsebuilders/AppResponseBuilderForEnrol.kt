@@ -56,18 +56,18 @@ class AppResponseBuilderForEnrol(
         fun buildPerson(request: AppEnrolRequest,
                         fingerprintResponse: FingerprintEnrolResponse?,
                         faceResponse: FaceCaptureResponse?): Person {
-            val isFingerprintAndFace = fingerprintResponse != null && faceResponse != null
-            val isFingerprintOnly = fingerprintResponse != null
-            val isFaceOnly = faceResponse != null
-
             return when {
-                isFingerprintAndFace -> buildPersonFromFingerprintAndFace(
-                    request, fingerprintResponse!!, faceResponse!!
-                )
+                fingerprintResponse != null && faceResponse != null -> {
+                    buildPersonFromFingerprintAndFace(request, fingerprintResponse, faceResponse)
+                }
 
-                isFingerprintOnly -> buildPersonFromFingerprint(request, fingerprintResponse!!)
+                fingerprintResponse != null -> {
+                    buildPersonFromFingerprint(request, fingerprintResponse)
+                }
 
-                isFaceOnly -> buildPersonFromFace(request, faceResponse!!)
+                faceResponse != null -> {
+                    buildPersonFromFace(request, faceResponse)
+                }
 
                 else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
             }
