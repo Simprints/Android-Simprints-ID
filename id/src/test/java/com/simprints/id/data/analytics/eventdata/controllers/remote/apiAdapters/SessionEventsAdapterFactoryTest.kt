@@ -3,7 +3,7 @@ package com.simprints.id.data.analytics.eventdata.controllers.remote.apiAdapters
 import android.net.NetworkInfo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.commontesttools.sessionEvents.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.OneToManyMatchEvent.MatchPool

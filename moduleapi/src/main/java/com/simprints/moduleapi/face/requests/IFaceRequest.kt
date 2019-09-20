@@ -6,11 +6,16 @@ import com.simprints.moduleapi.IRequest
 
 interface IFaceRequest : Parcelable, IRequest {
 
+    val type: IFaceRequestType
+
     companion object {
         const val BUNDLE_KEY = "FaceRequestBundleKey"
     }
+}
 
-    val projectId: String
-    val userId: String
-    val moduleId: String
+enum class IFaceRequestType {
+    CAPTURE,
+
+    VERIFY, //TBRemoved soon
+    IDENTIFY //TBRemoved soon
 }

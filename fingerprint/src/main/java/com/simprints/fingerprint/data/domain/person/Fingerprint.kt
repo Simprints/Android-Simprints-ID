@@ -9,8 +9,8 @@ import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import com.simprints.id.domain.fingerprint.Fingerprint as FingerprintCore
 import com.simprints.fingerprintmatcher.Fingerprint as FingerprintMatcher
+import com.simprints.id.data.db.person.domain.FingerprintSample as FingerprintSampleCore
 
 @Parcelize
 class Fingerprint(val fingerId: FingerIdentifier,
@@ -81,13 +81,13 @@ class Fingerprint(val fingerId: FingerIdentifier,
             return Fingerprint(fingerId, template)
         }
 
-        fun fromCoreToDomain(fingerprint: FingerprintCore) =
-            Fingerprint(FingerIdentifier.fromCoreToDomain(fingerprint.finger), fingerprint.templateBytes)
+        fun fromCoreToDomain(fingerprint: FingerprintSampleCore) =
+            Fingerprint(FingerIdentifier.fromCoreToDomain(fingerprint.fingerIdentifier), fingerprint.template)
     }
 }
 
 fun Fingerprint.fromDomainToCore() =
-    FingerprintCore(fingerId.fromDomainToCore(), template)
+    FingerprintSampleCore(fingerId.fromDomainToCore(), templateBytes, qualityScore, null)
 
 fun Fingerprint.fromDomainToMatcher() =
     FingerprintMatcher(fingerId.fromDomainToLibsimprints(), templateBytes)
