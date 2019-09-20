@@ -1,5 +1,6 @@
 package com.simprints.id.activities.coreexitform
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,15 +9,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Action.GO_BACK
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Action.SUBMIT
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_GO_BACK
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult.Companion.CORE_EXIT_FORM_RESULT_CODE_SUBMIT
+import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
+import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.GO_BACK
+import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult.Action.SUBMIT
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.CoreExitFormReason.*
+import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
@@ -57,7 +57,7 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     private fun setRadioGroupListener() {
-        refusalRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
+        exitFormRadioGroup.setOnCheckedChangeListener { _, optionIdentifier ->
             exitFormText.removeTextChangedListener(textWatcher)
             enableSubmitButton()
             enableRefusalText()
@@ -121,27 +121,27 @@ class CoreExitFormActivity : AppCompatActivity() {
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(CORE_EXIT_FORM_RESULT_CODE_GO_BACK, GO_BACK)
+        setResultAndFinish(GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
         viewModel.addExitFormEvent(exitFormStartTime, timeHelper.now(), getExitFormText(), exitFormReason)
-        setResultAndFinish(CORE_EXIT_FORM_RESULT_CODE_SUBMIT, SUBMIT)
+        setResultAndFinish(SUBMIT)
     }
 
-    private fun setResultAndFinish(resultCode: Int, exitFormAction: CoreExitFormResult.Action) {
-        setResult(resultCode, getIntentForResult(exitFormAction))
+    private fun setResultAndFinish(exitFormActivityAction: CoreExitFormActivityResult.Action) {
+        setResult(Activity.RESULT_OK, getIntentForResult(exitFormActivityAction))
         finish()
     }
 
     private fun getExitFormText() = exitFormText.text.toString()
 
-    private fun getIntentForResult(exitFormAction: CoreExitFormResult.Action) =
-        Intent().putExtra(CoreExitFormResult.BUNDLE_KEY, buildExitFormResult(exitFormAction))
+    private fun getIntentForResult(exitFormActivityAction: CoreExitFormActivityResult.Action) =
+        Intent().putExtra(EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormActivityAction))
 
-    private fun buildExitFormResult(exitFormAction: CoreExitFormResult.Action) =
-        CoreExitFormResult(exitFormAction,
-            CoreExitFormResult.Answer(exitFormReason, getExitFormText()))
+    private fun buildExitFormResult(exitFormActivityAction: CoreExitFormActivityResult.Action) =
+        CoreExitFormActivityResult(exitFormActivityAction,
+            CoreExitFormActivityResult.Answer(exitFormReason, getExitFormText()))
 
     private fun setFocusOnExitReasonAndDisableSubmit() {
         btSubmitExitForm.isEnabled = false

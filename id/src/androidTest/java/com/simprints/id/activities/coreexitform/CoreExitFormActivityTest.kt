@@ -10,7 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
-import com.simprints.id.activities.coreexitform.result.CoreExitFormResult
+import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
 import com.simprints.id.data.exitform.CoreExitFormReason
 import com.simprints.testtools.android.tryOnUiUntilTimeout
 import org.hamcrest.CoreMatchers.not
@@ -84,8 +84,8 @@ class CoreExitFormActivityTest {
         onView(withId(R.id.exitFormText)).perform(typeText(refusalReasonText), closeSoftKeyboard())
         onView(withId(R.id.btSubmitExitForm)).perform(click())
 
-        verifyIntentReturned(scenario.result, CoreExitFormResult.Action.SUBMIT,
-            CoreExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormResult.CORE_EXIT_FORM_RESULT_CODE_SUBMIT)
+        verifyIntentReturned(scenario.result, CoreExitFormActivityResult.Action.SUBMIT,
+            CoreExitFormReason.REFUSED_RELIGION, refusalReasonText, CoreExitFormActivityResult.CORE_EXIT_FORM_RESULT_CODE_SUBMIT)
     }
 
     @Test
@@ -94,21 +94,21 @@ class CoreExitFormActivityTest {
 
         onView(withId(R.id.btGoBack)).perform(click())
 
-        verifyIntentReturned(scenario.result, CoreExitFormResult.Action.GO_BACK,
-            CoreExitFormReason.OTHER, "", CoreExitFormResult.CORE_EXIT_FORM_RESULT_CODE_GO_BACK)
+        verifyIntentReturned(scenario.result, CoreExitFormActivityResult.Action.GO_BACK,
+            CoreExitFormReason.OTHER, "", CoreExitFormActivityResult.CORE_EXIT_FORM_RESULT_CODE_GO_BACK)
     }
 
     private fun verifyIntentReturned(result: Instrumentation.ActivityResult,
-                                     action: CoreExitFormResult.Action,
+                                     action: CoreExitFormActivityResult.Action,
                                      coreExitReason: CoreExitFormReason,
                                      exitFormText: String,
                                      expectedResultCode: Int) {
         assertThat(result.resultCode).isEqualTo(expectedResultCode)
 
-        result.resultData.setExtrasClassLoader(CoreExitFormResult::class.java.classLoader)
-        val response = result.resultData.getParcelableExtra<CoreExitFormResult>(CoreExitFormResult.BUNDLE_KEY)
+        result.resultData.setExtrasClassLoader(CoreExitFormActivityResult::class.java.classLoader)
+        val response = result.resultData.getParcelableExtra<CoreExitFormActivityResult>(CoreExitFormActivityResult.BUNDLE_KEY)
 
-        assertThat(response).isInstanceOf(CoreExitFormResult::class.java)
+        assertThat(response).isInstanceOf(CoreExitFormActivityResult::class.java)
         assertThat(response.action).isEqualTo(action)
         assertThat(response.answer.reason).isEqualTo(coreExitReason)
         assertThat(response.answer.optionalText).isEqualTo(exitFormText)

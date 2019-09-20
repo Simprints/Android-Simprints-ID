@@ -1,5 +1,6 @@
 package com.simprints.id.activities.faceexitform
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -7,12 +8,14 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.faceexitform.result.FaceExitFormResult
-import com.simprints.id.activities.faceexitform.result.FaceExitFormResult.Companion.FACE_EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
+import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Action
+import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult.Answer
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
+import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
@@ -123,24 +126,24 @@ class FaceExitFormActivity : AppCompatActivity() {
     }
 
     fun handleGoBackClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(FaceExitFormResult.FACE_EXIT_FORM_RESULT_CODE_GO_BACK, FaceExitFormResult.Action.GO_BACK)
+        setResultAndFinish(Action.GO_BACK)
     }
 
     fun handleSubmitClick(@Suppress("UNUSED_PARAMETER")view: View) {
-        setResultAndFinish(FaceExitFormResult.FACE_EXIT_FORM_RESULT_CODE_SUBMIT, FaceExitFormResult.Action.SUBMIT)
+        setResultAndFinish(Action.SUBMIT)
     }
 
-    private fun setResultAndFinish(resultCode: Int, exitFormAction: FaceExitFormResult.Action) {
-        setResult(resultCode, getIntentForAction(exitFormAction))
+    private fun setResultAndFinish(exitFormActivityAction: Action) {
+        setResult(Activity.RESULT_OK, getIntentForAction(exitFormActivityAction))
         finish()
     }
 
-    private fun getIntentForAction(exitFormAction: FaceExitFormResult.Action) = Intent().apply {
-        putExtra(FACE_EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormAction))
+    private fun getIntentForAction(exitFormActivityAction: Action) = Intent().apply {
+        putExtra(EXIT_FORM_BUNDLE_KEY, buildExitFormResult(exitFormActivityAction))
     }
 
-    private fun buildExitFormResult(exitFormAction: FaceExitFormResult.Action) =
-        FaceExitFormResult(exitFormAction, FaceExitFormResult.Answer(faceExitFormReason, getExitFormText()))
+    private fun buildExitFormResult(exitFormActivityAction: Action) =
+        FaceExitFormActivityResult(exitFormActivityAction, Answer(faceExitFormReason, getExitFormText()))
 
 
     override fun onBackPressed() {

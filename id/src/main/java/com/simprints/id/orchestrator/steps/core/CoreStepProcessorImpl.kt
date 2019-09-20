@@ -45,8 +45,8 @@ class CoreStepProcessorImpl : CoreStepProcessor {
             when (coreResponse.type) {
                 CoreResponseType.CONSENT -> data.getParcelableExtra<AskConsentResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.CORE_EXIT_FORM -> data.getParcelableExtra<CoreExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.FINGERPRINT_EXIT_FORM -> data.getParcelableExtra<FingerprintExitFormResponse>(CORE_STEP_BUNDLE)
-                CoreResponseType.FACE_EXIT_FORM -> data.getParcelableExtra<FaceExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.FINGERPRINT_EXIT_FORM -> data.getParcelableExtra<CoreFingerprintExitFormResponse>(CORE_STEP_BUNDLE)
+                CoreResponseType.FACE_EXIT_FORM -> data.getParcelableExtra<CoreFaceExitFormResponse>(CORE_STEP_BUNDLE)
                 CoreResponseType.FETCH_GUID -> TODO("Will be implemented with verification check")
             }
         }

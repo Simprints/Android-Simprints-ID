@@ -61,23 +61,23 @@ class CoreStepProcessorImplTest: BaseStepProcessorTest() {
     fun stepProcessorShouldProcessFingerprintExitFormResult() {
         val fingerprintExitFormData = Intent().apply {
             putExtra(CORE_STEP_BUNDLE,
-                FingerprintExitFormResponse(FingerprintExitFormReason.OTHER, "fingerprint_optional_text"))
+                CoreFingerprintExitFormResponse(FingerprintExitFormReason.OTHER, "fingerprint_optional_text"))
         }
         val result = coreStepProcessor
             .processResult(fingerprintExitFormData)
 
-        assertThat(result).isInstanceOf(FingerprintExitFormResponse::class.java)
+        assertThat(result).isInstanceOf(CoreFingerprintExitFormResponse::class.java)
     }
 
     @Test
     fun stepProcessorShouldProcessFaceExitFormResult() {
         val faceExitFormData = Intent().apply {
-            putExtra(CORE_STEP_BUNDLE, FaceExitFormResponse(FaceExitFormReason.OTHER,
+            putExtra(CORE_STEP_BUNDLE, CoreFaceExitFormResponse(FaceExitFormReason.OTHER,
                 "face_optional_text"))
         }
         val result = coreStepProcessor.processResult(faceExitFormData)
 
-        assertThat(result).isInstanceOf(FaceExitFormResponse::class.java)
+        assertThat(result).isInstanceOf(CoreFaceExitFormResponse::class.java)
     }
 
     @After
