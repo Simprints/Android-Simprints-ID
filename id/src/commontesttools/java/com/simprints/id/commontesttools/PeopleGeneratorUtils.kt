@@ -1,7 +1,9 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.domain.fingerprint.Fingerprint
-import com.simprints.id.domain.Person
+import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
@@ -60,7 +62,7 @@ object PeopleGeneratorUtils {
                         toSync: Boolean = false,
                         createdAt: Date = getRandomTime(),
                         updateAt: Date = getRandomTime(),
-                        idFingerprints: Array<Fingerprint> = arrayOf(getRandomFingerprint(), getRandomFingerprint())): Person =
+                        fingerprintSamples: Array<FingerprintSample> = arrayOf(getRandomFingerprintSample(), getRandomFingerprintSample())): Person =
         Person(
             patientId = patientId,
             projectId = projectId,
@@ -69,14 +71,18 @@ object PeopleGeneratorUtils {
             createdAt = if (!toSync) createdAt else null,
             updatedAt = if (!toSync) updateAt else null,
             toSync = toSync,
-            fingerprints = idFingerprints.toList()
+            fingerprintSamples = fingerprintSamples.toList()
         )
 
 
-    fun getRandomFingerprint(): Fingerprint {
+    fun getRandomFingerprintSample(): FingerprintSample {
         val commonFingerprint = FingerprintGeneratorUtils.generateRandomFingerprint()
-        return Fingerprint(commonFingerprint.finger, commonFingerprint.templateBytes)
+        return FingerprintSample(commonFingerprint.fingerIdentifier, commonFingerprint.template, commonFingerprint.templateQualityScore)
     }
+
+    fun getRandomFaceSample() =
+        FaceSample(kotlin.random.Random.nextBytes(20), SecuredImageRef(UUID.randomUUID().toString()))
+
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
         return Calendar.getInstance().apply {

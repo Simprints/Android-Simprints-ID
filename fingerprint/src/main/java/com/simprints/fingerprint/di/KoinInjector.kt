@@ -79,7 +79,7 @@ object KoinInjector {
         factory { appComponent().getSessionEventsManager() }
         factory { appComponent().getCrashReportManager() }
         factory { appComponent().getTimeHelper() }
-        factory { appComponent().getDbManager() }
+        factory { appComponent().getPersonRepository() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
     }

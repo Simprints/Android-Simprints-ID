@@ -1,28 +1,30 @@
 package com.simprints.id.services.scheduledSync.peopleUpsync.uploader
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
-
-class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+@InternalCoroutinesApi
+class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var localDbManager: LocalDbManager
-    @Inject lateinit var remotePeopleManager: RemotePeopleManager
+    @Inject lateinit var personLocaDataSource: PersonLocalDataSource
+    @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var newSyncStatusDatabase: SyncStatusDatabase
 
@@ -34,17 +36,17 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : W
         inputData.getString(USER_ID_KEY) ?: throw IllegalArgumentException("User Id required")
     }*/
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result = coroutineScope {
         injectDependencies()
         logMessageForCrashReport("PeopleUpSyncUploaderWorker - running")
 
         val task = PeopleUpSyncUploaderTask(
-            loginInfoManager, localDbManager, remotePeopleManager,
+            loginInfoManager, personLocaDataSource, personRemoteDataSource,
             projectId, /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
             newSyncStatusDatabase.upSyncDao
         )
 
-        return try {
+        return@coroutineScope try {
             task.execute()
             logMessageForCrashReport("PeopleUpSyncUploaderWorker - success")
             Result.success()

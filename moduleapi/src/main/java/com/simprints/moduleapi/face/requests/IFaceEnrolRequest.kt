@@ -1,4 +1,4 @@
 package com.simprints.moduleapi.face.requests
 
-
-interface IFaceEnrolRequest : IFaceRequest
+interface IFaceEnrolRequest {
+}

@@ -6,7 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
 import com.simprints.id.Application
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -23,9 +23,9 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.En
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.secure.LocalDbKey
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
@@ -304,7 +304,7 @@ class SessionEventsUploaderTaskAndroidTest {
         }
 
     private fun signOut() {
-        remoteDbManagerSpy.signOutOfRemoteDb()
+        remoteDbManagerSpy.signOut()
     }
 
     private fun mockBeingSignedIn() {

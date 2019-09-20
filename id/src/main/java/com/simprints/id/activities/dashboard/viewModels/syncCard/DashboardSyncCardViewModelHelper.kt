@@ -1,10 +1,10 @@
 package com.simprints.id.activities.dashboard.viewModels.syncCard
 
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.UpSyncStatus
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -24,8 +24,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
                                        component: AppComponent,
                                        isDownSyncRunning: Boolean) {
 
-    @Inject lateinit var dbManager: DbManager
-    @Inject lateinit var localDbManager: LocalDbManager
+    @Inject lateinit var personRepository: PersonRepository
     @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
@@ -106,16 +105,17 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
     private fun updateTotalDownSyncCount(): Completable =
         (syncScope?.let { syncScope ->
-            dbManager.getPeopleCountToDownSync(syncScope)
+            personRepository.countToDownSync(syncScope)
                 .map { peopleCounts -> peopleCounts.sumBy { it.count } }
         } ?: Single.just(0))
+
         .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
         .ignoreElement()
         .subscribeOn(Schedulers.io())
 
     private fun updateTotalLocalCount(): Completable =
         (syncScope?.let { syncScope ->
-            dbManager.getPeopleCountFromLocalForSyncScope(syncScope)
+            personRepository.localCountForSyncScope(syncScope)
                 .doAfterSuccess { syncScopeCount -> viewModel.updateState(peopleInDb = syncScopeCount.sumBy { it.count }, emitState = true) }
                 .ignoreElement()
         } ?: Completable.complete())
@@ -123,7 +123,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
 
     private fun updateTotalUpSyncCount(): Completable =
-        localDbManager.getPeopleCountFromLocal(toSync = true)
+        Single.just(personRepository.count(PersonLocalDataSource.Query(toSync = true)))
             .flatMapCompletable {
                 viewModel.updateState(peopleToUpload = it, emitState = true)
                 Completable.complete()

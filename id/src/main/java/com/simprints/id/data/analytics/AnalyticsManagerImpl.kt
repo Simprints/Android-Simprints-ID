@@ -27,14 +27,12 @@ class AnalyticsManagerImpl(private val loginInfoManager: LoginInfoManager,
 
     override fun logCallout(appRequest: AppRequest) {
         Timber.d("AnalyticsManagerImpl.logCallout(appRequest=$appRequest)")
-        with(appRequest) {
-            val bundle = Bundle()
-            bundle.putString("action", AppRequest.action(appRequest).toString())
-            bundle.putString("projectId", appRequest.projectId)
-            bundle.putString("userId", appRequest.userId)
-            bundle.putString("moduleID", appRequest.moduleId)
-            firebaseAnalytics.logEvent("callout", bundle)
-        }
+        val bundle = Bundle()
+        bundle.putString("action", appRequest.type.name)
+        bundle.putString("projectId", appRequest.projectId)
+        bundle.putString("userId", appRequest.userId)
+        bundle.putString("moduleID", appRequest.moduleId)
+        firebaseAnalytics.logEvent("callout", bundle)
     }
 
 
