@@ -11,6 +11,7 @@ import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger
@@ -79,6 +80,7 @@ class LaunchPresenter(component: FingerprintComponent,
     @Inject lateinit var locationProvider: LocationProvider
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
     @Inject lateinit var analyticsManager: FingerprintAnalyticsManager
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private var startConsentEventTime: Long = 0
     private val activity = view as Activity
@@ -302,7 +304,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed General Consent Text Error", e))
             GeneralConsent()
         }
-        return generalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return generalConsent.assembleText(androidResourcesHelper, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
     }
 
     private fun getParentalConsentText(): String {
@@ -312,7 +314,7 @@ class LaunchPresenter(component: FingerprintComponent,
             crashReportManager.logExceptionOrSafeException(MalformedConsentTextException("Malformed Parental Consent Text Error", e))
             ParentalConsent()
         }
-        return parentalConsent.assembleText(activity, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
+        return parentalConsent.assembleText(androidResourcesHelper, fingerprintRequest, fingerprintRequest.programName, fingerprintRequest.organizationName)
     }
 
     override fun handleOnBackPressed() {

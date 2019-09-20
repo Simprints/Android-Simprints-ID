@@ -50,6 +50,9 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        app.component.inject(this)
+        title = androidResourcesHelper.getString(R.string.login_title)
+
         setTextInLayout()
 
         loginActRequest = this.intent.extras?.getParcelable(LoginActivityRequest.BUNDLE_KEY)

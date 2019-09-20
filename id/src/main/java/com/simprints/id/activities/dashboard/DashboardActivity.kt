@@ -45,9 +45,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-
         val component = (application as Application).component
         component.inject(this)
+        title = androidResourcesHelper.getString(R.string.dashboard_label)
+
         setupActionBar()
 
         viewPresenter = DashboardPresenter(this, component)

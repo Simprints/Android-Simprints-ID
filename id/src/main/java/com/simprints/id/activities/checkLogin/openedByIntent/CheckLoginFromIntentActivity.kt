@@ -17,6 +17,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.InternalConstants.RequestIntents.Companion.LOGIN_ACTIVITY_REQUEST
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.parseAppRequest
@@ -29,16 +30,16 @@ open class CheckLoginFromIntentActivity : AppCompatActivity(), CheckLoginFromInt
 
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override lateinit var viewPresenter: CheckLoginFromIntentContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_login)
-
         val component = (application as Application).component
         component.inject(this)
-
+        title = androidResourcesHelper.getString(R.string.title_activity_front)
         viewPresenter = CheckLoginFromIntentPresenter(this, deviceId, component)
 
         viewPresenter.setup()

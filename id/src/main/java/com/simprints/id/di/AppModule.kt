@@ -171,8 +171,8 @@ open class AppModule {
 
     @Provides
     fun provideAndroidResourcesHelper(ctx: Context, preferencesManager: PreferencesManager): AndroidResourcesHelper {
-        val prefsWithLanguage = LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
-        return AndroidResourcesHelperImpl(prefsWithLanguage)
+        val contextWithSpecificLanguage = LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
+        return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
     }
 
     @Provides

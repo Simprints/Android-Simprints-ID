@@ -129,7 +129,7 @@ class CollectFingerprintsActivity :
 
     override fun refreshScanButtonAndTimeoutBar() {
         val activeStatus = viewPresenter.currentFinger().status
-        scan_button.setText(activeStatus.buttonTextId)
+        scan_button.text = androidResourcesHelper.getString(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 
