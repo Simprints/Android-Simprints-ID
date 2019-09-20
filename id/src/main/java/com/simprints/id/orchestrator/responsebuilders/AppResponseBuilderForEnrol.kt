@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
@@ -13,12 +14,16 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.TimeHelper
 import java.util.*
 
 class AppResponseBuilderForEnrol(
-    private val repository: PersonRepository
+    repository: PersonRepository,
+    sessionEventsManager: SessionEventsManager,
+    private val timeHelper: TimeHelper
 ) : BaseAppResponseBuilder() {
+
+    private val enrolmentHelper = EnrolmentHelper(repository, sessionEventsManager, timeHelper)
 
     override suspend fun buildAppResponse(modalities: List<Modality>,
                                           appRequest: AppRequest,
@@ -33,8 +38,11 @@ class AppResponseBuilderForEnrol(
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
-        val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse)
-        EnrolmentHelper(repository).saveAndUpload(person)
+        val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
+        with(enrolmentHelper) {
+            saveAndUpload(person)
+            registerEvent(person)
+        }
 
         return AppEnrolResponse(person.patientId)
     }
@@ -48,18 +56,19 @@ class AppResponseBuilderForEnrol(
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,
                         fingerprintResponse: FingerprintEnrolResponse?,
-                        faceResponse: FaceCaptureResponse?): Person {
+                        faceResponse: FaceCaptureResponse?,
+                        timeHelper: TimeHelper): Person {
             return when {
                 fingerprintResponse != null && faceResponse != null -> {
-                    buildPersonFromFingerprintAndFace(request, fingerprintResponse, faceResponse)
+                    buildPersonFromFingerprintAndFace(request, fingerprintResponse, faceResponse, timeHelper)
                 }
 
                 fingerprintResponse != null -> {
-                    buildPersonFromFingerprint(request, fingerprintResponse)
+                    buildPersonFromFingerprint(request, fingerprintResponse, timeHelper)
                 }
 
                 faceResponse != null -> {
-                    buildPersonFromFace(request, faceResponse)
+                    buildPersonFromFace(request, faceResponse, timeHelper)
                 }
 
                 else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
@@ -68,39 +77,42 @@ class AppResponseBuilderForEnrol(
 
         private fun buildPersonFromFingerprintAndFace(request: AppEnrolRequest,
                                                       fingerprintResponse: FingerprintEnrolResponse,
-                                                      faceResponse: FaceCaptureResponse): Person {
+                                                      faceResponse: FaceCaptureResponse,
+                                                      timeHelper: TimeHelper): Person {
             return Person(
                 fingerprintResponse.guid,
                 request.projectId,
                 request.userId,
                 request.moduleId,
-                createdAt = Date(TimeHelperImpl().now()),
+                createdAt = Date(timeHelper.now()),
                 fingerprintSamples = extractFingerprintSamples(fingerprintResponse),
                 faceSamples = extractFaceSamples(faceResponse)
             )
         }
 
         private fun buildPersonFromFingerprint(request: AppEnrolRequest,
-                                               fingerprintResponse: FingerprintEnrolResponse): Person {
+                                               fingerprintResponse: FingerprintEnrolResponse,
+                                               timeHelper: TimeHelper): Person {
             return Person(
                 fingerprintResponse.guid,
                 request.projectId,
                 request.userId,
                 request.moduleId,
-                createdAt = Date(TimeHelperImpl().now()),
+                createdAt = Date(timeHelper.now()),
                 fingerprintSamples = extractFingerprintSamples(fingerprintResponse)
             )
         }
 
         private fun buildPersonFromFace(request: AppEnrolRequest,
-                                        faceResponse: FaceCaptureResponse): Person {
+                                        faceResponse: FaceCaptureResponse,
+                                        timeHelper: TimeHelper): Person {
             val patientId = UUID.randomUUID().toString()
             return Person(
                 patientId,
                 request.projectId,
                 request.userId,
                 request.moduleId,
-                createdAt = Date(TimeHelperImpl().now()),
+                createdAt = Date(timeHelper.now()),
                 faceSamples = extractFaceSamples(faceResponse)
             )
         }
