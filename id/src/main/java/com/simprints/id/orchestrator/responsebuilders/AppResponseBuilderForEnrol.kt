@@ -39,7 +39,7 @@ class AppResponseBuilderForEnrol(
         val person = PersonBuilder.buildPerson(request, fingerprintResponse, faceResponse)
         personCreationCallback.onPersonCreated(person)
 
-        return buildAppEnrolResponse(person)
+        return AppEnrolResponse(person.patientId)
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
@@ -48,20 +48,14 @@ class AppResponseBuilderForEnrol(
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
         results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
 
-    private fun buildAppEnrolResponse(person: Person?): AppEnrolResponse {
-        if (person == null)
-            throw Throwable("App responses are null")
-        return AppEnrolResponse(person.patientId)
-    }
-
     interface PersonCreationCallback {
-        fun onPersonCreated(person: Person?)
+        fun onPersonCreated(person: Person)
     }
 
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,
                         fingerprintResponse: FingerprintEnrolResponse?,
-                        faceResponse: FaceCaptureResponse?): Person? {
+                        faceResponse: FaceCaptureResponse?): Person {
             val isFingerprintAndFace = fingerprintResponse != null && faceResponse != null
             val isFingerprintOnly = fingerprintResponse != null
             val isFaceOnly = faceResponse != null
@@ -75,7 +69,7 @@ class AppResponseBuilderForEnrol(
 
                 isFaceOnly -> buildPersonFromFace(request, faceResponse!!)
 
-                else -> null
+                else -> throw Throwable("Invalid response. Must be either fingerprint, face or both")
             }
         }
 
