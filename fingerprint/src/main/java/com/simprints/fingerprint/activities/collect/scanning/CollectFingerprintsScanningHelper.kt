@@ -12,6 +12,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
@@ -27,7 +28,6 @@ import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -41,7 +41,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
