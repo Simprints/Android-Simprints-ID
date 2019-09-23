@@ -267,7 +267,7 @@ open class AppModule {
         CoreExitFormViewModelFactory(sessionEventsManager)
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository) =
-        FetchGuidViewModelFactory(personRepository)
+    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository, simNetworkUtils: SimNetworkUtils) =
+        FetchGuidViewModelFactory(personRepository, simNetworkUtils)
 }
 

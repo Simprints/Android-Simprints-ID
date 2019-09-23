@@ -1,12 +1,12 @@
 package com.simprints.id.data.db.person
 
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.PersonFetchResult.PersonSource.*
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
@@ -63,11 +63,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                 val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
                 PersonFetchResult(person, REMOTE)
             } catch (t: Throwable) {
-                if (t is DownloadingAPersonWhoDoesntExistOnServerException) {
-                    PersonFetchResult(personSource = NOT_FOUND_IN_LOCAL_AND_REMOTE)
-                } else {
-                    PersonFetchResult(personSource = NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR)
-                }
+                throw t
             }
         }
 
