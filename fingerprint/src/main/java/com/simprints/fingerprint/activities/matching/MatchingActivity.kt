@@ -26,7 +26,6 @@ import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
 import com.simprints.id.Application
-import com.simprints.id.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -96,7 +95,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun setIdentificationProgressMatchingStart(matchSize: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, matchSize, matchSize)
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, matchSize, arrayOf(matchSize))
             tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
             setIdentificationProgress(50)
         }
@@ -109,19 +108,19 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, returnSize, returnSize)
+            tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, returnSize, arrayOf(returnSize))
 
             if (tier1Or2Matches > 0) {
                 tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
+                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, tier1Or2Matches, arrayOf(tier1Or2Matches))
             }
             if (tier3Matches > 0) {
                 tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
+                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, tier3Matches, arrayOf(tier3Matches))
             }
             if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
                 tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
+                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, tier4Matches, arrayOf(tier4Matches))
             }
             setIdentificationProgress(100)
 
@@ -166,5 +165,5 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         super.onDestroy()
     }
 
-    override fun onBackPressed() { }
+    override fun onBackPressed() {}
 }
