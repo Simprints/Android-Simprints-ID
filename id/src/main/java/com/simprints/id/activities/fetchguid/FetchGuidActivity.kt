@@ -40,8 +40,6 @@ class FetchGuidActivity : AppCompatActivity() {
         viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
 
         setupObserversForUi()
-
-        launchAlertIfPersonFetchFailed(NOT_FOUND_IN_LOCAL_AND_REMOTE)
     }
 
     private fun injectDependencies() {
@@ -51,7 +49,7 @@ class FetchGuidActivity : AppCompatActivity() {
 
     private fun setupObserversForUi() {
         viewModel.personFetch.observe(this, Observer {
-            //launchAlertIfPersonFetchFailed(it)
+            launchAlertIfPersonFetchFailed(it)
         })
     }
 
