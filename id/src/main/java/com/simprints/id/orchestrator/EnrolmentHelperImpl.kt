@@ -15,13 +15,14 @@ class EnrolmentHelperImpl(private val repository: PersonRepository,
     }
 
     override fun registerEvent(person: Person) {
-        sessionEventsManager
-            .updateSession {
-                it.addEvent(EnrolmentEvent(
-                    timeHelper.now(),
-                    person.patientId
-                ))
-            }
+        // TODO: populate person with fingerprint samples in id instead of fingerprint
+        if (person.fingerprintSamples.isNotEmpty())
+            sessionEventsManager.addPersonCreationEventInBackground(person)
+
+        sessionEventsManager.addEventInBackground(EnrolmentEvent(
+            timeHelper.now(),
+            person.patientId
+        ))
     }
 
 }
