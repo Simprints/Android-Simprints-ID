@@ -13,7 +13,7 @@ import com.simprints.moduleapi.face.responses.IFaceResponse
 class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory) : FaceStepProcessor {
 
     companion object {
-        const val ACTIVITY_CLASS_NAME = "com.simprints.face.activities.FaceCaptureActivity"
+        const val ACTIVITY_CLASS_NAME = "com.simprints.face.activities.orchestrator.FaceOrchestratorActivity"
         const val N_FACE_SAMPLES_TO_CAPTURE: Int = 1
     }
 
