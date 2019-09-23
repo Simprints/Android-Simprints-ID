@@ -213,6 +213,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
+        // TODO: check with Ridwan
         val person = Person(
             UUID.randomUUID().toString(),
             collectRequest.projectId,
