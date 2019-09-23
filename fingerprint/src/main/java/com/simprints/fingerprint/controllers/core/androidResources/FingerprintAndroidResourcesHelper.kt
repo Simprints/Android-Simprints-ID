@@ -8,4 +8,5 @@ interface FingerprintAndroidResourcesHelper {
     fun getStringArray(res: Int): Array<String>
     fun getString(resId: Int, vararg formatArgs: Any): String
     fun getDrawable(res: Int): Drawable?
+    fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String
 }

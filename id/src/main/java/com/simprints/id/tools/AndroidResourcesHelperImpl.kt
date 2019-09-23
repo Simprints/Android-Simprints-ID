@@ -62,21 +62,24 @@ class AndroidResourcesHelperImpl(val context: Context) : AndroidResourcesHelper 
          * @return The formatted final string
          */
         @JvmStatic
-        fun getStringPlural(context: Context, stringQuantityKey: Int, quantity: Int, vararg values: Any): String {
+        fun getStringPlural(context: Context, stringQuantityKey: Int, quantity: Int, params: Array<Any>): String {
             val res = context.resources
 
             return try {
                 val targetStringResourceName = res.getString(stringQuantityKey) + "_" + intToQuantity(quantity).toString()
                 val targetStringResourceId = res.getIdentifier(targetStringResourceName, "string", context.packageName)
-                res.getString(targetStringResourceId, *values)
+                res.getString(targetStringResourceId, *params)
             } catch (e: Resources.NotFoundException) {
                 // If we can't find the resource, try instead to find the "other" version
                 val targetStringResourceName = res.getString(stringQuantityKey) + "_" + QUANTITY.OTHER.toString()
                 val targetStringResourceId = res.getIdentifier(targetStringResourceName, "string", context.packageName)
-                res.getString(targetStringResourceId, *values)
+                res.getString(targetStringResourceId, *params)
             }
         }
     }
+
+    override fun getStringPlural(stringQuantityKey: Int, quantity: Int, params: Array<Any>): String =
+        getStringPlural(context, stringQuantityKey, quantity, params)
 
     override fun getString(res: Int): String = context.getString(res)
     override fun getString(resId: Int, vararg formatArgs: Any): String = context.getString(resId, formatArgs)
