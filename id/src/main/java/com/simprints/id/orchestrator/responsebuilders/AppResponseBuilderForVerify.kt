@@ -9,12 +9,12 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerify
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
-class AppResponseBuilderForVerify : AppResponseBuilder, BaseAppResponseBuilder() {
+class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
 
-    override fun buildAppResponse(modalities: List<Modality>,
-                                  appRequest: AppRequest,
-                                  steps: List<Step>,
-                                  sessionId: String): AppResponse {
+    override suspend fun buildAppResponse(modalities: List<Modality>,
+                                          appRequest: AppRequest,
+                                          steps: List<Step>,
+                                          sessionId: String): AppResponse {
         super.getErrorOrRefusalResponseIfAny(steps)?.let {
             return it
         }

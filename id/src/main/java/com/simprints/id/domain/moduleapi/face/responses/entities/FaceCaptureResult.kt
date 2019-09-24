@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FaceCaptureResult(val index: Int,
-                             val result: FaceSample?) : Parcelable
+                             val result: FaceCaptureSample?) : Parcelable
 
 fun IFaceCaptureResult.fromModuleApiToDomain(): FaceCaptureResult =
     FaceCaptureResult(index, sample?.fromModuleApiToDomain())

@@ -6,6 +6,8 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.RefusalFormAnswer
 import com.simprints.id.domain.moduleapi.app.responses.entities.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
@@ -22,6 +24,12 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
         return when {
             results.any { it is CoreExitFormResponse } -> {
                 buildAppExitFormResponse(results.find { it is CoreExitFormResponse } as CoreExitFormResponse)
+            }
+            results.any { it is CoreFingerprintExitFormResponse } -> {
+                buildAppExitFormResponse(results.find { it is CoreFingerprintExitFormResponse } as CoreFingerprintExitFormResponse)
+            }
+            results.any { it is CoreFaceExitFormResponse } -> {
+                buildAppExitFormResponse(results.find { it is CoreFaceExitFormResponse } as CoreFaceExitFormResponse)
             }
             results.any { it is FingerprintErrorResponse } -> {
                 buildAppErrorResponse(results.find { it is FingerprintErrorResponse } as FingerprintErrorResponse)
@@ -41,6 +49,14 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
     private fun buildAppExitFormResponse(coreExitFormResponse: CoreExitFormResponse) =
         AppRefusalFormResponse(RefusalFormAnswer(coreExitFormResponse.reason.fromDomainToModuleApi(),
             coreExitFormResponse.optionalText))
+
+    private fun buildAppExitFormResponse(coreFingerprintExitFormResponse: CoreFingerprintExitFormResponse) =
+        AppRefusalFormResponse(RefusalFormAnswer(coreFingerprintExitFormResponse.reason.fromDomainToModuleApi(),
+            coreFingerprintExitFormResponse.optionalText))
+
+    private fun buildAppExitFormResponse(coreFaceExitFormResponse: CoreFaceExitFormResponse) =
+        AppRefusalFormResponse(RefusalFormAnswer(coreFaceExitFormResponse.reason.fromDomainToModuleApi(),
+            coreFaceExitFormResponse.optionalText))
 
     private fun buildAppErrorResponse(fingerprintErrorResponse: FingerprintErrorResponse) =
         AppErrorResponse(fingerprintErrorResponse.fingerprintErrorReason.toAppErrorReason())
