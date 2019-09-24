@@ -19,6 +19,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
@@ -37,6 +38,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override lateinit var viewPresenter: LoginContract.Presenter
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var secureApiInterface: SecureApiInterface
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     val app by lazy {
         application as Application
@@ -48,6 +50,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        app.component.inject(this)
+        title = androidResourcesHelper.getString(R.string.login_title)
+
+        setTextInLayout()
+
         loginActRequest = this.intent.extras?.getParcelable(LoginActivityRequest.BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
@@ -63,6 +70,17 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
         viewPresenter = LoginPresenter(this, component, projectAuthenticator)
         viewPresenter.start()
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
+            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
+            loginButtonScanQr.text = getString(R.string.scan_qr)
+            loginButtonSignIn.text = getString(R.string.login)
+            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
+            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+        }
     }
 
     private fun initUI() {

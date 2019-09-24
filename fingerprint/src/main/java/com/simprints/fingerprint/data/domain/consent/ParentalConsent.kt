@@ -1,9 +1,9 @@
 package com.simprints.fingerprint.data.domain.consent
 
-import android.content.Context
-import com.google.gson.annotations.SerializedName
 import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
@@ -20,20 +20,23 @@ data class ParentalConsent(
     @SerializedName("consent_parent_confirmation") var consentParentConfirmation: Boolean = true
 ) {
 
-    fun assembleText(context: Context, fingerprintRequest: FingerprintRequest, programName: String, organisationName: String) = StringBuilder().apply {
+    fun assembleText(androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                     fingerprintRequest: FingerprintRequest,
+                     programName: String, organisationName: String) = StringBuilder().apply {
+
         when (fingerprintRequest) {
             is FingerprintIdentifyRequest, is FingerprintVerifyRequest -> {
-                if (consentParentIdVerify) append(context.getString(R.string.consent_parental_id_verify).format(programName))
+                if (consentParentIdVerify) append(androidResourcesHelper.getString(R.string.consent_parental_id_verify).format(programName))
             }
             else -> {
-                if (consentParentEnrolOnly) append(context.getString(R.string.consent_parental_enrol_only).format(programName))
-                if (consentParentEnrol) append(context.getString(R.string.consent_parental_enrol).format(programName))
+                if (consentParentEnrolOnly) append(androidResourcesHelper.getString(R.string.consent_parental_enrol_only).format(programName))
+                if (consentParentEnrol) append(androidResourcesHelper.getString(R.string.consent_parental_enrol).format(programName))
             }
         }
-        if (consentParentShareDataNo) append(context.getString(R.string.consent_parental_share_data_no))
-        if (consentParentShareDataYes) append(context.getString(R.string.consent_parental_share_data_yes).format(organisationName))
-        if (consentCollectYes) append(context.getString(R.string.consent_collect_yes))
-        if (consentParentPrivacyRights) append(context.getString(R.string.consent_parental_privacy_rights))
-        if (consentParentConfirmation) append(context.getString(R.string.consent_parental_confirmation))
+        if (consentParentShareDataNo) append(androidResourcesHelper.getString(R.string.consent_parental_share_data_no))
+        if (consentParentShareDataYes) append(androidResourcesHelper.getString(R.string.consent_parental_share_data_yes).format(organisationName))
+        if (consentCollectYes) append(androidResourcesHelper.getString(R.string.consent_collect_yes))
+        if (consentParentPrivacyRights) append(androidResourcesHelper.getString(R.string.consent_parental_privacy_rights))
+        if (consentParentConfirmation) append(androidResourcesHelper.getString(R.string.consent_parental_confirmation))
     }.toString()
 }

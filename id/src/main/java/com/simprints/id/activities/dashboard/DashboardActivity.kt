@@ -6,7 +6,6 @@ import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
@@ -18,6 +17,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_dashboard.*
 import kotlinx.android.synthetic.main.content_dashboard.*
@@ -29,6 +29,9 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     lateinit var preferences: PreferencesManager
     @Inject
     lateinit var loginInfoManager: LoginInfoManager
+
+    @Inject
+    lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -42,10 +45,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-
         val component = (application as Application).component
         component.inject(this)
-        LanguageHelper.setLanguage(this, preferences.language)
+        title = androidResourcesHelper.getString(R.string.dashboard_label)
+
         setupActionBar()
 
         viewPresenter = DashboardPresenter(this, component)
@@ -55,7 +58,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     private fun setupActionBar() {
-        dashboardToolbar.title = getString(R.string.dashboard_label)
+        dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
         setSupportActionBar(dashboardToolbar)
     }
 
@@ -107,6 +110,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
         if(BuildConfig.DEBUG){
             menu?.findItem(R.id.debug)?.isVisible = true
         }
+
+        menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
+        menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
+
         return true
     }
 
@@ -138,10 +145,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun startCheckLoginActivityAndFinish(){
         startActivity(Intent(this, RequestLoginActivity::class.java))
         finish()
-    }
-
-    override fun getStringWithParams(stringRes: Int, currentValue: Int, maxValue: Int): String {
-        return getString(stringRes, currentValue, maxValue)
     }
 
     override fun showToastForUserOffline() {
