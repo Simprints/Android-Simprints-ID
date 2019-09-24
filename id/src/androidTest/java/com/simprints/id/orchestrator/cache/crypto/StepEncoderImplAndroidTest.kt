@@ -6,11 +6,10 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.testtools.common.syntax.failTest
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
@@ -29,7 +28,7 @@ class StepEncoderImplAndroidTest {
     @Test
     fun shouldEncodeFingerprintEnrolStepToString() {
         val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
-        val fingerprintEnrolResult = mockFingerprintEnrolResult()
+        val fingerprintEnrolResult = mockFingerprintEnrolResponse()
         val step = buildStep(fingerprintEnrolRequest, fingerprintEnrolResult)
         val encodedString = stepEncoder.encode(step)
 
@@ -51,19 +50,19 @@ class StepEncoderImplAndroidTest {
     @Test
     fun shouldDecodeStringToFingerprintEnrolStep() {
         val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
-        val fingerprintEnrolResult = mockFingerprintEnrolResult()
+        val fingerprintEnrolResult = mockFingerprintEnrolResponse()
         val step = buildStep(fingerprintEnrolRequest, fingerprintEnrolResult)
         val encodedString = stepEncoder.encode(step)
         val decodedStep = stepEncoder.decode(encodedString)
 
-        decodedStep?.run {
+        with(decodedStep) {
             assertThat(requestCode, `is`(REQUEST_CODE))
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(fingerprintEnrolRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
             assertThat(result, `is`(fingerprintEnrolResult))
-        } ?: failTest(MESSAGE_NULL_DECODED_STEP)
+        }
     }
 
     @Test
@@ -74,14 +73,17 @@ class StepEncoderImplAndroidTest {
         val encodedString = stepEncoder.encode(step)
         val decodedStep = stepEncoder.decode(encodedString)
 
-        decodedStep?.run {
+        with(decodedStep) {
             assertThat(requestCode, `is`(REQUEST_CODE))
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(faceCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(result, `is`(faceCaptureResponse))
-        } ?: failTest(MESSAGE_NULL_DECODED_STEP)
+            assertThat(result, instanceOf(FaceCaptureResponse::class.java))
+            require(result is FaceCaptureResponse)
+            validateFaceCaptureResponse(result as FaceCaptureResponse,
+                faceCaptureResponse as FaceCaptureResponse)
+        }
     }
 
     @After
@@ -114,7 +116,7 @@ class StepEncoderImplAndroidTest {
         nFaceSamplesToCapture = 3
     )
 
-    private fun mockFingerprintEnrolResult(): Step.Result {
+    private fun mockFingerprintEnrolResponse(): Step.Result {
         return FingerprintEnrolResponse(UUID.randomUUID().toString())
     }
 
@@ -124,7 +126,7 @@ class StepEncoderImplAndroidTest {
         return FaceCaptureResponse(listOf(
             FaceCaptureResult(
                 index = 1,
-                result = FaceSample(
+                result = FaceCaptureSample(
                     "face_id",
                     template,
                     SecuredImageRef("uri")
@@ -133,11 +135,29 @@ class StepEncoderImplAndroidTest {
         ))
     }
 
+    private fun validateFaceCaptureResponse(response: FaceCaptureResponse,
+                                            expected: FaceCaptureResponse) {
+        with(response) {
+            capturingResult.forEachIndexed { index, item ->
+                val expectedItem = expected.capturingResult[index]
+                assertThat(item.index, `is`(expectedItem.index))
+
+                item.result?.let { sample ->
+                    val expectedSample = expectedItem.result
+                    assertThat(sample.faceId, `is`(expectedSample?.faceId))
+                    assertThat(sample.imageRef, `is`(expectedSample?.imageRef))
+                    expectedSample?.template?.let { expectedTemplate ->
+                        assertThat(sample.template.contentEquals(expectedTemplate), `is`(true))
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
         private const val REQUEST_CODE = 123
         private const val ACTIVITY_NAME = "com.simprints.id.MyActivity"
         private const val BUNDLE_KEY = "BUNDLE_KEY"
-        private const val MESSAGE_NULL_DECODED_STEP = "The decoded step must not be null"
     }
 
 }

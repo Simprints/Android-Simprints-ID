@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.cache.crypto
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 
 class FaceCaptureResponseEncoder(
@@ -22,7 +23,9 @@ class FaceCaptureResponseEncoder(
                         Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
                     }.toByteArray()
 
-                    val faceSample = item.result.copy(template = processedTemplate)
+                    val faceId = item.result.faceId
+                    val imageRef = item.result.imageRef
+                    val faceSample = FaceCaptureSample(faceId, processedTemplate, imageRef)
                     capturingResult.add(item.copy(result = faceSample))
                 }
             }
