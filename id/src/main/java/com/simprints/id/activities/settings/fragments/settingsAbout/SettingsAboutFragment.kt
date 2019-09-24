@@ -42,7 +42,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
         viewPresenter.start()
     }
 
-    fun setTextInLayout() {
+    private fun setTextInLayout() {
         with(androidResourcesHelper) {
             getAppVersionPreference().title = getString(R.string.preference_app_version_title)
             getDeviceIdPreference().title = getString(R.string.preference_device_id_title)

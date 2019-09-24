@@ -54,7 +54,7 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         setRadioGroupListener()
     }
 
-    fun setTextInLayout() {
+    private fun setTextInLayout() {
         with(androidResourcesHelper) {
             whySkipFingerprintingText.text = getString(R.string.why_did_you_skip_fingerprinting)
             rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
