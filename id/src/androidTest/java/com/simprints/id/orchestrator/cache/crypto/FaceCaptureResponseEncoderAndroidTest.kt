@@ -5,7 +5,7 @@ import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
-import com.simprints.id.domain.moduleapi.face.responses.entities.FaceSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
@@ -44,7 +44,7 @@ class FaceCaptureResponseEncoderAndroidTest {
     private fun mockResponse() = FaceCaptureResponse(listOf(
         FaceCaptureResult(
             index = 0,
-            result = FaceSample(
+            result = FaceCaptureSample(
                 "face_id_0",
                 UUID.randomUUID().toString().toByteArray(),
                 SecuredImageRef("uri_0")
@@ -52,7 +52,7 @@ class FaceCaptureResponseEncoderAndroidTest {
         ),
         FaceCaptureResult(
             index = 2,
-            result = FaceSample(
+            result = FaceCaptureSample(
                 "face_id_1",
                 UUID.randomUUID().toString().toByteArray(),
                 SecuredImageRef("uri_1")
