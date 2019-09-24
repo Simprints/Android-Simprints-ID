@@ -23,7 +23,11 @@ import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.SettingsAboutActivity
+import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -43,6 +47,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import dagger.BindsInstance
@@ -99,6 +104,10 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(settingsActivity: SettingsActivity)
+    fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
+    fun inject(settingsAboutFragment: SettingsAboutFragment)
+    fun inject(settingsAboutActivity: SettingsAboutActivity)
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
@@ -110,6 +119,7 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
+    fun getAndroidResourcesHelper(): AndroidResourcesHelper
 
     val orchestratorActivityComponentFactory: OrchestratorActivityComponent.Factory
 }

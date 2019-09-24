@@ -19,6 +19,7 @@ import com.simprints.fingerprint.activities.alert.response.AlertActResult
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.data.domain.InternalConstants
 import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.id.Application
@@ -28,6 +29,8 @@ import javax.inject.Inject
 class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallback {
 
     @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
 
@@ -44,8 +47,8 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         alertType = intent.extras?.getParcelable<AlertActRequest>(AlertActRequest.BUNDLE_KEY)?.alert
             ?: UNEXPECTED_ERROR
 
-        if(isNewBluetoothAlert(alertType)) {
-           setContentView(R.layout.activity_fingerprint_bluetooth_alert)
+        if (isNewBluetoothAlert(alertType)) {
+            setContentView(R.layout.activity_fingerprint_bluetooth_alert)
         } else {
             setContentView(R.layout.activity_fingerprint_alert)
         }
@@ -65,9 +68,18 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) { alertLeftButton?.setBackgroundColor(color) }
-    override fun setRightButtonBackgroundColor(@ColorInt color: Int) { alertRightButton?.setBackgroundColor(color) }
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alertTitle.setText(stringRes)
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) {
+        alertLeftButton?.setBackgroundColor(color)
+    }
+
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) {
+        alertRightButton?.setBackgroundColor(color)
+    }
+
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) {
+        alertTitle.text = androidResourcesHelper.getString(stringRes)
+    }
+
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
@@ -77,12 +89,14 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) {
+        message.text = androidResourcesHelper.getString(stringRes)
+    }
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertLeftButton?.visibility = View.VISIBLE
-            alertLeftButton?.setText(leftButtonAction.buttonText)
+            alertLeftButton?.text = androidResourcesHelper.getString(leftButtonAction.buttonText)
             alertLeftButton?.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
@@ -90,7 +104,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View, OrchestratorCallb
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertRightButton?.visibility = View.VISIBLE
-            alertRightButton?.setText(rightButtonAction.buttonText)
+            alertRightButton?.text = androidResourcesHelper.getString(rightButtonAction.buttonText)
             alertRightButton?.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         }
     }

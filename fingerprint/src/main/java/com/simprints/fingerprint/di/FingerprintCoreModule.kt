@@ -3,6 +3,8 @@ package com.simprints.fingerprint.di
 import com.simprints.core.di.FeatureScope
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelperImpl
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -17,10 +19,10 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import dagger.Module
@@ -60,6 +62,10 @@ open class FingerprintCoreModule {
     open fun provideFingerprintCrashReportManager(coreCrashReportManager: CoreCrashReportManager): FingerprintCrashReportManager =
         FingerprintCrashReportManagerImpl(coreCrashReportManager)
 
+    @Provides
+    @FeatureScope
+    open fun provideFingerprintAndroidResourcesHelper(coreAndroidResourcesHelper: AndroidResourcesHelper): FingerprintAndroidResourcesHelper =
+        FingerprintAndroidResourcesHelperImpl(coreAndroidResourcesHelper)
 
     @Provides
     @FeatureScope
