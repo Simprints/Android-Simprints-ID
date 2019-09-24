@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.simprints.id.R
 import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.orchestrator.di.OrchestratorComponentInjector
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -11,17 +12,19 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse.Reason.Companion.fromDomainAlertTypeToAppErrorType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
 
 open class OrchestratorActivity : AppCompatActivity(), OrchestratorContract.View {
 
-    @Inject
-    override lateinit var viewPresenter: OrchestratorContract.Presenter
+    @Inject override lateinit var viewPresenter: OrchestratorContract.Presenter
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         OrchestratorComponentInjector.inject(this)
         super.onCreate(savedInstanceState)
+        title = androidResourcesHelper.getString(R.string.title_activity_orchestrator)
 
         val appRequest = this.intent.extras?.getParcelable<AppRequest>(AppRequest.BUNDLE_KEY)
             ?: throw InvalidAppRequest()

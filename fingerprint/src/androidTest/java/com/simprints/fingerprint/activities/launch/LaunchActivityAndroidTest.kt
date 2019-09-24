@@ -13,6 +13,7 @@ import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintCoreModule
 import com.simprints.fingerprint.commontesttools.di.TestFingerprintModule
 import com.simprints.fingerprint.controllers.consentdata.ConsentDataManager
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.simnetworkutils.FingerprintSimNetworkUtils
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
@@ -58,6 +59,7 @@ class LaunchActivityAndroidTest {
     @Inject lateinit var dbManagerMock: FingerprintDbManager
     @Inject lateinit var simNetworkUtilsMock: FingerprintSimNetworkUtils
     @Inject lateinit var consentDataManagerMock: ConsentDataManager
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private val fingerprintModule by lazy {
         TestFingerprintModule(
@@ -238,7 +240,7 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val defaultGeneralConsentText = GeneralConsent().assembleText(
-            activity,
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -257,7 +259,8 @@ class LaunchActivityAndroidTest {
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
-        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+        val defaultGeneralConsentText = GeneralConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(identifyRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -275,14 +278,16 @@ class LaunchActivityAndroidTest {
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
-        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+        val defaultGeneralConsentText = GeneralConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        val defaultParentalConsentText = ParentalConsent().assembleText(activity,
+        val defaultParentalConsentText = ParentalConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -297,14 +302,16 @@ class LaunchActivityAndroidTest {
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
-        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+        val defaultGeneralConsentText = GeneralConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(identifyRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
         assertEquals(defaultGeneralConsentText, generalConsentText)
 
         val parentConsentText = activity.parentalConsentTextView.text.toString()
-        val defaultParentalConsentText = ParentalConsent().assembleText(activity,
+        val defaultParentalConsentText = ParentalConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(identifyRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -319,7 +326,8 @@ class LaunchActivityAndroidTest {
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
-        val defaultGeneralConsentText = GeneralConsent().assembleText(activity,
+        val defaultGeneralConsentText = GeneralConsent().assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -334,7 +342,8 @@ class LaunchActivityAndroidTest {
         val activity = launchActivityRule.activity
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
-        val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(activity,
+        val targetConsentText = EXTRA_UNRECOGNISED_CONSENT_TARGET.assembleText(
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
@@ -350,7 +359,7 @@ class LaunchActivityAndroidTest {
 
         val generalConsentText = activity.generalConsentTextView.text.toString()
         val targetConsentText = PARTIALLY_MISSING_CONSENT_TARGET.assembleText(
-            activity, 
+            androidResourcesHelper,
             fromFingerprintToDomainRequest(enrolRequest),
             DEFAULT_PROGRAM_NAME,
             DEFAULT_ORGANISATION_NAME)
