@@ -1,4 +1,4 @@
-package com.simprints.scarecrow
+package com.simprints.core.livedata
 
 import androidx.lifecycle.Observer
 
