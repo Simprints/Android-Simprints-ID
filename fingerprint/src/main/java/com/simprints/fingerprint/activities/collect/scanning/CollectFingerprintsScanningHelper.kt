@@ -12,6 +12,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
@@ -21,12 +22,12 @@ import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.di.FingerprintComponent
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.tools.extensions.Vibrate
+import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import com.simprints.fingerprintscanner.ButtonListener
 import com.simprints.fingerprintscanner.SCANNER_ERROR
 import com.simprints.fingerprintscanner.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprint.tools.extensions.Vibrate
-import com.simprints.fingerprint.tools.extensions.runOnUiThreadIfStillRunning
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -40,6 +41,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     @Inject lateinit var scannerManager: ScannerManager
     @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
@@ -81,7 +83,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         ProgressDialog(context).also { dialog ->
             dialog.isIndeterminate = true
             dialog.setCanceledOnTouchOutside(false)
-            dialog.setMessage(context.getString(R.string.reconnecting_message))
+            dialog.setMessage(androidResourcesHelper.getString(R.string.reconnecting_message))
             dialog.setOnCancelListener { view.cancelAndFinish() }
         }
 

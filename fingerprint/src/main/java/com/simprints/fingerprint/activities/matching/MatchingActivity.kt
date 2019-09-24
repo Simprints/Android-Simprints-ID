@@ -10,13 +10,12 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
@@ -43,6 +42,7 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
     @Inject lateinit var timeHelper: FingerprintTimeHelper
     @Inject lateinit var preferencesManager: FingerprintPreferencesManager
     @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +51,8 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
-        LanguageHelper.setLanguage(this, matchingRequest.language)
-
         setContentView(R.layout.activity_matching)
+        setTextInLayout()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val extras = intent.extras
@@ -64,6 +63,10 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         }
 
         viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, preferencesManager, timeHelper)
+    }
+
+    private fun setTextInLayout() {
+        matching_please_wait.text = androidResourcesHelper.getString(R.string.please_wait)
     }
 
     override fun onResume() {
@@ -86,13 +89,13 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun setIdentificationProgressLoadingStart() =
         runOnUiThread {
-            tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getString(R.string.loading_candidates)
             setIdentificationProgress(25)
         }
 
     override fun setIdentificationProgressMatchingStart(matchSize: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, matchSize, matchSize)
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, matchSize, arrayOf(matchSize))
             tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
             setIdentificationProgress(50)
         }
@@ -105,19 +108,19 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
         runOnUiThread {
-            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, returnSize, returnSize)
+            tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, returnSize, arrayOf(returnSize))
 
             if (tier1Or2Matches > 0) {
                 tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, tier1Or2Matches, tier1Or2Matches)
+                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, tier1Or2Matches, arrayOf(tier1Or2Matches))
             }
             if (tier3Matches > 0) {
                 tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, tier3Matches, tier3Matches)
+                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, tier3Matches, arrayOf(tier3Matches))
             }
             if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
                 tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, tier4Matches, tier4Matches)
+                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, tier4Matches, arrayOf(tier4Matches))
             }
             setIdentificationProgress(100)
 
@@ -162,5 +165,5 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
         super.onDestroy()
     }
 
-    override fun onBackPressed() { }
+    override fun onBackPressed() {}
 }

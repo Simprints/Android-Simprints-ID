@@ -218,7 +218,7 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addGuidSelectionEvent() {
-        addEvent(GuidSelectionEvent(0, "selected_id"))
+        addEvent(GuidSelectionEvent(0, RANDOM_GUID))
     }
 
     private fun SessionEvents.addIntentParsingEvent() {
@@ -264,14 +264,14 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addCallbackEvent() {
-        addEvent(EnrolmentCallbackEvent(0, "guid"))
+        addEvent(EnrolmentCallbackEvent(0, RANDOM_GUID))
 
         ErrorCallbackEvent.Reason.values().forEach {
             addEvent(ErrorCallbackEvent(0, it))
         }
 
         Tier.values().forEach {
-            addEvent(IdentificationCallbackEvent(0, "session_id", listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
+            addEvent(IdentificationCallbackEvent(0, RANDOM_GUID, listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
         }
 
         addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
@@ -280,10 +280,10 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(ConfirmationCalloutEvent(0, "projectId", "selected_guid", "session_id"))
+        addEvent(ConfirmationCalloutEvent(0, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(EnrolmentCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(0, "project_id", "user_id", "module_id", "verify_guid","metadata"))
+        addEvent(VerificationCalloutEvent(0, "project_id", "user_id", "module_id", RANDOM_GUID,"metadata"))
     }
 
 

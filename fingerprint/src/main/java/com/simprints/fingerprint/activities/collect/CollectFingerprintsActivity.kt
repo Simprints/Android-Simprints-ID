@@ -20,6 +20,7 @@ import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.orchestrator.Orchestrator
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
 import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
 import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
@@ -39,6 +40,7 @@ class CollectFingerprintsActivity :
 
     override val context: Context by lazy { this }
     @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
@@ -88,6 +90,11 @@ class CollectFingerprintsActivity :
         scanButton = scan_button
         progressBar = pb_timeout
         setListenerToMissingFinger()
+
+        with(androidResourcesHelper) {
+            scanButton.text = getString(R.string.scan)
+            missingFingerText.text = getString(R.string.missing_finger)
+        }
     }
 
     override fun onResume() {
@@ -122,7 +129,7 @@ class CollectFingerprintsActivity :
 
     override fun refreshScanButtonAndTimeoutBar() {
         val activeStatus = viewPresenter.currentFinger().status
-        scan_button.setText(activeStatus.buttonTextId)
+        scan_button.text = androidResourcesHelper.getString(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 
