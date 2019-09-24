@@ -14,7 +14,7 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.1.0"
+def androidx_lifecycle_version = "2.2.0-alpha05"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
@@ -63,11 +63,6 @@ def firebase = [
     config  : "com.google.firebase:firebase-config:16.3.0",
     perf    : "com.google.firebase:firebase-perf:16.2.3",
     storage : "com.google.firebase:firebase-storage:16.0.5",
-]
-
-def jwt_version = "3.8.1"
-def jwt = [
-    core: "com.auth0:java-jwt:$jwt_version"
 ]
 
 def crashlytics = [
@@ -196,6 +191,5 @@ ext.deps = [
     testing        : testing,
     realm          : realm,
     commons_io     : commons_io,
-    koin           : koin,
-    jwt            : jwt
+    koin           : koin
 ]
