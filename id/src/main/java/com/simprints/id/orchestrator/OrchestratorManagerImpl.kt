@@ -77,7 +77,7 @@ open class OrchestratorManagerImpl(
         steps.any { it.getStatus() == ONGOING }
 
     private suspend fun buildAppResponse() {
-        val cachedSteps = hotCache.load()
+        //val cachedSteps = hotCache.load()
 //        val steps: List<Step> = if (cachedSteps.isEmpty()) {
 //            modalitiesFlow.steps
 //        } else {

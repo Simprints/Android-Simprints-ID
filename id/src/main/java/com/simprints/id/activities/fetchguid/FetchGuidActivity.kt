@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
@@ -43,9 +43,9 @@ class FetchGuidActivity : AppCompatActivity() {
         fetchGuidRequest = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
         injectDependencies()
-        viewModel = ViewModelProviders.of(this, fetchGuidViewModelFactory).get(FetchGuidViewModel::class.java)
+        viewModel = ViewModelProvider(this, fetchGuidViewModelFactory).get(FetchGuidViewModel::class.java)
 
-        viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
+        tryToFetchGuid()
 
         setupObserversForUi()
     }
@@ -71,19 +71,10 @@ class FetchGuidActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
-            handleAlertButtonAction(it.buttonAction)
-        } ?: data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.let {
-            setResultAndFinish(it)
-        }
-    }
-
     private fun handleAlertButtonAction(alertButtonAction: AlertActResponse.ButtonAction) {
         when (alertButtonAction) {
             TRY_AGAIN -> {
-                viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
+                tryToFetchGuid()
             }
             BACK -> {
                 startExitFormActivity()
@@ -120,6 +111,19 @@ class FetchGuidActivity : AppCompatActivity() {
 
     private fun startFaceExitFormActivity() {
         startActivityForResult(Intent(this, FaceExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
+            handleAlertButtonAction(it.buttonAction)
+        } ?: data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.let {
+            setResultAndFinish(it)
+        }
+    }
+
+    private fun tryToFetchGuid() {
+        viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
     }
 
 

@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
@@ -57,7 +57,7 @@ class ConsentActivity : AppCompatActivity() {
 
         askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
+        viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
 
         setupTabs()
@@ -173,7 +173,7 @@ class ConsentActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHandler.buildExitFormResposeForCore(data)?.let {
+        exitFormHandler.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
         }
     }

@@ -13,7 +13,7 @@ import com.simprints.id.exitformhandler.ExitFormResult.ExitFormType.*
 
 class ExitFormHandlerImpl : ExitFormHandler {
 
-    override fun buildExitFormResposeForCore(data: Intent?): CoreResponse? =
+    override fun buildExitFormResponseForCore(data: Intent?): CoreResponse? =
         data?.getParcelableExtra<ExitFormResult>(EXIT_FORM_BUNDLE_KEY)?.let {
             when (it.type) {
                 CORE_EXIT_FORM -> {
@@ -29,11 +29,23 @@ class ExitFormHandlerImpl : ExitFormHandler {
         }
 
     private fun buildCoreExitFormResponseFromCoreExitForm(result: CoreExitFormActivityResult) =
-        CoreExitFormResponse(result.answer.reason, result.answer.optionalText)
+        if (result.action == CoreExitFormActivityResult.Action.SUBMIT) {
+            CoreExitFormResponse(result.answer.reason, result.answer.optionalText)
+        } else {
+            null
+        }
 
     private fun buildCoreExitFormResponseFromCoreFingerprintExitForm(result: FingerprintExitFormActivityResult) =
-        CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
+        if (result.action == FingerprintExitFormActivityResult.Action.SUBMIT) {
+            CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
+        } else {
+            null
+        }
 
     private fun buildCoreExitFormResponseFromCoreFaceExitForm(result: FaceExitFormActivityResult) =
-        CoreFaceExitFormResponse(result.answer.reason, result.answer.optionalText)
+        if (result.action == FaceExitFormActivityResult.Action.SUBMIT) {
+            CoreFaceExitFormResponse(result.answer.reason, result.answer.optionalText)
+        } else {
+            null
+        }
 }

@@ -26,6 +26,8 @@ interface AlertContract {
         fun startCoreExitFormActivity()
         fun startFingerprintExitFormActivity()
         fun startFaceExitFormActivity()
+        fun finishWithTryAgain()
+        fun openWifiSettings()
     }
 
     interface Presenter : BasePresenter {
