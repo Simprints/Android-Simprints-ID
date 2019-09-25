@@ -78,13 +78,13 @@ open class OrchestratorManagerImpl(
 
     private suspend fun buildAppResponse() {
         val cachedSteps = hotCache.load()
-        val steps: List<Step> = if (cachedSteps.isEmpty()) {
-            modalitiesFlow.steps
-        } else {
-            cachedSteps
-        }
+//        val steps: List<Step> = if (cachedSteps.isEmpty()) {
+//            modalitiesFlow.steps
+//        } else {
+//            cachedSteps
+//        }
         val appResponseToReturn = appResponseFactory.buildAppResponse(
-            modalities, appRequest, steps, sessionId
+            modalities, appRequest, modalitiesFlow.steps, sessionId
         )
         ongoingStep.value = null
         appResponse.value = appResponseToReturn

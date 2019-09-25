@@ -59,13 +59,15 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             val person = personLocalDataSource.load(PersonLocalDataSource.Query(patientId = patientId)).first()
             PersonFetchResult(person, LOCAL)
         } catch (t: Throwable) {
-            try {
-                val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
-                PersonFetchResult(person, REMOTE)
-            } catch (t: Throwable) {
-                throw t
-            }
+            tryToFetchPersonFromRemote(projectId, patientId)
         }
+
+    private fun tryToFetchPersonFromRemote(projectId: String, patientId: String) = try {
+        val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
+        PersonFetchResult(person, REMOTE)
+    } catch (t: Throwable) {
+        throw t
+    }
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
