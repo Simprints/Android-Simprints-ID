@@ -8,7 +8,7 @@ class FingerprintEnrolResponseEncoder(
     keystoreManager: KeystoreManager
 ) : ResponseEncoder(keystoreManager) {
 
-    override fun process(response: Step.Result, operation: Operation): Step.Result {
+    override fun process(response: Step.Result?, operation: Operation): Step.Result? {
         require(response is FingerprintEnrolResponse)
 
         val processedGuid = when (operation) {
