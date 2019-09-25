@@ -5,6 +5,6 @@ import com.simprints.id.orchestrator.steps.Step
 
 abstract class ResponseEncoder(protected val keystoreManager: KeystoreManager) {
 
-    abstract fun process(response: Step.Result, operation: Operation): Step.Result
+    abstract fun process(response: Step.Result?, operation: Operation): Step.Result?
 
 }

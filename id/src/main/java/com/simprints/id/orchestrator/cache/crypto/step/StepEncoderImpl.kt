@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator.cache.crypto.step
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.orchestrator.cache.crypto.response.BypassEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.FaceCaptureResponseEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.FingerprintEnrolResponseEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.Operation
@@ -32,9 +33,9 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
         val result = step.result
         return step.also {
             val responseEncoder = when (result) {
-                is FaceCaptureResponse -> FaceCaptureResponseEncoder(keystoreManager)
                 is FingerprintEnrolResponse -> FingerprintEnrolResponseEncoder(keystoreManager)
-                else -> throw Throwable("Null or invalid response")
+                is FaceCaptureResponse -> FaceCaptureResponseEncoder(keystoreManager)
+                else -> BypassEncoder(keystoreManager)
             }
             it.result = responseEncoder.process(result, operation)
         }
