@@ -115,18 +115,23 @@ class FetchGuidActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        tryToGetAlertActResponseAndHandleAction(data) ?: getCoreResponseAndFinish(data)
+    }
+
+    private fun tryToGetAlertActResponseAndHandleAction(data: Intent?) =
         data?.getParcelableExtra<AlertActResponse>(AlertActResponse.BUNDLE_KEY)?.let {
             handleAlertButtonAction(it.buttonAction)
-        } ?: data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.let {
+        }
+
+    private fun getCoreResponseAndFinish(data: Intent?) =
+        data?.getParcelableExtra<CoreResponse>(CORE_STEP_BUNDLE)?.let {
             setResultAndFinish(it)
         }
-    }
 
     private fun tryToFetchGuid() {
         viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
     }
-
-
+    
     private fun setResultAndFinish(coreResponse: CoreResponse) {
         setResult(RESULT_CODE_FETCH_GUID, buildIntentForResponse(coreResponse))
         finish()
@@ -135,4 +140,6 @@ class FetchGuidActivity : AppCompatActivity() {
     private fun buildIntentForResponse(coreResponse: CoreResponse) = Intent().apply {
         putExtra(CORE_STEP_BUNDLE, coreResponse)
     }
+
+    override fun onBackPressed() {}
 }
