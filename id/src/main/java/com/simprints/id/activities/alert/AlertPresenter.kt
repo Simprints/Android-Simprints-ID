@@ -10,6 +10,7 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
@@ -65,8 +66,35 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun handleBackButton() {
-        view.closeActivityAfterCloseButton()
+        if (alertType == AlertType.UNEXPECTED_ERROR || alertType == AlertType.GUID_NOT_FOUND_ONLINE) {
+            view.closeActivityAfterCloseButton()
+        } else {
+            startExitFormActivityBasedOnModalities()
+        }
     }
+
+    private fun startExitFormActivityBasedOnModalities() {
+        if (isSingleModality()) {
+            startModalitySpecificExitForm()
+        } else {
+            startCoreExitFormActivity()
+        }
+    }
+
+    private fun isSingleModality() = preferencesManager.modalities.size == 1
+
+    private fun startModalitySpecificExitForm() {
+        when (preferencesManager.modalities.first()) {
+            Modality.FINGER -> startFingerprintExitFormActivity()
+            Modality.FACE -> startFaceExitFormActivity()
+        }
+    }
+
+    private fun startCoreExitFormActivity() = view.startCoreExitFormActivity()
+
+    private fun startFingerprintExitFormActivity() = view.startFingerprintExitFormActivity()
+
+    private fun startFaceExitFormActivity() = view.startFaceExitFormActivity()
 
     private fun logToCrashReport() {
         crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertViewModel.name)

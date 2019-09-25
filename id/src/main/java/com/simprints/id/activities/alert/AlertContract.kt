@@ -23,6 +23,9 @@ interface AlertContract {
         fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun closeActivityAfterCloseButton()
+        fun startCoreExitFormActivity()
+        fun startFingerprintExitFormActivity()
+        fun startFaceExitFormActivity()
     }
 
     interface Presenter : BasePresenter {
