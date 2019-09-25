@@ -114,9 +114,24 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHandler.buildExitFormResposeForCore(data)?.let {
+        exitFormHandler.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
         }
+    }
+
+    override fun finishWithTryAgain() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.TRY_AGAIN))
+        })
+
+        finish()
+    }
+
+    override fun openWifiSettings() {
+        val intent = Intent().apply {
+            action = android.provider.Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivity(intent)
     }
 
     private fun setResultAndFinish(coreResponse: CoreResponse) {
