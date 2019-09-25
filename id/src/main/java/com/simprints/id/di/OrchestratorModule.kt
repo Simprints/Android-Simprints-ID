@@ -17,8 +17,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprin
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.crypto.StepEncoder
-import com.simprints.id.orchestrator.cache.crypto.StepEncoderImpl
+import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
+import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
