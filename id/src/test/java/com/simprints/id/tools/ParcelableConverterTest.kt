@@ -42,7 +42,7 @@ class ParcelableConverterTest {
         assertThat(step.bundleKey, `is`(BUNDLE_KEY))
         assertThat(step.request, `is`(request))
         assertThat(step.getStatus(), `is`(Step.Status.COMPLETED))
-        assertThat(step.result, `is`(result))
+        assertThat(step.getResult(), `is`(result))
     }
 
     @After

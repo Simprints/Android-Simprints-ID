@@ -30,7 +30,7 @@ class AppResponseBuilderForEnrol(
         }
 
         val request = appRequest as AppEnrolRequest
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 

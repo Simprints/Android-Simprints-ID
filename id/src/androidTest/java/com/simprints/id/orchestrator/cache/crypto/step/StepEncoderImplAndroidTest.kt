@@ -65,9 +65,9 @@ class StepEncoderImplAndroidTest {
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(fingerprintCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(result, instanceOf(FingerprintCaptureResponse::class.java))
-            require(result is FingerprintCaptureResponse)
-            validateFingerprintCaptureResponse(result as FingerprintCaptureResponse,
+            assertThat(getResult(), instanceOf(FingerprintCaptureResponse::class.java))
+            require(getResult() is FingerprintCaptureResponse)
+            validateFingerprintCaptureResponse(getResult() as FingerprintCaptureResponse,
                 fingerprintCaptureResponse as FingerprintCaptureResponse)
         }
     }
@@ -86,8 +86,8 @@ class StepEncoderImplAndroidTest {
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(faceCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(result, instanceOf(FaceCaptureResponse::class.java))
-            validateFaceCaptureResponse(result as FaceCaptureResponse,
+            assertThat(getResult(), instanceOf(FaceCaptureResponse::class.java))
+            validateFaceCaptureResponse(getResult() as FaceCaptureResponse,
                 faceCaptureResponse as FaceCaptureResponse)
         }
     }
@@ -106,7 +106,7 @@ class StepEncoderImplAndroidTest {
             assertThat(bundleKey, `is`(BUNDLE_KEY))
             assertThat(request, `is`(fingerprintCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(result, `is`(fingerprintIdentifyResponse))
+            assertThat(getResult(), `is`(fingerprintIdentifyResponse))
         }
     }
 
