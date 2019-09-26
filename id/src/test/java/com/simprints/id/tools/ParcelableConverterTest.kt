@@ -1,7 +1,7 @@
 package com.simprints.id.tools
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.model.Fingerprint
 import com.simprints.id.orchestrator.steps.Step
@@ -71,7 +71,7 @@ class ParcelableConverterTest {
         )
     }
 
-    private fun mockRequest(): Step.Request = FingerprintEnrolRequest(
+    private fun mockRequest(): Step.Request = FingerprintCaptureRequest(
         "projectId",
         "userId",
         "moduleId",
@@ -80,7 +80,8 @@ class ParcelableConverterTest {
         mapOf(),
         true,
         "programmeName",
-        "organisationName"
+        "organisationName",
+        "activityTitle"
     )
 
     private fun mockResult(): Step.Result {

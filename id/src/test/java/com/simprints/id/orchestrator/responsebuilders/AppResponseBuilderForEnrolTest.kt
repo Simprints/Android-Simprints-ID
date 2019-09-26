@@ -7,7 +7,7 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.model.IFingerprintImpl
@@ -101,7 +101,7 @@ class AppResponseBuilderForEnrolTest {
     }
 
     private fun mockFingerprintStep(): Step {
-        val request = FingerprintEnrolRequest(
+        val request = FingerprintCaptureRequest(
             "projectId",
             "userId",
             "moduleId",
@@ -110,7 +110,8 @@ class AppResponseBuilderForEnrolTest {
             mapOf(),
             true,
             "programmeName",
-            "organisationName"
+            "organisationName",
+            "activityTitle"
         )
 
         return Step(

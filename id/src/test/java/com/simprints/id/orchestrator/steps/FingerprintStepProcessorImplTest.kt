@@ -8,7 +8,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.orchestrator.enrolAppRequest
@@ -74,7 +74,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepEnrol(projectId, userId, moduleId, metadata)
 
-            verifyFingerprintIntent<FingerprintEnrolRequest>(step, ENROL.value)
+            verifyFingerprintIntent<FingerprintCaptureRequest>(step, ENROL.value)
         }
     }
 

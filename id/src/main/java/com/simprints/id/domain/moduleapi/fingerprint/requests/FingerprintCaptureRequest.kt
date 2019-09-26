@@ -4,7 +4,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.Fingerpri
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FingerprintEnrolRequest(val projectId: String,
+data class FingerprintCaptureRequest(val projectId: String,
                                    val userId: String,
                                    val moduleId: String,
                                    val metadata: String,
@@ -12,4 +12,5 @@ data class FingerprintEnrolRequest(val projectId: String,
                                    val fingerStatus: Map<FingerprintFingerIdentifier, Boolean>,
                                    val logoExists: Boolean,
                                    val programName: String,
-                                   val organizationName: String) : FingerprintRequest
+                                   val organizationName: String,
+                                   val activityTitle: String) : FingerprintRequest
