@@ -45,6 +45,7 @@
     <string name="reconnecting_message">পুনঃসংযোগ</string>
     <!-- Button Labels -->
     <string name="ok">ঠিক আছে</string>
+    <string name="cancel_button">বাতিল করুন</string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
@@ -61,6 +62,12 @@
     <string name="r_3_finger_name">ডান ৩য় আঙুল</string>
     <string name="r_4_finger_name">ডান ৪র্থ আঙুল</string>
     <string name="r_5_finger_name">ডান ৫ম আঙুল</string>
+
+    <string name="l_5_finger_name">বাম হাতের কনিষ্ঠা</string>
+    <string name="l_4_finger_name">বাম হাতের অনামিকা</string>
+    <string name="l_3_finger_name">বাম হাতের মধ্যমা</string>
+    <string name="l_2_finger_name">বাম হাতের তর্জনী</string>
+    <string name="l_1_finger_name">বাম হাতের বৃদ্ধাঙ্গুল</string>
 
 
     <!-- MatchingActivity : the waiting screen after an identification -->
@@ -178,7 +185,6 @@
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
     </string>
     <string name="alert_try_again">আবার চেষ্টা করা</string>
-    <string name="cancel_button">কনফিগারেশন সমস্যা</string>
     <string name="confirmation_logout_cancel">বাতিল করুন</string>
     <string name="confirmation_logout_message">আপনি কি লগআউট করতে চান?</string>
     <string name="confirmation_logout_title">লগআউট করুন</string>

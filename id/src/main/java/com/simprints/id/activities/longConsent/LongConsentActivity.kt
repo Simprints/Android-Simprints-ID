@@ -82,6 +82,6 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
     }
 
     override fun showDownloadErrorToast() {
-        showToast(R.string.long_consent_failed_to_download)
+        showToast(androidResourcesHelper, R.string.long_consent_failed_to_download)
     }
 }
