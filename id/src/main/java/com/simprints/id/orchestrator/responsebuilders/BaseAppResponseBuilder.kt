@@ -16,7 +16,7 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
     fun getErrorOrRefusalResponseIfAny(steps: List<Step>): AppResponse? {
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
 
         return when {
             results.any { it is CoreExitFormResponse } -> {
