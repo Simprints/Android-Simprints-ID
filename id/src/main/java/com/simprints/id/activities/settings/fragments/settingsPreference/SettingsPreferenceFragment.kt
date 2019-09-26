@@ -117,7 +117,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     }
 
     override fun showToastForTooManyModulesSelected(maxModules: Int) {
-        Toast.makeText(activity, androidResourcesHelper.getString(R.string.settings_too_many_modules_toast, maxModules), Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, androidResourcesHelper.getString(R.string.settings_too_many_modules_toast, arrayOf(maxModules)), Toast.LENGTH_LONG).show()
     }
 
     override fun showToastForInvalidSelectionOfFingers() {
