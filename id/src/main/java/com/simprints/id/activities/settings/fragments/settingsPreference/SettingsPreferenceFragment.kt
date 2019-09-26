@@ -21,12 +21,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.pref_general)
         setHasOptionsMenu(true)
 
         val component = (activity.application as Application).component
         component.inject(this)
 
+        addPreferencesFromResource(R.xml.pref_general)
         setTextInLayout()
 
         viewPresenter = SettingsPreferencePresenter(this, component)
@@ -37,7 +37,11 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     private fun setTextInLayout() {
         with(androidResourcesHelper) {
-            (getPreferenceForDefaultFingers() as MultiSelectListPreference).entries = arrayOf<CharSequence>(
+            getPreferenceForGeneralCategory().title = androidResourcesHelper.getString(R.string.settings_general)
+            getPreferenceForAppDetailsCategory().title = androidResourcesHelper.getString(R.string.settings_app_details)
+
+            val defaultFingersPreference = (getPreferenceForDefaultFingers() as MultiSelectListPreference)
+                defaultFingersPreference.entries = arrayOf<CharSequence>(
                 getString(R.string.l_1_finger_name),
                 getString(R.string.l_2_finger_name),
                 getString(R.string.r_1_finger_name),
@@ -49,6 +53,8 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 getString(R.string.l_5_finger_name),
                 getString(R.string.r_5_finger_name)
             )
+            defaultFingersPreference.positiveButtonText = androidResourcesHelper.getString(R.string.ok)
+            defaultFingersPreference.negativeButtonText = androidResourcesHelper.getString(R.string.cancel_button)
         }
     }
 
@@ -60,10 +66,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 summary = getString(R.string.preference_summary_settings_fingers)
             }
 
-            getPreferenceForSelectModules().apply {
+            val selectModulesPreference = (getPreferenceForSelectModules() as MultiSelectListPreference).apply {
                 title = getString(R.string.preference_select_modules_title)
                 summary = getString(R.string.preference_summary_modules)
             }
+            selectModulesPreference.positiveButtonText = androidResourcesHelper.getString(R.string.ok)
+            selectModulesPreference.negativeButtonText = androidResourcesHelper.getString(R.string.cancel_button)
 
             getPreferenceForAbout().title = getString(R.string.preference_app_details_title)
         }
@@ -83,6 +91,18 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         val languageNames = androidResourcesHelper.getStringArray(R.array.language_array)
         return languageCodes.zip(languageNames).toMap()
     }
+
+    private fun getPreferenceForGeneralCategory() =
+        findPreference(getKeyForGeneralPreferenceCategory())
+
+    private fun getKeyForGeneralPreferenceCategory() =
+        androidResourcesHelper.getString(R.string.preferences_general_key)
+
+    private fun getPreferenceForAppDetailsCategory() =
+        findPreference(getKeyForAppDetailsPreferenceCategory())
+
+    private fun getKeyForAppDetailsPreferenceCategory() =
+        androidResourcesHelper.getString(R.string.preferences_app_details_key)
 
     override fun getPreferenceForLanguage(): Preference =
         findPreference(getKeyForLanguagePreference())

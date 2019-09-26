@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:key="preferences_general"
+        android:key="@string/preferences_general_key"
         android:title="@string/settings_general">
         <ListPreference
             android:entries="@array/language_array"
@@ -24,7 +24,8 @@
 
     <PreferenceCategory android:layout="@layout/line_separator" />
 
-    <PreferenceCategory android:title="@string/settings_app_details">
+    <PreferenceCategory android:key="@string/preferences_app_details_key"
+        android:title="@string/settings_app_details">
         <Preference
             android:key="@string/preference_app_details_key"/>
 
