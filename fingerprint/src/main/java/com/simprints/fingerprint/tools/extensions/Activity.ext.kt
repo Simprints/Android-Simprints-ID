@@ -27,7 +27,7 @@ fun Activity.runOnUiThreadIfStillRunning(then: () -> Unit, otherwise: () -> Unit
     }
 }
 
-fun Activity.showToast(stringRes: Int) =
+fun Activity.showToast(string: String) =
     runOnUiThread {
-        Toast.makeText(this, stringRes, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, string, Toast.LENGTH_LONG).show()
     }
