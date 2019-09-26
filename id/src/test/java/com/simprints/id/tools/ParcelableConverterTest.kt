@@ -2,22 +2,21 @@ package com.simprints.id.tools
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.Fingerprint
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class ParcelableConverterTest {
 
     private lateinit var converter: ParcelableConverter
-
-    private val guid = UUID.randomUUID().toString()
 
     @Test
     fun withParcelableInput_shouldConvertToByteArray() {
@@ -84,7 +83,16 @@ class ParcelableConverterTest {
         "organisationName"
     )
 
-    private fun mockResult(): Step.Result = FingerprintEnrolResponse(guid)
+    private fun mockResult(): Step.Result {
+        val fingerprints = listOf(
+            Fingerprint(
+                IFingerIdentifier.RIGHT_THUMB,
+                "template".toByteArray(),
+                qualityScore = 3
+            )
+        )
+        return FingerprintCaptureResponse(fingerprints)
+    }
 
     companion object {
         private const val REQUEST_CODE = 123
