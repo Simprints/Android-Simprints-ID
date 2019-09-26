@@ -8,8 +8,8 @@ import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -46,9 +46,9 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.exitformhandler.ExitFormHandler
 import com.simprints.id.exitformhandler.ExitFormHandlerImpl
+import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
@@ -280,7 +280,10 @@ open class AppModule {
     open fun provideExitFormHandler(): ExitFormHandler = ExitFormHandlerImpl()
 
     @Provides
-    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository, simNetworkUtils: SimNetworkUtils) =
-        FetchGuidViewModelFactory(personRepository, simNetworkUtils)
+    open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
+                                              simNetworkUtils: SimNetworkUtils,
+                                              sessionEventsManager: SessionEventsManager,
+                                              timeHelper: TimeHelper) =
+        FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
 }
 
