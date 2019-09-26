@@ -37,6 +37,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
 
     private fun setTextInLayout() {
         with(androidResourcesHelper) {
+            getPreferenceForGeneralCategory().title = androidResourcesHelper.getString(R.string.settings_general)
+            getPreferenceForAppDetailsCategory().title = androidResourcesHelper.getString(R.string.settings_app_details)
+
             val defaultFingersPreference = (getPreferenceForDefaultFingers() as MultiSelectListPreference)
                 defaultFingersPreference.entries = arrayOf<CharSequence>(
                 getString(R.string.l_1_finger_name),
@@ -88,6 +91,18 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
         val languageNames = androidResourcesHelper.getStringArray(R.array.language_array)
         return languageCodes.zip(languageNames).toMap()
     }
+
+    private fun getPreferenceForGeneralCategory() =
+        findPreference(getKeyForGeneralPreferenceCategory())
+
+    private fun getKeyForGeneralPreferenceCategory() =
+        androidResourcesHelper.getString(R.string.preferences_general_key)
+
+    private fun getPreferenceForAppDetailsCategory() =
+        findPreference(getKeyForAppDetailsPreferenceCategory())
+
+    private fun getKeyForAppDetailsPreferenceCategory() =
+        androidResourcesHelper.getString(R.string.preferences_app_details_key)
 
     override fun getPreferenceForLanguage(): Preference =
         findPreference(getKeyForLanguagePreference())
