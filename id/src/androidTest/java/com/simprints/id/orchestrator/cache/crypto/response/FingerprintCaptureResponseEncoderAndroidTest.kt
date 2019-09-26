@@ -2,41 +2,59 @@ package com.simprints.id.orchestrator.cache.crypto.response
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.orchestrator.cache.crypto.response.FingerprintEnrolResponseEncoder
-import com.simprints.id.orchestrator.cache.crypto.response.Operation
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.Fingerprint
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.not
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import java.util.*
 
-class FingerprintEnrolResponseEncoderAndroidTest {
+class FingerprintCaptureResponseEncoderAndroidTest {
 
-    private val processor by lazy {
+    private val encoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val keystoreManager = KeystoreManagerImpl(context)
-        FingerprintEnrolResponseEncoder(keystoreManager)
+        FingerprintCaptureResponseEncoder(keystoreManager)
     }
 
     @Test
-    fun shouldEncryptGuid() {
-        val originalResponse = mockResponse()
-        val processedResponse = processor.process(originalResponse, Operation.ENCODE)
+    fun shouldEncryptTemplate() {
+        val originalResponse = mockFingerprintCaptureResponse()
+        val processedResponse = encoder.process(originalResponse, Operation.ENCODE)
 
-        require(processedResponse is FingerprintEnrolResponse)
-        MatcherAssert.assertThat(processedResponse.guid, CoreMatchers.not(CoreMatchers.equalTo(originalResponse.guid)))
+        require(processedResponse is FingerprintCaptureResponse)
+        verifyResponses(originalResponse, processedResponse)
     }
 
     @Test
-    fun shouldDecryptGuid() {
-        val originalResponse = processor.process(mockResponse(), Operation.ENCODE)
-        val processedResponse = processor.process(originalResponse, Operation.DECODE)
+    fun shouldDecryptTemplate() {
+        val originalResponse = encoder.process(mockFingerprintCaptureResponse(), Operation.ENCODE)
+        val processedResponse = encoder.process(originalResponse, Operation.DECODE)
 
-        require(originalResponse is FingerprintEnrolResponse)
-        require(processedResponse is FingerprintEnrolResponse)
-        MatcherAssert.assertThat(processedResponse.guid, CoreMatchers.not(CoreMatchers.equalTo(originalResponse.guid)))
+        require(originalResponse is FingerprintCaptureResponse)
+        require(processedResponse is FingerprintCaptureResponse)
+        verifyResponses(originalResponse, processedResponse)
     }
 
-    private fun mockResponse() = FingerprintEnrolResponse(UUID.randomUUID().toString())
+    private fun mockFingerprintCaptureResponse(): FingerprintCaptureResponse {
+        val fingerprints = listOf(
+            Fingerprint(
+                IFingerIdentifier.RIGHT_THUMB,
+                "template".toByteArray(),
+                qualityScore = 3
+            )
+        )
+        return FingerprintCaptureResponse(fingerprints)
+    }
+
+    private fun verifyResponses(originalResponse: FingerprintCaptureResponse,
+                                processedResponse: FingerprintCaptureResponse) {
+        processedResponse.fingerprints.forEachIndexed { index, processedFingerprint ->
+            val originalTemplate = originalResponse.fingerprints[index].template
+            val processedTemplate = processedFingerprint.template
+            assertThat(processedTemplate, not(equalTo(originalTemplate)))
+        }
+    }
 
 }
