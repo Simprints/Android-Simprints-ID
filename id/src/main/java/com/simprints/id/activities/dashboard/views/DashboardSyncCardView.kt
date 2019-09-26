@@ -41,7 +41,7 @@ class DashboardSyncCardView(private val rootView: View) : DashboardCardView(root
             syncUploadCountLabel.text = getString(R.string.dashboard_card_to_upload)
             syncDownloadCountLabel.text = getString(R.string.dashboard_card_to_download)
             totalPeopleInLocalLabel.text = getString(R.string.dashboard_card_available_on_phone)
-            cardEnrolTitle.text = getString(R.string.dashboard_card_enrol_title)
+            cardEnrolTitle.text = getString(R.string.dashboard_card_enrolment_info)
         }
     }
 

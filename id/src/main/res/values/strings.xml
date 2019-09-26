@@ -420,5 +420,7 @@
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
+    <string name="preferences_general_key">preferences_general</string>
+    <string name="preferences_app_details_key">app_details_key</string>
 
 </resources>

@@ -36,7 +36,7 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
     private fun setTextInLayout() {
         with(androidResHelper) {
-            textView_error_title.contentDescription = getString(R.string.configuration_error_title)
+            textView_error_title.text = getString(R.string.configuration_error_title)
             alert_image.contentDescription = getString(R.string.main_error_graphic)
             textView_message.text = getString(R.string.failed_to_retrieve_message)
             textView_close_button.text = getString(R.string.close)
