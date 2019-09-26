@@ -140,11 +140,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
 
     private fun showErrorForQRCodeFailed() {
-        showToast(R.string.login_qr_code_scanning_problem)
+        showToast(androidResourcesHelper, R.string.login_qr_code_scanning_problem)
     }
 
     override fun showErrorForInvalidQRCode() {
-        showToast(R.string.login_invalid_qr_code)
+        showToast(androidResourcesHelper, R.string.login_invalid_qr_code)
     }
 
     override fun updateProjectSecretInTextView(projectSecret: String) {
@@ -157,7 +157,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleMissingCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_missing_credentials)
+        showToast(androidResourcesHelper, R.string.login_missing_credentials)
     }
 
     override fun handleSignInSuccess() {
@@ -168,22 +168,22 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
-        showToast(R.string.login_no_network)
+        showToast(androidResourcesHelper, R.string.login_no_network)
     }
 
     override fun handleSignInFailedServerError() {
         progressDialog.dismiss()
-        showToast(R.string.login_server_error)
+        showToast(androidResourcesHelper, R.string.login_server_error)
     }
 
     override fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_invalid_credentials)
+        showToast(androidResourcesHelper, R.string.login_invalid_credentials)
     }
 
     override fun handleSignInFailedProjectIdIntentMismatch() {
         progressDialog.dismiss()
-        showToast(R.string.login_project_id_intent_mismatch)
+        showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
     }
 
     override fun handleSignInFailedUnknownReason() {

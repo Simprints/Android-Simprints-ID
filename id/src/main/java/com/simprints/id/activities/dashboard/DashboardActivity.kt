@@ -148,10 +148,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     }
 
     override fun showToastForUserOffline() {
-        showToast(R.string.login_no_network)
+        showToast(androidResourcesHelper, R.string.login_no_network)
     }
 
     override fun showToastForRecordsUpToDate() {
-        showToast(R.string.records_up_to_date)
+        showToast(androidResourcesHelper, R.string.records_up_to_date)
     }
 }

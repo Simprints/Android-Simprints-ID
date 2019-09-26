@@ -7,7 +7,6 @@ import com.simprints.id.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.DbManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
