@@ -1,5 +1,6 @@
 package com.simprints.id.domain.moduleapi.fingerprint
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
@@ -15,19 +16,21 @@ object DomainToModuleApiFingerprintRequest {
 
     fun fromDomainToModuleApiFingerprintRequest(fingerprintRequest: FingerprintRequest): IFingerprintRequest =
         when (fingerprintRequest) {
-            is FingerprintEnrolRequest -> fromDomainToModuleApiFingerprintEnrolRequest(fingerprintRequest)
+            is FingerprintCaptureRequest -> fromDomainToModuleApiFingerprintCaptureRequest(fingerprintRequest)
             is FingerprintVerifyRequest -> fromDomainToModuleApiFingerprintVerifyRequest(fingerprintRequest)
             is FingerprintIdentifyRequest -> fromDomainToModuleApiFingerprintIdentifyRequest(fingerprintRequest)
             else -> throw IllegalStateException("Invalid fingerprint request")
         }
 
-    private fun fromDomainToModuleApiFingerprintEnrolRequest(enrolRequest: FingerprintEnrolRequest): IFingerprintEnrolRequest =
-        with(enrolRequest) {
-            FingerprintEnrolRequestImpl(
+    private fun fromDomainToModuleApiFingerprintCaptureRequest(captureRequest: FingerprintCaptureRequest): IFingerprintCaptureRequest =
+        with(captureRequest) {
+            FingerprintCaptureRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
                 logoExists,
                 organizationName,
-                programName)
+                programName,
+                activityTitle
+            )
         }
 
     private fun fromDomainToModuleApiFingerprintVerifyRequest(verifyRequest: FingerprintVerifyRequest): IFingerprintVerifyRequest =
@@ -76,37 +79,44 @@ object DomainToModuleApiFingerprintRequest {
 }
 
 @Parcelize
-private data class FingerprintEnrolRequestImpl(override val projectId: String,
-                                               override val userId: String,
-                                               override val moduleId: String,
-                                               override val metadata: String,
-                                               override val language: String,
-                                               override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                               override val logoExists: Boolean,
-                                               override val programName: String,
-                                               override val organizationName: String) : IFingerprintEnrolRequest
+private data class FingerprintCaptureRequestImpl(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val language: String,
+    override val fingerStatus: Map<IFingerIdentifier, Boolean>,
+    override val logoExists: Boolean,
+    override val programName: String,
+    override val organizationName: String,
+    override val activityTitle: String
+) : IFingerprintCaptureRequest
 
 @Parcelize
-private data class FingerprintIdentifyRequestImpl(override val projectId: String,
-                                                  override val userId: String,
-                                                  override val moduleId: String,
-                                                  override val metadata: String,
-                                                  override val language: String,
-                                                  override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                                  override val logoExists: Boolean,
-                                                  override val programName: String,
-                                                  override val organizationName: String,
-                                                  override val matchGroup: IMatchGroup,
-                                                  override val returnIdCount: Int) : IFingerprintIdentifyRequest
+private data class FingerprintIdentifyRequestImpl(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val language: String,
+    override val fingerStatus: Map<IFingerIdentifier, Boolean>,
+    override val logoExists: Boolean,
+    override val programName: String,
+    override val organizationName: String,
+    override val matchGroup: IMatchGroup,
+    override val returnIdCount: Int
+) : IFingerprintIdentifyRequest
 
 @Parcelize
-private data class FingerprintVerifyRequestImpl(override val projectId: String,
-                                                override val userId: String,
-                                                override val moduleId: String,
-                                                override val metadata: String,
-                                                override val language: String,
-                                                override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                                override val logoExists: Boolean,
-                                                override val programName: String,
-                                                override val organizationName: String,
-                                                override val verifyGuid: String) : IFingerprintVerifyRequest
+private data class FingerprintVerifyRequestImpl(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val language: String,
+    override val fingerStatus: Map<IFingerIdentifier, Boolean>,
+    override val logoExists: Boolean,
+    override val programName: String,
+    override val organizationName: String,
+    override val verifyGuid: String
+) : IFingerprintVerifyRequest

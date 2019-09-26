@@ -7,7 +7,7 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
@@ -31,9 +31,9 @@ class StepEncoderImplAndroidTest {
 
     @Test
     fun shouldEncodeFingerprintCaptureStepToString() {
-        val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
+        val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
         val fingerprintCaptureResponse = mockFingerprintCaptureResponse()
-        val step = buildStep(fingerprintEnrolRequest, fingerprintCaptureResponse)
+        val step = buildStep(fingerprintCaptureRequest, fingerprintCaptureResponse)
         val encodedString = stepEncoder.encode(step)
 
         assertThat(encodedString, notNullValue())
@@ -53,9 +53,9 @@ class StepEncoderImplAndroidTest {
 
     @Test
     fun shouldDecodeStringToFingerprintCaptureStep() {
-        val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
+        val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
         val fingerprintCaptureResponse = mockFingerprintCaptureResponse()
-        val step = buildStep(fingerprintEnrolRequest, fingerprintCaptureResponse)
+        val step = buildStep(fingerprintCaptureRequest, fingerprintCaptureResponse)
         val encodedString = stepEncoder.encode(step)
         val decodedStep = stepEncoder.decode(encodedString)
 
@@ -63,7 +63,7 @@ class StepEncoderImplAndroidTest {
             assertThat(requestCode, `is`(REQUEST_CODE))
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(fingerprintEnrolRequest))
+            assertThat(request, `is`(fingerprintCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
             assertThat(result, instanceOf(FingerprintCaptureResponse::class.java))
             require(result is FingerprintCaptureResponse)
@@ -94,9 +94,9 @@ class StepEncoderImplAndroidTest {
 
     @Test
     fun shouldNotEncodeStepWithNonCaptureResult() {
-        val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
+        val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
         val fingerprintIdentifyResponse = mockFingerprintIdentifyResponse()
-        val step = buildStep(fingerprintEnrolRequest, fingerprintIdentifyResponse)
+        val step = buildStep(fingerprintCaptureRequest, fingerprintIdentifyResponse)
         val encodedString = stepEncoder.encode(step)
         val decodedStep = stepEncoder.decode(encodedString)
 
@@ -104,7 +104,7 @@ class StepEncoderImplAndroidTest {
             assertThat(requestCode, `is`(REQUEST_CODE))
             assertThat(activityName, `is`(ACTIVITY_NAME))
             assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(fingerprintEnrolRequest))
+            assertThat(request, `is`(fingerprintCaptureRequest))
             assertThat(getStatus(), `is`(Step.Status.COMPLETED))
             assertThat(result, `is`(fingerprintIdentifyResponse))
         }
@@ -124,7 +124,7 @@ class StepEncoderImplAndroidTest {
         status = Step.Status.COMPLETED
     )
 
-    private fun mockFingerprintEnrolRequest(): Step.Request = FingerprintEnrolRequest(
+    private fun mockFingerprintCaptureRequest(): Step.Request = FingerprintCaptureRequest(
         "projectId",
         "userId",
         "moduleId",
@@ -133,7 +133,8 @@ class StepEncoderImplAndroidTest {
         mapOf(),
         true,
         "programmeName",
-        "organisationName"
+        "organisationName",
+        "activityTitle"
     )
 
     private fun mockFaceCaptureRequest(): Step.Request = FaceCaptureRequest(
