@@ -1,8 +1,10 @@
-package com.simprints.id.orchestrator.cache.crypto
+package com.simprints.id.orchestrator.cache.crypto.response
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.orchestrator.cache.crypto.response.FingerprintEnrolResponseEncoder
+import com.simprints.id.orchestrator.cache.crypto.response.Operation
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.Test
