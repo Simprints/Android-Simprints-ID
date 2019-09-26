@@ -38,10 +38,10 @@ class ExitFormHandlerImpl : ExitFormHandler {
 
     private fun buildFingerprintResponseFromActivityResultIfSubmitted(result: FingerprintExitFormActivityResult) =
         when (result.action) {
-            FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS -> {
+            FingerprintExitFormActivityResult.Action.SUBMIT -> {
                 CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
             }
-            FingerprintExitFormActivityResult.Action.SUBMIT -> null
+            FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS -> null
         }
 
     private fun buildFaceResponseFromActivityResultIfSubmitted(result: FaceExitFormActivityResult) =
