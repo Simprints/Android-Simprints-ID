@@ -10,8 +10,6 @@ import com.simprints.id.data.db.PersonFetchResult.PersonSource
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val personRepository: PersonRepository,
@@ -23,12 +21,10 @@ class FetchGuidViewModel(private val personRepository: PersonRepository,
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
         viewModelScope.launch {
-            CoroutineScope(Dispatchers.IO).launch {
-                val personFetchStartTime = timeHelper.now()
-                val personFetchResult = getPersonFetchResult(projectId, verifyGuid)
-                personFetch.postValue(personFetchResult.personSource)
-                addPersonFetchEventToSession(personFetchResult, personFetchStartTime, verifyGuid)
-            }
+            val personFetchStartTime = timeHelper.now()
+            val personFetchResult = getPersonFetchResult(projectId, verifyGuid)
+            personFetch.postValue(personFetchResult.personSource)
+            addPersonFetchEventToSession(personFetchResult, personFetchStartTime, verifyGuid)
         }
     }
 
