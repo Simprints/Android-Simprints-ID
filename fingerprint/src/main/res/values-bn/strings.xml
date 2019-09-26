@@ -192,7 +192,7 @@
         <b><u>Development Worker Consent</u></b>\n\n
         Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
     </string>
-    <string name="bluetooth_error_pair_scanner_and_device_message">১। স্ক্যানার চালু আছে কিনা চেক করুন। ২। \"সেটিংস\" চাপুন। ৩। সংযুক্ত স্ক্যানার অসংযুক্ত করুন। ৪। স্ক্যানার এবং ট্যাব সংযুক্ত করুন। ৫। \"সিমপ্রিন্টস এ ফেরত যান\" চাপুন।</string>
+    <string name="bluetooth_error_pair_scanner_and_device_message">১। স্ক্যানার চালু আছে কিনা চেক করুন। \n২। \"সেটিংস\" চাপুন। \n৩। সংযুক্ত স্ক্যানার অসংযুক্ত করুন। \n৪। স্ক্যানার এবং ট্যাব সংযুক্ত করুন। \n৫। \"সিমপ্রিন্টস এ ফেরত যান\" চাপুন।</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">স্ক্যানার এবং ট্যাব সংযুক্ত করুন</string>
     <string name="confirm">নিশ্চিত করুন</string>
     <string name="confirm_fingers_dialog_title">আঙ্গুলের ছাপ নেয়া সম্পন্ন হয়েছে</string>
@@ -226,7 +226,7 @@
     <string name="returning_results">ফলাফল আসছে</string>
     <string name="scanner_confirmation_no">না</string>
     <string name="scanner_confirmation_yes">হ্যা</string>
-    <string name="scanner_error_turn_scanner_on_message">১। স্ক্যানার চালু করুন। ২। \"আবার চেষ্টা করুন\" চাপুন।</string>
+    <string name="scanner_error_turn_scanner_on_message">১। স্ক্যানার চালু করুন। \n২। \"আবার চেষ্টা করুন\" চাপুন।</string>
     <string name="scanner_id_comfirmation_message">%1$s কি আপনার স্ক্যানার?</string>
     <string name="scanner_error_turn_scanner_on_title">স্ক্যানার চালু করুন</string>
     <string name="title_fingerprint">আঙ্গুলের ছাপ</string>
