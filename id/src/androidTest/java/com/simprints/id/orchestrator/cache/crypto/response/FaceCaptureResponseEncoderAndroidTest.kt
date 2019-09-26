@@ -14,7 +14,7 @@ import java.util.*
 
 class FaceCaptureResponseEncoderAndroidTest {
 
-    private val processor by lazy {
+    private val encoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val keystoreManager = KeystoreManagerImpl(context)
         FaceCaptureResponseEncoder(keystoreManager)
@@ -23,7 +23,7 @@ class FaceCaptureResponseEncoderAndroidTest {
     @Test
     fun shouldEncryptTemplates() {
         val originalResponse = mockResponse()
-        val processedResponse = processor.process(originalResponse, Operation.ENCODE)
+        val processedResponse = encoder.process(originalResponse, Operation.ENCODE)
 
         require(processedResponse is FaceCaptureResponse)
 
@@ -32,8 +32,8 @@ class FaceCaptureResponseEncoderAndroidTest {
 
     @Test
     fun shouldDecryptTemplates() {
-        val originalResponse = processor.process(mockResponse(), Operation.ENCODE)
-        val processedResponse = processor.process(originalResponse, Operation.DECODE)
+        val originalResponse = encoder.process(mockResponse(), Operation.ENCODE)
+        val processedResponse = encoder.process(originalResponse, Operation.DECODE)
 
         require(originalResponse is FaceCaptureResponse)
         require(processedResponse is FaceCaptureResponse)
