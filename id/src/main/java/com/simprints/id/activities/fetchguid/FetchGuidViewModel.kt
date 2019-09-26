@@ -2,6 +2,7 @@ package com.simprints.id.activities.fetchguid
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.CandidateReadEvent
 import com.simprints.id.data.db.PersonFetchResult
@@ -9,8 +10,9 @@ import com.simprints.id.data.db.PersonFetchResult.PersonSource
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FetchGuidViewModel(private val personRepository: PersonRepository,
                          private val simNetworkUtils: SimNetworkUtils,
@@ -20,18 +22,20 @@ class FetchGuidViewModel(private val personRepository: PersonRepository,
     var personFetch = MutableLiveData<PersonSource>()
 
     fun fetchGuid(projectId: String, verifyGuid: String) {
-        doAsync {
-            val personFetchStartTime = timeHelper.now()
-            val personFetchResult = runBlocking {
-                try {
-                    personRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
-                } catch (t: Throwable) {
-                    getPersonFetchResultForError()
-                }
+        viewModelScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
+                val personFetchStartTime = timeHelper.now()
+                val personFetchResult = getPersonFetchResult(projectId, verifyGuid)
+                personFetch.postValue(personFetchResult.personSource)
+                addPersonFetchEventToSession(personFetchResult, personFetchStartTime, verifyGuid)
             }
-            personFetch.postValue(personFetchResult.personSource)
-            addPersonFetchEventToSession(personFetchResult, personFetchStartTime, verifyGuid)
         }
+    }
+
+    private suspend fun getPersonFetchResult(projectId: String, verifyGuid: String) = try {
+        personRepository.loadFromRemoteIfNeeded(projectId, verifyGuid)
+    } catch (t: Throwable) {
+        getPersonFetchResultForError()
     }
 
     private fun getPersonFetchResultForError() =

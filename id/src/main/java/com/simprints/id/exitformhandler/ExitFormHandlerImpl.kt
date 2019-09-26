@@ -17,35 +17,38 @@ class ExitFormHandlerImpl : ExitFormHandler {
         data?.getParcelableExtra<ExitFormResult>(EXIT_FORM_BUNDLE_KEY)?.let {
             when (it.type) {
                 CORE_EXIT_FORM -> {
-                    buildCoreExitFormResponseFromCoreExitForm(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
+                    buildCoreResponseFromActivityResultIfSubmitted(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
                 }
                 CORE_FINGERPRINT_EXIT_FROM -> {
-                    buildCoreExitFormResponseFromCoreFingerprintExitForm(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
+                    buildFingerprintResponseFromActivityResultIfSubmitted(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
                 }
                 CORE_FACE_EXIT_FORM -> {
-                    buildCoreExitFormResponseFromCoreFaceExitForm(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
+                    buildFaceResponseFromActivityResultIfSubmitted(data.getParcelableExtra(EXIT_FORM_BUNDLE_KEY))
                 }
             }
         }
 
-    private fun buildCoreExitFormResponseFromCoreExitForm(result: CoreExitFormActivityResult) =
-        if (result.action == CoreExitFormActivityResult.Action.SUBMIT) {
-            CoreExitFormResponse(result.answer.reason, result.answer.optionalText)
-        } else {
-            null
+    private fun buildCoreResponseFromActivityResultIfSubmitted(result: CoreExitFormActivityResult) =
+        when (result.action) {
+            CoreExitFormActivityResult.Action.SUBMIT ->  {
+                CoreExitFormResponse(result.answer.reason, result.answer.optionalText)
+            }
+            CoreExitFormActivityResult.Action.GO_BACK -> null
         }
 
-    private fun buildCoreExitFormResponseFromCoreFingerprintExitForm(result: FingerprintExitFormActivityResult) =
-        if (result.action == FingerprintExitFormActivityResult.Action.SUBMIT) {
-            CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
-        } else {
-            null
+    private fun buildFingerprintResponseFromActivityResultIfSubmitted(result: FingerprintExitFormActivityResult) =
+        when (result.action) {
+            FingerprintExitFormActivityResult.Action.SCAN_FINGERPRINTS -> {
+                CoreFingerprintExitFormResponse(result.answer.reason, result.answer.optionalText)
+            }
+            FingerprintExitFormActivityResult.Action.SUBMIT -> null
         }
 
-    private fun buildCoreExitFormResponseFromCoreFaceExitForm(result: FaceExitFormActivityResult) =
-        if (result.action == FaceExitFormActivityResult.Action.SUBMIT) {
-            CoreFaceExitFormResponse(result.answer.reason, result.answer.optionalText)
-        } else {
-            null
+    private fun buildFaceResponseFromActivityResultIfSubmitted(result: FaceExitFormActivityResult) =
+        when (result.action) {
+            FaceExitFormActivityResult.Action.SUBMIT -> {
+                CoreFaceExitFormResponse(result.answer.reason, result.answer.optionalText)
+            }
+            FaceExitFormActivityResult.Action.GO_BACK -> null
         }
 }
