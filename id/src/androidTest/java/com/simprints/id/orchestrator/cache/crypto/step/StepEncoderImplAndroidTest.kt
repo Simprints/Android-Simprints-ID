@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.cache.crypto
+package com.simprints.id.orchestrator.cache.crypto.step
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.core.images.SecuredImageRef
@@ -9,6 +9,9 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.orchestrator.steps.Step
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -86,6 +89,24 @@ class StepEncoderImplAndroidTest {
         }
     }
 
+    @Test
+    fun shouldNotEncodeStepWithNonCaptureResult() {
+        val fingerprintEnrolRequest = mockFingerprintEnrolRequest()
+        val fingerprintIdentifyResponse = mockFingerprintIdentifyResponse()
+        val step = buildStep(fingerprintEnrolRequest, fingerprintIdentifyResponse)
+        val encodedString = stepEncoder.encode(step)
+        val decodedStep = stepEncoder.decode(encodedString)
+
+        with(decodedStep) {
+            assertThat(requestCode, `is`(REQUEST_CODE))
+            assertThat(activityName, `is`(ACTIVITY_NAME))
+            assertThat(bundleKey, `is`(BUNDLE_KEY))
+            assertThat(request, `is`(fingerprintEnrolRequest))
+            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
+            assertThat(result, `is`(fingerprintIdentifyResponse))
+        }
+    }
+
     @After
     fun tearDown() {
         stopKoin()
@@ -133,6 +154,18 @@ class StepEncoderImplAndroidTest {
                 )
             )
         ))
+    }
+
+    private fun mockFingerprintIdentifyResponse(): Step.Result {
+        return FingerprintIdentifyResponse(
+            listOf(
+                FingerprintMatchingResult(
+                    "guid-found",
+                    3,
+                    FingerprintTier.TIER_1
+                )
+            )
+        )
     }
 
     private fun validateFaceCaptureResponse(response: FaceCaptureResponse,
