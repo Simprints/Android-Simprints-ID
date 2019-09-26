@@ -248,7 +248,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             .filter { fingerHasSatisfiedTerminalCondition(it) && !it.isFingerSkipped && it.template != null }
 
         if (fingers.isEmpty()) {
-            Toast.makeText(context, R.string.no_fingers_scanned, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, androidResourcesHelper.getString(R.string.no_fingers_scanned), Toast.LENGTH_LONG).show()
             handleRestart()
         } else {
             proceedToFinish(fingers.mapNotNull { it.template })
