@@ -152,10 +152,10 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun isSubmitButtonEnabled() = btSubmitRefusalForm.isEnabled
 
     override fun showToastForFormSubmit() {
-        showToast(R.string.refusal_toast_submit)
+        showToast(androidResourcesHelper.getString(R.string.refusal_toast_submit))
     }
 
     override fun showToastForSelectOptionAndSubmit() {
-        showToast(R.string.refusal_toast_select_option_submit)
+        showToast(androidResourcesHelper.getString(R.string.refusal_toast_select_option_submit))
     }
 }
