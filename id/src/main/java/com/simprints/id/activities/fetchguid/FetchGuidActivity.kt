@@ -131,7 +131,7 @@ class FetchGuidActivity : AppCompatActivity() {
     private fun tryToFetchGuid() {
         viewModel.fetchGuid(fetchGuidRequest.projectId, fetchGuidRequest.verifyGuid)
     }
-    
+
     private fun setResultAndFinish(coreResponse: CoreResponse) {
         setResult(RESULT_CODE_FETCH_GUID, buildIntentForResponse(coreResponse))
         finish()
