@@ -10,7 +10,14 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
@@ -62,12 +69,17 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             tryToFetchPersonFromRemote(projectId, patientId)
         }
 
-    private fun tryToFetchPersonFromRemote(projectId: String, patientId: String) = try {
-        val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
-        PersonFetchResult(person, REMOTE)
-    } catch (t: Throwable) {
-        throw t
-    }
+    private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                personRemoteDataSource.downloadPerson(projectId, patientId)
+                    .subscribeBy(
+                    onSuccess = { cont.resume(PersonFetchResult(it, REMOTE)) },
+                    onError = { cont.resumeWithException(it) }
+                )
+            }
+        }
+
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
