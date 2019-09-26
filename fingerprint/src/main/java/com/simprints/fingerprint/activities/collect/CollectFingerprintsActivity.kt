@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -94,6 +95,7 @@ class CollectFingerprintsActivity :
         with(androidResourcesHelper) {
             scanButton.text = getString(R.string.scan)
             missingFingerText.text = getString(R.string.missing_finger)
+            missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
         }
     }
 

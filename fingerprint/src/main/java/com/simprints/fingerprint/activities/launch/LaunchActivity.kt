@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.launch
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -78,6 +79,7 @@ class LaunchActivity : AppCompatActivity(), LaunchContract.View, OrchestratorCal
             loadingInfoTextView.text = getString(R.string.loading)
             generalConsentTextView.text = getString(R.string.short_consent)
             privacyNoticeText.text = getString(R.string.privacy_notice_text)
+            privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
             simprintsLogoWithTagLine.contentDescription = getString(R.string.launch_background_description)
         }
     }
