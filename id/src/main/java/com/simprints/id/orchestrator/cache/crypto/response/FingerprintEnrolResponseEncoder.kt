@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.cache.crypto
+package com.simprints.id.orchestrator.cache.crypto.response
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
@@ -8,7 +8,7 @@ class FingerprintEnrolResponseEncoder(
     keystoreManager: KeystoreManager
 ) : ResponseEncoder(keystoreManager) {
 
-    override fun process(response: Step.Result?, operation: Operation): Step.Result {
+    override fun process(response: Step.Result?, operation: Operation): Step.Result? {
         require(response is FingerprintEnrolResponse)
 
         val processedGuid = when (operation) {
