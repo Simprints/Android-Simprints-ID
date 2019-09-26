@@ -6,6 +6,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -89,7 +90,7 @@ class PersonRepositoryTest {
         val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
         assertThat(fetch.person).isEqualTo(person)
-        assertThat(fetch.fetchedOnline).isFalse()
+        assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.LOCAL)
     }
 
     @Test
@@ -101,7 +102,7 @@ class PersonRepositoryTest {
         val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
         assertThat(fetch.person).isEqualTo(person)
-        assertThat(fetch.fetchedOnline).isTrue()
+        assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
     }
 
 
