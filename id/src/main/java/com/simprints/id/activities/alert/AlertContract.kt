@@ -23,9 +23,7 @@ interface AlertContract {
         fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun closeActivityAfterCloseButton()
-        fun startCoreExitFormActivity()
-        fun startFingerprintExitFormActivity()
-        fun startFaceExitFormActivity()
+        fun startExitForm(exitFormActivityClass: String?)
         fun finishWithTryAgain()
         fun openWifiSettings()
     }

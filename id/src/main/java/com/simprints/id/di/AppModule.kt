@@ -46,8 +46,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.exitformhandler.ExitFormHandler
-import com.simprints.id.exitformhandler.ExitFormHandlerImpl
+import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.id.exitformhandler.ExitFormHelperImpl
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
@@ -277,7 +277,7 @@ open class AppModule {
         FingerprintExitFormViewModelFactory(sessionEventsManager)
 
     @Provides
-    open fun provideExitFormHandler(): ExitFormHandler = ExitFormHandlerImpl()
+    open fun provideExitFormHandler(): ExitFormHelper = ExitFormHelperImpl()
 
     @Provides
     open fun provideFetchGuidViewModelFactory(personRepository: PersonRepository,
