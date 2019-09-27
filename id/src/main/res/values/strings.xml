@@ -436,4 +436,5 @@
     <string name="scanner_not_working">Scanner not working</string>
     <string name="exit_form_go_back">Go Back</string>
     <string name="why_did_you_skip_biometrics">Why did you skip Biometric/s?</string>
+    <string name="why_did_you_skip_face">Why did you skip face scanning?</string>
 </resources>

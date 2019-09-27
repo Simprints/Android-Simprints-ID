@@ -11,7 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.simprints.id.activities.coreexitform.CoreExitFormActivity">
+    tools:context="com.simprints.id.activities.faceexitform.FaceExitFormActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -20,7 +20,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/exitFormText"
+            android:id="@+id/faceExitFormText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -36,10 +36,10 @@
             android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup" />
+            app:layout_constraintTop_toBottomOf="@id/faceExitFormRadioGroup" />
 
         <LinearLayout
-            android:id="@+id/refusalButtonsLayout"
+            android:id="@+id/faceRefusalButtonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -49,20 +49,20 @@
             android:weightSum="2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exitFormText">
+            app:layout_constraintTop_toBottomOf="@id/faceExitFormText">
 
             <Button
-                android:id="@+id/btGoBack"
+                android:id="@+id/faceBtGoBack"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="70dp"
                 android:onClick="handleGoBackClick"
-                android:text="@string/button_scan_prints"
+                android:text="@string/exit_form_go_back"
                 tools:ignore="ButtonStyle" />
 
             <Button
-                android:id="@+id/btSubmitExitForm"
+                android:id="@+id/faceBtSubmitExitForm"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -75,16 +75,16 @@
         </LinearLayout>
 
         <RadioGroup
-            android:id="@+id/exitFormRadioGroup"
+            android:id="@+id/faceExitFormRadioGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/whySkipBiometricsText">
+            app:layout_constraintTop_toBottomOf="@+id/whySkipFaceText">
 
             <RadioButton
-                android:id="@+id/rbReligiousConcerns"
+                android:id="@+id/faceRbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_religious_concerns"
@@ -92,7 +92,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbDataConcerns"
+                android:id="@+id/faceRbDataConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_data_concerns"
@@ -100,7 +100,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbDoesNotHavePermission"
+                android:id="@+id/faceRbDoesNotHavePermission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_does_not_have_permission"
@@ -108,7 +108,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbAppNotWorking"
+                android:id="@+id/faceRbAppNotWorking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_app_not_working"
@@ -116,7 +116,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbPersonNotPresent"
+                android:id="@+id/faceRbPersonNotPresent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_person_not_present"
@@ -124,7 +124,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbTooYoung"
+                android:id="@+id/faceRbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_too_young"
@@ -132,7 +132,7 @@
                 android:textSize="20sp" />
 
             <RadioButton
-                android:id="@+id/rbOther"
+                android:id="@+id/faceRbOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/refusal_other"
@@ -142,10 +142,10 @@
         </RadioGroup>
 
         <TextView
-            android:id="@+id/whySkipBiometricsText"
+            android:id="@+id/whySkipFaceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/why_did_you_skip_biometrics"
+            android:text="@string/why_did_you_skip_face"
             android:textAlignment="center"
             android:textColor="@color/simprints_white"
             android:textSize="25sp"

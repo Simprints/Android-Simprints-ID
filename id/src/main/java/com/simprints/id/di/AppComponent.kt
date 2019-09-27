@@ -18,7 +18,9 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.debug.DebugViewModel
-import com.simprints.id.activities.exitform.CoreExitFormActivity
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
+import com.simprints.id.activities.faceexitform.FaceExitFormActivity
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentPresenter
@@ -105,6 +107,8 @@ interface AppComponent {
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(consentActivity: ConsentActivity)
     fun inject(coreExitFormActivity: CoreExitFormActivity)
+    fun inject(fingerprintExitFormActivity: FingerprintExitFormActivity)
+    fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(orchestratorActivity: OrchestratorActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
