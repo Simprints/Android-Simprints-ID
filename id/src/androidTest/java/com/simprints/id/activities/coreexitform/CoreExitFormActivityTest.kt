@@ -107,10 +107,12 @@ class CoreExitFormActivityTest {
         result.resultData.setExtrasClassLoader(CoreExitFormActivityResult::class.java.classLoader)
         val response = result.resultData.getParcelableExtra<CoreExitFormActivityResult>(EXIT_FORM_BUNDLE_KEY)
 
-        assertThat(response).isInstanceOf(CoreExitFormActivityResult::class.java)
-        assertThat(response.action).isEqualTo(action)
-        assertThat(response.answer.reason).isEqualTo(coreExitReason)
-        assertThat(response.answer.optionalText).isEqualTo(exitFormText)
+        with(response) {
+            assertThat(this).isInstanceOf(CoreExitFormActivityResult::class.java)
+            assertThat(action).isEqualTo(action)
+            assertThat(answer.reason).isEqualTo(coreExitReason)
+            assertThat(answer.optionalText).isEqualTo(exitFormText)
+        }
     }
 
 

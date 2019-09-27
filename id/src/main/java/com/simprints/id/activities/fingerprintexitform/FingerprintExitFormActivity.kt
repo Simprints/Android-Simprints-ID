@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
@@ -45,7 +45,7 @@ class FingerprintExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
-        viewModel = ViewModelProviders.of(this, fingerprintExitFormViewModelFactory)
+        viewModel = ViewModelProvider(this, fingerprintExitFormViewModelFactory)
             .get(FingerprintExitFormViewModel::class.java)
         fingerprintExitFormStartTime = timeHelper.now()
 
