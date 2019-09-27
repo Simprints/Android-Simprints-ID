@@ -18,8 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.faceexitform.FaceExitFormActivity" />
+        <activity android:name=".activities.fingerprintexitform.FingerprintExitFormActivity" />
         <activity
-            android:name=".activities.exitform.CoreExitFormActivity"
+            android:name=".activities.coreexitform.CoreExitFormActivity"
             android:label="@string/title_activity_exit_form"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.consent.ConsentActivity" />
