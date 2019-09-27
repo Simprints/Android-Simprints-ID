@@ -1,6 +1,8 @@
 package com.simprints.id.data.db.person
 
 import com.simprints.id.data.db.PersonFetchResult
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
+import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -8,7 +10,14 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
@@ -55,11 +64,22 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {
             val person = personLocalDataSource.load(PersonLocalDataSource.Query(patientId = patientId)).first()
-            PersonFetchResult(person, false)
+            PersonFetchResult(person, LOCAL)
         } catch (t: Throwable) {
-            val person = personRemoteDataSource.downloadPerson(projectId, patientId).blockingGet()
-            PersonFetchResult(person, true)
+            tryToFetchPersonFromRemote(projectId, patientId)
         }
+
+    private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
+                    .subscribeBy(
+                    onSuccess = { cont.resume(PersonFetchResult(it, REMOTE)) },
+                    onError = { cont.resumeWithException(it) }
+                )
+            }
+        }
+
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
