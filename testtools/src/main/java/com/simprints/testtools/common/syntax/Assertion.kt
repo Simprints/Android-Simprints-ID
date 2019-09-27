@@ -1,7 +1,6 @@
 package com.simprints.testtools.common.syntax
 
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
 import junit.framework.AssertionFailedError
@@ -37,6 +36,19 @@ fun <T> verifyAtMost(times: Int, mock: T, methodCall: T.() -> Any?) =
 
 private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
     Mockito.verify(mock, mode(times)).methodCall()
+
+fun <T> verifyBlockingAtLeast(times: Int, mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, atLeast(times), methodCall)
+}
+
+fun <T> verifyBlockingNever(mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, never(), methodCall)
+}
+
+fun <T> verifyBlockingExactly(exactTimes: Int, mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, times(exactTimes), methodCall)
+}
+
 
 fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
     verify(mock).methodCall()

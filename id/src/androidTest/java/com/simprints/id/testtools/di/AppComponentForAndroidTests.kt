@@ -13,7 +13,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class, DataModule:: class])
 interface AppComponentForAndroidTests : AppComponent {
 
     @Component.Builder interface Builder {
@@ -21,6 +21,7 @@ interface AppComponentForAndroidTests : AppComponent {
         @BindsInstance
         fun application(app: Application): Builder
 
+        fun dataModule(dataModule: DataModule): Builder
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder

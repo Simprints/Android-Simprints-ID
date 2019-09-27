@@ -30,19 +30,19 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintIdentifyResponse(identify: FingerprintIdentifyResponse): IFingerprintIdentifyResponse =
         IFingerprintIdentifyResponseImpl(identify.identifications.map { fromDomainToFingerprintIdentificationResult(it) })
 
-    fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintRefusalFormResponse {
+    fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintExitFormResponse {
 
-        val reason = when (refusalResponse.reason) {
-            FingerprintRefusalFormReason.REFUSED_RELIGION -> IFingerprintRefusalReason.REFUSED_RELIGION
-            FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintRefusalReason.REFUSED_DATA_CONCERNS
-            FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintRefusalReason.REFUSED_PERMISSION
-            FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintRefusalReason.SCANNER_NOT_WORKING
-            FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintRefusalReason.REFUSED_NOT_PRESENT
-            FingerprintRefusalFormReason.REFUSED_YOUNG -> IFingerprintRefusalReason.REFUSED_YOUNG
-            FingerprintRefusalFormReason.OTHER -> IFingerprintRefusalReason.OTHER
+        val reason = when(refusalResponse.reason) {
+            FingerprintRefusalFormReason.REFUSED_RELIGION -> IFingerprintExitReason.REFUSED_RELIGION
+            FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintExitReason.REFUSED_DATA_CONCERNS
+            FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintExitReason.REFUSED_PERMISSION
+            FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintExitReason.SCANNER_NOT_WORKING
+            FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintExitReason.REFUSED_NOT_PRESENT
+            FingerprintRefusalFormReason.REFUSED_YOUNG -> IFingerprintExitReason.REFUSED_YOUNG
+            FingerprintRefusalFormReason.OTHER -> IFingerprintExitReason.OTHER
         }
 
-        return IFingerprintRefusalFormResponseImpl(reason, refusalResponse.extra)
+        return IFingerprintExitFormResponseImpl(reason, refusalResponse.extra)
     }
 
 
@@ -84,9 +84,9 @@ private class IFingerprintIdentifyResponseImpl(
 }
 
 @Parcelize
-private class IFingerprintRefusalFormResponseImpl(
-    override val reason: IFingerprintRefusalReason,
-    override val extra: String) : IFingerprintRefusalFormResponse {
+private class IFingerprintExitFormResponseImpl(
+    override val reason: IFingerprintExitReason,
+    override val extra: String) : IFingerprintExitFormResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.REFUSAL
 }
 

@@ -125,7 +125,7 @@ class SettingsAboutPresenterTest {
 
         presenter.logout()
 
-        verifyOnce(presenter.dbManager) { signOut() }
+        verifyOnce(presenter.signerManager) { signOut() }
     }
 
     @Test
@@ -156,7 +156,7 @@ class SettingsAboutPresenterTest {
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter){
-        presenter.dbManager = mock()
+        presenter.signerManager = mock()
         presenter.syncSchedulerHelper = mock()
         presenter.longConsentManager = mock()
         presenter.sessionEventManager = mock()
