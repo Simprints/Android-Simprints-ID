@@ -20,7 +20,6 @@ class CoreStepProcessorImpl : CoreStepProcessor {
     override fun buildStepConsent(consentType: ConsentType) =
         buildConsentStep(consentType)
 
-    //Building normal ConsentStep for now
     override fun buildStepVerify(projectId: String, verifyGuid: String): Step =
         buildVerifyStep(projectId, verifyGuid)
 

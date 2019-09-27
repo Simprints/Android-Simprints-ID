@@ -17,9 +17,12 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.stopKoin
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -99,7 +102,9 @@ class PersonRepositoryTest {
         wheneverOnSuspend(localDataSource) { load(anyNotNull()) } thenOnBlockingReturn flowOf()
         whenever(remoteDataSource) { downloadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(person)
 
-        val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
+        val fetch = runBlocking {
+            personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
+        }
 
         assertThat(fetch.person).isEqualTo(person)
         assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
@@ -132,6 +137,11 @@ class PersonRepositoryTest {
             projectId = subSyncScope.projectId,
             userId = subSyncScope.userId,
             moduleId = subSyncScope.moduleId)
+
+    @After
+    fun tearDown() {
+        stopKoin()
+    }
 
 
 }
