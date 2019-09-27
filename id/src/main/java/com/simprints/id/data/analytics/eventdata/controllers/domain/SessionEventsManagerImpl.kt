@@ -6,9 +6,13 @@ import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
-import com.simprints.id.data.analytics.eventdata.models.domain.session.*
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.CALLBACK_IDENTIFICATION
+import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.GUID_SELECTION
+import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
+import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
+import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
+import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.Person
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
 import com.simprints.id.exceptions.unexpected.InvalidSessionForGuidSelectionEvent
@@ -20,7 +24,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.*
 
 // Class to manage the current activeSession
 open class SessionEventsManagerImpl(private val deviceId: String,
@@ -135,7 +138,7 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         updateSessionInBackground { session ->
             session.addEvent(PersonCreationEvent(
                 timeHelper.now(),
-                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprints.map { EncodingUtils.byteArrayToBase64(it.templateBytes) })
+                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
             ))
         }
     }

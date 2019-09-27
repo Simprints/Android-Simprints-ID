@@ -6,6 +6,9 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
+import com.simprints.id.activities.consent.ConsentViewModelFactory
+import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -15,24 +18,26 @@ import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEvent
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImpl
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManagerImpl
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.consent.LongConsentManagerImpl
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.DbManagerImpl
-import com.simprints.id.data.db.local.LocalDbManager
-import com.simprints.id.data.db.local.realm.RealmDbManagerImpl
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
-import com.simprints.id.data.db.remote.FirebaseManagerImpl
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManager
-import com.simprints.id.data.db.remote.people.RemotePeopleManagerImpl
-import com.simprints.id.data.db.remote.project.RemoteProjectManager
-import com.simprints.id.data.db.remote.project.RemoteProjectManagerImpl
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManagerImpl
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSource
+import com.simprints.id.data.consent.shortconsent.ConsentLocalDataSourceImpl
+import com.simprints.id.data.consent.shortconsent.ConsentRepository
+import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
+import com.simprints.id.data.db.common.FirebaseManagerImpl
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -40,9 +45,14 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.orchestrator.builders.AppResponseFactory
-import com.simprints.id.orchestrator.builders.AppResponseFactoryImpl
+import com.simprints.id.orchestrator.EnrolmentHelper
+import com.simprints.id.exitformhandler.ExitFormHandler
+import com.simprints.id.exitformhandler.ExitFormHandlerImpl
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.secure.SignerManager
+import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -53,6 +63,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.*
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMasterImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
@@ -78,13 +89,6 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideLocalDbManager(ctx: Context,
-                                   secureDataManager: SecureDataManager,
-                                   loginInfoManager: LoginInfoManager): LocalDbManager =
-        RealmDbManagerImpl(ctx, secureDataManager, loginInfoManager)
-
-    @Provides
-    @Singleton
     open fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager = FirebaseManagerImpl(loginInfoManager)
 
     @Provides
@@ -93,26 +97,21 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun providePeopleUpSyncMaster() =
-        PeopleUpSyncMaster(
+    open fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
+        PeopleUpSyncMasterImpl(
             PeopleUpSyncUploaderMaster(),
             PeopleUpSyncPeriodicFlusherMaster()
         )
 
     @Provides
     @Singleton
-    open fun provideDbManager(localDbManager: LocalDbManager,
+    open fun provideDbManager(projectRepository: ProjectRepository,
                               remoteDbManager: RemoteDbManager,
-                              secureDataManager: SecureDataManager,
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
-                              sessionEventsManager: SessionEventsManager,
-                              remotePeopleManager: RemotePeopleManager,
-                              remoteProjectManager: RemoteProjectManager,
-                              timeHelper: TimeHelper,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
-                              database: SyncStatusDatabase): DbManager =
-        DbManagerImpl(localDbManager, remoteDbManager, loginInfoManager, preferencesManager, sessionEventsManager, remotePeopleManager, remoteProjectManager, timeHelper, peopleUpSyncMaster, database)
+                              database: SyncStatusDatabase): SignerManager =
+        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database.downSyncDao, database.upSyncDao)
 
     @Provides
     @Singleton
@@ -217,33 +216,28 @@ open class AppModule {
         SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
 
     @Provides
-    open fun provideCountTask(dbManager: DbManager,
-                              syncStatusDatabase: SyncStatusDatabase): CountTask = CountTaskImpl(dbManager)
+    open fun provideCountTask(personRepository: PersonRepository): CountTask = CountTaskImpl(personRepository)
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
+
     @Provides
-    open fun provideDownSyncTask(localDbManager: LocalDbManager,
-                                 remotePeopleManager: RemotePeopleManager,
+    open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
+                                 syncInfoLocalDataSource: SyncInfoLocalDataSource,
+                                 personRemoteDataSource: PersonRemoteDataSource,
                                  timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(localDbManager, remotePeopleManager, timeHelper, syncStatusDatabase.downSyncDao)
-
-    @Provides
-    @Singleton
-    open fun provideRemotePeopleManager(remoteDbManager: RemoteDbManager): RemotePeopleManager = RemotePeopleManagerImpl(remoteDbManager)
-
-    @Provides
-    @Singleton
-    open fun provideRemoteProjectManager(remoteDbManager: RemoteDbManager): RemoteProjectManager = RemoteProjectManagerImpl(remoteDbManager)
+                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
 
     @Provides
     @Singleton
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
 
     @Provides
-    open fun provideAppResponseBuilderFactory(): AppResponseFactory = AppResponseFactoryImpl()
-
+    open fun provideAppResponseBuilderFactory(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,
@@ -254,5 +248,34 @@ open class AppModule {
                                          sessionEventsManager: SessionEventsManager): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
+
+    @Provides
+    open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
+        ConsentLocalDataSourceImpl(prefs, remoteConfigWrapper)
+
+    @Provides
+    open fun provideConsentTextManager(context: Context,
+                                       consentLocalDataSource: ConsentLocalDataSource,
+                                       crashReportManager: CrashReportManager,
+                                       preferencesManager: PreferencesManager): ConsentRepository =
+        ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
+            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language)
+
+    @Provides
+    open fun provideConsentViewModelFactory(consentTextManager: ConsentRepository,
+                                            sessionEventsManager: SessionEventsManager,
+                                            timeHelper: TimeHelper) =
+        ConsentViewModelFactory(consentTextManager, sessionEventsManager)
+
+    @Provides
+    open fun provideCoreExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
+        CoreExitFormViewModelFactory(sessionEventsManager)
+
+    @Provides
+    open fun provideFingerprintExitFormViewModelFactory(sessionEventsManager: SessionEventsManager) =
+        FingerprintExitFormViewModelFactory(sessionEventsManager)
+
+    @Provides
+    open fun provideExitFormHandler(): ExitFormHandler = ExitFormHandlerImpl()
 }
 

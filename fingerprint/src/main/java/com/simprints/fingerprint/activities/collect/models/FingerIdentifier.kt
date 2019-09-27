@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.activities.collect.models
 
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import com.simprints.id.FingerIdentifier as FingerIdentifierCore
+import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 import com.simprints.libsimprints.FingerIdentifier as FingerIdentifierLibsimprints
 
 enum class FingerIdentifier {

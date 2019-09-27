@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException

@@ -6,18 +6,22 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.face.ModuleApiToDomainFaceResponse
-import com.simprints.id.domain.moduleapi.face.requests.FaceEnrolRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
-import com.simprints.id.orchestrator.enrolAppRequest
+import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -30,12 +34,16 @@ import org.mockito.MockitoAnnotations
 class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Mock lateinit var preferencesManagerMock: PreferencesManager
-    @Mock lateinit var converterModuleApiToDomainMock: ModuleApiToDomainFaceResponse
 
     private val faceRequestFactory: FaceRequestFactory = FaceRequestFactoryImpl()
     private lateinit var faceStepProcess: FaceStepProcessor
-    val result = Intent().apply {
-        putExtra(IFaceResponse.BUNDLE_KEY, mock<IFaceResponse>())
+
+    private lateinit var iFaceResponseMock: IFaceResponse
+
+    val result by lazy {
+        Intent().apply {
+            putExtra(IFaceResponse.BUNDLE_KEY, iFaceResponseMock)
+        }
     }
 
     @Before
@@ -49,7 +57,18 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
             whenever(programName) thenReturn "some_name"
         }
 
-        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory, converterModuleApiToDomainMock)
+        faceStepProcess = FaceStepProcessorImpl(faceRequestFactory)
+
+
+        mockFromModuleApiToDomainExt()
+    }
+
+    private fun mockFromModuleApiToDomainExt() {
+        mockkStatic("com.simprints.id.domain.moduleapi.face.responses.FaceResponseKt")
+        iFaceResponseMock = mockk()
+        every {
+            iFaceResponseMock.fromModuleApiToDomain()
+        } returns mock()
     }
 
     @Test
@@ -63,11 +82,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForEnrol() {
-        with(enrolAppRequest) {
-            val step = faceStepProcess.buildStepEnrol(projectId, userId, moduleId)
+        val step = faceStepProcess.buildCaptureStep()
 
-            verifyFaceIntent<FaceEnrolRequest>(step, ENROL.value)
-        }
+        verifyFaceIntent<FaceCaptureRequest>(step, CAPTURE.value)
     }
 
     @Test
@@ -80,31 +97,31 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     @Test
-    fun steProcessorShouldProcessFaceEnrolResult() {
-        faceStepProcess.processResult(ENROL.value, Activity.RESULT_OK, result)
+    fun stepProcessorShouldProcessFaceEnrolResult() {
+        faceStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
 
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
+        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
-    fun steProcessorShouldProcessFaceIdentifyResult() {
+    fun stepProcessorShouldProcessFaceIdentifyResult() {
         faceStepProcess.processResult(IDENTIFY.value, Activity.RESULT_OK, result)
 
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
+        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
-    fun steProcessorShouldProcessFaceVerifyResult() {
+    fun stepProcessorShouldProcessFaceVerifyResult() {
         faceStepProcess.processResult(VERIFY.value, Activity.RESULT_OK, result)
 
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
+        verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
-    fun steProcessorShouldNotProcessNoFaceResult() {
+    fun stepProcessorShouldNotProcessNoFaceResult() {
         faceStepProcess.processResult(0, Activity.RESULT_OK, result)
 
-        verifyNever(converterModuleApiToDomainMock) { fromModuleApiToDomainFaceResponse(anyNotNull()) }
+        verify(exactly = 0) { iFaceResponseMock.fromModuleApiToDomain() }
     }
 
     @After

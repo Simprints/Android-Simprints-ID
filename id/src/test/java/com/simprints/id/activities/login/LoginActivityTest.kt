@@ -9,6 +9,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.R
 import com.simprints.id.activities.login.request.LoginActivityRequest
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_SECRET
+import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.secure.ProjectAuthenticator
@@ -39,19 +42,12 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class LoginActivityTest {
 
-    companion object {
-        const val DEFAULT_PROJECT_ID = "some_project_id"
-        const val DEFAULT_PROJECT_SECRET = "some_project_secret"
-        const val DEFAULT_USER_ID = "some_user_id"
-    }
-
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     @Inject lateinit var sessionEventsLocalDbManager: SessionEventsLocalDbManager
 
     private val module by lazy {
         TestAppModule(app,
-            localDbManagerRule = MockRule,
             dbManagerRule = MockRule,
             sessionEventsLocalDbManagerRule = MockRule,
             crashReportManagerRule = MockRule)
@@ -66,12 +62,11 @@ class LoginActivityTest {
 
     @Test
     fun shouldUserIdPreFilled() {
-        val userId = "some_user_id"
 
         val controller = createRoboLoginActivity(getIntentForLoginAct()).start().resume().visible()
         val activity = controller.get()
         val userIdInEditText = activity.loginEditTextUserId.text.toString()
-        assertEquals(userIdInEditText, userId)
+        assertEquals(userIdInEditText, DEFAULT_USER_ID)
     }
 
     @Test
@@ -82,9 +77,9 @@ class LoginActivityTest {
 
         val loginAct = controller.get().apply {
             viewPresenter.projectAuthenticator = projectAuthenticator
-            loginEditTextUserId.setText("some_user_id")
-            loginEditTextProjectId.setText("some_project_id")
-            loginEditTextProjectSecret.setText("some_project_secret")
+            loginEditTextUserId.setText(DEFAULT_USER_ID)
+            loginEditTextProjectId.setText(DEFAULT_PROJECT_ID)
+            loginEditTextProjectSecret.setText(DEFAULT_PROJECT_SECRET)
             loginButtonSignIn.performClick()
         }
 
