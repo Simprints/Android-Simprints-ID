@@ -84,7 +84,7 @@ open class OrchestratorManagerImpl(
             cachedSteps
         }
         val appResponseToReturn = appResponseFactory.buildAppResponse(
-            modalities, appRequest, cachedSteps, sessionId
+            modalities, appRequest, steps, sessionId
         )
         ongoingStep.value = null
         appResponse.value = appResponseToReturn

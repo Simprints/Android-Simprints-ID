@@ -9,8 +9,7 @@ data class AlertActResponse(val alertType: AlertType, val buttonAction: ButtonAc
 
     enum class ButtonAction {
         CLOSE,
-        TRY_AGAIN,
-        BACK
+        TRY_AGAIN
     }
 
     companion object {
