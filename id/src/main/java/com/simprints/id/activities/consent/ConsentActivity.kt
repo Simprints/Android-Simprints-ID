@@ -1,5 +1,6 @@
 package com.simprints.id.activities.consent
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -30,6 +31,7 @@ import com.simprints.id.exitformhandler.ExitFormHandler
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
 
@@ -60,6 +62,7 @@ class ConsentActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
 
+        requestLocationPermission()
         setupTabs()
         setupObserversForUi()
     }
@@ -67,6 +70,11 @@ class ConsentActivity : AppCompatActivity() {
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun requestLocationPermission() {
+        requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE)
     }
 
     private fun setupTabs() {
@@ -194,5 +202,6 @@ class ConsentActivity : AppCompatActivity() {
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
+        const val LOCATION_PERMISSION_REQUEST_CODE = 99
     }
 }
