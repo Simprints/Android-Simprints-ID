@@ -2,7 +2,7 @@ package com.simprints.face.data.moduleapi.face
 
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
-import com.simprints.face.exceptions.InvalidFaceResponseException
+import com.simprints.face.data.moduleapi.face.responses.FaceResponseType
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.moduleapi.face.responses.IFaceResponseType
@@ -12,14 +12,12 @@ import kotlinx.android.parcel.Parcelize
 object DomainToFaceResponse {
 
     fun fromDomainToFaceResponse(faceResponse: FaceResponse): IFaceResponse =
-        when (faceResponse) {
-            is FaceCaptureResponse ->
-                fromDomainToFaceCaptureResponse(faceResponse)
-            else -> throw InvalidFaceResponseException()
+        when (faceResponse.type) {
+            FaceResponseType.CAPTURE -> fromDomainToFaceCaptureResponse(faceResponse as FaceCaptureResponse)
         }
 
     private fun fromDomainToFaceCaptureResponse(faceCaptureResponse: FaceCaptureResponse): IFaceCaptureResponseImpl =
-        IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult, faceCaptureResponse.type)
+        IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult, IFaceResponseType.CAPTURE)
 }
 
 @Parcelize
