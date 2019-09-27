@@ -94,18 +94,20 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
 
     override fun showConfirmationDialogForLogout() {
         activity.runOnUiThreadIfStillRunning {
-            buildConfirmationDialogForLogout().let {
-                it.show()
-            }
+            buildConfirmationDialogForLogout().show()
         }
     }
 
     internal fun buildConfirmationDialogForLogout(): AlertDialog =
         AlertDialog.Builder(activity)
-            .setTitle(R.string.confirmation_logout_title)
-            .setMessage(R.string.confirmation_logout_message)
-            .setPositiveButton(getString(R.string.logout)) { _, _ -> viewPresenter.logout() }
-            .setNegativeButton(getString(R.string.confirmation_logout_cancel), null).create()
+            .setTitle(androidResourcesHelper.getString(R.string.confirmation_logout_title))
+            .setMessage(androidResourcesHelper.getString(R.string.confirmation_logout_message))
+            .setPositiveButton(
+                androidResourcesHelper.getString(R.string.logout)
+            ) { _, _ -> viewPresenter.logout() }
+            .setNegativeButton(
+                androidResourcesHelper.getString(R.string.confirmation_logout_cancel), null
+            ).create()
 
     override fun finishSettings() {
         activity.runOnUiThreadIfStillRunning {
