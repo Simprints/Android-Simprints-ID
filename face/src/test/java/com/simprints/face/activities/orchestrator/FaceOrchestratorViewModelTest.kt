@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.google.common.truth.Truth
 import com.simprints.face.data.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.moduleapi.face.requests.IFaceCaptureRequest
+import com.simprints.moduleapi.face.requests.IFaceRequestType
 import com.simprints.testtools.common.livedata.testObserver
 import io.mockk.every
 import io.mockk.mockk
@@ -29,5 +30,6 @@ class FaceOrchestratorViewModelTest {
 
     private fun generateCaptureRequest(captures: Int) = mockk<IFaceCaptureRequest> {
         every { nFaceSamplesToCapture } returns captures
+        every { type } returns IFaceRequestType.CAPTURE
     }
 }
