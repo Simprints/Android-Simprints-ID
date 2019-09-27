@@ -1,5 +1,6 @@
 package com.simprints.id.activities.fetchguid
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,6 @@ import com.simprints.id.activities.alert.response.AlertActResponse
 import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.*
 import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fetchguid.result.FetchGuidResult.Companion.RESULT_CODE_FETCH_GUID
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
@@ -133,7 +133,7 @@ class FetchGuidActivity : AppCompatActivity() {
     }
 
     private fun setResultAndFinish(coreResponse: CoreResponse) {
-        setResult(RESULT_CODE_FETCH_GUID, buildIntentForResponse(coreResponse))
+        setResult(Activity.RESULT_OK, buildIntentForResponse(coreResponse))
         finish()
     }
 
