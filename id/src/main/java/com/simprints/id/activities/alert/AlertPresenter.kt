@@ -11,7 +11,7 @@ import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
-import com.simprints.id.domain.modality.Modality
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
@@ -23,6 +23,7 @@ class AlertPresenter(val view: AlertContract.View,
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
     private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 
@@ -78,33 +79,14 @@ class AlertPresenter(val view: AlertContract.View,
                 view.closeActivityAfterCloseButton()
             }
             AlertType.GUID_NOT_FOUND_OFFLINE -> {
-                startExitFormActivityBasedOnModalities()
+                startExitFormActivity()
             }
         }
     }
 
-    private fun startExitFormActivityBasedOnModalities() {
-        if (isSingleModality()) {
-            startModalitySpecificExitForm()
-        } else {
-            startCoreExitFormActivity()
-        }
+    private fun startExitFormActivity() {
+        view.startExitForm(exitFormHelper.getExitFormActivityClassFromModalities(preferencesManager.modalities))
     }
-
-    private fun isSingleModality() = preferencesManager.modalities.size == 1
-
-    private fun startModalitySpecificExitForm() {
-        when (preferencesManager.modalities.first()) {
-            Modality.FINGER -> startFingerprintExitFormActivity()
-            Modality.FACE -> startFaceExitFormActivity()
-        }
-    }
-
-    private fun startCoreExitFormActivity() = view.startCoreExitFormActivity()
-
-    private fun startFingerprintExitFormActivity() = view.startFingerprintExitFormActivity()
-
-    private fun startFaceExitFormActivity() = view.startFaceExitFormActivity()
 
     private fun logToCrashReport() {
         crashReportManager.logMessageForCrashReport(CrashReportTag.ALERT, CrashReportTrigger.UI, message = alertViewModel.name)

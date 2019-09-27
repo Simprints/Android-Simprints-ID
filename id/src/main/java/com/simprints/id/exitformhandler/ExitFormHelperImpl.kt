@@ -1,9 +1,13 @@
 package com.simprints.id.exitformhandler
 
 import android.content.Intent
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
+import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.faceexitform.result.FaceExitFormActivityResult
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.fingerprintexitform.result.FingerprintExitFormActivityResult
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
@@ -11,7 +15,24 @@ import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
 import com.simprints.id.exitformhandler.ExitFormResult.ExitFormType.*
 
-class ExitFormHandlerImpl : ExitFormHandler {
+class ExitFormHelperImpl : ExitFormHelper {
+
+    override fun getExitFormActivityClassFromModalities(modalities: List<Modality>): String? =
+        if (isSingleModality(modalities)) {
+            getModalitySpecificExitFormClass(modalities)
+        } else {
+            getCoreExitFormClass()
+        }
+
+    private fun isSingleModality(modalities: List<Modality>) = modalities.size == 1
+
+    private fun getModalitySpecificExitFormClass(modalities: List<Modality>) =
+        when (modalities.first()) {
+            Modality.FACE -> FaceExitFormActivity::class.java.canonicalName
+            Modality.FINGER -> FingerprintExitFormActivity::class.java.canonicalName
+        }
+
+    private fun getCoreExitFormClass() = CoreExitFormActivity::class.java.canonicalName
 
     override fun buildExitFormResponseForCore(data: Intent?): CoreResponse? =
         data?.getParcelableExtra<ExitFormResult>(EXIT_FORM_BUNDLE_KEY)?.let {

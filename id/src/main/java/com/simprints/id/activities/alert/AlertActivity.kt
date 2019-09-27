@@ -15,14 +15,11 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
-import com.simprints.id.activities.coreexitform.CoreExitFormActivity
-import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
-import com.simprints.id.exitformhandler.ExitFormHandler
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
@@ -31,7 +28,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
-    @Inject lateinit var exitFormHandler: ExitFormHandler
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,18 +88,14 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         viewPresenter.handleBackButton()
     }
 
-    override fun startCoreExitFormActivity() {
-        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
+    override fun startExitForm(exitFormActivityClass: String?) {
+        exitFormActivityClass?.let {
+            startActivityForResult(
+                Intent().setClassName(this, exitFormActivityClass),
+                CoreRequestCode.EXIT_FORM.value
+            )
+        }
     }
-
-    override fun startFingerprintExitFormActivity() {
-        startActivityForResult(Intent(this, FingerprintExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
-    override fun startFaceExitFormActivity() {
-        startActivityForResult(Intent(this, FaceExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
@@ -114,7 +107,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHandler.buildExitFormResponseForCore(data)?.let {
+        exitFormHelper.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
         }
     }
