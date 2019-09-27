@@ -69,10 +69,17 @@ class AlertPresenter(val view: AlertContract.View,
     }
 
     override fun handleBackButton() {
-        if (alertType == AlertType.UNEXPECTED_ERROR || alertType == AlertType.GUID_NOT_FOUND_ONLINE) {
-            view.closeActivityAfterCloseButton()
-        } else {
-            startExitFormActivityBasedOnModalities()
+        when (alertType) {
+            AlertType.UNEXPECTED_ERROR,
+            AlertType.GUID_NOT_FOUND_ONLINE,
+            AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            AlertType.DIFFERENT_USER_ID_SIGNED_IN,
+            AlertType.SAFETYNET_ERROR -> {
+                view.closeActivityAfterCloseButton()
+            }
+            AlertType.GUID_NOT_FOUND_OFFLINE -> {
+                startExitFormActivityBasedOnModalities()
+            }
         }
     }
 

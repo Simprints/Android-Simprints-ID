@@ -10,22 +10,18 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.alert.response.AlertActResponse
-import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.*
-import com.simprints.id.activities.coreexitform.CoreExitFormActivity
-import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
+import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.CLOSE
+import com.simprints.id.activities.alert.response.AlertActResponse.ButtonAction.TRY_AGAIN
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_AND_REMOTE
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.NOT_FOUND_IN_LOCAL_REMOTE_CONNECTION_ERROR
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.alert.AlertType
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.FetchGUIDRequest
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import javax.inject.Inject
 
 class FetchGuidActivity : AppCompatActivity() {
@@ -76,41 +72,10 @@ class FetchGuidActivity : AppCompatActivity() {
             TRY_AGAIN -> {
                 tryToFetchGuid()
             }
-            BACK -> {
-                startExitFormActivity()
-            }
             CLOSE -> {
                 setResultAndFinish(FetchGUIDResponse(false))
             }
         }
-    }
-
-    private fun startExitFormActivity() {
-        if (isSingleModality()) {
-            startModalitySpecificExitForm()
-        } else {
-            startCoreExitFormActivity()
-        }
-    }
-    private fun isSingleModality() = preferencesManager.modalities.size == 1
-
-    private fun startModalitySpecificExitForm() {
-        when (preferencesManager.modalities.first()) {
-            Modality.FINGER -> startFingerprintExitFormActivity()
-            Modality.FACE -> startFaceExitFormActivity()
-        }
-    }
-
-    private fun startCoreExitFormActivity() {
-        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
-    private fun startFingerprintExitFormActivity() {
-        startActivityForResult(Intent(this, FingerprintExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
-    private fun startFaceExitFormActivity() {
-        startActivityForResult(Intent(this, FaceExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
