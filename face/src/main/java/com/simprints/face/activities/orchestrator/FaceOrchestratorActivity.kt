@@ -10,7 +10,7 @@ import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.core.livedata.LiveDataEvent1Observer
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class FaceOrchestratorActivity : AppCompatActivity() {
@@ -37,7 +37,7 @@ class FaceOrchestratorActivity : AppCompatActivity() {
         viewModel.startCapture.observe(this, LiveDataEventObserver {
             startActivityForResult(Intent(this, FaceCaptureActivity::class.java), CAPTURE_REQUEST)
         })
-        viewModel.captureFinished.observe(this, LiveDataEvent1Observer {
+        viewModel.captureFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             finish()
