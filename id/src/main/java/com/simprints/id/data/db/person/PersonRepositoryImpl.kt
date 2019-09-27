@@ -72,7 +72,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
         suspendCancellableCoroutine { cont ->
             CoroutineScope(Dispatchers.IO).launch {
-                personRemoteDataSource.downloadPerson(projectId, patientId)
+                personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
                     .subscribeBy(
                     onSuccess = { cont.resume(PersonFetchResult(it, REMOTE)) },
                     onError = { cont.resumeWithException(it) }
