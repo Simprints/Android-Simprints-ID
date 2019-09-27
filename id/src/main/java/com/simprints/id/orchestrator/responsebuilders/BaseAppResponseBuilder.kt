@@ -8,6 +8,7 @@ import com.simprints.id.domain.moduleapi.app.responses.entities.fromDomainToModu
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintErrorResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppRefusalFormReason
@@ -36,6 +37,9 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
             results.any { it is FingerprintRefusalFormResponse } -> {
                 buildAppRefusalResponse(results.find { it is FingerprintRefusalFormResponse } as FingerprintRefusalFormResponse)
             }
+            results.any { it is FetchGUIDResponse } -> {
+                buildAppErrorResponse(results.find { it is FetchGUIDResponse } as FetchGUIDResponse)
+            }
             else -> {
                 null
             }
@@ -56,6 +60,13 @@ abstract class BaseAppResponseBuilder : AppResponseBuilder {
 
     private fun buildAppErrorResponse(fingerprintErrorResponse: FingerprintErrorResponse) =
         AppErrorResponse(fingerprintErrorResponse.fingerprintErrorReason.toAppErrorReason())
+
+    private fun buildAppErrorResponse(fetchGUIDResponse: FetchGUIDResponse) =
+        if (!fetchGUIDResponse.isGuidFound) {
+            AppErrorResponse(AppErrorResponse.Reason.GUID_NOT_FOUND_ONLINE)
+        } else {
+            null
+        }
 
     private fun buildAppRefusalResponse(fingerprintRefusalFormResponse: FingerprintRefusalFormResponse) =
         AppRefusalFormResponse(RefusalFormAnswer(

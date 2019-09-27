@@ -20,6 +20,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".activities.faceexitform.FaceExitFormActivity" />
         <activity android:name=".activities.fingerprintexitform.FingerprintExitFormActivity" />
+        <activity android:name=".activities.fetchguid.FetchGuidActivity" />
         <activity
             android:name=".activities.coreexitform.CoreExitFormActivity"
             android:label="@string/title_activity_exit_form"

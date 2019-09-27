@@ -70,6 +70,11 @@ class AppResponseBuilderForEnrol(
             }
         }
 
+        private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FingerprintEnrolResponse,
+                                                           faceResponse: FaceCaptureResponse) =
+        AppEnrolResponse(fingerprintResponse.guid)
+
+
         private fun buildPersonFromFingerprintAndFace(request: AppEnrolRequest,
                                                       fingerprintResponse: FingerprintEnrolResponse,
                                                       faceResponse: FaceCaptureResponse,

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
@@ -45,7 +45,7 @@ class CoreExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
-        viewModel = ViewModelProviders.of(this, coreExitFormViewModelFactory).get(CoreExitFormViewModel::class.java)
+        viewModel = ViewModelProvider(this, coreExitFormViewModelFactory).get(CoreExitFormViewModel::class.java)
         exitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()

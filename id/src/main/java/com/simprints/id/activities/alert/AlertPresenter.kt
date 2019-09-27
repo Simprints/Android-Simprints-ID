@@ -8,8 +8,10 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScree
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
+import com.simprints.id.domain.alert.AlertActivityViewModel.ButtonAction
 import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.alert.fromAlertToAlertTypeEvent
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.tools.TimeHelper
 import javax.inject.Inject
 
@@ -21,6 +23,7 @@ class AlertPresenter(val view: AlertContract.View,
     @Inject lateinit var sessionManager: SessionEventsManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
     private val alertViewModel = AlertActivityViewModel.fromAlertToAlertViewModel(alertType)
 
@@ -57,15 +60,32 @@ class AlertPresenter(val view: AlertContract.View,
         view.setAlertMessageWithStringRes(alertViewModel.message)
     }
 
-    override fun handleButtonClick(buttonAction: AlertActivityViewModel.ButtonAction) {
+    override fun handleButtonClick(buttonAction: ButtonAction) {
         when (buttonAction) {
-            is AlertActivityViewModel.ButtonAction.None -> Unit
-            is AlertActivityViewModel.ButtonAction.Close -> view.closeActivityAfterCloseButton()
+            is ButtonAction.None -> Unit
+            is ButtonAction.Close -> view.closeActivityAfterCloseButton()
+            is ButtonAction.TryAgain -> view.finishWithTryAgain()
+            is ButtonAction.WifiSettings -> view.openWifiSettings()
         }
     }
 
     override fun handleBackButton() {
-        view.closeActivityAfterCloseButton()
+        when (alertType) {
+            AlertType.UNEXPECTED_ERROR,
+            AlertType.GUID_NOT_FOUND_ONLINE,
+            AlertType.DIFFERENT_PROJECT_ID_SIGNED_IN,
+            AlertType.DIFFERENT_USER_ID_SIGNED_IN,
+            AlertType.SAFETYNET_ERROR -> {
+                view.closeActivityAfterCloseButton()
+            }
+            AlertType.GUID_NOT_FOUND_OFFLINE -> {
+                startExitFormActivity()
+            }
+        }
+    }
+
+    private fun startExitFormActivity() {
+        view.startExitForm(exitFormHelper.getExitFormActivityClassFromModalities(preferencesManager.modalities))
     }
 
     private fun logToCrashReport() {
