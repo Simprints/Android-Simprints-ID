@@ -24,12 +24,13 @@ class FaceOrchestratorViewModel : ViewModel() {
     val captureFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
     fun start(iFaceRequest: IFaceRequest) {
-        faceRequest = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
-        when (faceRequest) {
+        val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
+        when (request) {
             is FaceCaptureRequest -> {
-                captureNeededPhotos(faceRequest as FaceCaptureRequest)
+                captureNeededPhotos(request)
             }
         }
+        faceRequest = request
     }
 
     // TODO capture the correct number of photos the interface requests when integrating the face modality in full
