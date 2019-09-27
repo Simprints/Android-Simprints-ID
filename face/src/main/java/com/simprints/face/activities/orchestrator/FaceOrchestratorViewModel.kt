@@ -14,14 +14,14 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.core.livedata.LiveDataEvent1
+import com.simprints.core.livedata.LiveDataEventWithContent
 import java.util.*
 
 class FaceOrchestratorViewModel : ViewModel() {
     lateinit var faceRequest: FaceRequest
 
     val startCapture: MutableLiveData<LiveDataEvent> = MutableLiveData()
-    val captureFinished: MutableLiveData<LiveDataEvent1<IFaceResponse>> = MutableLiveData()
+    val captureFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
     fun start(iFaceRequest: IFaceRequest) {
         faceRequest = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)

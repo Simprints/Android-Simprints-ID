@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.
  */
-open class LiveDataEvent1<out T>(private val content: T) {
+open class LiveDataEventWithContent<out T>(private val content: T) {
 
     var hasBeenHandled = false
         private set // Allow external read but not write
@@ -29,6 +29,6 @@ open class LiveDataEvent1<out T>(private val content: T) {
     fun peekContent(): T = content
 }
 
-fun <T> MutableLiveData<LiveDataEvent1<T>>.send(content: T) {
-    this.value = LiveDataEvent1(content)
+fun <T> MutableLiveData<LiveDataEventWithContent<T>>.send(content: T) {
+    this.value = LiveDataEventWithContent(content)
 }
