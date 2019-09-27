@@ -24,7 +24,7 @@ android {
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         versionName "2019.3.2"
-        versionCode 182
+        versionCode 183
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
