@@ -1,5 +1,7 @@
 package com.simprints.moduleapi.common
 
-interface ISecuredImageRef {
+import android.os.Parcelable
+
+interface ISecuredImageRef : Parcelable {
     val uri: String
 }

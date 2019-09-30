@@ -8,7 +8,7 @@ interface CoreStepProcessor {
 
     fun buildStepConsent(consentType: ConsentType): Step
 
-    fun buildStepVerify(): Step
+    fun buildStepVerify(projectId: String, verifyGuid: String): Step
 
     fun processResult(data: Intent?): Step.Result?
 }

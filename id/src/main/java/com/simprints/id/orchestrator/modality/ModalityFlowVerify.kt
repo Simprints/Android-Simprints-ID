@@ -6,6 +6,7 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
@@ -39,7 +40,11 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
     override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
-            isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
+            isCoreResult(requestCode) -> {
+                coreStepProcessor.processResult(data).also {
+                    completeAllStepsIfFetchGuidResponseAndFailed(it)
+                }
+            }
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
             isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
             else -> throw IllegalStateException("Invalid result from intent")
@@ -48,5 +53,13 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
         return stepForRequest?.apply { setResult(result) }
+    }
+
+    private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {
+        if (result is FetchGUIDResponse) {
+            if (!result.isGuidFound) {
+                steps.forEach { it.setStatus(Step.Status.COMPLETED)  }
+            }
+        }
     }
 }

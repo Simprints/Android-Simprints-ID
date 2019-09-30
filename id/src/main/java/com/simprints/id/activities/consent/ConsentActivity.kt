@@ -1,5 +1,6 @@
 package com.simprints.id.activities.consent
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -8,28 +9,25 @@ import android.view.View
 import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.coreexitform.CoreExitFormActivity
-import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.response.AskConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.ConsentResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
-import com.simprints.id.exitformhandler.ExitFormHandler
+import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
 import com.simprints.id.tools.TimeHelper
+import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_consent.*
 import javax.inject.Inject
 
@@ -43,7 +41,7 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var viewModelFactory: ConsentViewModelFactory
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var exitFormHandler: ExitFormHandler
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
     private var startConsentEventTime: Long = 0
 
@@ -57,9 +55,10 @@ class ConsentActivity : AppCompatActivity() {
 
         askConsentRequestReceived = intent.extras?.getParcelable(CORE_STEP_BUNDLE) ?: throw InvalidAppRequest()
 
-        viewModel = ViewModelProviders.of(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
+        viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
 
+        requestLocationPermission()
         setupTabs()
         setupObserversForUi()
     }
@@ -67,6 +66,11 @@ class ConsentActivity : AppCompatActivity() {
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun requestLocationPermission() {
+        requestPermissionsIfRequired(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE)
     }
 
     private fun setupTabs() {
@@ -143,37 +147,20 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun startExitFormActivity() {
-        if (isSingleModality()) {
-            startModalitySpecificExitForm()
-        } else {
-            startCoreExitFormActivity()
+        val exitFormActivityClass =
+            exitFormHelper.getExitFormActivityClassFromModalities(preferencesManager.modalities)
+
+        exitFormActivityClass?.let {
+            startActivityForResult(
+                Intent().setClassName(this, it),
+                CoreRequestCode.EXIT_FORM.value
+            )
         }
-    }
-
-    private fun isSingleModality() = preferencesManager.modalities.size == 1
-
-    private fun startModalitySpecificExitForm() {
-        when (preferencesManager.modalities.first()) {
-            Modality.FINGER -> startFingerprintExitFormActivity()
-            Modality.FACE -> startFaceExitFormActivity()
-        }
-    }
-
-    private fun startCoreExitFormActivity() {
-        startActivityForResult(Intent(this, CoreExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
-    private fun startFingerprintExitFormActivity() {
-        startActivityForResult(Intent(this, FingerprintExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
-    }
-
-    private fun startFaceExitFormActivity() {
-        startActivityForResult(Intent(this, FaceExitFormActivity::class.java), CoreRequestCode.EXIT_FORM.value)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        exitFormHandler.buildExitFormResposeForCore(data)?.let {
+        exitFormHelper.buildExitFormResponseForCore(data)?.let {
             setResultAndFinish(it)
         }
     }
@@ -194,5 +181,6 @@ class ConsentActivity : AppCompatActivity() {
     companion object {
         const val GENERAL_CONSENT_TAB_TAG = "General"
         const val PARENTAL_CONSENT_TAB_TAG = "Parental"
+        const val LOCATION_PERMISSION_REQUEST_CODE = 99
     }
 }
