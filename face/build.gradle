@@ -82,4 +82,38 @@ dependencies {
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
+    androidTestImplementation(deps.testing.espresso.barista) {
+        exclude group: "com.android.support"
+        exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
+    }
+
+    // Koin
+    androidTestImplementation deps.koin.core_ext
+    androidTestImplementation deps.testing.koin
+
+    // ######################################################
+    //                      Unit test
+    // ######################################################
+
+    // Simprints
+    testImplementation project(':testtools')
+    testImplementation(deps.testing.junit) {
+        exclude group: "com.android.support"
+    }
+
+    // Android X
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.androidx.runner
+
+    // Kotlin
+    testImplementation deps.testing.coroutines_test
+
+    // Mockk
+    testImplementation deps.testing.mockk
+    testImplementation deps.testing.truth
 }

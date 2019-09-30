@@ -16,7 +16,7 @@ open class BaseStepProcessorTest {
         verifyStep<T>(
             step,
             expectedRequestCode,
-            "com.simprints.face.activities.FaceCaptureActivity",
+            "com.simprints.face.activities.orchestrator.FaceOrchestratorActivity",
             "FaceRequestBundleKey")
 
     protected inline fun <reified T : Parcelable> verifyCoreIntent(step: Step, expectedRequestCode: Int) =
