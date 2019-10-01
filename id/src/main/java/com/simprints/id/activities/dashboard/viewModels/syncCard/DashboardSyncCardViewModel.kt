@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.*
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
-import com.simprints.id.data.db.local.room.DownSyncStatus
-import com.simprints.id.data.db.local.room.UpSyncStatus
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 import org.jetbrains.anko.runOnUiThread

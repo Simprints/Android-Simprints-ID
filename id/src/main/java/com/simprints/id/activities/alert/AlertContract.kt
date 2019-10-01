@@ -23,6 +23,9 @@ interface AlertContract {
         fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction)
         fun setAlertMessageWithStringRes(@StringRes stringRes: Int)
         fun closeActivityAfterCloseButton()
+        fun startExitForm(exitFormActivityClass: String?)
+        fun finishWithTryAgain()
+        fun openWifiSettings()
     }
 
     interface Presenter : BasePresenter {

@@ -9,6 +9,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentPresenter
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
+import com.simprints.id.activities.consent.ConsentActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
@@ -17,10 +18,14 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.debug.DebugViewModel
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
+import com.simprints.id.activities.faceexitform.FaceExitFormActivity
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
+import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
+import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
@@ -28,7 +33,7 @@ import com.simprints.id.activities.settings.fragments.settingsPreference.Setting
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -49,7 +54,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
 @Singleton
 interface AppComponent {
 
@@ -59,6 +64,7 @@ interface AppComponent {
         fun application(app: Application): Builder
 
         fun appModule(appModule: AppModule): Builder
+        fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
         fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
@@ -70,7 +76,7 @@ interface AppComponent {
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
-    fun inject(longConsentActivity: LongConsentActivity)
+    fun inject(pricvacyNoticeActivity: PricvacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)
@@ -100,12 +106,17 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(consentActivity: ConsentActivity)
+    fun inject(coreExitFormActivity: CoreExitFormActivity)
+    fun inject(fingerprintExitFormActivity: FingerprintExitFormActivity)
+    fun inject(faceExitFormActivity: FaceExitFormActivity)
+    fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(orchestratorActivity: OrchestratorActivity)
 
-    fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
+    fun getPersonRepository(): PersonRepository
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getSimNetworkUtils(): SimNetworkUtils

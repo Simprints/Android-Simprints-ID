@@ -12,4 +12,4 @@ data class FingerprintEnrolRequest(val projectId: String,
                                    val fingerStatus: Map<FingerprintFingerIdentifier, Boolean>,
                                    val logoExists: Boolean,
                                    val programName: String,
-                                   val organizationName: String): FingerprintRequest
+                                   val organizationName: String) : FingerprintRequest

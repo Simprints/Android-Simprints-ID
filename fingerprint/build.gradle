@@ -111,11 +111,6 @@ dependencies {
     implementation deps.androidx.ui.fragment
     implementation deps.arch_components.work
 
-    // Koin
-    implementation deps.koin.core
-    implementation deps.koin.android
-    implementation deps.koin.viewmodel
-
     // RxJava
     implementation deps.rxjava2.permissions
     implementation deps.rxjava2.location

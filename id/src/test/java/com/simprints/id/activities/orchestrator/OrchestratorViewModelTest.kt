@@ -69,7 +69,7 @@ class OrchestratorViewModelTest {
         whenever(domainToModuleApiConverter) { fromDomainModuleApiAppResponse(anyNotNull()) } thenReturn mock()
         whenever(sessionEventsManagerMock) { getCurrentSession() } thenReturn Single.just(fakeSession)
         whenever(orchestratorManagerMock) { appResponse } thenReturn liveDataAppResponse
-        whenever(orchestratorManagerMock) { onGoingStep } thenReturn liveDataNextIntent
+        whenever(orchestratorManagerMock) { ongoingStep } thenReturn liveDataNextIntent
     }
 
     @Test
