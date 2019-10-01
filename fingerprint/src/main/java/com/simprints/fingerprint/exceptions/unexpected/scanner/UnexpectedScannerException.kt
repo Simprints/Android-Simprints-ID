@@ -9,8 +9,8 @@ class UnexpectedScannerException(message: String = "UnexpectedScannerException")
     companion object {
 
         @JvmStatic
-        fun forScannerError(scannerError: SCANNER_ERROR, where: String) =
-            UnexpectedScannerException("Uncaught or invalid scanner reason in $where : ${scannerError.details()}")
+        fun forScannerError(scannerError: SCANNER_ERROR?, where: String) =
+            UnexpectedScannerException("Uncaught or invalid scanner reason in $where : ${scannerError?.details()}")
     }
 
 }

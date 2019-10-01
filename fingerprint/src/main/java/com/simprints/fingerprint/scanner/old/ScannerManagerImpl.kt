@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.scanner
+package com.simprints.fingerprint.scanner.old
 
 import android.annotation.SuppressLint
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
@@ -18,6 +18,7 @@ import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
+@Deprecated("Use new ScannerManager")
 open class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerManager {
 
     override var scanner: Scanner? = null
