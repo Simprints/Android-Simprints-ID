@@ -11,8 +11,8 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.old.ScannerManager
+import com.simprints.fingerprint.scanner.old.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules

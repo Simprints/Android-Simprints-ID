@@ -25,8 +25,8 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.old.ScannerManager
+import com.simprints.fingerprint.scanner.old.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher

@@ -16,7 +16,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.old.ScannerManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.FingerprintUnexpectedException
 import com.simprints.fingerprint.exceptions.unexpected.scanner.UnexpectedScannerException

@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.commontesttools.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.old.ScannerManager
 import com.simprints.fingerprintscanner.v1.Scanner
 import io.reactivex.Completable
 

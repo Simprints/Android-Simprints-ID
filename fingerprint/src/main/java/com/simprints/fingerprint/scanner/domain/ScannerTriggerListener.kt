@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.controllers.scanner.wrapper.domain
+package com.simprints.fingerprint.scanner.domain
 
 interface ScannerTriggerListener {
 

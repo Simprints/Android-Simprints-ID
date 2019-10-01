@@ -1,9 +1,10 @@
-package com.simprints.fingerprint.controllers.scanner
+package com.simprints.fingerprint.scanner.old
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprintscanner.v1.Scanner
 import io.reactivex.Completable
 
+@Deprecated("Use new ScannerManager")
 interface ScannerManager {
 
     var scanner: Scanner?
