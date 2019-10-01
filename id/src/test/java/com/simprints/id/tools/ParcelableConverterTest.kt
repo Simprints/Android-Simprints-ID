@@ -42,7 +42,7 @@ class ParcelableConverterTest {
         assertThat(step.bundleKey, `is`(BUNDLE_KEY))
         assertThat(step.request, `is`(request))
         assertThat(step.getStatus(), `is`(Step.Status.COMPLETED))
-        assertThat(step.getResult(), `is`(result))
+        verifyResult(step.getResult(), result)
     }
 
     @After
@@ -77,7 +77,7 @@ class ParcelableConverterTest {
         "moduleId",
         "metadata",
         "language",
-        mapOf(),
+        emptyMap(),
         true,
         "programmeName",
         "organisationName",
@@ -93,6 +93,18 @@ class ParcelableConverterTest {
             )
         )
         return FingerprintCaptureResponse(fingerprints)
+    }
+
+    private fun verifyResult(actual: Step.Result?, expected: Step.Result) {
+        assertThat(actual, instanceOf(FingerprintCaptureResponse::class.java))
+        require(actual is FingerprintCaptureResponse && expected is FingerprintCaptureResponse)
+        assertThat(actual.fingerprints.size, `is`(expected.fingerprints.size))
+        actual.fingerprints.forEachIndexed { index, actualFingerprint ->
+            val expectedFingerprint = expected.fingerprints[index]
+            assertThat(actualFingerprint.template.contentEquals(expectedFingerprint.template), `is`(true))
+            assertThat(actualFingerprint.fingerId, `is`(expectedFingerprint.fingerId))
+            assertThat(actualFingerprint.qualityScore, `is`(expectedFingerprint.qualityScore))
+        }
     }
 
     companion object {
