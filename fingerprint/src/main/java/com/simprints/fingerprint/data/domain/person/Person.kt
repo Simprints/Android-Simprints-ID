@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.util.*
 import com.simprints.fingerprintmatcher.Person as PersonMatcher
-import com.simprints.id.domain.Person as PersonCore
+import com.simprints.id.data.db.person.domain.Person as PersonCore
 
 @Parcelize
 data class Person(
@@ -30,13 +30,13 @@ data class Person(
     companion object {
         fun fromCoreToDomain(corePerson: PersonCore) =
             with(corePerson) {
-                Person(patientId, projectId, userId, moduleId, fingerprints.map { Fingerprint.fromCoreToDomain(it) }, createdAt, updatedAt, toSync)
+                Person(patientId, projectId, userId, moduleId, fingerprintSamples.map { Fingerprint.fromCoreToDomain(it) }, createdAt, updatedAt, toSync)
             }
     }
 }
 
 fun Person.fromDomainToCore() =
-    PersonCore(patientId, projectId, userId, moduleId, fingerprints.map { it.fromDomainToCore() }, createdAt, updatedAt, toSync)
+    PersonCore(patientId, projectId, userId, moduleId, createdAt, updatedAt, toSync, fingerprints.map { it.fromDomainToCore() })
 
 fun Person.fromDomainToMatcher() =
     PersonMatcher(patientId, fingerprints.map { it.fromDomainToMatcher() })

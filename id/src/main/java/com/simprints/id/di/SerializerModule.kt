@@ -1,7 +1,7 @@
 package com.simprints.id.di
 
 import com.google.gson.Gson
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -24,8 +24,8 @@ class SerializerModule {
     @Provides @Singleton fun provideGson(): Gson = Gson()
 
     @Provides @Singleton @Named("FingerIdToBooleanSerializer") fun provideFingerIdToBooleanSerializer(@Named("FingerIdentifierSerializer") fingerIdentifierSerializer: Serializer<FingerIdentifier>,
-                                                                @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
-                                                                gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
+                                                                                                      @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,
+                                                                                                      gson: Gson): Serializer<Map<FingerIdentifier, Boolean>> = MapSerializer(fingerIdentifierSerializer, booleanSerializer, gson)
     @Provides @Singleton @Named("PeopleDownSyncTriggerToBooleanSerializer") fun providePeopleDownSyncTriggerToBooleanSerializer(
         @Named("PeopleDownSyncTriggerSerializer") peopleDownSyncSyncTriggerSerializer: Serializer<PeopleDownSyncTrigger>,
         @Named("BooleanSerializer") booleanSerializer: Serializer<Boolean>,

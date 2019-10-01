@@ -1,7 +1,8 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.id.FingerIdentifier
-import com.simprints.id.domain.fingerprint.Fingerprint
+import com.simprints.fingerprintscanner.tools.ota.toPositiveInt
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -43,7 +44,7 @@ object FingerprintGeneratorUtils {
     /**
      * @return A random valid [Fingerprint] with a random [FingerIdentifier]
      */
-    fun generateRandomFingerprint(): Fingerprint {
+    fun generateRandomFingerprint(): FingerprintSample {
         val fingerNo = RANDOM_GENERATOR.nextInt(FINGER_IDENTIFIERS.size)
         val fingerId = FINGER_IDENTIFIERS[fingerNo]
         return generateRandomFingerprint(fingerId)
@@ -53,7 +54,7 @@ object FingerprintGeneratorUtils {
      * @param fingerId Finger identifier of the fingerprint
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
-    fun generateRandomFingerprint(fingerId: FingerIdentifier): Fingerprint {
+    fun generateRandomFingerprint(fingerId: FingerIdentifier): FingerprintSample {
         val qualityScore = RANDOM_GENERATOR.nextInt(101).toByte()
         return generateRandomFingerprint(fingerId, qualityScore)
     }
@@ -65,7 +66,7 @@ object FingerprintGeneratorUtils {
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
     fun generateRandomFingerprint(fingerId: FingerIdentifier,
-                                  qualityScore: Byte): Fingerprint {
+                                  qualityScore: Byte): FingerprintSample {
         val nbMinutiae = RANDOM_GENERATOR.nextInt(128).toByte()
         val length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE
 
@@ -99,6 +100,6 @@ object FingerprintGeneratorUtils {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return Fingerprint(fingerId, templateBytes)
+        return FingerprintSample(fingerId, templateBytes, qualityScore.toPositiveInt())
     }
 }

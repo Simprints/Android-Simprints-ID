@@ -47,8 +47,15 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
             buildStep(VERIFY, this)
         }
 
-    private fun buildStep(requestCode: FingerprintRequestCode, request: FingerprintRequest): Step =
-        Step(requestCode.value, ACTIVITY_CLASS_NAME, IFingerprintRequest.BUNDLE_KEY, request, NOT_STARTED)
+    private fun buildStep(requestCode: FingerprintRequestCode, request: FingerprintRequest): Step {
+        return Step(
+            requestCode = requestCode.value,
+            activityName = ACTIVITY_CLASS_NAME,
+            bundleKey = IFingerprintRequest.BUNDLE_KEY,
+            request = request,
+            status = NOT_STARTED
+        )
+    }
 
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): FingerprintResponse? =
         if (isFingerprintResult(requestCode)) {

@@ -3,7 +3,7 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.preference.Preference
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.secure.SignerManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
@@ -17,7 +17,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     SettingsAboutContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var signerManager: SignerManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
@@ -86,7 +86,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     }
 
     override fun logout() {
-        dbManager.signOut()
+        signerManager.signOut()
         syncSchedulerHelper.cancelDownSyncWorkers()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
