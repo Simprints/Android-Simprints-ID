@@ -6,6 +6,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
+import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -16,9 +17,12 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.stopKoin
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -89,7 +93,7 @@ class PersonRepositoryTest {
         val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
         assertThat(fetch.person).isEqualTo(person)
-        assertThat(fetch.fetchedOnline).isFalse()
+        assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.LOCAL)
     }
 
     @Test
@@ -98,10 +102,12 @@ class PersonRepositoryTest {
         wheneverOnSuspend(localDataSource) { load(anyNotNull()) } thenOnBlockingReturn flowOf()
         whenever(remoteDataSource) { downloadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(person)
 
-        val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
+        val fetch = runBlocking {
+            personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
+        }
 
         assertThat(fetch.person).isEqualTo(person)
-        assertThat(fetch.fetchedOnline).isTrue()
+        assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
     }
 
 
@@ -131,6 +137,11 @@ class PersonRepositoryTest {
             projectId = subSyncScope.projectId,
             userId = subSyncScope.userId,
             moduleId = subSyncScope.moduleId)
+
+    @After
+    fun tearDown() {
+        stopKoin()
+    }
 
 
 }
