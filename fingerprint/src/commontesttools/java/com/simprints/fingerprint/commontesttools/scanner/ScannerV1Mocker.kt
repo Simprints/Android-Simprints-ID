@@ -4,7 +4,7 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGeneratorUtils
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
-import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import com.simprints.fingerprintscanner.v1.enums.UN20_STATE
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -13,7 +13,7 @@ import com.simprints.testtools.common.syntax.setupMock
 import com.simprints.testtools.common.syntax.whenThis
 import org.mockito.ArgumentMatchers.*
 
-fun createMockedScanner(also: Scanner.() -> Unit = {}): Scanner =
+fun createMockedScannerV1(also: ScannerV1.() -> Unit = {}): ScannerV1 =
     setupMock {
         makeCallbackSucceeding { connect(anyOrNull()) }
         makeCallbackSucceeding { disconnect(anyOrNull()) }
@@ -51,39 +51,39 @@ fun createMockedScanner(also: Scanner.() -> Unit = {}): Scanner =
         also(this)
     }
 
-fun Scanner.makeCallbackSucceeding(method: (Scanner) -> Unit) {
+fun ScannerV1.makeCallbackSucceeding(method: (ScannerV1) -> Unit) {
     whenThis(method) then { onMock ->
         val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
         callback?.onSuccess()
     }
 }
 
-fun Scanner.makeCallbackFailing(error: SCANNER_ERROR, method: (Scanner) -> Unit) {
+fun ScannerV1.makeCallbackFailing(error: SCANNER_ERROR, method: (ScannerV1) -> Unit) {
     whenThis(method) then { onMock ->
         val callback = onMock.arguments.find { it is ScannerCallback } as ScannerCallback?
         callback?.onFailure(error)
     }
 }
 
-fun Scanner.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
+fun ScannerV1.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
     makeScansSuccessful()
     whenThis { imageQuality } thenReturn qualityScore
     whenThis { template } thenReturn FingerprintGeneratorUtils.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
 }
 
-fun Scanner.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
+fun ScannerV1.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
     queueFinger(fingerIdentifier, DEFAULT_GOOD_IMAGE_QUALITY)
 
-fun Scanner.queueBadFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
+fun ScannerV1.queueBadFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =
     queueFinger(fingerIdentifier, DEFAULT_BAD_IMAGE_QUALITY)
 
-fun Scanner.queueFingerNotDetected() {
+fun ScannerV1.queueFingerNotDetected() {
     // SCANNER_ERROR.UN20_SDK_ERROR corresponds to no finger detected on sensor
     makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
     makeCallbackFailing(SCANNER_ERROR.UN20_SDK_ERROR) { forceCapture(anyInt(), anyOrNull()) }
 }
 
-fun Scanner.makeScansSuccessful() {
+fun ScannerV1.makeScansSuccessful() {
     makeCallbackSucceeding { startContinuousCapture(anyInt(), anyLong(), anyOrNull()) }
     makeCallbackSucceeding { forceCapture(anyInt(), anyOrNull()) }
 }

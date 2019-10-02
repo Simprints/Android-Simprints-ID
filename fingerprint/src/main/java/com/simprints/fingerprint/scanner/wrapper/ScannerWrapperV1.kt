@@ -1,14 +1,12 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.BluetoothNotSupportedException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.UnexpectedScannerException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
+import com.simprints.fingerprint.scanner.exceptions.safe.*
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.v1.ScannerCallback
@@ -19,6 +17,14 @@ import com.simprints.fingerprintscanner.v1.ButtonListener as ScannerTriggerListe
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
+
+    override val versionInformation: ScannerVersionInformation by lazy {
+        ScannerVersionInformation(
+            veroVersion = 1,
+            firmwareVersion = scannerV1.ucVersion.toInt(),
+            un20Version = scannerV1.unVersion.toInt()
+        )
+    }
 
     override fun connect(): Completable = Completable.create { result ->
         scannerV1.connect(ScannerCallbackWrapper({
@@ -71,14 +77,6 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         }))
     }
 
-    override fun getVersionInformation(): Single<ScannerVersionInformation> = Single.just(
-        ScannerVersionInformation(
-            veroVersion = 1,
-            firmwareVersion = scannerV1.ucVersion.toInt(),
-            un20Version = scannerV1.unVersion.toInt()
-        )
-    )
-
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         Single.create<CaptureFingerprintResponse> { emitter ->
             scannerV1.startContinuousCapture(qualityThreshold, timeOutMs.toLong(), continuousCaptureCallback(qualityThreshold, emitter))
@@ -109,10 +107,10 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
         )
 
     private fun handleFingerprintCaptureError(error: SCANNER_ERROR?, emitter: SingleEmitter<CaptureFingerprintResponse>) {
-        when (error) { // TODO : This error handling and catching
-            UN20_SDK_ERROR -> emitter.onError(Throwable("Finger not found")) // If no finger is detected on the sensor
-            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO -> emitter.onError(Throwable("ScannerDisconnectedException"))
-            BUSY, INTERRUPTED, TIMEOUT -> emitter.onError(Throwable("ScannerOperationInterrupted"))
+        when (error) {
+            UN20_SDK_ERROR -> emitter.onError(NoFingerDetectedException()) // If no finger is detected on the sensor
+            INVALID_STATE, SCANNER_UNREACHABLE, UN20_INVALID_STATE, OUTDATED_SCANNER_INFO -> emitter.onError(ScannerDisconnectedException())
+            BUSY, INTERRUPTED, TIMEOUT -> emitter.onError(ScannerOperationInterruptedException())
             else -> emitter.onError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
     }

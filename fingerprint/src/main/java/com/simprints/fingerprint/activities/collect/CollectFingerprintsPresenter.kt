@@ -21,11 +21,10 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.scanner.old.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.scanner.ScannerManager
 import timber.log.Timber
 import java.util.*
 import kotlin.math.min
@@ -231,9 +230,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(person))
     }
 
-    override fun handleException(simprintsException: FingerprintSimprintsException) {
-        crashReportManager.logExceptionOrSafeException(simprintsException)
-        Timber.e(simprintsException)
+    override fun handleException(e: Throwable) {
+        crashReportManager.logExceptionOrSafeException(e)
+        Timber.e(e)
         view.doLaunchAlert(FingerprintAlert.UNEXPECTED_ERROR)
     }
 

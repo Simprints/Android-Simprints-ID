@@ -19,11 +19,11 @@ import com.simprints.fingerprint.scanner.old.ScannerManager
 import com.simprints.fingerprint.scanner.old.ScannerManagerImpl
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
-import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
-import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.testtools.common.syntax.anyNotNull

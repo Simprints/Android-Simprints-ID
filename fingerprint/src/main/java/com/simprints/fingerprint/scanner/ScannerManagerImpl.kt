@@ -1,12 +1,12 @@
 package com.simprints.fingerprint.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.exceptions.safe.scanner.BluetoothNotEnabledException
-import com.simprints.fingerprint.exceptions.safe.scanner.MultipleScannersPairedException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerLowBatteryException
-import com.simprints.fingerprint.exceptions.safe.scanner.ScannerNotPairedException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.BluetoothNotSupportedException
-import com.simprints.fingerprint.exceptions.unexpected.scanner.UnknownScannerIssueException
+import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
+import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
+import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
@@ -18,6 +18,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
 
     override lateinit var scanner: ScannerWrapper
     override lateinit var lastPairedScannerId: String
+    override lateinit var lastPairedMacAddress: String
 
     override fun initScanner(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
@@ -27,6 +28,7 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
             else -> {
                 val macAddress = pairedScanners[0]
                 scanner = scannerFactory.create(macAddress)
+                lastPairedMacAddress = macAddress
                 lastPairedScannerId = ScannerUtils.convertAddressToSerial(macAddress)
                 it.onComplete()
             }

@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.exceptions.safe.scanner
+package com.simprints.fingerprint.scanner.exceptions.safe
 
 import com.simprints.fingerprint.exceptions.safe.FingerprintSafeException
 

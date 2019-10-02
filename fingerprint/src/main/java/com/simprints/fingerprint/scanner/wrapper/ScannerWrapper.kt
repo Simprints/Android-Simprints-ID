@@ -14,12 +14,11 @@ interface ScannerWrapper {
     fun sensorWakeUp(): Completable
     fun sensorShutDown(): Completable
 
-    fun getVersionInformation(): Single<ScannerVersionInformation>
-
     fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse>
 
     fun setUiIdle(): Completable
 
     fun registerTriggerListener(triggerListener: ScannerTriggerListener)
     fun unregisterTriggerListener(triggerListener: ScannerTriggerListener)
+    val versionInformation: ScannerVersionInformation
 }

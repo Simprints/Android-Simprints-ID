@@ -1,32 +1,26 @@
 package com.simprints.fingerprint.commontesttools.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.scanner.old.ScannerManager
-import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.factory.ScannerFactory
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import io.reactivex.Completable
 
-class ScannerManagerMock(override var scanner: Scanner?,
-                         override var lastPairedScannerId: String? = DEFAULT_MAC_ADDRESS) : ScannerManager {
+class ScannerManagerMock(val bluetoothAdapter: BluetoothComponentAdapter,
+                         scannerFactory: ScannerFactory,
+                         override var lastPairedScannerId: String = DEFAULT_SCANNER_ID,
+                         override var lastPairedMacAddress: String = DEFAULT_MAC_ADDRESS) : ScannerManager {
 
-    override fun start(): Completable = Completable.complete()
+    override var scanner: ScannerWrapper = scannerFactory.create(lastPairedMacAddress)
 
-    override fun disconnectVero(): Completable = Completable.complete()
-
-    override fun initVero(): Completable = Completable.complete()
-
-    override fun connectToVero(): Completable = Completable.complete()
-
-    override fun wakeUpVero(): Completable = Completable.complete()
-
-    override fun shutdownVero(): Completable = Completable.complete()
-
-    override fun resetVeroUI(): Completable = Completable.complete()
+    override fun initScanner(): Completable = Completable.complete()
 
     override fun getAlertType(it: Throwable): FingerprintAlert {
-        throw UnsupportedOperationException("Haven't implemented getAlertType in ScannerManagerMock")
+        throw UnsupportedOperationException("Haven't mocked getAlertType for $it in ScannerManagerMock")
     }
 
-    override fun disconnectScannerIfNeeded() = Unit
-
-    override fun checkBluetoothStatus(): Completable = Completable.complete()
+    override fun checkBluetoothStatus(): Completable = Completable.fromAction {
+        if (blu)
+    }
 }
