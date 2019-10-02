@@ -1,9 +1,10 @@
 package com.simprints.fingerprint.commontesttools.scanner
 
-import com.simprints.fingerprint.scanner.old.ScannerManager
-import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.testtools.common.syntax.whenThis
 
-fun ScannerManager.setupScannerManagerMockWithMockedScanner(mockedScanner: Scanner = createMockedScanner()) {
+fun ScannerManager.setupScannerManagerMockWithMockedScanner(mockedScanner: ScannerWrapper = ScannerWrapperV1(createMockedScannerV1())) {
     whenThis { scanner } thenReturn mockedScanner
 }

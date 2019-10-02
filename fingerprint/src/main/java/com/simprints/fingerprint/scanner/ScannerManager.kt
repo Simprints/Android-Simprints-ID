@@ -8,6 +8,7 @@ interface ScannerManager {
 
     var scanner: ScannerWrapper
     var lastPairedScannerId: String
+    var lastPairedMacAddress: String
 
     fun initScanner(): Completable
 

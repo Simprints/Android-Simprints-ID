@@ -25,10 +25,12 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.scanner.old.ScannerManager
-import com.simprints.fingerprint.scanner.old.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.scanner.factory.ScannerFactory
+import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.api.bluetooth.android.AndroidBluetoothAdapter
@@ -96,7 +98,8 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
-        single<ScannerManager> { ScannerManagerImpl(get()) }
+        single<ScannerFactory> { ScannerFactoryImpl(get()) }
+        single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
         factory { RunnableTaskDispatcher() }
