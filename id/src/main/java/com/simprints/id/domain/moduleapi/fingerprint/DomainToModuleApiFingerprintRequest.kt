@@ -29,7 +29,7 @@ object DomainToModuleApiFingerprintRequest {
                 logoExists,
                 organizationName,
                 programName,
-                activityTitle
+                fingerprintsToCapture.map(::fromDomainToFingerprintFingerIdentifier)
             )
         }
 
@@ -89,7 +89,7 @@ private data class FingerprintCaptureRequestImpl(
     override val logoExists: Boolean,
     override val programName: String,
     override val organizationName: String,
-    override val activityTitle: String
+    override val fingerprintsToCapture: List<IFingerIdentifier>
 ) : IFingerprintCaptureRequest
 
 @Parcelize

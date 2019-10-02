@@ -1,6 +1,7 @@
 package com.simprints.moduleapi.fingerprint.requests
 
-interface IFingerprintCaptureRequest: IFingerprintRequest {
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
-    val activityTitle: String
+interface IFingerprintCaptureRequest: IFingerprintRequest {
+    val fingerprintsToCapture: List<IFingerIdentifier>
 }
