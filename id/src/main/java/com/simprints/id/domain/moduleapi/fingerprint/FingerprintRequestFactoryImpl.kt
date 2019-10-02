@@ -29,7 +29,7 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
                 logoExists,
                 organizationName,
                 programName,
-                "activityTitle" // TODO: set correct activity title
+                emptyList() // TODO: set correct value
             )
         }
 
