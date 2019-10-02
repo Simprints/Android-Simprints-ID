@@ -26,13 +26,13 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
         setContentView(R.layout.activity_long_consent)
 
         initActionBar()
-        setTextInLayiout()
+        setTextInLayout()
 
         viewPresenter = LongConsentPresenter(this, component)
         viewPresenter.start()
     }
 
-    private fun setTextInLayiout() {
+    private fun setTextInLayout() {
         with(androidResourcesHelper) {
             longConsent_downloadButton.text = getString(R.string.long_consent_download_button_text)
             longConsent_noPrivacyNoticeText.text = getString(R.string.long_consent_no_privacy_notice_found_text)
@@ -44,7 +44,7 @@ class LongConsentActivity : AppCompatActivity(), LongConsentContract.View {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setTitle(R.string.privacy_notice_title)
+        supportActionBar?.title = androidResourcesHelper.getString(R.string.privacy_notice_title)
     }
 
     override fun onSupportNavigateUp(): Boolean {
