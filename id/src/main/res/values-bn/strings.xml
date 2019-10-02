@@ -269,6 +269,7 @@
     <string name="simprints_logo">সিমপ্রিন্টস লোগো</string>
     <string name="title_activity_settings">সেটিংস</string>
     <string name="title_activity_settings_about">সম্বন্ধে</string>
+    <string name="privacy_notice_title">গোপনীয়তা নোটিশ</string>
 
 
 </resources>
