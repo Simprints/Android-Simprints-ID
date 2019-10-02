@@ -39,21 +39,29 @@
     <!-- Consent Text -->
     <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your records. If that\'s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
-    <string name="consent_enrol_only">I\'d like to use your fingerprints to enrol you in %1$s.&#160;</string>
-    <string name="consent_enrol">I\'d like to use your fingerprints to enrol you in %1$s and identify you in the future.&#160;</string>
-    <string name="consent_id_verify">I\'d like to use your fingerprints to find your records for %1$s.&#160;</string>
-    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
-    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
+    <string name="consent_enrol_only">I\'d like to %1$s to enrol you in %2$s.&#160;</string>
+    <string name="consent_enrol">I\'d like to %1$s to enrol you in %2$s and identify you in the future.&#160;</string>
+    <string name="consent_id_verify">I\'d like to %1$s to find your records for %2$s.&#160;</string>
+    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.&#160;</string>
+    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your %2$s and current location.&#160;</string>
     <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
     <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
-    <string name="consent_confirmation">May I use your fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
-    <string name="consent_parental_enrol_only">I\'d like to use your child\'s fingerprints to enrol them in %1$s.&#160;</string>
-    <string name="consent_parental_enrol">I\'d like to use your child\'s fingerprints to enrol them in %1$s and identify them in the future.&#160;</string>
-    <string name="consent_parental_id_verify">I\'d like to use your child\'s fingerprints to find their records for %1$s.&#160;</string>
-    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
-    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
+    <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+
+    <string name="consent_parental_enrol_only">I\'d like to %1$s to enrol them in %2$s.&#160;</string>
+    <string name="consent_parental_enrol">I\'d like to %1$s to enrol them in %1$s and identify them in the future.&#160;</string>
+    <string name="consent_parental_id_verify">I\'d like to %1$s to find their records for %2$s.&#160;</string>
+    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.&#160;</string>
+    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.&#160;</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
-    <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+    <string name="consent_parental_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
+
+    <string name="biometrics_general_fingerprint">use your fingerprints</string>
+    <string name="biometric_general_face">take your photographs</string>
+    <string name="biometrics_general_access_fingerprint">fingerprint information</string>
+    <string name="biometrics_general_access_face">photographs</string>
+    <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
+    <string name="biometrics_parental_face">take your child\'s photographs</string>
     <!-- Loading Messages-->
     <string name="connect_scanner_loading">Loading</string>
     <string name="updating_database">Updating project database…</string>
