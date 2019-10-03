@@ -3,7 +3,8 @@ package com.simprints.id.orchestrator.cache.crypto.response
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.cache.model.Fingerprint
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -39,10 +40,15 @@ class FingerprintCaptureResponseEncoderAndroidTest {
 
     private fun mockFingerprintCaptureResponse(): FingerprintCaptureResponse {
         val fingerprints = listOf(
-            Fingerprint(
+            FingerprintCaptureResult(
                 IFingerIdentifier.RIGHT_THUMB,
-                "template".toByteArray(),
-                qualityScore = 3
+                FingerprintSample(
+                    "id",
+                    IFingerIdentifier.RIGHT_THUMB,
+                    qualityScore = 3,
+                    template = "template".toByteArray(),
+                    imageRef = null
+                )
             )
         )
         return FingerprintCaptureResponse(fingerprints)
@@ -50,9 +56,9 @@ class FingerprintCaptureResponseEncoderAndroidTest {
 
     private fun verifyResponses(originalResponse: FingerprintCaptureResponse,
                                 processedResponse: FingerprintCaptureResponse) {
-        processedResponse.fingerprints.forEachIndexed { index, processedFingerprint ->
-            val originalTemplate = originalResponse.fingerprints[index].template
-            val processedTemplate = processedFingerprint.template
+        processedResponse.captureResult.forEachIndexed { index, processedFingerprint ->
+            val originalTemplate = originalResponse.captureResult[index].sample?.template
+            val processedTemplate = processedFingerprint.sample?.template
             assertThat(processedTemplate, not(equalTo(originalTemplate)))
         }
     }

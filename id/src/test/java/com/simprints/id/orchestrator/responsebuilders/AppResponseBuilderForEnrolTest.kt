@@ -10,8 +10,9 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.tools.model.IFingerprintImpl
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
@@ -122,10 +123,15 @@ class AppResponseBuilderForEnrolTest {
             request = request,
             result = FingerprintCaptureResponse(
                 listOf(
-                    IFingerprintImpl(
-                        fingerId = IFingerIdentifier.LEFT_THUMB,
-                        template = "template".toByteArray(),
-                        qualityScore = 10
+                    FingerprintCaptureResult(
+                        IFingerIdentifier.LEFT_THUMB,
+                        FingerprintSample(
+                            "id",
+                            IFingerIdentifier.LEFT_THUMB,
+                            qualityScore = 10,
+                            template = "template".toByteArray(),
+                            imageRef = null
+                        )
                     )
                 )
             ),
