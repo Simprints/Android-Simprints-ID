@@ -25,13 +25,15 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
     }
 
     private fun StringBuilder.appendTextForParentalEnrol(context: Context) {
-        if (parentalConsentOptions.consentParentEnrolOnly) {
-            append(context.getString(R.string.consent_parental_enrol_only)
-                .format(getModalitySpecificUseCaseText(context), programName))
-        }
-        if (parentalConsentOptions.consentParentEnrol) {
-            append(context.getString(R.string.consent_parental_enrol)
-                .format(getModalitySpecificUseCaseText(context), programName))
+        with (parentalConsentOptions) {
+            if (consentParentEnrolOnly) {
+                append(context.getString(R.string.consent_parental_enrol_only)
+                    .format(getModalitySpecificUseCaseText(context), programName))
+            }
+            if (consentParentEnrol) {
+                append(context.getString(R.string.consent_parental_enrol)
+                    .format(getModalitySpecificUseCaseText(context), programName))
+            }
         }
     }
 
@@ -43,22 +45,24 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
     }
 
     private fun StringBuilder.extractDataSharingOptions(context: Context) {
-        if (parentalConsentOptions.consentParentShareDataNo) {
-            append(context.getString(R.string.consent_parental_share_data_no))
-        }
-        if (parentalConsentOptions.consentParentShareDataYes) {
-            append(context.getString(R.string.consent_parental_share_data_yes)
-                .format(organizationName, getModalitySpecificAccessText(context)))
-        }
-        if (parentalConsentOptions.consentCollectYes) {
-            append(context.getString(R.string.consent_collect_yes))
-        }
-        if (parentalConsentOptions.consentParentPrivacyRights) {
-            append(context.getString(R.string.consent_parental_privacy_rights))
-        }
-        if (parentalConsentOptions.consentParentConfirmation) {
-            append(context.getString(R.string.consent_parental_confirmation)
-                .format(getModalitySpecificUseCaseText(context)))
+        with (parentalConsentOptions) {
+            if (consentParentShareDataNo) {
+                append(context.getString(R.string.consent_parental_share_data_no))
+            }
+            if (consentParentShareDataYes) {
+                append(context.getString(R.string.consent_parental_share_data_yes)
+                    .format(organizationName, getModalitySpecificAccessText(context)))
+            }
+            if (consentCollectYes) {
+                append(context.getString(R.string.consent_collect_yes))
+            }
+            if (consentParentPrivacyRights) {
+                append(context.getString(R.string.consent_parental_privacy_rights))
+            }
+            if (consentParentConfirmation) {
+                append(context.getString(R.string.consent_parental_confirmation)
+                    .format(getModalitySpecificUseCaseText(context)))
+            }
         }
     }
 
