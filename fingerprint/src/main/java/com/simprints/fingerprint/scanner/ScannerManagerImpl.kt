@@ -1,9 +1,6 @@
 package com.simprints.fingerprint.scanner
 
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
-import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
-import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
@@ -21,9 +18,21 @@ import io.reactivex.Single
 class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter,
                          private val scannerFactory: ScannerFactory) : ScannerManager {
 
-    override lateinit var scanner: ScannerWrapper
+    override var scanner: ScannerWrapper? = null
     override var lastPairedScannerId: String? = null
     override var lastPairedMacAddress: String? = null
+
+    override fun <T> onScanner(method: ScannerWrapper.() -> T): T =
+        delegateToScannerOrThrow(method)
+
+    override fun scanner(method: ScannerWrapper.() -> Completable): Completable =
+        Completable.defer { delegateToScannerOrThrow(method) }
+
+    override fun <T> scanner(method: ScannerWrapper.() -> Single<T>): Single<T> =
+        Single.defer { delegateToScannerOrThrow(method)}
+
+    private fun <T> delegateToScannerOrThrow(method: ScannerWrapper.() -> T) =
+        scanner?.method() ?: throw NullScannerException()
 
     override fun initScanner(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
@@ -39,46 +48,6 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
             }
         }
     }
-
-    override fun connect(): Completable = delegateCompletableToScannerOrError { connect() }
-
-    override fun disconnectIfNecessary(): Completable =
-        if (::scanner.isInitialized) {
-            scanner.disconnect()
-        } else {
-            Completable.complete()
-        }
-
-    override fun sensorWakeUp(): Completable = delegateCompletableToScannerOrError { sensorWakeUp() }
-
-    override fun sensorShutDown(): Completable = delegateCompletableToScannerOrError{ sensorShutDown() }
-
-    override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        delegateSingleToScannerOrError { captureFingerprint(timeOutMs, qualityThreshold) }
-
-    override fun setUiIdle(): Completable = delegateCompletableToScannerOrError { setUiIdle() }
-
-    override fun registerTriggerListener(triggerListener: ScannerTriggerListener) =
-        delegateToScannerOrThrow { registerTriggerListener(triggerListener) }
-
-    override fun unregisterTriggerListener(triggerListener: ScannerTriggerListener) =
-        delegateToScannerOrThrow { unregisterTriggerListener(triggerListener) }
-
-    override val versionInformation: ScannerVersionInformation
-        get() = delegateToScannerOrThrow { versionInformation }
-
-    private fun <T> delegateToScannerOrThrow(method: ScannerWrapper.() -> T) =
-        if (::scanner.isInitialized) {
-            scanner.method()
-        } else {
-            throw NullScannerException()
-        }
-
-    private fun delegateCompletableToScannerOrError(method: ScannerWrapper.() -> Completable) =
-        Completable.defer { delegateToScannerOrThrow(method) }
-
-    private fun <T> delegateSingleToScannerOrError(method: ScannerWrapper.() -> Single<T>) =
-        Single.defer { delegateToScannerOrThrow(method)}
 
     override fun checkBluetoothStatus(): Completable = Completable.create {
         if (!bluetoothIsEnabled()) {

@@ -64,11 +64,11 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun startListeners() {
-        scannerManager.registerTriggerListener(scannerTriggerListener)
+        scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
     }
 
     fun stopListeners() {
-        scannerManager.unregisterTriggerListener(scannerTriggerListener)
+        scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
     }
 
     private fun initTimeoutBar(): TimeoutBar =
@@ -85,24 +85,24 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     @SuppressLint("CheckResult")
     fun reconnect() {
-        scannerManager.unregisterTriggerListener(scannerTriggerListener)
+        scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
         (view as Activity).runOnUiThreadIfStillRunning {
             view.un20WakeupDialog.show()
         }
 
-        scannerManager.disconnectIfNecessary()
+        scannerManager.scanner { disconnect() }
             .andThen(scannerManager.checkBluetoothStatus())
             .andThen(scannerManager.initScanner())
-            .andThen(scannerManager.connect())
-            .andThen(scannerManager.setUiIdle())
-            .andThen(scannerManager.sensorShutDown())
-            .andThen(scannerManager.sensorWakeUp())
+            .andThen(scannerManager.scanner { connect() })
+            .andThen(scannerManager.scanner { setUiIdle() })
+            .andThen(scannerManager.scanner { sensorShutDown() })
+            .andThen(scannerManager.scanner { sensorWakeUp() })
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(onComplete = {
                 Timber.d("reconnect.onSuccess()")
                 view.un20WakeupDialog.dismiss()
-                scannerManager.registerTriggerListener(scannerTriggerListener)
+                scannerManager.onScanner { registerTriggerListener(scannerTriggerListener) }
             }, onError = {
                 it.printStackTrace()
                 Timber.d("reconnect.onError()")
@@ -135,7 +135,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     private fun resetUIFromError() {
         currentFingerStatus = NOT_COLLECTED
         presenter.currentFinger().template = null
-        scannerManager.setUiIdle()
+        scannerManager.scanner { setUiIdle() }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -174,7 +174,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         presenter.refreshDisplay()
         view.timeoutBar.startTimeoutBar()
         scanningTask?.dispose()
-        scanningTask = scannerManager.captureFingerprint(timeoutInMillis, qualityThreshold)
+        scanningTask = scannerManager.scanner<CaptureFingerprintResponse> { captureFingerprint(timeoutInMillis, qualityThreshold) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -230,15 +230,15 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun resetScannerUi() {
-        scannerManager.setUiIdle().doInBackground()
+        scannerManager.scanner { setUiIdle() }.doInBackground()
     }
 
     fun stopReconnecting() {
-        scannerManager.disconnectIfNecessary().doInBackground()
+        scannerManager.scanner { disconnect() }.doInBackground()
     }
 
     fun disconnectScannerIfNeeded() {
-        scannerManager.disconnectIfNecessary().doInBackground()
+        scannerManager.scanner { disconnect() }.doInBackground()
     }
 
     fun setCurrentFingerAsSkippedAndAsNumberOfBadScansToAutoAddFinger() {
