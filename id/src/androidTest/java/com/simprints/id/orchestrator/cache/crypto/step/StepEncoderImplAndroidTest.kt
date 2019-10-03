@@ -13,7 +13,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptur
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
-import com.simprints.id.orchestrator.cache.model.Fingerprint
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.*

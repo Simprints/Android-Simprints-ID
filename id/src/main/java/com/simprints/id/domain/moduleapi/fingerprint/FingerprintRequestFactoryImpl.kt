@@ -29,7 +29,12 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
                 logoExists,
                 organizationName,
                 programName,
-                emptyList() // TODO: set correct value
+                fingerStatus.mapNotNull {
+                    if (it.value)
+                        buildFingerprintFingerIdentifier(it.key)
+                    else
+                        null
+                }
             )
         }
 

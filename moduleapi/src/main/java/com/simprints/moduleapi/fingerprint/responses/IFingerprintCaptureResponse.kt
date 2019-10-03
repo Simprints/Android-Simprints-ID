@@ -1,6 +1,7 @@
 package com.simprints.moduleapi.fingerprint.responses
 
-interface IFingerprintCaptureResponse: IFingerprintResponse {
+import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
 
-    val fingerprints: List<IFingerprint>
+interface IFingerprintCaptureResponse: IFingerprintResponse {
+    val captureResult: List<IFingerprintCaptureResult>
 }

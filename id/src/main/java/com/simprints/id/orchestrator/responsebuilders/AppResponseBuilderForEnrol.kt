@@ -10,6 +10,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
@@ -118,9 +119,12 @@ class AppResponseBuilderForEnrol(
         private fun extractFingerprintSamples(
             fingerprintResponse: FingerprintCaptureResponse
         ): List<FingerprintSample> {
-            return fingerprintResponse.fingerprints.map {
-                val fingerId = it.fingerId.fromModuleApiToDomain()
-                FingerprintSample(fingerId, it.template, it.qualityScore)
+            return fingerprintResponse.captureResult.mapNotNull { captureResult ->
+                val fingerId = captureResult.identifier.fromModuleApiToDomain()
+                captureResult.sample?.let { sample ->
+                    val imageRef = sample.imageRef?.fromModuleApiToDomain()
+                    FingerprintSample(fingerId, sample.template, sample.qualityScore, imageRef)
+                }
             }
         }
 

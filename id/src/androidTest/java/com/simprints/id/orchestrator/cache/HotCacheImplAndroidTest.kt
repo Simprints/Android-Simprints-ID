@@ -106,7 +106,7 @@ class HotCacheImplAndroidTest {
         true,
         "programmeName",
         "organisationName",
-        "activityTitle"
+        emptyList()
     )
 
 }

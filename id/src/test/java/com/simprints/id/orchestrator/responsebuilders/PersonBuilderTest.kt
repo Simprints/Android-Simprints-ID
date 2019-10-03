@@ -6,8 +6,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.model.IFingerprintImpl
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
@@ -26,7 +27,7 @@ class PersonBuilderTest {
         val fingerprintResponse = mockFingerprintResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, null, timeHelper)
-        val expectedFingerprints = fingerprintResponse.fingerprints
+        val expectedFingerprints = fingerprintResponse.captureResult
 
         with(person) {
             assertThat(projectId, `is`(request.projectId))
@@ -35,9 +36,11 @@ class PersonBuilderTest {
             assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
             fingerprintSamples.forEachIndexed { index, actualSample ->
                 val expectedSample = expectedFingerprints[index]
-                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.fingerId.toString()))
-                assertThat(actualSample.template.contentEquals(expectedSample.template), `is`(true))
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.qualityScore))
+                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                expectedSample.sample?.template?.let { expectedTemplate ->
+                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                }
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
             }
             assertThat(faceSamples, `is`(emptyList()))
         }
@@ -76,7 +79,7 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
-        val expectedFingerprints = fingerprintResponse.fingerprints
+        val expectedFingerprints = fingerprintResponse.captureResult
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 val imageRef = it.result?.imageRef
@@ -91,9 +94,11 @@ class PersonBuilderTest {
             assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
             fingerprintSamples.forEachIndexed { index, actualSample ->
                 val expectedSample = expectedFingerprints[index]
-                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.fingerId.toString()))
-                assertThat(actualSample.template.contentEquals(expectedSample.template), `is`(true))
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.qualityScore))
+                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                expectedSample.sample?.template?.let { expectedTemplate ->
+                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                }
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
             }
             faceSamples.forEachIndexed { index, faceSample ->
                 assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
@@ -118,11 +123,19 @@ class PersonBuilderTest {
 
     private fun mockFingerprintResponse(): FingerprintCaptureResponse {
         val fingerId = IFingerIdentifier.LEFT_THUMB
-        val template = "fingerprint".toByteArray()
-        val fingerprints = listOf(
-            IFingerprintImpl(fingerId, template, qualityScore = 10)
+        val captureResult = listOf(
+            FingerprintCaptureResult(
+                fingerId,
+                FingerprintSample(
+                    "id",
+                    fingerId,
+                    imageRef = null,
+                    qualityScore = 10,
+                    template = "template".toByteArray()
+                )
+            )
         )
-        return FingerprintCaptureResponse(fingerprints)
+        return FingerprintCaptureResponse(captureResult)
     }
 
     private fun mockFaceResponse(): FaceCaptureResponse {

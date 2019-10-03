@@ -3,7 +3,8 @@ package com.simprints.id.tools
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.cache.model.Fingerprint
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.MatcherAssert.assertThat
@@ -81,29 +82,36 @@ class ParcelableConverterTest {
         true,
         "programmeName",
         "organisationName",
-        "activityTitle"
+        emptyList()
     )
 
     private fun mockResult(): Step.Result {
-        val fingerprints = listOf(
-            Fingerprint(
+        val captureResult = listOf(
+            FingerprintCaptureResult(
                 IFingerIdentifier.RIGHT_THUMB,
-                "template".toByteArray(),
-                qualityScore = 3
+                FingerprintSample(
+                    "id",
+                    IFingerIdentifier.RIGHT_THUMB,
+                    imageRef = null,
+                    qualityScore = 4,
+                    template = "template".toByteArray()
+                )
             )
         )
-        return FingerprintCaptureResponse(fingerprints)
+        return FingerprintCaptureResponse(captureResult)
     }
 
     private fun verifyResult(actual: Step.Result?, expected: Step.Result) {
         assertThat(actual, instanceOf(FingerprintCaptureResponse::class.java))
         require(actual is FingerprintCaptureResponse && expected is FingerprintCaptureResponse)
-        assertThat(actual.fingerprints.size, `is`(expected.fingerprints.size))
-        actual.fingerprints.forEachIndexed { index, actualFingerprint ->
-            val expectedFingerprint = expected.fingerprints[index]
-            assertThat(actualFingerprint.template.contentEquals(expectedFingerprint.template), `is`(true))
-            assertThat(actualFingerprint.fingerId, `is`(expectedFingerprint.fingerId))
-            assertThat(actualFingerprint.qualityScore, `is`(expectedFingerprint.qualityScore))
+        assertThat(actual.captureResult.size, `is`(expected.captureResult.size))
+        actual.captureResult.forEachIndexed { index, actualFingerprint ->
+            val expectedFingerprint = expected.captureResult[index]
+            expectedFingerprint.sample?.template?.let { expectedTemplate ->
+                assertThat(actualFingerprint.sample?.template?.contentEquals(expectedTemplate), `is`(true))
+            }
+            assertThat(actualFingerprint.identifier, `is`(expectedFingerprint.identifier))
+            assertThat(actualFingerprint.sample?.qualityScore, `is`(expectedFingerprint.sample?.qualityScore))
         }
     }
 
