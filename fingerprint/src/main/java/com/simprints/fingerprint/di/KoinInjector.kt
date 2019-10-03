@@ -31,6 +31,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.api.bluetooth.android.AndroidBluetoothAdapter
@@ -98,7 +99,8 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
-        single<ScannerFactory> { ScannerFactoryImpl(get()) }
+        single { ScannerUiHelper() }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
