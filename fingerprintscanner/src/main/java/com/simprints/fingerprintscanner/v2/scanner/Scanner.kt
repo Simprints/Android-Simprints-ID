@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import android.bluetooth.BluetoothSocket
+import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
@@ -43,15 +43,15 @@ class Scanner(
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
 
-    private lateinit var socket: BluetoothSocket
+    private lateinit var socket: BluetoothComponentSocket
 
     private val disposables = mutableListOf<Disposable>()
 
-    override fun connect(socket: BluetoothSocket) {
+    override fun connect(socket: BluetoothComponentSocket) {
         this.socket = socket
         this.socket.connect()
-        messageInputStream.connect(socket.inputStream)
-        messageOutputStream.connect(socket.outputStream)
+        messageInputStream.connect(socket.getInputStream())
+        messageOutputStream.connect(socket.getOutputStream())
         state.connected = true
         state.triggerButtonActive = true
         disposables.add(subscribeTriggerButtonListeners())
@@ -91,6 +91,16 @@ class Scanner(
             .firstOrError()
             .ignoreElement()
             .doOnComplete { state.un20On = true }
+
+    fun turnUn20OffAndAwaitStateChangeEvent(): Completable =
+        sendCommandAndReceiveResponse<SetUn20OnResponse>(
+            SetUn20OnCommand(DigitalValue.FALSE)
+        ).ignoreElement()
+            .andThen(messageInputStream.veroEvents)
+            .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
+            .firstOrError()
+            .ignoreElement()
+            .doOnComplete { state.un20On = false }
 
     private fun assertUn20On() = Completable.fromAction {
         if (state.un20On != true) {

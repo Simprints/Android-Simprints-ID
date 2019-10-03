@@ -1,9 +1,9 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import android.bluetooth.BluetoothSocket
+import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
 
 interface Connectable {
 
-    fun connect(socket: BluetoothSocket)
+    fun connect(socket: BluetoothComponentSocket)
     fun disconnect()
 }

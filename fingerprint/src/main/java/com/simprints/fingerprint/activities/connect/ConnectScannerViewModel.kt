@@ -19,7 +19,6 @@ import com.simprints.fingerprintscanner.v1.ScannerUtils.convertAddressToSerial
 import io.reactivex.Completable
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
-import timber.log.Timber
 
 class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashReportManager,
                               private val scannerManager: ScannerManager,

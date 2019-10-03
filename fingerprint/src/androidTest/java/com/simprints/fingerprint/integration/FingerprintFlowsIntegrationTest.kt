@@ -49,7 +49,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
         acquireFingerprintKoinModules()
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager())
         declare {
-            single<ScannerFactory> { ScannerFactoryImpl(simulatedBluetoothAdapter) }
+            single<ScannerFactory> { ScannerFactoryImpl(simulatedBluetoothAdapter, get()) }
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }
             factory { dbManagerMock }
         }
