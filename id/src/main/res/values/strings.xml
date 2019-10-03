@@ -58,10 +58,12 @@
 
     <string name="biometrics_general_fingerprint">use your fingerprints</string>
     <string name="biometric_general_face">take your photographs</string>
-    <string name="biometrics_general_access_fingerprint">fingerprint information</string>
-    <string name="biometrics_general_access_face">photographs</string>
+    <string name="biometrics_access_fingerprint">fingerprint information</string>
+    <string name="biometrics_access_face">photographs</string>
     <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
     <string name="biometrics_parental_face">take your child\'s photographs</string>
+
+    <string name="biometric_concat_modalities">and</string>
     <!-- Loading Messages-->
     <string name="connect_scanner_loading">Loading</string>
     <string name="updating_database">Updating project database…</string>

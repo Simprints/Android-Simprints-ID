@@ -33,7 +33,7 @@ class FaceOrchestratorViewModel : ViewModel() {
         faceRequest = request
     }
 
-    // TODO capture the correct number of photos the interface requests when integrating the face modality in full
+    // TODO capture the correct number of photos the interface requests when integrating the face modalities in full
     private fun captureNeededPhotos(faceCaptureRequest: FaceCaptureRequest) {
         startCapture.send()
     }

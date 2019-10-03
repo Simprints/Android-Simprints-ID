@@ -39,7 +39,7 @@ class ConsentRepositoryImpl(private val context: Context,
 
     private fun getGeneralConsentData() =
         GeneralConsentDataGenerator(getGeneralConsentOptions(),
-            programName, organizationName, modalities.first())
+            programName, organizationName, modalities)
 
     private fun getGeneralConsentOptions() = try {
         JsonHelper.gson.fromJson(consentLocalDataSource.generalConsentOptionsJson, GeneralConsentOptions::class.java)
@@ -51,7 +51,7 @@ class ConsentRepositoryImpl(private val context: Context,
     private fun getParentalConsentData() =
         ParentalConsentDataGenerator(consentLocalDataSource.parentalConsentExists,
             getParentalConsentOptions(),
-            programName, organizationName, modalities.first())
+            programName, organizationName, modalities)
 
     private fun getParentalConsentOptions() = try {
         JsonHelper.gson.fromJson(consentLocalDataSource.parentalConsentOptionsJson, ParentalConsentOptions::class.java)
