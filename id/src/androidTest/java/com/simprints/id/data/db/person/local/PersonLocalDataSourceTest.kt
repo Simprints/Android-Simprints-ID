@@ -11,16 +11,17 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecords
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.Serializable
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -152,6 +153,19 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
             assertThat(fingerprintRecord[2].personId).isEqualTo(fakePerson2.patientId)
             assertThat(fingerprintRecord[3].personId).isEqualTo(fakePerson2.patientId)
         }
+    }
+
+    @Test
+    fun givenInvalidSerializableQuery_aThrowableIsThrown() = runBlocking {
+        val fingerprintRecordLocalDataSource =  (personLocalDataSource as FingerprintRecordLocalDataSource)
+        try {
+            fingerprintRecordLocalDataSource.loadFingerprintRecords(object : Serializable {} )
+            fail("no InvalidQueryToLoadRecords thrown")
+        } catch (t: Throwable) {
+            assertThat(t).isInstanceOf(InvalidQueryToLoadRecords::class.java)
+            return@runBlocking
+        }
+
     }
 
     @Test
