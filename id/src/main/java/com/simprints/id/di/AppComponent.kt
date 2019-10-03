@@ -10,6 +10,7 @@ import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromInten
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity
 import com.simprints.id.activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherPresenter
 import com.simprints.id.activities.consent.ConsentActivity
+import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
@@ -18,10 +19,9 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.debug.DebugViewModel
-import com.simprints.id.activities.coreexitform.CoreExitFormActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
-import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
+import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentPresenter
@@ -34,6 +34,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.FingerprintRecordLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -117,6 +118,7 @@ interface AppComponent {
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository
+    fun getFingerprintRecordLocalDataSource(): FingerprintRecordLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getSimNetworkUtils(): SimNetworkUtils
