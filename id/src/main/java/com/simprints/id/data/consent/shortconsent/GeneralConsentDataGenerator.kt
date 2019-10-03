@@ -24,13 +24,15 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
     }
 
     private fun StringBuilder.appendTextForConsentEnrol(context: Context) {
-        if (generalConsentOptions.consentEnrolOnly) {
-            append(context.getString(R.string.consent_enrol_only)
-                .format(getModalitySpecificUseCaseText(context), programName))
-        }
-        if (generalConsentOptions.consentEnrol) {
-            append(context.getString(R.string.consent_enrol)
-                .format(getModalitySpecificUseCaseText(context), programName))
+        with (generalConsentOptions) {
+            if (consentEnrolOnly) {
+                append(context.getString(R.string.consent_enrol_only)
+                    .format(getModalitySpecificUseCaseText(context), programName))
+            }
+            if (consentEnrol) {
+                append(context.getString(R.string.consent_enrol)
+                    .format(getModalitySpecificUseCaseText(context), programName))
+            }
         }
     }
 
@@ -42,23 +44,25 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
     }
 
     private fun StringBuilder.filterForDataSharingOptions(context: Context) {
-        if (generalConsentOptions.consentShareDataNo) {
-            append(context.getString(R.string.consent_share_data_no)
-                .format(getModalitySpecificAccessText(context)))
-        }
-        if (generalConsentOptions.consentShareDataYes) {
-            append(context.getString(R.string.consent_share_data_yes)
-                .format(organizationName, getModalitySpecificAccessText(context)))
-        }
-        if (generalConsentOptions.consentCollectYes) {
-            append(context.getString(R.string.consent_collect_yes))
-        }
-        if (generalConsentOptions.consentPrivacyRights) {
-            append(context.getString(R.string.consent_privacy_rights))
-        }
-        if (generalConsentOptions.consentConfirmation) {
-            append(context.getString(R.string.consent_confirmation)
-                .format(getModalitySpecificUseCaseText(context)))
+        with (generalConsentOptions) {
+            if (consentShareDataNo) {
+                append(context.getString(R.string.consent_share_data_no)
+                    .format(getModalitySpecificAccessText(context)))
+            }
+            if (consentShareDataYes) {
+                append(context.getString(R.string.consent_share_data_yes)
+                    .format(organizationName, getModalitySpecificAccessText(context)))
+            }
+            if (consentCollectYes) {
+                append(context.getString(R.string.consent_collect_yes))
+            }
+            if (consentPrivacyRights) {
+                append(context.getString(R.string.consent_privacy_rights))
+            }
+            if (consentConfirmation) {
+                append(context.getString(R.string.consent_confirmation)
+                    .format(getModalitySpecificUseCaseText(context)))
+            }
         }
     }
 
