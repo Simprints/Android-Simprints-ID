@@ -12,6 +12,6 @@ interface ScannerManager {
 
     fun initScanner(): Completable
 
-    fun getAlertType(it: Throwable): FingerprintAlert
+    fun getAlertType(e: Throwable): FingerprintAlert
     fun checkBluetoothStatus(): Completable
 }
