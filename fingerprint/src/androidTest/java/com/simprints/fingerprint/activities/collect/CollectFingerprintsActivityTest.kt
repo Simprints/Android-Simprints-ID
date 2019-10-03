@@ -17,6 +17,7 @@ import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
+import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -33,7 +34,7 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class CollectFingerprintsActivityTest: KoinTest {
+class CollectFingerprintsActivityTest : KoinTest {
 
     private lateinit var scenario: ActivityScenario<CollectFingerprintsActivity>
 
@@ -50,7 +51,10 @@ class CollectFingerprintsActivityTest: KoinTest {
 
         declare {
             factory { scannerFactoryMock }
-            factory<ScannerManager> { ScannerManagerImpl(get(), scannerFactoryMock) }
+            factory<ScannerManager> {
+                ScannerManagerImpl(DummyBluetoothAdapter(), scannerFactoryMock)
+                    .also { it.scanner = scanner }
+            }
         }
     }
 
