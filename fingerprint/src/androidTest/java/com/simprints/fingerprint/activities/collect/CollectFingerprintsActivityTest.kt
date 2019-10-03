@@ -9,13 +9,14 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
-import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -43,19 +44,19 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     private fun mockScannerManagerWithScanner(scanner: ScannerWrapper) {
 
-        val scannerFactory = setupMock<ScannerFactory> {
+        val scannerFactoryMock = setupMock<ScannerFactory> {
             whenThis { create(anyNotNull()) } thenReturn scanner
         }
 
         declare {
-            factory { scannerFactory }
-            factory<ScannerManager> { ScannerManagerMock(scanner) }
+            factory { scannerFactoryMock }
+            factory<ScannerManager> { ScannerManagerImpl(get(), scannerFactoryMock) }
         }
     }
 
     @Test
     fun twoGoodScansAndThenConfirm_finishesWithCorrectResult() {
-        mockScannerManagerWithScanner(createMockedScannerV1())
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -74,7 +75,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun twoGoodScansAndThenRestart_restartsToBeginning() {
-        mockScannerManagerWithScanner(createMockedScannerV1())
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -91,7 +92,7 @@ class CollectFingerprintsActivityTest: KoinTest {
     @Test
     fun mixedScansAndThenConfirm_finishesWithCorrectResult() {
         val scanner = createMockedScannerV1()
-        mockScannerManagerWithScanner(scanner)
+        mockScannerManagerWithScanner(ScannerWrapperV1(scanner))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -140,7 +141,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun onlySkippedFingers_pressConfirm_notAllowedToContinue() {
-        mockScannerManagerWithScanner(createMockedScannerV1())
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -166,7 +167,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
-        mockScannerManagerWithScanner(createMockedScannerV1 { queueBadFinger() })
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueBadFinger() }))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -183,7 +184,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun threeBadScansAndMaxReached_shouldNotAddAFinger() {
-        mockScannerManagerWithScanner(createMockedScannerV1 { queueBadFinger() })
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueBadFinger() }))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 
@@ -203,7 +204,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
-        mockScannerManagerWithScanner(createMockedScannerV1 { queueFingerNotDetected() })
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueFingerNotDetected() }))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -218,7 +219,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
-        mockScannerManagerWithScanner(createMockedScannerV1())
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
 
@@ -233,7 +234,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
     @Test
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
-        mockScannerManagerWithScanner(createMockedScannerV1())
+        mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
         scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
 

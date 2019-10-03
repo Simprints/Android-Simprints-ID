@@ -7,8 +7,8 @@ import io.reactivex.Completable
 interface ScannerManager {
 
     var scanner: ScannerWrapper
-    var lastPairedScannerId: String
-    var lastPairedMacAddress: String
+    var lastPairedScannerId: String?
+    var lastPairedMacAddress: String?
 
     fun initScanner(): Completable
 

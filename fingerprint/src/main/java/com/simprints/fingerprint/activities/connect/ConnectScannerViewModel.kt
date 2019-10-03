@@ -117,9 +117,9 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         progress.postValue(computeProgress(7))
         message.postValue(R.string.connect_scanner_finished)
         vibrate.postValue(Unit)
-        preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress)
+        preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress ?: "")
         preferencesManager.lastScannerVersion = scannerManager.scanner.versionInformation.firmwareVersion.toString()
-        analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress, scannerManager.lastPairedScannerId)
+        analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress?: "", scannerManager.lastPairedScannerId ?: "")
         finish.postValue(Unit)
     }
 
@@ -141,8 +141,8 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
                 ScannerConnectionEvent(
                     timeHelper.now(),
                     ScannerConnectionEvent.ScannerInfo(
-                        lastPairedScannerId,
-                        lastPairedMacAddress,
+                        lastPairedScannerId ?: "",
+                        lastPairedMacAddress ?: "",
                         scanner.versionInformation.toString())))
         }
     }
