@@ -1,5 +1,5 @@
 package com.simprints.moduleapi.fingerprint.responses
 
-interface IFingerprintMatchResponse {
+interface IFingerprintMatchResponse: IFingerprintResponse {
     val result: List<IFingerprintMatchResult>
 }
