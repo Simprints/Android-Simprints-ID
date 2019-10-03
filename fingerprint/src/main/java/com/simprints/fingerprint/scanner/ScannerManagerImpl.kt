@@ -45,8 +45,8 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
 
     private fun bluetoothIsEnabled() = ScannerUtils.isBluetoothEnabled(bluetoothAdapter)
 
-    override fun getAlertType(it: Throwable): FingerprintAlert =
-        when (it) {
+    override fun getAlertType(e: Throwable): FingerprintAlert =
+        when (e) {
             is BluetoothNotEnabledException -> FingerprintAlert.BLUETOOTH_NOT_ENABLED
             is BluetoothNotSupportedException -> FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
             is MultipleScannersPairedException -> FingerprintAlert.MULTIPLE_PAIRED_SCANNERS

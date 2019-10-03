@@ -9,18 +9,19 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.MediumTest
 import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityViewModel
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_MAC_ADDRESS
+import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_SCANNER_ID
 import com.simprints.fingerprint.commontesttools.scanner.ScannerWrapperMock
 import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.exceptions.safe.BluetoothNotEnabledException
 import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
@@ -42,7 +43,6 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-@MediumTest
 class ConnectScannerActivityAndroidTest: KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -196,7 +196,13 @@ class ConnectScannerActivityAndroidTest: KoinTest {
     }
 
     private fun makeInitVeroStepSucceeding() {
-        whenever(scannerManagerSpy) { initScanner() } thenReturn Completable.complete()
+        whenever(scannerManagerSpy) { initScanner() } then {
+            (it.mock as ScannerManager).apply {
+                lastPairedMacAddress = DEFAULT_MAC_ADDRESS
+                lastPairedScannerId = DEFAULT_SCANNER_ID
+            }
+            Completable.complete()
+        }
     }
 
     private fun makeConnectToVeroStepSucceeding() {
