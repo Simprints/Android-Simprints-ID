@@ -14,16 +14,13 @@ import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.scanner.ScannerManager
 import com.simprints.fingerprint.scanner.ScannerManagerImpl
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.failTest
-import com.simprints.testtools.common.syntax.setupMock
-import com.simprints.testtools.common.syntax.whenThis
+import com.simprints.testtools.common.syntax.mock
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -44,16 +41,9 @@ class CollectFingerprintsActivityTest : KoinTest {
     }
 
     private fun mockScannerManagerWithScanner(scanner: ScannerWrapper) {
-
-        val scannerFactoryMock = setupMock<ScannerFactory> {
-            whenThis { create(anyNotNull()) } thenReturn scanner
-        }
-
         declare {
-            factory { scannerFactoryMock }
             factory<ScannerManager> {
-                ScannerManagerImpl(DummyBluetoothAdapter(), scannerFactoryMock)
-                    .also { it.scanner = scanner }
+                ScannerManagerImpl(DummyBluetoothAdapter(), mock()).also { it.scanner = scanner }
             }
         }
     }

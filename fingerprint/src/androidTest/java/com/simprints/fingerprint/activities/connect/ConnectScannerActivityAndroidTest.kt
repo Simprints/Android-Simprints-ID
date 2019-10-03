@@ -16,7 +16,6 @@ import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRe
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_MAC_ADDRESS
 import com.simprints.fingerprint.commontesttools.scanner.DEFAULT_SCANNER_ID
 import com.simprints.fingerprint.commontesttools.scanner.ScannerWrapperMock
-import com.simprints.fingerprint.commontesttools.scanner.setupScannerManagerMockWithMockedScanner
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
@@ -27,10 +26,12 @@ import com.simprints.fingerprint.scanner.exceptions.safe.MultipleScannersPairedE
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerLowBatteryException
 import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
-import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprintscannermock.dummy.DummyBluetoothAdapter
 import com.simprints.id.Application
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.anyNotNull
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.spy
+import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.hamcrest.CoreMatchers.containsString
@@ -43,17 +44,16 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-class ConnectScannerActivityAndroidTest: KoinTest {
+class ConnectScannerActivityAndroidTest : KoinTest {
 
     @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
-    private val scannerWrapperSpy = spy(ScannerWrapperMock())
-    private val scannerFactoryMock: ScannerFactory = setupMock {
-        whenThis { create(anyNotNull()) } thenReturn scannerWrapperSpy
-    }
-    private val scannerManagerSpy: ScannerManager = spy(ScannerManagerImpl(DummyBluetoothAdapter(), scannerFactoryMock))
+    private val scannerWrapperMock = ScannerWrapperMock()
+    private val scannerManagerSpy: ScannerManager = spy(
+        ScannerManagerImpl(DummyBluetoothAdapter(), mock())
+    )
     private val dbManagerMock: FingerprintDbManager = mock()
 
     @Before
@@ -64,7 +64,6 @@ class ConnectScannerActivityAndroidTest: KoinTest {
             factory { dbManagerMock }
         }
         mockDefaultDbManager()
-        scannerManagerSpy.setupScannerManagerMockWithMockedScanner(scannerWrapperSpy)
     }
 
     private fun mockDefaultDbManager() {
@@ -200,17 +199,18 @@ class ConnectScannerActivityAndroidTest: KoinTest {
             (it.mock as ScannerManager).apply {
                 lastPairedMacAddress = DEFAULT_MAC_ADDRESS
                 lastPairedScannerId = DEFAULT_SCANNER_ID
+                scanner = scannerWrapperMock
             }
             Completable.complete()
         }
     }
 
     private fun makeConnectToVeroStepSucceeding() {
-        whenever(scannerManagerSpy.scanner) { connect() } thenReturn Completable.complete()
+        whenever(scannerManagerSpy) { connect() } thenReturn Completable.complete()
     }
 
     private fun makeResetVeroUIStepSucceeding() {
-        whenever(scannerManagerSpy.scanner) { setUiIdle() } thenReturn Completable.complete()
+        whenever(scannerManagerSpy) { setUiIdle() } thenReturn Completable.complete()
     }
 
     private fun makeInitVeroStepFailing(e: Exception) {
@@ -218,15 +218,15 @@ class ConnectScannerActivityAndroidTest: KoinTest {
     }
 
     private fun makeConnectToVeroStepFailing(e: Exception) {
-        whenever(scannerManagerSpy.scanner) { connect() } thenReturn Completable.error(e)
+        whenever(scannerManagerSpy) { connect() } thenReturn Completable.error(e)
     }
 
     private fun makeResetVeroUIStepFailing(e: Exception) {
-        whenever(scannerManagerSpy.scanner) { setUiIdle() } thenReturn Completable.error(e)
+        whenever(scannerManagerSpy) { setUiIdle() } thenReturn Completable.error(e)
     }
 
     private fun makeWakeUpVeroStepFailing(e: Exception) {
-        whenever(scannerManagerSpy.scanner) { sensorWakeUp() } thenReturn Completable.error(e)
+        whenever(scannerManagerSpy) { sensorWakeUp() } thenReturn Completable.error(e)
     }
 
     @After

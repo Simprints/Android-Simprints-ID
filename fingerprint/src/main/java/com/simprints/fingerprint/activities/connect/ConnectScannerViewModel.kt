@@ -58,7 +58,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     private fun disconnectVero() =
         veroTask(computeProgress(1), R.string.connect_scanner_bt_connect, "ScannerManager: disconnect",
-            scannerManager.scanner.disconnect())
+            scannerManager.disconnectIfNecessary())
 
     private fun checkIfBluetoothIsEnabled() =
         veroTask(computeProgress(2), R.string.connect_scanner_bt_connect, "ScannerManager: bluetooth is enabled",
@@ -70,18 +70,18 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
 
     private fun connectToVero() =
         veroTask(computeProgress(4), R.string.connect_scanner_bt_connect, "ScannerManager: connectToVero",
-            scannerManager.scanner.connect()) { addBluetoothConnectivityEvent() }
+            scannerManager.connect()) { addBluetoothConnectivityEvent() }
 
     private fun resetVeroUI() =
         veroTask(computeProgress(5), R.string.connect_scanner_setup, "ScannerManager: resetVeroUI",
-            scannerManager.scanner.setUiIdle())
+            scannerManager.setUiIdle())
 
     private fun wakeUpVero() =
         veroTask(computeProgress(6), R.string.connect_scanner_wake_un20, "ScannerManager: wakeUpVero",
-            scannerManager.scanner.sensorWakeUp()) { updateBluetoothConnectivityEventWithVeroInfo() }
+            scannerManager.sensorWakeUp()) { updateBluetoothConnectivityEventWithVeroInfo() }
 
     private fun updateBluetoothConnectivityEventWithVeroInfo() {
-        scannerManager.scanner.let {
+        scannerManager.let {
             sessionEventsManager.updateHardwareVersionInScannerConnectivityEvent(it.versionInformation.firmwareVersion.toString())
         }
     }
@@ -118,7 +118,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
         message.postValue(R.string.connect_scanner_finished)
         vibrate.postValue(Unit)
         preferencesManager.lastScannerUsed = convertAddressToSerial(scannerManager.lastPairedMacAddress ?: "")
-        preferencesManager.lastScannerVersion = scannerManager.scanner.versionInformation.firmwareVersion.toString()
+        preferencesManager.lastScannerVersion = scannerManager.versionInformation.firmwareVersion.toString()
         analyticsManager.logScannerProperties(scannerManager.lastPairedMacAddress?: "", scannerManager.lastPairedScannerId ?: "")
         finish.postValue(Unit)
     }
@@ -143,7 +143,7 @@ class ConnectScannerViewModel(private val crashReportManager: FingerprintCrashRe
                     ScannerConnectionEvent.ScannerInfo(
                         lastPairedScannerId ?: "",
                         lastPairedMacAddress ?: "",
-                        scanner.versionInformation.toString())))
+                        versionInformation.toString())))
         }
     }
 
