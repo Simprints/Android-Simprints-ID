@@ -47,7 +47,8 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
     private fun StringBuilder.extractDataSharingOptions(context: Context) {
         with (parentalConsentOptions) {
             if (consentParentShareDataNo) {
-                append(context.getString(R.string.consent_parental_share_data_no))
+                append(context.getString(R.string.consent_parental_share_data_no)
+                    .format(getModalitySpecificAccessText(context)))
             }
             if (consentParentShareDataYes) {
                 append(context.getString(R.string.consent_parental_share_data_yes)
