@@ -49,7 +49,7 @@
     <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
 
     <string name="consent_parental_enrol_only">I\'d like to %1$s to enrol them in %2$s.&#160;</string>
-    <string name="consent_parental_enrol">I\'d like to %1$s to enrol them in %1$s and identify them in the future.&#160;</string>
+    <string name="consent_parental_enrol">I\'d like to %1$s to enrol them in %2$s and identify them in the future.&#160;</string>
     <string name="consent_parental_id_verify">I\'d like to %1$s to find their records for %2$s.&#160;</string>
     <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.&#160;</string>
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.&#160;</string>
