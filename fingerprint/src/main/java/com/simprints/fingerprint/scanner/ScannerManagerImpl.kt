@@ -17,8 +17,8 @@ class ScannerManagerImpl(private val bluetoothAdapter: BluetoothComponentAdapter
                          private val scannerFactory: ScannerFactory) : ScannerManager {
 
     override lateinit var scanner: ScannerWrapper
-    override lateinit var lastPairedScannerId: String
-    override lateinit var lastPairedMacAddress: String
+    override var lastPairedScannerId: String? = null
+    override var lastPairedMacAddress: String? = null
 
     override fun initScanner(): Completable = Completable.create {
         val pairedScanners = ScannerUtils.getPairedScanners(bluetoothAdapter)
