@@ -3,58 +3,87 @@ package com.simprints.id.orchestrator.cache
 import android.content.SharedPreferences
 import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.tools.extensions.save
 
 class HotCacheImpl(private val preferences: SharedPreferences,
                    private val stepEncoder: StepEncoder) : HotCache {
 
-    private val memoryCache = arrayListOf<String>()
+    private val memoryCache = linkedMapOf<String, String>()
 
     override fun save(step: Step) {
-        val stepNotInCache = memoryCache.none { cachedStep ->
-            cachedStep.contains(step.id)
-        }
-
-        if (stepNotInCache) {
-            addStepToCache(step)
-        } else {
-            val cachedStepString = memoryCache.find { cachedStep -> cachedStep.contains(step.id) }
-            memoryCache.remove(cachedStepString)
-            addStepToCache(step)
+        stepEncoder.encode(step).also { encodedStep ->
+            saveEncodedStep(step.id, encodedStep)
         }
     }
 
+    private fun saveEncodedStep(id: String, encodedStep: String) {
+        memoryCache[id] = encodedStep
+        saveEncodedStepInSharedPrefs(id, encodedStep)
+
+        updateStepIdsInSharedPrefsFromMemoryCache()
+    }
+
     override fun load(): List<Step> {
-        val preferencesCache = loadFromPreferences()
+        loadMemoryCacheIfNeeded()
 
-        val cache = if (memoryCache.isEmpty() && preferencesCache.isNotEmpty())
-            memoryCache.apply { addAll(preferencesCache) }
-        else
-            memoryCache
+        return memoryCache.values.map {
+            stepEncoder.decode(it)
+        }
+    }
 
-        return cache.map {
-            val encodedStepWithoutId = it.split(SEPARATOR).last()
-            stepEncoder.decode(encodedStepWithoutId)
+    private fun loadMemoryCacheIfNeeded() {
+        if (memoryCache.isEmpty()) {
+            loadStepIdsFromSharedPrefs()?.forEach {
+                loadEncodedStepFromSharedPrefs(it)?.let { stepEncoded ->
+                    memoryCache[it] = stepEncoded
+                }
+            }
         }
     }
 
     override fun clear() {
-        preferences.edit().putStringSet(KEY_STEPS, null).apply()
+        loadStepIdsFromSharedPrefs()?.forEach {
+            saveEncodedStepInSharedPrefs(it, null)
+        }
+        clearStepIdsInSharedPrefs()
         memoryCache.clear()
     }
 
-    private fun addStepToCache(step: Step) {
-        stepEncoder.encode(step).also { encodedStep ->
-            val encodedStepWithId = "${step.id}$SEPARATOR$encodedStep"
-            memoryCache.add(encodedStepWithId)
-            preferences.edit()?.putStringSet(KEY_STEPS, memoryCache.toSet())?.apply()
+    /**
+     * load/save steps ids from shared prefs
+     */
+    private fun loadStepIdsFromSharedPrefs() =
+        preferences.getStringSet(KEY_STEPS, setOf())
+
+
+    private fun clearStepIdsInSharedPrefs() {
+        saveInSharedPrefs { it.putStringSet(KEY_STEPS, setOf()) }
+    }
+
+    private fun updateStepIdsInSharedPrefsFromMemoryCache() {
+        saveInSharedPrefs { it.putStringSet(KEY_STEPS, memoryCache.keys) }
+    }
+
+
+    /**
+     * load/save steps from shared prefs
+     */
+    private fun loadEncodedStepFromSharedPrefs(stepId: String) =
+        preferences.getString("${KEY_STEPS}_$stepId", null)
+
+
+    private fun saveEncodedStepInSharedPrefs(stepId: String, encodedStep: String?) {
+        saveInSharedPrefs { it.putString("${KEY_STEPS}_$stepId", encodedStep) }
+    }
+
+
+    private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> SharedPreferences.Editor) {
+        with(preferences) {
+            save(transaction)
         }
     }
 
-    private fun loadFromPreferences() = preferences.getStringSet(KEY_STEPS, setOf())!!.toList()
-
     private companion object {
         const val KEY_STEPS = "steps"
-        const val SEPARATOR = "£#£"
     }
-
 }
