@@ -54,7 +54,7 @@ class HotCacheImpl(private val preferences: SharedPreferences,
 
     private companion object {
         const val KEY_STEPS = "steps"
-        const val SEPARATOR = '#'
+        const val SEPARATOR = "£#£"
     }
 
 }
