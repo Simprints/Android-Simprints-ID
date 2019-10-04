@@ -3,6 +3,7 @@ package com.simprints.face.activities.orchestrator
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.simprints.core.livedata.LiveDataEvent
+import com.simprints.core.livedata.LiveDataEventWithContent
 import com.simprints.core.livedata.send
 import com.simprints.face.data.moduleapi.face.DomainToFaceResponse
 import com.simprints.face.data.moduleapi.face.FaceToDomainRequest
@@ -14,7 +15,6 @@ import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
 import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.core.livedata.LiveDataEventWithContent
 import java.util.*
 
 class FaceOrchestratorViewModel : ViewModel() {
@@ -33,7 +33,7 @@ class FaceOrchestratorViewModel : ViewModel() {
         faceRequest = request
     }
 
-    // TODO capture the correct number of photos the interface requests when integrating the face modalities in full
+    // TODO capture the correct number of photos the interface requests when integrating the face modality in full
     private fun captureNeededPhotos(faceCaptureRequest: FaceCaptureRequest) {
         startCapture.send()
     }
