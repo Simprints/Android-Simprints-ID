@@ -2,8 +2,7 @@ package com.simprints.moduleapi.fingerprint.requests
 
 import java.io.Serializable
 
-class IFingerprintMatchRequest: FingerprintRequest(
-    val probeFingerprintSamples: List<FingerprintSample>,
+interface IFingerprintMatchRequest : IFingerprintRequest {
+    val probeFingerprintSamples: List<IFingerprintSample>
     val queryForCandidates: Serializable
-)
-
+}
