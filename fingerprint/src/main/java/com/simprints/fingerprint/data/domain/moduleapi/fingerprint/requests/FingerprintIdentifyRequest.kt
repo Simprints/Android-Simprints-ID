@@ -4,14 +4,14 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FingerprintIdentifyRequest(override val projectId: String,
-                                      override val userId: String,
-                                      override val moduleId: String,
-                                      override val metadata: String,
+data class FingerprintIdentifyRequest(val projectId: String,
+                                      val userId: String,
+                                      val moduleId: String,
+                                      val metadata: String,
                                       override val language: String,
                                       override val fingerStatus: Map<FingerIdentifier, Boolean>,
-                                      override val logoExists: Boolean,
-                                      override val organizationName: String,
-                                      override val programName: String,
+                                      val logoExists: Boolean,
+                                      val organizationName: String,
+                                      val programName: String,
                                       val matchGroup: MatchGroup,
                                       val returnIdCount: Int) : FingerprintRequest

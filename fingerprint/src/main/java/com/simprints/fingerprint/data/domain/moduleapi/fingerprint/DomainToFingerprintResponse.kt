@@ -1,11 +1,13 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import android.os.Parcelable
+import com.simprints.fingerprint.activities.collect.models.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.responses.*
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -15,7 +17,10 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintErrorResponse(error: FingerprintErrorResponse): IFingerprintErrorResponse =
         IFingerprintErrorResponseImpl(fromFingerprintErrorReasonToErrorResponse(error.reason))
 
-    fun fromDomainToFingerprintEnrolResponse(enrol: FingerprintEnrolResponse): IFingerprintEnrolResponse = IFingerprintEnrolResponseImpl(enrol.guid)
+    fun fromDomainToFingerprintCaptureResponse(capture: FingerprintCaptureResponse): IFingerprintCaptureResponse =
+        IFingerprintCaptureResponseImpl(capture.fingerprints.map {
+            IFingerprintImpl(it.fingerId.fromDomainToModuleApi(), it.templateBytes, it.qualityScore)
+        })
 
     fun fromDomainToFingerprintVerifyResponse(verify: FingerprintVerifyResponse): IFingerprintVerifyResponse {
         val matchingResult = IMatchingResultImpl(verify.guid, verify.confidence, toIFingerprintResponseTier(verify.tier))
@@ -68,8 +73,8 @@ private class IFingerprintErrorResponseImpl(override val error: IFingerprintErro
 }
 
 @Parcelize
-private class IFingerprintEnrolResponseImpl(override val guid: String) : IFingerprintEnrolResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.ENROL
+private class IFingerprintCaptureResponseImpl(override val fingerprints: List<IFingerprint>) : IFingerprintCaptureResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
 }
 
 @Parcelize
@@ -95,3 +100,9 @@ private data class IMatchingResultImpl(
     override val guid: String,
     override val confidence: Int,
     override val tier: IFingerprintResponseTier) : Parcelable, IMatchingResult
+
+@Parcelize
+private class IFingerprintImpl(
+    override val fingerId: IFingerIdentifier,
+    override val template: ByteArray,
+    override val qualityScore: Int) : IFingerprint

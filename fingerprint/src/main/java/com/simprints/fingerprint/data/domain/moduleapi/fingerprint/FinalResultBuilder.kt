@@ -38,11 +38,11 @@ class FinalResultBuilder {
             ))
         })
 
-    fun createEnrolResult(collectFingerprintsTaskResult: CollectFingerprintsTaskResult) =
+    fun createCaptureResult(collectFingerprintsTaskResult: CollectFingerprintsTaskResult): FinalResult =
         FinalResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintEnrolResponse(
-                FingerprintEnrolResponse(collectFingerprintsTaskResult.probe.patientId))
-            )
+            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintCaptureResponse(
+                FingerprintCaptureResponse(collectFingerprintsTaskResult.fingerprints)
+            ))
         })
 
     fun createIdentifyResult(matchingTaskIdentifyResult: MatchingTaskIdentifyResult) =

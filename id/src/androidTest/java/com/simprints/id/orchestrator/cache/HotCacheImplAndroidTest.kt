@@ -3,7 +3,7 @@ package com.simprints.id.orchestrator.cache
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
 import com.simprints.id.orchestrator.steps.Step
 import org.hamcrest.CoreMatchers.`is`
@@ -96,7 +96,7 @@ class HotCacheImplAndroidTest {
         status = Step.Status.ONGOING
     )
 
-    private fun mockRequest() = FingerprintEnrolRequest(
+    private fun mockRequest() = FingerprintCaptureRequest(
         "projectId",
         "userId",
         "moduleId",
@@ -105,7 +105,8 @@ class HotCacheImplAndroidTest {
         mapOf(),
         true,
         "programmeName",
-        "organisationName"
+        "organisationName",
+        emptyList()
     )
 
 }

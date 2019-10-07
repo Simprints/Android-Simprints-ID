@@ -1,23 +1,23 @@
 package com.simprints.id.tools
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class ParcelableConverterTest {
 
     private lateinit var converter: ParcelableConverter
-
-    private val guid = UUID.randomUUID().toString()
 
     @Test
     fun withParcelableInput_shouldConvertToByteArray() {
@@ -43,7 +43,7 @@ class ParcelableConverterTest {
         assertThat(step.bundleKey, `is`(BUNDLE_KEY))
         assertThat(step.request, `is`(request))
         assertThat(step.getStatus(), `is`(Step.Status.COMPLETED))
-        assertThat(step.result, `is`(result))
+        verifyResult(step.getResult(), result)
     }
 
     @After
@@ -72,19 +72,48 @@ class ParcelableConverterTest {
         )
     }
 
-    private fun mockRequest(): Step.Request = FingerprintEnrolRequest(
+    private fun mockRequest(): Step.Request = FingerprintCaptureRequest(
         "projectId",
         "userId",
         "moduleId",
         "metadata",
         "language",
-        mapOf(),
+        emptyMap(),
         true,
         "programmeName",
-        "organisationName"
+        "organisationName",
+        emptyList()
     )
 
-    private fun mockResult(): Step.Result = FingerprintEnrolResponse(guid)
+    private fun mockResult(): Step.Result {
+        val captureResult = listOf(
+            FingerprintCaptureResult(
+                IFingerIdentifier.RIGHT_THUMB,
+                FingerprintSample(
+                    "id",
+                    IFingerIdentifier.RIGHT_THUMB,
+                    imageRef = null,
+                    qualityScore = 4,
+                    template = "template".toByteArray()
+                )
+            )
+        )
+        return FingerprintCaptureResponse(captureResult)
+    }
+
+    private fun verifyResult(actual: Step.Result?, expected: Step.Result) {
+        assertThat(actual, instanceOf(FingerprintCaptureResponse::class.java))
+        require(actual is FingerprintCaptureResponse && expected is FingerprintCaptureResponse)
+        assertThat(actual.captureResult.size, `is`(expected.captureResult.size))
+        actual.captureResult.forEachIndexed { index, actualFingerprint ->
+            val expectedFingerprint = expected.captureResult[index]
+            expectedFingerprint.sample?.template?.let { expectedTemplate ->
+                assertThat(actualFingerprint.sample?.template?.contentEquals(expectedTemplate), `is`(true))
+            }
+            assertThat(actualFingerprint.identifier, `is`(expectedFingerprint.identifier))
+            assertThat(actualFingerprint.sample?.qualityScore, `is`(expectedFingerprint.sample?.qualityScore))
+        }
+    }
 
     companion object {
         private const val REQUEST_CODE = 123

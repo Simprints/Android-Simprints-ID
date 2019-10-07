@@ -1,4 +1,4 @@
-package com.simprints.moduleapi.fingerprint.requests
+package com.simprints.moduleapi.fingerprint
 
 enum class IFingerIdentifier {
     RIGHT_5TH_FINGER,

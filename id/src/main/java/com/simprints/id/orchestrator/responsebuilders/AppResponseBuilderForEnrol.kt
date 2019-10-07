@@ -3,13 +3,15 @@ package com.simprints.id.orchestrator.responsebuilders
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.fromModuleApiToDomain
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.fromModuleApiToDomain
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.EnrolmentHelper
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.TimeHelper
@@ -29,7 +31,7 @@ class AppResponseBuilderForEnrol(
         }
 
         val request = appRequest as AppEnrolRequest
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceCaptureResponse(results)
         val fingerprintResponse = getFingerprintCaptureResponse(results)
 
@@ -45,12 +47,12 @@ class AppResponseBuilderForEnrol(
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
         results.filterIsInstance(FaceCaptureResponse::class.java).lastOrNull()
 
-    private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintEnrolResponse? =
-        results.filterIsInstance(FingerprintEnrolResponse::class.java).lastOrNull()
+    private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintCaptureResponse? =
+        results.filterIsInstance(FingerprintCaptureResponse::class.java).lastOrNull()
 
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,
-                        fingerprintResponse: FingerprintEnrolResponse?,
+                        fingerprintResponse: FingerprintCaptureResponse?,
                         faceResponse: FaceCaptureResponse?,
                         timeHelper: TimeHelper): Person {
             return when {
@@ -70,17 +72,13 @@ class AppResponseBuilderForEnrol(
             }
         }
 
-        private fun buildAppEnrolResponseForFingerprintAndFace(fingerprintResponse: FingerprintEnrolResponse,
-                                                           faceResponse: FaceCaptureResponse) =
-        AppEnrolResponse(fingerprintResponse.guid)
-
-
         private fun buildPersonFromFingerprintAndFace(request: AppEnrolRequest,
-                                                      fingerprintResponse: FingerprintEnrolResponse,
+                                                      fingerprintResponse: FingerprintCaptureResponse,
                                                       faceResponse: FaceCaptureResponse,
                                                       timeHelper: TimeHelper): Person {
+            val patientId = UUID.randomUUID().toString()
             return Person(
-                fingerprintResponse.guid,
+                patientId,
                 request.projectId,
                 request.userId,
                 request.moduleId,
@@ -91,10 +89,11 @@ class AppResponseBuilderForEnrol(
         }
 
         private fun buildPersonFromFingerprint(request: AppEnrolRequest,
-                                               fingerprintResponse: FingerprintEnrolResponse,
+                                               fingerprintResponse: FingerprintCaptureResponse,
                                                timeHelper: TimeHelper): Person {
+            val patientId = UUID.randomUUID().toString()
             return Person(
-                fingerprintResponse.guid,
+                patientId,
                 request.projectId,
                 request.userId,
                 request.moduleId,
@@ -117,9 +116,16 @@ class AppResponseBuilderForEnrol(
             )
         }
 
-        private fun extractFingerprintSamples(fingerprintResponse: FingerprintEnrolResponse): List<FingerprintSample> {
-            // TODO: awaiting implementation on fingerprint side
-            return emptyList()
+        private fun extractFingerprintSamples(
+            fingerprintResponse: FingerprintCaptureResponse
+        ): List<FingerprintSample> {
+            return fingerprintResponse.captureResult.mapNotNull { captureResult ->
+                val fingerId = captureResult.identifier.fromModuleApiToDomain()
+                captureResult.sample?.let { sample ->
+                    val imageRef = sample.imageRef?.fromModuleApiToDomain()
+                    FingerprintSample(fingerId, sample.template, sample.qualityScore, imageRef)
+                }
+            }
         }
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {

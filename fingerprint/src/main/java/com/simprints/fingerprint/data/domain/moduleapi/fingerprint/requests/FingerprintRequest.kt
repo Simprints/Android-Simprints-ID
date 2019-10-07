@@ -8,13 +8,6 @@ interface FingerprintRequest : Parcelable {
         const val BUNDLE_KEY = "FingerprintRequest"
     }
 
-    val projectId: String
-    val userId: String
-    val moduleId: String
-    val metadata: String
     val language: String
     val fingerStatus: Map<FingerIdentifier, Boolean>
-    val logoExists: Boolean
-    val programName: String
-    val organizationName: String
 }

@@ -10,7 +10,7 @@ import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 
-abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
+abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRequest) {
 
     protected var taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
@@ -41,13 +41,6 @@ abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
                     taskResults[REFUSED] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
                 }
             }
-        }
-    }
-
-    fun handleRunnableTaskResult(taskResult: TaskResult) {
-        (getCurrentTask() as FingerprintTask.RunnableTask).apply {
-            taskResults[taskResultKey] = taskResult
-            currentTaskIndex++
         }
     }
 

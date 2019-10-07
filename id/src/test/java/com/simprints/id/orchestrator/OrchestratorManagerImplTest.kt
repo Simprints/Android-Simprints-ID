@@ -200,7 +200,7 @@ class OrchestratorManagerImplTest {
         response?.let {
             mockSteps.firstOrNull { step ->
                 step.getStatus() == ONGOING
-            }?.result = it.fromModuleApiToDomain()
+            }?.setResult(it.fromModuleApiToDomain())
         }
 
         runBlockingTest {

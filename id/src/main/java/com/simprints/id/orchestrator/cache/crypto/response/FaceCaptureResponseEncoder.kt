@@ -13,25 +13,23 @@ class FaceCaptureResponseEncoder(
     override fun process(response: Step.Result?, operation: Operation): Step.Result? {
         require(response is FaceCaptureResponse)
 
-        val capturingResult = arrayListOf<FaceCaptureResult>()
-        response.capturingResult.forEach {
-            it.also { item ->
-                item.result?.template?.let { template ->
-                    val tmpTemplateString = String(template)
-                    val processedTemplate = when (operation) {
-                        Operation.ENCODE -> keystoreManager.encryptString(tmpTemplateString)
-                        Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
-                    }.toByteArray()
+        val capturingResult = response.capturingResult.mapNotNull { item ->
+            item.result?.template?.let { template ->
+                val tmpTemplateString = String(template)
+                val processedTemplate = when (operation) {
+                    Operation.ENCODE -> keystoreManager.encryptString(tmpTemplateString)
+                    Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
+                }.toByteArray()
 
-                    val faceId = item.result.faceId
-                    val imageRef = item.result.imageRef
-                    val faceSample = FaceCaptureSample(faceId, processedTemplate, imageRef)
-                    capturingResult.add(item.copy(result = faceSample))
-                }
+                val index = item.index
+                val faceId = item.result.faceId
+                val imageRef = item.result.imageRef
+                val faceCaptureSample = FaceCaptureSample(faceId, processedTemplate, imageRef)
+                FaceCaptureResult(index, faceCaptureSample)
             }
         }
 
-        return response.copy(capturingResult = capturingResult)
+        return FaceCaptureResponse(capturingResult)
     }
 
 }

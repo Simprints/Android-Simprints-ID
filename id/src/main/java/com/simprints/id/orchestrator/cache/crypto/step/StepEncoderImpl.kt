@@ -2,10 +2,10 @@ package com.simprints.id.orchestrator.cache.crypto.step
 
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.cache.crypto.response.BypassEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.FaceCaptureResponseEncoder
-import com.simprints.id.orchestrator.cache.crypto.response.FingerprintEnrolResponseEncoder
+import com.simprints.id.orchestrator.cache.crypto.response.FingerprintCaptureResponseEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.Operation
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.ParcelableConverter
@@ -30,14 +30,14 @@ class StepEncoderImpl(private val keystoreManager: KeystoreManager) : StepEncode
     }
 
     private fun processStep(step: Step, operation: Operation): Step {
-        val result = step.result
-        return step.also {
+        val result = step.getResult()
+        return step.apply {
             val responseEncoder = when (result) {
-                is FingerprintEnrolResponse -> FingerprintEnrolResponseEncoder(keystoreManager)
+                is FingerprintCaptureResponse -> FingerprintCaptureResponseEncoder(keystoreManager)
                 is FaceCaptureResponse -> FaceCaptureResponseEncoder(keystoreManager)
                 else -> BypassEncoder(keystoreManager)
             }
-            it.result = responseEncoder.process(result, operation)
+            setResult(responseEncoder.process(result, operation))
         }
     }
 
