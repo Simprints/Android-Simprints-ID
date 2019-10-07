@@ -5,8 +5,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
 class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
