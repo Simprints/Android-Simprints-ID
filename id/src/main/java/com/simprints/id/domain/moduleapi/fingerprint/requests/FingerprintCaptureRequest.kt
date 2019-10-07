@@ -1,18 +1,23 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FingerprintCaptureRequest(
-    val projectId: String,
-    val userId: String,
-    val moduleId: String,
-    val metadata: String,
-    val language: String,
-    val fingerStatus: Map<FingerprintFingerIdentifier, Boolean>,
-    val logoExists: Boolean,
-    val programName: String,
-    val organizationName: String,
-    val fingerprintsToCapture: List<FingerprintFingerIdentifier>
+    val fingerprintsToCapture: List<FingerIdentifier>
 ) : FingerprintRequest
+
+fun FingerprintCaptureRequest.fromDomainToModuleApi(): IFingerprintCaptureRequest =
+    FingerprintCaptureRequestImpl(
+        fingerprintsToCapture.map { it.fromDomainToModuleApi() }
+    )
+
+
+@Parcelize
+private data class FingerprintCaptureRequestImpl(
+    override val fingerprintsToCapture: List<IFingerIdentifier>
+) : IFingerprintCaptureRequest

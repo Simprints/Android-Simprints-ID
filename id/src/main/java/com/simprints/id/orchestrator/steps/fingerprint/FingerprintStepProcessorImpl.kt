@@ -3,7 +3,6 @@ package com.simprints.id.orchestrator.steps.fingerprint
 import android.content.Intent
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
-import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
 import com.simprints.id.orchestrator.steps.Step
