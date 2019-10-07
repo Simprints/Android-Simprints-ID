@@ -11,8 +11,23 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import com.simprints.core.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import com.simprints.core.tools.LanguageHelper
+import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.orchestrator.Orchestrator
+import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
+import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
+import com.simprints.id.Application
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
@@ -27,21 +42,28 @@ class MatchingActivity : FingerprintActivity() {
 
     private lateinit var matchingRequest: MatchingTaskRequest
 
+    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
+    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
+    @Inject lateinit var timeHelper: FingerprintTimeHelper
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
-        LanguageHelper.setLanguage(this, matchingRequest.language)
-
         setContentView(R.layout.activity_matching)
+        setTextInLayout()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         observeResult()
         observeProgress()
         observeTextViewUpdates()
         observeErrorHandlingCases()
+    }
+
+    private fun setTextInLayout() {
+        matching_please_wait.text = androidResourcesHelper.getString(R.string.please_wait)
     }
 
     override fun onResume() {
@@ -128,4 +150,6 @@ class MatchingActivity : FingerprintActivity() {
     override fun onBackPressed() {
         viewModel.handleBackPressed()
     }
+
+    override fun onBackPressed() {}
 }

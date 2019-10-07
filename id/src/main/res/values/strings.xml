@@ -421,6 +421,8 @@
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
     <string name="title_activity_exit_form">ExitFormActivity</string>
+    <string name="preferences_general_key">preferences_general</string>
+    <string name="preferences_app_details_key">app_details_key</string>
 
     <!--Exit form-->
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
