@@ -9,3 +9,4 @@ data class FingerprintMatchRequest(
     val probeFingerprintSamples: List<FingerprintSample>,
     val queryForCandidates: Serializable
 ) : FingerprintRequest
+
