@@ -17,7 +17,7 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
             return it
         }
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceResponseForVerify(results)
         val fingerprintResponse = getFingerprintResponseForVerify(results)
 

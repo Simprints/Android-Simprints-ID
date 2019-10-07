@@ -10,7 +10,6 @@ import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsT
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprintscanner.Scanner
@@ -246,7 +245,7 @@ class CollectFingerprintsActivityTest: KoinTest {
         private const val DEFAULT_USER_ID = "some_user_id"
         private const val DEFAULT_MODULE_ID = "some_module_id"
         private const val DEFAULT_LANGUAGE = "en"
-        private val DEFAULT_ACTION = Action.ENROL
+        private val DEFAULT_ACTIVITY_TITLE = "Enrolment"
         private val FINGER_STATUS_TWO_FINGERS = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
@@ -274,7 +273,7 @@ class CollectFingerprintsActivityTest: KoinTest {
 
         private fun collectTaskRequest(fingerStatus: Map<FingerIdentifier, Boolean>) =
             CollectFingerprintsTaskRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID,
-                DEFAULT_ACTION, DEFAULT_LANGUAGE, fingerStatus)
+                DEFAULT_ACTIVITY_TITLE, DEFAULT_LANGUAGE, fingerStatus)
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, CollectFingerprintsActivity::class.qualifiedName!!)

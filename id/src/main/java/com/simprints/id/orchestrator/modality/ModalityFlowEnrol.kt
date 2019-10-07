@@ -46,6 +46,6 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         completeAllStepsIfExitFormHappened(data)
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
-        return stepForRequest?.also { it.result = result }
+        return stepForRequest?.apply { setResult(result) }
     }
 }

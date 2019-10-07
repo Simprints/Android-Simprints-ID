@@ -5,8 +5,11 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.tools.TimeHelper
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
@@ -24,13 +27,21 @@ class PersonBuilderTest {
         val fingerprintResponse = mockFingerprintResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, null, timeHelper)
+        val expectedFingerprints = fingerprintResponse.captureResult
 
         with(person) {
-            assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
-            assertThat(fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
+            assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
+            fingerprintSamples.forEachIndexed { index, actualSample ->
+                val expectedSample = expectedFingerprints[index]
+                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                expectedSample.sample?.template?.let { expectedTemplate ->
+                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                }
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
+            }
             assertThat(faceSamples, `is`(emptyList()))
         }
     }
@@ -68,6 +79,7 @@ class PersonBuilderTest {
         val faceResponse = mockFaceResponse()
 
         val person = personBuilder.buildPerson(request, fingerprintResponse, faceResponse, timeHelper)
+        val expectedFingerprints = fingerprintResponse.captureResult
         val expectedFaceSamples = faceResponse.capturingResult.mapNotNull {
             it.result?.template?.let { template ->
                 val imageRef = it.result?.imageRef
@@ -76,11 +88,18 @@ class PersonBuilderTest {
         }
 
         with(person) {
-            assertThat(patientId, `is`(EXPECTED_GUID_FINGERPRINT))
             assertThat(projectId, `is`(request.projectId))
             assertThat(moduleId, `is`(request.moduleId))
             assertThat(userId, `is`(request.userId))
-            assertThat(fingerprintSamples, `is`(emptyList())) // TODO: validate once implemented
+            assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
+            fingerprintSamples.forEachIndexed { index, actualSample ->
+                val expectedSample = expectedFingerprints[index]
+                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                expectedSample.sample?.template?.let { expectedTemplate ->
+                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                }
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
+            }
             faceSamples.forEachIndexed { index, faceSample ->
                 assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
                 assertThat(faceSample.imageRef?.uri, `is`(expectedFaceSamples[index].imageRef?.uri))
@@ -102,7 +121,22 @@ class PersonBuilderTest {
         "projectId", "userId", "moduleId", "metadata"
     )
 
-    private fun mockFingerprintResponse() = FingerprintEnrolResponse(EXPECTED_GUID_FINGERPRINT)
+    private fun mockFingerprintResponse(): FingerprintCaptureResponse {
+        val fingerId = IFingerIdentifier.LEFT_THUMB
+        val captureResult = listOf(
+            FingerprintCaptureResult(
+                fingerId,
+                FingerprintSample(
+                    "id",
+                    fingerId,
+                    imageRef = null,
+                    qualityScore = 10,
+                    template = "template".toByteArray()
+                )
+            )
+        )
+        return FingerprintCaptureResponse(captureResult)
+    }
 
     private fun mockFaceResponse(): FaceCaptureResponse {
         return FaceCaptureResponse(
@@ -113,10 +147,6 @@ class PersonBuilderTest {
                 )
             )
         )
-    }
-
-    private companion object {
-        const val EXPECTED_GUID_FINGERPRINT = "expected-guid"
     }
 
 }

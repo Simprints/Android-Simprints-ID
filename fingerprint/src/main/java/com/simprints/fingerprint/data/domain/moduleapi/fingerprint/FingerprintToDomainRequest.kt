@@ -5,16 +5,18 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.Fing
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
+import com.simprints.moduleapi.fingerprint.requests.*
 
 object FingerprintToDomainRequest {
 
     fun fromFingerprintToDomainRequest(iFingerprintRequest: IFingerprintRequest): FingerprintRequest =
         when (iFingerprintRequest) {
-            is IFingerprintEnrolRequest ->
-                fromFingerprintToDomainEnrolRequest(iFingerprintRequest)
+            is IFingerprintCaptureRequest ->
+                fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
             is IFingerprintVerifyRequest ->
                 fromFingerprintToDomainVerifyRequest(iFingerprintRequest)
             is IFingerprintIdentifyRequest ->
@@ -40,13 +42,10 @@ object FingerprintToDomainRequest {
                 logoExists, programName, organizationName, verifyGuid)
         }
 
-
-    private fun fromFingerprintToDomainEnrolRequest(iFingerprintRequest: IFingerprintEnrolRequest): FingerprintEnrolRequest =
+    private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
-            FingerprintEnrolRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, programName, organizationName)
+            FingerprintCaptureRequest(
+                language, fingerStatus.mapKeys { it.key.toDomainClass() }, activityTitle
+            )
         }
-
 }

@@ -32,7 +32,7 @@ class IdentifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTask
 
     private fun FingerprintIdentifyRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest(
-            projectId, userId, moduleId, this.toAction(), language, fingerStatus
+            projectId, userId, moduleId, this.toAction().activityTitle, language, fingerStatus
         )
 
     private fun FingerprintIdentifyRequest.createMatchingTaskRequest() =

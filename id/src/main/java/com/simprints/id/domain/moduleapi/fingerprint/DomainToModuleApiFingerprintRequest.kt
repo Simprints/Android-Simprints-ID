@@ -1,8 +1,15 @@
 package com.simprints.id.domain.moduleapi.fingerprint
+
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier.*
+import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
+import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup.*
+import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.requests.*
 import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
@@ -13,18 +20,21 @@ object DomainToModuleApiFingerprintRequest {
 
     fun fromDomainToModuleApiFingerprintRequest(fingerprintRequest: FingerprintRequest): IFingerprintRequest =
         when (fingerprintRequest) {
-            is FingerprintEnrolRequest -> fromDomainToModuleApiFingerprintEnrolRequest(fingerprintRequest)
-            is IFingerprintMatchRequest -> TODO("PAS-390")
+            is FingerprintCaptureRequest -> fromDomainToModuleApiFingerprintCaptureRequest(fingerprintRequest)
+            is FingerprintVerifyRequest -> fromDomainToModuleApiFingerprintVerifyRequest(fingerprintRequest)
+            is FingerprintIdentifyRequest -> fromDomainToModuleApiFingerprintIdentifyRequest(fingerprintRequest)
             else -> throw IllegalStateException("Invalid fingerprint request")
         }
 
-    private fun fromDomainToModuleApiFingerprintEnrolRequest(enrolRequest: FingerprintEnrolRequest): IFingerprintEnrolRequest =
-        with(enrolRequest) {
-            FingerprintEnrolRequestImpl(
+    private fun fromDomainToModuleApiFingerprintCaptureRequest(captureRequest: FingerprintCaptureRequest): IFingerprintCaptureRequest =
+        with(captureRequest) {
+            FingerprintCaptureRequestImpl(
                 projectId, userId, moduleId, metadata, language, fingerStatus.mapKeys { fromDomainToFingerprintFingerIdentifier(it.key) },
                 logoExists,
                 organizationName,
-                programName)
+                programName,
+                fingerprintsToCapture.map(::fromDomainToFingerprintFingerIdentifier)
+            )
         }
 
 
@@ -44,12 +54,15 @@ object DomainToModuleApiFingerprintRequest {
 }
 
 @Parcelize
-private data class FingerprintEnrolRequestImpl(override val projectId: String,
-                                               override val userId: String,
-                                               override val moduleId: String,
-                                               override val metadata: String,
-                                               override val language: String,
-                                               override val fingerStatus: Map<IFingerIdentifier, Boolean>,
-                                               override val logoExists: Boolean,
-                                               override val programName: String,
-                                               override val organizationName: String) : IFingerprintEnrolRequest
+private data class FingerprintCaptureRequestImpl(
+    override val projectId: String,
+    override val userId: String,
+    override val moduleId: String,
+    override val metadata: String,
+    override val language: String,
+    override val fingerStatus: Map<IFingerIdentifier, Boolean>,
+    override val logoExists: Boolean,
+    override val programName: String,
+    override val organizationName: String,
+    override val fingerprintsToCapture: List<IFingerIdentifier>
+) : IFingerprintCaptureRequest

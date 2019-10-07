@@ -5,16 +5,18 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 
 interface FingerprintRequestFactory {
 
-    fun buildFingerprintEnrolRequest(projectId: String,
-                                     userId: String,
-                                     moduleId: String,
-                                     metadata: String,
-                                     prefs: PreferencesManager): FingerprintEnrolRequest
+    fun buildFingerprintCaptureRequest(projectId: String,
+                                       userId: String,
+                                       moduleId: String,
+                                       metadata: String,
+                                       prefs: PreferencesManager): FingerprintCaptureRequest
 
     fun buildFingerprintMatchRequest(projectId: String,
                                       userId: String,
@@ -34,7 +36,7 @@ interface FingerprintRequestFactory {
 fun FingerprintRequestFactory.buildFingerprintRequestFromAppRequest(appRequest: AppRequest, prefs: PreferencesManager): FingerprintRequest =
     when (appRequest) {
         is AppEnrolRequest -> with(appRequest) {
-            buildFingerprintEnrolRequest(projectId, userId, moduleId, metadata, prefs)
+            buildFingerprintCaptureRequest(projectId, userId, moduleId, metadata, prefs)
         }
         is AppVerifyRequest -> with(appRequest) {
             buildFingerprintVerifyRequest(projectId, userId, moduleId, metadata, verifyGuid, prefs)

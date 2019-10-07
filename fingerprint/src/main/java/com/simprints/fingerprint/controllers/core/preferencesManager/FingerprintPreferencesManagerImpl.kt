@@ -5,12 +5,6 @@ import java.util.*
 
 class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): FingerprintPreferencesManager {
 
-    override var lastEnrolDate: Date? = prefs.lastEnrolDate
-        set(value) {
-            field = value
-            prefs.lastEnrolDate = field
-        }
-
     override var lastVerificationDate: Date? = prefs.lastVerificationDate
         set(value) {
             field = value

@@ -22,7 +22,6 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
@@ -161,12 +160,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
-    override fun getTitle(): String =
-        when (collectRequest.action) {
-            Action.ENROL -> context.getString(R.string.register_title)
-            Action.IDENTIFY -> context.getString(R.string.identify_title)
-            Action.VERIFY -> context.getString(R.string.verify_title)
-        }
+    override fun getTitle(): String = collectRequest.activityTitle
 
     override fun refreshDisplay() {
         indicatorsHelper.refreshIndicators()
@@ -226,9 +220,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             collectRequest.moduleId,
             fingerprints)
 
-        sessionEventsManager.addPersonCreationEventInBackground(person)
-
-        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(person))
+        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints, person))
     }
 
     override fun handleException(simprintsException: FingerprintSimprintsException) {
