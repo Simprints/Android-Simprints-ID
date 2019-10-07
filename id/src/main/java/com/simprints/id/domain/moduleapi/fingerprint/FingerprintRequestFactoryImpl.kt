@@ -5,8 +5,6 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier.*
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
 

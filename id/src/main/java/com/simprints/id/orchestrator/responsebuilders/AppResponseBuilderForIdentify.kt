@@ -5,8 +5,6 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
 import com.simprints.id.orchestrator.steps.Step
 
 class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {

@@ -9,8 +9,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*

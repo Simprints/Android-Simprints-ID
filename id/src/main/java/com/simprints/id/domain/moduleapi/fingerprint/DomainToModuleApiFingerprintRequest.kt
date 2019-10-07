@@ -3,9 +3,10 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRe
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier.*
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup.*
-import com.simprints.moduleapi.fingerprint.requests.*
+import com.simprints.moduleapi.fingerprint.requests.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import kotlinx.android.parcel.Parcelize
 
 object DomainToModuleApiFingerprintRequest {
@@ -26,13 +27,6 @@ object DomainToModuleApiFingerprintRequest {
                 programName)
         }
 
-
-    private fun fromDomainToFingerprintMatchGroup(matchGroup: FingerprintMatchGroup): IMatchGroup =
-        when (matchGroup) {
-            GLOBAL -> IMatchGroup.GLOBAL
-            USER -> IMatchGroup.USER
-            MODULE -> IMatchGroup.MODULE
-        }
 
     private fun fromDomainToFingerprintFingerIdentifier(fingerIdentifier: FingerprintFingerIdentifier): IFingerIdentifier =
         when (fingerIdentifier) {

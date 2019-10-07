@@ -6,9 +6,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 
 interface FingerprintRequestFactory {
 
@@ -18,12 +16,12 @@ interface FingerprintRequestFactory {
                                      metadata: String,
                                      prefs: PreferencesManager): FingerprintEnrolRequest
 
-    fun buildFingerprintVerifyRequest(projectId: String,
+    fun buildFingerprintMatchRequest(projectId: String,
                                       userId: String,
                                       moduleId: String,
                                       metadata: String,
                                       verifyGuid: String,
-                                      prefs: PreferencesManager): FingerprintVerifyRequest
+                                      prefs: PreferencesManager): FingerprintMatchingRequest
 
     fun buildFingerprintIdentifyRequest(projectId: String,
                                         userId: String,

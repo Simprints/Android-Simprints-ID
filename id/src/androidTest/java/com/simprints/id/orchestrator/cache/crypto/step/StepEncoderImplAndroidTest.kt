@@ -9,8 +9,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.orchestrator.steps.Step
 import org.hamcrest.CoreMatchers.*
@@ -159,7 +158,7 @@ class StepEncoderImplAndroidTest {
     private fun mockFingerprintIdentifyResponse(): Step.Result {
         return FingerprintIdentifyResponse(
             listOf(
-                FingerprintMatchingResult(
+                FingerprintMatchResult(
                     "guid-found",
                     3,
                     FingerprintTier.TIER_1
