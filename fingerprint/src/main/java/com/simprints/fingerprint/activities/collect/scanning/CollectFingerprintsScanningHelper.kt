@@ -36,11 +36,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter,
                                         private val scannerManager: ScannerManager,
-                                        private val crashReportManager: FingerprintCrashReportManager) {
+                                        private val crashReportManager: FingerprintCrashReportManager,
+                                        private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
 
-    @Inject lateinit var scannerManager: ScannerManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus

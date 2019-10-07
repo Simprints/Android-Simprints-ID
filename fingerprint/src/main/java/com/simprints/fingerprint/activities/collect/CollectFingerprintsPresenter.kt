@@ -22,7 +22,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.data.domain.Action.*
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
@@ -36,14 +36,10 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val crashReportManager: FingerprintCrashReportManager,
                                    private val timeHelper: FingerprintTimeHelper,
                                    private val sessionEventsManager: FingerprintSessionEventsManager,
-                                   private val scannerManager: ScannerManager)
+                                   private val scannerManager: ScannerManager,
+                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper)
     : CollectFingerprintsContract.Presenter {
 
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
     private lateinit var fingerDisplayHelper: CollectFingerprintsFingerDisplayHelper
     private lateinit var indicatorsHelper: CollectFingerprintsIndicatorsHelper
@@ -68,7 +64,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            fingerprintRequest.fingerStatus,
+            collectRequest.fingerStatus,
             androidResourcesHelper)
     }
 
@@ -77,7 +73,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
-        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager)
+        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager, androidResourcesHelper)
     }
 
     private fun initScanButtonListeners() {
@@ -166,11 +162,10 @@ class CollectFingerprintsPresenter(private val context: Context,
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (fingerprintRequest) {
-            is FingerprintEnrolRequest -> androidResourcesHelper.getString(R.string.register_title)
-            is FingerprintIdentifyRequest -> androidResourcesHelper.getString(R.string.identify_title)
-            is FingerprintVerifyRequest -> androidResourcesHelper.getString(R.string.verify_title)
-            else -> ""
+        when (collectRequest.action) {
+            ENROL -> androidResourcesHelper.getString(R.string.register_title)
+            IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
+            VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
         }
 
     override fun refreshDisplay() {

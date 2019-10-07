@@ -15,18 +15,16 @@ import com.simprints.fingerprint.activities.alert.request.AlertTaskRequest
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 class AlertActivity : FingerprintActivity(), AlertContract.View {
 
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
-    override lateinit var viewPresenter: AlertContract.Presenter
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
     private lateinit var alertType: FingerprintAlert
     override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
