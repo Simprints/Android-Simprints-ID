@@ -6,20 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.collect.fingers.CollectFingerprintsFingerDisplayHelper
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_splash_screen.*
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class SplashScreenActivity : AppCompatActivity() {
 
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
+
         setTextInLayout()
 
         Handler().postDelayed({

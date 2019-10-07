@@ -8,11 +8,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
@@ -24,9 +22,7 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
-
-    override lateinit var viewPresenter: RefusalContract.Presenter
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -42,14 +38,10 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setTextInLayout()
-
-        viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
         setLayoutChangeListeners()
