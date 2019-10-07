@@ -12,7 +12,6 @@
         android:background="@color/simprints_off_white"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.simprints.id.com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
         tools:showIn="@layout/activity_collect_fingerprints">
 
@@ -50,8 +49,7 @@
             android:layout_marginStart="40dp"
             android:layout_gravity="start"
             android:textSize="15sp"
-            android:textColor="@color/colorAccent"
-            android:text="@string/missing_finger" />
+            android:textColor="@color/colorAccent"/>
 
         <LinearLayout
             android:id="@+id/indicator_layout"
@@ -77,7 +75,6 @@
             android:layout_weight="1"
             android:fontFamily="@font/muli"
             android:longClickable="true"
-            android:text="@string/scan"
             android:textColor="#7F000000"
             android:textSize="20sp"
             android:textStyle="bold" />

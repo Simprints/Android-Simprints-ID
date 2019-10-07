@@ -16,6 +16,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
@@ -27,6 +28,7 @@ class FaceExitFormActivity : AppCompatActivity() {
     private var faceExitFormReason = OTHER
 
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private val textWatcher = textWatcherOnChange {
         handleTextChangedInExitForm(it)
@@ -148,9 +150,9 @@ class FaceExitFormActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (faceBtSubmitExitForm.isEnabled) {
-            showToast(R.string.refusal_toast_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
         } else {
-            showToast(R.string.refusal_toast_select_option_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
         }
     }
 

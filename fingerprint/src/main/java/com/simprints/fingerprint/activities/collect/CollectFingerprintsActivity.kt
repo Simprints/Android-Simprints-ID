@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -30,6 +31,10 @@ import org.koin.core.parameter.parametersOf
 class CollectFingerprintsActivity :
     FingerprintActivity(),
     CollectFingerprintsContract.View {
+
+    override val context: Context by lazy { this }
+    @Inject lateinit var orchestrator: Orchestrator
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
 
     private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
@@ -76,6 +81,12 @@ class CollectFingerprintsActivity :
         scanButton = scan_button
         progressBar = pb_timeout
         setListenerToMissingFinger()
+
+        with(androidResourcesHelper) {
+            scanButton.text = getString(R.string.scan)
+            missingFingerText.text = getString(R.string.missing_finger)
+            missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        }
     }
 
     override fun onResume() {
@@ -110,7 +121,7 @@ class CollectFingerprintsActivity :
 
     override fun refreshScanButtonAndTimeoutBar() {
         val activeStatus = viewPresenter.currentFinger().status
-        scan_button.setText(activeStatus.buttonTextId)
+        scan_button.text = androidResourcesHelper.getString(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 

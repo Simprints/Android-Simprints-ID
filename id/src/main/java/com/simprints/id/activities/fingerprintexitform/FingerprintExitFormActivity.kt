@@ -17,6 +17,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FingerprintExitFormReason
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
@@ -31,6 +32,7 @@ class FingerprintExitFormActivity : AppCompatActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var fingerprintExitFormViewModelFactory: FingerprintExitFormViewModelFactory
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var fingerprintExitFormStartTime: Long = 0
     private var fingerprintExitFormReason = FingerprintExitFormReason.OTHER
@@ -160,9 +162,9 @@ class FingerprintExitFormActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (fingerprintBtSubmitExitForm.isEnabled) {
-            showToast(R.string.refusal_toast_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
         } else {
-            showToast(R.string.refusal_toast_select_option_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
         }
     }
 

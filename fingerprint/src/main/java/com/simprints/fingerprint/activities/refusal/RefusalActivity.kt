@@ -8,6 +8,9 @@ import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
+import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.tools.extensions.showToast
@@ -20,6 +23,10 @@ import org.koin.core.parameter.parametersOf
 class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
+
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+
+    override lateinit var viewPresenter: RefusalContract.Presenter
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -34,12 +41,36 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val component = FingerprintComponentBuilder.getComponent(application as Application)
+        component.inject(this)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        setTextInLayout()
+
+        viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
         setLayoutChangeListeners()
         setRadioGroupListener()
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            whySkipFingerprintingText.text = getString(R.string.why_did_you_skip_fingerprinting)
+            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            rbTooYoung.text = getString(R.string.refusal_too_young)
+            rbOther.text = getString(R.string.refusal_other)
+            refusalText.hint = getString(R.string.hint_other_reason)
+            btScanFingerprints.text = getString(R.string.button_scan_prints)
+            btSubmitRefusalForm.text = getString(R.string.button_submit)
+
+        }
     }
 
     private fun setButtonClickListeners() {
@@ -123,10 +154,10 @@ class RefusalActivity : FingerprintActivity(), RefusalContract.View {
     override fun isSubmitButtonEnabled() = btSubmitRefusalForm.isEnabled
 
     override fun showToastForFormSubmit() {
-        showToast(R.string.refusal_toast_submit)
+        showToast(androidResourcesHelper.getString(R.string.refusal_toast_submit))
     }
 
     override fun showToastForSelectOptionAndSubmit() {
-        showToast(R.string.refusal_toast_select_option_submit)
+        showToast(androidResourcesHelper.getString(R.string.refusal_toast_select_option_submit))
     }
 }

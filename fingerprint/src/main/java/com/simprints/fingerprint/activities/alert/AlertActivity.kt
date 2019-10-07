@@ -17,12 +17,16 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.refusal.RefusalActivity
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_fingerprint_alert.*
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 class AlertActivity : FingerprintActivity(), AlertContract.View {
 
+    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+    override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertType: FingerprintAlert
     override val viewPresenter: AlertContract.Presenter by inject { parametersOf(this, alertType) }
 
@@ -54,9 +58,18 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
-    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) { alertLeftButton?.setBackgroundColor(color) }
-    override fun setRightButtonBackgroundColor(@ColorInt color: Int) { alertRightButton?.setBackgroundColor(color) }
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alertTitle.setText(stringRes)
+    override fun setLeftButtonBackgroundColor(@ColorInt color: Int) {
+        alertLeftButton?.setBackgroundColor(color)
+    }
+
+    override fun setRightButtonBackgroundColor(@ColorInt color: Int) {
+        alertRightButton?.setBackgroundColor(color)
+    }
+
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) {
+        alertTitle.text = androidResourcesHelper.getString(stringRes)
+    }
+
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
@@ -66,12 +79,14 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) {
+        message.text = androidResourcesHelper.getString(stringRes)
+    }
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertLeftButton?.visibility = View.VISIBLE
-            alertLeftButton?.setText(leftButtonAction.buttonText)
+            alertLeftButton?.text = androidResourcesHelper.getString(leftButtonAction.buttonText)
             alertLeftButton?.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         }
     }
@@ -79,7 +94,7 @@ class AlertActivity : FingerprintActivity(), AlertContract.View {
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
             alertRightButton?.visibility = View.VISIBLE
-            alertRightButton?.setText(rightButtonAction.buttonText)
+            alertRightButton?.text = androidResourcesHelper.getString(rightButtonAction.buttonText)
             alertRightButton?.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         }
     }
