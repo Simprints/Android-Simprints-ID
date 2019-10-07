@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests
 
-import com.simprints.moduleapi.fingerprint.requests.IMatchGroup
 import  com.simprints.id.domain.GROUP as GROUP_CORE
 
 enum class MatchGroup {

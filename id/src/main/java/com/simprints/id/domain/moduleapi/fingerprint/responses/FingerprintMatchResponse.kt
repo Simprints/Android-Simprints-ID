@@ -1,6 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses
 
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -10,3 +11,5 @@ data class FingerprintMatchResponse(
 ) : FingerprintResponse {
     @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.MATCH
 }
+
+fun IFingerprintMatchResponse.fromModuleApiToDomain() = FingerprintMatchResponse(result.map { it.fromModuleApiToDomain() })
