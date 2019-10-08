@@ -41,9 +41,9 @@ class OrchestratorViewModel(
     private fun getCurrentSessionId(): String =
         sessionEventsManager.getCurrentSession().map { it.id }.blockingGet()
 
-    fun onModalStepRequestDone(requestCode: Int, resultCode: Int, data: Intent?) {
+    fun onModalStepRequestDone(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
         viewModelScope.launch {
-            orchestratorManager.handleIntentResult(requestCode, resultCode, data)
+            orchestratorManager.handleIntentResult(appRequest, requestCode, resultCode, data)
         }
     }
 

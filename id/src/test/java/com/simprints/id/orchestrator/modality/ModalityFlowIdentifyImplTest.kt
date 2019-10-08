@@ -40,7 +40,7 @@ class ModalityFlowIdentifyImplTest {
         whenever(faceStepMock) { activityName } thenReturn FACE_ACTIVITY_NAME
         whenever(coreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
-        whenever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
+        whenever(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
 
@@ -52,7 +52,7 @@ class ModalityFlowIdentifyImplTest {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FACE))
 
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-        verifyNever(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyNever(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
@@ -61,7 +61,7 @@ class ModalityFlowIdentifyImplTest {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FINGER))
 
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyNever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
@@ -70,7 +70,7 @@ class ModalityFlowIdentifyImplTest {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FACE, FINGER))
 
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FACE_ACTIVITY_NAME)
@@ -81,7 +81,7 @@ class ModalityFlowIdentifyImplTest {
         modalityFlowIdentify.startFlow(identifyAppRequest, listOf(FINGER, FACE))
 
         assertThat(modalityFlowIdentify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowIdentify.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowIdentify.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
