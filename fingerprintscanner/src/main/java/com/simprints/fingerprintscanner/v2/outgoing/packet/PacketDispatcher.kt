@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.outgoing.packet
 
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.outgoing.OutgoingConnectable
-import com.simprints.fingerprintscanner.v2.tools.completable
+import com.simprints.fingerprintscanner.v2.tools.reactive.completable
 import io.reactivex.Completable
 import java.io.OutputStream
 

@@ -3,8 +3,8 @@ package com.simprints.fingerprintscanner.v2.bluetooth
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import com.simprints.fingerprintscanner.v2.tools.hexStringToByteArray
-import com.simprints.fingerprintscanner.v2.tools.single
+import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.reactive.single
 import io.reactivex.Single
 import java.io.IOException
 import java.util.*
@@ -20,11 +20,7 @@ class BluetoothManager(private val bluetoothAdapter: BluetoothAdapter? = Bluetoo
 
         if (!bluetoothAdapter.isEnabled) throw BluetoothNotEnabledException()
 
-        val device = bluetoothAdapter.getRemoteDevice(
-            hexStringToByteArray(
-                macAddress
-            )
-        )
+        val device = bluetoothAdapter.getRemoteDevice(macAddress.hexToByteArray())
 
         device.createBond()
 

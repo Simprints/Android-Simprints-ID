@@ -1,7 +1,8 @@
 package com.simprints.fingerprintscanner.v2.domain.packet
 
 import com.simprints.fingerprintscanner.v2.domain.Protocol
-import com.simprints.fingerprintscanner.v2.tools.*
+import com.simprints.fingerprintscanner.v2.tools.primitives.size
+import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
 object PacketProtocol: Protocol {

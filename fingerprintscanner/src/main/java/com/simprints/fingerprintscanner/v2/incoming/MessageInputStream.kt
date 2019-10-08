@@ -10,7 +10,7 @@ import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroEve
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
-import com.simprints.fingerprintscanner.v2.tools.filterCast
+import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.InputStream
