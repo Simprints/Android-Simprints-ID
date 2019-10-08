@@ -1,9 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
 import com.simprints.id.domain.moduleapi.fingerprint.responses.*
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.moduleapi.fingerprint.responses.*
 
 object ModuleApiToDomainFingerprintResponse {
@@ -11,20 +9,10 @@ object ModuleApiToDomainFingerprintResponse {
     fun fromModuleApiToDomainFingerprintResponse(fingerprintResponse: IFingerprintResponse): FingerprintResponse =
         when (fingerprintResponse.type) {
             IFingerprintResponseType.ENROL -> fromModuleApiToFingerprintEnrolResponse(fingerprintResponse as IFingerprintEnrolResponse)
-            IFingerprintResponseType.VERIFY -> fromModuleApiToFingerprintVerifyResponse(fingerprintResponse as IFingerprintVerifyResponse)
-            IFingerprintResponseType.IDENTIFY -> fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse as IFingerprintIdentifyResponse)
+            IFingerprintResponseType.MATCH -> TODO("PAS-391")
             IFingerprintResponseType.REFUSAL -> fromModuleApiToFingerprintRefusalResponse(fingerprintResponse as IFingerprintExitFormResponse)
             IFingerprintResponseType.ERROR -> fromModuleApiToFingerprintErrorResponse(fingerprintResponse as IFingerprintErrorResponse)
         }
-
-    private fun fromModuleApiToFingerprintVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): FingerprintVerifyResponse {
-        val matchResult = FingerprintMatchingResult(
-            fingerprintResponse.matchingResult.guid,
-            fingerprintResponse.matchingResult.confidence,
-            fromFingerprintToDomainTier(fingerprintResponse.matchingResult.tier))
-
-        return FingerprintVerifyResponse(matchResult)
-    }
 
     private fun fromModuleApiToFingerprintErrorResponse(fingerprintResponse: IFingerprintErrorResponse): FingerprintErrorResponse =
         FingerprintErrorResponse(fromFingerprintToDomainError(fingerprintResponse.error))
@@ -32,12 +20,6 @@ object ModuleApiToDomainFingerprintResponse {
 
     private fun fromModuleApiToFingerprintEnrolResponse(fingerprintResponse: IFingerprintEnrolResponse): FingerprintEnrolResponse =
         FingerprintEnrolResponse(fingerprintResponse.guid)
-
-    private fun fromModuleApiToFingerprintIdentifyResponse(fingerprintResponse: IFingerprintIdentifyResponse): FingerprintIdentifyResponse =
-        FingerprintIdentifyResponse(fingerprintResponse.identifications.map { fromFingerprintToDomainMatchingResult(it) })
-
-    private fun fromFingerprintToDomainMatchingResult(matchingResult: IMatchingResult): FingerprintMatchingResult =
-        FingerprintMatchingResult(matchingResult.guid, matchingResult.confidence, fromFingerprintToDomainTier(matchingResult.tier))
 
     private fun fromModuleApiToFingerprintRefusalResponse(fingerprintResponse: IFingerprintExitFormResponse): FingerprintResponse {
 
@@ -59,14 +41,5 @@ object ModuleApiToDomainFingerprintResponse {
             IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
             IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
             IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> FingerprintErrorReason.GUID_NOT_FOUND_ONLINE
-        }
-
-    private fun fromFingerprintToDomainTier(tier: IFingerprintResponseTier): FingerprintTier =
-        when (tier) {
-            IFingerprintResponseTier.TIER_1 -> FingerprintTier.TIER_1
-            IFingerprintResponseTier.TIER_2 -> FingerprintTier.TIER_2
-            IFingerprintResponseTier.TIER_3 -> FingerprintTier.TIER_3
-            IFingerprintResponseTier.TIER_4 -> FingerprintTier.TIER_4
-            IFingerprintResponseTier.TIER_5 -> FingerprintTier.TIER_5
         }
 }
