@@ -14,5 +14,6 @@ interface FingerprintRequestFactory {
                                        metadata: String,
                                        prefs: PreferencesManager): FingerprintCaptureRequest
 
-    fun buildFingerprintMatchRequest(probeSamples: List<FingerprintSample>, query: PersonLocalDataSource.Query): FingerprintMatchRequest
+    fun buildFingerprintMatchRequest(probeSamples: List<FingerprintSample>,
+                                     query: PersonLocalDataSource.Query): FingerprintMatchRequest
 }
