@@ -72,16 +72,16 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldBuildTheRightStepForEnrol() {
         with(enrolAppRequest) {
-            val step = fingerprintStepProcess.buildStepEnrol(projectId, userId, moduleId, metadata)
+            val step = fingerprintStepProcess.buildStepToCapture(projectId, userId, moduleId, metadata)
 
-            verifyFingerprintIntent<FingerprintCaptureRequest>(step, ENROL.value)
+            verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
         }
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForIdentify() {
         with(identifyAppRequest) {
-            val step = fingerprintStepProcess.buildStepIdentify(projectId, userId, moduleId, metadata)
+            val step = fingerprintStepProcess.buildStepToMatch(projectId, userId, moduleId, metadata)
 
             verifyFingerprintIntent<FingerprintIdentifyRequest>(step, IDENTIFY.value)
         }
@@ -89,7 +89,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFingerprintEnrolResult() {
-        fingerprintStepProcess.processResult(ENROL.value, Activity.RESULT_OK, result)
+        fingerprintStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
 
         verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
     }

@@ -78,6 +78,6 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        vm.onModalStepRequestDone(requestCode, resultCode, data)
+        vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
     }
 }
