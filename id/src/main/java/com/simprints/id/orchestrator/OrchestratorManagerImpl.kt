@@ -14,7 +14,8 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
-    private val hotCache: HotCache
+    private val hotCache: HotCache,
+    private val flowManager: FlowManager
 ) : OrchestratorManager {
 
     override val ongoingStep = MutableLiveData<Step?>()
@@ -34,6 +35,7 @@ open class OrchestratorManagerImpl(
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
+        flowManager.setCurrentFlow(appRequest.type)
 
         proceedToNextStepOrAppResponse()
     }

@@ -183,8 +183,9 @@ class OrchestratorManagerImplTest {
         val preferences = mock<SharedPreferences>()
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
+        val flowManager = mock<FlowManager>()
 
-        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache)
+        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache, flowManager)
     }
 
     private fun OrchestratorManager.startFlowForEnrol(

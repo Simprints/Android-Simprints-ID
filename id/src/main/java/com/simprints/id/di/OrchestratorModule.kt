@@ -34,6 +34,7 @@ import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 class OrchestratorModule {
@@ -43,7 +44,6 @@ class OrchestratorModule {
 
     @Provides
     fun provideFingerprintRequestFactory(): FingerprintRequestFactory = FingerprintRequestFactoryImpl()
-
 
     @Provides
     fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
@@ -88,8 +88,9 @@ class OrchestratorModule {
     @Provides
     fun provideOrchestratorManager(modalityFlowFactory: ModalityFlowFactory,
                                    appResponseFactory: AppResponseFactory,
-                                   hotCache: HotCache): OrchestratorManager =
-        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache)
+                                   hotCache: HotCache,
+                                   flowManager: FlowManager): OrchestratorManager =
+        OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache, flowManager)
 
     @Provides
     fun provideOrchestratorEventsHelper(sessionEventsManager: SessionEventsManager,
@@ -129,5 +130,9 @@ class OrchestratorModule {
         sessionEventsManager: SessionEventsManager,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionEventsManager, timeHelper)
+
+    @Provides
+    @Singleton
+    fun provideFlowManager(): FlowManager = FlowManagerImpl()
 
 }
