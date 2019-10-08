@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscanner.v1
 
 import android.util.Log
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import java.math.BigInteger
 import java.util.regex.Pattern
 

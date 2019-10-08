@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter;
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter;
 import com.simprints.fingerprintscanner.v1.enums.HARDWARE_CONFIG;
 import com.simprints.fingerprintscanner.v1.enums.LED_STATE;
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_STATUS;

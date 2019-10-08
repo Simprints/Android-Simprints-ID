@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
