@@ -51,7 +51,7 @@ class OrchestratorModule {
     @Provides
     fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
                                         preferenceManager: PreferencesManager): FingerprintStepProcessor =
-        FingerprintStepProcessorImpl(fingerprintRequestFactory, ModuleApiToDomainFingerprintResponse, preferenceManager)
+        FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
 
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()

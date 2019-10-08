@@ -1,9 +1,9 @@
 package com.simprints.id.orchestrator.cache.crypto.response
 
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.steps.Step
 
 class FingerprintCaptureResponseEncoder(
@@ -24,10 +24,9 @@ class FingerprintCaptureResponseEncoder(
                 val id = sample.id
                 val fingerId = sample.fingerIdentifier
                 val imageRef = sample.imageRef
-                val qualityScore = sample.qualityScore
+                val qualityScore = sample.templateQualityScore
 
-                val processedSample = FingerprintSample(id, fingerId, imageRef,
-                    qualityScore, processedTemplate)
+                val processedSample = FingerprintSample(fingerId, processedTemplate, qualityScore, imageRef)
 
                 FingerprintCaptureResult(fingerId, processedSample)
             }
