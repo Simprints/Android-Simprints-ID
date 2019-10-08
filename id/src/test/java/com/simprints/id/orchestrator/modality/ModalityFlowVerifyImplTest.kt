@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.steps.Step
@@ -32,6 +33,7 @@ class ModalityFlowVerifyImplTest {
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
     @Mock lateinit var coreStepProcessor: CoreStepProcessor
+    @Mock lateinit var preferencesManager: PreferencesManager
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
     @Mock lateinit var verifyCoreStepMock: Step
@@ -46,12 +48,12 @@ class ModalityFlowVerifyImplTest {
         whenever(verifyCoreStepMock) { activityName } thenReturn VERIFY_ACTIVITY_NAME
         whenever(consentCoreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
-        whenever(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
+        whenever(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull()) } thenReturn verifyCoreStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn consentCoreStepMock
 
-        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
+        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, preferencesManager)
     }
 
     @Test
@@ -59,7 +61,7 @@ class ModalityFlowVerifyImplTest {
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE))
 
         assertThat(modalityFlowVerify.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-        verifyNever(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyNever(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
@@ -68,7 +70,7 @@ class ModalityFlowVerifyImplTest {
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER))
 
         assertThat(modalityFlowVerify.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-        verifyOnce(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull()) }
         verifyNever(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) }
     }
 
@@ -77,7 +79,7 @@ class ModalityFlowVerifyImplTest {
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE, FINGER))
 
         assertThat(modalityFlowVerify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-        verifyOnce(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowVerify.steps[0].activityName).isEqualTo(VERIFY_ACTIVITY_NAME)
         assertThat(modalityFlowVerify.steps[1].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
@@ -89,7 +91,7 @@ class ModalityFlowVerifyImplTest {
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER, FACE))
 
         assertThat(modalityFlowVerify.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-        verifyOnce(fingerprintStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToMatch(anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowVerify.steps[0].activityName).isEqualTo(VERIFY_ACTIVITY_NAME)
         assertThat(modalityFlowVerify.steps[1].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)

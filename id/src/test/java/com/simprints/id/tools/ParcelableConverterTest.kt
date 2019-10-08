@@ -1,11 +1,12 @@
 package com.simprints.id.tools
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.After
@@ -71,28 +72,16 @@ class ParcelableConverterTest {
         )
     }
 
-    private fun mockRequest(): Step.Request = FingerprintCaptureRequest(
-        "projectId",
-        "userId",
-        "moduleId",
-        "metadata",
-        "language",
-        emptyMap(),
-        true,
-        "programmeName",
-        "organisationName",
-        emptyList()
-    )
+    private fun mockRequest(): Step.Request = FingerprintCaptureRequest(listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_3RD_FINGER))
 
     private fun mockResult(): Step.Result {
         val captureResult = listOf(
             FingerprintCaptureResult(
-                IFingerIdentifier.RIGHT_THUMB,
+                FingerIdentifier.RIGHT_THUMB,
                 FingerprintSample(
-                    "id",
-                    IFingerIdentifier.RIGHT_THUMB,
+                    FingerIdentifier.RIGHT_THUMB,
                     imageRef = null,
-                    qualityScore = 4,
+                    templateQualityScore = 4,
                     template = "template".toByteArray()
                 )
             )
@@ -110,7 +99,7 @@ class ParcelableConverterTest {
                 assertThat(actualFingerprint.sample?.template?.contentEquals(expectedTemplate), `is`(true))
             }
             assertThat(actualFingerprint.identifier, `is`(expectedFingerprint.identifier))
-            assertThat(actualFingerprint.sample?.qualityScore, `is`(expectedFingerprint.sample?.qualityScore))
+            assertThat(actualFingerprint.sample?.templateQualityScore, `is`(expectedFingerprint.sample?.templateQualityScore))
         }
     }
 
