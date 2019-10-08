@@ -10,7 +10,7 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecords
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.await
 import com.simprints.id.tools.extensions.transactAwait
@@ -78,13 +78,16 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
     override suspend fun loadFingerprintRecords(query: Serializable): Flow<FingerprintRecord> =
         if (query is PersonLocalDataSource.Query) {
             load(query).map { person ->
-                person.fingerprintSamples.map {
-                    FingerprintRecord(person.patientId, it)
-                }.asFlow()
+                createFingerprintRecordFlow(person)
             }.flattenConcat()
         } else {
-            throw InvalidQueryToLoadRecords()
+            throw InvalidQueryToLoadRecordsException()
         }
+
+    private fun createFingerprintRecordFlow(person: Person): Flow<FingerprintRecord> =
+        person.fingerprintSamples.map {
+            FingerprintRecord(person.patientId, it)
+        }.asFlow()
 
     override suspend fun delete(query: PersonLocalDataSource.Query) {
         withContext(Dispatchers.Main) {
