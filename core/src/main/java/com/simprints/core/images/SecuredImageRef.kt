@@ -1,6 +1,7 @@
 package com.simprints.core.images
 
 import android.os.Parcelable
+import com.simprints.moduleapi.common.ISecuredImageRef
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

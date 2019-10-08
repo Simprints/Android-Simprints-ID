@@ -1,15 +1,10 @@
 package com.simprints.id.domain.moduleapi.fingerprint
 
-import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.data.db.person.domain.FingerIdentifier.*
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.moduleapi.fingerprint.requests.*
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintMatchGroup
-
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 
 class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
 
@@ -22,7 +17,7 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
             FingerprintCaptureRequest(
                 fingerStatus.mapNotNull {
                     if (it.value)
-                        buildFingerprintFingerIdentifier(it.key)
+                        it.key
                     else
                         null
                 }
