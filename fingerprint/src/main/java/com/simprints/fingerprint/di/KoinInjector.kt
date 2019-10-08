@@ -80,7 +80,7 @@ object KoinInjector {
         factory { appComponent().getSessionEventsManager() }
         factory { appComponent().getCrashReportManager() }
         factory { appComponent().getTimeHelper() }
-        factory { appComponent().getPersonRepository() }
+        factory { appComponent().getFingerprintRecordLocalDataSource() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
     }
