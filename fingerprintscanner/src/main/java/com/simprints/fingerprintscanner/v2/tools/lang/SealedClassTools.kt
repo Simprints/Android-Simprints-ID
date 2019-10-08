@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.v2.tools
+package com.simprints.fingerprintscanner.v2.tools.lang
 
 import kotlin.reflect.KClass
 

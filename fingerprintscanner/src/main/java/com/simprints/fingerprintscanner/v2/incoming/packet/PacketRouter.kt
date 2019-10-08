@@ -3,8 +3,8 @@ package com.simprints.fingerprintscanner.v2.incoming.packet
 import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
-import com.simprints.fingerprintscanner.v2.tools.toFlowable
-import com.simprints.fingerprintscanner.v2.tools.values
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
+import com.simprints.fingerprintscanner.v2.tools.lang.values
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable

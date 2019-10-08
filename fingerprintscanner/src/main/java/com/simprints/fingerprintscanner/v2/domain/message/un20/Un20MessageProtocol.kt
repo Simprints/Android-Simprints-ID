@@ -2,7 +2,6 @@ package com.simprints.fingerprintscanner.v2.domain.message.un20
 
 import com.simprints.fingerprintscanner.v2.domain.message.MessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20MessageType
-import com.simprints.fingerprintscanner.v2.tools.toByteArray
 import java.nio.ByteOrder
 
 object Un20MessageProtocol: MessageProtocol {

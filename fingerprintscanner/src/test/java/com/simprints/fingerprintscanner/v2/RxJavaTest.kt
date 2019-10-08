@@ -12,7 +12,10 @@ import com.simprints.fingerprintscanner.v2.incoming.packet.ByteArrayToPacketAccu
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.incoming.packet.toPacketStream
-import com.simprints.fingerprintscanner.v2.tools.*
+import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
+import com.simprints.fingerprintscanner.v2.tools.primitives.stripWhiteSpaceAndMakeLowercase
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
+import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
@@ -27,37 +30,6 @@ import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
 class RxJavaTest {
-
-    @Test
-    fun unsignedToIntTest() {
-        assertEquals(10, 10.toShort().unsignedToInt())
-        assertEquals(0, 0.toShort().unsignedToInt())
-        assertEquals(65530, 65530.toShort().unsignedToInt())
-        assertEquals(65532, (-4).toShort().unsignedToInt())
-        assertEquals(32767, 32767.toShort().unsignedToInt())
-        assertEquals(32768, 32768.toShort().unsignedToInt())
-        assertEquals(32769, 32769.toShort().unsignedToInt())
-        assertEquals(65535, (-1).toShort().unsignedToInt())
-    }
-
-    @Test
-    fun shortToByteArrayTest() {
-        assertHexStringsEqual("57 00", 87.toShort().toByteArray().toHexString())
-        assertHexStringsEqual("00 00", 0.toShort().toByteArray().toHexString())
-        assertHexStringsEqual("FF FF", 65535.toShort().toByteArray().toHexString())
-        assertHexStringsEqual("FF 00", 255.toShort().toByteArray().toHexString())
-        assertHexStringsEqual("00 01", 256.toShort().toByteArray().toHexString())
-        assertHexStringsEqual("17 36", 13847.toShort().toByteArray().toHexString())
-    }
-
-    @Test
-    fun intToByteArrayTest() {
-        assertHexStringsEqual("57 00 00 00", 87.toByteArray().toHexString())
-        assertHexStringsEqual("00 00 00 00", 0.toByteArray().toHexString())
-        assertHexStringsEqual("FF FF FF 7F", (Int.MAX_VALUE).toByteArray().toHexString())
-        assertHexStringsEqual("00 00 00 80", (Int.MIN_VALUE).toByteArray().toHexString())
-        assertHexStringsEqual("BB 5A 69 36", 912874171.toByteArray().toHexString())
-    }
 
     @Test
     fun packetBuilderTest() {
@@ -433,7 +405,7 @@ class RxJavaTest {
         )
     }
 
-    private fun OutputStream.writeBytes(byteString: String) = writeBytes(hexStringToByteArray(byteString))
+    private fun OutputStream.writeBytes(byteString: String) = writeBytes(byteString.hexToByteArray())
     private fun OutputStream.writeBytes(bytes: ByteArray) = this.write(bytes)
 
     private fun InputStream.toPacketStream(): Flowable<Packet> = this

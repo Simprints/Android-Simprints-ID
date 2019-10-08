@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.domain.message.vero.models
 
-import com.simprints.fingerprintscanner.v2.tools.unsignedToInt
+import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 
 sealed class LedMode(val byte: Byte) {
     object OFF : LedMode(0x00)

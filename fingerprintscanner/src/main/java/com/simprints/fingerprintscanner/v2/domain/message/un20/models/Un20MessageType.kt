@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.domain.message.un20.models
 
-import com.simprints.fingerprintscanner.v2.tools.values
+import com.simprints.fingerprintscanner.v2.tools.lang.values
 
 sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
 

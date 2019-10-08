@@ -2,8 +2,7 @@ package com.simprints.fingerprintscanner.v2.domain.message.vero
 
 import com.simprints.fingerprintscanner.v2.domain.message.MessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessageType
-import com.simprints.fingerprintscanner.v2.tools.toByteArray
-import com.simprints.fingerprintscanner.v2.tools.unsignedToInt
+import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
 object VeroMessageProtocol: MessageProtocol {

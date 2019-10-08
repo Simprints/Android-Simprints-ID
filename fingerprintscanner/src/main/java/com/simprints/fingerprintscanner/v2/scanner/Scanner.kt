@@ -22,7 +22,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetSmil
 import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
-import com.simprints.fingerprintscanner.v2.tools.filterCast
+import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
