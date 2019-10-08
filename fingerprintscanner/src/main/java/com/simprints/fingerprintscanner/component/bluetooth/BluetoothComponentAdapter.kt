@@ -1,4 +1,4 @@
-package com.simprints.fingerprintscanner.api.bluetooth
+package com.simprints.fingerprintscanner.component.bluetooth
 
 
 interface BluetoothComponentAdapter {

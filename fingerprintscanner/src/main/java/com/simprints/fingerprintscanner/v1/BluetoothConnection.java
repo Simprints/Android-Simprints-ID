@@ -2,9 +2,9 @@ package com.simprints.fingerprintscanner.v1;
 
 import androidx.annotation.NonNull;
 
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter;
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentDevice;
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket;
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter;
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice;
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket;
 
 import java.io.IOException;
 import java.io.InputStream;

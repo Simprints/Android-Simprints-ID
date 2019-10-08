@@ -3,7 +3,7 @@ package com.simprints.fingerprint.scanner.factory
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapperV1
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerFactoryImpl(private val bluetoothAdapter: BluetoothComponentAdapter,

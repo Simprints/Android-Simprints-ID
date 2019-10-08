@@ -1,8 +1,8 @@
 package com.simprints.fingerprintscannermock.record
 
 import android.bluetooth.BluetoothDevice
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentDevice
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import java.util.*
 
 class AndroidRecordBluetoothDevice(private val device: BluetoothDevice,

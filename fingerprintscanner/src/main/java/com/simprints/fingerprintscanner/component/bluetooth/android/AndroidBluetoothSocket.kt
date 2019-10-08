@@ -1,7 +1,7 @@
-package com.simprints.fingerprintscanner.api.bluetooth.android
+package com.simprints.fingerprintscanner.component.bluetooth.android
 
 import android.bluetooth.BluetoothSocket
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import java.io.InputStream
 import java.io.OutputStream
 

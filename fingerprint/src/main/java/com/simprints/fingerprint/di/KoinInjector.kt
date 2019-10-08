@@ -33,8 +33,8 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.api.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel

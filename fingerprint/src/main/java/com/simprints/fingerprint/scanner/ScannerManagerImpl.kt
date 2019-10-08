@@ -10,7 +10,7 @@ import com.simprints.fingerprint.scanner.exceptions.unexpected.NullScannerExcept
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.wrapper.ScannerWrapper
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.v1.ScannerUtils
 import io.reactivex.Completable
 import io.reactivex.Single

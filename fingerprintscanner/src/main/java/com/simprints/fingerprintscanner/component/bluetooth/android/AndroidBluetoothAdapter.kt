@@ -1,8 +1,8 @@
-package com.simprints.fingerprintscanner.api.bluetooth.android
+package com.simprints.fingerprintscanner.component.bluetooth.android
 
 import android.bluetooth.BluetoothAdapter
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.api.bluetooth.BluetoothComponentDevice
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice
 
 class AndroidBluetoothAdapter(private val adapter: BluetoothAdapter?) : BluetoothComponentAdapter {
 
