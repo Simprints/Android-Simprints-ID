@@ -11,7 +11,8 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecords
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
@@ -158,14 +159,9 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() = runBlocking {
         val fingerprintRecordLocalDataSource =  (personLocalDataSource as FingerprintRecordLocalDataSource)
-        try {
+        assertThrows<InvalidQueryToLoadRecordsException> {
             fingerprintRecordLocalDataSource.loadFingerprintRecords(object : Serializable {} )
-            fail("no InvalidQueryToLoadRecords thrown")
-        } catch (t: Throwable) {
-            assertThat(t).isInstanceOf(InvalidQueryToLoadRecords::class.java)
-            return@runBlocking
         }
-
     }
 
     @Test
