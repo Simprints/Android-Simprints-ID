@@ -139,7 +139,7 @@ class OrchestratorManagerImplTest {
         verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
+        verifyOnce(modalityFlowMock) { handleIntentResult(enrolAppRequest, anyInt(), anyInt(), anyNotNull()) }
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {
@@ -206,6 +206,7 @@ class OrchestratorManagerImplTest {
 
         runBlockingTest {
             handleIntentResult(
+                enrolAppRequest,
                 requestCode,
                 Activity.RESULT_OK,
                 Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))

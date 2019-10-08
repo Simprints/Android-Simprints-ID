@@ -8,9 +8,7 @@ import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.id.orchestrator.enrolAppRequest
 import com.simprints.id.orchestrator.identifyAppRequest
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
@@ -30,7 +28,6 @@ import org.koin.core.context.stopKoin
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     private lateinit var preferencesManagerMock: PreferencesManager
-    private lateinit var converterModuleApiToDomainMock: ModuleApiToDomainFingerprintResponse
 
     private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
@@ -42,7 +39,6 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     @Before
     fun setUp() {
         preferencesManagerMock = mock()
-        converterModuleApiToDomainMock = mock()
 
         with(preferencesManagerMock) {
             whenever(language) thenReturn "en"
@@ -55,7 +51,6 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
         fingerprintStepProcess = FingerprintStepProcessorImpl(
             fingerprintRequestFactory,
-            converterModuleApiToDomainMock,
             preferencesManagerMock
         )
     }
@@ -63,9 +58,9 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     @Test
     fun stepProcessorShouldBuildTheRightStepForVerify() {
         with(verifyAppRequest) {
-            val step = fingerprintStepProcess.buildStepVerify(projectId, userId, moduleId, metadata, verifyGuid)
+            val step = fingerprintStepProcess.buildStepToMatch(projectId, userId, moduleId, metadata, verifyGuid)
 
-            verifyFingerprintIntent<FingerprintVerifyRequest>(step, VERIFY.value)
+            verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
         }
     }
 
