@@ -1,9 +1,10 @@
 package com.simprints.fingerprintscanner.v2.tools.reactive
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.testtools.unit.reactive.testSubscribe
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
-import io.reactivex.schedulers.Schedulers
+import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Test
 import java.io.PipedInputStream
@@ -25,17 +26,13 @@ class RxInputStreamTest {
 
         inputStream
             .toFlowable(bufferSize = bufferSize)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.trampoline())
-            .subscribe(testSubscriber)
+            .testSubscribe(testSubscriber)
 
         val bytes = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF ".hexToByteArray()
         bytes.chunked(writeSize).forEach { outputStream.write(it) }
         outputStream.close()
 
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertComplete()
-        testSubscriber.assertNoErrors()
+        testSubscriber.awaitCompletionWithNoErrors()
 
         assertThat(testSubscriber.valueCount()).isEqualTo(calculateNumberOfElements(bufferSize, bytes.size))
         assertThat(testSubscriber.values().toHexStrings())
@@ -56,17 +53,13 @@ class RxInputStreamTest {
 
         inputStream
             .toFlowable(bufferSize = bufferSize)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.trampoline())
-            .subscribe(testSubscriber)
+            .testSubscribe(testSubscriber)
 
         val bytes = "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF ".hexToByteArray()
         bytes.chunked(writeSize).forEach { outputStream.write(it) }
         outputStream.close()
 
-        testSubscriber.awaitTerminalEvent()
-        testSubscriber.assertComplete()
-        testSubscriber.assertNoErrors()
+        testSubscriber.awaitCompletionWithNoErrors()
 
         assertThat(testSubscriber.valueCount()).isEqualTo(calculateNumberOfElements(bufferSize, bytes.size))
         assertThat(testSubscriber.values().toHexStrings())
