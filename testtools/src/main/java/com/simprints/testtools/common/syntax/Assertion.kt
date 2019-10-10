@@ -71,7 +71,7 @@ inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
             else -> throw(exception)
         }
     }
-    throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
+    failTest("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
 inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
