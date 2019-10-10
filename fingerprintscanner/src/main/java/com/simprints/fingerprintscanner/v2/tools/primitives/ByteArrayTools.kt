@@ -21,7 +21,10 @@ fun concatenateByteArrays(vararg byteArrays: ByteArray): ByteArray =
 fun concatenateByteArrays(byteArrays: Iterable<ByteArray>): ByteArray =
     byteArrays.reduce { acc: ByteArray, bytes: ByteArray -> acc + bytes }
 
-/** @throws IndexOutOfBoundsException */
+/**
+ * @throws IndexOutOfBoundsException if position includes a range outside of the buffer
+ * @throws java.nio.BufferUnderflowException if position includes a range that is too short
+ */
 fun <T> ByteArray.extract(getType: ByteBuffer.() -> T, position: IntRange? = null, byteOrder: ByteOrder): T =
     ByteBuffer.wrap(
         if (position != null)
