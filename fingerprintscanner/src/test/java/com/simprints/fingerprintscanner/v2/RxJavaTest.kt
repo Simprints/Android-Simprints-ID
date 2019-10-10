@@ -23,12 +23,14 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 
+@Ignore
 class RxJavaTest {
 
     @Test
