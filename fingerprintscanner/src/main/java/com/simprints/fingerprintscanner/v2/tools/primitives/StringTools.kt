@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.tools.primitives
 
-fun stripWhiteSpaceAndMakeLowercase(string: String) = string
+fun String.stripWhiteSpaceToLowercase() = this
     .replace(" ", "")
     .replace("\n", "")
     .replace("\r", "")

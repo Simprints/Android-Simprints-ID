@@ -1,15 +1,16 @@
 package com.simprints.fingerprintscanner.v2.tools.reactive
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.testtools.unit.reactive.testSubscribe
+import com.simprints.fingerprintscanner.testtools.calculateNumberOfElements
+import com.simprints.fingerprintscanner.testtools.chunked
+import com.simprints.fingerprintscanner.testtools.toHexStrings
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
-import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
+import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Test
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
-import kotlin.math.ceil
 
 class RxInputStreamTest {
 
@@ -66,12 +67,4 @@ class RxInputStreamTest {
             .containsExactlyElementsIn(bytes.chunked(bufferSize).toHexStrings())
             .inOrder()
     }
-
-    private fun ByteArray.chunked(size: Int) =
-        this.toList().chunked(size).map { it.toByteArray() }
-
-    private fun List<ByteArray>.toHexStrings() = this.map { it.toHexString() }
-
-    private fun calculateNumberOfElements(bufferSize: Int, numberOfBytes: Int) =
-        ceil(numberOfBytes.toFloat() / bufferSize.toFloat()).toInt()
 }
