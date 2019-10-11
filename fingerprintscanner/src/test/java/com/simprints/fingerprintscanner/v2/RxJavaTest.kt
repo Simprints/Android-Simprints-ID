@@ -1,5 +1,6 @@
 package com.simprints.fingerprintscanner.v2
 
+import com.simprints.fingerprintscanner.testtools.assertHexStringsEqual
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.packet.Channel
@@ -13,16 +14,14 @@ import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.incoming.packet.toPacketStream
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
-import com.simprints.fingerprintscanner.v2.tools.primitives.stripWhiteSpaceAndMakeLowercase
-import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
+import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.observers.TestObserver
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subscribers.TestSubscriber
-import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Test
 import java.io.InputStream
@@ -397,13 +396,6 @@ class RxJavaTest {
         assertHexStringsEqual(
             testSubscriber3.values().map { it.bytes.toHexString() }.reduce { a, b -> a + b },
             bytes3.repeat(11)
-        )
-    }
-
-    private fun assertHexStringsEqual(expected: String, actual: String) {
-        assertEquals(
-            stripWhiteSpaceAndMakeLowercase(expected),
-            stripWhiteSpaceAndMakeLowercase(actual)
         )
     }
 

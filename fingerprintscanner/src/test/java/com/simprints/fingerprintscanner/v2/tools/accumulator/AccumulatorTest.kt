@@ -4,8 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.tools.primitives.size
 import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Flowable
+import io.reactivex.rxkotlin.toFlowable
 import io.reactivex.subscribers.TestSubscriber
 import org.junit.Test
 
@@ -19,12 +18,8 @@ class AccumulatorTest {
         val strings = listOf("28abcdefghijklmnopqrstuvwxyz", "10DEADBEEF", "05xyz")
         val stringFragments = strings.reduce { acc, s -> acc + s }.chunked(fragmentSize)
 
-        val source = Flowable.create<String>({ e ->
-            stringFragments.forEach { e.onNext(it) }
-            e.onComplete()
-        }, BackpressureStrategy.BUFFER)
-
-        source
+        stringFragments
+            .toFlowable()
             .accumulateAndTakeElements(StringAccumulator())
             .testSubscribe(testSubscriber)
 

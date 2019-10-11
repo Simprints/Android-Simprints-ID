@@ -40,7 +40,7 @@ fun Int.toByteArray(byteOrder: ByteOrder): ByteArray =
 
 /** @throws IllegalArgumentException if odd number of hex characters */
 fun String.hexToByteArray(): ByteArray {
-    val s = stripWhiteSpaceAndMakeLowercase(this)
+    val s = stripWhiteSpaceToLowercase()
     if (s.length % 2 != 0) throw IllegalArgumentException("String must contain even number of bytes")
     if ("""([^a-f\d])""".toRegex().containsMatchIn(s)) throw IllegalArgumentException("String must contain only whitespace and hex characters (0-9,a-f,A-F)")
     val data = ByteArray(s.length / 2)
