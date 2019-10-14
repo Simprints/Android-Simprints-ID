@@ -25,7 +25,7 @@ import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivi
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentPresenter
-import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
@@ -81,7 +81,7 @@ interface AppComponent {
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
-    fun inject(pricvacyNoticeActivity: PricvacyNoticeActivity)
+    fun inject(privacyNoticeActivity: PrivacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)

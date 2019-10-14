@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.INDIVIDUAL
 import com.simprints.id.data.analytics.eventdata.models.domain.events.ConsentEvent.Type.PARENTAL
@@ -26,6 +26,7 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreResponseCode
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.requestPermissionsIfRequired
 import kotlinx.android.synthetic.main.activity_consent.*
@@ -42,6 +43,7 @@ class ConsentActivity : AppCompatActivity() {
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var exitFormHelper: ExitFormHelper
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private var startConsentEventTime: Long = 0
 
@@ -59,6 +61,7 @@ class ConsentActivity : AppCompatActivity() {
             .get(ConsentViewModel::class.java)
 
         requestLocationPermission()
+        setupTextInUi()
         setupTabs()
         setupObserversForUi()
     }
@@ -73,15 +76,21 @@ class ConsentActivity : AppCompatActivity() {
             LOCATION_PERMISSION_REQUEST_CODE)
     }
 
+    private fun setupTextInUi() {
+        consentDeclineButton.text = androidResourcesHelper.getString(R.string.launch_consent_decline_button)
+        consentAcceptButton.text = androidResourcesHelper.getString(R.string.launch_consent_accept_button)
+        privacyNoticeText.text = androidResourcesHelper.getString(R.string.privacy_notice_text)
+    }
+
     private fun setupTabs() {
         tabHost.setup()
 
         generalConsentTab = tabHost.newTabSpec(GENERAL_CONSENT_TAB_TAG)
-            .setIndicator(getString(R.string.consent_general_title))
+            .setIndicator(androidResourcesHelper.getString(R.string.consent_general_title))
             .setContent(R.id.generalConsentTextView)
 
         parentalConsentTab = tabHost.newTabSpec(PARENTAL_CONSENT_TAB_TAG)
-            .setIndicator(getString(R.string.consent_parental_title))
+            .setIndicator(androidResourcesHelper.getString(R.string.consent_parental_title))
             .setContent(R.id.parentalConsentTextView)
 
         tabHost.addTab(generalConsentTab)
@@ -143,7 +152,7 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun startPrivacyNoticeActivity() {
-        startActivity(Intent(this, PricvacyNoticeActivity::class.java))
+        startActivity(Intent(this, PrivacyNoticeActivity::class.java))
     }
 
     private fun startExitFormActivity() {

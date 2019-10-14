@@ -12,7 +12,7 @@ import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_privacy_notice.*
 import javax.inject.Inject
 
-class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
+class PrivacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
@@ -26,6 +26,7 @@ class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
         setContentView(R.layout.activity_privacy_notice)
 
         initActionBar()
+        initTextInUi()
 
         viewPresenter = LongConsentPresenter(this, component)
         viewPresenter.start()
@@ -36,7 +37,11 @@ class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setTitle(R.string.privacy_notice_title)
+        supportActionBar?.title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+    }
+
+    private fun initTextInUi() {
+        longConsent_downloadButton.text = androidResourcesHelper.getString(R.string.long_consent_download_button_text)
     }
 
     override fun onSupportNavigateUp(): Boolean {

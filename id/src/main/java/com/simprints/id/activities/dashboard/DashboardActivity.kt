@@ -12,7 +12,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
 import com.simprints.id.activities.debug.DebugActivity
-import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -120,7 +120,7 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
             val id = menuItem.itemId
             when (id) {
-                R.id.menuPrivacyNotice -> startActivity(Intent(this, PricvacyNoticeActivity::class.java))
+                R.id.menuPrivacyNotice -> startActivity(Intent(this, PrivacyNoticeActivity::class.java))
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
                 R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
             }
