@@ -15,5 +15,5 @@ interface MessageProtocol: Protocol {
         getDataLengthFromHeader(header) + HEADER_SIZE
 
     fun getDataBytes(messageBytes: ByteArray): ByteArray =
-        messageBytes.sliceArray(HEADER_SIZE..messageBytes.size)
+        messageBytes.sliceArray(HEADER_SIZE until messageBytes.size)
 }

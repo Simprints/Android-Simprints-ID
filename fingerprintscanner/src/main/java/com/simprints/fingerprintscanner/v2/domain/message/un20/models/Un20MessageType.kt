@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.domain.message.un20.models
 
-import com.simprints.fingerprintscanner.v2.tools.lang.values
+import com.simprints.fingerprintscanner.v2.tools.lang.objects
 
 sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
 
@@ -26,7 +26,7 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
         fun fromBytes(bytes: ByteArray): Un20MessageType =
             Pair(bytes[0], bytes[1]).let { (receivedMajorByte, receivedMinorByte) ->
 
-                Un20MessageType::class.values()
+                Un20MessageType::class.objects()
                     .firstOrNull {
                         it.majorByte == receivedMajorByte && it.minorByte == receivedMinorByte
                     }

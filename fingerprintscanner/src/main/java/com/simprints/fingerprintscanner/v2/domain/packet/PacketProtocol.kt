@@ -34,7 +34,7 @@ object PacketProtocol: Protocol {
         bytes.slice(HEADER_INDICES).toByteArray()
 
     fun getPayloadBytes(bytes: ByteArray): ByteArray =
-        bytes.slice(HEADER_INDICES.last + 1 until bytes.size).toByteArray()
+        bytes.slice(HEADER_SIZE until bytes.size).toByteArray()
 
     fun buildPacketBytes(source: Channel, destination: Channel, payload: ByteArray): ByteArray {
         val length = payload.size
