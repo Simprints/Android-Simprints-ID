@@ -27,7 +27,7 @@ object Un20MessageProtocol: MessageProtocol {
 
     fun buildMessageBytes(un20MessageType: Un20MessageType, data: ByteArray): ByteArray {
         val length = data.size
-        val header = un20MessageType.getBytes() + length.toShort().toByteArray()
+        val header = un20MessageType.getBytes() + length.toByteArray()
         return header + data
     }
 }
