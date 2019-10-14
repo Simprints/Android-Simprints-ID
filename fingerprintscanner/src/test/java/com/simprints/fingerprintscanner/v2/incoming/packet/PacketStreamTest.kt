@@ -2,7 +2,6 @@ package com.simprints.fingerprintscanner.v2.incoming.packet
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.testtools.*
-import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.setupMock
@@ -10,7 +9,6 @@ import com.simprints.testtools.common.syntax.whenThis
 import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.subscribers.TestSubscriber
 import org.junit.Test
 
 class PacketStreamTest {
@@ -23,14 +21,12 @@ class PacketStreamTest {
 
     @Test
     fun packetStream_accumulatesAndCreatesPacketsCorrectly() {
-        val testSubscriber = TestSubscriber<Packet>()
-
         val packetStrings = listOf("10 A0 01 00 F0", "10 A0 03 00 F0 F1 F2", "10 A0 02 00 F0 F1")
 
-        packetStrings.reduceString().hexToByteArray().chunked(4)
+        val testSubscriber = packetStrings.reduceString().hexToByteArray().chunked(4)
             .toFlowable()
             .toPacketStream(ByteArrayToPacketAccumulator(packetParserMock))
-            .testSubscribe(testSubscriber)
+            .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
 
