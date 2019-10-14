@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 
 class ConsentRepositoryImpl(private val context: Context,
@@ -12,7 +13,8 @@ class ConsentRepositoryImpl(private val context: Context,
                             private val crashReportManager: CrashReportManager,
                             private val programName: String,
                             private val organizationName: String,
-                            language: String) : ConsentRepository {
+                            language: String,
+                            private val modalities: List<Modality>) : ConsentRepository {
 
     private val generalConsentText = MutableLiveData<String>()
     private val parentalConsentText = MutableLiveData<String>()
@@ -32,7 +34,7 @@ class ConsentRepositoryImpl(private val context: Context,
 
     private fun getGeneralConsentData() =
         GeneralConsentDataGenerator(getGeneralConsentOptions(),
-            programName, organizationName)
+            programName, organizationName, modalities)
 
     private fun getGeneralConsentOptions() = try {
         JsonHelper.gson.fromJson(consentLocalDataSource.generalConsentOptionsJson, GeneralConsentOptions::class.java)
@@ -44,7 +46,7 @@ class ConsentRepositoryImpl(private val context: Context,
     private fun getParentalConsentData() =
         ParentalConsentDataGenerator(consentLocalDataSource.parentalConsentExists,
             getParentalConsentOptions(),
-            programName, organizationName)
+            programName, organizationName, modalities)
 
     private fun getParentalConsentOptions() = try {
         JsonHelper.gson.fromJson(consentLocalDataSource.parentalConsentOptionsJson, ParentalConsentOptions::class.java)
