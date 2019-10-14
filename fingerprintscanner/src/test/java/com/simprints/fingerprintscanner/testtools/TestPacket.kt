@@ -25,6 +25,9 @@ fun randomPacketWithSource(source: Channel): Packet =
             PacketParser().parse(it)
         }
 
+fun randomHollowPacketWithRawBytes(maxSize: Int = 20) =
+    hollowPacketWithRawBytes(Random.nextBytes(Random.nextInt(1, maxSize)))
+
 fun randomPacketsWithSource(source: Channel, maxSize: Int = 20): List<Packet> =
     List(Random.nextInt(1, maxSize)) { randomPacketWithSource(source) }
 

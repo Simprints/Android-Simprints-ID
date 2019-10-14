@@ -8,7 +8,7 @@ import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
 
-class MessageSerializer(val packetParser: PacketParser) {
+class MessageSerializer(private val packetParser: PacketParser) {
 
     fun serialize(message: OutgoingMessage): List<Packet> =
         message
