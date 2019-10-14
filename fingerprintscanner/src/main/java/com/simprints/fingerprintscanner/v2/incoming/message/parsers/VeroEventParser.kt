@@ -23,7 +23,7 @@ class VeroEventParser : MessageParser<VeroEvent> {
                 VeroMessageType.GET_POWER_LED_STATE,
                 VeroMessageType.SET_SMILE_LED_STATE,
                 VeroMessageType.SET_BLUETOOTH_LED_STATE,
-                VeroMessageType.SET_POWER_LED_STATE -> TODO()
+                VeroMessageType.SET_POWER_LED_STATE -> TODO("exception handling")
             }
         }
 }

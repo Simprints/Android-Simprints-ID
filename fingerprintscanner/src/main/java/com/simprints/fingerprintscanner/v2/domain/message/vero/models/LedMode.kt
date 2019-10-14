@@ -12,7 +12,7 @@ sealed class LedMode(val byte: Byte) {
             0 -> OFF
             in 1..254 -> FLASHING(value)
             255 -> ON
-            else -> TODO()
+            else -> TODO("exception handling")
         }
     }
 }

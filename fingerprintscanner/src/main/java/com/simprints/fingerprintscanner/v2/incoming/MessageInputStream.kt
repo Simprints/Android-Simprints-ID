@@ -30,11 +30,11 @@ class MessageInputStream(
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
         veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)
-            ?: throw TODO()
+            ?: throw TODO("exception handling")
         veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)
-            ?: throw TODO()
+            ?: throw TODO("exception handling")
         un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)
-            ?: throw TODO()
+            ?: throw TODO("exception handling")
     }
 
     override fun disconnect() {
@@ -45,7 +45,7 @@ class MessageInputStream(
         when {
             isSubclass<R, VeroResponse>() -> veroResponses
             isSubclass<R, Un20Response>() -> un20Responses
-            else -> TODO()
+            else -> TODO("exception handling")
         }
             .filterCast<R>()
             .firstOrError()

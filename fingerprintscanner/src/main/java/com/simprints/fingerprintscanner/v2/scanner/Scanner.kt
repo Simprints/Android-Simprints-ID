@@ -104,7 +104,7 @@ class Scanner(
 
     private fun assertUn20On() = Completable.fromAction {
         if (state.un20On != true) {
-            TODO("UN20 isn't on")
+            TODO("exception handling")
         }
     }
 

@@ -33,7 +33,7 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
                     ?: when (receivedMajorByte) {
                         Un20MessageMajorType.GET_TEMPLATE.majorByte -> GetTemplate(receivedMinorByte)
                         Un20MessageMajorType.GET_IMAGE.majorByte -> GetImage(receivedMinorByte)
-                        else -> TODO()
+                        else -> TODO("exception handling")
                     }
             }
     }
