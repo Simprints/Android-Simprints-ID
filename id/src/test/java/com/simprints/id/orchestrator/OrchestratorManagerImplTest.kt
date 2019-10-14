@@ -181,6 +181,8 @@ class OrchestratorManagerImplTest {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
         val preferences = mock<SharedPreferences>()
+        whenever(preferences) { edit() } thenReturn mock()
+
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 
