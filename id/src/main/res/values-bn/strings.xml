@@ -270,6 +270,10 @@
     <string name="title_activity_settings">সেটিংস</string>
     <string name="title_activity_settings_about">সম্বন্ধে</string>
     <string name="privacy_notice_title">গোপনীয়তা নোটিশ</string>
-
+    <string name="privacy_notice_text"><u>গোপনীয়তা নোটিশ</u></string>
+    <string name="launch_consent_accept_button">গ্রহণ করুন</string>
+    <string name="launch_consent_decline_button"> প্রত্যাখ্যান করুন</string>
+    <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
+    <string name="consent_general_title">সাধারন সম্মতি</string>
 
 </resources>
