@@ -10,11 +10,11 @@ import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroEve
 import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroResponseAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
+import com.simprints.fingerprintscanner.v2.tools.lang.isSubclass
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.InputStream
-import kotlin.reflect.full.isSubclassOf
 
 class MessageInputStream(
     private val packetRouter: PacketRouter,
@@ -43,8 +43,8 @@ class MessageInputStream(
 
     inline fun <reified R : IncomingMessage> receiveResponse(): Single<R> =
         when {
-            R::class.isSubclassOf(VeroResponse::class) -> veroResponses
-            R::class.isSubclassOf(Un20Response::class) -> un20Responses
+            isSubclass<R, VeroResponse>() -> veroResponses
+            isSubclass<R, Un20Response>() -> un20Responses
             else -> TODO()
         }
             .filterCast<R>()
