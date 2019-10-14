@@ -9,7 +9,7 @@ import kotlinx.android.parcel.Parcelize
 class FingerprintSample(
     override val id: String,
     override val fingerIdentifier: IFingerIdentifier,
-    override val imageRef: ISecuredImageRef?,
     override val qualityScore: Int,
-    override val template: ByteArray
+    override val template: ByteArray,
+    override val imageRef: ISecuredImageRef?
 ) : IFingerprintSample

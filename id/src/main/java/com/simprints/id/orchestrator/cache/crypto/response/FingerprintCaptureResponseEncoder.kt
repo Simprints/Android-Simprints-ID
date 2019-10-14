@@ -26,8 +26,8 @@ class FingerprintCaptureResponseEncoder(
                 val imageRef = sample.imageRef
                 val qualityScore = sample.qualityScore
 
-                val processedSample = FingerprintSample(id, fingerId, imageRef,
-                    qualityScore, processedTemplate)
+                val processedSample = FingerprintSample(id, fingerId, qualityScore,
+                    processedTemplate, imageRef)
 
                 FingerprintCaptureResult(fingerId, processedSample)
             }
