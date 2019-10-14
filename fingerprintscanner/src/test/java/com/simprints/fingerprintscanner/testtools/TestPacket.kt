@@ -33,7 +33,6 @@ fun randomPacketsWithSource(source: Channel, maxSize: Int = 20): List<Packet> =
 
 fun randomPayload(maxSize: Int = 20) = Random.nextBytes(Random.nextInt(maxSize))
 
-
 fun assertPacketsEqual(expected: List<Packet>, actual: List<Packet>) {
     assertThat(actual.size).isEqualTo(expected.size)
     expected.zip(actual).forEach { (expected, actual) ->
