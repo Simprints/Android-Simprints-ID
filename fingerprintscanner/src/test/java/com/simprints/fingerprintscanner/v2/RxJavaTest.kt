@@ -177,6 +177,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun publishPacketTest() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -216,6 +217,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun publishFlowablePacketTest() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -250,6 +252,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun publishFlowablePacketMultipleSubscribersShouldBothGetPackets() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -297,6 +300,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun publishFlowablePacketMultipleSubscribersFilteredShouldGetDifferentPackets() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()

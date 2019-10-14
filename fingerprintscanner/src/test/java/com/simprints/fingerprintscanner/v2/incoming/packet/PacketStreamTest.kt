@@ -6,7 +6,7 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.setupMock
 import com.simprints.testtools.common.syntax.whenThis
-import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
+import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test

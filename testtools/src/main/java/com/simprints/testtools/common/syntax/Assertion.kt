@@ -3,6 +3,7 @@ package com.simprints.testtools.common.syntax
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
+import io.reactivex.subscribers.TestSubscriber
 import junit.framework.AssertionFailedError
 import org.junit.Assert
 import org.mockito.Mockito
@@ -84,6 +85,12 @@ fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
     .await()
     .assertComplete()
     .assertNoErrors()
+
+fun <T> TestSubscriber<T>.awaitCompletionWithNoErrors() {
+    awaitTerminalEvent()
+    assertComplete()
+    assertNoErrors()
+}
 
 fun failTest(message: String?): Nothing {
     Assert.fail(message)

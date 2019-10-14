@@ -13,6 +13,12 @@ fun hollowPacketWithRawBytes(bytes: ByteArray) =
 fun hollowPacketWithPayload(payload: ByteArray) =
     Packet(byteArrayOf(), byteArrayOf(), payload, 0x00, 0x00, 0x00)
 
+fun packetWithSourceAndPayload(source: Channel, payload: ByteArray) =
+    PacketProtocol
+        .buildPacketBytes(source, Channel.Local.AndroidDevice, payload).let {
+            PacketParser().parse(it)
+        }
+
 fun randomPacketWithSource(source: Channel): Packet =
     PacketProtocol
         .buildPacketBytes(source, Channel.Local.AndroidDevice, randomPayload()).let {

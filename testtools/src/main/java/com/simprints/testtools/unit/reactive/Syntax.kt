@@ -8,9 +8,3 @@ fun <T> Flowable<T>.testSubscribe(): TestSubscriber<T> = this
     .subscribeOn(Schedulers.io())
     .observeOn(Schedulers.trampoline())
     .test()
-
-fun <T> TestSubscriber<T>.awaitCompletionWithNoErrors() {
-    awaitTerminalEvent()
-    assertComplete()
-    assertNoErrors()
-}
