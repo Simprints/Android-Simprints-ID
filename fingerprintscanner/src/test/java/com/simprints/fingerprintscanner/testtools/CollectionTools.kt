@@ -15,3 +15,13 @@ fun calculateNumberOfElements(chunkSize: Int, totalSize: Int) =
 fun List<String>.reduceString() = reduce { acc, s -> acc + s }
 
 fun List<String>.stripWhiteSpaceToLowercase() = map { it.stripWhiteSpaceToLowercase() }
+
+fun <T> interleave(vararg lists: List<T>): List<T> =
+    sequence {
+        val iterators = lists.map { it.iterator() }
+
+        while (iterators.any { it.hasNext() }) {
+            iterators.forEach { if (it.hasNext()) yield(it.next()) }
+        }
+
+    }.toList()
