@@ -6,6 +6,6 @@ enum class TemplateType(val byte: Byte) {
     fun getBytes() = byteArrayOf(byte)
 
     companion object {
-        fun fromBytes(bytes: ByteArray) = values().find { it.byte == bytes[0] } ?: TODO()
+        fun fromBytes(bytes: ByteArray) = values().find { it.byte == bytes[0] } ?: TODO("exception handling")
     }
 }

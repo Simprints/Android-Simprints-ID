@@ -29,6 +29,6 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     companion object {
         fun fromBytes(bytes: ByteArray) = values().find {
             it.majorByte == bytes[0] && it.minorByte == bytes[1]
-        } ?: TODO()
+        } ?: TODO("exception handling")
     }
 }

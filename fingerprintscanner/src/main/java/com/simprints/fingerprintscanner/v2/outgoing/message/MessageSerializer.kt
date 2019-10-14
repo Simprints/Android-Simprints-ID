@@ -20,7 +20,7 @@ class MessageSerializer(private val packetParser: PacketParser) {
                 val destination = when (message) {
                     is VeroCommand -> Channel.Remote.VeroServer
                     is Un20Command -> Channel.Remote.Un20Server
-                    else -> TODO()
+                    else -> TODO("exception handling")
                 }
 
                 PacketProtocol.buildPacketBytes(Channel.Local.AndroidDevice, destination, it)
