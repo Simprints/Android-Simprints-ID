@@ -4,7 +4,7 @@ import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
-import com.simprints.fingerprintscanner.v2.tools.lang.values
+import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable
@@ -30,7 +30,7 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
 
     private fun configureIncomingPacketStream(rawPacketStream: Flowable<Packet>) {
         incomingPackets = rawPacketStream.subscribeAndPublish()
-        incomingPacketChannels = Channel.Remote::class.values().associateWith {
+        incomingPacketChannels = Channel.Remote::class.objects().associateWith {
             incomingPackets.filterChannel(it).subscribeAndPublish()
         }
     }
