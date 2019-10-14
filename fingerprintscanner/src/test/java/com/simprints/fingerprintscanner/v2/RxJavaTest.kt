@@ -1,6 +1,7 @@
 package com.simprints.fingerprintscanner.v2
 
 import com.simprints.fingerprintscanner.testtools.assertHexStringsEqual
+import com.simprints.fingerprintscanner.testtools.reduceString
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
 import com.simprints.fingerprintscanner.v2.domain.packet.Channel
@@ -28,8 +29,9 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
+import kotlin.random.Random
 
-@Ignore
+@Ignore("Test class being migrated")
 class RxJavaTest {
 
     @Test
@@ -42,6 +44,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun packetTest() {
 
         val outputStream = PipedOutputStream()
@@ -69,6 +72,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun messageAccumulation_messageSpreadOutOverMultiplePackets_succeeds() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -103,6 +107,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun messageAccumulation_packetContainsMultipleMessages_succeeds() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -137,6 +142,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun messageAccumulation_multipleMessagesBrokenOverMultiplePackets_succeeds() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()
@@ -349,6 +355,7 @@ class RxJavaTest {
     }
 
     @Test
+    @Deprecated("Migrated")
     fun packetRouterTest() {
         val outputStream = PipedOutputStream()
         val inputStream = PipedInputStream()

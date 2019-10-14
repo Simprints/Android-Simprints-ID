@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscanner.v2.incoming.packet
 
-import com.google.common.truth.Truth.assertThat
+import com.simprints.fingerprintscanner.testtools.assertPacketsEqual
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import org.junit.Test
@@ -23,14 +23,5 @@ class PacketParserTest {
         val actualPacket = packetParser.parse(rawBytes)
 
         assertPacketsEqual(expectedPacket, actualPacket)
-    }
-
-    private fun assertPacketsEqual(expected: Packet, actual: Packet) {
-        assertThat(actual.bytes).isEqualTo(expected.bytes)
-        assertThat(actual.header).isEqualTo(expected.header)
-        assertThat(actual.payload).isEqualTo(expected.payload)
-        assertThat(actual.source).isEqualTo(expected.source)
-        assertThat(actual.destination).isEqualTo(expected.destination)
-        assertThat(actual.payloadLength).isEqualTo(expected.payloadLength)
     }
 }
