@@ -6,24 +6,21 @@ import com.simprints.fingerprintscanner.v2.tools.primitives.hexToByteArray
 import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
-import io.reactivex.subscribers.TestSubscriber
 import org.junit.Test
 
 class MessageStreamTest {
 
     @Test
     fun packetToMessageAccumulation_messageSpreadOutOverMultiplePackets_succeeds() {
-        val testSubscriber = TestSubscriber<TestMessage>()
-
         val packets = listOf("CC DD 08 00", "F0 F1 F2 F3 F4", "F5 F6 F7")
             .map { hollowPacketWithPayload(it.hexToByteArray()) }
         val messages = listOf("CC DD 08 00 F0 F1 F2 F3 F4 F5 F6 F7 ")
             .map { TestMessage(it.hexToByteArray()) }
 
-        packets
+        val testSubscriber = packets
             .toFlowable()
             .toMessageStream(TestMessageAccumulator(TestMessageParser()))
-            .testSubscribe(testSubscriber)
+            .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
 
@@ -34,17 +31,15 @@ class MessageStreamTest {
 
     @Test
     fun packetToMessageAccumulation_packetContainsMultipleMessages_succeeds() {
-        val testSubscriber = TestSubscriber<TestMessage>()
-
         val packets = listOf("CC DD 02 00 F0 F2 CC DD 00 00 CC DD 01 00 F0", "CC DD 00 00 CC DD 03 00 F0 F1 F2")
             .map { hollowPacketWithPayload(it.hexToByteArray()) }
         val messages = listOf("CC DD 02 00 F0 F2", "CC DD 00 00", "CC DD 01 00 F0", "CC DD 00 00", "CC DD 03 00 F0 F1 F2")
             .map { TestMessage(it.hexToByteArray()) }
 
-        packets
+        val testSubscriber = packets
             .toFlowable()
             .toMessageStream(TestMessageAccumulator(TestMessageParser()))
-            .testSubscribe(testSubscriber)
+            .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
 
@@ -55,17 +50,15 @@ class MessageStreamTest {
 
     @Test
     fun packetToMessageAccumulation_multipleMessagesBrokenOverMultiplePackets_succeeds() {
-        val testSubscriber = TestSubscriber<TestMessage>()
-
         val packets = listOf("CC DD 01 00", "F0 CC DD 03", "00 F0 F1 F2")
             .map { hollowPacketWithPayload(it.hexToByteArray()) }
         val messages = listOf("CC DD 01 00 F0", "CC DD 03 00 F0 F1 F2")
             .map { TestMessage(it.hexToByteArray()) }
 
-        packets
+        val testSubscriber = packets
             .toFlowable()
             .toMessageStream(TestMessageAccumulator(TestMessageParser()))
-            .testSubscribe(testSubscriber)
+            .testSubscribe()
 
         testSubscriber.awaitCompletionWithNoErrors()
 
