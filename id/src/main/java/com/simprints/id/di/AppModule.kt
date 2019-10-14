@@ -256,9 +256,11 @@ open class AppModule {
     open fun provideConsentTextManager(context: Context,
                                        consentLocalDataSource: ConsentLocalDataSource,
                                        crashReportManager: CrashReportManager,
-                                       preferencesManager: PreferencesManager): ConsentRepository =
+                                       preferencesManager: PreferencesManager,
+                                       androidResourcesHelper: AndroidResourcesHelper): ConsentRepository =
         ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
-            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language,
+            preferencesManager.programName, preferencesManager.organizationName,
+            androidResourcesHelper,
             preferencesManager.modalities)
 
     @Provides
