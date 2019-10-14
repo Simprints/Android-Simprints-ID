@@ -3,7 +3,24 @@ package com.simprints.fingerprintscanner.v2.tools.lang
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class SealedClassToolsTest {
+class ReflectionToolsTest {
+
+    @Test
+    fun isSubclass_forDirectSubclasses_succeedsCheck() {
+        assertThat(isSubclass<TestSubclass, TestOpenMiddleClass>()).isTrue()
+        assertThat(isSubclass<TestOpenMiddleClass, TestOpenBaseClass>()).isTrue()
+    }
+
+    @Test
+    fun isSubclass_forIndirectSubclasses_succeedsCheck() {
+        assertThat(isSubclass<TestSubclass, TestOpenBaseClass>()).isTrue()
+    }
+
+    @Test
+    fun isSubclass_forNonSubclasses_failsCheck() {
+        assertThat(isSubclass<TestNotSubclass, TestOpenBaseClass>()).isFalse()
+        assertThat(isSubclass<TestOpenBaseClass, TestSubclass>()).isFalse()
+    }
 
     @Test
     fun sealedClassWithObjectsOnly_retrieveObjects_returnsAllObjects() {
@@ -30,6 +47,11 @@ class SealedClassToolsTest {
                 TestSealedClassMixedClassesAndObjects.ObjectE
             ))
     }
+
+    private open class TestOpenBaseClass
+    private open class TestOpenMiddleClass : TestOpenBaseClass()
+    private class TestSubclass : TestOpenMiddleClass()
+    private class TestNotSubclass
 
     private sealed class TestSealedClassObjectsOnly {
         object ObjectA : TestSealedClassObjectsOnly()
