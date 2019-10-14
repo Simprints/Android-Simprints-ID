@@ -14,6 +14,7 @@ import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Flowable
 import io.reactivex.Single
 import java.io.InputStream
+import kotlin.reflect.full.isSubclassOf
 
 class MessageInputStream(
     private val packetRouter: PacketRouter,
@@ -41,9 +42,9 @@ class MessageInputStream(
     }
 
     inline fun <reified R : IncomingMessage> receiveResponse(): Single<R> =
-        when (R::class) {
-            VeroResponse::class -> veroResponses
-            Un20Response::class -> un20Responses
+        when {
+            R::class.isSubclassOf(VeroResponse::class) -> veroResponses
+            R::class.isSubclassOf(Un20Response::class) -> un20Responses
             else -> TODO()
         }
             .filterCast<R>()

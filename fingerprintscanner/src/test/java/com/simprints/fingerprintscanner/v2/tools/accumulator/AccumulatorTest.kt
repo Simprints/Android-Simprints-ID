@@ -2,7 +2,7 @@ package com.simprints.fingerprintscanner.v2.tools.accumulator
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.fingerprintscanner.v2.tools.primitives.size
-import com.simprints.testtools.unit.reactive.awaitCompletionWithNoErrors
+import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
 import org.junit.Test
