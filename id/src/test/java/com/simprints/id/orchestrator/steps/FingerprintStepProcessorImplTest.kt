@@ -18,12 +18,11 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorI
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyNever
-import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -65,7 +64,7 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     }
 
     private fun mockFromModuleApiToDomainExt() {
-        mockkStatic("com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponsekt")
+        mockkStatic("com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponseKt")
         every { fingerprintResponseMock.fromModuleApiToDomain() } returns mock()
     }
 
@@ -88,21 +87,21 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     fun stepProcessorShouldProcessFingerprintEnrolResult() {
         fingerprintStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
 
-        verifyOnce(fingerprintResponseMock) { fromModuleApiToDomain() }
+        verify { fingerprintResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
     fun stepProcessorShouldProcessFingerprintMatchResult() {
         fingerprintStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
 
-        verifyOnce(fingerprintResponseMock) { fromModuleApiToDomain() }
+        verify { fingerprintResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
     fun stepProcessorShouldNotProcessNoFingerprintResult() {
         fingerprintStepProcess.processResult(0, Activity.RESULT_OK, result)
 
-        verifyNever(fingerprintResponseMock) { fromModuleApiToDomain() }
+        verify(exactly = 0) { fingerprintResponseMock.fromModuleApiToDomain() }
     }
 
     @After

@@ -139,7 +139,9 @@ class OrchestratorManagerImplTest {
         verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verifyOnce(modalityFlowMock) { handleIntentResult(enrolAppRequest, anyInt(), anyInt(), anyNotNull()) }
+        verifyOnce(modalityFlowMock) { handleIntentResult(safeEq(enrolAppRequest), anyInt(), anyInt(), anyNotNull()) }
+
+    fun <T : Any> safeEq(value: T): T = eq(value) ?: value
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {
@@ -180,7 +182,9 @@ class OrchestratorManagerImplTest {
         val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
-        val preferences = mock<SharedPreferences>()
+        val preferences = mock<SharedPreferences>().apply {
+            whenever(this) { edit() } thenReturn mock()
+        }
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 
