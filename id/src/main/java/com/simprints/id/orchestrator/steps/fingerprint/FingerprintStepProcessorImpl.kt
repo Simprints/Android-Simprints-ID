@@ -49,9 +49,7 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
 
     override fun processResult(requestCode: Int, resultCode: Int, data: Intent?): FingerprintResponse? =
         if (isFingerprintResult(requestCode)) {
-            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.let {
-                it.fromModuleApiToDomain()
-            }
+            data?.getParcelableExtra<IFingerprintResponse>(RESPONSE_BUNDLE_KEY)?.fromModuleApiToDomain()
         } else {
             null
         }

@@ -9,15 +9,21 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.enrolAppRequest
-import com.simprints.id.orchestrator.identifyAppRequest
-import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
-import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.verifyNever
+import com.simprints.testtools.common.syntax.verifyOnce
+import com.simprints.testtools.common.syntax.whenever
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -32,8 +38,9 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     private val fingerprintRequestFactory: FingerprintRequestFactory = FingerprintRequestFactoryImpl()
     private lateinit var fingerprintStepProcess: FingerprintStepProcessor
 
+    private val fingerprintResponseMock: IFingerprintResponse = mockk()
     val result = Intent().apply {
-        putExtra(BUNDLE_KEY, mock<IFingerprintResponse>())
+        putExtra(BUNDLE_KEY, fingerprintResponseMock)
     }
 
     @Before
@@ -53,32 +60,27 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
             fingerprintRequestFactory,
             preferencesManagerMock
         )
+
+        mockFromModuleApiToDomainExt()
+    }
+
+    private fun mockFromModuleApiToDomainExt() {
+        mockkStatic("com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponsekt")
+        every { fingerprintResponseMock.fromModuleApiToDomain() } returns mock()
+    }
+
+
+    @Test
+    fun stepProcessorShouldBuildTheRightStepForMatching() {
+        val step = fingerprintStepProcess.buildStepToMatch(mock(), mock())
+        verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
     }
 
     @Test
-    fun stepProcessorShouldBuildTheRightStepForVerify() {
-        with(verifyAppRequest) {
-            val step = fingerprintStepProcess.buildStepToMatch(projectId, userId, moduleId, metadata, verifyGuid)
-
-            verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
-        }
-    }
-
-    @Test
-    fun stepProcessorShouldBuildTheRightStepForEnrol() {
+    fun stepProcessorShouldBuildTheRightStepForCapturing() {
         with(enrolAppRequest) {
             val step = fingerprintStepProcess.buildStepToCapture(projectId, userId, moduleId, metadata)
-
             verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
-        }
-    }
-
-    @Test
-    fun stepProcessorShouldBuildTheRightStepForIdentify() {
-        with(identifyAppRequest) {
-            val step = fingerprintStepProcess.buildStepToMatch(projectId, userId, moduleId, metadata)
-
-            verifyFingerprintIntent<FingerprintIdentifyRequest>(step, IDENTIFY.value)
         }
     }
 
@@ -86,32 +88,25 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
     fun stepProcessorShouldProcessFingerprintEnrolResult() {
         fingerprintStepProcess.processResult(CAPTURE.value, Activity.RESULT_OK, result)
 
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
+        verifyOnce(fingerprintResponseMock) { fromModuleApiToDomain() }
     }
 
     @Test
-    fun stepProcessorShouldProcessFingerprintIdentifyResult() {
-        fingerprintStepProcess.processResult(IDENTIFY.value, Activity.RESULT_OK, result)
+    fun stepProcessorShouldProcessFingerprintMatchResult() {
+        fingerprintStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
 
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
-    }
-
-    @Test
-    fun stepProcessorShouldProcessFingerprintVerifyResult() {
-        fingerprintStepProcess.processResult(VERIFY.value, Activity.RESULT_OK, result)
-
-        verifyOnce(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
+        verifyOnce(fingerprintResponseMock) { fromModuleApiToDomain() }
     }
 
     @Test
     fun stepProcessorShouldNotProcessNoFingerprintResult() {
         fingerprintStepProcess.processResult(0, Activity.RESULT_OK, result)
 
-        verifyNever(converterModuleApiToDomainMock) { fromModuleApiToDomainFingerprintResponse(anyNotNull()) }
+        verifyNever(fingerprintResponseMock) { fromModuleApiToDomain() }
     }
 
     @After
-    fun tearDown(){
+    fun tearDown() {
         stopKoin()
     }
 }

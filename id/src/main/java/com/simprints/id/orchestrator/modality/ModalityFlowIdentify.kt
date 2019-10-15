@@ -46,7 +46,6 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
 
     override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         require(appRequest is AppIdentifyRequest)
-
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
