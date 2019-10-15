@@ -1,5 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
@@ -8,11 +10,9 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -103,16 +103,7 @@ class AppResponseBuilderForEnrolTest {
 
     private fun mockFingerprintStep(): Step {
         val request = FingerprintCaptureRequest(
-            "projectId",
-            "userId",
-            "moduleId",
-            "metadata",
-            "language",
-            mapOf(),
-            true,
-            "programmeName",
-            "organisationName",
-            listOf(FingerprintFingerIdentifier.LEFT_THUMB, FingerprintFingerIdentifier.LEFT_INDEX_FINGER)
+            listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
         )
 
         return Step(
@@ -123,11 +114,10 @@ class AppResponseBuilderForEnrolTest {
             result = FingerprintCaptureResponse(
                 listOf(
                     FingerprintCaptureResult(
-                        IFingerIdentifier.LEFT_THUMB,
+                        FingerIdentifier.LEFT_THUMB,
                         FingerprintSample(
-                            "id",
-                            IFingerIdentifier.LEFT_THUMB,
-                            qualityScore = 10,
+                            FingerIdentifier.LEFT_THUMB,
+                            templateQualityScore = 10,
                             template = "template".toByteArray(),
                             imageRef = null
                         )
