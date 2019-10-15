@@ -260,7 +260,8 @@ open class AppModule {
                                        crashReportManager: CrashReportManager,
                                        preferencesManager: PreferencesManager): ConsentRepository =
         ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
-            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language)
+            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language,
+            preferencesManager.modalities)
 
     @Provides
     open fun provideConsentViewModelFactory(consentTextManager: ConsentRepository,
