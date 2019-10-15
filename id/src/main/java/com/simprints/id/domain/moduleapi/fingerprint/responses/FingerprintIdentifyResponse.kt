@@ -8,5 +8,5 @@ import kotlinx.android.parcel.Parcelize
 data class FingerprintIdentifyResponse(
     val identifications: List<FingerprintMatchingResult>
 ) : FingerprintResponse {
-    @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.IDENTIFY
+    @IgnoredOnParcel override val type: FingerprintResponseType = FingerprintResponseType.IDENTIFY
 }
