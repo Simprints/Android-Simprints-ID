@@ -98,7 +98,7 @@ class ParcelableConverterTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun verifyResult(actual: Step.Result?, expected: Step.Result) {

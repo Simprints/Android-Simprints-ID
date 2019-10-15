@@ -121,7 +121,7 @@ class AppResponseBuilderForEnrolTest {
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
             request = request,
-            result = FingerprintCaptureResponse(
+            result = FingerprintCaptureResponse(captureResult =
                 listOf(
                     FingerprintCaptureResult(
                         IFingerIdentifier.LEFT_THUMB,
