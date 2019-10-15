@@ -47,6 +47,8 @@ class CoreExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
+        setTextInLayout()
+
         viewModel = ViewModelProvider(this, coreExitFormViewModelFactory).get(CoreExitFormViewModel::class.java)
         exitFormStartTime = timeHelper.now()
 
@@ -56,6 +58,22 @@ class CoreExitFormActivity : AppCompatActivity() {
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            whySkipBiometricsText.text = getString(R.string.why_did_you_skip_biometrics)
+            rbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            rbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            rbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            rbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            rbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            rbTooYoung.text = getString(R.string.refusal_too_young)
+            rbOther.text = getString(R.string.refusal_other)
+            exitFormText.hint = getString(R.string.hint_other_reason)
+            btSubmitExitForm.text = getString(R.string.button_submit)
+            btGoBack.text = getString(R.string.exit_form_go_back)
+        }
     }
 
     private fun setRadioGroupListener() {

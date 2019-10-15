@@ -40,12 +40,30 @@ class FaceExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
+        setTextInLayout()
+
         setRadioGroupListener()
     }
 
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            whySkipFaceText.text = getString(R.string.why_did_you_skip_face)
+            faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            faceRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            faceRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            faceRbTooYoung.text = getString(R.string.refusal_too_young)
+            faceRbOther.text = getString(R.string.refusal_other)
+            faceExitFormText.hint = getString(R.string.hint_other_reason)
+            faceBtSubmitExitForm.text = getString(R.string.button_submit)
+            faceBtGoBack.text = getString(R.string.exit_form_go_back)
+        }
     }
 
     private fun setRadioGroupListener() {

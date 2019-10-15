@@ -47,6 +47,8 @@ class FingerprintExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
+        setTextInLayout()
+
         viewModel = ViewModelProvider(this, fingerprintExitFormViewModelFactory)
             .get(FingerprintExitFormViewModel::class.java)
         fingerprintExitFormStartTime = timeHelper.now()
@@ -57,6 +59,22 @@ class FingerprintExitFormActivity : AppCompatActivity() {
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            whySkipFingerprintText.text = getString(R.string.why_did_you_skip_fingerprinting)
+            fingerprintRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            fingerprintRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            fingerprintRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            fingerprintRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            fingerprintRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            fingerprintRbTooYoung.text = getString(R.string.refusal_too_young)
+            fingerprintRbOther.text = getString(R.string.refusal_other)
+            fingerprintExitFormText.hint = getString(R.string.hint_other_reason)
+            fingerprintBtSubmitExitForm.text = getString(R.string.button_submit)
+            fingerprintBtGoBack.text = getString(R.string.button_scan_prints)
+        }
     }
 
     private fun setRadioGroupListener() {
