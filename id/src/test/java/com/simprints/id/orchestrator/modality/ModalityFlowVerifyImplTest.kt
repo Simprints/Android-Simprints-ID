@@ -60,8 +60,9 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-            verifyStepWasAdded(first(), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(first(), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
         }
     }
 
@@ -71,8 +72,9 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY)
-            verifyStepWasAdded(first(), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(first(), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -82,9 +84,10 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-            verifyStepWasAdded(first(), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(first(), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FINGERPRINT_ACTIVITY_NAME)
         }
     }
 
@@ -94,9 +97,10 @@ class ModalityFlowVerifyImplTest {
 
         with(modalityFlowVerify.steps) {
             assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY)
-            verifyStepWasAdded(first(), CONSENT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
-            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(first(), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), CONSENT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(3), FACE_ACTIVITY_NAME)
         }
     }
 
