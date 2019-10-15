@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
+import com.simprints.id.domain.moduleapi.app.requests.AppRequestType
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.modality.ModalityFlow
@@ -14,9 +15,8 @@ import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
-    private val hotCache: HotCache,
-    private val flowManager: FlowManager
-) : OrchestratorManager {
+    private val hotCache: HotCache
+) : OrchestratorManager, FlowManager {
 
     override val ongoingStep = MutableLiveData<Step?>()
     override val appResponse = MutableLiveData<AppResponse?>()
@@ -26,6 +26,7 @@ open class OrchestratorManagerImpl(
     internal var sessionId: String = ""
 
     private lateinit var modalitiesFlow: ModalityFlow
+    private lateinit var flow: AppRequestType
 
     override suspend fun initialise(modalities: List<Modality>,
                                     appRequest: AppRequest,
@@ -35,7 +36,7 @@ open class OrchestratorManagerImpl(
         this.modalities = modalities
         modalitiesFlow = flowModalityFactory.createModalityFlow(appRequest, modalities)
         resetInternalState()
-        flowManager.setCurrentFlow(appRequest.type)
+        flow = appRequest.type
 
         proceedToNextStepOrAppResponse()
     }
@@ -54,6 +55,8 @@ open class OrchestratorManagerImpl(
     override fun clearState() {
         hotCache.clear()
     }
+
+    override fun getCurrentFlow() = flow
 
     private suspend fun proceedToNextStepOrAppResponse() {
         with(modalitiesFlow) {

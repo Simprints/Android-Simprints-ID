@@ -16,6 +16,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRe
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.*
@@ -23,6 +25,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Test
 import org.koin.core.context.stopKoin
+import java.util.*
 
 class StepEncoderImplAndroidTest {
 
@@ -133,7 +136,7 @@ class StepEncoderImplAndroidTest {
         "moduleId",
         "metadata",
         "language",
-        mapOf(),
+        emptyMap(),
         true,
         "programmeName",
         "organisationName",
@@ -145,14 +148,19 @@ class StepEncoderImplAndroidTest {
     )
 
     private fun mockFingerprintCaptureResponse(): Step.Result {
-        val fingerprints = listOf(
-            Fingerprint(
+        val captureResult = listOf(
+            FingerprintCaptureResult(
                 IFingerIdentifier.RIGHT_THUMB,
-                "template".toByteArray(),
-                qualityScore = 3
+                FingerprintSample(
+                    UUID.randomUUID().toString(),
+                    IFingerIdentifier.RIGHT_THUMB,
+                    3,
+                    "abcd1234".toByteArray(),
+                    null
+                )
             )
         )
-        return FingerprintCaptureResponse(fingerprints)
+        return FingerprintCaptureResponse(captureResult)
     }
 
     private fun mockFaceCaptureResponse(): Step.Result {
@@ -185,11 +193,18 @@ class StepEncoderImplAndroidTest {
     private fun validateFingerprintCaptureResponse(actual: FingerprintCaptureResponse,
                                                    expected: FingerprintCaptureResponse) {
         with(actual) {
-            fingerprints.forEachIndexed { index, actualFingerprint ->
-                val expectedFingerprint = expected.fingerprints[index]
-                assertThat(actualFingerprint.fingerId, `is`(expectedFingerprint.fingerId))
-                assertThat(actualFingerprint.qualityScore, `is`(expectedFingerprint.qualityScore))
-                assertThat(actualFingerprint.template.contentEquals(expectedFingerprint.template), `is`(true))
+            captureResult.forEachIndexed { index, actualResult ->
+                val expectedResult = expected.captureResult[index]
+                assertThat(actualResult.identifier, `is`(expectedResult.identifier))
+                actualResult.sample?.let { actualSample ->
+                    expectedResult.sample?.let { expectedSample ->
+                        assertThat(actualSample.fingerIdentifier, `is`(expectedSample.fingerIdentifier))
+                        assertThat(actualSample.id, `is`(expectedSample.id))
+                        assertThat(actualSample.imageRef, `is`(expectedSample.imageRef))
+                        assertThat(actualSample.qualityScore, `is`(expectedSample.qualityScore))
+                        assertThat(actualSample.template.contentEquals(expectedSample.template), `is`(true))
+                    }
+                }
             }
         }
     }
