@@ -18,7 +18,7 @@ object ModuleApiToDomainFingerprintResponse {
         }
 
     private fun fromModuleApiToFingerprintCaptureResponse(fingerprintResponse: IFingerprintCaptureResponse): FingerprintCaptureResponse {
-        return FingerprintCaptureResponse(fingerprintResponse.captureResult)
+        return FingerprintCaptureResponse(captureResult = fingerprintResponse.captureResult)
     }
 
     private fun fromModuleApiToFingerprintVerifyResponse(fingerprintResponse: IFingerprintVerifyResponse): FingerprintVerifyResponse {

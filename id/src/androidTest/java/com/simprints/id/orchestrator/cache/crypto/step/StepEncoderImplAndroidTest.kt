@@ -157,7 +157,7 @@ class StepEncoderImplAndroidTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun mockFaceCaptureResponse(): Step.Result {

@@ -39,7 +39,7 @@ class FingerprintCaptureResponseEncoderAndroidTest {
     }
 
     private fun mockFingerprintCaptureResponse(): FingerprintCaptureResponse {
-        val fingerprints = listOf(
+        val captureResult = listOf(
             FingerprintCaptureResult(
                 IFingerIdentifier.RIGHT_THUMB,
                 FingerprintSample(
@@ -51,7 +51,7 @@ class FingerprintCaptureResponseEncoderAndroidTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(fingerprints)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun verifyResponses(originalResponse: FingerprintCaptureResponse,

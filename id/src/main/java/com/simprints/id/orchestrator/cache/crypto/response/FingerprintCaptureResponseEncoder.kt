@@ -33,7 +33,7 @@ class FingerprintCaptureResponseEncoder(
             }
         }
 
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
 }
