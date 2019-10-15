@@ -133,7 +133,7 @@ class StepEncoderImplAndroidTest {
         "moduleId",
         "metadata",
         "language",
-        emptyMap(),
+        mapOf(FingerprintFingerIdentifier.LEFT_THUMB to true),
         true,
         "programmeName",
         "organisationName",
