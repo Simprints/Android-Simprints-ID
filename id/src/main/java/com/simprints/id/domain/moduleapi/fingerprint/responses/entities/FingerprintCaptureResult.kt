@@ -1,4 +1,4 @@
-package com.simprints.id.orchestrator.cache.model
+package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult

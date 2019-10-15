@@ -10,7 +10,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
