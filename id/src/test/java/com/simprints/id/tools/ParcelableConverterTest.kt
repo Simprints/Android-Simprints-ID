@@ -3,7 +3,7 @@ package com.simprints.id.tools
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
