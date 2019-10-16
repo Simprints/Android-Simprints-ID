@@ -34,6 +34,7 @@ import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 class OrchestratorModule {
@@ -90,6 +91,7 @@ class OrchestratorModule {
     }
 
     @Provides
+    @Singleton // Since OrchestratorManagerImpl is also a FlowManager, it needs to be a Singleton
     fun provideOrchestratorManagerImpl(modalityFlowFactory: ModalityFlowFactory,
                                        appResponseFactory: AppResponseFactory,
                                        hotCache: HotCache): OrchestratorManagerImpl =
