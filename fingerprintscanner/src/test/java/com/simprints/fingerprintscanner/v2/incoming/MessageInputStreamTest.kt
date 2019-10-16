@@ -40,9 +40,9 @@ class MessageInputStreamTest {
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server to Flowable.empty<Packet>().publish())
+            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
+            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 
@@ -63,9 +63,9 @@ class MessageInputStreamTest {
         val expectedResponse = GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to Flowable.empty<Packet>().publish(),
-            Channel.Remote.VeroEvent to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server to packets.toFlowable().publish())
+            Channel.Remote.VeroServer as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.Un20Server as Channel to packets.toFlowable().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 
@@ -87,9 +87,9 @@ class MessageInputStreamTest {
         val expectedEvent = TriggerButtonPressedEvent()
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to Flowable.empty<Packet>().publish(),
-            Channel.Remote.VeroEvent to packets.toFlowable().publish(),
-            Channel.Remote.Un20Server to Flowable.empty<Packet>().publish())
+            Channel.Remote.VeroServer as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.VeroEvent as Channel to packets.toFlowable().publish(),
+            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 
@@ -111,9 +111,9 @@ class MessageInputStreamTest {
         val firstExpectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server to Flowable.empty<Packet>().publish())
+            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
+            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 
@@ -134,9 +134,9 @@ class MessageInputStreamTest {
         val expectedResponse = GetUn20OnResponse(DigitalValue.TRUE)
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to packets.toFlowable().publish(),
-            Channel.Remote.VeroEvent to Flowable.empty<Packet>().publish(),
-            Channel.Remote.Un20Server to Flowable.empty<Packet>().publish())
+            Channel.Remote.VeroServer as Channel to packets.toFlowable().publish(),
+            Channel.Remote.VeroEvent as Channel to Flowable.empty<Packet>().publish(),
+            Channel.Remote.Un20Server as Channel to Flowable.empty<Packet>().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 
@@ -165,9 +165,9 @@ class MessageInputStreamTest {
         val un20ResponsePackets = un20ResponseBytes.chunked(2).map { packetWithSourceAndPayload(Channel.Remote.Un20Server, it) }
 
         val channels = mapOf(
-            Channel.Remote.VeroServer to veroResponsePackets.toFlowable().publish(),
-            Channel.Remote.VeroEvent to veroEventPackets.toFlowable().publish(),
-            Channel.Remote.Un20Server to un20ResponsePackets.toFlowable().publish())
+            Channel.Remote.VeroServer as Channel to veroResponsePackets.toFlowable().publish(),
+            Channel.Remote.VeroEvent as Channel to veroEventPackets.toFlowable().publish(),
+            Channel.Remote.Un20Server as Channel to un20ResponsePackets.toFlowable().publish())
 
         whenever(packetRouter) { incomingPacketChannels } thenReturn channels
 

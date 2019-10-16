@@ -6,6 +6,7 @@ import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothDevice
 import com.simprints.fingerprintscannermock.simulated.tools.OutputStreamInterceptor
 import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerV1
+import com.simprints.fingerprintscannermock.simulated.v2.SimulatedScannerV2
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
 import java.io.PipedInputStream
@@ -26,7 +27,7 @@ class SimulatedScannerManager(
     private val simulatedScanner: SimulatedScanner =
         when (simulationMode) {
             SimulationMode.V1 -> SimulatedScannerV1(this, scannerState)
-            SimulationMode.V2 -> TODO()
+            SimulationMode.V2 -> SimulatedScannerV2(this, scannerState)
         }
 
     private val mockFingerIndex = AtomicInteger(0)
