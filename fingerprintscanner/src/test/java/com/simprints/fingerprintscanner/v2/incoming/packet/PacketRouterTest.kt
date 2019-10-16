@@ -4,6 +4,7 @@ import com.simprints.fingerprintscanner.testtools.assertPacketsEqual
 import com.simprints.fingerprintscanner.testtools.interleave
 import com.simprints.fingerprintscanner.testtools.randomPacketsWithSource
 import com.simprints.fingerprintscanner.v2.domain.packet.Channel
+import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import com.simprints.testtools.common.syntax.failTest
 import com.simprints.testtools.unit.reactive.testSubscribe
 import org.junit.Before
@@ -23,7 +24,7 @@ class PacketRouterTest {
         inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        router = PacketRouter(ByteArrayToPacketAccumulator(PacketParser()))
+        router = PacketRouter(Channel.Remote::class.objects(), ByteArrayToPacketAccumulator(PacketParser()))
 
         router.connect(inputStream)
     }
