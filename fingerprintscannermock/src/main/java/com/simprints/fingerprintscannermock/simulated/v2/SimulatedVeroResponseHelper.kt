@@ -1,13 +1,14 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
+import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroCommand
 import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 
 class SimulatedVeroResponseHelper(simulatedScannerManager: SimulatedScannerManager,
-                                  simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<VeroCommand> {
+                                  simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<VeroCommand, Un20Response> {
 
-    override fun createResponseToCommand(command: VeroCommand): ByteArray =
+    override fun createResponseToCommand(command: VeroCommand): Un20Response =
         when(command) {
             is GetFirmwareVersionCommand -> TODO()
             is GetUn20OnCommand -> TODO()
