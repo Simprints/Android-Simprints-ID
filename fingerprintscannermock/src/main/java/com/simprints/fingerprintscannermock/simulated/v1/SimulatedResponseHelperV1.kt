@@ -5,7 +5,6 @@ import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
-import com.simprints.fingerprintscannermock.simulated.tools.bytesToMessageV1
 
 class SimulatedResponseHelperV1(private val simulatedScannerManager: SimulatedScannerManager,
                                 private val simulatedScanner: SimulatedScanner) {
@@ -69,7 +68,7 @@ class SimulatedResponseHelperV1(private val simulatedScannerManager: SimulatedSc
         val response = byteArrayFromHexString(
             simulatedScannerManager.currentMockFinger().toV1().getTemplateFragmentsResponses[message.fragmentNumber.toInt()]
         )
-        if (bytesToMessageV1(response).isLastFragment) {
+        if (response.toMessageV1().isLastFragment) {
             simulatedScannerManager.cycleToNextFinger()
         }
         return response

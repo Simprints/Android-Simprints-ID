@@ -26,7 +26,7 @@ class OutputStreamInterceptor : OutputStream() {
     }
 
     override fun flush() {
-        val bytes = concatenateByteArrays(buffer)
+        val bytes = buffer.reduce { acc, bytes -> acc + bytes }
         observers.forEach { it.onNext(bytes) }
         buffer.clear()
     }
