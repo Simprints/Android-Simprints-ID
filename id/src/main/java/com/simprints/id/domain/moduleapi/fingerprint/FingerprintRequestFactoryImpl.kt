@@ -4,7 +4,7 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerIdentifier.*
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
@@ -13,13 +13,13 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.Fingerpri
 
 class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
 
-    override fun buildFingerprintEnrolRequest(projectId: String,
-                                              userId: String,
-                                              moduleId: String,
-                                              metadata: String,
-                                              prefs: PreferencesManager): FingerprintEnrolRequest =
+    override fun buildFingerprintCaptureRequest(projectId: String,
+                                                userId: String,
+                                                moduleId: String,
+                                                metadata: String,
+                                                prefs: PreferencesManager): FingerprintCaptureRequest =
         with(prefs) {
-            FingerprintEnrolRequest(
+            FingerprintCaptureRequest(
                 projectId,
                 userId,
                 moduleId,
@@ -28,7 +28,14 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
                 fingerStatus.mapKeys { buildFingerprintFingerIdentifier(it.key) },
                 logoExists,
                 organizationName,
-                programName)
+                programName,
+                fingerStatus.mapNotNull {
+                    if (it.value)
+                        buildFingerprintFingerIdentifier(it.key)
+                    else
+                        null
+                }
+            )
         }
 
     override fun buildFingerprintVerifyRequest(projectId: String,

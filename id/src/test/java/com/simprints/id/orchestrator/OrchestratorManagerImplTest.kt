@@ -181,6 +181,8 @@ class OrchestratorManagerImplTest {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
         val preferences = mock<SharedPreferences>()
+        whenever(preferences) { edit() } thenReturn mock()
+
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 
@@ -200,7 +202,7 @@ class OrchestratorManagerImplTest {
         response?.let {
             mockSteps.firstOrNull { step ->
                 step.getStatus() == ONGOING
-            }?.result = it.fromModuleApiToDomain()
+            }?.setResult(it.fromModuleApiToDomain())
         }
 
         runBlockingTest {
