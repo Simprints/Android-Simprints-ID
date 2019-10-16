@@ -1,9 +1,11 @@
-package com.simprints.fingerprintscannermock.simulated
+package com.simprints.fingerprintscannermock.simulated.v1
+
+import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 
 
-enum class SimulatedFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99
-                           val generateTemplateResponse: String = "fa fa fa fa 0c 00 8c 00 f5 f5 f5 f5 ", // OK response
-                           val getTemplateFragmentsResponses: List<String>) {
+enum class SimulatedFingerV1(val imageQualityResponse: String = "fa fa fa fa 0e 00 8b 00 63 00 f5 f5 f5 f5 ", // Quality score 99
+                             val generateTemplateResponse: String = "fa fa fa fa 0c 00 8c 00 f5 f5 f5 f5 ", // OK response
+                             val getTemplateFragmentsResponses: List<String>) {
 
     PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN(
             getTemplateFragmentsResponses = listOf(
@@ -82,23 +84,19 @@ enum class SimulatedFinger(val imageQualityResponse: String = "fa fa fa fa 0e 00
     NO_FINGER(
             generateTemplateResponse = "fa fa fa fa 0e 00 8c 0d 69 00 f5 f5 f5 f5 ", // SDK error
             getTemplateFragmentsResponses = listOf());
-
-    companion object {
-
-        val person1TwoFingersGoodScan =
-                arrayOf(PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-                    PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN)
-
-        val person1TwoFingersAgainGoodScan =
-                arrayOf(PERSON_1_VERSION_2_LEFT_THUMB_GOOD_SCAN,
-                    PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN)
-
-        val person2TwoFingersGoodScan =
-                arrayOf(PERSON_2_VERSION_1_LEFT_THUMB_GOOD_SCAN,
-                    PERSON_2_VERSION_1_LEFT_INDEX_GOOD_SCAN)
-
-        val person2TwoFingersAgainGoodScan =
-                arrayOf(PERSON_2_VERSION_2_LEFT_THUMB_GOOD_SCAN,
-                    PERSON_2_VERSION_2_LEFT_INDEX_GOOD_SCAN)
-    }
 }
+
+fun SimulatedFinger.toV1(): SimulatedFingerV1 =
+    when(this) {
+        SimulatedFinger.PERSON_1_FINGER_1_VERSION_1_GOOD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_1_LEFT_THUMB_GOOD_SCAN
+        SimulatedFinger.PERSON_1_FINGER_2_VERSION_1_GOOD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_1_LEFT_INDEX_GOOD_SCAN
+        SimulatedFinger.PERSON_1_FINGER_1_VERSION_2_GOOD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_2_LEFT_THUMB_GOOD_SCAN
+        SimulatedFinger.PERSON_1_FINGER_2_VERSION_2_GOOD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_2_LEFT_INDEX_GOOD_SCAN
+        SimulatedFinger.PERSON_2_FINGER_1_VERSION_1_GOOD_SCAN -> SimulatedFingerV1.PERSON_2_VERSION_1_LEFT_THUMB_GOOD_SCAN
+        SimulatedFinger.PERSON_2_FINGER_2_VERSION_1_GOOD_SCAN -> SimulatedFingerV1.PERSON_2_VERSION_1_LEFT_INDEX_GOOD_SCAN
+        SimulatedFinger.PERSON_2_FINGER_1_VERSION_2_GOOD_SCAN -> SimulatedFingerV1.PERSON_2_VERSION_2_LEFT_THUMB_GOOD_SCAN
+        SimulatedFinger.PERSON_2_FINGER_2_VERSION_2_GOOD_SCAN -> SimulatedFingerV1.PERSON_2_VERSION_2_LEFT_INDEX_GOOD_SCAN
+        SimulatedFinger.PERSON_1_FINGER_1_VERSION_1_BAD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_1_LEFT_THUMB_BAD_SCAN
+        SimulatedFinger.PERSON_1_FINGER_2_VERSION_1_BAD_SCAN -> SimulatedFingerV1.PERSON_1_VERSION_1_LEFT_INDEX_BAD_SCAN
+        SimulatedFinger.NO_FINGER -> SimulatedFingerV1.NO_FINGER
+    }
