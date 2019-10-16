@@ -1,12 +1,11 @@
-package com.simprints.fingerprintscannermock.simulated
+package com.simprints.fingerprintscannermock.simulated.tools
 
-import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.concatenateByteArrays
 import io.reactivex.Observer
 import java.io.OutputStream
 
 /**
  * Wraps an [OutputStream] and exposes an observable that contains the bytes written.
- * There is no byte buffer limit so [bytes] only emits the bytes when flush() is called.
+ * There is no byte buffer limit so onNext is called on [observers] only when flush() is called.
  */
 class OutputStreamInterceptor : OutputStream() {
 

@@ -18,8 +18,9 @@ import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
-import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
+import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
@@ -47,7 +48,7 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager())
+        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(SimulationMode.V1))
         declare {
             single<ScannerFactory> { ScannerFactoryImpl(simulatedBluetoothAdapter, get()) }
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }

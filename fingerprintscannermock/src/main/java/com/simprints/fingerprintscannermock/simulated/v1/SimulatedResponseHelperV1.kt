@@ -1,12 +1,14 @@
-package com.simprints.fingerprintscannermock.simulated
+package com.simprints.fingerprintscannermock.simulated.v1
 
 import com.simprints.fingerprintscanner.v1.Message
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE.*
-import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.byteArrayFromHexString
-import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.bytesToMessage
+import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
+import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
+import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
+import com.simprints.fingerprintscannermock.simulated.tools.bytesToMessageV1
 
-
-class SimulatedResponseHelper(private val simulatedScannerManager: SimulatedScannerManager) {
+class SimulatedResponseHelperV1(private val simulatedScannerManager: SimulatedScannerManager,
+                                private val simulatedScanner: SimulatedScanner) {
 
     fun createMockResponse(message: Message): ByteArray =
         when (message.messageType) {
@@ -36,7 +38,7 @@ class SimulatedResponseHelper(private val simulatedScannerManager: SimulatedScan
     )
 
     private fun getSensorInfoResponse() =
-        if (simulatedScannerManager.scannerState.isUn20On) {
+        if (simulatedScanner.scannerState.isUn20On) {
             byteArrayFromHexString(
                 "fa fa fa fa 1d 00 80 00 b5 07 49 cc 88 06 06 00 06 00 a3 0e 83 0e 00 00 02 f5 f5 f5 f5 "
             )
@@ -56,18 +58,18 @@ class SimulatedResponseHelper(private val simulatedScannerManager: SimulatedScan
     )
 
     private fun imageQualityResponse() = byteArrayFromHexString(
-        simulatedScannerManager.currentMockFinger().imageQualityResponse
+        simulatedScannerManager.currentMockFinger().toV1().imageQualityResponse
     )
 
     private fun generateTemplateResponse() = byteArrayFromHexString(
-        simulatedScannerManager.currentMockFinger().generateTemplateResponse
+        simulatedScannerManager.currentMockFinger().toV1().generateTemplateResponse
     )
 
     private fun getTemplateFragmentResponseAndCycleToNextFingerIfNeeded(message: Message): ByteArray {
         val response = byteArrayFromHexString(
-            simulatedScannerManager.currentMockFinger().getTemplateFragmentsResponses[message.fragmentNumber.toInt()]
+            simulatedScannerManager.currentMockFinger().toV1().getTemplateFragmentsResponses[message.fragmentNumber.toInt()]
         )
-        if (bytesToMessage(response).isLastFragment) {
+        if (bytesToMessageV1(response).isLastFragment) {
             simulatedScannerManager.cycleToNextFinger()
         }
         return response
