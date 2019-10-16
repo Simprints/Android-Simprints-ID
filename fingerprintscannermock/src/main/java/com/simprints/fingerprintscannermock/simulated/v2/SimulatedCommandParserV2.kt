@@ -14,12 +14,11 @@ class SimulatedCommandParserV2() {
     val inputStreamFlowable = inputStreamObservableEmitter.toFlowable(BackpressureStrategy.BUFFER)
     val messageStreamFlowable = inputStreamFlowable
         .toPacketStream(ByteArrayToPacketAccumulator(PacketParser()))
-        .toMessageStream()
 
     fun updateWithNewBytes(bytes: ByteArray) {
         inputStreamObservableEmitter.onNext(bytes)
     }
 
 }
-
-class FirmwarePacketToMessageAccumulator : PacketToMessageAccumulator<>
+//
+//class FirmwarePacketToMessageAccumulator : PacketToMessageAccumulator<>
