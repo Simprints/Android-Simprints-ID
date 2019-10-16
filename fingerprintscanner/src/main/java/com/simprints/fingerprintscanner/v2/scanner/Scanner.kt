@@ -5,11 +5,13 @@ import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageQualityCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageQualityResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetTemplateResponse
 import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetSmileLedStateCommand
@@ -115,6 +117,13 @@ class Scanner(
             )
         ).ignoreElement()
 
+    fun getImageQuality(): Single<Short> =
+        assertUn20On().andThen(
+            sendCommandAndReceiveResponse<GetImageQualityResponse>(
+                GetImageQualityCommand()
+            )
+        ).map { it.imageQuality }
+
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<ByteArray> =
         assertUn20On().andThen(
             sendCommandAndReceiveResponse<GetTemplateResponse>(
@@ -129,7 +138,6 @@ class Scanner(
                 GetImageCommand(imageFormat)
             )
         ).map { it.image }
-
 
     companion object {
         val DEFAULT_DPI = Dpi(500)
