@@ -5,6 +5,7 @@ import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import io.reactivex.Completable
 import io.reactivex.Observer
 import io.reactivex.Single
@@ -13,7 +14,7 @@ import com.simprints.fingerprintscanner.v2.scanner.Scanner as ScannerV2
 
 class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val scannerUiHelper: ScannerUiHelper,
-                       private val socket: BluetoothComponentSocket): ScannerWrapper {
+                       private val socket: BluetoothComponentSocket) : ScannerWrapper {
 
     override val versionInformation: ScannerVersionInformation by lazy {
         TODO()
@@ -33,8 +34,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
         scannerV2.captureFingerprint()
-            .andThen(scannerV2.acquireTemplate())
-            .flatMap { TODO("Need to deduce quality score and update scanner UI appropriately") }
+            .andThen(scannerV2.getImageQuality())
+            .flatMap {
+                imageQuality -> scannerV2.acquireTemplate().map { template -> CaptureFingerprintResponse(template, imageQuality.unsignedToInt()) }
+            }
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())
 

@@ -15,6 +15,7 @@ class Un20ResponseParser : MessageParser<Un20Response> {
             when (Un20MessageProtocol.getMessageType(messageBytes)) {
                 Un20MessageType.GetUn20AppVersion -> GetUn20AppVersionResponse.fromBytes(data)
                 Un20MessageType.CaptureFingerprint -> CaptureFingerprintResponse.fromBytes(data)
+                Un20MessageType.GetImageQuality -> GetImageQualityResponse.fromBytes(data)
                 Un20MessageType.GetSupportedTemplateTypes -> GetSupportedTemplateTypesResponse.fromBytes(data)
                 is Un20MessageType.GetTemplate -> GetTemplateResponse.fromBytes(minorTypeByte, data)
                 Un20MessageType.GetSupportedImageFormats -> GetSupportedImageFormatsResponse.fromBytes(data)
