@@ -220,8 +220,6 @@ class CollectFingerprintsPresenter(private val context: Context,
             collectRequest.moduleId,
             fingerprints)
 
-        sessionEventsManager.addPersonCreationEventInBackground(person)
-
         view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints, person))
     }
 

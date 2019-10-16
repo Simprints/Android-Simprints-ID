@@ -16,9 +16,17 @@ data class Step(
     val activityName: String,
     val bundleKey: String,
     val request: Request,
-    var result: Result? = null,
+    private var result: Result? = null,
     private var status: Status
 ) : Parcelable {
+
+    fun getResult() = result
+
+    fun setResult(result: Result?) {
+        if (result != null)
+            setStatus(COMPLETED)
+        this.result = result
+    }
 
     fun getStatus(): Status {
         updateStatusBasedOnResult()

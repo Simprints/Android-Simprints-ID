@@ -26,7 +26,7 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
                                 userId: String,
                                 moduleId: String,
                                 metadata: String): Step =
-        fingerprintRequestFactory.buildFingerprintEnrolRequest(projectId, userId, moduleId, metadata, prefs).run {
+        fingerprintRequestFactory.buildFingerprintCaptureRequest(projectId, userId, moduleId, metadata, prefs).run {
             buildStep(ENROL, this)
         }
 

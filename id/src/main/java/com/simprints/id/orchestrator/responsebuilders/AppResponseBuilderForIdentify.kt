@@ -19,7 +19,7 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
             return it
         }
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceResponseForIdentify(results)
         val fingerprintResponse = getFingerprintResponseForIdentify(results)
 

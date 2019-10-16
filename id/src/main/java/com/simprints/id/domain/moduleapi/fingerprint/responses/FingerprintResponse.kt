@@ -5,7 +5,7 @@ import com.simprints.id.orchestrator.steps.Step.Result
 
 interface FingerprintResponse: Parcelable, Result {
 
-    val type: FingerprintTypeResponse
+    val type: FingerprintResponseType
 
     companion object {
         const val BUNDLE_KEY = "FingerprintResponseBundleKey"
@@ -13,7 +13,7 @@ interface FingerprintResponse: Parcelable, Result {
 
 }
 
-enum class FingerprintTypeResponse {
+enum class FingerprintResponseType {
     ENROL,
     IDENTIFY,
     VERIFY,
