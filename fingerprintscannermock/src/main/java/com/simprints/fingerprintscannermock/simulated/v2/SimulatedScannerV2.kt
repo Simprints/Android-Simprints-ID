@@ -12,6 +12,4 @@ class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
     override fun handleAppToScannerEvent(bytes: ByteArray, returnStream: OutputStream) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
-    private fun respondWithMessage()
 }

@@ -7,4 +7,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20Messag
 class CaptureFingerprintCommand(val dpi: Dpi) : Un20Command(Un20MessageType.CaptureFingerprint){
 
     override fun getDataBytes(): ByteArray = dpi.getBytes()
+
+    companion object {
+        fun fromBytes(data: ByteArray) = CaptureFingerprintCommand(Dpi.fromBytes(data))
+    }
 }
