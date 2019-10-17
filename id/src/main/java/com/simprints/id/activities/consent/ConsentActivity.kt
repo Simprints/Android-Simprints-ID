@@ -77,9 +77,11 @@ class ConsentActivity : AppCompatActivity() {
     }
 
     private fun setupTextInUi() {
-        consentDeclineButton.text = androidResourcesHelper.getString(R.string.launch_consent_decline_button)
-        consentAcceptButton.text = androidResourcesHelper.getString(R.string.launch_consent_accept_button)
-        privacyNoticeText.text = androidResourcesHelper.getString(R.string.privacy_notice_text)
+        with (androidResourcesHelper) {
+            consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
+            consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
+            privacyNoticeText.text = getString(R.string.privacy_notice_text)
+        }
     }
 
     private fun setupTabs() {
