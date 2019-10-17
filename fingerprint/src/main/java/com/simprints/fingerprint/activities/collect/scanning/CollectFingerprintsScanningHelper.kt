@@ -12,6 +12,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsPresenter
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.SCANNER_BUTTON
@@ -35,7 +36,9 @@ class CollectFingerprintsScanningHelper(private val context: Context,
                                         private val view: CollectFingerprintsContract.View,
                                         private val presenter: CollectFingerprintsContract.Presenter,
                                         private val scannerManager: ScannerManager,
-                                        private val crashReportManager: FingerprintCrashReportManager) {
+                                        private val crashReportManager: FingerprintCrashReportManager,
+                                        private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
+
 
     private var previousStatus: FingerStatus = NOT_COLLECTED
     private var currentFingerStatus: FingerStatus
@@ -75,7 +78,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         ProgressDialog(context).also { dialog ->
             dialog.isIndeterminate = true
             dialog.setCanceledOnTouchOutside(false)
-            dialog.setMessage(context.getString(R.string.reconnecting_message))
+            dialog.setMessage(androidResourcesHelper.getString(R.string.reconnecting_message))
             dialog.setOnCancelListener { view.cancelAndFinish() }
         }
 

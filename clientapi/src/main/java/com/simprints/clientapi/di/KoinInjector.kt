@@ -22,6 +22,7 @@ import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -60,6 +61,7 @@ object KoinInjector {
     private fun Module.defineBuildersForCoreManagers() {
         factory { SessionEventsManager.build(androidApplication() as Application) }
         factory { CoreCrashReportManager.build(androidApplication() as Application) }
+        factory { AndroidResourcesHelper.build(androidApplication() as Application) }
         factory { TimeHelper.build(androidApplication() as Application) }
     }
 

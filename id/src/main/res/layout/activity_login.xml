@@ -20,7 +20,6 @@
             android:id="@+id/loginImageViewLogo"
             android:layout_width="55dp"
             android:layout_height="75dp"
-            android:contentDescription="@string/simprints_logo"
             android:src="@drawable/simprints_logo"
             android:layout_marginBottom="50dp"/>
 
@@ -37,7 +36,6 @@
                 android:textSize="15sp"
                 android:inputType="text"
                 android:enabled="false"
-                android:hint="@string/login_user_id_hint"
                 android:textColor="@color/simprints_white"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -50,7 +48,6 @@
                 android:id="@+id/loginEditTextProjectId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_id_hint"
                 android:textSize="15sp"
                 android:inputType="textVisiblePassword"
                 android:textColor="@color/simprints_white"/>
@@ -66,7 +63,6 @@
                 android:id="@+id/loginEditTextProjectSecret"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_secret_hint"
                 android:maxLines="3"
                 android:textSize="15sp"
                 android:inputType="textPassword"
@@ -78,14 +74,12 @@
             android:layout_width="wrap_content"
             android:layout_height="55dp"
             android:layout_marginTop="10dp"
-            android:drawableEnd="@drawable/ic_barcode"
-            android:text="@string/scan_qr" />
+            android:drawableEnd="@drawable/ic_barcode"/>
 
         <Button
             android:id="@+id/loginButtonSignIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="@string/login" />
+            android:layout_marginTop="5dp"/>
         </LinearLayout>
 </RelativeLayout>

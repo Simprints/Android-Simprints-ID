@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import android.widget.Toast
 import com.simprints.core.tools.EncodingUtils
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.confirmFingerprints.ConfirmFingerprintsDialog
@@ -15,6 +14,7 @@ import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.scanning.CollectFingerprintsScanningHelper
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.FINGER_CAPTURE
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -22,7 +22,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.data.domain.Action.*
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
@@ -36,7 +36,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val crashReportManager: FingerprintCrashReportManager,
                                    private val timeHelper: FingerprintTimeHelper,
                                    private val sessionEventsManager: FingerprintSessionEventsManager,
-                                   private val scannerManager: ScannerManager)
+                                   private val scannerManager: ScannerManager,
+                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -52,8 +53,6 @@ class CollectFingerprintsPresenter(private val context: Context,
     private var confirmDialog: AlertDialog? = null
 
     override fun start() {
-        LanguageHelper.setLanguage(context, collectRequest.language)
-
         initFingerDisplayHelper(view)
         initIndicatorsHelper(context, view)
         initScanningHelper(context, view)
@@ -65,7 +64,8 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            collectRequest.fingerStatus)
+            collectRequest.fingerStatus,
+            androidResourcesHelper)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -73,7 +73,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
-        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager)
+        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager, androidResourcesHelper)
     }
 
     private fun initScanButtonListeners() {
@@ -163,9 +163,9 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     override fun getTitle(): String =
         when (collectRequest.action) {
-            Action.ENROL -> context.getString(R.string.register_title)
-            Action.IDENTIFY -> context.getString(R.string.identify_title)
-            Action.VERIFY -> context.getString(R.string.verify_title)
+            ENROL -> androidResourcesHelper.getString(R.string.register_title)
+            IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
+            VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
         }
 
     override fun refreshDisplay() {
@@ -203,7 +203,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             .filter { fingerHasSatisfiedTerminalCondition(it) && !it.isFingerSkipped && it.template != null }
 
         if (fingers.isEmpty()) {
-            Toast.makeText(context, R.string.no_fingers_scanned, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, androidResourcesHelper.getString(R.string.no_fingers_scanned), Toast.LENGTH_LONG).show()
             handleRestart()
         } else {
             proceedToFinish(fingers.mapNotNull { it.template })
@@ -239,8 +239,8 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun addCaptureEventInSession(finger: Finger) {
         sessionEventsManager.addEventInBackground(FingerprintCaptureEvent(
-            timeHelper.now(),
             lastCaptureStartedAt,
+            timeHelper.now(),
             finger.id,
             qualityThreshold,
             FingerprintCaptureEvent.buildResult(finger.status),
@@ -252,7 +252,7 @@ class CollectFingerprintsPresenter(private val context: Context,
 
     private fun createMapAndShowDialog() {
         isConfirmDialogShown = true
-        confirmDialog = ConfirmFingerprintsDialog(context, createMapForScannedFingers(),
+        confirmDialog = ConfirmFingerprintsDialog(context, androidResourcesHelper, createMapForScannedFingers(),
             callbackConfirm = { handleConfirmFingerprintsAndContinue() },
             callbackRestart = { handleRestart() })
             .create().also {
@@ -264,7 +264,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun createMapForScannedFingers(): MutableMap<String, Boolean> =
         mutableMapOf<String, Boolean>().also { mapOfScannedFingers ->
             activeFingers.forEach {
-                mapOfScannedFingers[context.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
+                mapOfScannedFingers[androidResourcesHelper.getString(FingerRes.get(it).nameId)] = it.isGoodScan || it.isRescanGoodScan
             }
         }
 
