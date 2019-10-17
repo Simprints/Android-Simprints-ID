@@ -4,17 +4,18 @@ import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.data.prefs.PreferencesManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_privacy_notice.*
 import javax.inject.Inject
 
-class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
+class PrivacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
     @Inject lateinit var preferences: PreferencesManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override lateinit var viewPresenter: LongConsentContract.Presenter
 
@@ -22,10 +23,10 @@ class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
         super.onCreate(savedInstanceState)
 
         val component = (application as Application).component.also { it.inject(this) }
-        LanguageHelper.setLanguage(this, preferences.language)
         setContentView(R.layout.activity_privacy_notice)
 
         initActionBar()
+        initTextInUi()
 
         viewPresenter = LongConsentPresenter(this, component)
         viewPresenter.start()
@@ -36,7 +37,11 @@ class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setTitle(R.string.privacy_notice_title)
+        supportActionBar?.title = androidResourcesHelper.getString(R.string.privacy_notice_title)
+    }
+
+    private fun initTextInUi() {
+        longConsent_downloadButton.text = androidResourcesHelper.getString(R.string.long_consent_download_button_text)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -74,6 +79,6 @@ class PricvacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
     }
 
     override fun showDownloadErrorToast() {
-        showToast(R.string.long_consent_failed_to_download)
+        showToast(androidResourcesHelper, R.string.long_consent_failed_to_download)
     }
 }

@@ -12,7 +12,6 @@
         android:id="@+id/loginImageViewLogo"
         android:layout_width="55dp"
         android:layout_height="75dp"
-        android:contentDescription="@string/simprints_logo"
         android:layout_centerInParent="true"
         android:src="@drawable/simprints_logo" />
 
