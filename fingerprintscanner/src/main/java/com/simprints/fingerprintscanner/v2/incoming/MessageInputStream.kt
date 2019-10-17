@@ -30,11 +30,11 @@ class MessageInputStream(
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)?.doOnNext { println("Scanner Message Stream:  IN : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
             ?: throw TODO("exception handling")
-        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)?.doOnNext { println("Scanner Message Stream:  IN : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
             ?: throw TODO("exception handling")
-        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)?.doOnNext { println("Scanner Message Stream:  IN : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
             ?: throw TODO("exception handling")
     }
 

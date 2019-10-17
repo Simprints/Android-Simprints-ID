@@ -12,7 +12,7 @@ class MessageOutputStream(
 ) : OutgoingConnectable by packetDispatcher {
 
     fun sendMessage(message: OutgoingMessage): Completable =
-        messageSerializer.serialize(message.also { println("Scanner Message Stream: OUT : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }).let {
+        messageSerializer.serialize(message.also { println("Scanner Message Stream:           OUT : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }).let {
             packetDispatcher.dispatch(it)
         }
 }
