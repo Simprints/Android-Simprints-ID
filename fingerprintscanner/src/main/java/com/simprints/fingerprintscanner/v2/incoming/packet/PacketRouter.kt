@@ -11,6 +11,7 @@ import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
 class PacketRouter(private val channels: List<Channel>,
+                   private inline val packetChannelDesignator: Packet.() -> Byte,
                    private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
 
     private lateinit var inputStream: InputStream
@@ -46,7 +47,7 @@ class PacketRouter(private val channels: List<Channel>,
     }
 
     private fun ConnectableFlowable<Packet>.filterChannel(channel: Channel) =
-        filter { packet -> packet.source == channel.id.value }
+        filter { packet -> packet.packetChannelDesignator() == channel.id.value }
 
     private fun Flowable<Packet>.subscribeAndPublish() =
         this.subscribeOn(Schedulers.io()).publish()

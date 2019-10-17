@@ -11,19 +11,20 @@ class SimulatedResponseOutputStream {
 
     fun serialize(message: IncomingMessage): List<ByteArray> =
         message
+            .also { println("Scanner Message Stream:  Simulated OUT : ${it::class.simpleName} : ${it.getBytes()}") }
             .getBytes()
             .asList()
             .chunked(PacketProtocol.MAX_PAYLOAD_SIZE)
             .map { it.toByteArray() }
             .map {
-                val destination = when (message) {
+                val source = when (message) {
                     is VeroResponse -> Channel.Remote.VeroServer
                     is VeroEvent -> Channel.Remote.VeroEvent
                     is Un20Response -> Channel.Remote.Un20Server
                     else -> throw IllegalArgumentException("Trying to serialize invalid simulated message")
                 }
 
-                PacketProtocol.buildPacketBytes(Channel.Local.AndroidDevice, destination, it)
+                PacketProtocol.buildPacketBytes(source, Channel.Local.AndroidDevice, it)
             }
 
 }

@@ -27,12 +27,15 @@ class SimulatedCommandInputStream {
     private val router =
         PacketRouter(
             listOf(Channel.Remote.VeroServer, Channel.Remote.Un20Server),
+            { destination },
             ByteArrayToPacketAccumulator(PacketParser())
         ).also { it.connect(inputStream) }
 
     val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(VeroCommandAccumulator(VeroCommandParser()))
+        ?.doOnNext { println("Scanner Message Stream:  Simulated  IN : ${it::class.simpleName} : ${it.getBytes()}") }
         ?: throw IllegalStateException()
     val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(Un20CommandAccumulator(Un20CommandParser()))
+        ?.doOnNext { println("Scanner Message Stream:  Simulated  IN : ${it::class.simpleName} : ${it.getBytes()}") }
         ?: throw IllegalStateException()
 
     fun updateWithNewBytes(bytes: ByteArray) {
@@ -57,7 +60,7 @@ class SimulatedCommandInputStream {
                     GET_SMILE_LED_STATE -> GetSmileLedStateCommand.fromBytes(data)
                     GET_BLUETOOTH_LED_STATE -> GetBluetoothLedStateCommand.fromBytes(data)
                     GET_POWER_LED_STATE -> GetPowerLedStateCommand.fromBytes(data)
-                    SET_SMILE_LED_STATE -> GetSmileLedStateCommand.fromBytes(data)
+                    SET_SMILE_LED_STATE -> SetSmileLedStateCommand.fromBytes(data)
                     SET_BLUETOOTH_LED_STATE -> SetBluetoothLedStateCommand.fromBytes(data)
                     SET_POWER_LED_STATE -> SetPowerLedStateCommand.fromBytes(data)
                     UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED -> throw IllegalArgumentException("Should not send events")
