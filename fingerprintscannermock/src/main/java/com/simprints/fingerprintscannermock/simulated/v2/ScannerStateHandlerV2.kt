@@ -16,7 +16,7 @@ fun ScannerState.updateStateAccordingToOutgoingMessage(command: OutgoingMessage)
                     isUn20On = when (command.value) {
                         FALSE -> false
                         TRUE -> true
-                    }
+                    }.also { eventQueue.add { (this as SimulatedScannerV2).triggerUn20StateChangeEvent(command.value) } }
                 }
                 else -> {
                     /* do nothing */

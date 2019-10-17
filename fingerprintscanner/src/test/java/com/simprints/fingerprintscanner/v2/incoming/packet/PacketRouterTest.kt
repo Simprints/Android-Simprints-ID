@@ -24,7 +24,7 @@ class PacketRouterTest {
         inputStream = PipedInputStream()
         inputStream.connect(outputStream)
 
-        router = PacketRouter(Channel.Remote::class.objects(), ByteArrayToPacketAccumulator(PacketParser()))
+        router = PacketRouter(Channel.Remote::class.objects(), { source }, ByteArrayToPacketAccumulator(PacketParser()))
 
         router.connect(inputStream)
     }

@@ -11,16 +11,16 @@ import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
-import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
+import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
 import com.simprints.moduleapi.fingerprint.responses.*
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Completable
@@ -37,7 +37,7 @@ import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class FingerprintFlowsIntegrationTest: KoinTest {
+class FingerprintFlowsIntegrationTest : KoinTest {
 
     private val dbManagerMock: FingerprintDbManager = mock()
 
@@ -48,9 +48,13 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(SimulationMode.V1))
+        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(SimulationMode.V2))
         declare {
-            single<ScannerFactory> { ScannerFactoryImpl(simulatedBluetoothAdapter, get()) }
+            single<ScannerFactory> {
+                spy(ScannerFactoryImpl(simulatedBluetoothAdapter, get())).apply {
+                    whenThis { create(anyNotNull()) } then { createScannerV2(it.arguments[0] as String) }
+                }
+            }
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }
             factory { dbManagerMock }
         }
