@@ -12,12 +12,15 @@ import com.simprints.id.domain.moduleapi.core.response.*
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse.Companion.CORE_STEP_BUNDLE
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
+import com.simprints.id.testtools.TestApplication
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class CoreStepProcessorImplTest: BaseStepProcessorTest() {
 
     private val coreStepProcessor = CoreStepProcessorImpl()
