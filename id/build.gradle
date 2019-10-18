@@ -190,6 +190,9 @@ dependencies {
     api deps.koin.android
     api deps.koin.viewmodel
 
+    // Conceal (encryption)
+    implementation deps.conceal.core
+
     // Test
     testImplementation project(':fingerprintscannermock')
     testImplementation deps.testing.retrofit
