@@ -109,6 +109,10 @@ def koin = [
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
+// Conceal (encryption)
+def conceal = [
+    core: "com.facebook.conceal:conceal:2.0.2"
+]
 
 def mockito_version = "2.23.0"
 def espresso_version = "3.2.0-alpha04"
@@ -159,7 +163,7 @@ def testing = [
     live_data      : "com.jraska.livedata:testing-ktx:1.1.0"
 ]
 
-//No using Realm plugin: https://github.com/realm/realm-java/issues/5982
+//Not using Realm plugin: https://github.com/realm/realm-java/issues/5982
 def realm_version = "4.3.4"
 def realm = [
     annotations          : "io.realm:realm-annotations:$realm_version",
@@ -191,5 +195,6 @@ ext.deps = [
     testing        : testing,
     realm          : realm,
     commons_io     : commons_io,
-    koin           : koin
+    koin           : koin,
+    conceal        : conceal
 ]
