@@ -21,6 +21,7 @@ import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
@@ -38,9 +39,11 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
+import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
 
     @get:Rule
