@@ -16,8 +16,8 @@ class FaceCaptureResponseEncoderAndroidTest {
 
     private val processor by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridCipherImpl(context)
-        FaceCaptureResponseEncoder(encrypter)
+        val cipher = HybridCipherImpl(context)
+        FaceCaptureResponseEncoder(cipher)
     }
 
     @Test

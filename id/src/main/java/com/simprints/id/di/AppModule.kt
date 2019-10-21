@@ -223,7 +223,7 @@ open class AppModule {
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
-    fun provideHybridEncrypter(context: Context): HybridCipher = HybridCipherImpl(context)
+    fun provideHybridCipher(context: Context): HybridCipher = HybridCipherImpl(context)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,

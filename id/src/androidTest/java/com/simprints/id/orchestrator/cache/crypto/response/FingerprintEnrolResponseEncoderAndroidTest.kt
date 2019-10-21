@@ -12,8 +12,8 @@ class FingerprintEnrolResponseEncoderAndroidTest {
 
     private val encoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridCipherImpl(context)
-        FingerprintEnrolResponseEncoder(encrypter)
+        val cipher = HybridCipherImpl(context)
+        FingerprintEnrolResponseEncoder(cipher)
     }
 
     @Test
