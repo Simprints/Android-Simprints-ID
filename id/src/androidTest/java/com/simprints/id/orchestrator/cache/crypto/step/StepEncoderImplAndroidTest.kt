@@ -26,8 +26,8 @@ class StepEncoderImplAndroidTest {
 
     private val stepEncoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridCipherImpl(context)
-        StepEncoderImpl(encrypter)
+        val cipher = HybridCipherImpl(context)
+        StepEncoderImpl(cipher)
     }
 
     @Test

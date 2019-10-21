@@ -16,8 +16,8 @@ class HotCacheImplAndroidTest {
     private val hotCache by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val preferences = context.getSharedPreferences("file_name", Context.MODE_PRIVATE)
-        val encrypter = mock<HybridCipher>()
-        val stepEncoder = StepEncoderImpl(encrypter)
+        val cipher = mock<HybridCipher>()
+        val stepEncoder = StepEncoderImpl(cipher)
         HotCacheImpl(preferences, stepEncoder)
     }
 
