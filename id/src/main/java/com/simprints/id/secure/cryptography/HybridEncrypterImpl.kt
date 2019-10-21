@@ -17,17 +17,19 @@ class HybridEncrypterImpl(private val context: Context) : HybridEncrypter {
 
     override fun encrypt(plainString: String): String {
         val encryptedBytes = crypto.encrypt(plainString.toByteArray(), entity)
-        return String(encryptedBytes, Charsets.ISO_8859_1)
+        return String(encryptedBytes, encryptionCharset)
     }
 
     override fun decrypt(encryptedString: String): String {
-        val encryptedBytes = encryptedString.toByteArray(Charsets.ISO_8859_1)
+        val encryptedBytes = encryptedString.toByteArray(encryptionCharset)
         val decryptedBytes = crypto.decrypt(encryptedBytes, entity)
         return String(decryptedBytes)
     }
 
     companion object {
         private const val ENTITY_NAME = "simprints_entity"
+
+        private val encryptionCharset = Charsets.ISO_8859_1
     }
 
 }
