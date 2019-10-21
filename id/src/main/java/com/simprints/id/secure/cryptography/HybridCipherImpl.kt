@@ -6,7 +6,7 @@ import com.facebook.android.crypto.keychain.SharedPrefsBackedKeyChain
 import com.facebook.crypto.CryptoConfig
 import com.facebook.crypto.Entity
 
-class HybridEncrypterImpl(private val context: Context) : HybridEncrypter {
+class HybridCipherImpl(private val context: Context) : HybridCipher {
 
     private val crypto by lazy {
         val keyChain = SharedPrefsBackedKeyChain(context, CryptoConfig.KEY_256)

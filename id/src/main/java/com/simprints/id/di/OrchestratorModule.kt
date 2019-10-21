@@ -29,7 +29,7 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.secure.cryptography.HybridEncrypter
+import com.simprints.id.secure.cryptography.HybridCipher
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -119,8 +119,8 @@ class OrchestratorModule {
 
     @Provides
     fun provideStepEncoder(
-        encrypter: HybridEncrypter
-    ): StepEncoder = StepEncoderImpl(encrypter)
+        cipher: HybridCipher
+    ): StepEncoder = StepEncoderImpl(cipher)
 
     @Provides
     fun provideEnrolmentHelper(

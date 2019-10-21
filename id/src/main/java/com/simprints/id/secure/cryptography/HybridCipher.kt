@@ -1,6 +1,6 @@
 package com.simprints.id.secure.cryptography
 
-interface HybridEncrypter {
+interface HybridCipher {
     fun encrypt(plainString: String): String
     fun decrypt(encryptedString: String): String
 }

@@ -5,7 +5,7 @@ import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.secure.cryptography.HybridEncrypterImpl
+import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.testtools.common.mock.mockTemplate
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -16,7 +16,7 @@ class FaceCaptureResponseEncoderAndroidTest {
 
     private val processor by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridEncrypterImpl(context)
+        val encrypter = HybridCipherImpl(context)
         FaceCaptureResponseEncoder(encrypter)
     }
 
