@@ -4,7 +4,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
@@ -36,20 +36,20 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
         }
     }
 
-    private fun getFaceResponseForVerify(results: List<Step.Result?>): FaceVerifyResponse? =
-        results.filterIsInstance(FaceVerifyResponse::class.java).lastOrNull()
+    private fun getFaceResponseForVerify(results: List<Step.Result?>): FaceMatchResponse? =
+        results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
     private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceVerifyResponse,
+    private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceMatchResponse,
                                                             fingerprintResponse: FingerprintMatchResponse): AppVerifyResponse =
         TODO("Not implemented yet")
 
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse): AppVerifyResponse =
         TODO("Not implemented yet")
 
-    private fun buildAppVerifyResponseForFace(faceResponse: FaceVerifyResponse): AppVerifyResponse {
+    private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse): AppVerifyResponse {
         TODO("Not implemented yet")
     }
 }

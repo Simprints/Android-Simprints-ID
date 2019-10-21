@@ -37,7 +37,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
             with(appRequest) {
                 when (it) {
                     FINGER -> fingerprintStepProcessor.buildStepToCapture(projectId, userId, projectId, metadata)
-                    FACE -> faceStepProcessor.buildStepVerify(projectId, userId, projectId)
+                    FACE -> faceStepProcessor.buildCaptureStep()
                 }
             }
         }

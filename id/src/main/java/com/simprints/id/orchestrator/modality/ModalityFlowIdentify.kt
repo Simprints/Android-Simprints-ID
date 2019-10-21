@@ -36,7 +36,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
             with(appRequest) {
                 when (it) {
                     Modality.FINGER -> fingerprintStepProcessor.buildStepToCapture(projectId, userId, moduleId, metadata)
-                    Modality.FACE -> faceStepProcessor.buildStepIdentify(projectId, userId, moduleId)
+                    Modality.FACE -> faceStepProcessor.buildCaptureStep() //STOPSHIP
                 }
             }
         }
