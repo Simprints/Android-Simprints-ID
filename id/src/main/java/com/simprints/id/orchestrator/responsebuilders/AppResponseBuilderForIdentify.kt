@@ -4,7 +4,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
@@ -36,13 +36,13 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
         }
     }
 
-    private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceIdentifyResponse? =
-        results.filterIsInstance(FaceIdentifyResponse::class.java).lastOrNull()
+    private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceMatchResponse? =
+        results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
     private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceIdentifyResponse,
+    private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceMatchResponse,
                                                          fingerprintResponse: FingerprintMatchResponse,
                                                          sessionId: String): AppIdentifyResponse {
         TODO("Not implemented yet")
@@ -53,7 +53,7 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
         TODO("Not implemented yet")
     }
 
-    private fun buildAppIdentifyResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse {
+    private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse, sessionId: String): AppIdentifyResponse {
         TODO("Not implemented yet")
     }
 }

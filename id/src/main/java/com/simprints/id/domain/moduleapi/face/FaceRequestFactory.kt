@@ -1,18 +1,14 @@
 package com.simprints.id.domain.moduleapi.face
 
+import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
+import java.io.Serializable
 
 interface FaceRequestFactory {
 
     fun buildCaptureRequest(nFaceSamplesToCapture: Int): FaceCaptureRequest
 
-    fun buildFaceVerifyRequest(projectId: String,
-                               userId: String,
-                               moduleId: String): FaceVerifyRequest
-
-    fun buildFaceIdentifyRequest(projectId: String,
-                                 userId: String,
-                                 moduleId: String): FaceIdentifyRequest
+    fun buildFaceMatchRequest(probeFaceSamples: List<FaceSample>,
+                              queryForCandidates: Serializable): FaceMatchRequest
 }

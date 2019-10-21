@@ -9,5 +9,5 @@ data class FaceMatchingResult(val guidFound: String,
                               val confidence: Int,
                               val tier: FaceTier) : Parcelable
 
-fun IFaceMatchingResult.fromDomainApiToDomain() =
+fun IFaceMatchingResult.fromModuleApiToDomain() =
     FaceMatchingResult(guid, confidence, tier.fromDomainApiToDomain())

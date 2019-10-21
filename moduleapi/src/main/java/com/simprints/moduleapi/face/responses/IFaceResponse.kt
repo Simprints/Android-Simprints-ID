@@ -15,10 +15,8 @@ interface IFaceResponse : Parcelable, IResponse {
 
 enum class IFaceResponseType {
     CAPTURE,
+    MATCH,
     EXIT_FORM,
-    ERROR,
-
-    VERIFY, //TBRemoved soon
-    IDENTIFY //TBRemoved soon
+    ERROR
 }
 

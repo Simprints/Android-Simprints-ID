@@ -1,12 +1,15 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
+import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.IDENTIFY
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
@@ -22,18 +25,9 @@ class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory) 
             buildStep(CAPTURE, this)
         }
 
-    override fun buildStepIdentify(projectId: String,
-                                   userId: String,
-                                   moduleId: String): Step =
-        faceRequestFactory.buildFaceIdentifyRequest(projectId, userId, moduleId).run {
+    override fun buildStepMatch(probeFaceSample: List<FaceSample>, query: PersonLocalDataSource.Query): Step =
+        faceRequestFactory.buildFaceMatchRequest(probeFaceSample, query).run {
             buildStep(IDENTIFY, this)
-        }
-
-    override fun buildStepVerify(projectId: String,
-                                 userId: String,
-                                 moduleId: String): Step =
-        faceRequestFactory.buildFaceVerifyRequest(projectId, userId, moduleId).run {
-            buildStep(VERIFY, this)
         }
 
     private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest): Step {
