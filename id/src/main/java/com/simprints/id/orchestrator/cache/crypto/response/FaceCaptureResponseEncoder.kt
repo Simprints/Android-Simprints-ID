@@ -4,11 +4,11 @@ import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridEncrypter
+import com.simprints.id.secure.cryptography.HybridCipher
 
 class FaceCaptureResponseEncoder(
-    encrypter: HybridEncrypter
-) : ResponseEncoder(encrypter) {
+    cipher: HybridCipher
+) : ResponseEncoder(cipher) {
 
     override fun process(response: Step.Result?, operation: Operation): Step.Result? {
         require(response is FaceCaptureResponse)
@@ -19,8 +19,8 @@ class FaceCaptureResponseEncoder(
                 item.result?.template?.let { template ->
                     val tmpTemplateString = String(template)
                     val processedTemplate = when (operation) {
-                        Operation.ENCODE -> encrypter.encrypt(tmpTemplateString)
-                        Operation.DECODE -> encrypter.decrypt(tmpTemplateString)
+                        Operation.ENCODE -> cipher.encrypt(tmpTemplateString)
+                        Operation.DECODE -> cipher.decrypt(tmpTemplateString)
                     }.toByteArray()
 
                     val faceId = item.result.faceId

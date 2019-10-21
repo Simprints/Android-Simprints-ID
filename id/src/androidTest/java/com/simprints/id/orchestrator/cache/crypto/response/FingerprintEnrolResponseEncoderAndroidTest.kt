@@ -2,7 +2,7 @@ package com.simprints.id.orchestrator.cache.crypto.response
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.secure.cryptography.HybridEncrypterImpl
+import com.simprints.id.secure.cryptography.HybridCipherImpl
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.junit.Test
@@ -12,7 +12,7 @@ class FingerprintEnrolResponseEncoderAndroidTest {
 
     private val encoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridEncrypterImpl(context)
+        val encrypter = HybridCipherImpl(context)
         FingerprintEnrolResponseEncoder(encrypter)
     }
 

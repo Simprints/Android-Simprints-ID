@@ -13,7 +13,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdenti
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridEncrypterImpl
+import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.testtools.common.mock.mockTemplate
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -26,7 +26,7 @@ class StepEncoderImplAndroidTest {
 
     private val stepEncoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val encrypter = HybridEncrypterImpl(context)
+        val encrypter = HybridCipherImpl(context)
         StepEncoderImpl(encrypter)
     }
 

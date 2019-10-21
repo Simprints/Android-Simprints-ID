@@ -7,10 +7,10 @@ import com.simprints.id.orchestrator.cache.crypto.response.FaceCaptureResponseEn
 import com.simprints.id.orchestrator.cache.crypto.response.FingerprintEnrolResponseEncoder
 import com.simprints.id.orchestrator.cache.crypto.response.Operation
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridEncrypter
+import com.simprints.id.secure.cryptography.HybridCipher
 import com.simprints.id.tools.ParcelableConverter
 
-class StepEncoderImpl(private val encrypter: HybridEncrypter) : StepEncoder {
+class StepEncoderImpl(private val cipher: HybridCipher) : StepEncoder {
 
     override fun encode(step: Step): String {
         val stepCopy = step.copy()
@@ -33,9 +33,9 @@ class StepEncoderImpl(private val encrypter: HybridEncrypter) : StepEncoder {
         val result = step.result
         return step.also {
             val responseEncoder = when (result) {
-                is FingerprintEnrolResponse -> FingerprintEnrolResponseEncoder(encrypter)
-                is FaceCaptureResponse -> FaceCaptureResponseEncoder(encrypter)
-                else -> BypassEncoder(encrypter)
+                is FingerprintEnrolResponse -> FingerprintEnrolResponseEncoder(cipher)
+                is FaceCaptureResponse -> FaceCaptureResponseEncoder(cipher)
+                else -> BypassEncoder(cipher)
             }
             it.result = responseEncoder.process(result, operation)
         }
