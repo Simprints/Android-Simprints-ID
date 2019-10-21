@@ -9,7 +9,7 @@ import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.Companion.isFaceResult
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.IDENTIFY
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 
@@ -27,7 +27,7 @@ class FaceStepProcessorImpl(private val faceRequestFactory: FaceRequestFactory) 
 
     override fun buildStepMatch(probeFaceSample: List<FaceSample>, query: PersonLocalDataSource.Query): Step =
         faceRequestFactory.buildFaceMatchRequest(probeFaceSample, query).run {
-            buildStep(IDENTIFY, this)
+            buildStep(MATCH, this)
         }
 
     private fun buildStep(requestCode: FaceRequestCode, request: FaceRequest): Step {

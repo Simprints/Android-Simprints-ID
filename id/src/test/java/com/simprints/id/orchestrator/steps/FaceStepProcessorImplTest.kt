@@ -7,14 +7,12 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceIdentifyRequest
-import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
+import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
-import com.simprints.id.orchestrator.identifyAppRequest
-import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
+import com.simprints.id.orchestrator.steps.face.FaceRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
-import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
@@ -73,11 +71,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForVerify() {
-        with(verifyAppRequest) {
-            val step = faceStepProcess.buildStepVerify(projectId, userId, moduleId)
+        val step = faceStepProcess.buildStepMatch(mock(), mock())
 
-            verifyFaceIntent<FaceVerifyRequest>(step, VERIFY.value)
-        }
+        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }
 
     @Test
@@ -89,11 +85,9 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForIdentify() {
-        with(identifyAppRequest) {
-            val step = faceStepProcess.buildStepIdentify(projectId, userId, moduleId)
+        val step = faceStepProcess.buildStepMatch(mock(), mock())
 
-            verifyFaceIntent<FaceIdentifyRequest>(step, IDENTIFY.value)
-        }
+        verifyFaceIntent<FaceMatchRequest>(step, MATCH.value)
     }
 
     @Test
@@ -105,14 +99,14 @@ class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Test
     fun stepProcessorShouldProcessFaceIdentifyResult() {
-        faceStepProcess.processResult(IDENTIFY.value, Activity.RESULT_OK, result)
+        faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
 
         verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }
 
     @Test
     fun stepProcessorShouldProcessFaceVerifyResult() {
-        faceStepProcess.processResult(VERIFY.value, Activity.RESULT_OK, result)
+        faceStepProcess.processResult(MATCH.value, Activity.RESULT_OK, result)
 
         verify(exactly = 1) { iFaceResponseMock.fromModuleApiToDomain() }
     }
