@@ -53,6 +53,8 @@ import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.cryptography.HybridCipher
+import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -220,6 +222,8 @@ open class AppModule {
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
+    @Provides
+    fun provideHybridCipher(context: Context): HybridCipher = HybridCipherImpl(context)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
