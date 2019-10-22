@@ -12,7 +12,7 @@ data class ApiGetPerson(val id: String,
                         val createdAt: Date?,
                         val updatedAt: Date?,
                         val fingerprints: List<ApiFingerprintSample>? = null,
-                        var faces: List<ApiFace>? = null)
+                        var faces: List<ApiFaceSample>? = null)
 
 fun Person.fromDomainToGetApi(): ApiGetPerson =
     ApiGetPerson(

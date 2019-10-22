@@ -10,7 +10,7 @@ data class ApiPostPerson(val id: String,
                          val userId: String,
                          val moduleId: String,
                          val fingerprints: List<ApiFingerprintSample>? = null,
-                         var faces: List<ApiFace>? = null)
+                         var faces: List<ApiFaceSample>? = null)
 
 fun Person.fromDomainToPostApi(): ApiPostPerson =
     ApiPostPerson(
