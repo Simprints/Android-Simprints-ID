@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.person.remote.models
 
 import androidx.annotation.Keep
+import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 
@@ -16,5 +17,6 @@ fun Person.fromDomainToPostApi(): ApiPostPerson =
         id = patientId,
         userId = userId,
         moduleId = moduleId,
-        fingerprints = fingerprintSamples.map(FingerprintSample::fromDomainToApi)
+        fingerprints = fingerprintSamples.map(FingerprintSample::fromDomainToApi),
+        faces = faceSamples.map(FaceSample::fromDomainToApi)
     )
