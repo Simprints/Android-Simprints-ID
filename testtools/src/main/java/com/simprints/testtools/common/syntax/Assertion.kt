@@ -3,6 +3,7 @@ package com.simprints.testtools.common.syntax
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
+import io.reactivex.subscribers.TestSubscriber
 import junit.framework.AssertionFailedError
 import org.junit.Assert
 import org.mockito.Mockito
@@ -71,7 +72,7 @@ inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
             else -> throw(exception)
         }
     }
-    throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
+    failTest("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
 inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
@@ -84,6 +85,12 @@ fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
     .await()
     .assertComplete()
     .assertNoErrors()
+
+fun <T> TestSubscriber<T>.awaitCompletionWithNoErrors() {
+    awaitTerminalEvent()
+    assertComplete()
+    assertNoErrors()
+}
 
 fun failTest(message: String?): Nothing {
     Assert.fail(message)
