@@ -22,6 +22,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetSmil
 import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetUn20OnResponse
 import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
+import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Completable
 import io.reactivex.Observer
@@ -36,9 +37,9 @@ class Scanner(
 
     val state = ScannerState(
         connected = false,
-        firmwareVersion = null,
         un20On = null,
-        triggerButtonActive = false
+        triggerButtonActive = false,
+        smileLedState = null
     )
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
@@ -80,26 +81,25 @@ class Scanner(
     fun setSmileLedState(smileLedState: SmileLedState): Completable =
         sendCommandAndReceiveResponse<SetSmileLedStateResponse>(
             SetSmileLedStateCommand(smileLedState)
-        ).ignoreElement()
+        ).completeOnceReceived()
+            .doOnComplete { state.smileLedState = smileLedState }
 
     fun turnUn20OnAndAwaitStateChangeEvent(): Completable =
         sendCommandAndReceiveResponse<SetUn20OnResponse>(
             SetUn20OnCommand(DigitalValue.TRUE)
-        ).ignoreElement()
+        ).completeOnceReceived()
             .andThen(messageInputStream.veroEvents)
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.TRUE }
-            .firstOrError()
-            .ignoreElement()
+            .completeOnceReceived()
             .doOnComplete { state.un20On = true }
 
     fun turnUn20OffAndAwaitStateChangeEvent(): Completable =
         sendCommandAndReceiveResponse<SetUn20OnResponse>(
             SetUn20OnCommand(DigitalValue.FALSE)
-        ).ignoreElement()
+        ).completeOnceReceived()
             .andThen(messageInputStream.veroEvents)
             .filterCast<Un20StateChangeEvent> { it.value == DigitalValue.FALSE }
-            .firstOrError()
-            .ignoreElement()
+            .completeOnceReceived()
             .doOnComplete { state.un20On = false }
 
     private fun assertUn20On() = Completable.fromAction {
@@ -113,7 +113,7 @@ class Scanner(
             sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
                 CaptureFingerprintCommand(dpi)
             )
-        ).ignoreElement()
+        ).completeOnceReceived()
 
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<ByteArray> =
         assertUn20On().andThen(

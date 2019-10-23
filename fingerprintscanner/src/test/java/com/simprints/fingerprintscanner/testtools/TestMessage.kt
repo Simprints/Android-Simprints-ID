@@ -30,3 +30,6 @@ object TestMessageProtocol : MessageProtocol {
 
 class TestMessageAccumulator(testMessageParser: TestMessageParser) :
     PacketToMessageAccumulator<TestMessage>(TestMessageProtocol, testMessageParser)
+
+fun List<TestMessage>.lowerHexStrings() =
+    map { it.bytes }.toHexStrings().stripWhiteSpaceToLowercase()
