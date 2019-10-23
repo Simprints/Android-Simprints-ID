@@ -7,7 +7,6 @@ import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.app.DomainToModuleApiAppResponse
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
@@ -30,6 +29,7 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
+import com.simprints.id.secure.cryptography.HybridCipher
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -43,7 +43,6 @@ class OrchestratorModule {
 
     @Provides
     fun provideFingerprintRequestFactory(): FingerprintRequestFactory = FingerprintRequestFactoryImpl()
-
 
     @Provides
     fun provideFaceStepProcessor(faceRequestFactory: FaceRequestFactory): FaceStepProcessor =
@@ -120,8 +119,8 @@ class OrchestratorModule {
 
     @Provides
     fun provideStepEncoder(
-        keystoreManager: KeystoreManager
-    ): StepEncoder = StepEncoderImpl(keystoreManager)
+        cipher: HybridCipher
+    ): StepEncoder = StepEncoderImpl(cipher)
 
     @Provides
     fun provideEnrolmentHelper(

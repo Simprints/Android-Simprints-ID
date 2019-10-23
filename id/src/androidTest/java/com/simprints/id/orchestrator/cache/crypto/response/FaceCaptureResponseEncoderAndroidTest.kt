@@ -2,22 +2,22 @@ package com.simprints.id.orchestrator.cache.crypto.response
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.core.images.SecuredImageRef
-import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
+import com.simprints.id.secure.cryptography.HybridCipherImpl
+import com.simprints.testtools.common.mock.mockTemplate
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
-import java.util.*
 
 class FaceCaptureResponseEncoderAndroidTest {
 
     private val processor by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val keystoreManager = KeystoreManagerImpl(context)
-        FaceCaptureResponseEncoder(keystoreManager)
+        val cipher = HybridCipherImpl(context)
+        FaceCaptureResponseEncoder(cipher)
     }
 
     @Test
@@ -46,7 +46,7 @@ class FaceCaptureResponseEncoderAndroidTest {
             index = 0,
             result = FaceCaptureSample(
                 "face_id_0",
-                UUID.randomUUID().toString().toByteArray(),
+                mockTemplate(),
                 SecuredImageRef("uri_0")
             )
         ),
@@ -54,7 +54,7 @@ class FaceCaptureResponseEncoderAndroidTest {
             index = 2,
             result = FaceCaptureSample(
                 "face_id_1",
-                UUID.randomUUID().toString().toByteArray(),
+                mockTemplate(),
                 SecuredImageRef("uri_1")
             )
         )
