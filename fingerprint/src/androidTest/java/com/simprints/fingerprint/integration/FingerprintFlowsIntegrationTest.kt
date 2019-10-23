@@ -48,17 +48,26 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(SimulationMode.V2))
+        setupDbManagerMock()
+    }
+
+    private fun setupSimulatedBluetoothAdapterAndKoinModules(simulationMode: SimulationMode) {
+        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
         declare {
             single<ScannerFactory> {
                 spy(ScannerFactoryImpl(simulatedBluetoothAdapter, get())).apply {
-                    whenThis { create(anyNotNull()) } then { createScannerV2(it.arguments[0] as String) }
+                    whenThis { create(anyNotNull()) } then {
+                        val macAddress = it.arguments[0] as String
+                        when (simulationMode) {
+                            SimulationMode.V1 -> createScannerV1(macAddress)
+                            SimulationMode.V2 -> createScannerV2(macAddress)
+                        }
+                    }
                 }
             }
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }
             factory { dbManagerMock }
         }
-        setupDbManagerMock()
     }
 
     private fun setupDbManagerMock() {
@@ -74,25 +83,42 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     }
 
     @Test
-    fun enrolFlow_finishesSuccessfully() {
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
-
-        waitUntilCollectFingerprintsIsDisplayed()
-        pressScanUntilDialogIsDisplayedAndClickConfirm()
-
-        with(scenario.result) {
-            resultData.setExtrasClassLoader(IFingerprintEnrolResponse::class.java.classLoader)
-            assertEquals(Activity.RESULT_OK, resultCode)
-            assertNotNull(resultData?.extras?.getParcelable<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                assertEquals(IFingerprintResponseType.ENROL, type)
-            })
-        }
-
-        verifyOnce(dbManagerMock) { savePerson(anyNotNull()) }
+    fun enrolFlow_withScannerV1_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V1)
+        assertEnrolFlowFinishesSuccessfully()
     }
 
     @Test
-    fun identifyFlow_finishesSuccessfully() {
+    fun enrolFlow_withScannerV2_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V2)
+        assertEnrolFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun identifyFlow_withScannerV1_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V1)
+        assertIdentifyFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun identifyFlow_withScannerV2_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V2)
+        assertIdentifyFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun verifyFlow_withScannerV1_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V1)
+        assertVerifyFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun verifyFlow_withScannerV2_finishesSuccessfully() {
+        setupSimulatedBluetoothAdapterAndKoinModules(SimulationMode.V2)
+        assertVerifyFlowFinishesSuccessfully()
+    }
+
+    private fun assertIdentifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
 
         waitUntilCollectFingerprintsIsDisplayed()
@@ -107,8 +133,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
         }
     }
 
-    @Test
-    fun verifyFlow_finishesSuccessfully() {
+    private fun assertVerifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
 
         waitUntilCollectFingerprintsIsDisplayed()
@@ -121,6 +146,23 @@ class FingerprintFlowsIntegrationTest : KoinTest {
                 assertEquals(IFingerprintResponseType.VERIFY, type)
             })
         }
+    }
+
+    private fun assertEnrolFlowFinishesSuccessfully() {
+        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.ENROL))
+
+        waitUntilCollectFingerprintsIsDisplayed()
+        pressScanUntilDialogIsDisplayedAndClickConfirm()
+
+        with(scenario.result) {
+            resultData.setExtrasClassLoader(IFingerprintEnrolResponse::class.java.classLoader)
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintEnrolResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.ENROL, type)
+            })
+        }
+
+        verifyOnce(dbManagerMock) { savePerson(anyNotNull()) }
     }
 
     @After
