@@ -21,6 +21,12 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     companion object {
         private const val COMMCARE_BUNDLE_KEY = "odk_intent_bundle"
 
+        // Based on the documentation, we are supposed to send either odk_intent_bundle (for key-values result)
+        // or odk_intent_data (for a single integer or string), but apparently due to a bug in commcare
+        // if we send `odk_intent_bundle` only, the result is processed correctly, but a toast shows an
+        // error message. That is because commcare can't find odk_intent_data
+        private const val COMMCARE_DATA_KEY = "odk_intent_data"
+
         private const val BIOMETRICS_COMPLETE_CHECK_KEY = "biometricsComplete"
         private const val REGISTRATION_GUID_KEY = "guid"
         private const val VERIFICATION_CONFIDENCE_KEY = "confidence"
@@ -118,6 +124,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
 
     private fun injectDataAsCommCareBundleIntoIntent(intent: Intent, data: Bundle) {
         intent.putExtra(COMMCARE_BUNDLE_KEY, data)
+        intent.putExtra(COMMCARE_DATA_KEY, "")
     }
 
     override fun injectSessionIdIntoIntent(sessionId: String) {
