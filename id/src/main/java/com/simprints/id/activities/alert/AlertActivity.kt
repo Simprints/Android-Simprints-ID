@@ -21,6 +21,7 @@ import com.simprints.id.domain.alert.AlertType
 import com.simprints.id.domain.moduleapi.core.response.CoreResponse
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode
+import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
 
@@ -28,11 +29,15 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alert)
+        (application as Application).component.inject(this)
+        title = androidResourcesHelper.getString(R.string.alert_title)
+
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
 
@@ -54,7 +59,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override fun setLayoutBackgroundColor(@ColorInt color: Int) = alertLayout.setBackgroundColor(color)
     override fun setLeftButtonBackgroundColor(@ColorInt color: Int) = alertLeftButton.setBackgroundColor(color)
     override fun setRightButtonBackgroundColor(@ColorInt color: Int) = alertRightButton.setBackgroundColor(color)
-    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) = alertTitle.setText(stringRes)
+    override fun setAlertTitleWithStringRes(@StringRes stringRes: Int) { alertTitle.text = androidResourcesHelper.getString(stringRes) }
     override fun setAlertImageWithDrawableId(@DrawableRes drawableId: Int) = alertImage.setImageResource(drawableId)
     override fun setAlertHintImageWithDrawableId(@DrawableRes alertHintDrawableId: Int?) {
         if (alertHintDrawableId != null) {
@@ -64,11 +69,11 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         }
     }
 
-    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) = message.setText(stringRes)
+    override fun setAlertMessageWithStringRes(@StringRes stringRes: Int) { message.text = androidResourcesHelper.getString(stringRes) }
 
     override fun initLeftButton(leftButtonAction: AlertActivityViewModel.ButtonAction) {
         if (leftButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertLeftButton.setText(leftButtonAction.buttonText)
+            alertLeftButton.text = androidResourcesHelper.getString(leftButtonAction.buttonText)
             alertLeftButton.setOnClickListener { viewPresenter.handleButtonClick(leftButtonAction) }
         } else {
             alertLeftButton.visibility = View.GONE
@@ -77,7 +82,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun initRightButton(rightButtonAction: AlertActivityViewModel.ButtonAction) {
         if (rightButtonAction !is AlertActivityViewModel.ButtonAction.None) {
-            alertRightButton.setText(rightButtonAction.buttonText)
+            alertRightButton.text = androidResourcesHelper.getString(rightButtonAction.buttonText)
             alertRightButton.setOnClickListener { viewPresenter.handleButtonClick(rightButtonAction) }
         } else {
             alertRightButton.visibility = View.GONE

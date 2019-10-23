@@ -24,8 +24,8 @@ class MessageStreamTest {
 
         testSubscriber.awaitCompletionWithNoErrors()
 
-        assertThat(testSubscriber.values().map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
-            .containsExactlyElementsIn(messages.map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
+        assertThat(testSubscriber.values().lowerHexStrings())
+            .containsExactlyElementsIn(messages.lowerHexStrings())
             .inOrder()
     }
 
@@ -43,8 +43,8 @@ class MessageStreamTest {
 
         testSubscriber.awaitCompletionWithNoErrors()
 
-        assertThat(testSubscriber.values().map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
-            .containsExactlyElementsIn(messages.map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
+        assertThat(testSubscriber.values().lowerHexStrings())
+            .containsExactlyElementsIn(messages.lowerHexStrings())
             .inOrder()
     }
 
@@ -62,8 +62,8 @@ class MessageStreamTest {
 
         testSubscriber.awaitCompletionWithNoErrors()
 
-        assertThat(testSubscriber.values().map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
-            .containsExactlyElementsIn(messages.map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase())
+        assertThat(testSubscriber.values().lowerHexStrings())
+            .containsExactlyElementsIn(messages.lowerHexStrings())
             .inOrder()
     }
 }

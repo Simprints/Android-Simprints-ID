@@ -58,7 +58,7 @@
                 android:layout_weight="1"
                 android:minHeight="70dp"
                 android:onClick="handleGoBackClick"
-                android:text="@string/button_scan_prints"
+                android:text="@string/exit_form_go_back"
                 tools:ignore="ButtonStyle" />
 
             <Button
