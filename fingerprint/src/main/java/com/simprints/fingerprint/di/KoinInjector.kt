@@ -27,13 +27,16 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.scanner.factory.ScannerFactory
+import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -85,6 +88,7 @@ object KoinInjector {
         factory { appComponent().getPersonRepository() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
+        factory { appComponent().getAndroidResourcesHelper() }
     }
 
     private fun Module.defineBuildersForFingerprintManagers() {
@@ -99,7 +103,9 @@ object KoinInjector {
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
-        single<ScannerManager> { ScannerManagerImpl(get()) }
+        single { ScannerUiHelper() }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
+        single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
         factory { RunnableTaskDispatcher() }

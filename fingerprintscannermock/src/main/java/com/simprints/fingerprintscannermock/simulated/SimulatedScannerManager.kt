@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscannermock.simulated
 
-import com.simprints.fingerprintscanner.Message
+import com.simprints.fingerprintscanner.v1.Message
 import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils.bytesToMessage
 import io.reactivex.Observer
 import io.reactivex.observers.DisposableObserver
