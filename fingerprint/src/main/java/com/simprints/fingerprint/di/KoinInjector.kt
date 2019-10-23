@@ -88,6 +88,7 @@ object KoinInjector {
         factory { appComponent().getPersonRepository() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
+        factory { appComponent().getAndroidResourcesHelper() }
     }
 
     private fun Module.defineBuildersForFingerprintManagers() {
