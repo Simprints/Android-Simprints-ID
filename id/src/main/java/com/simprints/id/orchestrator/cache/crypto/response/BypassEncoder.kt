@@ -1,11 +1,11 @@
 package com.simprints.id.orchestrator.cache.crypto.response
 
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.secure.cryptography.HybridCipher
 
 class BypassEncoder(
-    keystoreManager: KeystoreManager
-): ResponseEncoder(keystoreManager) {
+    cipher: HybridCipher
+): ResponseEncoder(cipher) {
 
     override fun process(response: Step.Result?, operation: Operation): Step.Result? = response
 

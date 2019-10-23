@@ -120,10 +120,6 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         alert.postValue(FingerprintAlert.UNEXPECTED_ERROR)
     }
 
-    fun handleBackPressed() {
-        result.postValue(FinishResult(ResultCode.CANCELLED, null, 0))
-    }
-
     override fun onCleared() {
         if (::matchTaskDisposable.isInitialized) matchTaskDisposable.dispose()
     }

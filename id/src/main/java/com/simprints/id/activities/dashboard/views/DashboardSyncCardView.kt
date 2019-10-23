@@ -13,24 +13,36 @@ import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCa
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
-import com.simprints.core.tools.AndroidResourcesHelper
+import com.simprints.id.tools.AndroidResourcesHelper
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
 class DashboardSyncCardView(private val rootView: View) : DashboardCardView(rootView) {
 
+    private val cardEnrolTitle: TextView = rootView.findViewById(R.id.dashboardCardEnrolTitle)
     private val syncDescription: TextView = rootView.findViewById(R.id.dashboardCardSyncDescription)
     private val syncUploadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadText)
+    private val syncUploadCountLabel: TextView = rootView.findViewById(R.id.dashboardCardSyncUploadTextLabel)
+
     private val syncDownloadCount: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadText)
+    private val syncDownloadCountLabel: TextView = rootView.findViewById(R.id.dashboardCardSyncDownloadTextLabel)
+
     private val syncButton: Button = rootView.findViewById(R.id.dashboardSyncCardSyncButton)
     private val totalPeopleInLocal: TextView = rootView.findViewById(R.id.dashboardCardSyncTotalLocalText)
+    private val totalPeopleInLocalLabel: TextView = rootView.findViewById(R.id.dashboardCardSyncTotalLocalTextLabel)
 
     @Inject
     lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     init {
         (rootView.context.applicationContext as Application).component.inject(this)
+        with(androidResourcesHelper) {
+            syncUploadCountLabel.text = getString(R.string.dashboard_card_to_upload)
+            syncDownloadCountLabel.text = getString(R.string.dashboard_card_to_download)
+            totalPeopleInLocalLabel.text = getString(R.string.dashboard_card_available_on_phone)
+            cardEnrolTitle.text = getString(R.string.dashboard_card_enrolment_info)
+        }
     }
 
     override fun bind(viewModel: ViewModel) {
