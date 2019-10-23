@@ -1,7 +1,6 @@
 package com.simprints.fingerprintscanner.v2.domain.packet
 
 import com.simprints.fingerprintscanner.v2.domain.Protocol
-import com.simprints.fingerprintscanner.v2.tools.primitives.size
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
@@ -16,7 +15,7 @@ object PacketProtocol: Protocol {
     private val DESTINATION_INDICES_IN_HEADER = 1..1
     private val LENGTH_INDICES_IN_HEADER = 2..3
 
-    val HEADER_SIZE = HEADER_INDICES.size()
+    val HEADER_SIZE = HEADER_INDICES.count()
 
     fun getSourceFromHeader(header: ByteArray): Byte =
         header.extract({ get() }, SOURCE_INDICES_IN_HEADER)

@@ -23,7 +23,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
-            android:text="@string/why_did_you_skip_fingerprinting"
             android:textAlignment="center"
             android:textColor="@color/simprints_white"
             android:textSize="25sp" />
@@ -38,7 +37,6 @@
                 android:id="@+id/rbReligiousConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_religious_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -46,7 +44,6 @@
                 android:id="@+id/rbDataConcerns"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_data_concerns"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -54,7 +51,6 @@
                 android:id="@+id/rbDoesNotHavePermission"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_does_not_have_permission"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -62,7 +58,6 @@
                 android:id="@+id/rbAppNotWorking"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_app_not_working"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -70,7 +65,6 @@
                 android:id="@+id/rbPersonNotPresent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_person_not_present"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -78,7 +72,6 @@
                 android:id="@+id/rbTooYoung"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_too_young"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -86,7 +79,6 @@
                 android:id="@+id/rbOther"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/refusal_other"
                 android:textColor="@color/simprints_white"
                 android:textSize="20sp" />
 
@@ -101,7 +93,6 @@
             android:background="@color/simprints_white"
             android:enabled="false"
             android:gravity="top|start"
-            android:hint="@string/hint_other_reason"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:maxLength="100"
@@ -125,7 +116,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="70dp"
-                android:text="@string/button_scan_prints"
                 tools:ignore="ButtonStyle" />
 
             <Button
@@ -135,7 +125,6 @@
                 android:layout_weight="1"
                 android:enabled="false"
                 android:minHeight="70dp"
-                android:text="@string/button_submit"
                 tools:ignore="ButtonStyle" />
 
         </LinearLayout>

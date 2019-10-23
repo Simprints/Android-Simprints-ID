@@ -17,6 +17,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.*
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.id.orchestrator.verifyAppRequest
+import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
 import com.simprints.testtools.common.syntax.*
@@ -25,8 +26,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     private lateinit var preferencesManagerMock: PreferencesManager

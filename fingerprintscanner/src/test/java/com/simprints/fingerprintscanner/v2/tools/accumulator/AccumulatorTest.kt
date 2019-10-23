@@ -1,7 +1,6 @@
 package com.simprints.fingerprintscanner.v2.tools.accumulator
 
 import com.google.common.truth.Truth.assertThat
-import com.simprints.fingerprintscanner.v2.tools.primitives.size
 import com.simprints.testtools.common.syntax.awaitCompletionWithNoErrors
 import com.simprints.testtools.unit.reactive.testSubscribe
 import io.reactivex.rxkotlin.toFlowable
@@ -49,7 +48,7 @@ class AccumulatorTest {
     class StringAccumulator : Accumulator<String, String, String>(
         initialFragmentCollection = "",
         addFragmentToCollection = { this + it },
-        canComputeElementLengthFromCollection = { it.length >= LENGTH_INDICES.size() },
+        canComputeElementLengthFromCollection = { it.length >= LENGTH_INDICES.count() },
         computeElementLengthFromCollection = ::computeLength,
         getCollectionLength = { length },
         sliceCollection = { slice(it) },

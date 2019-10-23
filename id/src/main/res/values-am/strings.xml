@@ -107,4 +107,5 @@
     <string name="consent_general_title">ፈቃደኝነት</string>
     <string name="consent_parental_title">የወላጅ ፈቃደኝነት</string>
     <string name="privacy_notice_text"><u>የደህንነት ማሳታወቂያ</u></string>
+    <string name="privacy_notice_title">የደህንነት ማሳታወቂያ</string>
 </resources>

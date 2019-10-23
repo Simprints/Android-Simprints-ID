@@ -3,8 +3,7 @@ package com.simprints.id.di
 import android.content.Context
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
-import com.simprints.core.tools.AndroidResourcesHelper
-import com.simprints.core.tools.AndroidResourcesHelperImpl
+import com.simprints.core.tools.LanguageHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
@@ -54,6 +53,8 @@ import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
+import com.simprints.id.secure.cryptography.HybridCipher
+import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -69,10 +70,7 @@ import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.Peop
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
-import com.simprints.id.tools.RandomGenerator
-import com.simprints.id.tools.RandomGeneratorImpl
-import com.simprints.id.tools.TimeHelper
-import com.simprints.id.tools.TimeHelperImpl
+import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.utils.SimNetworkUtils
@@ -168,8 +166,10 @@ open class AppModule {
     fun provideTimeHelper(): TimeHelper = TimeHelperImpl()
 
     @Provides
-    fun provideAndroidResourcesHelper(ctx: Context): AndroidResourcesHelper =
-        AndroidResourcesHelperImpl(ctx)
+    fun provideAndroidResourcesHelper(ctx: Context, preferencesManager: PreferencesManager): AndroidResourcesHelper {
+        val contextWithSpecificLanguage = LanguageHelper.contextWithSpecificLanguage(ctx, preferencesManager.language)
+        return AndroidResourcesHelperImpl(contextWithSpecificLanguage)
+    }
 
     @Provides
     @Singleton
@@ -222,6 +222,8 @@ open class AppModule {
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
+    @Provides
+    fun provideHybridCipher(context: Context): HybridCipher = HybridCipherImpl(context)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
@@ -258,9 +260,11 @@ open class AppModule {
     open fun provideConsentTextManager(context: Context,
                                        consentLocalDataSource: ConsentLocalDataSource,
                                        crashReportManager: CrashReportManager,
-                                       preferencesManager: PreferencesManager): ConsentRepository =
+                                       preferencesManager: PreferencesManager,
+                                       androidResourcesHelper: AndroidResourcesHelper): ConsentRepository =
         ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
-            preferencesManager.programName, preferencesManager.organizationName, preferencesManager.language,
+            preferencesManager.programName, preferencesManager.organizationName,
+            androidResourcesHelper,
             preferencesManager.modalities)
 
     @Provides

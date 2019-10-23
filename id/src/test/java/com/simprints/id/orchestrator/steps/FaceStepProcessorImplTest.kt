@@ -15,6 +15,7 @@ import com.simprints.id.orchestrator.steps.face.FaceRequestCode.*
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.verifyAppRequest
+import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
@@ -29,8 +30,10 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class FaceStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Mock lateinit var preferencesManagerMock: PreferencesManager
