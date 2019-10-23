@@ -2,7 +2,6 @@ package com.simprints.fingerprintscanner.v2.scanner
 
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.isA
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
@@ -42,12 +41,10 @@ class ScannerTest {
         val mockMessageOutputStream = mock<MessageOutputStream>()
         val mockInputStream = mock<InputStream>()
         val mockOutputStream = mock<OutputStream>()
-        val mockSocket = mockBluetoothSocket(mockInputStream, mockOutputStream)
 
         val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
-        scanner.connect(mockSocket)
+        scanner.connect(mockInputStream, mockOutputStream)
 
-        verifyOnce(mockSocket) { connect() }
         verifyOnce(mockMessageInputStream) { connect(mockInputStream) }
         verifyOnce(mockMessageOutputStream) { connect(mockOutputStream) }
     }
@@ -60,10 +57,9 @@ class ScannerTest {
             whenThis { veroEvents } thenReturn eventsSubject.toFlowable(BackpressureStrategy.BUFFER)
         }
         val mockMessageOutputStream = mock<MessageOutputStream>()
-        val mockSocket = mockBluetoothSocket()
 
         val scanner = Scanner(mockMessageInputStream, mockMessageOutputStream)
-        scanner.connect(mockSocket)
+        scanner.connect(mock(), mock())
 
         val testObserver = TestObserver<Unit>()
         scanner.triggerButtonListeners.add(testObserver)
@@ -95,7 +91,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
-        scanner.connect(mockBluetoothSocket())
+        scanner.connect(mock(), mock())
 
         scanner.turnUn20OnAndAwaitStateChangeEvent().testSubscribe().awaitAndAssertSuccess()
         assertThat(scanner.state.un20On).isTrue()
@@ -122,7 +118,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream)
-        scanner.connect(mockBluetoothSocket())
+        scanner.connect(mock(), mock())
 
         val smileLedState = SmileLedState(
             LedState(LedMode.ON, 0x00, 0x00 ,0x04),
@@ -154,7 +150,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mockBluetoothSocket())
+            connect(mock(), mock())
             state.un20On = true
         }
 
@@ -179,7 +175,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mockBluetoothSocket())
+            connect(mock(), mock())
             state.un20On = null
         }
 
@@ -206,7 +202,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mockBluetoothSocket())
+            connect(mock(), mock())
             state.un20On = true
         }
 
@@ -236,7 +232,7 @@ class ScannerTest {
         }
 
         val scanner = Scanner(messageInputStreamSpy, mockMessageOutputStream).apply {
-            connect(mockBluetoothSocket())
+            connect(mock(), mock())
             state.un20On = true
         }
 
@@ -245,11 +241,4 @@ class ScannerTest {
         testObserver.assertValueCount(1)
         assertThat(testObserver.values().first()).isEqualTo(image)
     }
-
-    private fun mockBluetoothSocket(mockInputStream: InputStream = mock(),
-                                    mockOutputStream: OutputStream = mock()) =
-        setupMock<BluetoothComponentSocket> {
-            whenThis { getInputStream() } thenReturn mockInputStream
-            whenThis { getOutputStream() } thenReturn mockOutputStream
-        }
 }

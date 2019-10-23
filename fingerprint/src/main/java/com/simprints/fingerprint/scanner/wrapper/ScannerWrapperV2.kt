@@ -9,6 +9,7 @@ import com.simprints.fingerprint.scanner.exceptions.safe.ScannerNotPairedExcepti
 import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import io.reactivex.Completable
 import io.reactivex.Observer
@@ -23,6 +24,8 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
                        private val macAddress: String,
                        private val bluetoothAdapter: BluetoothComponentAdapter) : ScannerWrapper {
 
+    private lateinit var socket: BluetoothComponentSocket
+
     override val versionInformation: ScannerVersionInformation by lazy {
         ScannerVersionInformation(2, 7, 2) // TODO : Implement version fetching
     }
@@ -36,10 +39,10 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
         if (!device.isBonded()) throw ScannerNotPairedException()
 
         try {
-            val socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
+            socket = device.createRfcommSocketToServiceRecord(DEFAULT_UUID)
             bluetoothAdapter.cancelDiscovery()
             socket.connect()
-            scannerV2.connect(socket)
+            scannerV2.connect(socket.getInputStream(), socket.getOutputStream())
         } catch (e: IOException) {
             throw ScannerDisconnectedException()
         }
@@ -47,6 +50,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
 
     override fun disconnect(): Completable = Completable.fromAction {
         scannerV2.disconnect()
+        socket.close()
     }
 
     override fun sensorWakeUp(): Completable = scannerV2.turnUn20OnAndAwaitStateChangeEvent()
