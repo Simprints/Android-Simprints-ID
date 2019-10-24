@@ -69,7 +69,7 @@
     <string name="preference_scanner_version_title">የእስካነር  ስሪት</string>
     <string name="preference_select_fingers_title">ለአሻራ የሚሆን ቋሚ እጣት ይምረጡ</string>
     <string name="preference_select_language_title">ቋንቋ</string>
-    <string name="preference_select_modules_title">ምዕራፍ ይመረጡ</string>
+    <string name="title_select_modules">ምዕራፍ ይመረጡ</string>
     <string name="preference_summary_modules">ሲንክ እንዲደረግ የሚፈልጉትን ምዕራፍይምረጡ</string>
     <string name="preference_summary_settings_fingers">እስካን እንዲደረግ የሚፈልጉተን የጣት አሻራ ይምረጡ</string>
     <string name="preference_sync_and_search_title">የሲንክ እና የፍለጋ ተግባቦት</string>

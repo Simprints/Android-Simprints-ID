@@ -412,7 +412,6 @@
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
-    <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_select_fingers_title">Select default fingers</string>
     <string name="preference_app_version_title">App Version</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
@@ -420,5 +419,10 @@
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
+
+    <!-- region Module selection -->
+    <string name="title_select_modules">Select modules</string>
+    <string name="hint_search_modules">Search modules</string>
+    <!-- endregion -->
 
 </resources>
