@@ -9,10 +9,12 @@
     <!-- endregion -->
 
     <!-- region Padding -->
+    <dimen name="padding_chip">8dp</dimen>
     <dimen name="padding_default">16dp</dimen>
     <!-- endregion -->
 
     <!-- region Text size -->
+    <dimen name="text_size_chip">14sp</dimen>
     <dimen name="text_size_toolbar_title">18sp</dimen>
     <!-- endregion -->
 </resources>
