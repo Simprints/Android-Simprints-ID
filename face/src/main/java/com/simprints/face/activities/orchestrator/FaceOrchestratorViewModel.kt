@@ -12,7 +12,10 @@ import com.simprints.face.data.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.face.data.moduleapi.face.requests.FaceRequest
 import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
-import com.simprints.face.data.moduleapi.face.responses.entities.*
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceCaptureResult
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchResult
+import com.simprints.face.data.moduleapi.face.responses.entities.FaceSample
+import com.simprints.face.data.moduleapi.face.responses.entities.SecuredImageRef
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
 import java.util.*
@@ -21,7 +24,9 @@ class FaceOrchestratorViewModel : ViewModel() {
     lateinit var faceRequest: FaceRequest
 
     val startCapture: MutableLiveData<LiveDataEvent> = MutableLiveData()
-    val captureFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
+    val startMatching: MutableLiveData<LiveDataEvent> = MutableLiveData()
+
+    val flowFinished: MutableLiveData<LiveDataEventWithContent<IFaceResponse>> = MutableLiveData()
 
     fun start(iFaceRequest: IFaceRequest) {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
@@ -30,7 +35,7 @@ class FaceOrchestratorViewModel : ViewModel() {
                 captureNeededPhotos(request)
             }
             is FaceMatchRequest -> {
-                generateFaceMatchResponse()
+                startMatchingFaces(request)
             }
         }
         faceRequest = request
@@ -41,8 +46,16 @@ class FaceOrchestratorViewModel : ViewModel() {
         startCapture.send()
     }
 
+    private fun startMatchingFaces(request: FaceMatchRequest) {
+        startMatching.send()
+    }
+
     fun captureFinished() {
-        captureFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(generateFakeCaptureResponse()))
+        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(generateFakeCaptureResponse()))
+    }
+
+    fun matchFinished() {
+        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(generateFaceMatchResponse()))
     }
 
     private fun generateFakeCaptureResponse(): FaceCaptureResponse {
@@ -56,9 +69,9 @@ class FaceOrchestratorViewModel : ViewModel() {
     private fun generateFaceMatchResponse(): FaceMatchResponse {
 
         val faceMatchResults = listOf(
-            FaceMatchResult(UUID.randomUUID().toString(), 75, FaceTier.TIER_1),
-            FaceMatchResult(UUID.randomUUID().toString(), 50, FaceTier.TIER_2),
-            FaceMatchResult(UUID.randomUUID().toString(), 25, FaceTier.TIER_3)
+            FaceMatchResult(UUID.randomUUID().toString(), 75),
+            FaceMatchResult(UUID.randomUUID().toString(), 50),
+            FaceMatchResult(UUID.randomUUID().toString(), 25)
         )
 
         return FaceMatchResponse(faceMatchResults)

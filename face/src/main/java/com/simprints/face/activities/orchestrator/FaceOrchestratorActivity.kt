@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.core.livedata.LiveDataEventObserver
+import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import com.simprints.face.activities.FaceCaptureActivity
 import com.simprints.face.di.KoinInjector
 import com.simprints.face.exceptions.InvalidFaceRequestException
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceResponse
-import com.simprints.core.livedata.LiveDataEventWithContentObserver
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class FaceOrchestratorActivity : AppCompatActivity() {
@@ -37,10 +37,14 @@ class FaceOrchestratorActivity : AppCompatActivity() {
         viewModel.startCapture.observe(this, LiveDataEventObserver {
             startActivityForResult(Intent(this, FaceCaptureActivity::class.java), CAPTURE_REQUEST)
         })
-        viewModel.captureFinished.observe(this, LiveDataEventWithContentObserver {
+        viewModel.flowFinished.observe(this, LiveDataEventWithContentObserver {
             val intent = Intent().apply { putExtra(IFaceResponse.BUNDLE_KEY, it) }
             setResult(Activity.RESULT_OK, intent)
             finish()
+        })
+
+        viewModel.startMatching.observe(this, LiveDataEventObserver {
+            viewModel.matchFinished()
         })
     }
 

@@ -1,9 +1,8 @@
 package com.simprints.face.data.moduleapi.face.responses.entities
 
-import android.os.Parcelable
+import com.simprints.moduleapi.face.responses.IFaceMatchResult
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FaceMatchResult(val guidFound: String,
-                           val confidence: Int,
-                           val tier: FaceTier) : Parcelable
+data class FaceMatchResult(override val guid: String,
+                           override val confidence: Int) : IFaceMatchResult
