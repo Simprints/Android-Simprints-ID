@@ -53,7 +53,7 @@
     <string name="preference_scanner_version_title">Varzinii Iskaanarii</string>
     <string name="preference_select_fingers_title">Ashaaraa qubaa beekamaa filadhu</string>
     <string name="preference_select_language_title">Qooqa</string>
-    <string name="title_select_modules">Moojuliiwwan filadhu</string>
+    <string name="preference_select_modules_title">Moojuliiwwan filadhu</string>
     <string name="preference_summary_modules">"Moojuulii siinkii gochuu barbaadu filadhu "</string>
     <string name="preference_summary_settings_fingers">Quba ashaaraan isaa fuudhuu barbaaddu filadhu</string>
     <string name="preference_sync_and_search_title">Siinkii fi Sirreeffama barbaadi</string>

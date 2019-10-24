@@ -23,7 +23,7 @@
             android:entryValues="@array/empty"
             android:key="@string/preference_select_modules_key"
             android:summary="@string/preference_summary_modules"
-            android:title="@string/title_select_modules"
+            android:title="@string/preference_select_modules_title"
             android:shouldDisableView="true"/>
     </PreferenceCategory>
 
