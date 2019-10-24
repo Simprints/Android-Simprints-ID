@@ -1,7 +1,7 @@
 package com.simprints.fingerprintscannermock.simulated
 
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentDevice
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentSocket
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import java.util.*
 
 

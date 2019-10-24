@@ -16,6 +16,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.exitform.FaceExitFormReason.*
 import com.simprints.id.exitformhandler.ExitFormResult.Companion.EXIT_FORM_BUNDLE_KEY
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
@@ -27,6 +28,7 @@ class FaceExitFormActivity : AppCompatActivity() {
     private var faceExitFormReason = OTHER
 
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     private val textWatcher = textWatcherOnChange {
         handleTextChangedInExitForm(it)
@@ -38,12 +40,30 @@ class FaceExitFormActivity : AppCompatActivity() {
 
         injectDependencies()
 
+        setTextInLayout()
+
         setRadioGroupListener()
     }
 
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            whySkipFaceText.text = getString(R.string.why_did_you_skip_face)
+            faceRbReligiousConcerns.text = getString(R.string.refusal_religious_concerns)
+            faceRbDataConcerns.text = getString(R.string.refusal_data_concerns)
+            faceRbDoesNotHavePermission.text = getString(R.string.refusal_does_not_have_permission)
+            faceRbAppNotWorking.text = getString(R.string.refusal_app_not_working)
+            faceRbPersonNotPresent.text = getString(R.string.refusal_person_not_present)
+            faceRbTooYoung.text = getString(R.string.refusal_too_young)
+            faceRbOther.text = getString(R.string.refusal_other)
+            faceExitFormText.hint = getString(R.string.hint_other_reason)
+            faceBtSubmitExitForm.text = getString(R.string.button_submit)
+            faceBtGoBack.text = getString(R.string.exit_form_go_back)
+        }
     }
 
     private fun setRadioGroupListener() {
@@ -148,9 +168,9 @@ class FaceExitFormActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (faceBtSubmitExitForm.isEnabled) {
-            showToast(R.string.refusal_toast_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_submit)
         } else {
-            showToast(R.string.refusal_toast_select_option_submit)
+            showToast(androidResourcesHelper, R.string.refusal_toast_select_option_submit)
         }
     }
 

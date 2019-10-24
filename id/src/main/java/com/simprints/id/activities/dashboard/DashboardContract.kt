@@ -11,7 +11,6 @@ interface DashboardContract {
         fun updateCardViews()
         fun stopRequestIfRequired()
         fun notifyCardViewChanged(position: Int)
-        fun getStringWithParams(stringRes: Int, currentValue: Int = 0, maxValue: Int = 0): String
         fun showToastForUserOffline()
         fun showToastForRecordsUpToDate()
         fun startCheckLoginActivityAndFinish()

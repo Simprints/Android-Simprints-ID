@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/menu_privacy_notice"
-        android:id="@+id/menuPrivacyNotice" />
-    <item android:title="@string/menu_settings"
-        android:id="@+id/menuSettings" />
+    <item
+        android:id="@+id/menuPrivacyNotice"
+        android:title="@string/menu_privacy_notice" />
+    <item
+        android:id="@+id/menuSettings"
+        android:title="@string/menu_settings" />
 
-    <item android:title="Debug"
-        android:visible="false"
-        android:id="@+id/debug" />
+    <item
+        android:id="@+id/debug"
+        android:title="Debug"
+        android:visible="false" />
 </menu>

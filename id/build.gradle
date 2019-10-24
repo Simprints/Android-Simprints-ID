@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2019.3.1"
-        versionCode 175
+        versionName "2019.3.2"
+        versionCode 184
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -189,6 +189,9 @@ dependencies {
     api deps.koin.core
     api deps.koin.android
     api deps.koin.viewmodel
+
+    // Conceal (encryption)
+    implementation deps.conceal.core
 
     // Test
     testImplementation project(':fingerprintscannermock')

@@ -15,6 +15,8 @@ import com.simprints.fingerprint.activities.refusal.RefusalContract
 import com.simprints.fingerprint.activities.refusal.RefusalPresenter
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManager
 import com.simprints.fingerprint.controllers.core.analytics.FingerprintAnalyticsManagerImpl
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelperImpl
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -25,12 +27,15 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.controllers.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
-import com.simprints.fingerprintscanner.bluetooth.BluetoothComponentAdapter
-import com.simprints.fingerprintscanner.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprint.scanner.factory.ScannerFactory
+import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
+import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -82,6 +87,7 @@ object KoinInjector {
         factory { appComponent().getPersonRepository() }
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
+        factory { appComponent().getAndroidResourcesHelper() }
     }
 
     private fun Module.defineBuildersForFingerprintManagers() {
@@ -91,11 +97,14 @@ object KoinInjector {
         factory<FingerprintCrashReportManager> { FingerprintCrashReportManagerImpl(get()) }
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
+        factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
         single<BluetoothComponentAdapter> { AndroidBluetoothAdapter(BluetoothAdapter.getDefaultAdapter()) }
-        single<ScannerManager> { ScannerManagerImpl(get()) }
+        single { ScannerUiHelper() }
+        single<ScannerFactory> { ScannerFactoryImpl(get(), get()) }
+        single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
         factory { Orchestrator(get()) }
@@ -106,7 +115,7 @@ object KoinInjector {
             AlertPresenter(view, get(), get(), get(), fingerprintAlert)
         }
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
-            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get())
+            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
