@@ -72,6 +72,7 @@
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_extra_large"
         android:layout_marginEnd="@dimen/margin_large"
+        android:background="@drawable/shape_search_view_outline"
         app:layout_constraintBottom_toTopOf="@+id/rvModules"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
