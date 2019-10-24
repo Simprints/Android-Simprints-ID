@@ -1,5 +1,5 @@
 package com.simprints.moduleapi.face.responses
 
-interface IFaceMatchResponse {
+interface IFaceMatchResponse: IFaceResponse {
     val result: List<IFaceMatchResult>
 }
