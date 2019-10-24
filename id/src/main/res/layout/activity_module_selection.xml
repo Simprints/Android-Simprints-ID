@@ -29,7 +29,7 @@
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroup"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_large"
         android:layout_marginTop="@dimen/margin_default"
         android:layout_marginEnd="@dimen/margin_large"
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.25" />
+        app:layout_constraintGuide_percent="0.31" />
 
     <View
         android:id="@+id/divider"
