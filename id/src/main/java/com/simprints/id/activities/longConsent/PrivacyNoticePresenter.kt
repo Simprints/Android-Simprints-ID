@@ -1,22 +1,25 @@
 package com.simprints.id.activities.longConsent
 
+import android.annotation.SuppressLint
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class LongConsentPresenter(val view: LongConsentContract.View,
-                           component: AppComponent) : LongConsentContract.Presenter {
+class PrivacyNoticePresenter(val view: PrivacyNoticeContract.View,
+                             component: AppComponent) : PrivacyNoticeContract.Presenter {
 
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var simNetworkUtils: SimNetworkUtils
 
     init {
         component.inject(this)
@@ -33,8 +36,17 @@ class LongConsentPresenter(val view: LongConsentContract.View,
     }
 
     override fun downloadLongConsent() {
-        view.setDownloadInProgress(true)
-        logMessageForCrashReportWithNetworkTrigger("Starting download for long consent")
+        if (simNetworkUtils.isConnected()) {
+            logMessageForCrashReportWithNetworkTrigger("Starting download for long consent")
+            view.setDownloadInProgress(true)
+            startDownloadingLongConsent()
+        } else {
+            view.showUserOfflineToast()
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun startDownloadingLongConsent() {
         longConsentManager.downloadLongConsentWithProgress(preferences.language)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
