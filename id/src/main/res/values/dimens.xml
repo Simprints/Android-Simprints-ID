@@ -5,6 +5,7 @@
     <!-- region Margin -->
     <dimen name="margin_default">8dp</dimen>
     <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_extra_large">24dp</dimen>
     <!-- endregion -->
 
     <!-- region Padding -->
