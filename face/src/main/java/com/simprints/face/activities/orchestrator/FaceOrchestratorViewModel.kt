@@ -30,7 +30,7 @@ class FaceOrchestratorViewModel : ViewModel() {
                 captureNeededPhotos(request)
             }
             is FaceMatchRequest -> {
-                generateFaceFaceMatchResponse()
+                generateFaceMatchResponse()
             }
         }
         faceRequest = request
@@ -53,7 +53,7 @@ class FaceOrchestratorViewModel : ViewModel() {
         return FaceCaptureResponse(captureResults)
     }
 
-    private fun generateFaceFaceMatchResponse(): FaceMatchResponse {
+    private fun generateFaceMatchResponse(): FaceMatchResponse {
 
         val faceMatchResults = listOf(
             FaceMatchResult(UUID.randomUUID().toString(), 75, FaceTier.TIER_1),
