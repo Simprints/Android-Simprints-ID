@@ -1,4 +1,13 @@
 <resources>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- region Margin -->
+    <dimen name="margin_default">8dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <!-- endregion -->
+
+    <!-- region Text size -->
+    <dimen name="text_size_title">18sp</dimen>
+    <!-- endregion -->
 </resources>
