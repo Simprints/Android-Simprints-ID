@@ -12,6 +12,6 @@
     <!-- endregion -->
 
     <!-- region Text size -->
-    <dimen name="text_size_title">18sp</dimen>
+    <dimen name="text_size_toolbar_title">18sp</dimen>
     <!-- endregion -->
 </resources>

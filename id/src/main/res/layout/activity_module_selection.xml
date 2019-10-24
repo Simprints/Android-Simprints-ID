@@ -6,16 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/txtSelectModules"
-        style="@style/SimprintsTextViewStyle.Title"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/toolbarLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_large"
-        android:layout_marginTop="@dimen/margin_large"
-        android:text="@string/preference_select_modules_title"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextAppearance="@style/SimprintsTextViewStyle.Toolbar"
+            app:title="@string/preference_select_modules_title" />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chipGroup"
@@ -27,7 +36,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtSelectModules" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
     <TextView
         android:id="@+id/txtNoModulesSelected"
@@ -38,7 +47,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtSelectModules" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

@@ -31,9 +31,15 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- region TextView -->
     <style name="SimprintsTextViewStyle" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/muli</item>
     </style>
+
+    <style name="SimprintsTextViewStyle.Toolbar">
+        <item name="android:textSize">@dimen/text_size_toolbar_title</item>
+    </style>
+    <!-- endregion -->
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -53,12 +59,6 @@
     <style name="AppTheme.Launcher">
         <item name="windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/launch_screen</item>
-    </style>
-
-    <style name="SimprintsTextViewStyle.Title">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">@color/colorAccent</item>
-        <item name="android:textSize">@dimen/text_size_title</item>
     </style>
 
     <!-- clientapi themes-->
