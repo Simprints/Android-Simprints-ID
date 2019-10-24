@@ -55,6 +55,12 @@
         <item name="android:windowBackground">@drawable/launch_screen</item>
     </style>
 
+    <style name="SimprintsTextViewStyle.Title">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:textSize">@dimen/text_size_title</item>
+    </style>
+
     <!-- clientapi themes-->
     <style name="ClientApiTheme" parent="AppTheme"/>
 
