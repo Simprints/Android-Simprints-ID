@@ -5,5 +5,5 @@
     style="@style/SimprintsTextViewStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:padding="@dimen/padding_default"
     tools:text="@sample/sample_modules.json/data/name"/>
