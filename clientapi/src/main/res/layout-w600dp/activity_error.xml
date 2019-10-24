@@ -17,7 +17,6 @@
         android:layout_marginTop="10dp"
         android:layout_weight="0.15"
         android:gravity="center"
-        android:text="@string/configuration_error_title"
         android:textAllCaps="true"
         android:textColor="@color/simprints_white"
         android:textSize="28sp"
@@ -30,7 +29,6 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_weight="0.55"
-        android:contentDescription="@string/main_error_graphic"
         android:src="@drawable/clientapi_error_icon" />
 
     <LinearLayout
@@ -48,7 +46,6 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:layout_weight="1"
-            android:contentDescription="@string/hint_graphic"
             android:src="@drawable/clientapi_error_hint_cog"
             tools:ignore="NestedWeights" />
 
@@ -61,7 +58,6 @@
             android:paddingStart="0dp"
             android:paddingEnd="10dp"
             android:textSize="22sp"
-            android:text="@string/failed_to_retrieve_message"
             android:textColor="@color/simprints_white" />
 
     </LinearLayout>
@@ -81,7 +77,6 @@
             android:layout_weight="1"
             android:background="@color/alert_yellow"
             android:gravity="center"
-            android:text="@string/close"
             android:textColor="@color/simprints_white"
             android:textSize="28sp"
             tools:ignore="NestedWeights" />

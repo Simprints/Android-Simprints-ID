@@ -25,10 +25,14 @@ import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivi
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.LongConsentPresenter
-import com.simprints.id.activities.longConsent.PricvacyNoticeActivity
+import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.SettingsAboutActivity
+import com.simprints.id.activities.settings.SettingsActivity
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
+import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -49,6 +53,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyn
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import dagger.BindsInstance
@@ -77,7 +82,7 @@ interface AppComponent {
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
     fun inject(aboutActivity: DebugActivity)
-    fun inject(pricvacyNoticeActivity: PricvacyNoticeActivity)
+    fun inject(privacyNoticeActivity: PrivacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
     fun inject(checkLoginActivity: CheckLoginFromMainLauncherActivity)
@@ -107,6 +112,10 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(settingsActivity: SettingsActivity)
+    fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
+    fun inject(settingsAboutFragment: SettingsAboutFragment)
+    fun inject(settingsAboutActivity: SettingsAboutActivity)
     fun inject(consentActivity: ConsentActivity)
     fun inject(coreExitFormActivity: CoreExitFormActivity)
     fun inject(fingerprintExitFormActivity: FingerprintExitFormActivity)
@@ -126,4 +135,5 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
     fun getFlowManager(): FlowManager
+    fun getAndroidResourcesHelper(): AndroidResourcesHelper
 }
