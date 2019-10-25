@@ -251,7 +251,6 @@ class CollectFingerprintsActivityTest : KoinTest {
         private const val DEFAULT_USER_ID = "some_user_id"
         private const val DEFAULT_MODULE_ID = "some_module_id"
         private const val DEFAULT_LANGUAGE = "en"
-        private val DEFAULT_ACTIVITY_TITLE = "Enrolment"
         private val FINGER_STATUS_TWO_FINGERS = mapOf(
             FingerIdentifier.RIGHT_THUMB to false,
             FingerIdentifier.RIGHT_INDEX_FINGER to false,
