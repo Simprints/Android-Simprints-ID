@@ -23,11 +23,12 @@ class FaceCaptureResponseEncoder(
                         Operation.DECODE -> cipher.decrypt(tmpTemplateString)
                     }.toByteArray()
 
-                val index = item.index
-                val faceId = item.result.faceId
-                val imageRef = item.result.imageRef
-                val faceCaptureSample = FaceCaptureSample(faceId, processedTemplate, imageRef)
-                FaceCaptureResult(index, faceCaptureSample)
+                    val index = item.index
+                    val faceId = item.result.faceId
+                    val imageRef = item.result.imageRef
+                    val faceCaptureSample = FaceCaptureSample(faceId, processedTemplate, imageRef)
+                    FaceCaptureResult(index, faceCaptureSample)
+                }
             }
         }
 

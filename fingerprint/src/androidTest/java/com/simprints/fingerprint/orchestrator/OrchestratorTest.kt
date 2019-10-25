@@ -13,7 +13,7 @@ import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.data.domain.matching.MatchingResult
 import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder

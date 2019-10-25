@@ -9,7 +9,6 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
-import com.simprints.fingerprint.data.domain.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -280,7 +279,7 @@ class CollectFingerprintsActivityTest : KoinTest {
 
         private fun collectTaskRequest(fingerStatus: Map<FingerIdentifier, Boolean>) =
             CollectFingerprintsTaskRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID,
-                DEFAULT_ACTIVITY_TITLE, DEFAULT_LANGUAGE, fingerStatus)
+                DEFAULT_LANGUAGE, fingerStatus)
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, CollectFingerprintsActivity::class.qualifiedName!!)

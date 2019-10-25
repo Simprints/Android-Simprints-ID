@@ -33,9 +33,9 @@ class StepEncoderImpl(private val cipher: HybridCipher) : StepEncoder {
         val result = step.getResult()
         return step.apply {
             val responseEncoder = when (result) {
-                is FingerprintCaptureResponse -> FingerprintCaptureResponseEncoder(keystoreManager)
-                is FaceCaptureResponse -> FaceCaptureResponseEncoder(keystoreManager)
-                else -> BypassEncoder(keystoreManager)
+                is FingerprintCaptureResponse -> FingerprintCaptureResponseEncoder(cipher)
+                is FaceCaptureResponse -> FaceCaptureResponseEncoder(cipher)
+                else -> BypassEncoder(cipher)
             }
             setResult(responseEncoder.process(result, operation))
         }

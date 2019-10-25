@@ -21,8 +21,8 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.controllers.scanner.ScannerManager
-import com.simprints.fingerprint.data.domain.Action.*
+import com.simprints.fingerprint.controllers.core.flow.Action.*
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -37,7 +37,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val timeHelper: FingerprintTimeHelper,
                                    private val sessionEventsManager: FingerprintSessionEventsManager,
                                    private val scannerManager: ScannerManager,
-                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper)
+                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                                   private val masterFlowManager: MasterFlowManager)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -162,7 +163,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (collectRequest.action) {
+        when (masterFlowManager.getCurrentAction()) {
             ENROL -> androidResourcesHelper.getString(R.string.register_title)
             IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
             VERIFY -> androidResourcesHelper.getString(R.string.verify_title)

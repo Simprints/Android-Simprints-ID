@@ -21,6 +21,8 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
@@ -88,6 +90,7 @@ object KoinInjector {
         factory { appComponent().getImprovedSharedPreferences() }
         factory { appComponent().getRemoteConfigWrapper() }
         factory { appComponent().getAndroidResourcesHelper() }
+        factory { appComponent().getFlowManager() }
     }
 
     private fun Module.defineBuildersForFingerprintManagers() {
@@ -98,6 +101,7 @@ object KoinInjector {
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
+        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {

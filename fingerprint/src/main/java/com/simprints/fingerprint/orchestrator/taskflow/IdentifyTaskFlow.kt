@@ -9,7 +9,7 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBu
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.MatchGroup
-import com.simprints.fingerprint.data.domain.toAction
+import com.simprints.fingerprint.controllers.core.flow.toAction
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 
@@ -32,7 +32,7 @@ class IdentifyTaskFlow(fingerprintRequest: FingerprintRequest) : FingerprintTask
 
     private fun FingerprintIdentifyRequest.createCollectFingerprintsTaskRequest() =
         CollectFingerprintsTaskRequest(
-            projectId, userId, moduleId, this.toAction().activityTitle, language, fingerStatus
+            projectId, userId, moduleId, language, fingerStatus
         )
 
     private fun FingerprintIdentifyRequest.createMatchingTaskRequest() =
