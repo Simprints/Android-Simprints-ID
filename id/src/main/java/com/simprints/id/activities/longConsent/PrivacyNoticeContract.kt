@@ -3,7 +3,7 @@ package com.simprints.id.activities.longConsent
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 
-interface LongConsentContract {
+interface PrivacyNoticeContract {
 
     interface View : BaseView<Presenter> {
 
@@ -16,6 +16,8 @@ interface LongConsentContract {
         fun setDownloadInProgress(inProgress: Boolean)
 
         fun showDownloadErrorToast()
+
+        fun showUserOfflineToast()
     }
 
     interface Presenter : BasePresenter {
