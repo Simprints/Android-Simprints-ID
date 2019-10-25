@@ -15,7 +15,6 @@ import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.ByteArrayToPacketAccumulator
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketParser
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
-import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 import io.reactivex.Flowable
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
@@ -33,10 +32,8 @@ class SimulatedCommandInputStream {
         ).also { it.connect(inputStream) }
 
     val veroCommands: Flowable<VeroCommand> = router.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(VeroCommandAccumulator(VeroCommandParser()))
-        ?.doOnNext { println("Scanner Message Stream: Simulated IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
         ?: throw IllegalStateException()
     val un20Commands: Flowable<Un20Command> = router.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(Un20CommandAccumulator(Un20CommandParser()))
-        ?.doOnNext { println("Scanner Message Stream: Simulated IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
         ?: throw IllegalStateException()
 
     fun updateWithNewBytes(bytes: ByteArray) {

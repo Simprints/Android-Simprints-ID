@@ -11,7 +11,6 @@ import com.simprints.fingerprintscanner.v2.incoming.message.accumulators.VeroRes
 import com.simprints.fingerprintscanner.v2.incoming.message.toMessageStream
 import com.simprints.fingerprintscanner.v2.incoming.packet.PacketRouter
 import com.simprints.fingerprintscanner.v2.tools.lang.isSubclass
-import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 import com.simprints.fingerprintscanner.v2.tools.reactive.filterCast
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -30,11 +29,11 @@ class MessageInputStream(
 
     override fun connect(inputStream: InputStream) {
         packetRouter.connect(inputStream)
-        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        veroResponses = packetRouter.incomingPacketChannels[Channel.Remote.VeroServer]?.toMessageStream(veroResponseAccumulator)
             ?: throw TODO("exception handling")
-        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        veroEvents = packetRouter.incomingPacketChannels[Channel.Remote.VeroEvent]?.toMessageStream(veroEventAccumulator)
             ?: throw TODO("exception handling")
-        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)?.doOnNext { println("Scanner Message Stream:           IN  : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
+        un20Responses = packetRouter.incomingPacketChannels[Channel.Remote.Un20Server]?.toMessageStream(un20ResponseAccumulator)
             ?: throw TODO("exception handling")
     }
 

@@ -6,13 +6,11 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroResponse
 import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.PacketProtocol
-import com.simprints.fingerprintscanner.v2.tools.primitives.toHexString
 
 class SimulatedResponseOutputStream {
 
     fun serialize(message: IncomingMessage): List<ByteArray> =
         message
-            .also { println("Scanner Message Stream: Simulated OUT : ${it::class.simpleName} : ${it.getBytes().toHexString()}") }
             .getBytes()
             .asList()
             .chunked(PacketProtocol.MAX_PAYLOAD_SIZE)
