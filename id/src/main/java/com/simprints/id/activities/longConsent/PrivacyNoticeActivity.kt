@@ -12,12 +12,12 @@ import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.activity_privacy_notice.*
 import javax.inject.Inject
 
-class PrivacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
+class PrivacyNoticeActivity : AppCompatActivity(), PrivacyNoticeContract.View {
 
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
-    override lateinit var viewPresenter: LongConsentContract.Presenter
+    override lateinit var viewPresenter: PrivacyNoticeContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +28,7 @@ class PrivacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
         initActionBar()
         initTextInUi()
 
-        viewPresenter = LongConsentPresenter(this, component)
+        viewPresenter = PrivacyNoticePresenter(this, component)
         viewPresenter.start()
     }
 
@@ -80,5 +80,9 @@ class PrivacyNoticeActivity : AppCompatActivity(), LongConsentContract.View {
 
     override fun showDownloadErrorToast() {
         showToast(androidResourcesHelper, R.string.long_consent_failed_to_download)
+    }
+
+    override fun showUserOfflineToast() {
+        showToast(androidResourcesHelper, R.string.login_no_network)
     }
 }
