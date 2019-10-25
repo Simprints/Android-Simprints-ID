@@ -3,7 +3,6 @@ package com.simprints.fingerprint.activities.matching
 import android.content.Intent
 import android.util.Log
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
@@ -15,7 +14,6 @@ import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchE
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.person.Person
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher

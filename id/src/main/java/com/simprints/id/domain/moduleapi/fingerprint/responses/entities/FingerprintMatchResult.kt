@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.responses.entities
 
 import android.os.Parcelable
-import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResult
+import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize

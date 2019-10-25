@@ -9,8 +9,7 @@ import kotlinx.android.parcel.Parcelize
 class CollectFingerprintsTaskRequest(val projectId: String,
                                      val userId: String,
                                      val moduleId: String,
-                                     val language: String,
-                                     val fingerStatus: Map<FingerIdentifier, Boolean>) : TaskRequest, Parcelable {
+                                     val fingerprintsToCapture: List<FingerIdentifier>) : TaskRequest, Parcelable {
 
     companion object {
         const val BUNDLE_KEY = "CollectRequestBundleKey"

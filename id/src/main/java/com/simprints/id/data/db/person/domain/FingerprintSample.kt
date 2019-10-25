@@ -25,14 +25,13 @@ open class FingerprintSample(
 }
 
 fun FingerprintSample.fromDomainToModuleApi(): IFingerprintSample =
-    FingerprintSampleImpl(id, fingerIdentifier.fromDomainToModuleApi(), template, templateQualityScore, imageRef?.fromDomainToModuleApi())
+    FingerprintSampleImpl(fingerIdentifier.fromDomainToModuleApi(), template, templateQualityScore, imageRef?.fromDomainToModuleApi())
 
 fun IFingerprintSample.fromModuleApiToDomain(): FingerprintSample =
     FingerprintSample(fingerIdentifier.fromModuleApiToDomain(), template, templateQualityScore, imageRef?.fromModuleApiToDomain())
 
 @Parcelize
 private class FingerprintSampleImpl(
-    override val id: String,
     override val fingerIdentifier: IFingerIdentifier,
     override val template: ByteArray,
     override val templateQualityScore: Int,

@@ -12,7 +12,7 @@ import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,
-                                             var fingerStatus: Map<FingerIdentifier, Boolean>,
+                                             var fingerprintsToCapture: List<FingerIdentifier>,
                                              private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
 
 
@@ -52,7 +52,7 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
         return Finger(id, isFingerActive, fingerPriority, fingerOrder)
     }
 
-    private fun isFingerRequired(identifier: FingerIdentifier) = fingerStatus[identifier] == true
+    private fun isFingerRequired(identifier: FingerIdentifier) = fingerprintsToCapture.contains(identifier)
 
     private fun refreshWhichFingerIsLast() {
         presenter.activeFingers.forEach { it.isLastFinger = false }

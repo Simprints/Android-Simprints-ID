@@ -4,7 +4,6 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class MatchingResult(
+data class MatchResult(
     val guid: String,
-    val confidence: Int,
-    val tier: MatchingTier) : Parcelable
+    val confidence: Float) : Parcelable

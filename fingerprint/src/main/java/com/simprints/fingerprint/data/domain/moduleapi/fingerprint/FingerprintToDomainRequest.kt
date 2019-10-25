@@ -1,15 +1,14 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import com.simprints.fingerprint.activities.collect.models.toDomainClass
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
+import com.simprints.fingerprint.data.domain.person.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
-import com.simprints.moduleapi.fingerprint.requests.*
 
 object FingerprintToDomainRequest {
 
@@ -17,35 +16,25 @@ object FingerprintToDomainRequest {
         when (iFingerprintRequest) {
             is IFingerprintCaptureRequest ->
                 fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
-            is IFingerprintVerifyRequest ->
-                fromFingerprintToDomainVerifyRequest(iFingerprintRequest)
-            is IFingerprintIdentifyRequest ->
-                fromFingerprintToDomainIdentifyRequest(iFingerprintRequest)
+            is IFingerprintMatchRequest ->
+                fromFingerprintToDomainMatchRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
-        }
-
-    private fun fromFingerprintToDomainIdentifyRequest(iFingerprintRequest: IFingerprintIdentifyRequest): FingerprintIdentifyRequest =
-        with(iFingerprintRequest) {
-            FingerprintIdentifyRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, organizationName, programName, matchGroup.fromModuleApiToDomain(), returnIdCount
-            )
-        }
-
-
-    private fun fromFingerprintToDomainVerifyRequest(iFingerprintRequest: IFingerprintVerifyRequest): FingerprintVerifyRequest =
-        with(iFingerprintRequest) {
-            FingerprintVerifyRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, programName, organizationName, verifyGuid)
         }
 
     private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
             FingerprintCaptureRequest(
-                language, fingerStatus.mapKeys { it.key.toDomainClass() }
+                fingerprintsToCapture.map { it.toDomainClass() }
             )
+        }
+
+    private fun fromFingerprintToDomainMatchRequest(iFingerprintRequest: IFingerprintMatchRequest): FingerprintMatchRequest =
+        with(iFingerprintRequest) {
+            FingerprintMatchRequest(probeFingerprintSamples.map {
+                Fingerprint(
+                    it.fingerIdentifier.toDomainClass(),
+                    it.template
+                )
+            }, queryForCandidates)
         }
 }
