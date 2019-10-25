@@ -1,6 +1,6 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.fingerprintscanner.tools.ota.toPositiveInt
+import com.simprints.fingerprintscanner.v1.tools.ota.toPositiveInt
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import java.nio.ByteBuffer
