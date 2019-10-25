@@ -15,7 +15,6 @@ interface IFaceRequest : Parcelable, IRequest {
 
 enum class IFaceRequestType {
     CAPTURE,
-
-    VERIFY, //TBRemoved soon
-    IDENTIFY //TBRemoved soon
+    VERIFY,
+    IDENTIFY
 }

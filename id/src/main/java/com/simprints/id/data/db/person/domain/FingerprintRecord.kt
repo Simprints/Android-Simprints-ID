@@ -10,4 +10,8 @@ class FingerprintRecord(val personId: String,
                         override val fingerIdentifier: FingerIdentifier,
                         override val template: ByteArray,
                         override val imageRef: SecuredImageRef?,
-                        override val templateQualityScore: Int) : FingerprintSample(fingerIdentifier, template, templateQualityScore, imageRef), Parcelable
+                        override val templateQualityScore: Int) : FingerprintSample(fingerIdentifier, template, templateQualityScore, imageRef), Parcelable {
+
+    constructor(personId: String, sample: FingerprintSample) :
+        this(personId, sample.fingerIdentifier, sample.template, sample.imageRef, sample.templateQualityScore)
+}

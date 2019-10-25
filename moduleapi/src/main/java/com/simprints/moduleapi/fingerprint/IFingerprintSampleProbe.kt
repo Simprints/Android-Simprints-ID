@@ -1,13 +1,12 @@
-package com.simprints.moduleapi.fingerprint.responses.entities
+package com.simprints.moduleapi.fingerprint
 
 import android.os.Parcelable
 import com.simprints.moduleapi.common.ISecuredImageRef
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 
-interface IFingerprintSample : Parcelable {
+interface IFingerprintSample: Parcelable {
     val id: String
     val fingerIdentifier: IFingerIdentifier
     val template: ByteArray
-    val qualityScore: Int
+    val templateQualityScore: Int
     val imageRef: ISecuredImageRef?
 }

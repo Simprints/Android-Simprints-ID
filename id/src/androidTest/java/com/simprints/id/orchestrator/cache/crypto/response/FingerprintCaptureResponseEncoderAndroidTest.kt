@@ -4,6 +4,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.equalTo

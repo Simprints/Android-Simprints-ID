@@ -139,7 +139,9 @@ class OrchestratorManagerImplTest {
         verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
+        verifyOnce(modalityFlowMock) { handleIntentResult(safeEq(enrolAppRequest), anyInt(), anyInt(), anyNotNull()) }
+
+    fun <T : Any> safeEq(value: T): T = eq(value) ?: value
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {
@@ -186,7 +188,7 @@ class OrchestratorManagerImplTest {
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 
-        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, mock())
+        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache)
     }
 
     private fun OrchestratorManager.startFlowForEnrol(
@@ -207,6 +209,7 @@ class OrchestratorManagerImplTest {
 
         runBlockingTest {
             handleIntentResult(
+                enrolAppRequest,
                 requestCode,
                 Activity.RESULT_OK,
                 Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))

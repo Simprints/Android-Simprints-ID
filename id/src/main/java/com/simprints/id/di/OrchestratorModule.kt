@@ -12,7 +12,6 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
@@ -52,7 +51,7 @@ class OrchestratorModule {
     @Provides
     fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
                                         preferenceManager: PreferencesManager): FingerprintStepProcessor =
-        FingerprintStepProcessorImpl(fingerprintRequestFactory, ModuleApiToDomainFingerprintResponse, preferenceManager)
+        FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
 
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
@@ -68,15 +67,17 @@ class OrchestratorModule {
     @Named("ModalityFlowVerify")
     fun provideModalityFlowVerify(fingerprintStepProcessor: FingerprintStepProcessor,
                                   faceStepProcessor: FaceStepProcessor,
-                                  coreStepProcessor: CoreStepProcessor): ModalityFlow =
-        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
+                                  coreStepProcessor: CoreStepProcessor,
+                                  prefs: PreferencesManager): ModalityFlow =
+        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, prefs)
 
     @Provides
     @Named("ModalityFlowIdentify")
     fun provideModalityFlowIdentify(fingerprintStepProcessor: FingerprintStepProcessor,
                                     faceStepProcessor: FaceStepProcessor,
-                                    coreStepProcessor: CoreStepProcessor): ModalityFlow =
-        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
+                                    coreStepProcessor: CoreStepProcessor,
+                                    prefs: PreferencesManager): ModalityFlow =
+        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, prefs)
 
     // Orchestration
     @Provides

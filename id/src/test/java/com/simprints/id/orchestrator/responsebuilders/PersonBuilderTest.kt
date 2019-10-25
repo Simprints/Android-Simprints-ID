@@ -1,15 +1,17 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.data.db.person.domain.FaceSample
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.tools.TimeHelper
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
@@ -40,7 +42,7 @@ class PersonBuilderTest {
                 expectedSample.sample?.template?.let { expectedTemplate ->
                     assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
                 }
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.templateQualityScore))
             }
             assertThat(faceSamples, `is`(emptyList()))
         }
@@ -98,7 +100,7 @@ class PersonBuilderTest {
                 expectedSample.sample?.template?.let { expectedTemplate ->
                     assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
                 }
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.qualityScore))
+                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.templateQualityScore))
             }
             faceSamples.forEachIndexed { index, faceSample ->
                 assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
@@ -122,15 +124,14 @@ class PersonBuilderTest {
     )
 
     private fun mockFingerprintResponse(): FingerprintCaptureResponse {
-        val fingerId = IFingerIdentifier.LEFT_THUMB
+        val fingerId = FingerIdentifier.LEFT_THUMB
         val captureResult = listOf(
             FingerprintCaptureResult(
                 fingerId,
                 FingerprintSample(
-                    "id",
                     fingerId,
                     imageRef = null,
-                    qualityScore = 10,
+                    templateQualityScore = 10,
                     template = "template".toByteArray()
                 )
             )

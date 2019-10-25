@@ -14,8 +14,13 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.Fingerpri
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
+import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.secure.cryptography.HybridCipherImpl
@@ -180,7 +185,7 @@ class StepEncoderImplAndroidTest {
     private fun mockFingerprintIdentifyResponse(): Step.Result {
         return FingerprintIdentifyResponse(
             listOf(
-                FingerprintMatchingResult(
+                FingerprintMatchResult(
                     "guid-found",
                     3,
                     FingerprintTier.TIER_1

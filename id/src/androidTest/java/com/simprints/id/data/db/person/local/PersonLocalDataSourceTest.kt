@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.person.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
@@ -10,16 +11,18 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.Serializable
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -132,6 +135,32 @@ class PersonLocalDataSourceTest : RealmTestsBase() {
         realm.executeTransaction {
             assertEquals(realm.where(DbPerson::class.java).count(), 1)
             assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+        }
+    }
+
+    @Test
+    fun givenManyPeopleSaved_loadWithSerializableShouldReturnFingerprintRecords() = runBlocking {
+        val fakePerson1 = getFakePerson()
+        val fakePerson2 = getFakePerson()
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
+        personLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
+
+        val fingerprintRecordLocalDataSource =  (personLocalDataSource as FingerprintRecordLocalDataSource)
+        val fingerprintRecord = fingerprintRecordLocalDataSource.loadFingerprintRecords(PersonLocalDataSource.Query()).toList()
+        realm.executeTransaction {
+            assertThat(fingerprintRecord.count()).isEqualTo(fakePerson1.fingerprintSamples.count() + fakePerson2.fingerprintSamples.count())
+            assertThat(fingerprintRecord[0].personId).isEqualTo(fakePerson1.patientId)
+            assertThat(fingerprintRecord[1].personId).isEqualTo(fakePerson1.patientId)
+            assertThat(fingerprintRecord[2].personId).isEqualTo(fakePerson2.patientId)
+            assertThat(fingerprintRecord[3].personId).isEqualTo(fakePerson2.patientId)
+        }
+    }
+
+    @Test
+    fun givenInvalidSerializableQuery_aThrowableIsThrown() = runBlocking {
+        val fingerprintRecordLocalDataSource =  (personLocalDataSource as FingerprintRecordLocalDataSource)
+        assertThrows<InvalidQueryToLoadRecordsException> {
+            fingerprintRecordLocalDataSource.loadFingerprintRecords(object : Serializable {} )
         }
     }
 
