@@ -231,7 +231,6 @@ class OrchestratorTest {
         private const val DEFAULT_LOGO_EXISTS = true
         private const val DEFAULT_PROGRAM_NAME = "This program"
         private const val DEFAULT_ORGANISATION_NAME = "This organisation"
-        private const val DEFAULT_ACTIVITY_TITLE = "Enrolment"
         private const val DEFAULT_VERIFY_GUID = "verify_guid"
         private const val DEFAULT_NUMBER_OF_ID_RETURNS = 10
         private val DEFAULT_MATCH_GROUP = MatchGroup.GLOBAL
@@ -249,7 +248,7 @@ class OrchestratorTest {
         )
 
         private fun createFingerprintCaptureRequest() =
-            FingerprintCaptureRequest(DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS, DEFAULT_ACTIVITY_TITLE)
+            FingerprintCaptureRequest(DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS)
 
         private fun createFingerprintRequest(action: Action) =
             when (action) {
@@ -261,6 +260,7 @@ class OrchestratorTest {
                     DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
                     DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME,
                     DEFAULT_VERIFY_GUID)
+                else -> throw UnsupportedOperationException()
             }
     }
 }
