@@ -5,5 +5,4 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FingerprintCaptureRequest(override val language: String,
-                                     override val fingerStatus: Map<FingerIdentifier, Boolean>,
-                                     val activityTitle: String) : FingerprintRequest
+                                     override val fingerStatus: Map<FingerIdentifier, Boolean>) : FingerprintRequest

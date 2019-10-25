@@ -39,7 +39,7 @@ object FingerprintToDomainRequest {
     private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
             FingerprintCaptureRequest(
-                language, fingerStatus.mapKeys { it.key.toDomainClass() }, activityTitle
+                language, fingerStatus.mapKeys { it.key.toDomainClass() }
             )
         }
 }
