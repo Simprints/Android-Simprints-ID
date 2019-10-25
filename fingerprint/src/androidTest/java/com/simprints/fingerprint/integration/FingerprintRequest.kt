@@ -2,7 +2,7 @@ package com.simprints.fingerprint.integration
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.id.Application
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
@@ -65,8 +65,7 @@ data class TestFingerprintCaptureRequest(override val projectId: String,
                                          override val fingerStatus: Map<IFingerIdentifier, Boolean>,
                                          override val logoExists: Boolean,
                                          override val programName: String,
-                                         override val organizationName: String,
-                                         override val activityTitle: String) : IFingerprintCaptureRequest
+                                         override val organizationName: String) : IFingerprintCaptureRequest
 
 @Parcelize
 data class TestFingerprintIdentifyRequest(override val projectId: String,
