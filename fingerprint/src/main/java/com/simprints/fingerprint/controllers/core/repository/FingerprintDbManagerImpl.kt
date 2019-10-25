@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.repository
 
 import com.simprints.core.tools.extentions.singleWithSuspend
-import com.simprints.id.data.db.person.domain.FingerprintRecord
+import com.simprints.fingerprint.data.domain.person.FingerprintRecord
 import com.simprints.id.data.db.person.local.FingerprintRecordLocalDataSource
 import io.reactivex.Single
 import kotlinx.coroutines.flow.toList
@@ -13,6 +13,8 @@ class FingerprintDbManagerImpl(private val coreFingerprintRecordLocalDataSource:
 
     override fun loadPeople(query: Serializable): Single<List<FingerprintRecord>> =
         singleWithSuspend {
-            coreFingerprintRecordLocalDataSource.loadFingerprintRecords(query).toList()
+            coreFingerprintRecordLocalDataSource.loadFingerprintRecords(query).toList().map {
+                FingerprintRecord(it.personId, it)
+            }
         }
 }

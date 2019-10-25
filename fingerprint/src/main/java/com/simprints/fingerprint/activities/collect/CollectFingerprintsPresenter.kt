@@ -65,7 +65,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            collectRequest.fingerStatus,
+            collectRequest.fingerprintsToCapture,
             androidResourcesHelper)
     }
 
@@ -157,7 +157,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         activeFingers.filter { fingerHasSatisfiedTerminalCondition(it) }.size >= maximumTotalNumberOfFingersForAutoAdding
 
     private fun numberOfOriginalFingers() =
-        collectRequest.fingerStatus.filter { it.value }.size
+        collectRequest.fingerprintsToCapture.toSet().size
 
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
