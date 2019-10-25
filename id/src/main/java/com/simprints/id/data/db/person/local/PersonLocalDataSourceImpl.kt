@@ -2,6 +2,7 @@ package com.simprints.id.data.db.person.local
 
 import android.content.Context
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.person.domain.FingerprintRecord
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.fromDbToDomain
@@ -9,6 +10,7 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.await
 import com.simprints.id.tools.extensions.transactAwait
@@ -17,16 +19,14 @@ import io.realm.RealmConfiguration
 import io.realm.RealmQuery
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import java.io.Serializable
 
 @FlowPreview
 class PersonLocalDataSourceImpl(private val appContext: Context,
                                 val secureDataManager: SecureDataManager,
                                 val loginInfoManager: LoginInfoManager) : PersonLocalDataSource {
-
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
         const val PROJECT_ID_FIELD = "projectId"
@@ -74,6 +74,20 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
                     ?: flowOf()
             }
         }
+
+    override suspend fun loadFingerprintRecords(query: Serializable): Flow<FingerprintRecord> =
+        if (query is PersonLocalDataSource.Query) {
+            load(query).map { person ->
+                createFingerprintRecordFlow(person)
+            }.flattenConcat()
+        } else {
+            throw InvalidQueryToLoadRecordsException()
+        }
+
+    private fun createFingerprintRecordFlow(person: Person): Flow<FingerprintRecord> =
+        person.fingerprintSamples.map {
+            FingerprintRecord(person.patientId, it)
+        }.asFlow()
 
     override suspend fun delete(query: PersonLocalDataSource.Query) {
         withContext(Dispatchers.Main) {

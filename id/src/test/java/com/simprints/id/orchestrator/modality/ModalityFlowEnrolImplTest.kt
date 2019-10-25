@@ -43,7 +43,7 @@ class ModalityFlowEnrolImplTest {
         whenever(faceStepMock) { activityName } thenReturn FACE_ACTIVITY_NAME
         whenever(coreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
-        whenever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
+        whenever(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
 
@@ -55,7 +55,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-        verifyNever(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyNever(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildCaptureStep() }
     }
 
@@ -64,7 +64,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyNever(faceStepProcessor) { buildCaptureStep() }
     }
 
@@ -73,7 +73,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE, FINGER))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         verifyOnce(faceStepProcessor) { buildCaptureStep() }
         assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowEnrol.steps[1].activityName).isEqualTo(FACE_ACTIVITY_NAME)
@@ -84,7 +84,7 @@ class ModalityFlowEnrolImplTest {
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER, FACE))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
-        verifyOnce(fingerprintStepProcessor) { buildStepEnrol(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) }
         assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowEnrol.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
     }

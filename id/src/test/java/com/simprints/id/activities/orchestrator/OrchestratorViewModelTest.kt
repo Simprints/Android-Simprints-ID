@@ -87,10 +87,10 @@ class OrchestratorViewModelTest {
     @Test
     fun viewModelStart_shouldForwardResultToOrchestrator() {
         runBlocking {
-            vm.onModalStepRequestDone(REQUEST_CODE, Activity.RESULT_OK, null)
+            vm.onModalStepRequestDone(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
             verifyOnce(orchestratorManagerMock) {
                 runBlocking {
-                    handleIntentResult(REQUEST_CODE, Activity.RESULT_OK, null)
+                    handleIntentResult(enrolAppRequest, REQUEST_CODE, Activity.RESULT_OK, null)
                 }
             }
         }

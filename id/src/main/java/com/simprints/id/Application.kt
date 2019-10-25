@@ -12,6 +12,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import timber.log.Timber
 
 open class Application : MultiDexApplication() {
@@ -96,4 +97,8 @@ open class Application : MultiDexApplication() {
         }
     }
 
+    override fun onTerminate() {
+        super.onTerminate()
+        stopKoin()
+    }
 }

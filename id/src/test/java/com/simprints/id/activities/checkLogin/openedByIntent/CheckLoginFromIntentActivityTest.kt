@@ -24,7 +24,7 @@ package com.simprints.id.activities.checkLogin.openedByIntent
 //            override val moduleId: String,
 //            override val metadata: String
 //        ) : IAppEnrollRequest {
-//            fun toIntent() = Intent(RequestAction.CAPTURE.toString())
+//            fun toIntent() = Intent(RequestAction.MATCH.toString())
 //                .apply { putExtra(IAppRequest.BUNDLE_KEY, this@AppEnrollRequest) }
 //        }
 //

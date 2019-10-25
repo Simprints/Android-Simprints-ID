@@ -41,8 +41,8 @@ open class OrchestratorManagerImpl(
         proceedToNextStepOrAppResponse()
     }
 
-    override suspend fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        modalitiesFlow.handleIntentResult(requestCode, resultCode, data)?.let(hotCache::save)
+    override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
+        modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)?.let(hotCache::save)
         proceedToNextStepOrAppResponse()
     }
 
