@@ -11,7 +11,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 
-
+// TODO: replace with PreferenceFragmentCompat
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {
 
     override lateinit var viewPresenter: SettingsPreferenceContract.Presenter
@@ -84,6 +84,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun openSettingAboutActivity() {
         activity.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
+        }
+    }
+
+    override fun openModuleSelectionActivity() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).openModuleSelectionActivity()
         }
     }
 }

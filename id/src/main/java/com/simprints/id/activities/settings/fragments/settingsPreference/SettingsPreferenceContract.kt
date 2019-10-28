@@ -36,6 +36,8 @@ interface SettingsPreferenceContract {
         fun showToastForInvalidSelectionOfFingers()
 
         fun openSettingAboutActivity()
+
+        fun openModuleSelectionActivity()
     }
 
     interface Presenter : BasePresenter
