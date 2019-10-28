@@ -13,10 +13,10 @@ import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprintmatcher.Person as LibPerson
-import com.simprints.fingerprint.data.domain.person.fromDomainToMatcher
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
+import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcher
+import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcherPerson
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -32,6 +32,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
+import com.simprints.fingerprintmatcher.Person as LibPerson
 import com.simprints.fingerprintmatcher.Person as MatcherPerson
 
 class MatchingViewModel(private val dbManager: FingerprintDbManager,
@@ -93,19 +94,19 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                 })
     }
 
-    private fun MatchTask.runMatch(candidates: List<Person>, probeFingerprints: List<Fingerprint>): Single<MatchResult> =
+    private fun MatchTask.runMatch(candidates: List<FingerprintRecord>, probeFingerprints: List<Fingerprint>): Single<MatchResult> =
         Single.create { emitter ->
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
             val libProbe = LibPerson(UUID.randomUUID().toString(), probeFingerprints.map { it.fromDomainToMatcher() })
-            val libCandidates = candidates.map { it.fromDomainToMatcher() }
+            val libCandidates = candidates.map { it.fromDomainToMatcherPerson() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
     private fun MatchTask.matchCallback(
         emitter: SingleEmitter<MatchResult>,
-        candidates: List<Person>,
+        candidates: List<FingerprintRecord>,
         scores: List<Float>) = object : MatcherEventListener {
 
         override fun onMatcherProgress(progress: Progress?) {
@@ -132,7 +133,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
 
-    private class MatchResult(val candidates: List<Person>, val scores: List<Float>)
+    private class MatchResult(val candidates: List<FingerprintRecord>, val scores: List<Float>)
 
     data class IdentificationBeginningSummary(val matchSize: Int)
 

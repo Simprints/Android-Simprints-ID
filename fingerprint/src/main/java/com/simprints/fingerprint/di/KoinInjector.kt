@@ -127,7 +127,7 @@ object KoinInjector {
 
         viewModel { OrchestratorViewModel(get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
     }
 
     private fun Scope.appComponent() =
