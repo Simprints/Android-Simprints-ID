@@ -20,11 +20,10 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.flow.Action.*
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
-import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
 import timber.log.Timber
 import java.util.*
@@ -220,14 +219,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
-        val person = Person(
-            UUID.randomUUID().toString(),
-            collectRequest.projectId,
-            collectRequest.userId,
-            collectRequest.moduleId,
-            fingerprints)
-
-        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints, person))
+        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints))
     }
 
     override fun handleException(e: Throwable) {

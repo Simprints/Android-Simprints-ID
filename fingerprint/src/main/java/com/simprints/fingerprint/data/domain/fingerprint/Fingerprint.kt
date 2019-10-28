@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.data.domain.person
+package com.simprints.fingerprint.data.domain.fingerprint
 
 import android.os.Parcel
 import android.os.Parcelable

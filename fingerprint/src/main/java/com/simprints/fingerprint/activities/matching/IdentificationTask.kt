@@ -3,7 +3,6 @@ package com.simprints.fingerprint.activities.matching
 import android.content.Intent
 import android.util.Log
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
@@ -16,7 +15,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolTy
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
@@ -33,7 +32,7 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(): Single<List<Person>> =
+    override fun loadCandidates(): Single<List<FingerprintRecord>> =
         Completable.fromAction {
             viewModel.hasLoadingBegun.postValue(true)
             viewModel.progress.postValue(25)
@@ -41,7 +40,7 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
             dbManager.loadPeople(matchingRequest.queryForCandidates)
         )
 
-    override fun handlesCandidatesLoaded(candidates: List<Person>) {
+    override fun handlesCandidatesLoaded(candidates: List<FingerprintRecord>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
         viewModel.matchBeginningSummary.postValue(MatchingViewModel.IdentificationBeginningSummary(candidates.size))
@@ -55,21 +54,21 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
         viewModel.progress.postValue(progress / 2 + 50)
     }
 
-    override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
+    override fun handleMatchResult(candidates: List<FingerprintRecord>, scores: List<Float>) {
 
         val topCandidates = candidates
             .zip(scores)
             .sortedByDescending { (_, score) -> score }
             .take(returnIdCount)
             .map { (candidate, score) ->
-                MatchResult(candidate.patientId, score)
+                MatchResult(candidate.personId, score)
             }
 
         sessionEventsManager.addEventInBackground(
             OneToManyMatchEvent(
                 matchStartTime,
                 timeHelper.now(),
-                OneToManyMatchEvent.MatchPool(MatchPoolType.fromQueryForIdentifyPool(matchingIdentifyRequest.queryForIdentifyPool), candidates.size),
+                OneToManyMatchEvent.MatchPool(MatchPoolType.fromMatchingQuery(matchingRequest.queryForCandidates), candidates.size),
                 topCandidates.map { MatchEntry(it.guid, it.confidence) }))
 
 
@@ -80,7 +79,7 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
         preferenceManager.lastIdentificationDate = Date()
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
-            MatchingTaskIdentifyResult(topCandidates))
+            MatchingTaskResult(topCandidates))
 
         viewModel.progress.postValue(100)
 

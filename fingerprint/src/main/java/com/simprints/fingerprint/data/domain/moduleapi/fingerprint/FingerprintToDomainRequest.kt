@@ -4,7 +4,7 @@ import com.simprints.fingerprint.activities.collect.models.toDomainClass
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.person.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
