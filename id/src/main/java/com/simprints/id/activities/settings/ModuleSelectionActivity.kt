@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.id.R
-import com.simprints.id.activities.settings.fragments.moduleSelection.ModuleSelectionFragment
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : AppCompatActivity() {
