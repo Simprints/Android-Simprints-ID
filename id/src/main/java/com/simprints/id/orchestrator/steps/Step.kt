@@ -6,6 +6,7 @@ import com.simprints.id.domain.moduleapi.core.requests.CoreRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import java.util.*
 
