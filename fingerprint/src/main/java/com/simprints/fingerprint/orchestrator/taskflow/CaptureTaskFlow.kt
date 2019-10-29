@@ -23,9 +23,7 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
         ConnectScannerTaskRequest()
 
     private fun FingerprintCaptureRequest.createCollectFingerprintsTaskRequest() =
-        CollectFingerprintsTaskRequest( // TODO : Remove project, user, module from task request once Identify & Verify removed
-            "", "", "", fingerprintsToCapture
-        )
+        CollectFingerprintsTaskRequest(fingerprintsToCapture)
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
         finalResultBuilder.createCaptureResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)
