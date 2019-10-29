@@ -168,7 +168,7 @@ class OrchestratorManagerImplTest {
         }
 
         val nFaceSamplesToCapture = 3
-        val request = FaceCaptureRequest(nFaceSamplesToCapture)
+        val request = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
 
         mockSteps.add(
             Step(
