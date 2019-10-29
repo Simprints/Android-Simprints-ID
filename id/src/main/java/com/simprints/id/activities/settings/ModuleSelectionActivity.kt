@@ -9,14 +9,21 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : AppCompatActivity() {
 
+    private val fragment = ModuleSelectionFragment.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.prefContent, ModuleSelectionFragment())
+            .replace(R.id.prefContent, fragment)
             .commit()
+    }
+
+    override fun onBackPressed() {
+        fragment.updateSelectedModules()
+        super.onBackPressed()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.simprints.id.moduleselection.ModuleRepository
-import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.Application as SimprintsApplication
 
@@ -21,8 +20,8 @@ class ModuleViewModel(application: Application) : AndroidViewModel(application) 
         value = repository.getSelectedModules()
     }
 
-    fun setSelectedModules(selectedModules: List<Module>, callback: ModuleSelectionCallback) {
-        repository.setSelectedModules(selectedModules, callback)
+    fun setSelectedModules(selectedModules: List<Module>) {
+        repository.setSelectedModules(selectedModules)
     }
 
 }
