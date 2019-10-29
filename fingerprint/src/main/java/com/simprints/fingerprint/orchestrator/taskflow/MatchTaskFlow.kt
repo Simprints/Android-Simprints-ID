@@ -18,9 +18,7 @@ class MatchTaskFlow(matchRequest: FingerprintMatchRequest) : FingerprintTaskFlow
     }
 
     private fun FingerprintMatchRequest.createMatchingTaskRequest() =
-        MatchingTaskRequest(
-            probeFingerprintSamples, queryForCandidates
-        )
+        MatchingTaskRequest(probeFingerprintSamples, queryForCandidates)
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
         finalResultBuilder.createMatchResult(taskResults[MATCHING] as MatchingTaskResult)

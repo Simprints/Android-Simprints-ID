@@ -51,7 +51,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun twoGoodScansAndThenConfirm_finishesWithCorrectResult() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -63,14 +63,14 @@ class CollectFingerprintsActivityTest : KoinTest {
         }
 
         assertNotNull(result)
-        assertEquals(2, result?.probe?.fingerprints?.size)
+        assertEquals(2, result?.fingerprints?.size)
     }
 
     @Test
     fun twoGoodScansAndThenRestart_restartsToBeginning() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -87,7 +87,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         val scanner = createMockedScannerV1()
         mockScannerManagerWithScanner(ScannerWrapperV1(scanner))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         // 1. Good scan
         scanner.queueGoodFinger(FingerIdentifier.LEFT_THUMB)
@@ -121,7 +121,7 @@ class CollectFingerprintsActivityTest : KoinTest {
         }
 
         assertNotNull(result)
-        result?.probe?.fingerprints?.let {
+        result?.fingerprints?.let {
             assertEquals(3, it.size)
             assertEquals(DEFAULT_GOOD_IMAGE_QUALITY, it[0].qualityScore)
             assertEquals(FingerIdentifier.LEFT_THUMB, it[0].fingerId)
@@ -136,7 +136,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun onlySkippedFingers_pressConfirm_notAllowedToContinue() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         skipFinger()
         waitForSplashScreenToAppearAndDisappear()
@@ -162,7 +162,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun threeBadScanAndMaxNotReached_shouldAddAFinger() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueBadFinger() }))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -179,7 +179,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun threeBadScansAndMaxReached_shouldNotAddAFinger() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueBadFinger() }))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FOUR_FINGERS).toIntent())
 
         val viewPager = getCurrentActivity()?.findViewById<ViewPagerCustom>(R.id.view_pager)
 
@@ -199,7 +199,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun threeBadScansDueToMissingTemplates_shouldNotAddAFinger() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1 { queueFingerNotDetected() }))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         pressScan()
         pressScan()
@@ -214,7 +214,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun skipFingerAndMaxNotReached_shouldAddAFinger() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_TWO_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(TWO_FINGERS).toIntent())
 
         skipFinger()
 
@@ -229,7 +229,7 @@ class CollectFingerprintsActivityTest : KoinTest {
     fun skipFingerAndMaxReached_shouldNotAddAFinger() {
         mockScannerManagerWithScanner(ScannerWrapperV1(createMockedScannerV1()))
 
-        scenario = ActivityScenario.launch(collectTaskRequest(FINGER_STATUS_FOUR_FINGERS).toIntent())
+        scenario = ActivityScenario.launch(collectTaskRequest(FOUR_FINGERS).toIntent())
 
         skipFinger()
 
@@ -247,38 +247,19 @@ class CollectFingerprintsActivityTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_PROJECT_ID = "some_project_id"
-        private const val DEFAULT_USER_ID = "some_user_id"
-        private const val DEFAULT_MODULE_ID = "some_module_id"
-        private const val DEFAULT_LANGUAGE = "en"
-        private val FINGER_STATUS_TWO_FINGERS = mapOf(
-            FingerIdentifier.RIGHT_THUMB to false,
-            FingerIdentifier.RIGHT_INDEX_FINGER to false,
-            FingerIdentifier.RIGHT_3RD_FINGER to false,
-            FingerIdentifier.RIGHT_4TH_FINGER to false,
-            FingerIdentifier.RIGHT_5TH_FINGER to false,
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.LEFT_INDEX_FINGER to true,
-            FingerIdentifier.LEFT_3RD_FINGER to false,
-            FingerIdentifier.LEFT_4TH_FINGER to false,
-            FingerIdentifier.LEFT_5TH_FINGER to false
+        private val TWO_FINGERS = listOf(
+            FingerIdentifier.LEFT_THUMB,
+            FingerIdentifier.LEFT_INDEX_FINGER
         )
-        private val FINGER_STATUS_FOUR_FINGERS = mapOf(
-            FingerIdentifier.RIGHT_THUMB to true,
-            FingerIdentifier.RIGHT_INDEX_FINGER to true,
-            FingerIdentifier.RIGHT_3RD_FINGER to false,
-            FingerIdentifier.RIGHT_4TH_FINGER to false,
-            FingerIdentifier.RIGHT_5TH_FINGER to false,
-            FingerIdentifier.LEFT_THUMB to true,
-            FingerIdentifier.LEFT_INDEX_FINGER to true,
-            FingerIdentifier.LEFT_3RD_FINGER to false,
-            FingerIdentifier.LEFT_4TH_FINGER to false,
-            FingerIdentifier.LEFT_5TH_FINGER to false
+        private val FOUR_FINGERS = listOf(
+            FingerIdentifier.RIGHT_THUMB,
+            FingerIdentifier.RIGHT_INDEX_FINGER,
+            FingerIdentifier.LEFT_THUMB,
+            FingerIdentifier.LEFT_INDEX_FINGER
         )
 
-        private fun collectTaskRequest(fingerStatus: Map<FingerIdentifier, Boolean>) =
-            CollectFingerprintsTaskRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, DEFAULT_MODULE_ID,
-                DEFAULT_LANGUAGE, fingerStatus)
+        private fun collectTaskRequest(fingersToCapture: List<FingerIdentifier>) =
+            CollectFingerprintsTaskRequest(fingersToCapture)
 
         private fun CollectFingerprintsTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, CollectFingerprintsActivity::class.qualifiedName!!)

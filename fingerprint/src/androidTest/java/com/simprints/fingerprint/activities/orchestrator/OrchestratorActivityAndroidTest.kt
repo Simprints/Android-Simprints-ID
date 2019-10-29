@@ -116,8 +116,6 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_LANGUAGE = "en"
-
-        private fun launchTaskRequest() = ConnectScannerTaskRequest(DEFAULT_LANGUAGE)
+        private fun launchTaskRequest() = ConnectScannerTaskRequest()
     }
 }
