@@ -50,12 +50,12 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         coreStepProcessor.buildStepVerify(projectId, verifyGuid)
 
     fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
+        tryProcessingResultFromCoreStepProcessor(data)
+            ?: tryProcessingResultFromFingerprintStepProcessor(requestCode, resultCode, data)
+
+    private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
             if (isExitFormResponse(coreResult)) {
-                completeAllSteps()
-            }
-        } ?: fingerprintStepProcessor.processResult(requestCode, resultCode, data).also { fingerResult ->
-            if (fingerResult is FingerprintRefusalFormResponse) {
                 completeAllSteps()
             }
         }
@@ -64,6 +64,15 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         coreResult is CoreExitFormResponse ||
             coreResult is CoreFingerprintExitFormResponse ||
             coreResult is CoreFaceExitFormResponse
+
+    private fun tryProcessingResultFromFingerprintStepProcessor(requestCode: Int,
+                                                                resultCode: Int,
+                                                                data: Intent?) =
+        fingerprintStepProcessor.processResult(requestCode, resultCode, data).also { fingerResult ->
+            if (fingerResult is FingerprintRefusalFormResponse) {
+                completeAllSteps()
+            }
+        }
 
     private fun completeAllSteps() {
         steps.forEach { it.setStatus(Step.Status.COMPLETED) }
