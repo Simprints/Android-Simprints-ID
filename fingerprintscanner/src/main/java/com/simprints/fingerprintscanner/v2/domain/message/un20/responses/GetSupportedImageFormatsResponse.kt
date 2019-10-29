@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20Messag
 
 class GetSupportedImageFormatsResponse(val supportedImageFormats: Set<ImageFormat>) : Un20Response(Un20MessageType.GetSupportedImageFormats) {
 
+    override fun getDataBytes(): ByteArray = supportedImageFormats.map { it.getBytes() }.reduce { acc, bytes -> acc + bytes }
+
     companion object {
         fun fromBytes(data: ByteArray) =
             GetSupportedImageFormatsResponse(

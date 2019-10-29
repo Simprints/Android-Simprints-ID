@@ -1,7 +1,8 @@
-package com.simprints.fingerprintscannermock.simulated
+package com.simprints.fingerprintscannermock.simulated.component
 
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentDevice
+import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 
 
 class SimulatedBluetoothAdapter(private val simulatedScannerManager: SimulatedScannerManager) : BluetoothComponentAdapter {
