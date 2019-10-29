@@ -15,6 +15,7 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.secure.EncryptedSharedPreferencesFactoryImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -39,6 +40,13 @@ open class PreferencesModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+
+    @Provides
+    @Singleton
+    @Named("EncryptedSharedPreferences")
+    fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+
 
     @Provides
     @Singleton

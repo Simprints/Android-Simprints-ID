@@ -146,6 +146,7 @@ dependencies {
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
+    implementation deps.androidx.security
     implementation deps.support.material
     implementation deps.arch_components.work
     implementation deps.playservices.location
@@ -189,9 +190,6 @@ dependencies {
     api deps.koin.core
     api deps.koin.android
     api deps.koin.viewmodel
-
-    // Conceal (encryption)
-    implementation deps.conceal.core
 
     // Test
     testImplementation project(':fingerprintscannermock')

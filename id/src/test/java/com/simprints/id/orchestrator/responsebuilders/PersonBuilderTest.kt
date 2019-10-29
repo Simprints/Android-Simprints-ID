@@ -9,8 +9,6 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResu
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock

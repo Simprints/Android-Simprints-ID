@@ -3,7 +3,6 @@ package com.simprints.id
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.facebook.soloader.SoLoader
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
@@ -53,7 +52,6 @@ open class Application : MultiDexApplication() {
 
         initFabric()
         handleUndeliverableExceptionInRxJava()
-        initConceal()
     }
 
     private fun initFabric() {
@@ -81,11 +79,6 @@ open class Application : MultiDexApplication() {
             exceptionToPrint.printStackTrace()
             component.getCrashReportManager().logException(e)
         }
-    }
-
-    private fun initConceal() {
-        val nativeExopackage = false
-        SoLoader.init(this, nativeExopackage)
     }
 
     private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
