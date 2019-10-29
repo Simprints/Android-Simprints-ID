@@ -103,7 +103,7 @@ class AppResponseBuilderForEnrolTest {
 
     private fun mockFingerprintStep(): Step {
         val request = FingerprintCaptureRequest(
-            listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+            fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
         )
 
         return Step(
