@@ -5,8 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
+import com.simprints.id.moduleselection.model.Module
 
-class ModuleAdapter : ListAdapter<String, ModuleViewHolder>(DiffCallback) {
+class ModuleAdapter : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -19,13 +20,13 @@ class ModuleAdapter : ListAdapter<String, ModuleViewHolder>(DiffCallback) {
         holder.bindTo(moduleName)
     }
 
-    companion object DiffCallback : DiffUtil.ItemCallback<String>() {
-        override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+    companion object DiffCallback : DiffUtil.ItemCallback<Module>() {
+        override fun areItemsTheSame(oldItem: Module, newItem: Module): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
-            return oldItem.contentEquals(newItem)
+        override fun areContentsTheSame(oldItem: Module, newItem: Module): Boolean {
+            return oldItem.name == newItem.name && oldItem.isSelected && newItem.isSelected
         }
     }
 
