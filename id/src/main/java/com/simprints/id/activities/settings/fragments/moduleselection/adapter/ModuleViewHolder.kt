@@ -11,13 +11,14 @@ class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
 
-    fun bindTo(module: Module) {
+    fun bindTo(module: Module, tracker: ModuleSelectionTracker) {
         with(checkBox) {
             text = module.name
             isChecked = module.isSelected
 
             onCheckedChange { _, isChecked ->
                 module.isSelected = isChecked
+                tracker.onSelectionStateChanged(module)
             }
         }
     }

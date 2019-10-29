@@ -1,6 +1,7 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +10,15 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
+import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionTracker
 import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
-class ModuleSelectionFragment private constructor(): Fragment(), ModuleSelectionCallback {
+class ModuleSelectionFragment private constructor()
+    : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
 
-    private val adapter by lazy { ModuleAdapter() }
+    private val adapter by lazy { ModuleAdapter(tracker = this) }
 
     private lateinit var viewModel: ModuleViewModel
 
@@ -34,19 +37,16 @@ class ModuleSelectionFragment private constructor(): Fragment(), ModuleSelection
     }
 
     override fun noModulesSelected() {
-        // TODO: show toast
+        Log.d("TEST_ALAN", "No modules")
     }
 
     override fun tooManyModulesSelected() {
-        // TODO: show toast
+        Log.d("TEST_ALAN", "Too many")
     }
 
-    override fun onSuccess() {
-        // TODO: close
-    }
-
-    fun updateSelectedModules() {
-        viewModel.setSelectedModules(modules.filter { it.isSelected })
+    override fun onSelectionStateChanged(module: Module) {
+        modules.find { it.name == module.name }?.isSelected = module.isSelected
+        updateSelectedModules()
     }
 
     private fun fetchData() {
@@ -63,12 +63,14 @@ class ModuleSelectionFragment private constructor(): Fragment(), ModuleSelection
 
     private fun getSelectedModules() {
         viewModel.getSelectedModules().observe(this, Observer { selectedModules ->
-            modules = modules.map { module ->
-                module.apply {
-                    isSelected = selectedModules.any { it.name == name }
-                }
+            modules.forEach { module ->
+                module.isSelected = selectedModules.any { it.name == module.name }
             }
         })
+    }
+
+    private fun updateSelectedModules() {
+        viewModel.setSelectedModules(modules.filter { it.isSelected })
     }
 
     companion object {

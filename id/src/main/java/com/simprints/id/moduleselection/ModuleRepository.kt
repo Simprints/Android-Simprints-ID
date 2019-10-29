@@ -44,7 +44,6 @@ class ModuleRepository(component: AppComponent) {
                 preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
                 logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
                 setCrashlyticsKeyForModules()
-                callback.onSuccess()
             }
         }
     }
