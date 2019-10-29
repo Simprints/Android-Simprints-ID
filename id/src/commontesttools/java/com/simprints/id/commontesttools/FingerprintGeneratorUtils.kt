@@ -1,5 +1,4 @@
 package com.simprints.id.commontesttools
-
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import java.nio.ByteBuffer
