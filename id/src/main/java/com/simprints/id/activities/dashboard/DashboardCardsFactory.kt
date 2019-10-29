@@ -1,6 +1,5 @@
 package com.simprints.id.activities.dashboard
 
-import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
@@ -12,6 +11,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
 import java.util.*
@@ -82,7 +82,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 position,
                 DashboardCardViewModel.State(
                     R.drawable.scanner,
-                    getStringFromRes(R.string.dashboard_card_lastscanner_title),
+                    androidResourcesHelper.getString(R.string.dashboard_card_lastscanner_title),
                     preferencesManager.lastScannerUsed))
             ).doOnError { it.printStackTrace() }
         } else {
@@ -96,7 +96,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
             Single.just(DashboardCardViewModel(DashboardCardType.LAST_ENROL,
                 position, DashboardCardViewModel.State(
                 R.drawable.fingerprint_enrol,
-                getStringFromRes(R.string.dashboard_card_enrol_title),
+                androidResourcesHelper.getString(R.string.dashboard_card_enrol_title),
                 dateFormat.format(date).toString()))).doOnError { it.printStackTrace() }
         }
 
@@ -106,7 +106,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 DashboardCardType.LAST_VERIFICATION,
                 position, DashboardCardViewModel.State(
                 R.drawable.fingerprint_verification,
-                getStringFromRes(R.string.dashboard_card_verification_title),
+                androidResourcesHelper.getString(R.string.dashboard_card_verification_title),
                 dateFormat.format(date).toString())
             )).doOnError { it.printStackTrace() }
         }
@@ -118,7 +118,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
                 position,
                 DashboardCardViewModel.State(
                     R.drawable.fingerprint_identification,
-                    getStringFromRes(R.string.dashboard_card_identification_title),
+                    androidResourcesHelper.getString(R.string.dashboard_card_identification_title),
                     dateFormat.format(date).toString()))).doOnError { it.printStackTrace() }
         }
 

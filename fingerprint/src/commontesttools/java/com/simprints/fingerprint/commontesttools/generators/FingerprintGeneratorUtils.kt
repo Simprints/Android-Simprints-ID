@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.commontesttools.generators
 
 import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.data.domain.person.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*

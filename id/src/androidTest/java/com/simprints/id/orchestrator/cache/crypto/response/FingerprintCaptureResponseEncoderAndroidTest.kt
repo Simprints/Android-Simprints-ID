@@ -4,6 +4,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.not
@@ -38,7 +40,7 @@ class FingerprintCaptureResponseEncoderAndroidTest {
     }
 
     private fun mockFingerprintCaptureResponse(): FingerprintCaptureResponse {
-        val fingerprints = listOf(
+        val captureResult = listOf(
             FingerprintCaptureResult(
                 IFingerIdentifier.RIGHT_THUMB,
                 FingerprintSample(
@@ -50,7 +52,7 @@ class FingerprintCaptureResponseEncoderAndroidTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(fingerprints)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun verifyResponses(originalResponse: FingerprintCaptureResponse,

@@ -11,12 +11,12 @@
     tools:context="com.simprints.fingerprint.activities.matching.MatchingActivity">
 
     <TextView
+        android:id="@+id/matching_please_wait"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/pb_identification"
         android:layout_alignParentStart="true"
-        android:gravity="center_horizontal"
-        android:text="@string/please_wait" />
+        android:gravity="center_horizontal" />
 
     <ProgressBar
         android:id="@+id/pb_identification"
@@ -36,8 +36,7 @@
         android:id="@+id/tv_matchingProgressStatus1"
         android:layout_below="@+id/pb_identification"
         android:layout_alignParentStart="true"
-        android:gravity="center_horizontal"
-        android:text="@string/empty"/>
+        android:gravity="center_horizontal"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -45,8 +44,7 @@
         android:id="@+id/tv_matchingProgressStatus2"
         android:layout_below="@+id/tv_matchingProgressStatus1"
         android:layout_alignParentStart="true"
-        android:gravity="center_horizontal"
-        android:text="@string/empty"/>
+        android:gravity="center_horizontal"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -55,7 +53,6 @@
         android:layout_below="@+id/tv_matchingProgressStatus2"
         android:layout_alignParentStart="true"
         android:gravity="center_horizontal"
-        android:text="@string/empty"
         android:visibility="gone"/>
     <TextView
         android:layout_width="match_parent"
@@ -64,7 +61,6 @@
         android:layout_below="@+id/tv_matchingResultStatus1"
         android:layout_alignParentStart="true"
         android:gravity="center_horizontal"
-        android:text="@string/empty"
         android:visibility="gone"/>
     <TextView
         android:layout_width="match_parent"
@@ -73,7 +69,6 @@
         android:layout_below="@+id/tv_matchingResultStatus2"
         android:layout_alignParentStart="true"
         android:gravity="center_horizontal"
-        android:text="@string/empty"
         android:visibility="gone"/>
 
 </RelativeLayout>
