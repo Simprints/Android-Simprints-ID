@@ -12,6 +12,7 @@ class ModuleRepository(component: AppComponent) {
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var callback: ModuleSelectionCallback
 
     init {
         component.inject(this)
@@ -29,7 +30,7 @@ class ModuleRepository(component: AppComponent) {
         }
     }
 
-    fun setSelectedModules(selectedModules: List<Module>, callback: ModuleSelectionCallback) {
+    fun setSelectedModules(selectedModules: List<Module>) {
         when {
             selectedModules.isEmpty() -> {
                 callback.noModulesSelected()
