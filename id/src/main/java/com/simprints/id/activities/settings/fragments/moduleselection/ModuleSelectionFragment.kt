@@ -9,9 +9,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
+import com.simprints.id.moduleselection.ModuleSelectionCallback
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
-class ModuleSelectionFragment : Fragment() {
+class ModuleSelectionFragment : Fragment(), ModuleSelectionCallback {
 
     private val adapter by lazy { ModuleAdapter() }
 
@@ -31,41 +32,16 @@ class ModuleSelectionFragment : Fragment() {
         })
     }
 
-    /*private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
-        when {
-            moduleIdHash.size == 0 -> { handleNoModulesSelected(moduleIdHash) }
-            moduleIdHash.size > MAX_SELECTED_MODULES -> { handleTooManyModulesSelected(moduleIdHash) }
-            else -> {
-                preferencesManager.selectedModules = moduleIdHash
-                logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
-                setCrashlyticsKeyForModules()
-            }
-        }
-        return true
+    override fun noModulesSelected() {
+        // TODO: show toast
     }
 
-    private fun handleNoModulesSelected(moduleIdHash: HashSet<String>) {
-        view.showToastForNoModulesSelected()
-        moduleIdHash.clear()
-        moduleIdHash.addAll(preferencesManager.selectedModules)
+    override fun tooManyModulesSelected() {
+        // TODO: show toast
     }
 
-    private fun handleTooManyModulesSelected(moduleIdHash: HashSet<String>) {
-        view.showToastForTooManyModulesSelected(MAX_SELECTED_MODULES)
-        moduleIdHash.clear()
-        moduleIdHash.addAll(preferencesManager.selectedModules)
+    override fun onSuccess() {
+        // TODO: close
     }
-
-    private fun setCrashlyticsKeyForModules() {
-        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-    }
-
-    private fun logMessageForCrashReport(message: String) {
-        crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
-    }
-
-    companion object {
-        const val MAX_SELECTED_MODULES = 6
-    }*/
 
 }
