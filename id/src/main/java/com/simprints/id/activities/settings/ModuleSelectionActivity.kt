@@ -21,11 +21,6 @@ class ModuleSelectionActivity : AppCompatActivity() {
             .commit()
     }
 
-    override fun onBackPressed() {
-        fragment.updateSelectedModules()
-        super.onBackPressed()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {

@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
 
-class ModuleAdapter : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
+class ModuleAdapter(
+    private val tracker: ModuleSelectionTracker
+) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -17,7 +19,7 @@ class ModuleAdapter : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 
     override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
         val moduleName = getItem(position)
-        holder.bindTo(moduleName)
+        holder.bindTo(moduleName, tracker)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Module>() {
