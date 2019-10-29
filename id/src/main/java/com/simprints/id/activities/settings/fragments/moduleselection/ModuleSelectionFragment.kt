@@ -27,7 +27,7 @@ class ModuleSelectionFragment : Fragment() {
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
         viewModel.getAvailableModules().observe(this, Observer { modules ->
-            adapter.submitList(modules.map { it.name })
+            adapter.submitList(modules)
         })
     }
 
