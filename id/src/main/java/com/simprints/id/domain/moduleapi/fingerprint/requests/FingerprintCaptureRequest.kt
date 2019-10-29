@@ -8,7 +8,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FingerprintCaptureRequest(
-    val fingerprintsToCapture: List<FingerIdentifier>
+    val fingerprintsToCapture: List<FingerIdentifier>,
+    override val type: FingerprintRequestType = FingerprintRequestType.CAPTURE
 ) : FingerprintRequest
 
 fun FingerprintCaptureRequest.fromDomainToModuleApi(): IFingerprintCaptureRequest =
