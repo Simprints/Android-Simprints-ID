@@ -2,7 +2,7 @@ package com.simprints.fingerprint.integration
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.id.Application
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
@@ -15,7 +15,7 @@ fun createFingerprintCaptureRequestIntent() = Intent()
     .putExtra(IFingerprintRequest.BUNDLE_KEY,
         TestFingerprintCaptureRequest(DEFAULT_PROJECT_ID, DEFAULT_USER_ID,
             DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
-            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_ACTIVITY_TITLE))
+            DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME, DEFAULT_FINGERS_TO_CAPTURE))
 
 fun createFingerprintRequestIntent(action: Action): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
@@ -29,6 +29,7 @@ fun createFingerprintRequestIntent(action: Action): Intent = Intent()
             DEFAULT_MODULE_ID, DEFAULT_META_DATA, DEFAULT_LANGUAGE, DEFAULT_FINGER_STATUS,
             DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME, DEFAULT_ORGANISATION_NAME,
             DEFAULT_VERIFY_GUID)
+        else -> throw UnsupportedOperationException()
     })
 
 const val DEFAULT_PROJECT_ID = "some_project_id"
@@ -39,7 +40,6 @@ const val DEFAULT_LANGUAGE = "en"
 const val DEFAULT_LOGO_EXISTS = true
 const val DEFAULT_PROGRAM_NAME = "This program"
 const val DEFAULT_ORGANISATION_NAME = "This organisation"
-const val DEFAULT_ACTIVITY_TITLE = "Enrolment"
 const val DEFAULT_VERIFY_GUID = "verify_guid"
 const val DEFAULT_NUMBER_OF_ID_RETURNS = 10
 val DEFAULT_MATCH_GROUP = IMatchGroup.GLOBAL
@@ -55,6 +55,10 @@ val DEFAULT_FINGER_STATUS = mapOf(
     IFingerIdentifier.LEFT_4TH_FINGER to false,
     IFingerIdentifier.LEFT_5TH_FINGER to false
 )
+val DEFAULT_FINGERS_TO_CAPTURE = listOf(
+    IFingerIdentifier.LEFT_THUMB,
+    IFingerIdentifier.LEFT_INDEX_FINGER
+)
 
 @Parcelize
 data class TestFingerprintCaptureRequest(override val projectId: String,
@@ -66,7 +70,7 @@ data class TestFingerprintCaptureRequest(override val projectId: String,
                                          override val logoExists: Boolean,
                                          override val programName: String,
                                          override val organizationName: String,
-                                         override val activityTitle: String) : IFingerprintCaptureRequest
+                                         override val fingerprintsToCapture: List<IFingerIdentifier>) : IFingerprintCaptureRequest
 
 @Parcelize
 data class TestFingerprintIdentifyRequest(override val projectId: String,

@@ -11,7 +11,8 @@ import java.io.Serializable
 @Parcelize
 data class FingerprintMatchRequest(
     val probeFingerprintSamples: List<FingerprintSample>,
-    val queryForCandidates: Serializable
+    val queryForCandidates: Serializable,
+    override val type: FingerprintRequestType = FingerprintRequestType.MATCH
 ) : FingerprintRequest
 
 

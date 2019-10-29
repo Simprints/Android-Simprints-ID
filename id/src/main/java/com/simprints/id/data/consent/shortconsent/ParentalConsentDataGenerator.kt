@@ -1,103 +1,104 @@
 package com.simprints.id.data.consent.shortconsent
 
-import android.content.Context
 import com.simprints.id.R
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.domain.moduleapi.core.requests.ConsentType
+import com.simprints.id.tools.AndroidResourcesHelper
 
 data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
                                         val parentalConsentOptions: ParentalConsentOptions,
                                         val programName: String,
                                         val organizationName: String,
-                                        val modalities: List<Modality>) {
+                                        val modalities: List<Modality>,
+                                        val androidResourcesHelper: AndroidResourcesHelper) {
 
-    fun assembleText(context: Context, askConsentRequest: AskConsentRequest) = StringBuilder().apply {
-        filterAppRequestForParentalConsent(askConsentRequest, context)
-        extractDataSharingOptions(context)
+    fun assembleText(askConsentRequest: AskConsentRequest) = StringBuilder().apply {
+        filterAppRequestForParentalConsent(askConsentRequest)
+        extractDataSharingOptions()
     }.toString()
 
-    private fun StringBuilder.filterAppRequestForParentalConsent(askConsentRequest: AskConsentRequest, context: Context) {
+    private fun StringBuilder.filterAppRequestForParentalConsent(askConsentRequest: AskConsentRequest) {
         when (askConsentRequest.consentType) {
-            ConsentType.ENROL -> appendTextForParentalEnrol(context)
-            ConsentType.IDENTIFY, ConsentType.VERIFY -> appendTextForIdentifyOrVerify(context)
+            ConsentType.ENROL -> appendTextForParentalEnrol()
+            ConsentType.IDENTIFY, ConsentType.VERIFY -> appendTextForIdentifyOrVerify()
         }
     }
 
-    private fun StringBuilder.appendTextForParentalEnrol(context: Context) {
+    private fun StringBuilder.appendTextForParentalEnrol() {
         with(parentalConsentOptions) {
             if (consentParentEnrolOnly) {
-                append(context.getString(R.string.consent_parental_enrol_only)
-                    .format(getModalitySpecificUseCaseText(context), programName))
+                append(androidResourcesHelper.getString(R.string.consent_parental_enrol_only)
+                    .format(getModalitySpecificUseCaseText(), programName))
             }
             if (consentParentEnrol) {
-                append(context.getString(R.string.consent_parental_enrol)
-                    .format(getModalitySpecificUseCaseText(context), programName))
+                append(androidResourcesHelper.getString(R.string.consent_parental_enrol)
+                    .format(getModalitySpecificUseCaseText(), programName))
             }
         }
     }
 
-    private fun StringBuilder.appendTextForIdentifyOrVerify(context: Context) {
+    private fun StringBuilder.appendTextForIdentifyOrVerify() {
         if (parentalConsentOptions.consentParentIdVerify) {
-            append(context.getString(R.string.consent_parental_id_verify)
-                .format(getModalitySpecificUseCaseText(context), programName))
+            append(androidResourcesHelper.getString(R.string.consent_parental_id_verify)
+                .format(getModalitySpecificUseCaseText(), programName))
         }
     }
 
-    private fun StringBuilder.extractDataSharingOptions(context: Context) {
+    private fun StringBuilder.extractDataSharingOptions() {
         with(parentalConsentOptions) {
             if (consentParentShareDataNo) {
-                append(context.getString(R.string.consent_parental_share_data_no)
-                    .format(getModalitySpecificAccessText(context)))
+                append(androidResourcesHelper.getString(R.string.consent_parental_share_data_no)
+                    .format(getModalitySpecificAccessText()))
             }
             if (consentParentShareDataYes) {
-                append(context.getString(R.string.consent_parental_share_data_yes)
-                    .format(organizationName, getModalitySpecificAccessText(context)))
+                append(androidResourcesHelper.getString(R.string.consent_parental_share_data_yes)
+                    .format(organizationName, getModalitySpecificAccessText()))
             }
             if (consentCollectYes) {
-                append(context.getString(R.string.consent_collect_yes))
+                append(androidResourcesHelper.getString(R.string.consent_collect_yes))
             }
             if (consentParentPrivacyRights) {
-                append(context.getString(R.string.consent_parental_privacy_rights))
+                append(androidResourcesHelper.getString(R.string.consent_parental_privacy_rights))
             }
             if (consentParentConfirmation) {
-                append(context.getString(R.string.consent_parental_confirmation)
-                    .format(getModalitySpecificUseCaseText(context)))
+                append(androidResourcesHelper.getString(R.string.consent_parental_confirmation)
+                    .format(getModalitySpecificUseCaseText()))
             }
         }
     }
 
-    private fun getModalitySpecificUseCaseText(context: Context) = if (isSingleModality()) {
-        getSingleModalitySpecificUseCaseText(context)
+    private fun getModalitySpecificUseCaseText() = if (isSingleModality()) {
+        getSingleModalitySpecificUseCaseText()
     } else {
-        getConcatenatedModalitiesUseCaseText(context)
+        getConcatenatedModalitiesUseCaseText()
     }
 
-    private fun getConcatenatedModalitiesUseCaseText(context: Context) =
-        String.format("%s %s %s", context.getString(R.string.biometrics_parental_fingerprint),
-            context.getString(R.string.biometric_concat_modalities),
-            context.getString(R.string.biometrics_parental_face))
+    private fun getConcatenatedModalitiesUseCaseText() =
+        String.format("%s %s %s", androidResourcesHelper.getString(R.string.biometrics_parental_fingerprint),
+            androidResourcesHelper.getString(R.string.biometric_concat_modalities),
+            androidResourcesHelper.getString(R.string.biometrics_parental_face))
 
-    private fun getSingleModalitySpecificUseCaseText(context: Context) =
+    private fun getSingleModalitySpecificUseCaseText() =
         when (modalities.first()) {
-            Modality.FACE -> context.getString(R.string.biometrics_parental_face)
-            Modality.FINGER -> context.getString(R.string.biometrics_parental_fingerprint)
+            Modality.FACE -> androidResourcesHelper.getString(R.string.biometrics_parental_face)
+            Modality.FINGER -> androidResourcesHelper.getString(R.string.biometrics_parental_fingerprint)
         }
 
-    private fun getModalitySpecificAccessText(context: Context) = if (isSingleModality()) {
-        getSingleModalityAccessText(context)
+    private fun getModalitySpecificAccessText() = if (isSingleModality()) {
+        getSingleModalityAccessText()
     } else {
-        getConcatenatedModalitiesAccessText(context)
+        getConcatenatedModalitiesAccessText()
     }
 
-    private fun getConcatenatedModalitiesAccessText(context: Context) =
-        String.format("%s %s %s", context.getString(R.string.biometrics_access_fingerprint),
-            context.getString(R.string.biometric_concat_modalities),
-            context.getString(R.string.biometrics_access_face))
+    private fun getConcatenatedModalitiesAccessText() =
+        String.format("%s %s %s", androidResourcesHelper.getString(R.string.biometrics_access_fingerprint),
+            androidResourcesHelper.getString(R.string.biometric_concat_modalities),
+            androidResourcesHelper.getString(R.string.biometrics_access_face))
 
-    private fun getSingleModalityAccessText(context: Context) = when (modalities.first()) {
-        Modality.FACE -> context.getString(R.string.biometrics_access_face)
-        Modality.FINGER -> context.getString(R.string.biometrics_access_fingerprint)
+    private fun getSingleModalityAccessText() = when (modalities.first()) {
+        Modality.FACE -> androidResourcesHelper.getString(R.string.biometrics_access_face)
+        Modality.FINGER -> androidResourcesHelper.getString(R.string.biometrics_access_fingerprint)
     }
 
     private fun isSingleModality() = modalities.size == 1

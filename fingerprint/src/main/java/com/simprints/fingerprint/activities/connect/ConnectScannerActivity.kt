@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.lifecycle.Observer
-import com.simprints.core.tools.LanguageHelper
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
@@ -36,16 +35,10 @@ class ConnectScannerActivity : FingerprintActivity() {
             this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
                 ?: throw InvalidRequestForConnectScannerActivityException()
 
-        setLanguage(connectScannerRequest.language)
-
         observeScannerEvents()
         observeLifecycleEvents()
 
         viewModel.start()
-    }
-
-    private fun setLanguage(language: String) {
-        LanguageHelper.setLanguage(this, language)
     }
 
     private fun observeScannerEvents() {

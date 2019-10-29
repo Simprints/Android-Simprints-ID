@@ -6,6 +6,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.secure.cryptography.HybridCipher
+import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -15,8 +17,8 @@ class HotCacheImplAndroidTest {
     private val hotCache by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val preferences = context.getSharedPreferences("file_name", Context.MODE_PRIVATE)
-        val keystoreManager = KeystoreManagerImpl(context)
-        val stepEncoder = StepEncoderImpl(keystoreManager)
+        val cipher = mock<HybridCipher>()
+        val stepEncoder = StepEncoderImpl(cipher)
         HotCacheImpl(preferences, stepEncoder)
     }
 

@@ -27,8 +27,7 @@
         android:layout_height="0dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_weight="0.45"
-        android:contentDescription="@string/main_error_graphic" />
+        android:layout_weight="0.45"/>
 
 
     <TextView

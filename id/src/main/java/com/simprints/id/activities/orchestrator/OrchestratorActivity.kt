@@ -12,6 +12,7 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
 import javax.inject.Inject
@@ -19,6 +20,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest.Companion.BUNDL
 
 class OrchestratorActivity : AppCompatActivity() {
 
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
     lateinit var appRequest: AppRequest
 

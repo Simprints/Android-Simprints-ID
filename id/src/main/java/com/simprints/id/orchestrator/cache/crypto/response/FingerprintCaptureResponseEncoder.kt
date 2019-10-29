@@ -1,14 +1,14 @@
 package com.simprints.id.orchestrator.cache.crypto.response
 
 import com.simprints.id.data.db.person.domain.FingerprintSample
-import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.secure.cryptography.HybridCipher
 
 class FingerprintCaptureResponseEncoder(
-    keystoreManager: KeystoreManager
-) : ResponseEncoder(keystoreManager) {
+    cipher: HybridCipher
+) : ResponseEncoder(cipher) {
 
     override fun process(response: Step.Result?, operation: Operation): Step.Result? {
         require(response is FingerprintCaptureResponse)
@@ -17,22 +17,22 @@ class FingerprintCaptureResponseEncoder(
             item.sample?.let { sample ->
                 val tmpTemplateString = String(sample.template)
                 val processedTemplate = when (operation) {
-                    Operation.ENCODE -> keystoreManager.encryptString(tmpTemplateString)
-                    Operation.DECODE -> keystoreManager.decryptString(tmpTemplateString)
+                    Operation.ENCODE -> cipher.encrypt(tmpTemplateString)
+                    Operation.DECODE -> cipher.decrypt(tmpTemplateString)
                 }.toByteArray()
 
-                val id = sample.id
                 val fingerId = sample.fingerIdentifier
                 val imageRef = sample.imageRef
                 val qualityScore = sample.templateQualityScore
 
-                val processedSample = FingerprintSample(fingerId, processedTemplate, qualityScore, imageRef)
+                val processedSample = FingerprintSample(fingerId, processedTemplate,
+                    qualityScore, imageRef)
 
                 FingerprintCaptureResult(fingerId, processedSample)
             }
         }
 
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
 }

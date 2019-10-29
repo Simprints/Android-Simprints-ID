@@ -2,11 +2,13 @@ package com.simprints.id.orchestrator.cache.crypto.step
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.core.images.SecuredImageRef
-import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
@@ -16,9 +18,13 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRe
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
 import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
+import com.simprints.id.secure.cryptography.HybridCipherImpl
+import com.simprints.testtools.common.mock.mockTemplate
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
@@ -31,8 +37,8 @@ class StepEncoderImplAndroidTest {
 
     private val stepEncoder by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val keystoreManager = KeystoreManagerImpl(context)
-        StepEncoderImpl(keystoreManager)
+        val cipher = HybridCipherImpl(context)
+        StepEncoderImpl(cipher)
     }
 
     @Test
@@ -136,7 +142,7 @@ class StepEncoderImplAndroidTest {
         "moduleId",
         "metadata",
         "language",
-        emptyMap(),
+        mapOf(FingerprintFingerIdentifier.LEFT_THUMB to true),
         true,
         "programmeName",
         "organisationName",
@@ -160,18 +166,16 @@ class StepEncoderImplAndroidTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun mockFaceCaptureResponse(): Step.Result {
-        val template = "abcd1234".toByteArray()
-
         return FaceCaptureResponse(listOf(
             FaceCaptureResult(
                 index = 1,
                 result = FaceCaptureSample(
                     "face_id",
-                    template,
+                    mockTemplate(),
                     SecuredImageRef("uri")
                 )
             )

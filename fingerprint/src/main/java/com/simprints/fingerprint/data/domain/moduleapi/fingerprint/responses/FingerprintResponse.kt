@@ -9,8 +9,7 @@ interface FingerprintResponse: Parcelable {
 
 enum class FingerprintResponseType {
     CAPTURE,
-    VERIFY,
-    IDENTIFY,
+    MATCH,
     REFUSAL,
     ERROR
 }

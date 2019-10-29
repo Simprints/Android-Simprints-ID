@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.controllers.core.preferencesManager
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
+import java.io.Serializable
 
 @Keep
 enum class MatchPoolType {
@@ -10,11 +10,10 @@ enum class MatchPoolType {
     PROJECT;
 
     companion object {
-        fun fromQueryForIdentifyPool(queryForIdentifyPool: QueryForIdentifyPool): MatchPoolType =
+
+        fun fromMatchingQuery(query: Serializable): MatchPoolType =
             when {
-                queryForIdentifyPool.userId != null -> USER
-                queryForIdentifyPool.moduleId != null -> MODULE
-                else -> PROJECT
+                else -> PROJECT // STOPSHIP : Need to determine MatchPoolType from the matching query
             }
     }
 }
