@@ -17,7 +17,6 @@ import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAn
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
-import com.simprints.id.tools.AndroidResourcesHelperImpl.Companion.getStringPlural
 import kotlinx.android.synthetic.main.activity_matching.*
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -73,24 +72,24 @@ class MatchingActivity : FingerprintActivity() {
         })
 
         viewModel.matchBeginningSummary.observe(this, Observer {
-            tv_matchingProgressStatus1.text = getStringPlural(this@MatchingActivity, R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
             tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
         })
 
         viewModel.matchFinishedSummary.observe(this, Observer {
-            tv_matchingProgressStatus2.text = getStringPlural(this@MatchingActivity, R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
+            tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
 
             if (it.tier1Or2Matches > 0) {
                 tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = getStringPlural(this@MatchingActivity, R.string.tier1or2_matches_quantity_key, it.tier1Or2Matches, arrayOf(it.tier1Or2Matches))
+                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, it.tier1Or2Matches, arrayOf(it.tier1Or2Matches))
             }
             if (it.tier3Matches > 0) {
                 tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = getStringPlural(this@MatchingActivity, R.string.tier3_matches_quantity_key, it.tier3Matches, arrayOf(it.tier3Matches))
+                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, it.tier3Matches, arrayOf(it.tier3Matches))
             }
             if (it.tier1Or2Matches < 1 && it.tier3Matches < 1 || it.tier4Matches > 1) {
                 tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = getStringPlural(this@MatchingActivity, R.string.tier4_matches_quantity_key, it.tier4Matches, arrayOf(it.tier4Matches))
+                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, it.tier4Matches, arrayOf(it.tier4Matches))
             }
             setIdentificationProgress(100)
         })

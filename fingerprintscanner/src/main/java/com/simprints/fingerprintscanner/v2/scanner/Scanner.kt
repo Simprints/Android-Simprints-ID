@@ -1,15 +1,16 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageQualityCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageQualityResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetTemplateResponse
 import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetSmileLedStateCommand
@@ -29,6 +30,8 @@ import io.reactivex.Observer
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import java.io.InputStream
+import java.io.OutputStream
 
 class Scanner(
     private val messageInputStream: MessageInputStream,
@@ -44,15 +47,11 @@ class Scanner(
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
 
-    private lateinit var socket: BluetoothComponentSocket
-
     private val disposables = mutableListOf<Disposable>()
 
-    override fun connect(socket: BluetoothComponentSocket) {
-        this.socket = socket
-        this.socket.connect()
-        messageInputStream.connect(socket.getInputStream())
-        messageOutputStream.connect(socket.getOutputStream())
+    override fun connect(inputStream: InputStream, outputStream: OutputStream) {
+        messageInputStream.connect(inputStream)
+        messageOutputStream.connect(outputStream)
         state.connected = true
         state.triggerButtonActive = true
         disposables.add(subscribeTriggerButtonListeners())
@@ -61,7 +60,6 @@ class Scanner(
     override fun disconnect() {
         messageInputStream.disconnect()
         messageOutputStream.disconnect()
-        socket.close()
         state.connected = false
         state.triggerButtonActive = false
         disposables.forEach { it.dispose() }
@@ -115,6 +113,13 @@ class Scanner(
             )
         ).completeOnceReceived()
 
+    fun getImageQuality(): Single<Short> =
+        assertUn20On().andThen(
+            sendCommandAndReceiveResponse<GetImageQualityResponse>(
+                GetImageQualityCommand()
+            )
+        ).map { it.imageQuality }
+
     fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<ByteArray> =
         assertUn20On().andThen(
             sendCommandAndReceiveResponse<GetTemplateResponse>(
@@ -129,7 +134,6 @@ class Scanner(
                 GetImageCommand(imageFormat)
             )
         ).map { it.image }
-
 
     companion object {
         val DEFAULT_DPI = Dpi(500)

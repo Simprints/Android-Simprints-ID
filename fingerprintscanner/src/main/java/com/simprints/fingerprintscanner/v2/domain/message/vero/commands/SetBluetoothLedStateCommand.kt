@@ -7,4 +7,9 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessag
 class SetBluetoothLedStateCommand(val ledState: LedState) : VeroCommand(VeroMessageType.SET_BLUETOOTH_LED_STATE) {
 
     override fun getDataBytes(): ByteArray = ledState.getBytes()
+
+    companion object {
+        fun fromBytes(data: ByteArray) =
+            SetBluetoothLedStateCommand(LedState.fromBytes(data))
+    }
 }

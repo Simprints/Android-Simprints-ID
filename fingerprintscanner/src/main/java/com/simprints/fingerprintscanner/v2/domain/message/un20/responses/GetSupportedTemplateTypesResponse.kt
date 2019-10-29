@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20Messag
 
 class GetSupportedTemplateTypesResponse(val supportedTemplateTypes: Set<TemplateType>) : Un20Response(Un20MessageType.GetSupportedTemplateTypes) {
 
+    override fun getDataBytes(): ByteArray = supportedTemplateTypes.map { it.getBytes() }.reduce { acc, bytes -> acc + bytes }
+
     companion object {
         fun fromBytes(data: ByteArray) =
             GetSupportedTemplateTypesResponse(
