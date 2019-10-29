@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<CheckBox
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/SimprintsStyle.TextView"
-    android:id="@+id/txtModuleName"
+    android:id="@+id/checkBox"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/padding_default"
-    tools:text="@sample/sample_modules.json/data/name"/>
+    android:layout_margin="@dimen/margin_large"
+    tools:text="@sample/sample_modules.json/data/name"
+    tools:checked="@sample/sample_modules.json/data/selected"/>
