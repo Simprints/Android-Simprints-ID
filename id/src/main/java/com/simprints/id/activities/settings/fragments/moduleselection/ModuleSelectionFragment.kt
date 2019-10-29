@@ -31,14 +31,7 @@ class ModuleSelectionFragment : Fragment() {
         })
     }
 
-    /*private fun configureSelectModuleEntriesFromModuleIdOptions() {
-        val preference = view.getPreferenceForSelectModules() as MultiSelectListPreference
-
-        preference.entries = preferencesManager.moduleIdOptions.toTypedArray()
-        preference.entryValues = preferencesManager.moduleIdOptions.toTypedArray()
-    }
-
-    private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
+    /*private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
         when {
             moduleIdHash.size == 0 -> { handleNoModulesSelected(moduleIdHash) }
             moduleIdHash.size > MAX_SELECTED_MODULES -> { handleTooManyModulesSelected(moduleIdHash) }
