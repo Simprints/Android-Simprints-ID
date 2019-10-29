@@ -37,7 +37,8 @@ def androidx = [
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
-    ]
+    ],
+    security: ['androidx.security:security-crypto:1.0.0-alpha02']
 ]
 
 def support = [
@@ -109,10 +110,6 @@ def koin = [
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
-// Conceal (encryption)
-def conceal = [
-    core: "com.facebook.conceal:conceal:2.0.2"
-]
 
 def mockito_version = "2.23.0"
 def espresso_version = "3.2.0-alpha04"
@@ -195,6 +192,5 @@ ext.deps = [
     testing        : testing,
     realm          : realm,
     commons_io     : commons_io,
-    koin           : koin,
-    conceal        : conceal
+    koin           : koin
 ]

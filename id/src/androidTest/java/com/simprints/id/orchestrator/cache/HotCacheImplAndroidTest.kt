@@ -1,26 +1,24 @@
 package com.simprints.id.orchestrator.cache
 
-import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.data.secure.EncryptedSharedPreferencesFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridCipher
-import com.simprints.testtools.common.syntax.mock
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+
+
 
 class HotCacheImplAndroidTest {
 
     private val hotCache by lazy {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val preferences = context.getSharedPreferences("file_name", Context.MODE_PRIVATE)
-        val cipher = mock<HybridCipher>()
-        val stepEncoder = StepEncoderImpl(cipher)
-        HotCacheImpl(preferences, stepEncoder)
+        val encryptedShared = EncryptedSharedPreferencesFactoryImpl(context).encryptedSharedPreferences
+        val stepEncoder = StepEncoderImpl()
+        HotCacheImpl(encryptedShared, stepEncoder)
     }
+
 
     @Test
     fun shouldCacheStep() {
@@ -98,17 +96,5 @@ class HotCacheImplAndroidTest {
         status = Step.Status.ONGOING
     )
 
-    private fun mockRequest() = FingerprintCaptureRequest(
-        "projectId",
-        "userId",
-        "moduleId",
-        "metadata",
-        "language",
-        mapOf(),
-        true,
-        "programmeName",
-        "organisationName",
-        emptyList()
-    )
-
+    private fun mockRequest() = FingerprintCaptureRequest(fingerprintsToCapture = emptyList())
 }

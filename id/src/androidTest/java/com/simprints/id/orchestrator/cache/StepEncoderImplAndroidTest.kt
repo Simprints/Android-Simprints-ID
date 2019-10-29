@@ -1,49 +1,33 @@
-package com.simprints.id.orchestrator.cache.crypto.step
+package com.simprints.id.orchestrator.cache
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
-import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.testtools.common.mock.mockTemplate
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After
 import org.junit.Test
 import org.koin.core.context.stopKoin
-import java.util.*
 
 class StepEncoderImplAndroidTest {
 
-    private val stepEncoder by lazy {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val cipher = HybridCipherImpl(context)
-        StepEncoderImpl(cipher)
-    }
+    private val fakeSample = FingerprintGeneratorUtils.generateRandomFingerprint()
+    private val stepEncoder = StepEncoderImpl()
 
     @Test
     fun shouldEncodeFingerprintCaptureStepToString() {
         val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
+
         val fingerprintCaptureResponse = mockFingerprintCaptureResponse()
         val step = buildStep(fingerprintCaptureRequest, fingerprintCaptureResponse)
         val encodedString = stepEncoder.encode(step)
@@ -104,24 +88,6 @@ class StepEncoderImplAndroidTest {
         }
     }
 
-    @Test
-    fun shouldNotEncodeStepWithNonCaptureResult() {
-        val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
-        val fingerprintIdentifyResponse = mockFingerprintIdentifyResponse()
-        val step = buildStep(fingerprintCaptureRequest, fingerprintIdentifyResponse)
-        val encodedString = stepEncoder.encode(step)
-        val decodedStep = stepEncoder.decode(encodedString)
-
-        with(decodedStep) {
-            assertThat(requestCode, `is`(REQUEST_CODE))
-            assertThat(activityName, `is`(ACTIVITY_NAME))
-            assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(fingerprintCaptureRequest))
-            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), `is`(fingerprintIdentifyResponse))
-        }
-    }
-
     @After
     fun tearDown() {
         stopKoin()
@@ -137,16 +103,7 @@ class StepEncoderImplAndroidTest {
     )
 
     private fun mockFingerprintCaptureRequest(): Step.Request = FingerprintCaptureRequest(
-        "projectId",
-        "userId",
-        "moduleId",
-        "metadata",
-        "language",
-        mapOf(FingerprintFingerIdentifier.LEFT_THUMB to true),
-        true,
-        "programmeName",
-        "organisationName",
-        listOf(FingerprintFingerIdentifier.LEFT_THUMB, FingerprintFingerIdentifier.LEFT_INDEX_FINGER)
+        fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
     )
 
     private fun mockFaceCaptureRequest(): Step.Request = FaceCaptureRequest(
@@ -156,12 +113,11 @@ class StepEncoderImplAndroidTest {
     private fun mockFingerprintCaptureResponse(): Step.Result {
         val captureResult = listOf(
             FingerprintCaptureResult(
-                IFingerIdentifier.RIGHT_THUMB,
+                FingerIdentifier.RIGHT_THUMB,
                 FingerprintSample(
-                    UUID.randomUUID().toString(),
-                    IFingerIdentifier.RIGHT_THUMB,
-                    3,
-                    "abcd1234".toByteArray(),
+                    FingerIdentifier.RIGHT_THUMB,
+                    fakeSample.template,
+                    fakeSample.templateQualityScore,
                     null
                 )
             )
@@ -182,17 +138,6 @@ class StepEncoderImplAndroidTest {
         ))
     }
 
-    private fun mockFingerprintIdentifyResponse(): Step.Result {
-        return FingerprintIdentifyResponse(
-            listOf(
-                FingerprintMatchResult(
-                    "guid-found",
-                    3,
-                    FingerprintTier.TIER_1
-                )
-            )
-        )
-    }
 
     private fun validateFingerprintCaptureResponse(actual: FingerprintCaptureResponse,
                                                    expected: FingerprintCaptureResponse) {
@@ -205,7 +150,7 @@ class StepEncoderImplAndroidTest {
                         assertThat(actualSample.fingerIdentifier, `is`(expectedSample.fingerIdentifier))
                         assertThat(actualSample.id, `is`(expectedSample.id))
                         assertThat(actualSample.imageRef, `is`(expectedSample.imageRef))
-                        assertThat(actualSample.qualityScore, `is`(expectedSample.qualityScore))
+                        assertThat(actualSample.templateQualityScore, `is`(expectedSample.templateQualityScore))
                         assertThat(actualSample.template.contentEquals(expectedSample.template), `is`(true))
                     }
                 }
