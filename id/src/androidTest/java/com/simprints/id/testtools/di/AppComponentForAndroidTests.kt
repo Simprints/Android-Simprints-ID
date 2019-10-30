@@ -3,6 +3,7 @@ package com.simprints.id.testtools.di
 import com.simprints.id.Application
 import com.simprints.id.activities.dashboard.DashboardActivityAndroidTest
 import com.simprints.id.activities.login.LoginActivityAndroidTest
+import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
 import com.simprints.id.di.AppComponent
@@ -37,4 +38,5 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(secureDataManagerTest: SecureDataManagerTest)
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
     fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplAndroidTest)
+    fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
 }
