@@ -1,5 +1,6 @@
 package com.simprints.id.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
@@ -87,7 +88,9 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    open fun provideModuleSelectionCallback(): ModuleSelectionCallback = ModuleSelectionFragment.getInstance()
+    open fun provideModuleSelectionCallback(
+        applicationContext: Context
+    ): ModuleSelectionCallback = ModuleSelectionFragment.getInstance(applicationContext)
 
     @Provides
     @Singleton

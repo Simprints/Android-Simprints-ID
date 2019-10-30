@@ -1,12 +1,13 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,7 +18,7 @@ import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
-class ModuleSelectionFragment private constructor()
+class ModuleSelectionFragment private constructor(private val applicationContext: Context)
     : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
 
     private val adapter by lazy { ModuleAdapter(tracker = this) }
@@ -40,11 +41,11 @@ class ModuleSelectionFragment private constructor()
     }
 
     override fun noModulesSelected() {
-        Log.d("TEST_ALAN", "No modules")
+        Toast.makeText(applicationContext, "No modules", Toast.LENGTH_SHORT).show()
     }
 
     override fun tooManyModulesSelected() {
-        Log.d("TEST_ALAN", "Too many")
+        Toast.makeText(applicationContext, "Too many", Toast.LENGTH_SHORT).show()
     }
 
     override fun onSelectionStateChanged(module: Module) {
@@ -84,7 +85,9 @@ class ModuleSelectionFragment private constructor()
     }
 
     companion object {
-        fun getInstance(): ModuleSelectionFragment = lazy { ModuleSelectionFragment() }.value
+        fun getInstance(applicationContext: Context): ModuleSelectionFragment = lazy {
+            ModuleSelectionFragment(applicationContext)
+        }.value
     }
 
 }
