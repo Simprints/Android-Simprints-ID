@@ -107,4 +107,5 @@
     <string name="consent_parental_title">Waliigaltee maatii</string>
     <string name="consent_parental_confirmation">Mallattoo qubaa mucaa kee fayyadamuu nadanda\’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin qaba\”.</string>
     <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
+    <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
 </resources>

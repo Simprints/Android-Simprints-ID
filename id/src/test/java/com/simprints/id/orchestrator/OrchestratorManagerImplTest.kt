@@ -16,7 +16,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
@@ -24,6 +24,7 @@ import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.Step.Status.ONGOING
 import com.simprints.id.orchestrator.steps.face.FaceRequestCode.CAPTURE
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
+import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.moduleapi.face.requests.IFaceRequest
 import com.simprints.moduleapi.face.responses.IFaceCaptureResponse
@@ -41,9 +42,11 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 import org.mockito.Mockito.*
 import org.mockito.stubbing.Answer
+import org.robolectric.annotation.Config
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class)
 class OrchestratorManagerImplTest {
 
     @get:Rule
@@ -165,7 +168,7 @@ class OrchestratorManagerImplTest {
         }
 
         val nFaceSamplesToCapture = 3
-        val request = FaceCaptureRequest(nFaceSamplesToCapture)
+        val request = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
 
         mockSteps.add(
             Step(
@@ -182,9 +185,9 @@ class OrchestratorManagerImplTest {
         val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
-        val preferences = mock<SharedPreferences>().apply {
-            whenever(this) { edit() } thenReturn mock()
-        }
+        val preferences = mock<SharedPreferences>()
+        whenever(preferences) { edit() } thenReturn mock()
+
         val stepEncoder = mock<StepEncoder>()
         val hotCache = HotCacheImpl(preferences, stepEncoder)
 

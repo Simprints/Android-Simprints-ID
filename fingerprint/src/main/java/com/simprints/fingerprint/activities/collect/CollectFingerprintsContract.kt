@@ -4,12 +4,11 @@ import android.app.ProgressDialog
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.base.BasePresenter
 import com.simprints.fingerprint.activities.base.BaseView
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 
 interface CollectFingerprintsContract {
 
@@ -58,7 +57,7 @@ interface CollectFingerprintsContract {
         fun handleConfirmFingerprintsAndContinue()
         fun handleOnBackPressed()
         fun handleTryAgainFromDifferentActivity()
-        fun handleException(simprintsException: FingerprintSimprintsException)
+        fun handleException(e: Throwable)
 
         // Scanning
         var isConfirmDialogShown: Boolean

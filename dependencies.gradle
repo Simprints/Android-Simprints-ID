@@ -1,4 +1,4 @@
-def kotlin_version = "1.3.21"
+def kotlin_version = "1.3.30"
 def kotlin = [
     reflect           : "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TODO: remove it when we drop the legacy code around Firebase,
     stdlib            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
@@ -37,7 +37,8 @@ def androidx = [
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
-    ]
+    ],
+    security: ['androidx.security:security-crypto:1.0.0-alpha02']
 ]
 
 def support = [
@@ -159,7 +160,7 @@ def testing = [
     live_data      : "com.jraska.livedata:testing-ktx:1.1.0"
 ]
 
-//No using Realm plugin: https://github.com/realm/realm-java/issues/5982
+//Not using Realm plugin: https://github.com/realm/realm-java/issues/5982
 def realm_version = "4.3.4"
 def realm = [
     annotations          : "io.realm:realm-annotations:$realm_version",

@@ -10,16 +10,21 @@ import com.simprints.id.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.tools.AndroidResourcesHelper
 import org.jetbrains.anko.startActivity
+import javax.inject.Inject
 
 // App launched when user open SimprintsID using the Home button
 open class CheckLoginFromMainLauncherActivity : AppCompatActivity(), CheckLoginFromMainLauncherContract.View {
 
     override lateinit var viewPresenter: CheckLoginFromMainLauncherContract.Presenter
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (application as Application).component.inject(this)
         setContentView(R.layout.activity_check_login)
+        title = androidResourcesHelper.getString(R.string.title_activity_front)
 
         val component = (application as Application).component
         component.inject(this)

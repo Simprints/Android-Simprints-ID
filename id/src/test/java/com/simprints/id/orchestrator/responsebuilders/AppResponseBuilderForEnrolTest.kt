@@ -103,7 +103,7 @@ class AppResponseBuilderForEnrolTest {
 
     private fun mockFingerprintStep(): Step {
         val request = FingerprintCaptureRequest(
-            listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
+            fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
         )
 
         return Step(
@@ -111,7 +111,7 @@ class AppResponseBuilderForEnrolTest {
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
             request = request,
-            result = FingerprintCaptureResponse(
+            result = FingerprintCaptureResponse(captureResult =
                 listOf(
                     FingerprintCaptureResult(
                         FingerIdentifier.LEFT_THUMB,

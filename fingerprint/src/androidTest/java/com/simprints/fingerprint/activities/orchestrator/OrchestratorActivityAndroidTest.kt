@@ -12,7 +12,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.integration.createFingerprintRequestIntent
@@ -116,8 +116,6 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_LANGUAGE = "en"
-
-        private fun launchTaskRequest() = ConnectScannerTaskRequest(DEFAULT_LANGUAGE)
+        private fun launchTaskRequest() = ConnectScannerTaskRequest()
     }
 }

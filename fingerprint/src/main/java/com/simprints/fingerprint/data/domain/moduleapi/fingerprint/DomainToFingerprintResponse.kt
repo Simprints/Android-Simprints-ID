@@ -2,13 +2,15 @@ package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import android.os.Parcelable
 import com.simprints.fingerprint.activities.collect.models.fromDomainToModuleApi
-import com.simprints.fingerprint.data.domain.matching.MatchingResult
-import com.simprints.fingerprint.data.domain.matching.MatchingTier
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
+import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
+import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.responses.*
+import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintCaptureResult
+import com.simprints.moduleapi.fingerprint.responses.entities.IFingerprintMatchResult
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -19,16 +21,23 @@ object DomainToFingerprintResponse {
 
     fun fromDomainToFingerprintCaptureResponse(capture: FingerprintCaptureResponse): IFingerprintCaptureResponse =
         IFingerprintCaptureResponseImpl(capture.fingerprints.map {
-            IFingerprintImpl(it.fingerId.fromDomainToModuleApi(), it.templateBytes, it.qualityScore)
+            IFingerprintCaptureResultImpl(
+                it.fingerId.fromDomainToModuleApi(),
+                IFingerprintSampleImpl(
+                    it.fingerId.fromDomainToModuleApi(),
+                    it.templateBytes,
+                    it.qualityScore,
+                    null
+                ))
         })
 
-    fun fromDomainToFingerprintVerifyResponse(verify: FingerprintVerifyResponse): IFingerprintVerifyResponse {
-        val matchingResult = IMatchingResultImpl(verify.guid, verify.confidence, toIFingerprintResponseTier(verify.tier))
-        return IFingerprintVerifyResponseImpl(matchingResult)
-    }
-
-    fun fromDomainToFingerprintIdentifyResponse(identify: FingerprintIdentifyResponse): IFingerprintIdentifyResponse =
-        IFingerprintIdentifyResponseImpl(identify.identifications.map { fromDomainToFingerprintIdentificationResult(it) })
+    fun fromDomainToFingerprintMatchResponse(matchResponse: FingerprintMatchResponse): IFingerprintMatchResponse =
+        IFingerprintMatchResponseImpl(matchResponse.result.map {
+            IFingerprintMatchResultImpl(
+                personId = it.guid,
+                confidenceScore = it.confidence
+            )
+        })
 
     fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintExitFormResponse {
 
@@ -45,19 +54,6 @@ object DomainToFingerprintResponse {
         return IFingerprintExitFormResponseImpl(reason, refusalResponse.extra)
     }
 
-
-    private fun fromDomainToFingerprintIdentificationResult(result: MatchingResult): IMatchingResult =
-        IMatchingResultImpl(result.guid, result.confidence, toIFingerprintResponseTier(result.tier))
-
-    private fun toIFingerprintResponseTier(tier: MatchingTier): IFingerprintResponseTier =
-        when (tier) {
-            MatchingTier.TIER_1 -> IFingerprintResponseTier.TIER_1
-            MatchingTier.TIER_2 -> IFingerprintResponseTier.TIER_2
-            MatchingTier.TIER_3 -> IFingerprintResponseTier.TIER_3
-            MatchingTier.TIER_4 -> IFingerprintResponseTier.TIER_4
-            MatchingTier.TIER_5 -> IFingerprintResponseTier.TIER_5
-        }
-
     private fun fromFingerprintErrorReasonToErrorResponse(reason: FingerprintErrorReason) =
         when (reason) {
             UNEXPECTED_ERROR -> IFingerprintErrorReason.UNEXPECTED_ERROR
@@ -73,14 +69,8 @@ private class IFingerprintErrorResponseImpl(override val error: IFingerprintErro
 }
 
 @Parcelize
-private class IFingerprintCaptureResponseImpl(override val fingerprints: List<IFingerprint>) : IFingerprintCaptureResponse {
+private class IFingerprintCaptureResponseImpl(override val captureResult: List<IFingerprintCaptureResult>) : IFingerprintCaptureResponse {
     @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.CAPTURE
-}
-
-@Parcelize
-private class IFingerprintIdentifyResponseImpl(
-    override val identifications: List<IMatchingResult>) : IFingerprintIdentifyResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.IDENTIFY
 }
 
 @Parcelize
@@ -91,18 +81,25 @@ private class IFingerprintExitFormResponseImpl(
 }
 
 @Parcelize
-private class IFingerprintVerifyResponseImpl(override val matchingResult: IMatchingResult) : IFingerprintVerifyResponse {
-    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.VERIFY
+private data class IFingerprintMatchResponseImpl(
+    override val result: List<IFingerprintMatchResult>
+) : Parcelable, IFingerprintMatchResponse {
+    @IgnoredOnParcel override val type: IFingerprintResponseType = IFingerprintResponseType.MATCH
 }
 
 @Parcelize
-private data class IMatchingResultImpl(
-    override val guid: String,
-    override val confidence: Int,
-    override val tier: IFingerprintResponseTier) : Parcelable, IMatchingResult
+private data class IFingerprintMatchResultImpl(
+    override val personId: String,
+    override val confidenceScore: Float) : Parcelable, IFingerprintMatchResult
 
 @Parcelize
-private class IFingerprintImpl(
-    override val fingerId: IFingerIdentifier,
+private class IFingerprintCaptureResultImpl(
+    override val identifier: IFingerIdentifier,
+    override val sample: IFingerprintSample?) : IFingerprintCaptureResult
+
+@Parcelize
+private class IFingerprintSampleImpl(
+    override val fingerIdentifier: IFingerIdentifier,
     override val template: ByteArray,
-    override val qualityScore: Int) : IFingerprint
+    override val templateQualityScore: Int,
+    override val imageRef: ISecuredImageRef?) : IFingerprintSample

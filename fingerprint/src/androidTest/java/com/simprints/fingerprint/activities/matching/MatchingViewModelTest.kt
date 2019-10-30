@@ -5,13 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskIdentifyRequest.QueryForIdentifyPool
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskIdentifyResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.commontesttools.DEFAULT_MODULE_ID
 import com.simprints.fingerprint.commontesttools.DEFAULT_PROJECT_ID
 import com.simprints.fingerprint.commontesttools.DEFAULT_USER_ID
@@ -20,8 +16,7 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.fingerprint.Person
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode

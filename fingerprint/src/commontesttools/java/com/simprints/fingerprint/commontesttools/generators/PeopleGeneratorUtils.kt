@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.commontesttools.generators
 
-import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*

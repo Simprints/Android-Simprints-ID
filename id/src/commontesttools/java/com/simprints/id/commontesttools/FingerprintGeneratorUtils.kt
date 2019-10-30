@@ -1,6 +1,5 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.fingerprintscanner.tools.ota.toPositiveInt
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import java.nio.ByteBuffer
@@ -100,6 +99,6 @@ object FingerprintGeneratorUtils {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return FingerprintSample(fingerId, templateBytes, qualityScore.toPositiveInt())
+        return FingerprintSample(fingerId, templateBytes, qualityScore.toInt() and 0xFF)
     }
 }

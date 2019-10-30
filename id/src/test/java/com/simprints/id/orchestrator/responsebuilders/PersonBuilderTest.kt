@@ -134,7 +134,7 @@ class PersonBuilderTest {
                 )
             )
         )
-        return FingerprintCaptureResponse(captureResult)
+        return FingerprintCaptureResponse(captureResult = captureResult)
     }
 
     private fun mockFaceResponse(): FaceCaptureResponse {

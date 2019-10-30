@@ -36,13 +36,29 @@ dependencies {
 
     // Kotlin
     implementation deps.kotlin.stdlib
+    implementation deps.kotlin.reflect
 
     // Android
     implementation deps.androidx.appcompat
 
-    // Unit tests
+    // RxJava
+    implementation deps.rxjava2.core
+    implementation deps.rxjava2.android
+    implementation deps.rxjava2.kotlin
+
+    // ######################################################
+    //                      Unit test
+    // ######################################################
+
+    // Simprints
     testImplementation project(':testtools')
+
+    // JUnit
     testImplementation deps.testing.junit
+
+    // Mockito
+    testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.truth
 }
 
 def libraryGroupId = 'com.simprints'

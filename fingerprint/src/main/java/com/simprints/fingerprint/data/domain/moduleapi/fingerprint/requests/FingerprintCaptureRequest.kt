@@ -4,6 +4,4 @@ import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class FingerprintCaptureRequest(override val language: String,
-                                     override val fingerStatus: Map<FingerIdentifier, Boolean>,
-                                     val activityTitle: String) : FingerprintRequest
+data class FingerprintCaptureRequest(val fingerprintsToCapture: List<FingerIdentifier>) : FingerprintRequest

@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2019.3.1"
-        versionCode 175
+        versionName "2019.3.2"
+        versionCode 184
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -146,6 +146,7 @@ dependencies {
     implementation deps.androidx.ui.cardview
     implementation deps.androidx.ui.preference
     implementation deps.androidx.ui.fragment
+    implementation deps.androidx.security
     implementation deps.support.material
     implementation deps.arch_components.work
     implementation deps.playservices.location

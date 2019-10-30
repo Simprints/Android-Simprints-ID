@@ -12,7 +12,7 @@ class FingerprintErrorResponse(
     val fingerprintErrorReason: FingerprintErrorReason
 ): FingerprintResponse {
 
-    @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.ENROL
+    @IgnoredOnParcel override val type: FingerprintResponseType = FingerprintResponseType.ENROL
 }
 
 fun IFingerprintErrorResponse.fromModuleApiToDomain() =
