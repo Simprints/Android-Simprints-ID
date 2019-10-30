@@ -9,12 +9,11 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : AppCompatActivity() {
 
-    private val fragment = ModuleSelectionFragment.getInstance()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
+        val fragment = ModuleSelectionFragment.getInstance(applicationContext)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, fragment)
