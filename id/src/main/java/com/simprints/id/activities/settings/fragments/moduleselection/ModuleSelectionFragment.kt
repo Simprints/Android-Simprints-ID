@@ -25,7 +25,7 @@ class ModuleSelectionFragment private constructor()
     private lateinit var viewModel: ModuleViewModel
 
     private var modules = emptyList<Module>()
-    private var selectedModulesCount = 0
+    private var selectedModules = emptyList<Module>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -49,8 +49,8 @@ class ModuleSelectionFragment private constructor()
 
     override fun onSelectionStateChanged(module: Module) {
         modules.find { it.name == module.name }?.isSelected = module.isSelected
-        selectedModulesCount = modules.count { it.isSelected }
-        txtNoModulesSelected.visibility = if (selectedModulesCount == 0) VISIBLE else GONE
+        selectedModules = modules.filter { it.isSelected }
+        configureNoModulesSelectedTextVisibility(selectedModules)
         updateSelectedModules()
     }
 
@@ -69,7 +69,7 @@ class ModuleSelectionFragment private constructor()
     private fun getSelectedModules() {
         viewModel.getSelectedModules().observe(this, Observer { selectedModules ->
             modules.forEach { module ->
-                txtNoModulesSelected.visibility = GONE
+                configureNoModulesSelectedTextVisibility(selectedModules)
                 module.isSelected = selectedModules.any { it.name == module.name }
             }
         })
@@ -77,6 +77,10 @@ class ModuleSelectionFragment private constructor()
 
     private fun updateSelectedModules() {
         viewModel.setSelectedModules(modules.filter { it.isSelected })
+    }
+
+    private fun configureNoModulesSelectedTextVisibility(selectedModules: List<Module>) {
+        txtNoModulesSelected.visibility = if (selectedModules.isEmpty()) VISIBLE else GONE
     }
 
     companion object {
