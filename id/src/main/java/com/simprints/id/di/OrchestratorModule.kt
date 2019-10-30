@@ -66,9 +66,8 @@ class OrchestratorModule {
     @Named("ModalityFlowVerify")
     fun provideModalityFlowVerify(fingerprintStepProcessor: FingerprintStepProcessor,
                                   faceStepProcessor: FaceStepProcessor,
-                                  coreStepProcessor: CoreStepProcessor,
-                                  prefs: PreferencesManager): ModalityFlow =
-        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, prefs)
+                                  coreStepProcessor: CoreStepProcessor): ModalityFlow =
+        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
 
     @Provides
     @Named("ModalityFlowIdentify")
