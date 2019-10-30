@@ -14,12 +14,13 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.di.AppModule
 import com.simprints.id.di.PreferencesModule
 import com.simprints.id.di.SerializerModule
+import com.simprints.id.moduleselection.ModuleRepositoryTest
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.SubDownSyncTaskTest
+import com.simprints.id.services.scheduledSync.peopleDownSync.worker.CountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncManagerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.DownSyncMasterWorkerTest
-import com.simprints.id.services.scheduledSync.peopleDownSync.worker.CountWorkerTest
 import com.simprints.id.services.scheduledSync.peopleDownSync.worker.SubDownSyncWorkerTest
 import dagger.BindsInstance
 import dagger.Component
@@ -56,4 +57,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(dashboardSyncCardViewModelTest: DashboardSyncCardViewModelTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
+    fun inject(moduleRepositoryTest: ModuleRepositoryTest)
 }
