@@ -7,7 +7,7 @@ import java.io.Serializable
 
 class FaceRequestFactoryImpl: FaceRequestFactory {
 
-    override fun buildCaptureRequest(nFaceSamplesToCapture: Int) = FaceCaptureRequest(nFaceSamplesToCapture)
+    override fun buildCaptureRequest(nFaceSamplesToCapture: Int) = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
 
     override fun buildFaceMatchRequest(
         probeFaceSamples: List<FaceSample>,

@@ -5,9 +5,7 @@ import com.simprints.fingerprint.orchestrator.task.TaskRequest
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class ConnectScannerTaskRequest(
-    val language: String
-) : TaskRequest, Parcelable {
+class ConnectScannerTaskRequest : TaskRequest, Parcelable {
 
     companion object {
         const val BUNDLE_KEY = "ConnectScannerRequestKey"

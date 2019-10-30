@@ -10,7 +10,7 @@ import kotlinx.android.parcel.Parcelize
 data class FingerprintMatchResponse(
     val result: List<FingerprintMatchResult>
 ) : FingerprintResponse {
-    @IgnoredOnParcel override val type: FingerprintTypeResponse = FingerprintTypeResponse.MATCH
+    @IgnoredOnParcel override val type: FingerprintResponseType = FingerprintResponseType.MATCH
 }
 
 fun IFingerprintMatchResponse.fromModuleApiToDomain() = FingerprintMatchResponse(result.map { it.fromModuleApiToDomain() })

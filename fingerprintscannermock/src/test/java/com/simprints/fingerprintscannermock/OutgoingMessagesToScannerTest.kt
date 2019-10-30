@@ -1,8 +1,8 @@
 package com.simprints.fingerprintscannermock
 
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprintscanner.wrappedScannerCallback
+import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprintscanner.v1.ScannerCallback
+import com.simprints.fingerprintscanner.v1.wrappedScannerCallback
 import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils
 import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager

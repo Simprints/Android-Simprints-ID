@@ -19,6 +19,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppErrorResponse
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.secure.SecureApiInterface
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.SimProgressDialog
 import com.simprints.id.tools.extensions.scannerAppIntent
 import com.simprints.id.tools.extensions.showToast
@@ -37,6 +38,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override lateinit var viewPresenter: LoginContract.Presenter
     @Inject lateinit var preferences: PreferencesManager
     @Inject lateinit var secureApiInterface: SecureApiInterface
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
 
     val app by lazy {
         application as Application
@@ -48,6 +50,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        app.component.inject(this)
+        title = androidResourcesHelper.getString(R.string.login_title)
+
+        setTextInLayout()
+
         loginActRequest = this.intent.extras?.getParcelable(LoginActivityRequest.BUNDLE_KEY)
             ?: throw InvalidAppRequest()
 
@@ -63,6 +70,17 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
         viewPresenter = LoginPresenter(this, component, projectAuthenticator)
         viewPresenter.start()
+    }
+
+    private fun setTextInLayout() {
+        with(androidResourcesHelper) {
+            loginEditTextUserId.hint = getString(R.string.login_user_id_hint)
+            loginEditTextProjectSecret.hint = getString(R.string.login_secret_hint)
+            loginButtonScanQr.text = getString(R.string.scan_qr)
+            loginButtonSignIn.text = getString(R.string.login)
+            loginEditTextProjectId.hint = getString(R.string.login_id_hint)
+            loginImageViewLogo.contentDescription = getString(R.string.simprints_logo)
+        }
     }
 
     private fun initUI() {
@@ -122,11 +140,11 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         }
 
     private fun showErrorForQRCodeFailed() {
-        showToast(R.string.login_qr_code_scanning_problem)
+        showToast(androidResourcesHelper, R.string.login_qr_code_scanning_problem)
     }
 
     override fun showErrorForInvalidQRCode() {
-        showToast(R.string.login_invalid_qr_code)
+        showToast(androidResourcesHelper, R.string.login_invalid_qr_code)
     }
 
     override fun updateProjectSecretInTextView(projectSecret: String) {
@@ -139,7 +157,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleMissingCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_missing_credentials)
+        showToast(androidResourcesHelper, R.string.login_missing_credentials)
     }
 
     override fun handleSignInSuccess() {
@@ -150,22 +168,22 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun handleSignInFailedNoConnection() {
         progressDialog.dismiss()
-        showToast(R.string.login_no_network)
+        showToast(androidResourcesHelper, R.string.login_no_network)
     }
 
     override fun handleSignInFailedServerError() {
         progressDialog.dismiss()
-        showToast(R.string.login_server_error)
+        showToast(androidResourcesHelper, R.string.login_server_error)
     }
 
     override fun handleSignInFailedInvalidCredentials() {
         progressDialog.dismiss()
-        showToast(R.string.login_invalid_credentials)
+        showToast(androidResourcesHelper, R.string.login_invalid_credentials)
     }
 
     override fun handleSignInFailedProjectIdIntentMismatch() {
         progressDialog.dismiss()
-        showToast(R.string.login_project_id_intent_mismatch)
+        showToast(androidResourcesHelper, R.string.login_project_id_intent_mismatch)
     }
 
     override fun handleSignInFailedUnknownReason() {

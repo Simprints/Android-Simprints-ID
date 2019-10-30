@@ -41,7 +41,6 @@ open class Application : MultiDexApplication() {
     }
 
     open fun initModules() {
-
         if (Timber.treeCount() <= 0) {
             if (isReleaseWithLogfileVariant()) {
                 Timber.plant(FileLoggingTree())
@@ -52,7 +51,6 @@ open class Application : MultiDexApplication() {
         }
 
         initFabric()
-
         handleUndeliverableExceptionInRxJava()
     }
 
@@ -63,8 +61,6 @@ open class Application : MultiDexApplication() {
 
         Fabric.with(this, crashlyticsKit)
     }
-
-    private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     // RxJava doesn't allow not handled exceptions, when that happens the app crashes.
     // https://github.com/ReactiveX/RxJava/wiki/What's-different-in-2.0#reason-handling
@@ -84,6 +80,8 @@ open class Application : MultiDexApplication() {
             component.getCrashReportManager().logException(e)
         }
     }
+
+    private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     private fun initServiceLocation() {
         startKoin {

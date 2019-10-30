@@ -1,6 +1,6 @@
 package com.simprints.fingerprintscannermock
 
-import com.simprints.fingerprintscanner.Message
+import com.simprints.fingerprintscanner.v1.Message
 import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils
 import junit.framework.Assert
 import org.junit.Test

@@ -6,7 +6,7 @@ import com.simprints.moduleapi.fingerprint.responses.*
 
 interface FingerprintResponse: Parcelable, Result {
 
-    val type: FingerprintTypeResponse
+    val type: FingerprintResponseType
 
     companion object {
         const val BUNDLE_KEY = "FingerprintResponseBundleKey"
@@ -23,7 +23,7 @@ fun IFingerprintResponse.fromModuleApiToDomain(): FingerprintResponse =
     }
 
 
-enum class FingerprintTypeResponse {
+enum class FingerprintResponseType {
     ENROL,
     MATCH,
     REFUSAL,
