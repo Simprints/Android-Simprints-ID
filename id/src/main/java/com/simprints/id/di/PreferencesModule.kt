@@ -87,13 +87,13 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
+    open fun provideModuleSelectionCallback(): ModuleSelectionCallback = ModuleSelectionFragment.getInstance()
+
+    @Provides
+    @Singleton
     fun providePreferencesManager(settingsPreferencesManager: SettingsPreferencesManager,
                                   lastEventsPreferencesManager: RecentEventsPreferencesManager,
                                   app: Application): PreferencesManager =
         PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
-
-    @Provides
-    @Singleton
-    fun provideModuleSelectionCallback(): ModuleSelectionCallback = ModuleSelectionFragment.getInstance()
 
 }
