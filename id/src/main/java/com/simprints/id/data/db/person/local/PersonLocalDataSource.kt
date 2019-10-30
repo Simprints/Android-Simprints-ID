@@ -5,7 +5,7 @@ import io.realm.Sort
 import kotlinx.coroutines.flow.Flow
 import java.io.Serializable
 
-interface PersonLocalDataSource : FingerprintRecordLocalDataSource {
+interface PersonLocalDataSource : FingerprintIdentityLocalDataSource {
 
     class Query(val projectId: String? = null,
                 val patientId: String? = null,
