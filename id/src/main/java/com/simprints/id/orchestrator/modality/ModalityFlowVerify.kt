@@ -3,8 +3,6 @@ package com.simprints.id.orchestrator.modality
 import android.content.Intent
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
-import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -23,8 +21,7 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                              private val faceStepProcessor: FaceStepProcessor,
-                             private val coreStepProcessor: CoreStepProcessor,
-                             private val prefs: PreferencesManager) : ModalityFlowBaseImpl(coreStepProcessor) {
+                             private val coreStepProcessor: CoreStepProcessor) : ModalityFlowBaseImpl(coreStepProcessor) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
@@ -64,20 +61,11 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
         return stepRequested.also {
             if (result is FingerprintCaptureResponse) {
-                val query = buildQuery(appRequest, prefs.matchGroup)
+                val query = Query(patientId = appRequest.verifyGuid)
                 addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
             }
         }
     }
-
-    private fun buildQuery(appRequest: AppVerifyRequest, matchGroup: GROUP): Query =
-        with(appRequest) {
-            when (matchGroup) {
-                GROUP.GLOBAL -> Query(projectId, patientId = verifyGuid)
-                GROUP.USER -> Query(projectId, userId = userId, patientId = verifyGuid)
-                GROUP.MODULE -> Query(projectId, moduleId = moduleId, patientId = verifyGuid)
-            }
-        }
 
     private fun addMatchingStep(probeSamples: List<FingerprintSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
