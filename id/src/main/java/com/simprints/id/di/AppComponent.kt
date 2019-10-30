@@ -38,7 +38,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.FingerprintRecordLocalDataSource
+import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -129,7 +129,7 @@ interface AppComponent {
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository
-    fun getFingerprintRecordLocalDataSource(): FingerprintRecordLocalDataSource
+    fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getSimNetworkUtils(): SimNetworkUtils
