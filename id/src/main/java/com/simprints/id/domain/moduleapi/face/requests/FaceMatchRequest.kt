@@ -10,7 +10,8 @@ import java.io.Serializable
 @Parcelize
 data class FaceMatchRequest (
     val probeFaceSamples: List<FaceSample>,
-    val queryForCandidates: Serializable
+    val queryForCandidates: Serializable,
+    override val type: FaceRequestType = FaceRequestType.MATCH
 ) : FaceRequest
 
 fun FaceMatchRequest.fromDomainToModuleApi(): IFaceMatchRequest =
