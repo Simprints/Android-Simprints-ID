@@ -41,11 +41,19 @@ class ModuleSelectionFragment private constructor(private val applicationContext
     }
 
     override fun noModulesSelected() {
-        Toast.makeText(applicationContext, "No modules", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            applicationContext,
+            R.string.settings_no_modules_toast,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
-    override fun tooManyModulesSelected() {
-        Toast.makeText(applicationContext, "Too many", Toast.LENGTH_SHORT).show()
+    override fun tooManyModulesSelected(maxAllowed: Int) {
+        Toast.makeText(
+            applicationContext,
+            applicationContext.getString(R.string.settings_too_many_modules_toast, maxAllowed),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onSelectionStateChanged(module: Module) {

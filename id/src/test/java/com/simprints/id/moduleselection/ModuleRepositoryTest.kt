@@ -57,7 +57,7 @@ class ModuleRepositoryTest {
 
         repository.setSelectedModules(selectedModules)
 
-        verify(repository.callback).tooManyModulesSelected()
+        verify(repository.callback).tooManyModulesSelected(maxAllowed = 6)
     }
 
     @Test
