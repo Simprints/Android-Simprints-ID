@@ -37,7 +37,7 @@ class ModuleRepository(component: AppComponent) {
             }
 
             selectedModules.size > MAX_SELECTED_MODULES -> {
-                callback.tooManyModulesSelected()
+                callback.tooManyModulesSelected(MAX_SELECTED_MODULES)
             }
 
             else -> {
