@@ -1,55 +1,42 @@
-package com.simprints.id.orchestrator.cache.crypto.step
+package com.simprints.id.orchestrator.cache
 
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.commontesttools.FingerprintGeneratorUtils
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.domain.moduleapi.fingerprint.requests.entities.FingerprintFingerIdentifier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchingResult
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintTier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
-import com.simprints.id.orchestrator.cache.model.FingerprintCaptureResult
-import com.simprints.id.orchestrator.cache.model.FingerprintSample
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.testtools.common.mock.mockTemplate
-import com.simprints.moduleapi.fingerprint.IFingerIdentifier
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
 import org.junit.After
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
-import java.util.*
 
-class StepEncoderImplAndroidTest {
+@RunWith(AndroidJUnit4::class)
+class StepEncoderImplTest {
 
-    private val stepEncoder by lazy {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val cipher = HybridCipherImpl(context)
-        StepEncoderImpl(cipher)
-    }
+    private val fakeSample = FingerprintGeneratorUtils.generateRandomFingerprint()
+    private val stepEncoder = StepEncoderImpl()
 
     @Test
     fun shouldEncodeFingerprintCaptureStepToString() {
         val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
+
         val fingerprintCaptureResponse = mockFingerprintCaptureResponse()
         val step = buildStep(fingerprintCaptureRequest, fingerprintCaptureResponse)
         val encodedString = stepEncoder.encode(step)
 
-        assertThat(encodedString, notNullValue())
-        assertThat(encodedString, not(equalTo("")))
+        MatcherAssert.assertThat(encodedString, CoreMatchers.notNullValue())
+        MatcherAssert.assertThat(encodedString, CoreMatchers.not(CoreMatchers.equalTo("")))
     }
 
     @Test
@@ -59,8 +46,8 @@ class StepEncoderImplAndroidTest {
         val step = buildStep(faceCaptureRequest, faceCaptureResponse)
         val encodedString = stepEncoder.encode(step)
 
-        assertThat(encodedString, notNullValue())
-        assertThat(encodedString, not(equalTo("")))
+        MatcherAssert.assertThat(encodedString, CoreMatchers.notNullValue())
+        MatcherAssert.assertThat(encodedString, CoreMatchers.not(CoreMatchers.equalTo("")))
     }
 
     @Test
@@ -72,12 +59,12 @@ class StepEncoderImplAndroidTest {
         val decodedStep = stepEncoder.decode(encodedString)
 
         with(decodedStep) {
-            assertThat(requestCode, `is`(REQUEST_CODE))
-            assertThat(activityName, `is`(ACTIVITY_NAME))
-            assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(fingerprintCaptureRequest))
-            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), instanceOf(FingerprintCaptureResponse::class.java))
+            MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
+            MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
+            MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
+            MatcherAssert.assertThat(request, CoreMatchers.`is`(fingerprintCaptureRequest))
+            MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
+            MatcherAssert.assertThat(getResult(), CoreMatchers.instanceOf(FingerprintCaptureResponse::class.java))
             require(getResult() is FingerprintCaptureResponse)
             validateFingerprintCaptureResponse(getResult() as FingerprintCaptureResponse,
                 fingerprintCaptureResponse as FingerprintCaptureResponse)
@@ -93,32 +80,14 @@ class StepEncoderImplAndroidTest {
         val decodedStep = stepEncoder.decode(encodedString)
 
         with(decodedStep) {
-            assertThat(requestCode, `is`(REQUEST_CODE))
-            assertThat(activityName, `is`(ACTIVITY_NAME))
-            assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(faceCaptureRequest))
-            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), instanceOf(FaceCaptureResponse::class.java))
+            MatcherAssert.assertThat(requestCode, CoreMatchers.`is`(REQUEST_CODE))
+            MatcherAssert.assertThat(activityName, CoreMatchers.`is`(ACTIVITY_NAME))
+            MatcherAssert.assertThat(bundleKey, CoreMatchers.`is`(BUNDLE_KEY))
+            MatcherAssert.assertThat(request, CoreMatchers.`is`(faceCaptureRequest))
+            MatcherAssert.assertThat(getStatus(), CoreMatchers.`is`(Step.Status.COMPLETED))
+            MatcherAssert.assertThat(getResult(), CoreMatchers.instanceOf(FaceCaptureResponse::class.java))
             validateFaceCaptureResponse(getResult() as FaceCaptureResponse,
                 faceCaptureResponse as FaceCaptureResponse)
-        }
-    }
-
-    @Test
-    fun shouldNotEncodeStepWithNonCaptureResult() {
-        val fingerprintCaptureRequest = mockFingerprintCaptureRequest()
-        val fingerprintIdentifyResponse = mockFingerprintIdentifyResponse()
-        val step = buildStep(fingerprintCaptureRequest, fingerprintIdentifyResponse)
-        val encodedString = stepEncoder.encode(step)
-        val decodedStep = stepEncoder.decode(encodedString)
-
-        with(decodedStep) {
-            assertThat(requestCode, `is`(REQUEST_CODE))
-            assertThat(activityName, `is`(ACTIVITY_NAME))
-            assertThat(bundleKey, `is`(BUNDLE_KEY))
-            assertThat(request, `is`(fingerprintCaptureRequest))
-            assertThat(getStatus(), `is`(Step.Status.COMPLETED))
-            assertThat(getResult(), `is`(fingerprintIdentifyResponse))
         }
     }
 
@@ -137,16 +106,7 @@ class StepEncoderImplAndroidTest {
     )
 
     private fun mockFingerprintCaptureRequest(): Step.Request = FingerprintCaptureRequest(
-        "projectId",
-        "userId",
-        "moduleId",
-        "metadata",
-        "language",
-        mapOf(FingerprintFingerIdentifier.LEFT_THUMB to true),
-        true,
-        "programmeName",
-        "organisationName",
-        listOf(FingerprintFingerIdentifier.LEFT_THUMB, FingerprintFingerIdentifier.LEFT_INDEX_FINGER)
+        fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
     )
 
     private fun mockFaceCaptureRequest(): Step.Request = FaceCaptureRequest(
@@ -156,12 +116,11 @@ class StepEncoderImplAndroidTest {
     private fun mockFingerprintCaptureResponse(): Step.Result {
         val captureResult = listOf(
             FingerprintCaptureResult(
-                IFingerIdentifier.RIGHT_THUMB,
+                FingerIdentifier.RIGHT_THUMB,
                 FingerprintSample(
-                    UUID.randomUUID().toString(),
-                    IFingerIdentifier.RIGHT_THUMB,
-                    3,
-                    "abcd1234".toByteArray(),
+                    FingerIdentifier.RIGHT_THUMB,
+                    fakeSample.template,
+                    fakeSample.templateQualityScore,
                     null
                 )
             )
@@ -182,31 +141,20 @@ class StepEncoderImplAndroidTest {
         ))
     }
 
-    private fun mockFingerprintIdentifyResponse(): Step.Result {
-        return FingerprintIdentifyResponse(
-            listOf(
-                FingerprintMatchResult(
-                    "guid-found",
-                    3,
-                    FingerprintTier.TIER_1
-                )
-            )
-        )
-    }
 
     private fun validateFingerprintCaptureResponse(actual: FingerprintCaptureResponse,
                                                    expected: FingerprintCaptureResponse) {
         with(actual) {
             captureResult.forEachIndexed { index, actualResult ->
                 val expectedResult = expected.captureResult[index]
-                assertThat(actualResult.identifier, `is`(expectedResult.identifier))
+                MatcherAssert.assertThat(actualResult.identifier, CoreMatchers.`is`(expectedResult.identifier))
                 actualResult.sample?.let { actualSample ->
                     expectedResult.sample?.let { expectedSample ->
-                        assertThat(actualSample.fingerIdentifier, `is`(expectedSample.fingerIdentifier))
-                        assertThat(actualSample.id, `is`(expectedSample.id))
-                        assertThat(actualSample.imageRef, `is`(expectedSample.imageRef))
-                        assertThat(actualSample.qualityScore, `is`(expectedSample.qualityScore))
-                        assertThat(actualSample.template.contentEquals(expectedSample.template), `is`(true))
+                        MatcherAssert.assertThat(actualSample.fingerIdentifier, CoreMatchers.`is`(expectedSample.fingerIdentifier))
+                        MatcherAssert.assertThat(actualSample.id, CoreMatchers.`is`(expectedSample.id))
+                        MatcherAssert.assertThat(actualSample.imageRef, CoreMatchers.`is`(expectedSample.imageRef))
+                        MatcherAssert.assertThat(actualSample.templateQualityScore, CoreMatchers.`is`(expectedSample.templateQualityScore))
+                        MatcherAssert.assertThat(actualSample.template.contentEquals(expectedSample.template), CoreMatchers.`is`(true))
                     }
                 }
             }
@@ -218,14 +166,14 @@ class StepEncoderImplAndroidTest {
         with(actual) {
             capturingResult.forEachIndexed { index, item ->
                 val expectedItem = expected.capturingResult[index]
-                assertThat(item.index, `is`(expectedItem.index))
+                MatcherAssert.assertThat(item.index, CoreMatchers.`is`(expectedItem.index))
 
                 item.result?.let { sample ->
                     val expectedSample = expectedItem.result
-                    assertThat(sample.faceId, `is`(expectedSample?.faceId))
-                    assertThat(sample.imageRef, `is`(expectedSample?.imageRef))
+                    MatcherAssert.assertThat(sample.faceId, CoreMatchers.`is`(expectedSample?.faceId))
+                    MatcherAssert.assertThat(sample.imageRef, CoreMatchers.`is`(expectedSample?.imageRef))
                     expectedSample?.template?.let { expectedTemplate ->
-                        assertThat(sample.template.contentEquals(expectedTemplate), `is`(true))
+                        MatcherAssert.assertThat(sample.template.contentEquals(expectedTemplate), CoreMatchers.`is`(true))
                     }
                 }
             }

@@ -4,6 +4,8 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -49,11 +51,13 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
     }
 
     private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
-                                                       sessionId: String): AppIdentifyResponse {
-        TODO("Not implemented yet")
-    }
+                                                       sessionId: String) =
+        AppIdentifyResponse(
+            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) },
+            sessionId)
 
-    private fun buildAppIdentifyResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse {
+    private fun buildAppIdentifyResponseForFace(faceResponse: FaceIdentifyResponse,
+                                                sessionId: String): AppIdentifyResponse {
         TODO("Not implemented yet")
     }
 }

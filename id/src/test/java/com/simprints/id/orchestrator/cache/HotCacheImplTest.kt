@@ -1,25 +1,22 @@
 package com.simprints.id.orchestrator.cache
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
-import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import android.content.Context.MODE_PRIVATE
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth
+import com.simprints.id.Application
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
 import com.simprints.id.orchestrator.steps.Step
-import com.simprints.id.secure.cryptography.HybridCipher
-import com.simprints.testtools.common.syntax.mock
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class HotCacheImplAndroidTest {
+@RunWith(AndroidJUnit4::class)
+class HotCacheImplTest {
 
     private val hotCache by lazy {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val preferences = context.getSharedPreferences("file_name", Context.MODE_PRIVATE)
-        val cipher = mock<HybridCipher>()
-        val stepEncoder = StepEncoderImpl(cipher)
-        HotCacheImpl(preferences, stepEncoder)
+        val context =  ApplicationProvider.getApplicationContext<Application>()
+        val stepEncoder = StepEncoderImpl()
+        HotCacheImpl(context.getSharedPreferences("shared", MODE_PRIVATE), stepEncoder)
     }
 
     @Test
@@ -32,8 +29,8 @@ class HotCacheImplAndroidTest {
         val isStepCached = cachedSteps.contains(step)
         val cachedStepCount = cachedSteps.size
 
-        assertThat(cachedStepCount, `is`(1))
-        assertThat(isStepCached, `is`(true))
+        Truth.assertThat(cachedStepCount).isEqualTo(1)
+        Truth.assertThat(isStepCached).isEqualTo(true)
     }
 
     @Test
@@ -50,9 +47,9 @@ class HotCacheImplAndroidTest {
         val cachedStepCount = cachedSteps.size
         val isOldStepCached = cachedSteps.contains(oldStep)
 
-        assertThat(cachedStepCount, `is`(1))
-        assertThat(cachedSteps.first(), `is`(newStep))
-        assertThat(isOldStepCached, `is`(false))
+        Truth.assertThat(cachedStepCount).isEqualTo(1)
+        Truth.assertThat(cachedSteps.first()).isEqualTo(newStep)
+        Truth.assertThat(isOldStepCached).isEqualTo(false)
     }
 
     @Test
@@ -68,9 +65,9 @@ class HotCacheImplAndroidTest {
         val cachedSteps = hotCache.load()
         val cachedStepCount = cachedSteps.size
 
-        assertThat(cachedStepCount, `is`(2))
-        assertThat(cachedSteps.contains(step1), `is`(true))
-        assertThat(cachedSteps.contains(step2), `is`(true))
+        Truth.assertThat(cachedStepCount).isEqualTo(2)
+        Truth.assertThat(cachedSteps).contains(step1)
+        Truth.assertThat(cachedSteps).contains(step2)
     }
 
     @Test
@@ -86,8 +83,8 @@ class HotCacheImplAndroidTest {
         val cachedStepCount = cachedSteps.size
         val isStepCached = cachedSteps.contains(step)
 
-        assertThat(cachedStepCount, `is`(0))
-        assertThat(isStepCached, `is`(false))
+        Truth.assertThat(cachedStepCount).isEqualTo(0)
+        Truth.assertThat(isStepCached).isFalse()
     }
 
     private fun mockStep() = Step(
@@ -98,17 +95,5 @@ class HotCacheImplAndroidTest {
         status = Step.Status.ONGOING
     )
 
-    private fun mockRequest() = FingerprintCaptureRequest(
-        "projectId",
-        "userId",
-        "moduleId",
-        "metadata",
-        "language",
-        mapOf(),
-        true,
-        "programmeName",
-        "organisationName",
-        emptyList()
-    )
-
+    private fun mockRequest() = FingerprintCaptureRequest(fingerprintsToCapture = emptyList())
 }
