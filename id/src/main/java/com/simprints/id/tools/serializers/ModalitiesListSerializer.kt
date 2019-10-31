@@ -17,15 +17,17 @@ class ModalitiesListSerializer : Serializer<List<Modality>> {
         string.replace(" ", "").replace("\n", "").replace("\r", "")
             .split(delimiter)
             .filter { it.isNotEmpty() }
-            .map {
+            .mapNotNull {
                 when (it) {
-                    "FACE" -> Modality.FACE
-                    "FINGER" -> Modality.FINGER
+                    FACE_MODALITY -> Modality.FACE
+                    FINGER_MODALITY -> Modality.FINGER
                     else -> null
                 }
-            }.filterNotNull()
+            }
 
     companion object {
         const val delimiter = ","
+        private const val FACE_MODALITY = "FACE"
+        private const val FINGER_MODALITY = "FINGER"
     }
 }

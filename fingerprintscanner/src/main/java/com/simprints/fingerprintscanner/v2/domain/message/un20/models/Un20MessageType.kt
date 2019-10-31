@@ -10,6 +10,8 @@ sealed class Un20MessageType(val majorByte: Byte, val minorByte: Byte) {
     // 0x2_ : Sensor commands
     object CaptureFingerprint : Un20MessageType(Un20MessageMajorType.CAPTURE_FINGERPRINT.majorByte, 0x00)
 
+    object GetImageQuality : Un20MessageType(Un20MessageMajorType.GET_IMAGE_QUALITY.majorByte, 0x00)
+
     // 0x3_ : Template commands
     object GetSupportedTemplateTypes : Un20MessageType(Un20MessageMajorType.GET_SUPPORTED_TEMPLATE_TYPES.majorByte, 0x00)
 

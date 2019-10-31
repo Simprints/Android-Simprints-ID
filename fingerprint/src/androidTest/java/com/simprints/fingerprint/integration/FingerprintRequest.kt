@@ -2,7 +2,8 @@ package com.simprints.fingerprint.integration
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGeneratorUtils
+import com.simprints.fingerprint.commontesttools.data.TestDbQuery
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToCore
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
@@ -15,19 +16,21 @@ import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
 import kotlinx.android.parcel.Parcelize
 import java.io.Serializable
 
-fun createFingerprintCaptureRequestIntent(): Intent = Intent()
+fun createFingerprintCaptureRequestIntent(fingerprintsToCapture: List<IFingerIdentifier> =
+                                              DEFAULT_FINGERS_TO_CAPTURE): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
         FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY,
-        TestFingerprintCaptureRequest(DEFAULT_FINGERS_TO_CAPTURE))
+        TestFingerprintCaptureRequest(fingerprintsToCapture))
 
-fun createFingerprintRequestIntent(): Intent = Intent()
+fun createFingerprintMatchRequestIntent(probeFingerprints: List<Fingerprint>,
+                                        queryForCandidates: TestDbQuery): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
         FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY,
         TestFingerprintMatchRequest(
-            List(2) { FingerprintGeneratorUtils.generateRandomFingerprint().fromDomainToCore().fromDomainToModuleApi() },
-            TODO("Create Serializable query")))
+            probeFingerprints.map { it.fromDomainToCore().fromDomainToModuleApi() },
+            queryForCandidates))
 
 val DEFAULT_FINGERS_TO_CAPTURE = listOf(
     IFingerIdentifier.LEFT_THUMB,

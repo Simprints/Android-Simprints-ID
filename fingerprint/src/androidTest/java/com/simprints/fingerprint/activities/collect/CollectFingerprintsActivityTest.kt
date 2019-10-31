@@ -5,10 +5,12 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.R
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.commontesttools.scanner.*
+import com.simprints.fingerprint.controllers.core.flow.Action
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -20,6 +22,8 @@ import com.simprints.id.Application
 import com.simprints.testtools.android.getCurrentActivity
 import com.simprints.testtools.common.syntax.failTest
 import com.simprints.testtools.common.syntax.mock
+import com.simprints.testtools.common.syntax.setupMock
+import com.simprints.testtools.common.syntax.whenThis
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -44,6 +48,7 @@ class CollectFingerprintsActivityTest : KoinTest {
             factory<ScannerManager> {
                 ScannerManagerImpl(DummyBluetoothAdapter(), mock()).also { it.scanner = scanner }
             }
+            factory<MasterFlowManager> { setupMock { whenThis { getCurrentAction() } thenReturn Action.IDENTIFY } }
         }
     }
 

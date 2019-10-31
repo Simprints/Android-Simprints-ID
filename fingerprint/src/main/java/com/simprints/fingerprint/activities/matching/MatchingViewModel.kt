@@ -14,7 +14,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcher
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcherPerson
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
@@ -94,7 +94,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
                 })
     }
 
-    private fun MatchTask.runMatch(candidates: List<FingerprintRecord>, probeFingerprints: List<Fingerprint>): Single<MatchResult> =
+    private fun MatchTask.runMatch(candidates: List<FingerprintIdentity>, probeFingerprints: List<Fingerprint>): Single<MatchResult> =
         Single.create { emitter ->
             val matcherType = getMatcherType()
             val scores = mutableListOf<Float>()
@@ -106,7 +106,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
 
     private fun MatchTask.matchCallback(
         emitter: SingleEmitter<MatchResult>,
-        candidates: List<FingerprintRecord>,
+        candidates: List<FingerprintIdentity>,
         scores: List<Float>) = object : MatcherEventListener {
 
         override fun onMatcherProgress(progress: Progress?) {
@@ -133,7 +133,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
         subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
 
-    private class MatchResult(val candidates: List<FingerprintRecord>, val scores: List<Float>)
+    private class MatchResult(val candidates: List<FingerprintIdentity>, val scores: List<Float>)
 
     data class IdentificationBeginningSummary(val matchSize: Int)
 

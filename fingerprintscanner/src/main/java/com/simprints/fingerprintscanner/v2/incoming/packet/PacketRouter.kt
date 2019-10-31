@@ -4,22 +4,23 @@ import com.simprints.fingerprintscanner.v2.domain.packet.Channel
 import com.simprints.fingerprintscanner.v2.domain.packet.Packet
 import com.simprints.fingerprintscanner.v2.incoming.IncomingConnectable
 import com.simprints.fingerprintscanner.v2.tools.reactive.toFlowable
-import com.simprints.fingerprintscanner.v2.tools.lang.objects
 import io.reactivex.Flowable
 import io.reactivex.disposables.Disposable
 import io.reactivex.flowables.ConnectableFlowable
 import io.reactivex.schedulers.Schedulers
 import java.io.InputStream
 
-class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
+class PacketRouter(private val channels: List<Channel>,
+                   private inline val packetChannelDesignator: Packet.() -> Byte,
+                   private val byteArrayToPacketAccumulator: ByteArrayToPacketAccumulator) : IncomingConnectable {
 
     private lateinit var inputStream: InputStream
 
     private lateinit var incomingPackets: ConnectableFlowable<Packet>
-    lateinit var incomingPacketChannels: Map<Channel.Remote, ConnectableFlowable<Packet>>
+    lateinit var incomingPacketChannels: Map<Channel, ConnectableFlowable<Packet>>
 
     private lateinit var incomingPacketsDisposable: Disposable
-    private lateinit var incomingPacketChannelsDisposable: Map<Channel.Remote, Disposable>
+    private lateinit var incomingPacketChannelsDisposable: Map<Channel, Disposable>
 
     override fun connect(inputStream: InputStream) {
         this.inputStream = inputStream
@@ -30,7 +31,7 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
 
     private fun configureIncomingPacketStream(rawPacketStream: Flowable<Packet>) {
         incomingPackets = rawPacketStream.subscribeAndPublish()
-        incomingPacketChannels = Channel.Remote::class.objects().associateWith {
+        incomingPacketChannels = channels.associateWith {
             incomingPackets.filterChannel(it).subscribeAndPublish()
         }
     }
@@ -45,8 +46,8 @@ class PacketRouter(private val byteArrayToPacketAccumulator: ByteArrayToPacketAc
         incomingPacketChannelsDisposable.forEach { it.value.dispose() }
     }
 
-    private fun ConnectableFlowable<Packet>.filterChannel(channel: Channel.Remote) =
-        filter { packet -> packet.source == channel.id.value }
+    private fun ConnectableFlowable<Packet>.filterChannel(channel: Channel) =
+        filter { packet -> packet.packetChannelDesignator() == channel.id.value }
 
     private fun Flowable<Packet>.subscribeAndPublish() =
         this.subscribeOn(Schedulers.io()).publish()

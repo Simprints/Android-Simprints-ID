@@ -24,7 +24,8 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                              private val faceStepProcessor: FaceStepProcessor,
                              private val coreStepProcessor: CoreStepProcessor,
-                             private val prefs: PreferencesManager) : ModalityFlowBaseImpl(coreStepProcessor) {
+                             private val prefs: PreferencesManager) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor) {
 
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
@@ -57,8 +58,9 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
             isFaceResult(requestCode) -> faceStepProcessor.processResult(requestCode, resultCode, data)
             else -> throw IllegalStateException("Invalid result from intent")
         }
-        completeAllStepsIfExitFormHappened(data)
 
+        completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
+        
         val stepRequested = steps.firstOrNull { it.requestCode == requestCode }
         stepRequested?.setResult(result)
 
