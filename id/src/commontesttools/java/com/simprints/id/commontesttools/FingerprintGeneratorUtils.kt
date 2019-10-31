@@ -1,5 +1,4 @@
 package com.simprints.id.commontesttools
-
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import java.nio.ByteBuffer
@@ -54,7 +53,7 @@ object FingerprintGeneratorUtils {
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
     fun generateRandomFingerprint(fingerId: FingerIdentifier): FingerprintSample {
-        val qualityScore = RANDOM_GENERATOR.nextInt(101).toByte()
+        val qualityScore = RANDOM_GENERATOR.nextInt(101)
         return generateRandomFingerprint(fingerId, qualityScore)
     }
 
@@ -65,7 +64,7 @@ object FingerprintGeneratorUtils {
      * @return A random valid [Fingerprint] with specified [FingerIdentifier]
      */
     fun generateRandomFingerprint(fingerId: FingerIdentifier,
-                                  qualityScore: Byte): FingerprintSample {
+                                  qualityScore: Int): FingerprintSample {
         val nbMinutiae = RANDOM_GENERATOR.nextInt(128).toByte()
         val length = HEADER_SIZE + nbMinutiae * MINUTIAE_SIZE
 
@@ -81,7 +80,7 @@ object FingerprintGeneratorUtils {
         bb.putShort(VERTICAL_PPCM, SECUGEN_HAMSTER_PPCM)
         bb.put(NB_FINGERPRINTS, 1.toByte())
         bb.put(FIRST_FINGER_POSITION, 0.toByte())
-        bb.put(FIRST_QUALITY, qualityScore)
+        bb.put(FIRST_QUALITY, qualityScore.toByte())
         bb.put(FIRST_NB_MINUTIAE, nbMinutiae)
 
         for (minutiaNo in 0 until nbMinutiae) {
@@ -99,6 +98,6 @@ object FingerprintGeneratorUtils {
         bb.position(0)
         val templateBytes = ByteArray(bb.remaining())
         bb.get(templateBytes)
-        return FingerprintSample(fingerId, templateBytes, qualityScore.toInt() and 0xFF)
+        return FingerprintSample(fingerId, templateBytes, qualityScore)
     }
 }

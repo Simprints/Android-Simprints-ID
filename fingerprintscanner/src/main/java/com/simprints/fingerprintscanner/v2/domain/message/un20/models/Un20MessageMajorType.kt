@@ -6,6 +6,7 @@ enum class Un20MessageMajorType(val majorByte: Byte) {
 
     // 0x2_ : Sensor commands
     CAPTURE_FINGERPRINT(0x21),
+    GET_IMAGE_QUALITY(0x22),
 
     // 0x3_ : Template commands
     GET_SUPPORTED_TEMPLATE_TYPES(0x30),

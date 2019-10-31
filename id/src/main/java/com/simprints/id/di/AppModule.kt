@@ -257,9 +257,8 @@ open class AppModule {
                                        crashReportManager: CrashReportManager,
                                        preferencesManager: PreferencesManager,
                                        androidResourcesHelper: AndroidResourcesHelper): ConsentRepository =
-        ConsentRepositoryImpl(context, consentLocalDataSource, crashReportManager,
-            preferencesManager.programName, preferencesManager.organizationName,
-            androidResourcesHelper,
+        ConsentRepositoryImpl(consentLocalDataSource, crashReportManager, preferencesManager.programName,
+            preferencesManager.organizationName, androidResourcesHelper,
             preferencesManager.modalities)
 
     @Provides
