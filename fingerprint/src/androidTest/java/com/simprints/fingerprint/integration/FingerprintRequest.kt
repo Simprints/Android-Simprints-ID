@@ -21,10 +21,10 @@ fun createFingerprintCaptureRequestIntent(fingerprintsToCapture: List<IFingerIde
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
         FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY,
-        TestFingerprintCaptureRequest(DEFAULT_FINGERS_TO_CAPTURE))
+        TestFingerprintCaptureRequest(fingerprintsToCapture))
 
-fun createFingerprintRequestIntent(probeFingerprints: List<Fingerprint>,
-                                   queryForCandidates: TestDbQuery): Intent = Intent()
+fun createFingerprintMatchRequestIntent(probeFingerprints: List<Fingerprint>,
+                                        queryForCandidates: TestDbQuery): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
         FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY,

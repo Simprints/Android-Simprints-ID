@@ -2,7 +2,7 @@ package com.simprints.fingerprint.commontesttools.generators
 
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -110,7 +110,7 @@ object FingerprintGenerator {
         generateRandomFingerprints(generateRandomFingerIds(n))
 
     fun generateRandomFingerprintRecord(fingerIds: List<FingerIdentifier>) =
-        FingerprintRecord(UUID.randomUUID().toString(), generateRandomFingerprints(fingerIds))
+        FingerprintIdentity(UUID.randomUUID().toString(), generateRandomFingerprints(fingerIds))
 
     fun generateRandomFingerprintRecord() =
         generateRandomFingerprintRecord(generateRandomFingerIds(RANDOM_GENERATOR.nextInt(9) + 1))
