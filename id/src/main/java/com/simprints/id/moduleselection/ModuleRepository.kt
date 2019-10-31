@@ -1,5 +1,7 @@
 package com.simprints.id.moduleselection
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -10,22 +12,25 @@ import javax.inject.Inject
 
 class ModuleRepository(component: AppComponent) {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var callback: ModuleSelectionCallback
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var callback: ModuleSelectionCallback
 
     init {
         component.inject(this)
     }
 
-    fun getAvailableModules(): List<Module> {
-        return preferencesManager.moduleIdOptions.map { name ->
+    fun getAvailableModules(): LiveData<List<Module>> = MutableLiveData<List<Module>>().apply {
+        value = preferencesManager.moduleIdOptions.map { name ->
             Module(name, isSelected = false)
         }
     }
 
-    fun getSelectedModules(): List<Module> {
-        return preferencesManager.selectedModules.map { name ->
+    fun getSelectedModules(): LiveData<List<Module>> = MutableLiveData<List<Module>>().apply {
+        value = preferencesManager.selectedModules.map { name ->
             Module(name, isSelected = true)
         }
     }

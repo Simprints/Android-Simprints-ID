@@ -22,7 +22,9 @@ class ModuleRepositoryTest {
 
     private val app = ApplicationProvider.getApplicationContext<TestApplication>()
     private val appModule = TestAppModule(app, crashReportManagerRule = DependencyRule.MockRule)
-    private val preferencesModule = TestPreferencesModule(settingsPreferencesManagerRule = DependencyRule.MockRule)
+    private val preferencesModule = TestPreferencesModule(
+        settingsPreferencesManagerRule = DependencyRule.MockRule
+    )
 
     private lateinit var repository: ModuleRepository
 
@@ -86,7 +88,7 @@ class ModuleRepositoryTest {
 
         val actual = repository.getAvailableModules()
 
-        assertThat(actual).isEqualTo(expected)
+        assertThat(actual.value).isEqualTo(expected)
     }
 
     @Test
@@ -98,7 +100,7 @@ class ModuleRepositoryTest {
 
         val actual = repository.getSelectedModules()
 
-        assertThat(actual).isEqualTo(expected)
+        assertThat(actual.value).isEqualTo(expected)
     }
 
     private fun configureMock() {
