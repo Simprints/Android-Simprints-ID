@@ -5,21 +5,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleQueryFilter
 import com.simprints.id.moduleselection.model.Module
-import java.util.*
 
 class ModuleAdapter(
     private val tracker: ModuleSelectionTracker
 ) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 
     fun filter(modules: List<Module>, searchTerm: String?) {
-        val defaultLocale = Locale.getDefault()
-        searchTerm?.toLowerCase(defaultLocale)?.let { query ->
-            submitList(modules.filter {
-                it.name.toLowerCase(defaultLocale).contains(query)
-                // TODO: add !it.isSelected to filter once "selected modules" area is implemented
-            })
-        }
+        val queryFilter = ModuleQueryFilter()
+        val filteredList = queryFilter.filter(modules, searchTerm)
+        submitList(filteredList)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
