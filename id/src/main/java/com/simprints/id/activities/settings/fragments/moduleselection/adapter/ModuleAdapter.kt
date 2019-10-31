@@ -5,18 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
-import com.simprints.id.activities.settings.fragments.moduleselection.ModuleQueryFilter
 import com.simprints.id.moduleselection.model.Module
 
 class ModuleAdapter(
     private val tracker: ModuleSelectionTracker
 ) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
-
-    fun filter(modules: List<Module>, searchTerm: String?) {
-        val queryFilter = ModuleQueryFilter()
-        val filteredList = queryFilter.filter(modules, searchTerm)
-        submitList(filteredList)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
