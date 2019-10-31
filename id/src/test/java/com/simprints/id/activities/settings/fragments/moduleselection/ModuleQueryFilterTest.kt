@@ -1,7 +1,10 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
 import com.google.common.truth.Truth.assertThat
+import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.tools.utils.QueryFilter
+import com.simprints.testtools.common.syntax.mock
 import org.junit.Test
 
 class ModuleQueryFilterTest {
@@ -60,6 +63,26 @@ class ModuleQueryFilterTest {
         val actual = filter.filter(items, query)
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun withNoResultsFound_shouldTriggerCallback() {
+        val query = "z"
+        val callback = mock<QueryFilter.SearchResultCallback>()
+
+        filter.filter(items, query, callback)
+
+        verify(callback).onNothingFound()
+    }
+
+    @Test
+    fun withResultsFound_shouldTriggerCallback() {
+        val query = "c"
+        val callback = mock<QueryFilter.SearchResultCallback>()
+
+        filter.filter(items, query, callback)
+
+        verify(callback).onResultsFound()
     }
 
 }
