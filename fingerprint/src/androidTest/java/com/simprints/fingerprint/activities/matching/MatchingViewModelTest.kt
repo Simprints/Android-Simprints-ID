@@ -16,7 +16,7 @@ import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -56,7 +56,7 @@ class MatchingViewModelTest : KoinTest {
             setupMock {
                 whenThis { start() } then {
                     IDENTIFY_PROGRESS_RANGE.forEach { n -> callback.onMatcherProgress(Progress(n)) }
-                    scores.addAll(candidates.map { ((if (it.guid == probe.guid) 1f else 0f)) })
+                    scores.addAll(candidates.map { ((if (it.fingerprints == probe.fingerprints) SUCCESSFUL_MATCH_SCORE else NOT_MATCH_SCORE)) })
                     callback.onMatcherEvent(EVENT.MATCH_COMPLETED)
                 }
             }
@@ -142,7 +142,7 @@ class MatchingViewModelTest : KoinTest {
             start(identifyRequestWithinProjectGroup, mockIdentificationLibMatcher)
             result.test().awaitValue().assertValue { it.finishDelayMillis == IdentificationTask.matchingEndWaitTimeInMillis }
             hasLoadingBegun.test().assertValue { it }
-            matchBeginningSummary.test().assertValue { it.matchSize == CANDIDATE_POOL }
+            matchBeginningSummary.test().assertValue { it.matchSize == CANDIDATE_POOL + 1 }
             assertThat(progressTestObserver.valueHistory())
                 .containsExactlyElementsIn((0..0) + (25..25) + (50..50) + IDENTIFY_PROGRESS_RANGE.map { it / 2 + 50 } + (100..100))
                 .inOrder()
@@ -209,7 +209,7 @@ class MatchingViewModelTest : KoinTest {
         }
     }
 
-    private fun assertIdentificationResult(result: MatchingViewModel.FinishResult, probe: FingerprintRecord, shouldProbeInMatchingResult: Boolean = true) {
+    private fun assertIdentificationResult(result: MatchingViewModel.FinishResult, probe: FingerprintIdentity, shouldProbeInMatchingResult: Boolean = true) {
         assertNotNull(result.data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.apply {
             assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, results.size)
             if (shouldProbeInMatchingResult) {
@@ -227,7 +227,7 @@ class MatchingViewModelTest : KoinTest {
 
     private fun createViewModel() = get<MatchingViewModel>()
 
-    private fun setupDbManagerLoadCandidates(candidates: List<FingerprintRecord>) {
+    private fun setupDbManagerLoadCandidates(candidates: List<FingerprintIdentity>) {
         whenever(dbManagerMock) { loadPeople(anyNotNull()) } thenReturn Single.just(candidates)
     }
 
@@ -237,13 +237,15 @@ class MatchingViewModelTest : KoinTest {
     }
 
     companion object {
+        private const val NOT_MATCH_SCORE = 0f
+        private const val SUCCESSFUL_MATCH_SCORE = 1f
 
         private const val DEFAULT_NUMBER_OF_ID_RETURNS = 10
-        private const val CANDIDATE_POOL = 50
+        private const val CANDIDATE_POOL = 49
         private val IDENTIFY_PROGRESS_RANGE = 0..100
 
         private val probeFingerprintRecord = FingerprintGenerator.generateRandomFingerprintRecord()
-        private val candidatesWithoutProbe = FingerprintGenerator.generateRandomFingerprintRecords(CANDIDATE_POOL).toList()
+        private val candidatesWithoutProbe = FingerprintGenerator.generateRandomFingerprintRecords(CANDIDATE_POOL)
         private val candidatesWithProbe = candidatesWithoutProbe + probeFingerprintRecord
 
         private val identifyRequestWithinProjectGroup = MatchingTaskRequest(
