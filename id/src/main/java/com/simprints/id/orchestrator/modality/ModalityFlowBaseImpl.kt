@@ -9,10 +9,15 @@ import com.simprints.id.domain.moduleapi.core.requests.ConsentType
 import com.simprints.id.domain.moduleapi.core.response.CoreExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFaceExitFormResponse
 import com.simprints.id.domain.moduleapi.core.response.CoreFingerprintExitFormResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
+import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
+import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 
-abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor): ModalityFlow {
+abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProcessor,
+                                    private val fingerprintStepProcessor: FingerprintStepProcessor,
+                                    private val faceStepProcessor: FaceStepProcessor): ModalityFlow {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -44,10 +49,14 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
     private fun buildVerifyCoreStep(projectId: String, verifyGuid: String) =
         coreStepProcessor.buildStepVerify(projectId, verifyGuid)
 
-    fun completeAllStepsIfExitFormHappened(data: Intent?) =
+    fun completeAllStepsIfExitFormHappened(requestCode: Int, resultCode: Int, data: Intent?) =
+        tryProcessingResultFromCoreStepProcessor(data)
+            ?: tryProcessingResultFromFingerprintStepProcessor(requestCode, resultCode, data)
+
+    private fun tryProcessingResultFromCoreStepProcessor(data: Intent?) =
         coreStepProcessor.processResult(data).also { coreResult ->
             if (isExitFormResponse(coreResult)) {
-                steps.forEach { it.setStatus(Step.Status.COMPLETED)  }
+                completeAllSteps()
             }
         }
 
@@ -55,4 +64,17 @@ abstract class ModalityFlowBaseImpl(private val coreStepProcessor: CoreStepProce
         coreResult is CoreExitFormResponse ||
             coreResult is CoreFingerprintExitFormResponse ||
             coreResult is CoreFaceExitFormResponse
+
+    private fun tryProcessingResultFromFingerprintStepProcessor(requestCode: Int,
+                                                                resultCode: Int,
+                                                                data: Intent?) =
+        fingerprintStepProcessor.processResult(requestCode, resultCode, data).also { fingerResult ->
+            if (fingerResult is FingerprintRefusalFormResponse) {
+                completeAllSteps()
+            }
+        }
+
+    private fun completeAllSteps() {
+        steps.forEach { it.setStatus(Step.Status.COMPLETED) }
+    }
 }
