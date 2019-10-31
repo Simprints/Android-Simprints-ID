@@ -60,6 +60,7 @@
     <string name="biometric_general_face">take your photographs</string>
     <string name="biometrics_access_fingerprint">fingerprint information</string>
     <string name="biometrics_access_face">photographs</string>
+    <string name="biometrics_access_fingerprint_face">fingerprint information, photographs</string>
     <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
     <string name="biometrics_parental_face">take your child\'s photographs</string>
 
