@@ -1,6 +1,7 @@
 package com.simprints.fingerprintscanner.v2.domain.message.vero.models
 
 import com.simprints.fingerprintscanner.v2.domain.message.vero.VeroMessageProtocol
+import com.simprints.fingerprintscanner.v2.tools.primitives.toByteArray
 
 class FirmwareVersion(
     val majorVersionCode: Short,
@@ -8,6 +9,14 @@ class FirmwareVersion(
     val firmwareVersion: Int,
     val magicBytes: ByteArray
 ) {
+
+    fun getBytes() = with(VeroMessageProtocol) {
+        majorVersionCode.toByteArray(byteOrder) +
+            minorVersionCode.toByteArray(byteOrder) +
+            firmwareVersion.toByteArray(byteOrder) +
+            magicBytes
+    }
+
     companion object {
         fun fromBytes(bytes: ByteArray) =
             with(VeroMessageProtocol) {

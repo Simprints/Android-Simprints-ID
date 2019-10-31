@@ -1,6 +1,5 @@
 package com.simprints.id.data.consent.shortconsent
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.JsonSyntaxException
 import com.simprints.core.tools.json.JsonHelper
@@ -9,8 +8,7 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.core.requests.AskConsentRequest
 import com.simprints.id.tools.AndroidResourcesHelper
 
-class ConsentRepositoryImpl(private val context: Context,
-                            private val consentLocalDataSource: ConsentLocalDataSource,
+class ConsentRepositoryImpl(private val consentLocalDataSource: ConsentLocalDataSource,
                             private val crashReportManager: CrashReportManager,
                             private val programName: String,
                             private val organizationName: String,

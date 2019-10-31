@@ -7,4 +7,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessag
 class SetSmileLedStateCommand(val smileLedState: SmileLedState) : VeroCommand(VeroMessageType.SET_SMILE_LED_STATE) {
 
     override fun getDataBytes(): ByteArray = smileLedState.getBytes()
+
+    companion object {
+        fun fromBytes(data: ByteArray) = SetSmileLedStateCommand(SmileLedState.fromBytes(data))
+    }
 }
