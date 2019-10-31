@@ -30,8 +30,8 @@ class ConsentTextRepositoryImplTest {
         private const val GENERAL_CONSENT_ENROL_FACE_TEXT = "I'd like to take your photographs to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your photographs and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I take your photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
         private const val PARENTAL_CONSENT_ENROL_FACE_TEXT = "I'd like to take your child's photographs to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their photographs and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I take your child's photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
 
-        private const val GENERAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your fingerprints and take your photographs to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your fingerprint information and photographs and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I use your fingerprints and take your photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
-        private  const val PARENTAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your child's fingerprints and take your child's photographs to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their fingerprint information and photographs and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I use your child's fingerprints and take your child's photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
+        private const val GENERAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your fingerprints and take your photographs to enrol you in program_name and identify you in the future. Simprints, a UK-based nonprofit, will have access to your fingerprint information, photographs and current location. If you accept, you may withdraw your permission at any time and ask for your data to be erased. May I use your fingerprints and take your photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
+        private  const val PARENTAL_CONSENT_ENROL_MULTI_TEXT = "I'd like to use your child's fingerprints and take your child's photographs to enrol them in program_name and identify them in the future. Simprints, a UK-based nonprofit, will have access to their fingerprint information, photographs and current location. If you accept, you may withdraw your permission at any time and ask for your child's data to be erased. May I use your child's fingerprints and take your child's photographs? Please say \"I accept\", \"I decline\", or \"I have questions.\""
         private const val PROGRAM_NAME = "program_name"
         private const val ORGANIZATION_NAME = "organization_name"
     }
@@ -43,8 +43,8 @@ class ConsentTextRepositoryImplTest {
             whenever(this) { generalConsentOptionsJson } thenReturn JsonHelper.toJson(GeneralConsentOptions())
         }
 
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
 
         val generalConsentText =
             consentTextRepo.getGeneralConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -58,8 +58,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentOptionsJson } thenReturn JsonHelper.toJson(ParentalConsentOptions())
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
 
         val parentalConsentText =
             consentTextRepo.getParentalConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -73,8 +73,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { generalConsentOptionsJson } thenReturn JsonHelper.toJson(GeneralConsentOptions())
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FACE))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FACE))
 
         val generalConsentText =
             consentTextRepo.getGeneralConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -88,8 +88,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentOptionsJson } thenReturn JsonHelper.toJson(ParentalConsentOptions())
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FACE))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FACE))
 
         val parentalConsentText =
             consentTextRepo.getParentalConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -103,8 +103,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { generalConsentOptionsJson } thenReturn JsonHelper.toJson(GeneralConsentOptions())
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER, FACE))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER, FACE))
 
         val generalConsentText =
             consentTextRepo.getGeneralConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -118,8 +118,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentOptionsJson } thenReturn JsonHelper.toJson(ParentalConsentOptions())
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER, FACE))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER, FACE))
 
         val parentalConsentText =
             consentTextRepo.getParentalConsentText(AskConsentRequest(ConsentType.ENROL)).value
@@ -132,8 +132,8 @@ class ConsentTextRepositoryImplTest {
         val consentDataSourceMock = mock<ConsentLocalDataSource>().apply {
             whenever(this) { parentalConsentExists } thenReturn true
         }
-        val consentTextRepo = ConsentRepositoryImpl(context,
-            consentDataSourceMock, mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
+        val consentTextRepo = ConsentRepositoryImpl(consentDataSourceMock,
+            mock(), PROGRAM_NAME, ORGANIZATION_NAME, androidResourcesHelper, listOf(FINGER))
 
         val parentalConsentExists = consentTextRepo.parentalConsentExists().value
 

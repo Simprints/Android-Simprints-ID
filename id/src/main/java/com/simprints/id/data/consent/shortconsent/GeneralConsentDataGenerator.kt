@@ -91,9 +91,7 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
     }
 
     private fun getConcatenatedModalitiesAccessText() =
-        String.format("%s %s %s", androidResourcesHelper.getString(R.string.biometrics_access_fingerprint),
-            androidResourcesHelper.getString(R.string.biometric_concat_modalities),
-            androidResourcesHelper.getString(R.string.biometrics_access_face))
+        androidResourcesHelper.getString(R.string.biometrics_access_fingerprint_face)
 
     private fun getSingleModalityAccessText() = when (modalities.first()) {
         Modality.FACE -> androidResourcesHelper.getString(R.string.biometrics_access_face)
