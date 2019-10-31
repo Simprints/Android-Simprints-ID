@@ -6,6 +6,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.models.VeroMessag
 
 class Un20StateChangeEvent(val value: DigitalValue) : VeroEvent(VeroMessageType.UN20_STATE_CHANGE) {
 
+    override fun getDataBytes(): ByteArray = byteArrayOf(value.byte)
+
     companion object {
         fun fromBytes(data: ByteArray) =
             Un20StateChangeEvent(DigitalValue.fromBytes(data))

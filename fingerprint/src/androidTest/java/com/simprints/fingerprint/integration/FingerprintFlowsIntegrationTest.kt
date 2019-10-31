@@ -8,22 +8,26 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collect.pressScanUntilDialogIsDisplayedAndClickConfirm
 import com.simprints.fingerprint.activities.collect.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
-import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
+import com.simprints.fingerprint.commontesttools.data.DEFAULT_PROJECT_ID
+import com.simprints.fingerprint.commontesttools.data.TestDbQuery
+import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.flow.Action
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
-import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
-import com.simprints.moduleapi.fingerprint.responses.*
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.anyOrNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenThis
+import com.simprints.fingerprintscannermock.simulated.SimulationMode
+import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
+import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
+import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -34,12 +38,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declare
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class FingerprintFlowsIntegrationTest: KoinTest {
+class FingerprintFlowsIntegrationTest : KoinTest {
 
     private val dbManagerMock: FingerprintDbManager = mock()
+    private val masterFlowManager: MasterFlowManager = mock()
 
     @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -48,70 +54,112 @@ class FingerprintFlowsIntegrationTest: KoinTest {
     @Before
     fun setUp() {
         acquireFingerprintKoinModules()
-        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager())
+    }
+
+    private fun setupMocksAndKoinModules(simulationMode: SimulationMode, action: Action) {
+        val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(SimulatedScannerManager(simulationMode))
         declare {
-            single<ScannerFactory> { ScannerFactoryImpl(simulatedBluetoothAdapter, get()) }
+            single<ScannerFactory> {
+                spy(ScannerFactoryImpl(simulatedBluetoothAdapter, get())).apply {
+                    whenThis { create(anyNotNull()) } then {
+                        val macAddress = it.arguments[0] as String
+                        when (simulationMode) {
+                            SimulationMode.V1 -> createScannerV1(macAddress)
+                            SimulationMode.V2 -> createScannerV2(macAddress)
+                        }
+                    }
+                }
+            }
             single<ScannerManager> { ScannerManagerImpl(simulatedBluetoothAdapter, get()) }
+            factory { masterFlowManager }
             factory { dbManagerMock }
         }
+        setupMasterFlowManager(action)
         setupDbManagerMock()
+    }
+
+    private fun setupMasterFlowManager(action: Action) {
+        whenever(masterFlowManager) { getCurrentAction() } thenReturn action
     }
 
     private fun setupDbManagerMock() {
         with(dbManagerMock) {
-            whenThis { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(PersonFetchResult(
-                PeopleGeneratorUtils.getRandomPerson(), false
-            ))
-            whenThis { loadPeople(anyNotNull(), anyOrNull(), anyOrNull()) } thenReturn Single.just(
-                PeopleGeneratorUtils.getRandomPeople(NUMBER_OF_PEOPLE_IN_DB)
-            )
+            whenThis { loadPeople(anyNotNull()) } then {
+                val query = it.arguments[0] as TestDbQuery
+                val numberOfPeopleToLoad = if (query.patientId == null) NUMBER_OF_PEOPLE_IN_DB else 1
+                Single.just(
+                    FingerprintGenerator.generateRandomFingerprintRecords(numberOfPeopleToLoad)
+                )
+            }
         }
     }
 
     @Test
-    fun captureFlow_finishesSuccessfully() {
+    fun captureFlow_withScannerV1_finishesSuccessfully() {
+        setupMocksAndKoinModules(SimulationMode.V1, Action.ENROL)
+        assertCaptureFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun captureFlow_withScannerV2_finishesSuccessfully() {
+        setupMocksAndKoinModules(SimulationMode.V2, Action.ENROL)
+        assertCaptureFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun matchFlow_identify_finishesSuccessfully() {
+        setupMocksAndKoinModules(SimulationMode.V2, Action.IDENTIFY)
+        assertIdentifyFlowFinishesSuccessfully()
+    }
+
+    @Test
+    fun matchFlow_verify_finishesSuccessfully() {
+        setupMocksAndKoinModules(SimulationMode.V2, Action.VERIFY)
+        assertVerifyFlowFinishesSuccessfully()
+    }
+
+    private fun assertCaptureFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
-        with(scenario.result) {
+        return with(scenario.result) {
             resultData.setExtrasClassLoader(IFingerprintCaptureResponse::class.java.classLoader)
             assertEquals(Activity.RESULT_OK, resultCode)
-            assertNotNull(resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+            val captureResponse = resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
                 assertEquals(IFingerprintResponseType.CAPTURE, type)
+            }
+            assertNotNull(captureResponse)
+        }
+    }
+
+    private fun assertIdentifyFlowFinishesSuccessfully() {
+        scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
+            FingerprintGenerator.generateRandomFingerprints(2),
+            TestDbQuery(projectId = DEFAULT_PROJECT_ID)
+        ))
+
+        with(scenario.result) {
+            resultData.setExtrasClassLoader(IFingerprintMatchResponse::class.java.classLoader)
+            assertEquals(Activity.RESULT_OK, resultCode)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintMatchResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.MATCH, type)
             })
         }
     }
 
-    @Test
-    fun identifyFlow_finishesSuccessfully() {
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
-
-        waitUntilCollectFingerprintsIsDisplayed()
-        pressScanUntilDialogIsDisplayedAndClickConfirm()
-
-        with(scenario.result) {
-            resultData.setExtrasClassLoader(IFingerprintIdentifyResponse::class.java.classLoader)
-            assertEquals(Activity.RESULT_OK, resultCode)
-            assertNotNull(resultData?.extras?.getParcelable<IFingerprintIdentifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                assertEquals(IFingerprintResponseType.IDENTIFY, type)
-            })
-        }
-    }
-
-    @Test
-    fun verifyFlow_finishesSuccessfully() {
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.VERIFY))
-
-        waitUntilCollectFingerprintsIsDisplayed()
-        pressScanUntilDialogIsDisplayedAndClickConfirm()
+    private fun assertVerifyFlowFinishesSuccessfully() {
+        scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
+            FingerprintGenerator.generateRandomFingerprints(2),
+            TestDbQuery(patientId = UUID.randomUUID().toString())
+        ))
 
         with(scenario.result) {
-            resultData.setExtrasClassLoader(IFingerprintVerifyResponse::class.java.classLoader)
+            resultData.setExtrasClassLoader(IFingerprintMatchResponse::class.java.classLoader)
             assertEquals(Activity.RESULT_OK, resultCode)
-            assertNotNull(resultData?.extras?.getParcelable<IFingerprintVerifyResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                assertEquals(IFingerprintResponseType.VERIFY, type)
+            assertNotNull(resultData?.extras?.getParcelable<IFingerprintMatchResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
+                assertEquals(IFingerprintResponseType.MATCH, type)
             })
         }
     }

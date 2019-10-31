@@ -1,4 +1,4 @@
-package com.simprints.fingerprint.activities.collect.models
+package com.simprints.fingerprint.data.domain.fingerprint
 
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
 import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore

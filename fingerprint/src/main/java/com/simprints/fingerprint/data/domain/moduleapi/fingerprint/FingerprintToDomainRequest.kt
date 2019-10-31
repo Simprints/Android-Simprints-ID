@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
-import com.simprints.fingerprint.activities.collect.models.toDomainClass
+import com.simprints.fingerprint.data.domain.fingerprint.toDomainClass
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
