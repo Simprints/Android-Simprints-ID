@@ -2,14 +2,13 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +41,7 @@ class ModuleViewModelTest {
 
         val actual = viewModel.getAvailableModules().value
 
-        assertThat(actual, `is`(expected))
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -54,7 +53,7 @@ class ModuleViewModelTest {
 
         val actual = viewModel.getSelectedModules().value
 
-        assertThat(actual, `is`(expected))
+        assertThat(actual).isEqualTo(expected)
     }
 
     private fun configureMock() {

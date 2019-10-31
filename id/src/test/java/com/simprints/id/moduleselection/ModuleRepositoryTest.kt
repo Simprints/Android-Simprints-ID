@@ -2,6 +2,7 @@ package com.simprints.id.moduleselection
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.verify
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
@@ -10,8 +11,6 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -87,7 +86,7 @@ class ModuleRepositoryTest {
 
         val actual = repository.getAvailableModules()
 
-        assertThat(actual, `is`(expected))
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -99,7 +98,7 @@ class ModuleRepositoryTest {
 
         val actual = repository.getSelectedModules()
 
-        assertThat(actual, `is`(expected))
+        assertThat(actual).isEqualTo(expected)
     }
 
     private fun configureMock() {
