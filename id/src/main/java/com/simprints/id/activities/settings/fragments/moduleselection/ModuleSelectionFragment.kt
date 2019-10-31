@@ -34,7 +34,6 @@ class ModuleSelectionFragment private constructor(private val applicationContext
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        searchView.queryHint = getString(R.string.hint_search_modules)
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
         fetchData()
@@ -72,6 +71,7 @@ class ModuleSelectionFragment private constructor(private val applicationContext
         viewModel.getAvailableModules().observe(this, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules)
+            searchView.setOnQueryTextListener(ModuleSelectionQueryListener(adapter, modules))
         })
     }
 
