@@ -1,12 +1,13 @@
 package com.simprints.fingerprint.commontesttools.generators
 
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
 
-object FingerprintGeneratorUtils {
+object FingerprintGenerator {
 
     private val ISO_FORMAT_ID = Integer.parseInt("464D5200", 16)     // 'F' 'M' 'R' 00hex
     private val ISO_2005_VERSION = Integer.parseInt("20323000", 16)  // ' ' '2' '0' 00hex
@@ -101,4 +102,22 @@ object FingerprintGeneratorUtils {
         bb.get(templateBytes)
         return Fingerprint(fingerId, templateBytes)
     }
+
+    fun generateRandomFingerprints(fingerIds: List<FingerIdentifier>) =
+        fingerIds.map { generateRandomFingerprint(it) }
+
+    fun generateRandomFingerprints(n: Int) =
+        generateRandomFingerprints(generateRandomFingerIds(n))
+
+    fun generateRandomFingerprintRecord(fingerIds: List<FingerIdentifier>) =
+        FingerprintRecord(UUID.randomUUID().toString(), generateRandomFingerprints(fingerIds))
+
+    fun generateRandomFingerprintRecord() =
+        generateRandomFingerprintRecord(generateRandomFingerIds(RANDOM_GENERATOR.nextInt(9) + 1))
+
+    fun generateRandomFingerprintRecords(n: Int) =
+        List(n) { generateRandomFingerprintRecord() }
+
+    fun generateRandomFingerIds(n: Int) =
+        List(n) { FingerIdentifier.values()[RANDOM_GENERATOR.nextInt(FingerIdentifier.values().size)] }
 }
