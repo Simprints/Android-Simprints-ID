@@ -63,7 +63,7 @@ def firebase = [
 
 def jwt_version = "3.8.1"
 def jwt = [
-        core: "com.auth0:java-jwt:$jwt_version"
+    core: "com.auth0:java-jwt:$jwt_version"
 ]
 
 def crashlytics = [
@@ -104,20 +104,20 @@ def rxjava2 = [
 // Koin, Service Location
 def koin_version = "2.0.1"
 def koin = [
-    core    : "org.koin:koin-core:$koin_version",
-    core_ext: "org.koin:koin-core-ext:$koin_version",
-    android : "org.koin:koin-android:$koin_version",
+    core     : "org.koin:koin-core:$koin_version",
+    core_ext : "org.koin:koin-core-ext:$koin_version",
+    android  : "org.koin:koin-android:$koin_version",
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
 
 def mockito_version = "2.23.0"
 def espresso_version = "3.2.0-alpha04"
-def roboletric_version = "4.1"
+def robolectric_version = "4.1"
 def testing = [
     junit          : "junit:junit:4.13-beta-2",
     robolectric    : [
-        core    : "org.robolectric:robolectric:$roboletric_version",
+        core    : "org.robolectric:robolectric:$robolectric_version",
         multidex: "org.robolectric:multidex:3.4.2"
     ],
     truth          : "com.google.truth:truth:0.42",
@@ -155,7 +155,8 @@ def testing = [
     coroutines_core: 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.2.1',
     coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.2.1',
     koin           : "org.koin:koin-test:$koin_version",
-    live_data      : "com.jraska.livedata:testing-ktx:1.1.0"
+    live_data      : "com.jraska.livedata:testing-ktx:1.1.0",
+    kappuccino     : "br.com.concretesolutions:kappuccino:1.2.1"
 ]
 
 //No using Realm plugin: https://github.com/realm/realm-java/issues/5982
