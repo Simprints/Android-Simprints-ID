@@ -6,10 +6,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
+import java.util.*
 
 class ModuleAdapter(
     private val tracker: ModuleSelectionTracker
 ) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
+
+    fun filter(modules: List<Module>, searchTerm: String?) {
+        val defaultLocale = Locale.getDefault()
+        searchTerm?.toLowerCase(defaultLocale)?.let { query ->
+            submitList(modules.filter {
+                it.name.toLowerCase(defaultLocale).contains(query)
+                // TODO: add !it.isSelected to filter once "selected modules" area is implemented
+            })
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
