@@ -1,9 +1,11 @@
 package com.simprints.id.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -17,6 +19,7 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -34,34 +37,46 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
+    fun provideRemoteConfigFetcher(
+        remoteConfig: FirebaseRemoteConfig
+    ): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+    fun provideSharedPreferences(
+        app: Application
+    ): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
     @Provides
     @Singleton
-    fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
+    fun provideImprovedSharedPreferences(
+        basePrefs: SharedPreferences
+    ): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
     @Provides
     @Singleton
-    fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
+    fun provideRemoteConfigWrapper(
+        remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences
+    ): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
 
     @Provides
     @Singleton
-    fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
+    fun provideScannerAttributesPreferencesManager(
+        prefs: ImprovedSharedPreferences
+    ): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
     @Provides
     @Singleton
-    open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
-                                               remoteConfigWrapper: RemoteConfigWrapper,
-                                               @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                               @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
-                                               @Named("ModalSerializer") modalitySerializer: Serializer<Modality>,
-                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
-                                               @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                               @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
+    open fun provideSettingsPreferencesManager(
+        prefs: ImprovedSharedPreferences,
+        remoteConfigWrapper: RemoteConfigWrapper,
+        @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+        @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
+        @Named("ModalSerializer") modalitySerializer: Serializer<Modality>,
+        @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
+        @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+        @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>
+    ): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
@@ -73,8 +88,15 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
+    open fun provideModuleSelectionCallback(
+        applicationContext: Context
+    ): ModuleSelectionCallback = ModuleSelectionFragment.getInstance(applicationContext)
+
+    @Provides
+    @Singleton
     fun providePreferencesManager(settingsPreferencesManager: SettingsPreferencesManager,
                                   lastEventsPreferencesManager: RecentEventsPreferencesManager,
                                   app: Application): PreferencesManager =
         PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+
 }
