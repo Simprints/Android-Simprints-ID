@@ -9,10 +9,13 @@ class ModuleSelectionQueryListener(
     private val modules: List<Module>
 ) : SearchView.OnQueryTextListener {
 
+    private val queryFilter = ModuleQueryFilter()
+
     override fun onQueryTextSubmit(query: String?) = false
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        adapter.filter(modules, newText)
+        val filteredList = queryFilter.filter(modules, newText)
+        adapter.submitList(filteredList)
         return false
     }
 
