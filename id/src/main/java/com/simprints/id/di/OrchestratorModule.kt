@@ -15,8 +15,8 @@ import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryIm
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
@@ -28,7 +28,6 @@ import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.secure.cryptography.HybridCipher
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -121,14 +120,12 @@ class OrchestratorModule {
 
     @Provides
     fun provideHotCache(
-        preferences: SharedPreferences,
+        @Named("EncryptedSharedPreferences")  sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
-    ): HotCache = HotCacheImpl(preferences, stepEncoder)
+    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
 
     @Provides
-    fun provideStepEncoder(
-        cipher: HybridCipher
-    ): StepEncoder = StepEncoderImpl(cipher)
+    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
 
     @Provides
     fun provideEnrolmentHelper(

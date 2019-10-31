@@ -15,7 +15,7 @@ class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
                                                 prefs: PreferencesManager): FingerprintCaptureRequest =
         with(prefs) {
             FingerprintCaptureRequest(
-                fingerStatus.mapNotNull {
+                fingerprintsToCapture = fingerStatus.mapNotNull {
                     if (it.value)
                         it.key
                     else
