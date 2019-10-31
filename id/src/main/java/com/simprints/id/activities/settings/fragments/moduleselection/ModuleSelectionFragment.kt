@@ -16,10 +16,12 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionTracker
 import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.tools.utils.QueryFilter
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
-class ModuleSelectionFragment private constructor(private val applicationContext: Context)
-    : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
+class ModuleSelectionFragment private constructor(
+    private val applicationContext: Context
+) : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker, QueryFilter.SearchResultCallback {
 
     private val adapter by lazy { ModuleAdapter(tracker = this) }
 
@@ -62,6 +64,14 @@ class ModuleSelectionFragment private constructor(private val applicationContext
         updateSelectedModules()
     }
 
+    override fun onNothingFound() {
+        txtNoResults.visibility = VISIBLE
+    }
+
+    override fun onResultsFound() {
+        txtNoResults.visibility = GONE
+    }
+
     private fun fetchData() {
         getAvailableModules()
         getSelectedModules()
@@ -71,7 +81,9 @@ class ModuleSelectionFragment private constructor(private val applicationContext
         viewModel.getAvailableModules().observe(this, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules)
-            searchView.setOnQueryTextListener(ModuleSelectionQueryListener(adapter, modules))
+            searchView.setOnQueryTextListener(
+                ModuleSelectionQueryListener(adapter, modules, searchResultCallback = this)
+            )
         })
     }
 
