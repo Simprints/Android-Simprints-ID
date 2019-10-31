@@ -1,7 +1,7 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
 import android.os.Parcelable
-import com.simprints.fingerprint.activities.collect.models.fromDomainToModuleApi
+import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
