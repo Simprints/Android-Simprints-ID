@@ -26,7 +26,7 @@ class ModuleQueryFilterTest {
     @Test
     fun withNullQuery_shouldReturnEmptyList() {
         val query: String? = null
-        val actual = filter.filter(items, query)
+        val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEmpty()
     }
@@ -37,7 +37,7 @@ class ModuleQueryFilterTest {
         val expected = listOf(
             Module("D", false)
         )
-        val actual = filter.filter(items, query)
+        val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -48,7 +48,7 @@ class ModuleQueryFilterTest {
         val expected = listOf(
             Module("B", false)
         )
-        val actual = filter.filter(items, query)
+        val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -60,7 +60,7 @@ class ModuleQueryFilterTest {
             Module("A", false),
             Module("Alpha", false)
         )
-        val actual = filter.filter(items, query)
+        val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -70,7 +70,7 @@ class ModuleQueryFilterTest {
         val query = "z"
         val callback = mock<QueryFilter.SearchResultCallback>()
 
-        filter.filter(items, query, callback)
+        filter.getFilteredList(items, query, callback)
 
         verify(callback).onNothingFound()
     }
@@ -80,7 +80,7 @@ class ModuleQueryFilterTest {
         val query = "c"
         val callback = mock<QueryFilter.SearchResultCallback>()
 
-        filter.filter(items, query, callback)
+        filter.getFilteredList(items, query, callback)
 
         verify(callback).onResultsFound()
     }

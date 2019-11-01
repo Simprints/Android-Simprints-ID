@@ -16,7 +16,7 @@ class ModuleSelectionQueryListener(
     override fun onQueryTextSubmit(query: String?) = false
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        val filteredList = queryFilter.filter(modules, newText, searchResultCallback)
+        val filteredList = queryFilter.getFilteredList(modules, newText, searchResultCallback)
         adapter.submitList(filteredList)
         return false
     }
