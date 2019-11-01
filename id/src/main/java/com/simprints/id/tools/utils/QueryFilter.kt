@@ -1,16 +1,5 @@
 package com.simprints.id.tools.utils
 
 interface QueryFilter<T> {
-
-    fun getFilteredList(
-        items: List<T>,
-        query: String?,
-        callback: SearchResultCallback? = null
-    ): List<T>
-
-    interface SearchResultCallback {
-        fun onNothingFound()
-        fun onResultsFound()
-    }
-
+    fun getFilteredList(items: List<T>, query: String?): List<T>
 }
