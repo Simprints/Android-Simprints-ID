@@ -2,7 +2,6 @@ package com.simprints.id.activities.settings.fragments.moduleselection
 
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.tools.utils.QueryFilter
-import java.util.*
 
 class ModuleQueryFilter : QueryFilter<Module> {
 
@@ -11,11 +10,10 @@ class ModuleQueryFilter : QueryFilter<Module> {
         query: String?,
         callback: QueryFilter.SearchResultCallback?
     ): List<Module> {
-        val defaultLocale = Locale.getDefault()
-        val result = query?.toLowerCase(defaultLocale)?.let { lowercaseQuery ->
-            items.filter {
-                it.name.toLowerCase(defaultLocale).contains(lowercaseQuery)
-                // TODO: add !it.isSelected to filter once "selected modules" area is implemented
+        val result = query?.let { searchTerm ->
+            items.filter { module ->
+                module.name.contains(searchTerm, ignoreCase = true)
+                // TODO: add !module.isSelected to filter once "selected modules" area is implemented
             }
         } ?: emptyList()
 
