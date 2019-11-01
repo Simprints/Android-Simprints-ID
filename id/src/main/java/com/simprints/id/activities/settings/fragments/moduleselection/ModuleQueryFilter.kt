@@ -7,22 +7,14 @@ class ModuleQueryFilter : QueryFilter<Module> {
 
     override fun getFilteredList(
         items: List<Module>,
-        query: String?,
-        callback: QueryFilter.SearchResultCallback?
+        query: String?
     ): List<Module> {
-        val result = query?.let { searchTerm ->
+        return query?.let { searchTerm ->
             items.filter { module ->
                 module.name.contains(searchTerm, ignoreCase = true)
                 // TODO: add !module.isSelected to filter once "selected modules" area is implemented
             }
         } ?: emptyList()
-
-        if (result.isEmpty())
-            callback?.onNothingFound()
-        else
-            callback?.onResultsFound()
-
-        return result
     }
 
 }

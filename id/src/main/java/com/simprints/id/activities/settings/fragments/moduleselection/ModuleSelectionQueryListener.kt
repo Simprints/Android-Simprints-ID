@@ -8,7 +8,7 @@ import com.simprints.id.tools.utils.QueryFilter
 class ModuleSelectionQueryListener(
     private val adapter: ModuleAdapter,
     private val modules: List<Module>,
-    private val searchResultCallback: QueryFilter.SearchResultCallback
+    private val searchResultCallback: SearchResultCallback
 ) : SearchView.OnQueryTextListener {
 
     private val queryFilter: QueryFilter<Module> = ModuleQueryFilter()
@@ -16,9 +16,20 @@ class ModuleSelectionQueryListener(
     override fun onQueryTextSubmit(query: String?) = false
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        val filteredList = queryFilter.getFilteredList(modules, newText, searchResultCallback)
+        val filteredList = queryFilter.getFilteredList(modules, newText)
+
+        if (filteredList.isEmpty())
+            searchResultCallback.onNothingFound()
+        else
+            searchResultCallback.onResultsFound()
+
         adapter.submitList(filteredList)
         return false
+    }
+
+    interface SearchResultCallback {
+        fun onNothingFound()
+        fun onResultsFound()
     }
 
 }
