@@ -5,7 +5,7 @@ import com.simprints.id.tools.utils.QueryFilter
 
 class ModuleQueryFilter : QueryFilter<Module> {
 
-    override fun filter(
+    override fun getFilteredList(
         items: List<Module>,
         query: String?,
         callback: QueryFilter.SearchResultCallback?
