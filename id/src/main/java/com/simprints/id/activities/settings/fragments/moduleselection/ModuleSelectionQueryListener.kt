@@ -8,7 +8,7 @@ import com.simprints.id.tools.utils.QueryFilter
 class ModuleSelectionQueryListener(
     private val adapter: ModuleAdapter,
     private val modules: List<Module>,
-    private val searchResultCallback: QueryFilter.SearchResultCallback?
+    private val searchResultCallback: QueryFilter.SearchResultCallback
 ) : SearchView.OnQueryTextListener {
 
     private val queryFilter: QueryFilter<Module> = ModuleQueryFilter()
