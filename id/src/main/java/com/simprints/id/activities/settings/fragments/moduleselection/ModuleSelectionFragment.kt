@@ -90,8 +90,8 @@ class ModuleSelectionFragment private constructor(
 
     private fun getSelectedModules() {
         viewModel.getSelectedModules().observe(this, Observer { selectedModules ->
+            configureNoModulesSelectedTextVisibility(selectedModules)
             modules.forEach { module ->
-                configureNoModulesSelectedTextVisibility(selectedModules)
                 module.isSelected = selectedModules.any { it.name == module.name }
             }
         })
