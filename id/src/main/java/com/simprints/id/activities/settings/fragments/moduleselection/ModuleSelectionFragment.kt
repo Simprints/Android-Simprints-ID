@@ -20,14 +20,12 @@ import kotlinx.android.synthetic.main.fragment_module_selection.*
 
 class ModuleSelectionFragment private constructor(
     private val applicationContext: Context
-) : Fragment(),
-    ModuleSelectionCallback,
-    ModuleSelectionTracker,
-    ModuleSelectionQueryListener.SearchResultCallback {
+) : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
 
     private val adapter by lazy { ModuleAdapter(tracker = this) }
 
     private lateinit var viewModel: ModuleViewModel
+    private lateinit var queryListener: ModuleSelectionQueryListener
 
     private var modules = emptyList<Module>()
     private var selectedModules = emptyList<Module>()
@@ -66,14 +64,6 @@ class ModuleSelectionFragment private constructor(
         updateSelectedModules()
     }
 
-    override fun onNothingFound() {
-        txtNoResults.visibility = VISIBLE
-    }
-
-    override fun onResultsFound() {
-        txtNoResults.visibility = GONE
-    }
-
     private fun fetchData() {
         getAvailableModules()
         getSelectedModules()
@@ -83,9 +73,18 @@ class ModuleSelectionFragment private constructor(
         viewModel.getAvailableModules().observe(this, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules)
-            searchView.setOnQueryTextListener(
-                ModuleSelectionQueryListener(adapter, modules, searchResultCallback = this)
-            )
+
+            queryListener = ModuleSelectionQueryListener(modules)
+            searchView.setOnQueryTextListener(queryListener)
+            observeSearchResults()
+        })
+    }
+
+    private fun observeSearchResults() {
+        queryListener.searchResults.observe(this, Observer { searchResults ->
+            adapter.submitList(searchResults)
+
+            txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
         })
     }
 
