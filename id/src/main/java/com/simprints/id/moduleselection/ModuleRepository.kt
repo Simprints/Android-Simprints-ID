@@ -36,26 +36,18 @@ class ModuleRepository(component: AppComponent) {
     }
 
     fun setSelectedModules(selectedModules: List<Module>) {
-        if (isModuleSelectionValid(selectedModules)) {
-            preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
-            logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
-            setCrashlyticsKeyForModules()
-        }
-    }
+        when {
+            selectedModules.isEmpty() -> callback.noModulesSelected()
 
-    private fun isModuleSelectionValid(selectedModules: List<Module>): Boolean {
-        return when {
-            selectedModules.isEmpty() -> {
-                callback.noModulesSelected()
-                false
+            selectedModules.size > MAX_SELECTED_MODULES -> callback.tooManyModulesSelected(
+                MAX_SELECTED_MODULES
+            )
+
+            else -> {
+                preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
+                logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
+                setCrashlyticsKeyForModules()
             }
-
-            selectedModules.size > MAX_SELECTED_MODULES -> {
-                callback.tooManyModulesSelected(MAX_SELECTED_MODULES)
-                false
-            }
-
-            else -> true
         }
     }
 
