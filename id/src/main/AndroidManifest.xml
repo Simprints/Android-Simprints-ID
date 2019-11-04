@@ -100,7 +100,7 @@
             android:label="@string/preference_select_modules_title"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.ActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
 
         <activity
             android:name=".activities.dashboard.DashboardActivity"
