@@ -1,10 +1,10 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
-import com.simprints.fingerprint.activities.collect.models.fromDomainToCore
+import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore

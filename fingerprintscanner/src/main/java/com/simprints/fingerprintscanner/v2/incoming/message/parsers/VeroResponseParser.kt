@@ -18,7 +18,7 @@ class VeroResponseParser : MessageParser<VeroResponse> {
                 GET_SMILE_LED_STATE -> GetSmileLedStateResponse.fromBytes(data)
                 GET_BLUETOOTH_LED_STATE -> GetBluetoothLedStateResponse.fromBytes(data)
                 GET_POWER_LED_STATE -> GetPowerLedStateResponse.fromBytes(data)
-                SET_SMILE_LED_STATE -> GetSmileLedStateResponse.fromBytes(data)
+                SET_SMILE_LED_STATE -> SetSmileLedStateResponse.fromBytes(data)
                 SET_BLUETOOTH_LED_STATE -> SetBluetoothLedStateResponse.fromBytes(data)
                 SET_POWER_LED_STATE -> SetPowerLedStateResponse.fromBytes(data)
                 UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED -> TODO("exception handling")

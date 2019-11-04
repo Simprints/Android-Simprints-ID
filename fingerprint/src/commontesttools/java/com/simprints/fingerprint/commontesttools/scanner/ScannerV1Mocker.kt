@@ -1,10 +1,8 @@
 package com.simprints.fingerprint.commontesttools.scanner
 
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.commontesttools.generators.FingerprintGeneratorUtils
-import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
-import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 import com.simprints.fingerprintscanner.v1.ScannerCallback
 import com.simprints.fingerprintscanner.v1.enums.UN20_STATE
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -12,6 +10,7 @@ import com.simprints.testtools.common.syntax.anyOrNull
 import com.simprints.testtools.common.syntax.setupMock
 import com.simprints.testtools.common.syntax.whenThis
 import org.mockito.ArgumentMatchers.*
+import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 fun createMockedScannerV1(also: ScannerV1.() -> Unit = {}): ScannerV1 =
     setupMock {
@@ -44,7 +43,7 @@ fun createMockedScannerV1(also: ScannerV1.() -> Unit = {}): ScannerV1 =
         whenThis { crashLogValid } thenReturn true
         whenThis { un20State } thenReturn UN20_STATE.READY
         whenThis { imageQuality } thenReturn DEFAULT_GOOD_IMAGE_QUALITY
-        whenThis { template } thenReturn PeopleGeneratorUtils.getRandomFingerprint().templateBytes
+        whenThis { template } thenReturn FingerprintGenerator.generateRandomFingerprint().templateBytes
         whenThis { connection_sendOtaPacket(anyInt(), anyInt(), anyString()) } thenReturn true
         whenThis { connection_sendOtaMeta(anyInt(), anyShort()) } thenReturn true
         whenThis { connection_setBank(anyChar(), anyChar(), anyChar()) } thenReturn true
@@ -68,7 +67,7 @@ fun ScannerV1.makeCallbackFailing(error: SCANNER_ERROR, method: (ScannerV1) -> U
 fun ScannerV1.queueFinger(fingerIdentifier: FingerIdentifier, qualityScore: Int) {
     makeScansSuccessful()
     whenThis { imageQuality } thenReturn qualityScore
-    whenThis { template } thenReturn FingerprintGeneratorUtils.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
+    whenThis { template } thenReturn FingerprintGenerator.generateRandomFingerprint(fingerIdentifier, qualityScore.toByte()).templateBytes
 }
 
 fun ScannerV1.queueGoodFinger(fingerIdentifier: FingerIdentifier = FingerIdentifier.LEFT_THUMB) =

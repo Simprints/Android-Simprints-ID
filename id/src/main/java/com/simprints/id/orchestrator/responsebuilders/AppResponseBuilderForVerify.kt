@@ -5,6 +5,8 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
@@ -46,8 +48,9 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
                                                             fingerprintResponse: FingerprintMatchResponse): AppVerifyResponse =
         TODO("Not implemented yet")
 
-    private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse): AppVerifyResponse =
-        TODO("Not implemented yet")
+    private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
+        AppVerifyResponse(
+            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }.first())
 
     private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse): AppVerifyResponse {
         TODO("Not implemented yet")

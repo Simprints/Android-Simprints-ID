@@ -3,13 +3,13 @@ package com.simprints.id.data.db.person
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.local.FingerprintRecordLocalDataSource
+import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import io.reactivex.Single
 
-interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, FingerprintRecordLocalDataSource {
+interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, FingerprintIdentityLocalDataSource {
 
     fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
     fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>>

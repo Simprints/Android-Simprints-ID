@@ -6,7 +6,7 @@ import com.simprints.fingerprint.activities.collect.CollectFingerprintsContract
 import com.simprints.fingerprint.activities.collect.FingerPageAdapter
 import com.simprints.fingerprint.activities.collect.models.DefaultScanConfig
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 

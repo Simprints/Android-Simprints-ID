@@ -14,7 +14,7 @@ import com.simprints.fingerprint.controllers.core.preferencesManager.Fingerprint
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.matching.MatchResult
-import com.simprints.fingerprint.data.domain.fingerprint.FingerprintRecord
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
@@ -30,10 +30,10 @@ class VerificationTask(private val viewModel: MatchingViewModel,
 
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(): Single<List<FingerprintRecord>> =
+    override fun loadCandidates(): Single<List<FingerprintIdentity>> =
         dbManager.loadPeople(matchingRequest.queryForCandidates)
 
-    override fun handlesCandidatesLoaded(candidates: List<FingerprintRecord>) {
+    override fun handlesCandidatesLoaded(candidates: List<FingerprintIdentity>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
     }
@@ -44,7 +44,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
         viewModel.progress.postValue(100)
     }
 
-    override fun handleMatchResult(candidates: List<FingerprintRecord>, scores: List<Float>) {
+    override fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>) {
         val candidate = candidates.first()
         val score = scores.first()
 

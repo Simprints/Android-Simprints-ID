@@ -5,12 +5,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.fingerprint.activities.alert.FingerprintAlert.BLUETOOTH_NOT_SUPPORTED
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.alert.result.AlertTaskResult.CloseButtonAction.CLOSE
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
-import com.simprints.fingerprint.commontesttools.generators.PeopleGeneratorUtils
+import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
@@ -149,7 +149,7 @@ class OrchestratorTest {
     private fun Orchestrator.okCollectResult() {
         handleActivityTaskResult(ResultCode.OK) {
             assertEquals(CollectFingerprintsTaskResult.BUNDLE_KEY, it)
-            CollectFingerprintsTaskResult(List(2) { PeopleGeneratorUtils.getRandomFingerprint() })
+            CollectFingerprintsTaskResult(FingerprintGenerator.generateRandomFingerprints(2))
         }
     }
 

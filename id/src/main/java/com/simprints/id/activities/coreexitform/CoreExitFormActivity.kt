@@ -72,7 +72,7 @@ class CoreExitFormActivity : AppCompatActivity() {
             rbOther.text = getString(R.string.refusal_other)
             exitFormText.hint = getString(R.string.hint_other_reason)
             btSubmitExitForm.text = getString(R.string.button_submit)
-            btGoBack.text = getString(R.string.exit_form_go_back)
+            btGoBack.text = getString(R.string.exit_form_return_to_simprints)
         }
     }
 

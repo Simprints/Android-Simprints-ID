@@ -60,6 +60,7 @@
     <string name="biometric_general_face">take your photographs</string>
     <string name="biometrics_access_fingerprint">fingerprint information</string>
     <string name="biometrics_access_face">photographs</string>
+    <string name="biometrics_access_fingerprint_face">fingerprint information, photographs</string>
     <string name="biometrics_parental_fingerprint">use your child\'s fingerprints</string>
     <string name="biometrics_parental_face">take your child\'s photographs</string>
 
@@ -446,8 +447,8 @@
     <string name="refusal_other">Other</string>
     <string name="beneficiary_refused">Beneficiary refused</string>
     <string name="scanner_not_working">Scanner not working</string>
-    <string name="exit_form_go_back">Go Back</string>
-    <string name="why_did_you_skip_biometrics">Why did you skip Biometric/s?</string>
+    <string name="exit_form_return_to_simprints">Return to Simprints</string>
+    <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
     <string name="why_did_you_skip_face">Why did you skip face scanning?</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
 </resources>
