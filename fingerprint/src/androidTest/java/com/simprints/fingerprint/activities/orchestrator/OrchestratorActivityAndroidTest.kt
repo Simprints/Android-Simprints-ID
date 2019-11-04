@@ -12,10 +12,9 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
 import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
-import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
-import com.simprints.fingerprint.integration.createFingerprintRequestIntent
+import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
@@ -62,7 +61,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
             .respondWith(Instrumentation.ActivityResult(ResultCode.OK.value,
                 Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())))
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         whenever(orchestratorMock) { isFinished() } thenReturn true
         whenever(orchestratorMock) { getFinalResult() } thenReturn
@@ -78,7 +77,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         whenever(orchestratorMock) { getFinalResult() } thenReturn
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
 
@@ -99,7 +98,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         // Make sure other activities don't start appearing
         whenever(orchestratorViewModel) { start(anyNotNull()) } thenDoNothing {}
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         scenario.recreate()
 

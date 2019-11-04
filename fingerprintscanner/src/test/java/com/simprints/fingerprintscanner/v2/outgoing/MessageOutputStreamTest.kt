@@ -1,5 +1,6 @@
 package com.simprints.fingerprintscanner.v2.outgoing
 
+import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.outgoing.message.MessageSerializer
 import com.simprints.fingerprintscanner.v2.outgoing.packet.PacketDispatcher
 import com.simprints.testtools.common.syntax.*
@@ -27,7 +28,9 @@ class MessageOutputStreamTest {
 
         val messageOutputStream = MessageOutputStream(messageSerializerMock, packetDispatcherMock)
 
-        messageOutputStream.sendMessage(mock()).test().await()
+        messageOutputStream.sendMessage(object : OutgoingMessage {
+            override fun getBytes(): ByteArray = byteArrayOf(0x10, 0x20, 0x30)
+        }).test().await()
 
         verifyOnlyInteraction(messageSerializerMock) { serialize(anyNotNull()) }
         verifyOnlyInteraction(packetDispatcherMock) { dispatch(anyNotNull()) }

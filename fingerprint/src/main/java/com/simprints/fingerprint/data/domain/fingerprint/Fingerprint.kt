@@ -2,9 +2,6 @@ package com.simprints.fingerprint.data.domain.fingerprint
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
-import com.simprints.fingerprint.activities.collect.models.fromDomainToCore
-import com.simprints.fingerprint.activities.collect.models.fromDomainToLibsimprints
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer

@@ -62,7 +62,7 @@ class FaceExitFormActivity : AppCompatActivity() {
             faceRbOther.text = getString(R.string.refusal_other)
             faceExitFormText.hint = getString(R.string.hint_other_reason)
             faceBtSubmitExitForm.text = getString(R.string.button_submit)
-            faceBtGoBack.text = getString(R.string.exit_form_go_back)
+            faceBtGoBack.text = getString(R.string.exit_form_return_to_simprints)
         }
     }
 

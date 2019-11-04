@@ -7,7 +7,10 @@ import com.simprints.fingerprintscanner.v2.incoming.message.parsers.MessageParse
 import com.simprints.fingerprintscanner.v2.tools.primitives.unsignedToInt
 import java.nio.ByteOrder
 
-class TestMessage(val bytes: ByteArray) : IncomingMessage
+class TestMessage(private val bytes: ByteArray) : IncomingMessage {
+
+    override fun getBytes(): ByteArray = bytes
+}
 
 class TestMessageParser : MessageParser<TestMessage> {
 
@@ -32,4 +35,4 @@ class TestMessageAccumulator(testMessageParser: TestMessageParser) :
     PacketToMessageAccumulator<TestMessage>(TestMessageProtocol, testMessageParser)
 
 fun List<TestMessage>.lowerHexStrings() =
-    map { it.bytes }.toHexStrings().stripWhiteSpaceToLowercase()
+    map { it.getBytes() }.toHexStrings().stripWhiteSpaceToLowercase()

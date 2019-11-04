@@ -1,9 +1,10 @@
 package com.simprints.fingerprintscanner.v2.scanner
 
-import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentSocket
+import java.io.InputStream
+import java.io.OutputStream
 
 interface Connectable {
 
-    fun connect(socket: BluetoothComponentSocket)
+    fun connect(inputStream: InputStream, outputStream: OutputStream)
     fun disconnect()
 }

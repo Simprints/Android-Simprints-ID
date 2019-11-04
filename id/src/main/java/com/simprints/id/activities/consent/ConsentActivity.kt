@@ -3,6 +3,7 @@ package com.simprints.id.activities.consent
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Paint.UNDERLINE_TEXT_FLAG
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -81,6 +82,7 @@ class ConsentActivity : AppCompatActivity() {
             consentDeclineButton.text = getString(R.string.launch_consent_decline_button)
             consentAcceptButton.text = getString(R.string.launch_consent_accept_button)
             privacyNoticeText.text = getString(R.string.privacy_notice_text)
+            privacyNoticeText.paintFlags = privacyNoticeText.paintFlags or UNDERLINE_TEXT_FLAG
         }
     }
 

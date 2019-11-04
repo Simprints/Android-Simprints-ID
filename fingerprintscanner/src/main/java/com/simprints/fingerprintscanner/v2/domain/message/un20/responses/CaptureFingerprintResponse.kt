@@ -5,6 +5,8 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20Messag
 
 class CaptureFingerprintResponse(val responseCode: ResponseCode) : Un20Response(Un20MessageType.CaptureFingerprint) {
 
+    override fun getDataBytes(): ByteArray = byteArrayOf(responseCode.byte)
+
     enum class ResponseCode(val byte: Byte) {
         OK(0x00),
         FINGERPRINT_NOT_FOUND(0x20),
