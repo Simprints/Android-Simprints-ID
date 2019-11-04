@@ -16,7 +16,8 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:chipSpacing="@dimen/chip_spacing_default" />
 
     <TextView
         android:id="@+id/txtNoModulesSelected"
