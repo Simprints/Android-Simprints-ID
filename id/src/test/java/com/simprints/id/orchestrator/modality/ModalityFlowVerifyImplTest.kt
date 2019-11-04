@@ -51,7 +51,7 @@ class ModalityFlowVerifyImplTest {
         whenever(coreStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull()) } thenReturn verifyCoreStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn consentCoreStepMock
 
-        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, preferencesManager)
+        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test

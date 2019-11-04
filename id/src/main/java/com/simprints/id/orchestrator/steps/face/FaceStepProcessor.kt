@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.steps.face
 
 import android.content.Intent
-import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 
 /**
@@ -13,7 +13,7 @@ interface FaceStepProcessor {
 
     fun buildCaptureStep(): Step
 
-    fun buildStepMatch(probeFaceSample: List<FaceSample>, query: PersonLocalDataSource.Query): Step
+    fun buildStepMatch(probeFaceSample: List<FaceCaptureSample>, query: PersonLocalDataSource.Query): Step
 
     fun processResult(requestCode: Int,
                       resultCode: Int,
