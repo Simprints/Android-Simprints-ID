@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="SimprintsStyle"/>
+    <style name="SimprintsStyle" />
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -31,6 +31,13 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar.MaterialComponents" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textViewStyle">@style/SimprintsStyle.TextView</item>
     </style>
 
     <!-- region TextView -->
@@ -73,12 +80,12 @@
     </style>
 
     <!-- clientapi themes-->
-    <style name="ClientApiTheme" parent="AppTheme"/>
+    <style name="ClientApiTheme" parent="AppTheme" />
 
     <style name="ClientApiTheme.Launcher" parent="AppTheme.Launcher" />
 
     <style name="ClientApiTheme.NoActionBar" parent="AppTheme.NoActionBar" />
 
-    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent"/>
+    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent" />
 
 </resources>

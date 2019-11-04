@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.chip.Chip
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionTracker
@@ -42,25 +43,47 @@ class ModuleSelectionFragment(
 
     override fun onSelectionStateChanged(module: Module) {
         modules.find { it.name == module.name }?.isSelected = module.isSelected
-        selectedModules = modules.filter { it.isSelected }
-        configureNoModulesSelectedTextVisibility(selectedModules)
         updateSelectedModules()
     }
 
     private fun fetchData() {
-        getAvailableModules()
-        getSelectedModules()
+        viewModel.getModules().observe(this, Observer { modules ->
+            this.modules = modules
+            adapter.submitList(modules.filter { !it.isSelected })
+            configureSearchView()
+            observeSearchResults()
+            configureNoModulesSelectedTextVisibility()
+            displaySelectedModules()
+        })
     }
 
-    private fun getAvailableModules() {
-        viewModel.getAvailableModules().observe(this, Observer { modules ->
-            this.modules = modules
-            adapter.submitList(modules)
+    private fun configureSearchView() {
+        queryListener = ModuleSelectionQueryListener(modules)
+        searchView.setOnQueryTextListener(queryListener)
+    }
 
-            queryListener = ModuleSelectionQueryListener(modules)
-            searchView.setOnQueryTextListener(queryListener)
-            observeSearchResults()
-        })
+    private fun displaySelectedModules() {
+        modules.filter {
+            it.isSelected && !selectedModules.contains(it)
+        }.forEach { selectedModule ->
+            val chip = makeChipForModule(selectedModule)
+            chipGroup.addView(chip)
+        }
+        selectedModules = modules.filter { it.isSelected }
+    }
+
+    private fun makeChipForModule(selectedModule: Module): Chip {
+        return Chip(requireContext()).apply {
+            text = selectedModule.name
+            isCloseIconVisible = true
+            setOnCloseIconClickListener {
+                modules.first { module ->
+                    module.name == selectedModule.name
+                }.isSelected = false
+                viewModel.updateModules(modules)
+                chipGroup.removeView(it)
+            }
+        }
     }
 
     private fun observeSearchResults() {
@@ -71,16 +94,8 @@ class ModuleSelectionFragment(
         })
     }
 
-    private fun getSelectedModules() {
-        viewModel.getSelectedModules().observe(this, Observer { selectedModules ->
-            configureNoModulesSelectedTextVisibility(selectedModules)
-            modules.forEach { module ->
-                module.isSelected = selectedModules.any { it.name == module.name }
-            }
-        })
-    }
-
     private fun updateSelectedModules() {
+        selectedModules = modules.filter { it.isSelected }
         viewModel.getMaxSelectedModules().observe(this, Observer { maxSelectedModules ->
             when {
                 selectedModules.isEmpty() -> noModulesSelected()
@@ -89,7 +104,7 @@ class ModuleSelectionFragment(
                     maxSelectedModules
                 )
 
-                else -> viewModel.setSelectedModules(selectedModules)
+                else -> viewModel.updateModules(modules)
             }
         })
     }
@@ -110,8 +125,8 @@ class ModuleSelectionFragment(
         ).show()
     }
 
-    private fun configureNoModulesSelectedTextVisibility(selectedModules: List<Module>) {
-        txtNoModulesSelected.visibility = if (selectedModules.isEmpty()) VISIBLE else GONE
+    private fun configureNoModulesSelectedTextVisibility() {
+        txtNoModulesSelected.visibility = if (modules.none { it.isSelected }) VISIBLE else GONE
     }
 
 }
