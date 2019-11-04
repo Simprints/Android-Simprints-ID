@@ -1,7 +1,7 @@
 package com.simprints.id.activities.settings.fragments.moduleselection.adapter
 
 import android.view.View
-import android.widget.CheckBox
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
@@ -9,15 +9,14 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private val checkBox: CheckBox = itemView.findViewById(R.id.checkBox)
+    private val txtModuleName: TextView = itemView.findViewById(R.id.txtModuleName)
 
     fun bindTo(module: Module, tracker: ModuleSelectionTracker) {
-        with(checkBox) {
+        with(txtModuleName) {
             text = module.name
-            isChecked = module.isSelected
 
             onClick {
-                module.isSelected = isChecked
+                module.isSelected = true
                 tracker.onSelectionStateChanged(module)
             }
         }
