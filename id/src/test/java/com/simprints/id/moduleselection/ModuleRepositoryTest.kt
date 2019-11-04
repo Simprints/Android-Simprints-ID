@@ -10,6 +10,7 @@ import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
 import org.junit.Test
@@ -25,6 +26,7 @@ class ModuleRepositoryTest {
     private val preferencesModule = TestPreferencesModule(
         settingsPreferencesManagerRule = DependencyRule.MockRule
     )
+    private val callback: ModuleSelectionCallback = mock()
 
     private lateinit var repository: ModuleRepository
 
@@ -39,9 +41,9 @@ class ModuleRepositoryTest {
     fun whenSelectingNoModules_shouldTriggerCallback() {
         val selectedModules = emptyList<Module>()
 
-        repository.setSelectedModules(selectedModules)
+        repository.setSelectedModules(selectedModules, callback)
 
-        verify(repository.callback).noModulesSelected()
+        verify(callback).noModulesSelected()
     }
 
     @Test
@@ -56,9 +58,9 @@ class ModuleRepositoryTest {
             Module("7", true)
         )
 
-        repository.setSelectedModules(selectedModules)
+        repository.setSelectedModules(selectedModules, callback)
 
-        verify(repository.callback).tooManyModulesSelected(maxAllowed = 6)
+        verify(callback).tooManyModulesSelected(maxAllowed = 6)
     }
 
     @Test
@@ -71,7 +73,7 @@ class ModuleRepositoryTest {
             Module("5", true)
         )
 
-        repository.setSelectedModules(selectedModules)
+        repository.setSelectedModules(selectedModules, callback)
 
         verify(repository.crashReportManager)
             .setModuleIdsCrashlyticsKey(repository.preferencesManager.selectedModules)

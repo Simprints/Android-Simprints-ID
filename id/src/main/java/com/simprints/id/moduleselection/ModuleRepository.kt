@@ -16,8 +16,6 @@ class ModuleRepository(component: AppComponent) {
     lateinit var preferencesManager: PreferencesManager
     @Inject
     lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var callback: ModuleSelectionCallback
 
     init {
         component.inject(this)
@@ -35,13 +33,13 @@ class ModuleRepository(component: AppComponent) {
         }
     }
 
-    fun setSelectedModules(selectedModules: List<Module>) {
+    fun setSelectedModules(selectedModules: List<Module>, callback: ModuleSelectionCallback) {
         when {
             selectedModules.isEmpty() -> callback.noModulesSelected()
 
-            selectedModules.size > MAX_SELECTED_MODULES -> callback.tooManyModulesSelected(
-                MAX_SELECTED_MODULES
-            )
+            selectedModules.size > MAX_SELECTED_MODULES -> {
+                callback.tooManyModulesSelected(MAX_SELECTED_MODULES)
+            }
 
             else -> {
                 preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
