@@ -14,13 +14,12 @@ import androidx.lifecycle.ViewModelProviders
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionTracker
-import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
 class ModuleSelectionFragment(
     private val applicationContext: Context
-) : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
+) : Fragment(), ModuleSelectionTracker {
 
     private val adapter by lazy { ModuleAdapter(tracker = this) }
 
@@ -39,22 +38,6 @@ class ModuleSelectionFragment(
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
         fetchData()
-    }
-
-    override fun noModulesSelected() {
-        Toast.makeText(
-            applicationContext,
-            R.string.settings_no_modules_toast,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    override fun tooManyModulesSelected(maxAllowed: Int) {
-        Toast.makeText(
-            applicationContext,
-            applicationContext.getString(R.string.settings_too_many_modules_toast, maxAllowed),
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     override fun onSelectionStateChanged(module: Module) {
@@ -98,7 +81,33 @@ class ModuleSelectionFragment(
     }
 
     private fun updateSelectedModules() {
-        viewModel.setSelectedModules(modules.filter { it.isSelected }, callback = this)
+        viewModel.getMaxSelectedModules().observe(this, Observer { maxSelectedModules ->
+            when {
+                selectedModules.isEmpty() -> noModulesSelected()
+
+                selectedModules.size > maxSelectedModules -> tooManyModulesSelected(
+                    maxSelectedModules
+                )
+
+                else -> viewModel.setSelectedModules(selectedModules)
+            }
+        })
+    }
+
+    private fun noModulesSelected() {
+        Toast.makeText(
+            applicationContext,
+            R.string.settings_no_modules_toast,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun tooManyModulesSelected(maxAllowed: Int) {
+        Toast.makeText(
+            applicationContext,
+            applicationContext.getString(R.string.settings_too_many_modules_toast, maxAllowed),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun configureNoModulesSelectedTextVisibility(selectedModules: List<Module>) {
