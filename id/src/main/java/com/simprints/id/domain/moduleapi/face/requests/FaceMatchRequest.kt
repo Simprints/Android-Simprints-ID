@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.face.requests
 
-import com.simprints.id.data.db.person.domain.FaceSample
-import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.fromDomainToModuleApi
 import com.simprints.moduleapi.face.requests.IFaceMatchRequest
 import com.simprints.moduleapi.face.responses.entities.IFaceSample
 import kotlinx.android.parcel.Parcelize
@@ -9,7 +9,7 @@ import java.io.Serializable
 
 @Parcelize
 data class FaceMatchRequest (
-    val probeFaceSamples: List<FaceSample>,
+    val probeFaceSamples: List<FaceCaptureSample>,
     val queryForCandidates: Serializable,
     override val type: FaceRequestType = FaceRequestType.MATCH
 ) : FaceRequest

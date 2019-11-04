@@ -2,9 +2,7 @@ package com.simprints.id.data.db.person.domain
 
 import android.os.Parcelable
 import com.simprints.core.images.SecuredImageRef
-import com.simprints.core.images.fromDomainToModuleApi
-import com.simprints.moduleapi.common.ISecuredImageRef
-import com.simprints.moduleapi.face.responses.entities.IFaceSample
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
@@ -20,12 +18,5 @@ open class FaceSample(
     }
 }
 
-fun FaceSample.fromDomainToModuleApi(): IFaceSample =
-    IFaceSampleImpl(id, template, imageRef?.fromDomainToModuleApi())
+fun FaceCaptureSample.fromModuleEntityToDomain() = FaceSample(template, imageRef)
 
-@Parcelize
-private class IFaceSampleImpl(
-    override val faceId: String,
-    override val template: ByteArray,
-    override val imageRef: ISecuredImageRef?
-): IFaceSample
