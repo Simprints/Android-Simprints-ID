@@ -18,7 +18,7 @@ import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
-class ModuleSelectionFragment private constructor(
+class ModuleSelectionFragment(
     private val applicationContext: Context
 ) : Fragment(), ModuleSelectionCallback, ModuleSelectionTracker {
 
@@ -98,17 +98,11 @@ class ModuleSelectionFragment private constructor(
     }
 
     private fun updateSelectedModules() {
-        viewModel.setSelectedModules(modules.filter { it.isSelected })
+        viewModel.setSelectedModules(modules.filter { it.isSelected }, callback = this)
     }
 
     private fun configureNoModulesSelectedTextVisibility(selectedModules: List<Module>) {
         txtNoModulesSelected.visibility = if (selectedModules.isEmpty()) VISIBLE else GONE
-    }
-
-    companion object {
-        fun getInstance(applicationContext: Context): ModuleSelectionFragment = lazy {
-            ModuleSelectionFragment(applicationContext)
-        }.value
     }
 
 }

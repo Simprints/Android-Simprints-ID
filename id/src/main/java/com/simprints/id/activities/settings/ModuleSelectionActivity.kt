@@ -13,7 +13,7 @@ class ModuleSelectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
-        val fragment = ModuleSelectionFragment.getInstance(applicationContext)
+        val fragment = ModuleSelectionFragment(applicationContext)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.prefContent, fragment)
