@@ -1,11 +1,9 @@
 package com.simprints.id.di
 
-import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
 import com.simprints.id.FingerIdentifier
-import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -19,7 +17,6 @@ import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
-import com.simprints.id.moduleselection.ModuleSelectionCallback
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 import dagger.Module
@@ -85,12 +82,6 @@ open class PreferencesModule {
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer)
-
-    @Provides
-    @Singleton
-    open fun provideModuleSelectionCallback(
-        applicationContext: Context
-    ): ModuleSelectionCallback = ModuleSelectionFragment.getInstance(applicationContext)
 
     @Provides
     @Singleton

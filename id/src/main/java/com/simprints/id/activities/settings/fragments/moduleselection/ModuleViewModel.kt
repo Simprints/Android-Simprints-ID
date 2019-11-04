@@ -19,4 +19,6 @@ class ModuleViewModel(application: Application) : AndroidViewModel(application) 
         repository.setSelectedModules(selectedModules)
     }
 
+    fun getMaxSelectedModules(): LiveData<Int> = repository.getMaxSelectedModules()
+
 }
