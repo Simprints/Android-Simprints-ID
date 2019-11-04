@@ -17,6 +17,8 @@ class ModuleRepository(component: AppComponent) {
     @Inject
     lateinit var crashReportManager: CrashReportManager
 
+    private var availableModules = emptyList<Module>()
+
     init {
         component.inject(this)
     }

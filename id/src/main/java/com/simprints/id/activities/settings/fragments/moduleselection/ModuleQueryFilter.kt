@@ -9,7 +9,6 @@ class ModuleQueryFilter : QueryFilter<Module> {
         return query?.let { searchTerm ->
             items.filter { module ->
                 module.name.contains(searchTerm, ignoreCase = true)
-                // TODO: add !module.isSelected to filter once "selected modules" area is implemented
             }
         } ?: emptyList()
     }
