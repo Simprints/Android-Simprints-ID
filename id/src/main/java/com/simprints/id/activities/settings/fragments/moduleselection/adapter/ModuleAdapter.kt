@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
 
-class ModuleAdapter(
+open class ModuleAdapter(
     private val tracker: ModuleSelectionTracker
 ) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 

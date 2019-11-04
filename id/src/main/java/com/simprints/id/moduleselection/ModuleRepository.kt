@@ -16,8 +16,6 @@ class ModuleRepository(component: AppComponent) {
     lateinit var preferencesManager: PreferencesManager
     @Inject
     lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var callback: ModuleSelectionCallback
 
     init {
         component.inject(this)
@@ -36,27 +34,13 @@ class ModuleRepository(component: AppComponent) {
     }
 
     fun setSelectedModules(selectedModules: List<Module>) {
-        if (isModuleSelectionValid(selectedModules)) {
-            preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
-            logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
-            setCrashlyticsKeyForModules()
-        }
+        preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
+        logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
+        setCrashlyticsKeyForModules()
     }
 
-    private fun isModuleSelectionValid(selectedModules: List<Module>): Boolean {
-        return when {
-            selectedModules.isEmpty() -> {
-                callback.noModulesSelected()
-                false
-            }
-
-            selectedModules.size > MAX_SELECTED_MODULES -> {
-                callback.tooManyModulesSelected(MAX_SELECTED_MODULES)
-                false
-            }
-
-            else -> true
-        }
+    fun getMaxSelectedModules(): LiveData<Int> = MutableLiveData<Int>().apply {
+        value = MAX_SELECTED_MODULES
     }
 
     private fun setCrashlyticsKeyForModules() {

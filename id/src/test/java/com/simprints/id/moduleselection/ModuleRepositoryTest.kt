@@ -36,32 +36,6 @@ class ModuleRepositoryTest {
     }
 
     @Test
-    fun whenSelectingNoModules_shouldTriggerCallback() {
-        val selectedModules = emptyList<Module>()
-
-        repository.setSelectedModules(selectedModules)
-
-        verify(repository.callback).noModulesSelected()
-    }
-
-    @Test
-    fun whenSelectingTooManyModules_shouldTriggerCallback() {
-        val selectedModules = listOf(
-            Module("1", true),
-            Module("2", true),
-            Module("3", true),
-            Module("4", true),
-            Module("5", true),
-            Module("6", true),
-            Module("7", true)
-        )
-
-        repository.setSelectedModules(selectedModules)
-
-        verify(repository.callback).tooManyModulesSelected(maxAllowed = 6)
-    }
-
-    @Test
     fun whenSelectingAnAcceptableNumberOfModules_shouldLogOnCrashReport() {
         val selectedModules = listOf(
             Module("1", true),

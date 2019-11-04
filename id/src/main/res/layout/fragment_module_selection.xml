@@ -57,7 +57,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/guideline"
-        app:queryHint="@string/hint_search_modules" />
+        app:queryHint="@string/hint_search_modules"
+        app:iconifiedByDefault="false"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvModules"
@@ -71,5 +72,17 @@
         app:layout_constraintTop_toBottomOf="@id/searchView"
         tools:itemCount="100"
         tools:listitem="@layout/item_module" />
+
+    <TextView
+        android:id="@+id/txtNoResults"
+        style="@style/SimprintsStyle.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_default"
+        android:text="@string/no_results"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/searchView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

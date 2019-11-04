@@ -5,7 +5,7 @@ import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
-import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -16,7 +16,7 @@ class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             text = module.name
             isChecked = module.isSelected
 
-            onCheckedChange { _, isChecked ->
+            onClick {
                 module.isSelected = isChecked
                 tracker.onSelectionStateChanged(module)
             }
