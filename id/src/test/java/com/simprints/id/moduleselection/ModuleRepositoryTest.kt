@@ -45,22 +45,22 @@ class ModuleRepositoryTest {
             Module("5", true)
         )
 
-        repository.setSelectedModules(selectedModules)
+        repository.updateModules(selectedModules)
 
         verify(repository.crashReportManager)
             .setModuleIdsCrashlyticsKey(repository.preferencesManager.selectedModules)
     }
 
     @Test
-    fun shouldReturnAvailableModules() {
+    fun shouldReturnAllModules() {
         val expected = listOf(
             Module("a", false),
-            Module("b", false),
-            Module("c", false),
+            Module("b", true),
+            Module("c", true),
             Module("d", false)
         )
 
-        val actual = repository.getAvailableModules()
+        val actual = repository.getModules()
 
         assertThat(actual.value).isEqualTo(expected)
     }
@@ -72,9 +72,9 @@ class ModuleRepositoryTest {
             Module("c", true)
         )
 
-        val actual = repository.getSelectedModules()
+        val actual = repository.getModules().value?.filter { it.isSelected }
 
-        assertThat(actual.value).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
 
     private fun configureMock() {
