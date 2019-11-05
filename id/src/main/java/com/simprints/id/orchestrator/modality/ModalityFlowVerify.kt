@@ -9,6 +9,8 @@ import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
@@ -64,12 +66,19 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
             if (result is FingerprintCaptureResponse) {
                 val query = Query(patientId = appRequest.verifyGuid)
                 addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
+            } else if (result is FaceCaptureResponse) {
+                val query = Query(patientId = appRequest.verifyGuid)
+                addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
             }
         }
     }
 
     private fun addMatchingStep(probeSamples: List<FingerprintSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    }
+
+    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: Query) {
+        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
     }
 
     private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {
