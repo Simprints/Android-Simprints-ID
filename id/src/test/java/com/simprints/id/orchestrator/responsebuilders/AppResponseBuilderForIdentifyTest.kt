@@ -1,6 +1,8 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.domain.modality.Modality
+import com.simprints.id.domain.modality.Modality.FACE
+import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.orchestrator.steps.Step
@@ -18,7 +20,7 @@ class AppResponseBuilderForIdentifyTest {
     @Test
     fun withFingerprintOnlySteps_shouldBuildAppResponse() {
         runBlockingTest {
-            val modalities = listOf(Modality.FINGER)
+            val modalities = listOf(FINGER)
             val steps = mockSteps(modalities)
 
             val response = responseBuilder.buildAppResponse(
@@ -32,7 +34,21 @@ class AppResponseBuilderForIdentifyTest {
     @Test
     fun withFaceOnlySteps_shouldBuildAppIdentifyResponse() {
         runBlockingTest {
-            val modalities = listOf(Modality.FACE)
+            val modalities = listOf(FACE)
+            val steps = mockSteps(modalities)
+
+            val response = responseBuilder.buildAppResponse(
+                modalities, mockRequest(), steps, "sessionId"
+            )
+
+            assertThat(response, instanceOf(AppIdentifyResponse::class.java))
+        }
+    }
+
+    @Test
+    fun withFingerprintAndFaceSteps_shouldBuildAppIdentifyResponse() {
+        runBlockingTest {
+            val modalities = listOf(FINGER, FACE)
             val steps = mockSteps(modalities)
 
             val response = responseBuilder.buildAppResponse(
@@ -51,12 +67,12 @@ class AppResponseBuilderForIdentifyTest {
     private fun mockSteps(modalities: List<Modality>): List<Step> {
         val steps = arrayListOf<Step>()
 
-        if (modalities.contains(Modality.FINGER)) {
+        if (modalities.contains(FINGER)) {
             steps.add(mockFingerprintCaptureStep())
             steps.add(mockFingerprintMatchStep())
         }
 
-        if (modalities.contains(Modality.FACE)) {
+        if (modalities.contains(FACE)) {
             steps.add(mockFaceCaptureStep())
             steps.add(mockFaceMatchStep())
         }

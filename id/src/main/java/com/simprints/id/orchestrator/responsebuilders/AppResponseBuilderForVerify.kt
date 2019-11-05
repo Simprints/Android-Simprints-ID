@@ -45,8 +45,9 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
         results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
     private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceMatchResponse,
-                                                            fingerprintResponse: FingerprintMatchResponse): AppVerifyResponse =
-        TODO("Not implemented yet")
+                                                            fingerprintResponse: FingerprintMatchResponse) =
+        AppVerifyResponse(
+            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }.first())
 
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
         AppVerifyResponse(
