@@ -46,9 +46,10 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
 
     private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceMatchResponse,
                                                          fingerprintResponse: FingerprintMatchResponse,
-                                                         sessionId: String): AppIdentifyResponse {
-        TODO("Not implemented yet")
-    }
+                                                         sessionId: String) =
+        AppIdentifyResponse(
+            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) },
+            sessionId)
 
     private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
                                                        sessionId: String) =
