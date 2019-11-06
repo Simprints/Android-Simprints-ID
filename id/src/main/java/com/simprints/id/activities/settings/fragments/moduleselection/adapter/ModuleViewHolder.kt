@@ -11,13 +11,13 @@ class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val txtModuleName: TextView = itemView.findViewById(R.id.txtModuleName)
 
-    fun bindTo(module: Module, tracker: ModuleSelectionTracker) {
+    fun bindTo(module: Module, listener: ModuleSelectionListener) {
         with(txtModuleName) {
             text = module.name
 
             onClick {
                 module.isSelected = true
-                tracker.onSelectionStateChanged(module)
+                listener.onModuleSelected(module)
             }
         }
     }
