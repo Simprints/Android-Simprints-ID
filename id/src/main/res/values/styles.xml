@@ -49,6 +49,10 @@
         <item name="android:textColor">@color/simprints_white</item>
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="SimprintsStyle.TextView.Orange">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
     <!-- endregion -->
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

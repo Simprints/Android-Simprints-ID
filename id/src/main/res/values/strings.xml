@@ -425,6 +425,7 @@
     <string name="hint_search_modules">Search modules</string>
     <string name="no_modules_selected">No modules selected</string>
     <string name="no_results">No results</string>
+    <string name="selected_modules">Selected modules</string>
     <!-- endregion -->
 
 </resources>
