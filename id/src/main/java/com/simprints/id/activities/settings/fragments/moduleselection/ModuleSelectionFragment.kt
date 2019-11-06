@@ -8,6 +8,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -28,7 +29,7 @@ class ModuleSelectionFragment(
     private lateinit var queryListener: ModuleSelectionQueryListener
 
     private var modules = emptyList<Module>()
-    private var selectedModules = emptyList<Module>()
+    private var selectedModules = mutableListOf<Module>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -42,8 +43,8 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
-        updateSelectedModules()
-        addChipForModule(module)
+        selectedModules.add(module)
+        updateSelectedModules(module)
     }
 
     private fun fetchData() {
@@ -68,7 +69,7 @@ class ModuleSelectionFragment(
         }.forEach { selectedModule ->
             addChipForModule(selectedModule)
         }
-        selectedModules = modules.filter { it.isSelected }
+        selectedModules = modules.filter { it.isSelected }.toMutableList()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -79,8 +80,8 @@ class ModuleSelectionFragment(
                 modules.first { module ->
                     module.name == selectedModule.name
                 }.isSelected = false
-                updateSelectedModules()
-                chipGroup.removeView(it)
+                selectedModules.remove(selectedModule)
+                updateSelectedModules(selectedModule)
             }
         }
 
@@ -95,18 +96,35 @@ class ModuleSelectionFragment(
         })
     }
 
-    private fun updateSelectedModules() {
-        selectedModules = modules.filter { it.isSelected }
+    private fun updateSelectedModules(lastModuleChanged: Module) {
         val maxSelectedModules = viewModel.getMaxSelectedModules()
+
         when {
-            selectedModules.isEmpty() -> noModulesSelected()
+            selectedModules.isEmpty() -> {
+                noModulesSelected()
+                modules.first { it.name == lastModuleChanged.name }.isSelected = true
+                selectedModules.add(lastModuleChanged)
+            }
 
-            selectedModules.size > maxSelectedModules -> tooManyModulesSelected(
-                maxSelectedModules
-            )
+            selectedModules.size > maxSelectedModules -> {
+                tooManyModulesSelected(maxSelectedModules)
+                modules.first { it.name == lastModuleChanged.name }.isSelected = false
+                selectedModules.remove(lastModuleChanged)
+            }
 
-            else -> viewModel.updateModules(modules)
+            else -> {
+                viewModel.updateModules(modules)
+
+                if (lastModuleChanged.isSelected)
+                    addChipForModule(lastModuleChanged)
+                else
+                    chipGroup.removeView(findChip(lastModuleChanged))
+            }
         }
+    }
+
+    private fun findChip(module: Module): Chip? {
+        return chipGroup.children.find { (it as Chip).text == module.name } as Chip
     }
 
     private fun noModulesSelected() {
