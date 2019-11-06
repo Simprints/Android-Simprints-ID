@@ -1,6 +1,7 @@
 <resources>
-    <!-- region Chip spacing -->
+    <!-- region Chip -->
     <dimen name="chip_spacing_default">8dp</dimen>
+    <dimen name="chip_corner_size_module_selection">0dp</dimen>
     <!-- endregion -->
 
     <!-- region Margin -->
