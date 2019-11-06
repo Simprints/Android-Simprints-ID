@@ -14,15 +14,15 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.chip.Chip
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
-import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionTracker
+import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 
 class ModuleSelectionFragment(
     private val applicationContext: Context
-) : Fragment(), ModuleSelectionTracker {
+) : Fragment(), ModuleSelectionListener {
 
-    private val adapter by lazy { ModuleAdapter(tracker = this) }
+    private val adapter by lazy { ModuleAdapter(listener = this) }
 
     private lateinit var viewModel: ModuleViewModel
     private lateinit var queryListener: ModuleSelectionQueryListener
@@ -41,9 +41,9 @@ class ModuleSelectionFragment(
         fetchData()
     }
 
-    override fun onSelectionStateChanged(module: Module) {
-        modules.find { it.name == module.name }?.isSelected = module.isSelected
+    override fun onModuleSelected(module: Module) {
         updateSelectedModules()
+        addChipForModule(module)
     }
 
     private fun fetchData() {
@@ -66,24 +66,25 @@ class ModuleSelectionFragment(
         modules.filter {
             it.isSelected && !selectedModules.contains(it)
         }.forEach { selectedModule ->
-            val chip = makeChipForModule(selectedModule)
-            chipGroup.addView(chip)
+            addChipForModule(selectedModule)
         }
         selectedModules = modules.filter { it.isSelected }
     }
 
-    private fun makeChipForModule(selectedModule: Module): Chip {
-        return Chip(requireContext()).apply {
+    private fun addChipForModule(selectedModule: Module) {
+        val chip = Chip(requireContext()).apply {
             text = selectedModule.name
             isCloseIconVisible = true
             setOnCloseIconClickListener {
                 modules.first { module ->
                     module.name == selectedModule.name
                 }.isSelected = false
-                viewModel.updateModules(modules)
+                updateSelectedModules()
                 chipGroup.removeView(it)
             }
         }
+
+        chipGroup.addView(chip)
     }
 
     private fun observeSearchResults() {
@@ -96,17 +97,16 @@ class ModuleSelectionFragment(
 
     private fun updateSelectedModules() {
         selectedModules = modules.filter { it.isSelected }
-        viewModel.getMaxSelectedModules().observe(this, Observer { maxSelectedModules ->
-            when {
-                selectedModules.isEmpty() -> noModulesSelected()
+        val maxSelectedModules = viewModel.getMaxSelectedModules()
+        when {
+            selectedModules.isEmpty() -> noModulesSelected()
 
-                selectedModules.size > maxSelectedModules -> tooManyModulesSelected(
-                    maxSelectedModules
-                )
+            selectedModules.size > maxSelectedModules -> tooManyModulesSelected(
+                maxSelectedModules
+            )
 
-                else -> viewModel.updateModules(modules)
-            }
-        })
+            else -> viewModel.updateModules(modules)
+        }
     }
 
     private fun noModulesSelected() {

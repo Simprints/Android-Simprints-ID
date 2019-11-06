@@ -8,7 +8,7 @@ import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
 
 open class ModuleAdapter(
-    private val tracker: ModuleSelectionTracker
+    private val listener: ModuleSelectionListener
 ) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
@@ -19,7 +19,7 @@ open class ModuleAdapter(
 
     override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
         val moduleName = getItem(position)
-        holder.bindTo(moduleName, tracker)
+        holder.bindTo(moduleName, listener)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Module>() {

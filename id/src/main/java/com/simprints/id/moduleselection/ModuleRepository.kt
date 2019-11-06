@@ -38,9 +38,7 @@ class ModuleRepository(component: AppComponent) {
         setSelectedModules(modules.filter { it.isSelected })
     }
 
-    fun getMaxSelectedModules(): LiveData<Int> = MutableLiveData<Int>().apply {
-        value = MAX_SELECTED_MODULES
-    }
+    fun getMaxSelectedModules(): Int = MAX_SELECTED_MODULES
 
     private fun setSelectedModules(selectedModules: List<Module>) {
         preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
