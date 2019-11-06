@@ -84,7 +84,7 @@ class ModuleSelectionFragment(
             setChipDrawable(chipDrawable)
             text = selectedModule.name
             setOnCloseIconClickListener {
-                (it as Chip).isChecked = true
+                (it as Chip).isSelected = true
                 handleChipClick(selectedModule)
             }
         }
@@ -140,14 +140,13 @@ class ModuleSelectionFragment(
                 if (lastModuleChanged.isSelected)
                     addChipForModule(lastModuleChanged)
                 else
-                    chipGroup.removeView(findChip(lastModuleChanged))
+                    chipGroup.removeView(findSelectedChip())
             }
         }
     }
 
-    // FIXME
-    private fun findChip(module: Module): Chip? {
-        val view = chipGroup.children.find { (it as Chip).text == module.name }
+    private fun findSelectedChip(): Chip? {
+        val view = chipGroup.children.find { (it as Chip).isSelected }
 
         return if (view != null)
             view as Chip
