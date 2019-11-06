@@ -47,15 +47,7 @@
 
     <style name="SimprintsStyle.TextView.White">
         <item name="android:textColor">@color/simprints_white</item>
-    </style>
-    <!-- endregion -->
-
-    <!-- region Chip -->
-    <style name="SimprintsStyle.Chip">
-        <item name="android:background">@drawable/shape_chip</item>
-        <item name="android:textColor">@color/simprints_white</item>
-        <item name="android:textSize">@dimen/text_size_chip</item>
-        <item name="android:padding">@dimen/padding_chip</item>
+        <item name="android:textSize">14sp</item>
     </style>
     <!-- endregion -->
 

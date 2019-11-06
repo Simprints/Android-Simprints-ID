@@ -13,11 +13,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipDrawable
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
+import org.jetbrains.anko.dimen
 
 class ModuleSelectionFragment(
     private val applicationContext: Context
@@ -73,19 +77,37 @@ class ModuleSelectionFragment(
     }
 
     private fun addChipForModule(selectedModule: Module) {
-        val chip = Chip(requireContext()).apply {
+        val context = requireContext()
+        val chipDrawable = createChipDrawable(context)
+
+        val chip = Chip(context).apply {
+            setChipDrawable(chipDrawable)
             text = selectedModule.name
-            isCloseIconVisible = true
             setOnCloseIconClickListener {
-                modules.first { module ->
-                    module.name == selectedModule.name
-                }.isSelected = false
-                selectedModules.remove(selectedModule)
-                updateSelectedModules(selectedModule)
+                (it as Chip).isChecked = true
+                handleChipClick(selectedModule)
             }
         }
 
         chipGroup.addView(chip)
+    }
+
+    private fun createChipDrawable(context: Context): ChipDrawable {
+        return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
+            setTextAppearanceResource(R.style.SimprintsStyle_TextView_White)
+            shapeAppearanceModel = ShapeAppearanceModel().also { shapeAppearanceModel ->
+                val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection)
+                shapeAppearanceModel.setAllCorners(CornerFamily.CUT, cornerSize)
+            }
+        }
+    }
+
+    private fun handleChipClick(selectedModule: Module) {
+        modules.first { module ->
+            module.name == selectedModule.name
+        }.isSelected = false
+        selectedModules.remove(selectedModule)
+        updateSelectedModules(selectedModule)
     }
 
     private fun observeSearchResults() {
@@ -123,8 +145,14 @@ class ModuleSelectionFragment(
         }
     }
 
+    // FIXME
     private fun findChip(module: Module): Chip? {
-        return chipGroup.children.find { (it as Chip).text == module.name } as Chip
+        val view = chipGroup.children.find { (it as Chip).text == module.name }
+
+        return if (view != null)
+            view as Chip
+        else
+            null
     }
 
     private fun noModulesSelected() {
