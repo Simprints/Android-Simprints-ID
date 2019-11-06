@@ -3,8 +3,6 @@ package com.simprints.id.activities.settings
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.rule.ActivityTestRule
-import br.com.concretesolutions.kappuccino.actions.ClickActions.click
-import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.notDisplayed
 import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInteractions.recyclerView
 import com.simprints.id.Application
@@ -58,17 +56,6 @@ class ModuleSelectionActivityAndroidTest {
     }
 
     @Test
-    fun whenDeselectingAllModules_noModulesSelectedTextShouldBeVisible() {
-        click {
-            id(ID_CHIP_CLOSE_BUTTON)
-        }
-
-        displayed {
-            id(R.id.txtNoModulesSelected)
-        }
-    }
-
-    @Test
     fun whenSelectingAModule_shouldBeRemovedFromList() {
         recyclerView(R.id.rvModules) {
             atPosition(0) {
@@ -89,10 +76,6 @@ class ModuleSelectionActivityAndroidTest {
         whenever {
             preferencesManager.selectedModules
         } thenReturn setOf("b")
-    }
-
-    private companion object {
-        const val ID_CHIP_CLOSE_BUTTON = 1
     }
 
 }
