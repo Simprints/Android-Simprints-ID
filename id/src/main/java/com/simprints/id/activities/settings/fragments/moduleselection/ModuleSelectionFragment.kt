@@ -57,7 +57,7 @@ class ModuleSelectionFragment(
             adapter.submitList(modules.filter { !it.isSelected })
             configureSearchView()
             observeSearchResults()
-            configureNoModulesSelectedTextVisibility()
+            configureTextViewVisibility()
             displaySelectedModules()
         })
     }
@@ -170,8 +170,14 @@ class ModuleSelectionFragment(
         ).show()
     }
 
-    private fun configureNoModulesSelectedTextVisibility() {
-        txtNoModulesSelected.visibility = if (modules.none { it.isSelected }) VISIBLE else GONE
+    private fun configureTextViewVisibility() {
+        if (modules.none { it.isSelected }) {
+            txtNoModulesSelected.visibility = VISIBLE
+            txtSelectedModules.visibility = GONE
+        } else {
+            txtNoModulesSelected.visibility = GONE
+            txtSelectedModules.visibility = VISIBLE
+        }
     }
 
 }
