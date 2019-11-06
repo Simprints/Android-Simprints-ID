@@ -21,6 +21,7 @@ import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsT
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
@@ -39,6 +40,7 @@ class CollectFingerprintsActivity :
     val context: Context by lazy { this }
     val orchestrator: Orchestrator by inject()
     val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
+    val sessionEventsManager: FingerprintSessionEventsManager by inject()
 
     private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
