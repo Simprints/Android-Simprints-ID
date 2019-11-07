@@ -83,7 +83,7 @@ class ModuleRepositoryTest {
             repository.preferencesManager.maxNumberOfModules
         } thenReturn 10
 
-        assertThat(repository.getMaxSelectedModules()).isEqualTo(10)
+        assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
     }
 
     private fun configureMock() {
