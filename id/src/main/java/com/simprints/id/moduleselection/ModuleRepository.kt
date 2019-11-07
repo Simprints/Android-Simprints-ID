@@ -38,7 +38,7 @@ class ModuleRepository(component: AppComponent) {
         setSelectedModules(modules.filter { it.isSelected })
     }
 
-    fun getMaxSelectedModules(): Int = preferencesManager.maxNumberOfModules
+    fun getMaxNumberOfModules(): Int = preferencesManager.maxNumberOfModules
 
     private fun setSelectedModules(selectedModules: List<Module>) {
         preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
