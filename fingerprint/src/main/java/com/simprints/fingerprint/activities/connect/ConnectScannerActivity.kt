@@ -17,11 +17,11 @@ import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.activity_connect_scanner.*
-import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
-    private val viewModel: ConnectScannerViewModel by inject()
+    private val viewModel: ConnectScannerViewModel by viewModel()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 

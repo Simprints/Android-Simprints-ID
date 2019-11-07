@@ -33,22 +33,10 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module(override = true) {
-            defineBuildersForCoreManagers()
             defineBuildersForFaceManagers()
             defineBuildersForDomainClasses()
             defineBuildersForViewModels()
         }
-
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { appComponent().getPreferencesManager() }
-        factory { appComponent().getAnalyticsManager() }
-        factory { appComponent().getSessionEventsManager() }
-        factory { appComponent().getCrashReportManager() }
-        factory { appComponent().getTimeHelper() }
-        factory { appComponent().getPersonRepository() }
-        factory { appComponent().getImprovedSharedPreferences() }
-        factory { appComponent().getRemoteConfigWrapper() }
-    }
 
     private fun Module.defineBuildersForFaceManagers() {
 
