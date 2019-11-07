@@ -68,7 +68,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
     override fun returnVerification(confidence: Int, tier: Tier, guid: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
-            putInt(VERIFICATION_CONFIDENCE_KEY, confidence)
+            putString(VERIFICATION_CONFIDENCE_KEY, confidence.toString())
             putString(VERIFICATION_TIER_KEY, tier.name)
             putString(VERIFICATION_GUID_KEY, guid)
         }
