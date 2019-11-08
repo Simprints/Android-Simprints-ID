@@ -17,30 +17,33 @@ class ModuleRepository(component: AppComponent) {
     @Inject
     lateinit var crashReportManager: CrashReportManager
 
+    private val modules = MutableLiveData<List<Module>>()
+
     init {
         component.inject(this)
     }
 
-    fun getAvailableModules(): LiveData<List<Module>> = MutableLiveData<List<Module>>().apply {
-        value = preferencesManager.moduleIdOptions.map { name ->
-            Module(name, isSelected = false)
+    fun getModules(): LiveData<List<Module>> {
+        val allModules = preferencesManager.moduleIdOptions
+        val selectedModules = preferencesManager.selectedModules
+        modules.value = allModules.map { name ->
+            val isSelected = selectedModules.contains(name)
+            Module(name, isSelected)
         }
+        return modules
     }
 
-    fun getSelectedModules(): LiveData<List<Module>> = MutableLiveData<List<Module>>().apply {
-        value = preferencesManager.selectedModules.map { name ->
-            Module(name, isSelected = true)
-        }
+    fun updateModules(modules: List<Module>) {
+        this.modules.value = modules
+        setSelectedModules(modules.filter { it.isSelected })
     }
 
-    fun setSelectedModules(selectedModules: List<Module>) {
+    fun getMaxSelectedModules(): Int = MAX_SELECTED_MODULES
+
+    private fun setSelectedModules(selectedModules: List<Module>) {
         preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
         logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
         setCrashlyticsKeyForModules()
-    }
-
-    fun getMaxSelectedModules(): LiveData<Int> = MutableLiveData<Int>().apply {
-        value = MAX_SELECTED_MODULES
     }
 
     private fun setCrashlyticsKeyForModules() {

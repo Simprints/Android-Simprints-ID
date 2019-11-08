@@ -9,6 +9,7 @@ import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInter
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
@@ -29,15 +30,18 @@ class ModuleSelectionActivityAndroidTest {
         settingsPreferencesManagerRule = DependencyRule.MockRule
     )
 
+    private lateinit var preferencesManager: PreferencesManager
+
     @Before
     fun setUp() {
         AndroidTestConfig(this, null, preferencesModule).fullSetup()
-        configureMock()
-        rule.launchActivity(Intent())
+        preferencesManager = app.component.getPreferencesManager()
     }
 
     @Test
-    fun shouldLoadModules() {
+    fun shouldLoadOnlyUnselectedModules() {
+        launchWithModulesSelected()
+
         recyclerView(R.id.rvModules) {
             sizeIs(4)
         }
@@ -45,6 +49,8 @@ class ModuleSelectionActivityAndroidTest {
 
     @Test
     fun whenSelectingModules_noModulesSelectedTextShouldNotBeVisible() {
+        launchWithModulesSelected()
+
         recyclerView(R.id.rvModules) {
             atPosition(0) {
                 click()
@@ -57,43 +63,76 @@ class ModuleSelectionActivityAndroidTest {
     }
 
     @Test
-    fun whenNoModulesAreSelected_noModulesSelectedTextShouldBeVisible() {
+    fun whenSelectingAModule_shouldBeRemovedFromList() {
+        launchWithModulesSelected()
+
+        recyclerView(R.id.rvModules) {
+            atPosition(0) {
+                click()
+            }
+
+            sizeIs(3)
+        }
+    }
+
+    @Test
+    fun withSelectedModules_shouldDisplaySelectedModulesText() {
+        launchWithModulesSelected()
+
+        displayed {
+            id(R.id.txtSelectedModules)
+        }
+    }
+
+    @Test
+    fun withSelectedModules_shouldNotDisplayNoModulesSelectedText() {
+        launchWithModulesSelected()
+
+        notDisplayed {
+            id(R.id.txtNoModulesSelected)
+        }
+    }
+
+    @Test
+    fun withoutSelectedModules_shouldDisplayNoModulesSelectedText() {
+        launchWithoutModulesSelected()
+
         displayed {
             id(R.id.txtNoModulesSelected)
         }
     }
 
     @Test
-    fun whenDeselectingAllModules_noModulesSelectedTextShouldBeVisible() {
-        recyclerView(R.id.rvModules) {
-            atPosition(0) {
-                click()
-            }
-        }
+    fun withoutSelectedModules_shouldNotDisplaySelectedModulesText() {
+        launchWithoutModulesSelected()
 
         notDisplayed {
-            id(R.id.txtNoModulesSelected)
-        }
-
-        recyclerView(R.id.rvModules) {
-            atPosition(0) {
-                click()
-            }
-        }
-
-        displayed {
-            id(R.id.txtNoModulesSelected)
+            id(R.id.txtSelectedModules)
         }
     }
 
-    private fun configureMock() {
-        val preferencesManager = app.component.getPreferencesManager()
+    private fun launchWithModulesSelected() {
         whenever {
             preferencesManager.moduleIdOptions
-        } thenReturn setOf("a", "b", "c", "d")
+        } thenReturn setOf("a", "b", "c", "d", "e")
+
+        whenever {
+            preferencesManager.selectedModules
+        } thenReturn setOf("b")
+
+        rule.launchActivity(Intent())
+    }
+
+    private fun launchWithoutModulesSelected() {
+        whenever {
+            preferencesManager.moduleIdOptions
+        } thenReturn setOf("a", "b", "c", "d", "e")
+
         whenever {
             preferencesManager.selectedModules
         } thenReturn emptySet()
+
+        rule.launchActivity(Intent())
     }
 
 }
