@@ -44,6 +44,7 @@ class ModuleSelectionFragment(
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
         fetchData()
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onModuleSelected(module: Module) {
@@ -91,6 +92,7 @@ class ModuleSelectionFragment(
         }
 
         chipGroup.addView(chip)
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     private fun createChipDrawable(context: Context): ChipDrawable {
