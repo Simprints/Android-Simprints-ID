@@ -101,6 +101,12 @@ def rxjava2 = [
     tasks      : "io.ashdavies.rx:rx-tasks:2.2.0"
 ]
 
+// Fuzzywuzzy (fuzzy search)
+def fuzzywuzzy_version = "1.2.0"
+def fuzzywuzzy = [
+    core: "me.xdrop:fuzzywuzzy:$fuzzywuzzy_version"
+]
+
 // Koin, Service Location
 def koin_version = "2.0.1"
 def koin = [
@@ -109,7 +115,6 @@ def koin = [
     android  : "org.koin:koin-android:$koin_version",
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
-
 
 def mockito_version = "2.23.0"
 def espresso_version = "3.2.0-alpha04"
