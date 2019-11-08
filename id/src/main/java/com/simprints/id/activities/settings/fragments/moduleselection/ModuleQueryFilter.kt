@@ -7,15 +7,17 @@ import me.xdrop.fuzzywuzzy.FuzzySearch
 class ModuleQueryFilter : QueryFilter<Module> {
 
     override fun getFilteredList(items: List<Module>, query: String?): List<Module> {
-        val limit = 5 // TODO: check if it's really necessary
+        val limit = 5 // TODO: check
         val searchResults = FuzzySearch.extractTop(query, items.map { it.name }, limit).apply {
             sortByDescending { it.score }
         }
 
-        val moduleNames = searchResults.map { it.string }
+        val moduleNames = searchResults.filter {
+            it.score > 50 // TODO: check
+        }.map { it.string }
 
         return items.filter { module ->
-            moduleNames.contains(module.name)
+            moduleNames.contains(module.name) && !module.isSelected
         }
     }
 

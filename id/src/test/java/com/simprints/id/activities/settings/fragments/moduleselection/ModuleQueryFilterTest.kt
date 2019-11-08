@@ -21,8 +21,8 @@ class ModuleQueryFilterTest {
     private val filter = ModuleQueryFilter()
 
     @Test
-    fun withNullQuery_shouldReturnEmptyList() {
-        val query: String? = null
+    fun withEmptyQuery_shouldReturnEmptyList() {
+        val query = ""
         val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEmpty()
