@@ -130,7 +130,7 @@ class ModuleSelectionFragment(
                 selectedModules.add(lastModuleChanged)
             }
 
-            selectedModules.size > maxNumberOfModules -> {
+            lastModuleChanged.isSelected && selectedModules.size > maxNumberOfModules -> {
                 tooManyModulesSelected(maxNumberOfModules)
                 modules.first { it.name == lastModuleChanged.name }.isSelected = false
                 selectedModules.remove(lastModuleChanged)
