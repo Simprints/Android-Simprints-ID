@@ -83,6 +83,7 @@ class ModuleSelectionFragment(
         val chip = Chip(context).apply {
             setChipDrawable(chipDrawable)
             text = selectedModule.name
+            isCheckable = false
             setOnCloseIconClickListener {
                 (it as Chip).isSelected = true
                 handleChipClick(selectedModule)
