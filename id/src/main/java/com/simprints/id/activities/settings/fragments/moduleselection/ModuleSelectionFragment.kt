@@ -121,7 +121,7 @@ class ModuleSelectionFragment(
     }
 
     private fun updateSelectedModules(lastModuleChanged: Module) {
-        val maxSelectedModules = viewModel.getMaxSelectedModules()
+        val maxNumberOfModules = viewModel.getMaxNumberOfModules()
 
         when {
             selectedModules.isEmpty() -> {
@@ -130,8 +130,8 @@ class ModuleSelectionFragment(
                 selectedModules.add(lastModuleChanged)
             }
 
-            lastModuleChanged.isSelected && selectedModules.size > maxSelectedModules -> {
-                tooManyModulesSelected(maxSelectedModules)
+            lastModuleChanged.isSelected && selectedModules.size > maxNumberOfModules -> {
+                tooManyModulesSelected(maxNumberOfModules)
                 modules.first { it.name == lastModuleChanged.name }.isSelected = false
                 selectedModules.remove(lastModuleChanged)
             }

@@ -17,6 +17,6 @@ class ModuleViewModel(application: Application) : AndroidViewModel(application) 
         repository.updateModules(modules)
     }
 
-    fun getMaxSelectedModules(): Int = repository.getMaxSelectedModules()
+    fun getMaxNumberOfModules(): Int = repository.getMaxNumberOfModules()
 
 }
