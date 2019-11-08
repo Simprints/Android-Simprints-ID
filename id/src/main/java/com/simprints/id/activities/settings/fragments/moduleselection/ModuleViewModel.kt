@@ -11,14 +11,12 @@ class ModuleViewModel(application: Application) : AndroidViewModel(application) 
 
     private val repository = ModuleRepository((application as SimprintsApplication).component)
 
-    fun getAvailableModules(): LiveData<List<Module>> = repository.getAvailableModules()
+    fun getModules(): LiveData<List<Module>> = repository.getModules()
 
-    fun getSelectedModules(): LiveData<List<Module>> = repository.getSelectedModules()
-
-    fun setSelectedModules(selectedModules: List<Module>) {
-        repository.setSelectedModules(selectedModules)
+    fun updateModules(modules: List<Module>) {
+        repository.updateModules(modules)
     }
 
-    fun getMaxSelectedModules(): LiveData<Int> = repository.getMaxSelectedModules()
+    fun getMaxSelectedModules(): Int = repository.getMaxSelectedModules()
 
 }

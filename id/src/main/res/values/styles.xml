@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="SimprintsStyle"/>
+    <style name="SimprintsStyle" />
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -33,6 +33,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.MaterialComponents" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textViewStyle">@style/SimprintsStyle.TextView</item>
+    </style>
+
     <!-- region TextView -->
     <style name="SimprintsStyle.TextView" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/muli</item>
@@ -40,15 +47,11 @@
 
     <style name="SimprintsStyle.TextView.White">
         <item name="android:textColor">@color/simprints_white</item>
+        <item name="android:textSize">14sp</item>
     </style>
-    <!-- endregion -->
 
-    <!-- region Chip -->
-    <style name="SimprintsStyle.Chip">
-        <item name="android:background">@drawable/shape_chip</item>
-        <item name="android:textColor">@color/simprints_white</item>
-        <item name="android:textSize">@dimen/text_size_chip</item>
-        <item name="android:padding">@dimen/padding_chip</item>
+    <style name="SimprintsStyle.TextView.Orange">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
     <!-- endregion -->
 
@@ -73,12 +76,12 @@
     </style>
 
     <!-- clientapi themes-->
-    <style name="ClientApiTheme" parent="AppTheme"/>
+    <style name="ClientApiTheme" parent="AppTheme" />
 
     <style name="ClientApiTheme.Launcher" parent="AppTheme.Launcher" />
 
     <style name="ClientApiTheme.NoActionBar" parent="AppTheme.NoActionBar" />
 
-    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent"/>
+    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent" />
 
 </resources>
