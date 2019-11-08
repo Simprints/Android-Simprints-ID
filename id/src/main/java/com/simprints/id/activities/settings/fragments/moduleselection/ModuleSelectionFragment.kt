@@ -44,7 +44,6 @@ class ModuleSelectionFragment(
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
         fetchData()
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onModuleSelected(module: Module) {
