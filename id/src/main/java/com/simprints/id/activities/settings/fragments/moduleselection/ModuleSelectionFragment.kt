@@ -83,6 +83,7 @@ class ModuleSelectionFragment(
         val chip = Chip(context).apply {
             setChipDrawable(chipDrawable)
             text = selectedModule.name
+            isCheckable = false
             setOnCloseIconClickListener {
                 (it as Chip).isSelected = true
                 handleChipClick(selectedModule)
@@ -90,6 +91,7 @@ class ModuleSelectionFragment(
         }
 
         chipGroup.addView(chip)
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     private fun createChipDrawable(context: Context): ChipDrawable {
