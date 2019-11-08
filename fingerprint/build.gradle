@@ -185,7 +185,7 @@ dependencies {
     androidTestImplementation deps.testing.mockito.core
     androidTestImplementation deps.testing.mockito.android
     androidTestImplementation deps.testing.mockito.kotlin
-    androidTestCompile deps.testing.mockito.mockito_inline_androidtests
+    androidTestImplementation deps.testing.mockito.mockito_inline_androidtests
 
     // Espresso
     androidTestImplementation deps.testing.espresso.core
