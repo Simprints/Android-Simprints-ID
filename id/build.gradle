@@ -182,6 +182,7 @@ dependencies {
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
     implementation deps.koin.android
+    implementation 'me.xdrop:fuzzywuzzy:1.2.0' // TODO
 
     // Test
     testImplementation project(':fingerprintscannermock')
