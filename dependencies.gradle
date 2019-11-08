@@ -197,5 +197,6 @@ ext.deps = [
     realm          : realm,
     commons_io     : commons_io,
     koin           : koin,
-    jwt            : jwt
+    jwt            : jwt,
+    fuzzywuzzy     : fuzzywuzzy
 ]
