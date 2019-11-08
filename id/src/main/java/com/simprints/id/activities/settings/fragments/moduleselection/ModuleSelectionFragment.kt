@@ -63,7 +63,7 @@ class ModuleSelectionFragment(
     }
 
     private fun configureSearchView() {
-        queryListener = ModuleSelectionQueryListener(modules)
+        queryListener = ModuleSelectionQueryListener(modules.filter { !it.isSelected })
         searchView.setOnQueryTextListener(queryListener)
     }
 
