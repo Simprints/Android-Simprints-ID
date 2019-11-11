@@ -29,15 +29,15 @@ import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManage
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
+import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
 import com.simprints.id.Application
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
@@ -74,24 +74,11 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module(override = true) {
-            defineBuildersForCoreManagers()
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()
         }
 
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { appComponent().getPreferencesManager() }
-        factory { appComponent().getAnalyticsManager() }
-        factory { appComponent().getSessionEventsManager() }
-        factory { appComponent().getCrashReportManager() }
-        factory { appComponent().getTimeHelper() }
-        factory { appComponent().getFingerprintRecordLocalDataSource() }
-        factory { appComponent().getImprovedSharedPreferences() }
-        factory { appComponent().getRemoteConfigWrapper() }
-        factory { appComponent().getAndroidResourcesHelper() }
-        factory { appComponent().getFlowManager() }
-    }
 
     private fun Module.defineBuildersForFingerprintManagers() {
         factory<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
