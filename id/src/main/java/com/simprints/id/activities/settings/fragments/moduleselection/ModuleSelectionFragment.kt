@@ -28,12 +28,10 @@ class ModuleSelectionFragment(
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
+    private val chipHelper by lazy { ModuleChipHelper(requireContext(), listener = this) }
+
     private val viewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
-    }
-
-    private val chipHelper by lazy {
-        ModuleChipHelper(requireContext(), listener = this)
     }
 
     private lateinit var queryListener: ModuleSelectionQueryListener
@@ -60,7 +58,7 @@ class ModuleSelectionFragment(
     }
 
     override fun onChipClick(module: Module) {
-        modules.find { it.name == module.name }?.isSelected = false
+        modules.findMatchFor(module)?.isSelected = false
         selectedModules.remove(module)
         saveSelection(module)
     }
@@ -68,7 +66,7 @@ class ModuleSelectionFragment(
     private fun fetchData() {
         viewModel.getModules().observe(this, Observer { modules ->
             this.modules = modules
-            adapter.submitList(modules.filter { !it.isSelected })
+            adapter.submitList(modules.getUnselected())
             configureSearchView()
             observeSearchResults()
             configureTextViewVisibility()
@@ -78,7 +76,7 @@ class ModuleSelectionFragment(
     }
 
     private fun configureSearchView() {
-        queryListener = ModuleSelectionQueryListener(modules.filter { !it.isSelected })
+        queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
     }
 
@@ -93,7 +91,7 @@ class ModuleSelectionFragment(
     }
 
     private fun updateSelectedModules() {
-        selectedModules = modules.filter { it.isSelected }.toMutableList()
+        selectedModules = modules.getSelected().toMutableList()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -129,13 +127,13 @@ class ModuleSelectionFragment(
 
     private fun handleNoModulesSelected(lastModuleChanged: Module) {
         notifyNoModulesSelected()
-        modules.first { it.name == lastModuleChanged.name }.isSelected = true
+        modules.findMatchFor(lastModuleChanged)?.isSelected = true
         selectedModules.add(lastModuleChanged)
     }
 
     private fun handleTooManyModulesSelected(maxSelectedModules: Int, lastModuleChanged: Module) {
         notifyTooManyModulesSelected(maxSelectedModules)
-        modules.first { it.name == lastModuleChanged.name }.isSelected = false
+        modules.findMatchFor(lastModuleChanged)?.isSelected = false
         selectedModules.remove(lastModuleChanged)
     }
 
@@ -173,5 +171,11 @@ class ModuleSelectionFragment(
             txtSelectedModules.visibility = VISIBLE
         }
     }
+
+    private fun List<Module>.getSelected() = filter { it.isSelected }
+
+    private fun List<Module>.getUnselected() = filter { !it.isSelected }
+
+    private fun List<Module>.findMatchFor(module: Module) = find { it.name == module.name }
 
 }
