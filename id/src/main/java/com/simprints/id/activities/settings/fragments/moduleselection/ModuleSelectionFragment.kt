@@ -44,6 +44,7 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
+        module.isSelected = true
         selectedModules.add(module)
         saveSelection(module)
         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }

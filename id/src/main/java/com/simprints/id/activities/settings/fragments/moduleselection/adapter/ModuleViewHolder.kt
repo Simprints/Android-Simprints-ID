@@ -16,7 +16,6 @@ class ModuleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             text = module.name
 
             onClick {
-                module.isSelected = true
                 listener.onModuleSelected(module)
             }
         }
