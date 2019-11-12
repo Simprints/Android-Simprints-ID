@@ -78,11 +78,13 @@ class ModuleSelectionFragment(
     }
 
     private fun displaySelectedModules() {
-        modules.filter {
-            it.isSelected && !selectedModules.contains(it)
-        }.forEach { selectedModule ->
+        modules.filter(::isSelectedModuleNotDisplayed).forEach { selectedModule ->
             addChipForModule(selectedModule)
         }
+    }
+
+    private fun isSelectedModuleNotDisplayed(module: Module): Boolean {
+        return module.isSelected && !selectedModules.contains(module)
     }
 
     private fun updateSelectedModules() {
