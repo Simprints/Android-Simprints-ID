@@ -41,8 +41,4 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
         }
     }
 
-    interface ChipClickListener {
-        fun onChipClick(module: Module)
-    }
-
 }
