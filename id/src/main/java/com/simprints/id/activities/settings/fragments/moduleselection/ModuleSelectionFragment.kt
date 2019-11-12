@@ -35,7 +35,6 @@ class ModuleSelectionFragment(
     }
 
     private var modules = emptyList<Module>()
-    private var selectedModules = mutableListOf<Module>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -49,15 +48,11 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
-        module.isSelected = true
-        selectedModules.add(module)
         saveSelection(module)
         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onChipClick(module: Module) {
-        modules.findMatchFor(module)?.isSelected = false
-        selectedModules.remove(module)
         saveSelection(module)
     }
 
@@ -68,7 +63,6 @@ class ModuleSelectionFragment(
             configureSearchView()
             configureTextViewVisibility()
             displaySelectedModules()
-            updateSelectedModules()
         })
     }
 
@@ -79,17 +73,11 @@ class ModuleSelectionFragment(
     }
 
     private fun displaySelectedModules() {
-        modules.filter(::isSelectedModuleNotDisplayed).forEach { selectedModule ->
+        chipGroup.removeAllViews()
+
+        modules.getSelected().forEach { selectedModule ->
             addChipForModule(selectedModule)
         }
-    }
-
-    private fun isSelectedModuleNotDisplayed(module: Module): Boolean {
-        return module.isSelected && !selectedModules.contains(module)
-    }
-
-    private fun updateSelectedModules() {
-        selectedModules = modules.getSelected().toMutableList()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -107,41 +95,22 @@ class ModuleSelectionFragment(
 
     private fun saveSelection(lastModuleChanged: Module) {
         val maxSelectedModules = viewModel.getMaxSelectedModules()
-        val noModulesSelected = selectedModules.isEmpty()
-        val tooManyModulesSelected = lastModuleChanged.isSelected
-            && selectedModules.size > maxSelectedModules
+
+        val selectedModulesSize = modules.getSelected().size
+        val noModulesSelected = lastModuleChanged.isSelected && selectedModulesSize == 1
+        val tooManyModulesSelected = !lastModuleChanged.isSelected && selectedModulesSize == maxSelectedModules
 
         when {
-            noModulesSelected -> handleNoModulesSelected(lastModuleChanged)
-
-            tooManyModulesSelected -> handleTooManyModulesSelected(
-                maxSelectedModules,
-                lastModuleChanged
-            )
-
+            noModulesSelected -> notifyNoModulesSelected()
+            tooManyModulesSelected -> notifyTooManyModulesSelected(maxSelectedModules)
             else -> handleModuleSelected(lastModuleChanged)
         }
     }
 
-    private fun handleNoModulesSelected(lastModuleChanged: Module) {
-        notifyNoModulesSelected()
-        modules.findMatchFor(lastModuleChanged)?.isSelected = true
-        selectedModules.add(lastModuleChanged)
-    }
-
-    private fun handleTooManyModulesSelected(maxSelectedModules: Int, lastModuleChanged: Module) {
-        notifyTooManyModulesSelected(maxSelectedModules)
-        modules.findMatchFor(lastModuleChanged)?.isSelected = false
-        selectedModules.remove(lastModuleChanged)
-    }
-
     private fun handleModuleSelected(lastModuleChanged: Module) {
+        lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
-
-        if (lastModuleChanged.isSelected)
-            addChipForModule(lastModuleChanged)
-        else
-            chipGroup.removeView(chipHelper.findSelectedChip(chipGroup))
+        displaySelectedModules()
     }
 
     private fun notifyNoModulesSelected() {
@@ -174,6 +143,6 @@ class ModuleSelectionFragment(
 
     private fun List<Module>.getUnselected() = filter { !it.isSelected }
 
-    private fun List<Module>.findMatchFor(module: Module) = find { it.name == module.name }
+    //private fun List<Module>.findMatchFor(module: Module) = find { it.name == module.name }
 
 }
