@@ -22,12 +22,12 @@ class ModuleSelectionActivityAndroidTest {
         settingsPreferencesManagerRule = DependencyRule.MockRule
     )
 
-    private lateinit var preferencesManager: PreferencesManager
+    private lateinit var preferencesManagerMock: PreferencesManager
 
     @Before
     fun setUp() {
         AndroidTestConfig(this, null, preferencesModule).fullSetup()
-        preferencesManager = app.component.getPreferencesManager()
+        preferencesManagerMock = app.component.getPreferencesManager()
     }
 
     @Test
@@ -105,11 +105,11 @@ class ModuleSelectionActivityAndroidTest {
 
     private fun launchWithModulesSelected() {
         whenever {
-            preferencesManager.moduleIdOptions
+            preferencesManagerMock.moduleIdOptions
         } thenReturn setOf("a", "b", "c", "d", "e")
 
         whenever {
-            preferencesManager.selectedModules
+            preferencesManagerMock.selectedModules
         } thenReturn setOf("b")
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
@@ -117,11 +117,11 @@ class ModuleSelectionActivityAndroidTest {
 
     private fun launchWithoutModulesSelected() {
         whenever {
-            preferencesManager.moduleIdOptions
+            preferencesManagerMock.moduleIdOptions
         } thenReturn setOf("a", "b", "c", "d", "e")
 
         whenever {
-            preferencesManager.selectedModules
+            preferencesManagerMock.selectedModules
         } thenReturn emptySet()
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
