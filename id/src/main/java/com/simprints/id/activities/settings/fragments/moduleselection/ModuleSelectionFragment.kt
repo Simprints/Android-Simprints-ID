@@ -48,12 +48,12 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
-        saveSelection(module)
+        updateSelectionIfPossible(module)
         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onChipClick(module: Module) {
-        saveSelection(module)
+        updateSelectionIfPossible(module)
     }
 
     private fun fetchData() {
@@ -73,16 +73,25 @@ class ModuleSelectionFragment(
     }
 
     private fun displaySelectedModules() {
-        chipGroup.removeAllViews()
+        val displayedModuleNames = chipHelper.findSelectedModuleNames(chipGroup)
 
-        modules.getSelected().forEach { selectedModule ->
-            addChipForModule(selectedModule)
+        modules.forEach { module ->
+            val isModuleDisplayed = displayedModuleNames.contains(module.name)
+            val isModuleSelected = module.isSelected
+
+            when {
+                isModuleSelected && !isModuleDisplayed -> addChipForModule(module)
+                !isModuleSelected && isModuleDisplayed -> removeChipForModule(module)
+            }
         }
     }
 
     private fun addChipForModule(selectedModule: Module) {
-        val chip = chipHelper.createChipForModule(selectedModule)
-        chipGroup.addView(chip)
+        chipHelper.addModuleChip(chipGroup, selectedModule)
+    }
+
+    private fun removeChipForModule(selectedModule: Module) {
+        chipHelper.removeModuleChip(chipGroup, selectedModule)
     }
 
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
@@ -93,7 +102,7 @@ class ModuleSelectionFragment(
         })
     }
 
-    private fun saveSelection(lastModuleChanged: Module) {
+    private fun updateSelectionIfPossible(lastModuleChanged: Module) {
         val maxSelectedModules = viewModel.getMaxSelectedModules()
 
         val selectedModulesSize = modules.getSelected().size
@@ -110,7 +119,6 @@ class ModuleSelectionFragment(
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
-        displaySelectedModules()
     }
 
     private fun notifyNoModulesSelected() {
@@ -142,7 +150,5 @@ class ModuleSelectionFragment(
     private fun List<Module>.getSelected() = filter { it.isSelected }
 
     private fun List<Module>.getUnselected() = filter { !it.isSelected }
-
-    //private fun List<Module>.findMatchFor(module: Module) = find { it.name == module.name }
 
 }
