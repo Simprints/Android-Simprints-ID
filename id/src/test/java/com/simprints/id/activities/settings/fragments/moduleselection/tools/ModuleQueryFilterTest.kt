@@ -1,4 +1,4 @@
-package com.simprints.id.activities.settings.fragments.moduleselection
+package com.simprints.id.activities.settings.fragments.moduleselection.tools
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.model.Module
