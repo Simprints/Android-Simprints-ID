@@ -42,6 +42,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.moduleselection.ModuleRepository
+import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowFactory
@@ -228,6 +230,12 @@ open class AppModule {
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
+
+    @Provides
+    fun provideModuleRepository(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
