@@ -43,7 +43,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         val SELECTED_MODULES_DEFAULT = setOf<String>()
 
         const val MAX_NUMBER_OF_MODULES_KEY = "MaxNbOfModules"
-        const val MAX_NUMBER_OF_MODULES_DEFAULT = 2
+        const val MAX_NUMBER_OF_MODULES_DEFAULT = 6
 
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = GROUP.USER
