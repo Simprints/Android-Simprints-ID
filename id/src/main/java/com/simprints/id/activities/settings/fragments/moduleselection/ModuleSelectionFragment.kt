@@ -28,9 +28,15 @@ class ModuleSelectionFragment(
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
-    private lateinit var viewModel: ModuleViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
+    }
+
+    private val chipHelper by lazy {
+        ModuleChipHelper(requireContext(), listener = this)
+    }
+
     private lateinit var queryListener: ModuleSelectionQueryListener
-    private lateinit var chipHelper: ModuleChipHelper
 
     private var modules = emptyList<Module>()
     private var selectedModules = mutableListOf<Module>()
@@ -43,8 +49,6 @@ class ModuleSelectionFragment(
         super.onViewCreated(view, savedInstanceState)
         rvModules.adapter = adapter
         application.component.inject(this)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
-        chipHelper = ModuleChipHelper(requireContext(), listener = this)
         fetchData()
     }
 
