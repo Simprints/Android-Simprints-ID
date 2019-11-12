@@ -23,14 +23,8 @@ class ModuleRepository(component: AppComponent) {
         component.inject(this)
     }
 
-    fun getModules(): LiveData<List<Module>> {
-        val allModules = preferencesManager.moduleIdOptions
-        val selectedModules = preferencesManager.selectedModules
-        modules.value = allModules.map { name ->
-            val isSelected = selectedModules.contains(name)
-            Module(name, isSelected)
-        }
-        return modules
+    fun getModules(): LiveData<List<Module>> = modules.apply {
+        value = buildModulesList()
     }
 
     fun updateModules(modules: List<Module>) {
@@ -39,6 +33,14 @@ class ModuleRepository(component: AppComponent) {
     }
 
     fun getMaxSelectedModules(): Int = MAX_SELECTED_MODULES
+
+    private fun buildModulesList() = preferencesManager.moduleIdOptions.map {
+        Module(it, isModuleSelected(it))
+    }
+
+    private fun isModuleSelected(moduleName: String): Boolean {
+        return preferencesManager.selectedModules.contains(moduleName)
+    }
 
     private fun setSelectedModules(selectedModules: List<Module>) {
         preferencesManager.selectedModules = selectedModules.map { it.name }.toSet()
