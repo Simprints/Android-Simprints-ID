@@ -15,7 +15,6 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
-    var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
     /** @throws JsonSyntaxException */
