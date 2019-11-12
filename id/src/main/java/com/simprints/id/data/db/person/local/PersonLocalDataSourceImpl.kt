@@ -75,11 +75,14 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             }
         }
 
-    override suspend fun delete(query: PersonLocalDataSource.Query) {
+    override suspend fun delete(people: List<Person>) {
         withContext(Dispatchers.Main) {
-            Realm.getInstance(config).use {
-                it.buildQueryForPerson(query)
-                    .await()?.deleteAllFromRealm()
+            Realm.getInstance(config).use { realmInstance ->
+                people.forEach {
+                    realmInstance
+                        .buildQueryForPerson(PersonLocalDataSource.Query(patientId = it.patientId))
+                        .await()?.deleteAllFromRealm()
+                }
             }
         }
     }

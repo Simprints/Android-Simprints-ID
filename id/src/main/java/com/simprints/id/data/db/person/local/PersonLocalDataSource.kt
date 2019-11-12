@@ -15,6 +15,6 @@ interface PersonLocalDataSource {
 
     suspend fun insertOrUpdate(people: List<Person>)
     suspend fun load(query: Query? = null): Flow<Person>
-    suspend fun delete(query: Query)
+    suspend fun delete(people: List<Person>)
     fun count(query: Query = Query()): Int
 }
