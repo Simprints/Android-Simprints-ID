@@ -110,19 +110,24 @@ class ModuleSelectionFragment(
 
         when {
             noModulesSelected -> handleNoModulesSelected(lastModuleChanged)
-            tooManyModulesSelected -> handleTooManyModulesSelected(maxSelectedModules, lastModuleChanged)
+
+            tooManyModulesSelected -> handleTooManyModulesSelected(
+                maxSelectedModules,
+                lastModuleChanged
+            )
+
             else -> handleModuleSelected(lastModuleChanged)
         }
     }
 
     private fun handleNoModulesSelected(lastModuleChanged: Module) {
-        noModulesSelected()
+        notifyNoModulesSelected()
         modules.first { it.name == lastModuleChanged.name }.isSelected = true
         selectedModules.add(lastModuleChanged)
     }
 
     private fun handleTooManyModulesSelected(maxSelectedModules: Int, lastModuleChanged: Module) {
-        tooManyModulesSelected(maxSelectedModules)
+        notifyTooManyModulesSelected(maxSelectedModules)
         modules.first { it.name == lastModuleChanged.name }.isSelected = false
         selectedModules.remove(lastModuleChanged)
     }
@@ -136,7 +141,7 @@ class ModuleSelectionFragment(
             chipGroup.removeView(chipHelper.findSelectedChip(chipGroup))
     }
 
-    private fun noModulesSelected() {
+    private fun notifyNoModulesSelected() {
         Toast.makeText(
             application,
             R.string.settings_no_modules_toast,
@@ -144,7 +149,7 @@ class ModuleSelectionFragment(
         ).show()
     }
 
-    private fun tooManyModulesSelected(maxAllowed: Int) {
+    private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
             application.getString(R.string.settings_too_many_modules_toast, maxAllowed),
