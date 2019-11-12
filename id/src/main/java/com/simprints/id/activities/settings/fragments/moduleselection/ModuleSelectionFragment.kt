@@ -1,6 +1,5 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,17 +9,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
+import javax.inject.Inject
 
 class ModuleSelectionFragment(
-    private val applicationContext: Context
+    private val application: Application
 ) : Fragment(), ModuleSelectionListener, ModuleChipHelper.ChipClickListener {
+
+    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -38,7 +41,8 @@ class ModuleSelectionFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         rvModules.adapter = adapter
-        viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
+        application.component.inject(this)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
         chipHelper = ModuleChipHelper(requireContext(), listener = this)
         fetchData()
     }
@@ -127,7 +131,7 @@ class ModuleSelectionFragment(
 
     private fun noModulesSelected() {
         Toast.makeText(
-            applicationContext,
+            application,
             R.string.settings_no_modules_toast,
             Toast.LENGTH_SHORT
         ).show()
@@ -135,8 +139,8 @@ class ModuleSelectionFragment(
 
     private fun tooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
-            applicationContext,
-            applicationContext.getString(R.string.settings_too_many_modules_toast, maxAllowed),
+            application,
+            application.getString(R.string.settings_too_many_modules_toast, maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }
