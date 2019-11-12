@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chip xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:closeIconVisible="true"
+    app:closeIcon="@drawable/ic_close_chip"
+    app:closeIconTint="@color/simprints_white"
+    app:chipBackgroundColor="@color/colorAccent" />

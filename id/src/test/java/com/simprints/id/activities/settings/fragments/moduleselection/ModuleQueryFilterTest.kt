@@ -8,7 +8,7 @@ class ModuleQueryFilterTest {
 
     private val items = listOf(
         Module("A", false),
-        Module("B", false),
+        Module("B", true),
         Module("C", false),
         Module("D", false),
         Module("E", false),
@@ -41,9 +41,9 @@ class ModuleQueryFilterTest {
 
     @Test
     fun withLowercaseQuery_shouldReturnCorrectResult() {
-        val query = "b"
+        val query = "c"
         val expected = listOf(
-            Module("B", false)
+            Module("C", false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -60,6 +60,14 @@ class ModuleQueryFilterTest {
         val actual = filter.getFilteredList(items, query)
 
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun shouldNotReturnSelectedModules() {
+        val query = "b"
+        val actual = filter.getFilteredList(items, query)
+
+        assertThat(actual).isEmpty()
     }
 
 }
