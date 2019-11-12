@@ -68,6 +68,15 @@ class ModuleRepositoryImplTest {
         assertThat(actual).isEqualTo(expected)
     }
 
+    @Test
+    fun shouldFetchMaxNumberOfModulesFromRemoteConfig() {
+        whenever {
+            repository.preferencesManager.maxNumberOfModules
+        } thenReturn 10
+
+        assertThat(repository.getMaxNumberOfModules()).isEqualTo(10)
+    }
+
     private fun configureMock() {
         whenever {
             preferencesManager.moduleIdOptions

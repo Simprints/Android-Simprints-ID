@@ -13,6 +13,6 @@ class ModuleViewModel(private val repository: ModuleRepository) : ViewModel() {
         repository.updateModules(modules)
     }
 
-    fun getMaxSelectedModules(): Int = repository.getMaxSelectedModules()
+    fun getMaxNumberOfModules(): Int = repository.getMaxNumberOfModules()
 
 }
