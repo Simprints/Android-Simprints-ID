@@ -3,15 +3,16 @@ package com.simprints.id.orchestrator.cache
 import android.content.Context.MODE_PRIVATE
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.*
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.Application
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.orchestrator.steps.Step
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.test.AutoCloseKoinTest
 
 @RunWith(AndroidJUnit4::class)
-class HotCacheImplTest {
+class HotCacheImplTest: AutoCloseKoinTest() {
 
     private val hotCache by lazy {
         val context =  ApplicationProvider.getApplicationContext<Application>()
