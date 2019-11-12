@@ -113,7 +113,7 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
             completableWithSuspend {
-                personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.fromGetApiToDomain() })
+                filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
@@ -161,6 +161,15 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                 Timber.e(t)
             }
             null
+        }
+    }
+
+    private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfPeople: List<ApiGetPerson>) {
+        val batchOfPeopleToSaveInLocal = batchOfPeople.filter { !it.deleted }
+        val batchOfPeopleToBeDeleted = batchOfPeople.filter { it.deleted }
+        personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { it.fromGetApiToDomain() })
+        batchOfPeopleToBeDeleted.forEach {
+            personLocalDataSource.delete(PersonLocalDataSource.Query(patientId = it.id))
         }
     }
 
