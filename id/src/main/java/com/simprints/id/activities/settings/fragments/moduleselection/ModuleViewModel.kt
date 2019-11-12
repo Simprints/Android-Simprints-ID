@@ -1,15 +1,11 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.simprints.id.moduleselection.ModuleRepository
 import com.simprints.id.moduleselection.model.Module
 
-class ModuleViewModel(
-    application: Application,
-    private val repository: ModuleRepository
-) : AndroidViewModel(application) {
+class ModuleViewModel(private val repository: ModuleRepository) : ViewModel() {
 
     fun getModules(): LiveData<List<Module>> = repository.getModules()
 

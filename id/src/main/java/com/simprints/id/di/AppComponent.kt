@@ -23,6 +23,7 @@ import com.simprints.id.activities.longConsent.LongConsentActivity
 import com.simprints.id.activities.longConsent.LongConsentPresenter
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
 import com.simprints.id.data.analytics.AnalyticsManager
@@ -99,6 +100,7 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(moduleSelectionActivity: ModuleSelectionFragment)
 
     fun getDbManager(): DbManager
     fun getSessionEventsManager(): SessionEventsManager
