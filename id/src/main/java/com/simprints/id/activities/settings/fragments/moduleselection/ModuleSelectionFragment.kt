@@ -34,8 +34,6 @@ class ModuleSelectionFragment(
         ViewModelProvider(this, viewModelFactory).get(ModuleViewModel::class.java)
     }
 
-    private lateinit var queryListener: ModuleSelectionQueryListener
-
     private var modules = emptyList<Module>()
     private var selectedModules = mutableListOf<Module>()
 
@@ -68,7 +66,6 @@ class ModuleSelectionFragment(
             this.modules = modules
             adapter.submitList(modules.getUnselected())
             configureSearchView()
-            observeSearchResults()
             configureTextViewVisibility()
             displaySelectedModules()
             updateSelectedModules()
@@ -76,8 +73,9 @@ class ModuleSelectionFragment(
     }
 
     private fun configureSearchView() {
-        queryListener = ModuleSelectionQueryListener(modules.getUnselected())
+        val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
+        observeSearchResults(queryListener)
     }
 
     private fun displaySelectedModules() {
@@ -99,7 +97,7 @@ class ModuleSelectionFragment(
         chipGroup.addView(chip)
     }
 
-    private fun observeSearchResults() {
+    private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
         queryListener.searchResults.observe(this, Observer { searchResults ->
             adapter.submitList(searchResults)
 
