@@ -1,4 +1,4 @@
-package com.simprints.id.activities.settings.fragments.moduleselection
+package com.simprints.id.activities.settings.fragments.moduleselection.tools
 
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.tools.utils.QueryFilter
