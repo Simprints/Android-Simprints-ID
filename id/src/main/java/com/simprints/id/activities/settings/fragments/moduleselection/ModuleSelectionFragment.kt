@@ -8,29 +8,25 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipDrawable
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
+import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
-import org.jetbrains.anko.dimen
 
 class ModuleSelectionFragment(
     private val applicationContext: Context
-) : Fragment(), ModuleSelectionListener {
+) : Fragment(), ModuleSelectionListener, ModuleChipHelper.ChipClickListener {
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
     private lateinit var viewModel: ModuleViewModel
     private lateinit var queryListener: ModuleSelectionQueryListener
+    private lateinit var chipHelper: ModuleChipHelper
 
     private var modules = emptyList<Module>()
     private var selectedModules = mutableListOf<Module>()
@@ -43,11 +39,20 @@ class ModuleSelectionFragment(
         super.onViewCreated(view, savedInstanceState)
         rvModules.adapter = adapter
         viewModel = ViewModelProviders.of(this).get(ModuleViewModel::class.java)
+        chipHelper = ModuleChipHelper(requireContext(), listener = this)
         fetchData()
     }
 
     override fun onModuleSelected(module: Module) {
         selectedModules.add(module)
+        saveSelection(module)
+    }
+
+    override fun onChipClick(module: Module) {
+        modules.first {
+            it.name == module.name
+        }.isSelected = false
+        selectedModules.remove(module)
         saveSelection(module)
     }
 
@@ -81,39 +86,9 @@ class ModuleSelectionFragment(
     }
 
     private fun addChipForModule(selectedModule: Module) {
-        val context = requireContext()
-        val chipDrawable = createChipDrawable(context)
-
-        val chip = Chip(context).apply {
-            setChipDrawable(chipDrawable)
-            text = selectedModule.name
-            isCheckable = false
-            setOnCloseIconClickListener {
-                (it as Chip).isSelected = true
-                handleChipClick(selectedModule)
-            }
-        }
-
+        val chip = chipHelper.createChipForModule(selectedModule)
         chipGroup.addView(chip)
         scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
-    }
-
-    private fun createChipDrawable(context: Context): ChipDrawable {
-        return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
-            setTextAppearanceResource(R.style.SimprintsStyle_TextView_White)
-            shapeAppearanceModel = ShapeAppearanceModel().also { shapeAppearanceModel ->
-                val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection)
-                shapeAppearanceModel.setAllCorners(CornerFamily.CUT, cornerSize)
-            }
-        }
-    }
-
-    private fun handleChipClick(selectedModule: Module) {
-        modules.first { module ->
-            module.name == selectedModule.name
-        }.isSelected = false
-        selectedModules.remove(selectedModule)
-        saveSelection(selectedModule)
     }
 
     private fun observeSearchResults() {
@@ -146,18 +121,9 @@ class ModuleSelectionFragment(
                 if (lastModuleChanged.isSelected)
                     addChipForModule(lastModuleChanged)
                 else
-                    chipGroup.removeView(findSelectedChip())
+                    chipGroup.removeView(chipHelper.findSelectedChip(chipGroup))
             }
         }
-    }
-
-    private fun findSelectedChip(): Chip? {
-        val view = chipGroup.children.find { (it as Chip).isSelected }
-
-        return if (view != null)
-            view as Chip
-        else
-            null
     }
 
     private fun noModulesSelected() {
