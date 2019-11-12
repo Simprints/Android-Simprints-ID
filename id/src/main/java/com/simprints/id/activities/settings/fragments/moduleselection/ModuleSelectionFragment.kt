@@ -104,29 +104,36 @@ class ModuleSelectionFragment(
 
     private fun saveSelection(lastModuleChanged: Module) {
         val maxSelectedModules = viewModel.getMaxSelectedModules()
+        val noModulesSelected = selectedModules.isEmpty()
+        val tooManyModulesSelected = lastModuleChanged.isSelected
+            && selectedModules.size > maxSelectedModules
 
         when {
-            selectedModules.isEmpty() -> {
-                noModulesSelected()
-                modules.first { it.name == lastModuleChanged.name }.isSelected = true
-                selectedModules.add(lastModuleChanged)
-            }
-
-            lastModuleChanged.isSelected && selectedModules.size > maxSelectedModules -> {
-                tooManyModulesSelected(maxSelectedModules)
-                modules.first { it.name == lastModuleChanged.name }.isSelected = false
-                selectedModules.remove(lastModuleChanged)
-            }
-
-            else -> {
-                viewModel.updateModules(modules)
-
-                if (lastModuleChanged.isSelected)
-                    addChipForModule(lastModuleChanged)
-                else
-                    chipGroup.removeView(chipHelper.findSelectedChip(chipGroup))
-            }
+            noModulesSelected -> handleNoModulesSelected(lastModuleChanged)
+            tooManyModulesSelected -> handleTooManyModulesSelected(maxSelectedModules, lastModuleChanged)
+            else -> handleModuleSelected(lastModuleChanged)
         }
+    }
+
+    private fun handleNoModulesSelected(lastModuleChanged: Module) {
+        noModulesSelected()
+        modules.first { it.name == lastModuleChanged.name }.isSelected = true
+        selectedModules.add(lastModuleChanged)
+    }
+
+    private fun handleTooManyModulesSelected(maxSelectedModules: Int, lastModuleChanged: Module) {
+        tooManyModulesSelected(maxSelectedModules)
+        modules.first { it.name == lastModuleChanged.name }.isSelected = false
+        selectedModules.remove(lastModuleChanged)
+    }
+
+    private fun handleModuleSelected(lastModuleChanged: Module) {
+        viewModel.updateModules(modules)
+
+        if (lastModuleChanged.isSelected)
+            addChipForModule(lastModuleChanged)
+        else
+            chipGroup.removeView(chipHelper.findSelectedChip(chipGroup))
     }
 
     private fun noModulesSelected() {
