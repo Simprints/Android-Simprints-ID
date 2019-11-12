@@ -7,6 +7,7 @@ import com.simprints.core.tools.AndroidResourcesHelper
 import com.simprints.core.tools.AndroidResourcesHelperImpl
 import com.simprints.id.Application
 import com.simprints.id.activities.orchestrator.di.OrchestratorActivityComponent
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -42,6 +43,8 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.data.secure.SecureDataManagerImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
+import com.simprints.id.moduleselection.ModuleRepository
+import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.orchestrator.OrchestratorManager
 import com.simprints.id.orchestrator.OrchestratorManagerImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowFactory
@@ -228,6 +231,15 @@ open class AppModule {
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
+
+    @Provides
+    fun provideModuleViewModelFactory(repository: ModuleRepository) = ModuleViewModelFactory(repository)
+
+    @Provides
+    fun provideModuleRepository(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideDownSyncTask(localDbManager: LocalDbManager,
