@@ -48,7 +48,7 @@ class ModuleSelectionFragment(
 
     override fun onModuleSelected(module: Module) {
         selectedModules.add(module)
-        updateSelectedModules(module)
+        saveSelection(module)
     }
 
     private fun fetchData() {
@@ -59,6 +59,7 @@ class ModuleSelectionFragment(
             observeSearchResults()
             configureTextViewVisibility()
             displaySelectedModules()
+            updateSelectedModules()
         })
     }
 
@@ -73,6 +74,9 @@ class ModuleSelectionFragment(
         }.forEach { selectedModule ->
             addChipForModule(selectedModule)
         }
+    }
+
+    private fun updateSelectedModules() {
         selectedModules = modules.filter { it.isSelected }.toMutableList()
     }
 
@@ -109,7 +113,7 @@ class ModuleSelectionFragment(
             module.name == selectedModule.name
         }.isSelected = false
         selectedModules.remove(selectedModule)
-        updateSelectedModules(selectedModule)
+        saveSelection(selectedModule)
     }
 
     private fun observeSearchResults() {
@@ -120,7 +124,7 @@ class ModuleSelectionFragment(
         })
     }
 
-    private fun updateSelectedModules(lastModuleChanged: Module) {
+    private fun saveSelection(lastModuleChanged: Module) {
         val maxSelectedModules = viewModel.getMaxSelectedModules()
 
         when {
