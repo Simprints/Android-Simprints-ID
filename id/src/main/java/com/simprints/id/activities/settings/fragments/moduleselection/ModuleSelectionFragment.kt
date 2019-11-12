@@ -105,16 +105,16 @@ class ModuleSelectionFragment(
     }
 
     private fun saveSelection(lastModuleChanged: Module) {
-        val maxNumberOfModules = viewModel.getMaxNumberOfModules()
+        val maxSelectedModules = viewModel.getMaxSelectedModules()
         val noModulesSelected = selectedModules.isEmpty()
         val tooManyModulesSelected = lastModuleChanged.isSelected
-            && selectedModules.size > maxNumberOfModules
+            && selectedModules.size > maxSelectedModules
 
         when {
             noModulesSelected -> handleNoModulesSelected(lastModuleChanged)
 
             tooManyModulesSelected -> handleTooManyModulesSelected(
-                maxNumberOfModules,
+                maxSelectedModules,
                 lastModuleChanged
             )
 
