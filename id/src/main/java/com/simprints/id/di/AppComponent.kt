@@ -44,7 +44,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.guidselection.GuidSelectionWorker
-import com.simprints.id.orchestrator.FlowManager
+import com.simprints.id.orchestrator.FlowProvider
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
@@ -125,7 +125,7 @@ interface AppComponent {
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
     fun inject(orchestratorActivity: OrchestratorActivity)
-    fun inject(flowManager: FlowManager)
+    fun inject(flowProvider: FlowProvider)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
@@ -138,6 +138,6 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
-    fun getFlowManager(): FlowManager
+    fun getFlowManager(): FlowProvider
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
 }
