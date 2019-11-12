@@ -14,6 +14,7 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
+import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
 import kotlinx.android.synthetic.main.fragment_module_selection.*
@@ -21,7 +22,7 @@ import javax.inject.Inject
 
 class ModuleSelectionFragment(
     private val application: Application
-) : Fragment(), ModuleSelectionListener, ModuleChipHelper.ChipClickListener {
+) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
 
