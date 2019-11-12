@@ -63,7 +63,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {
-            val person = personLocalDataSource.load(PersonLocalDataSource.Query(patientId = patientId)).first()
+            val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()
             PersonFetchResult(person, LOCAL)
         } catch (t: Throwable) {
             tryToFetchPersonFromRemote(projectId, patientId)

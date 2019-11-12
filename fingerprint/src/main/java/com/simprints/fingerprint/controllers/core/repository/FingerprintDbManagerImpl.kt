@@ -16,7 +16,7 @@ class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSourc
                 .loadFingerprintIdentities(query)
                 .toList()
                 .map {
-                    FingerprintIdentity(it.id, it.fingerprints.map { fingerprint -> Fingerprint.fromCoreToDomain(fingerprint) })
+                    FingerprintIdentity(it.patientId, it.fingerprints.map { fingerprint -> Fingerprint.fromCoreToDomain(fingerprint) })
                 }
         }
 }

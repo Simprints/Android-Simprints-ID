@@ -11,7 +11,7 @@ enum class Tier {
     TIER_5;
 
     companion object {
-        @JvmStatic fun computeTier(score: Float): Tier {
+        fun computeTier(score: Float): Tier {
             return when {
                 score < 20f -> TIER_5
                 score < 35f -> TIER_4
