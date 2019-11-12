@@ -78,7 +78,7 @@
         app:layout_constraintBottom_toTopOf="@+id/rvModules"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/divider"
         app:queryHint="@string/hint_search_modules"
         app:iconifiedByDefault="false"/>
 
