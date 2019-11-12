@@ -27,13 +27,8 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
         }
     }
 
-    fun findSelectedChip(parent: ChipGroup): Chip? {
-        val view = parent.children.find { (it as Chip).isSelected }
-
-        return if (view != null)
-            view as Chip
-        else
-            null
+    fun findSelectedChip(parent: ChipGroup): Chip {
+        return parent.children.find { (it as Chip).isSelected } as Chip
     }
 
     private fun createChipDrawable(): ChipDrawable {
