@@ -10,14 +10,13 @@ class ModuleQueryFilter : QueryFilter<Module> {
         if (query.isNullOrEmpty() || query.isBlank() || items.isEmpty())
             return items
 
-        val moduleNames = FuzzySearch.extractAll(query, items.map { it.name })
-            .filter { it.score > 50 }
-            .sortedByDescending { it.score }
-            .map { it.string }
+        return FuzzySearch.extractAll(
+            query, items, { it.name }, MATCHING_SCORE_THRESHOLD
+        ).sortedByDescending { it.score }.map { it.referent }
+    }
 
-        return items.filter { module ->
-            moduleNames.contains(module.name)
-        }
+    companion object {
+        private const val MATCHING_SCORE_THRESHOLD = 50
     }
 
 }
