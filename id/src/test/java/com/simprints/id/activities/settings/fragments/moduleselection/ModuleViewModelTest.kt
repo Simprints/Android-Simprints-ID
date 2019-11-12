@@ -31,15 +31,15 @@ class ModuleViewModelTest {
     }
 
     @Test
-    fun shouldReturnAvailableModules() {
+    fun shouldReturnAllModules() {
         val expected = listOf(
             Module("a", false),
-            Module("b", false),
-            Module("c", false),
+            Module("b", true),
+            Module("c", true),
             Module("d", false)
         )
 
-        val actual = viewModel.getAvailableModules().value
+        val actual = viewModel.getModules().value
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -51,7 +51,7 @@ class ModuleViewModelTest {
             Module("c", true)
         )
 
-        val actual = viewModel.getSelectedModules().value
+        val actual = viewModel.getModules().value?.filter { it.isSelected }
 
         assertThat(actual).isEqualTo(expected)
     }
