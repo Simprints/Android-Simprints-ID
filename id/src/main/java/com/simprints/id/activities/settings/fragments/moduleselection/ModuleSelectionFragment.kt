@@ -46,6 +46,7 @@ class ModuleSelectionFragment(
     override fun onModuleSelected(module: Module) {
         selectedModules.add(module)
         saveSelection(module)
+        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     override fun onChipClick(module: Module) {
@@ -88,7 +89,6 @@ class ModuleSelectionFragment(
     private fun addChipForModule(selectedModule: Module) {
         val chip = chipHelper.createChipForModule(selectedModule)
         chipGroup.addView(chip)
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     private fun observeSearchResults() {
