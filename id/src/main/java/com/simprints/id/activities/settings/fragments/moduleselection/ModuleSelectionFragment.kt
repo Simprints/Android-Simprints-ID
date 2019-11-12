@@ -50,9 +50,7 @@ class ModuleSelectionFragment(
     }
 
     override fun onChipClick(module: Module) {
-        modules.first {
-            it.name == module.name
-        }.isSelected = false
+        modules.find { it.name == module.name }?.isSelected = false
         selectedModules.remove(module)
         saveSelection(module)
     }
