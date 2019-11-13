@@ -86,7 +86,7 @@
         android:id="@+id/rvModules"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/margin_default"
+        android:layout_marginTop="@dimen/margin_large"
         android:scrollbars="vertical"
         android:fadeScrollbars="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
