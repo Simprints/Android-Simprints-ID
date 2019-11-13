@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
 import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceMatchRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
@@ -14,6 +13,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRe
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintMatchResult
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.mock
@@ -32,11 +32,10 @@ fun mockFingerprintCaptureStep(): Step {
         listOf(
             FingerprintCaptureResult(
                 FingerIdentifier.LEFT_THUMB,
-                FingerprintSample(
+                FingerprintCaptureSample(
                     FingerIdentifier.LEFT_THUMB,
                     templateQualityScore = 10,
-                    template = "template".toByteArray(),
-                    imageRef = null
+                    template = "template".toByteArray()
                 )
             )
         )

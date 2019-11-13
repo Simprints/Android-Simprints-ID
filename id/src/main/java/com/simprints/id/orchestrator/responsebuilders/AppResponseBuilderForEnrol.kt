@@ -120,20 +120,17 @@ class AppResponseBuilderForEnrol(
             return fingerprintResponse.captureResult.mapNotNull { captureResult ->
                 val fingerId = captureResult.identifier
                 captureResult.sample?.let { sample ->
-                    val imageRef = sample.imageRef
-                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore, imageRef)
+                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
                 }
             }
         }
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
             return faceResponse.capturingResult.mapNotNull {
-                val imageRef = it.result?.imageRef
                 it.result?.template?.let { template ->
-                    FaceSample(template, imageRef)
+                    FaceSample(template)
                 }
             }
         }
     }
-
 }
