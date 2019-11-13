@@ -43,6 +43,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val SELECTED_MODULES_KEY = "SelectedModules"
         val SELECTED_MODULES_DEFAULT = setOf<String>()
 
+        const val MAX_NUMBER_OF_MODULES_KEY = "MaxNbOfModules"
+        const val MAX_NUMBER_OF_MODULES_DEFAULT = 6
+
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = GROUP.USER
 
@@ -102,6 +105,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // What modules were selected by the user
     override var selectedModules: Set<String>
         by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
+
+    override var maxNumberOfModules: Int
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MAX_NUMBER_OF_MODULES_KEY, MAX_NUMBER_OF_MODULES_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: GROUP
