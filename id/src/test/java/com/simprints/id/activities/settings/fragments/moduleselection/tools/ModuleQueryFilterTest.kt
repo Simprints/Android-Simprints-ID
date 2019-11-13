@@ -60,9 +60,9 @@ class ModuleQueryFilterTest {
     fun withExactQuery_shouldReturnCorrectResult() {
         val query = "Legama"
         val expected = listOf(
-            Module(name="Abama", isSelected=false),
+            Module(name="Legama", isSelected=false),
             Module(name="Achura Mazegaja", isSelected=false),
-            Module(name="Legama", isSelected=false)
+            Module(name="Abama", isSelected=false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -73,9 +73,9 @@ class ModuleQueryFilterTest {
     fun withLowercaseQuery_shouldReturnCorrectResult() {
         val query = "legama"
         val expected = listOf(
-            Module(name="Abama", isSelected=false),
+            Module(name="Legama", isSelected=false),
             Module(name="Achura Mazegaja", isSelected=false),
-            Module(name="Legama", isSelected=false)
+            Module(name="Abama", isSelected=false)
         )
         val actual = filter.getFilteredList(items, query)
 
@@ -88,10 +88,11 @@ class ModuleQueryFilterTest {
         val expected = listOf(
             Module("Abama", false),
             Module("Abama Dawet", false),
+            Module("Legama", false),
             Module("Achura Mazegaja", false),
             Module("Hajo Salata", false),
-            Module("Legama", false),
-            Module("Madagascar", false)
+            Module("Madagascar", false),
+            Module("Wakanda", false)
         )
         val actual = filter.getFilteredList(items, query)
 
