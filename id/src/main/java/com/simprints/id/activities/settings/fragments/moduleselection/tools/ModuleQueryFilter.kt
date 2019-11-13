@@ -1,23 +1,20 @@
 package com.simprints.id.activities.settings.fragments.moduleselection.tools
 
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.tools.extensions.fuzzySearch
 import com.simprints.id.tools.utils.QueryFilter
-import me.xdrop.fuzzywuzzy.FuzzySearch
 
 class ModuleQueryFilter : QueryFilter<Module> {
 
     override fun getFilteredList(items: List<Module>, query: String?): List<Module> {
-        if (query.isNullOrEmpty() || query.isBlank() || items.isEmpty())
-            return items
+        return if (isRelevantQuery(query) && items.isNotEmpty())
+            items.fuzzySearch(query, { it.name })
+        else
+            items
+    }
 
-        val moduleNames = FuzzySearch.extractAll(query, items.map { it.name })
-            .filter { it.score > 50 }
-            .sortedByDescending { it.score }
-            .map { it.string }
-
-        return items.filter { module ->
-            moduleNames.contains(module.name)
-        }
+    private fun isRelevantQuery(query: String?): Boolean {
+        return query != null && query.isNotEmpty() && query.isNotBlank()
     }
 
 }

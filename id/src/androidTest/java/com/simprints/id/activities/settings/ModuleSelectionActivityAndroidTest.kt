@@ -1,8 +1,7 @@
 package com.simprints.id.activities.settings
 
-import android.content.Intent
+import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.rule.ActivityTestRule
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.displayed
 import br.com.concretesolutions.kappuccino.assertions.VisibilityAssertions.notDisplayed
 import br.com.concretesolutions.kappuccino.custom.recyclerView.RecyclerViewInteractions.recyclerView
@@ -14,28 +13,21 @@ import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.whenever
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class ModuleSelectionActivityAndroidTest {
-
-    @Rule
-    @JvmField
-    val rule = ActivityTestRule<ModuleSelectionActivity>(
-        ModuleSelectionActivity::class.java, true, false
-    )
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val preferencesModule = TestPreferencesModule(
         settingsPreferencesManagerRule = DependencyRule.MockRule
     )
 
-    private lateinit var preferencesManager: PreferencesManager
+    private lateinit var preferencesManagerMock: PreferencesManager
 
     @Before
     fun setUp() {
         AndroidTestConfig(this, null, preferencesModule).fullSetup()
-        preferencesManager = app.component.getPreferencesManager()
+        preferencesManagerMock = app.component.getPreferencesManager()
     }
 
     @Test
@@ -113,26 +105,26 @@ class ModuleSelectionActivityAndroidTest {
 
     private fun launchWithModulesSelected() {
         whenever {
-            preferencesManager.moduleIdOptions
+            preferencesManagerMock.moduleIdOptions
         } thenReturn setOf("a", "b", "c", "d", "e")
 
         whenever {
-            preferencesManager.selectedModules
+            preferencesManagerMock.selectedModules
         } thenReturn setOf("b")
 
-        rule.launchActivity(Intent())
+        ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
     private fun launchWithoutModulesSelected() {
         whenever {
-            preferencesManager.moduleIdOptions
+            preferencesManagerMock.moduleIdOptions
         } thenReturn setOf("a", "b", "c", "d", "e")
 
         whenever {
-            preferencesManager.selectedModules
+            preferencesManagerMock.selectedModules
         } thenReturn emptySet()
 
-        rule.launchActivity(Intent())
+        ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
 }
