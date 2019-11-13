@@ -1,7 +1,6 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -11,6 +10,7 @@ import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
 import com.simprints.id.orchestrator.steps.core.CoreRequestCode.Companion.isCoreResult
@@ -81,7 +81,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         }
     }
 
-    private fun addMatchingStepForFinger(probeSamples: List<FingerprintSample>, query: Query) {
+    private fun addMatchingStepForFinger(probeSamples: List<FingerprintCaptureSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
     }
 

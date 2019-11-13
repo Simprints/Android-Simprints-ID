@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 /**
  * It creates a Step to launch (used to launch a specific Activity) to execute
@@ -16,7 +16,7 @@ interface FingerprintStepProcessor {
                            moduleId: String,
                            metadata: String): Step
 
-    fun buildStepToMatch(probeSamples: List<FingerprintSample>, query: Query): Step
+    fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: Query): Step
 
     fun processResult(requestCode: Int,
                       resultCode: Int,

@@ -1,12 +1,12 @@
 package com.simprints.id.orchestrator.steps.fingerprint
 
 import android.content.Intent
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.fromModuleApiToDomain
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
@@ -32,7 +32,7 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
             buildStep(CAPTURE, this)
         }
 
-    override fun buildStepToMatch(probeSamples: List<FingerprintSample>, query: PersonLocalDataSource.Query): Step =
+    override fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: PersonLocalDataSource.Query): Step =
         fingerprintRequestFactory.buildFingerprintMatchRequest(probeSamples, query).run {
             buildStep(MATCH, this)
         }
