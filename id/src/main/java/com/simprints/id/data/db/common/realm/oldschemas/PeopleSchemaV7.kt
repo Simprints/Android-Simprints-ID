@@ -3,7 +3,6 @@ package com.simprints.id.data.db.common.realm.oldschemas
 object PeopleSchemaV7 {
 
     const val FINGERPRINT_TABLE: String = "DbFingerprintSample"
-    const val FINGERPRINT_FIELD_IMAGEREF: String = "imageRef"
     const val FINGERPRINT_FIELD_TEMPLATE: String = "template"
     const val FINGERPRINT_FIELD_ID: String = "id"
     const val FINGERPRINT_FIELD_FINGER_IDENTIFIER: String = "fingerIdentifier"
@@ -16,6 +15,5 @@ object PeopleSchemaV7 {
     const val FACE_TABLE: String = "DbFaceSample"
     const val FACE_FIELD_ID: String = "id"
     const val FACE_FIELD_TEMPLATE: String = "template"
-    const val FACE_FIELD_IMAGEREF: String = "imageRef"
 
 }
