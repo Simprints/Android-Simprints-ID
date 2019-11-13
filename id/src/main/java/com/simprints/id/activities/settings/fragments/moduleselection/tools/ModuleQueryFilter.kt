@@ -7,12 +7,17 @@ import me.xdrop.fuzzywuzzy.FuzzySearch
 class ModuleQueryFilter : QueryFilter<Module> {
 
     override fun getFilteredList(items: List<Module>, query: String?): List<Module> {
-        if (query.isNullOrEmpty() || query.isBlank() || items.isEmpty())
-            return items
+        return if (isRelevantQuery(query) && items.isNotEmpty()) {
+            FuzzySearch.extractAll(
+                query, items, { it.name }, MATCHING_SCORE_THRESHOLD
+            ).sortedByDescending { it.score }.map { it.referent }
+        } else {
+            items
+        }
+    }
 
-        return FuzzySearch.extractAll(
-            query, items, { it.name }, MATCHING_SCORE_THRESHOLD
-        ).sortedByDescending { it.score }.map { it.referent }
+    private fun isRelevantQuery(query: String?): Boolean {
+        return query != null && query.isNotEmpty() && query.isNotBlank()
     }
 
     companion object {
