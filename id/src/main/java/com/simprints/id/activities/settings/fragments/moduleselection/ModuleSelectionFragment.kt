@@ -6,7 +6,9 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -67,6 +69,9 @@ class ModuleSelectionFragment(
     }
 
     private fun configureSearchView() {
+        val searchText = requireActivity().findViewById<TextView>(androidx.appcompat.R.id.search_src_text)
+        val typeface = ResourcesCompat.getFont(requireContext(), R.font.muli)
+        searchText.typeface = typeface
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
