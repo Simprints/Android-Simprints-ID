@@ -1,6 +1,5 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
@@ -81,7 +80,7 @@ object PeopleGeneratorUtils {
     }
 
     fun getRandomFaceSample() =
-        FaceSample(kotlin.random.Random.nextBytes(20), SecuredImageRef(UUID.randomUUID().toString()))
+        FaceSample(kotlin.random.Random.nextBytes(20))
 
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
