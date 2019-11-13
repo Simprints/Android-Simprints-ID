@@ -15,6 +15,7 @@
     <!-- region Padding -->
     <dimen name="padding_chip">8dp</dimen>
     <dimen name="padding_default">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
     <!-- endregion -->
 
     <!-- region Text size -->
