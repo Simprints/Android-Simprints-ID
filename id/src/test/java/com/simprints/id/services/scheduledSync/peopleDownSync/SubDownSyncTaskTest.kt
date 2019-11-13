@@ -238,6 +238,9 @@ class SubDownSyncTaskTest {
         val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
         wheneverOnSuspend(personLocalDataSourceMock) { insertOrUpdate(argForInsertOrUpdateInLocalDb.capture()) } thenOnBlockingReturn Unit
 
+        val argForDeleteInLocalDb = argumentCaptor<List<Person>>()
+        wheneverOnSuspend(personLocalDataSourceMock) { delete(argForDeleteInLocalDb.capture()) } thenOnBlockingReturn Unit
+
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()
         whenever(downSyncDao) { updateLastPatientId(anyString(), argForUpdateLastPatientIdInRoom.capture()) } thenDoNothing {}
 
@@ -245,6 +248,8 @@ class SubDownSyncTaskTest {
         sync.execute(subScope).test().awaitAndAssertSuccess()
 
         verifyBlockingExactly(batches, personLocalDataSourceMock) { insertOrUpdate(anyNotNull()) }
+        verifyBlockingExactly(batches, personLocalDataSourceMock) { delete(anyNotNull()) }
+
         verifyExactly(batches, downSyncDao) { updateLastPatientId(anyString(), anyString()) }
         verifyExactly(batches + 1, downSyncDao) { updateLastSyncTime(anyString(), anyLong()) }
         verifyLastPatientSaveIsTheRightOne(argForInsertOrUpdateInLocalDb.allValues.last(), peopleToDownload)
