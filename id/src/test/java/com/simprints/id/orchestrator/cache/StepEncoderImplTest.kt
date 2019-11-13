@@ -1,10 +1,8 @@
 package com.simprints.id.orchestrator.cache
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.commontesttools.FingerprintGeneratorUtils
 import com.simprints.id.data.db.person.domain.FingerIdentifier
-import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
@@ -12,6 +10,7 @@ import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSamp
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.mock.mockTemplate
 import org.hamcrest.CoreMatchers
@@ -117,7 +116,7 @@ class StepEncoderImplTest {
         val captureResult = listOf(
             FingerprintCaptureResult(
                 FingerIdentifier.RIGHT_THUMB,
-                FingerprintSample(
+                FingerprintCaptureSample(
                     FingerIdentifier.RIGHT_THUMB,
                     fakeSample.template,
                     fakeSample.templateQualityScore,
@@ -135,7 +134,7 @@ class StepEncoderImplTest {
                 result = FaceCaptureSample(
                     "face_id",
                     mockTemplate(),
-                    SecuredImageRef("uri")
+                    null
                 )
             )
         ))
