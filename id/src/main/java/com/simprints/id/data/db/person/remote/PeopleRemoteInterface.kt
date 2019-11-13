@@ -6,6 +6,8 @@ import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
 import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
+import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -45,4 +47,9 @@ interface PeopleRemoteInterface {
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: PipeSeparatorWrapperForURLListParam<String>?, //moduleId = module1|module2|
         @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
+
+    @POST("projects/{projectId}/patient-operations/count")
+    fun requestPeopleOperations(
+        @Path("projectId") projectId: String,
+        @Body operationsJson: ApiPeopleOperations) : Single<ApiPeopleOperationsResponse>
 }
