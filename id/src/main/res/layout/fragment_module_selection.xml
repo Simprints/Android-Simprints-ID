@@ -80,7 +80,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider"
         app:queryHint="@string/hint_search_modules"
-        app:iconifiedByDefault="false"/>
+        app:iconifiedByDefault="false"
+        app:closeIcon="@drawable/ic_cancel_search_bar"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvModules"
