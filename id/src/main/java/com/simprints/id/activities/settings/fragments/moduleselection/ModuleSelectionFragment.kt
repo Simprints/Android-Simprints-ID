@@ -103,7 +103,7 @@ class ModuleSelectionFragment(
     }
 
     private fun updateSelectionIfPossible(lastModuleChanged: Module) {
-        val maxSelectedModules = viewModel.getMaxSelectedModules()
+        val maxSelectedModules = viewModel.getMaxNumberOfModules()
 
         val selectedModulesSize = modules.getSelected().size
         val noModulesSelected = lastModuleChanged.isSelected && selectedModulesSize == 1

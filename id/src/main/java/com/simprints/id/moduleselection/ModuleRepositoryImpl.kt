@@ -24,7 +24,7 @@ class ModuleRepositoryImpl(
         setSelectedModules(modules.filter { it.isSelected })
     }
 
-    override fun getMaxSelectedModules(): Int = MAX_SELECTED_MODULES
+    override fun getMaxNumberOfModules(): Int = preferencesManager.maxNumberOfModules
 
     private fun buildModulesList() = preferencesManager.moduleIdOptions.map {
         Module(it, isModuleSelected(it))
@@ -48,10 +48,6 @@ class ModuleRepositoryImpl(
         crashReportManager.logMessageForCrashReport(
             CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message
         )
-    }
-
-    private companion object {
-        const val MAX_SELECTED_MODULES = 6
     }
 
 }
