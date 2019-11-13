@@ -19,7 +19,9 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.tools.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_module_selection.*
+import org.jetbrains.anko.appcompat.v7.coroutines.onSearchClick
 import javax.inject.Inject
 
 class ModuleSelectionFragment(
@@ -73,7 +75,10 @@ class ModuleSelectionFragment(
         val typeface = ResourcesCompat.getFont(requireContext(), R.font.muli)
         searchText.typeface = typeface
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
-        searchView.setOnQueryTextListener(queryListener)
+        with(searchView) {
+            setOnQueryTextListener(queryListener)
+            onSearchClick { requireActivity().hideKeyboard() }
+        }
         observeSearchResults(queryListener)
     }
 
