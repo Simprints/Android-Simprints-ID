@@ -27,6 +27,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     : SettingsPreferencesManager {
 
     companion object {
+
         const val NB_IDS_KEY = "NbOfIdsInt"
         const val NB_IDS_DEFAULT = 10
 
