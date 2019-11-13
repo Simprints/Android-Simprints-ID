@@ -84,7 +84,7 @@ class Fingerprint(val fingerId: FingerIdentifier,
 }
 
 fun Fingerprint.fromDomainToCore() =
-    FingerprintSampleCore(fingerId.fromDomainToCore(), templateBytes, qualityScore, null)
+    FingerprintSampleCore(fingerId.fromDomainToCore(), templateBytes, qualityScore)
 
 fun Fingerprint.fromDomainToMatcher() =
     FingerprintMatcher(fingerId.fromDomainToLibsimprints(), templateBytes)
