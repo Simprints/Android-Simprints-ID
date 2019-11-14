@@ -79,17 +79,17 @@ class MatchingActivity : FingerprintActivity() {
         viewModel.matchFinishedSummary.observe(this, Observer {
             tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
 
-            if (it.tier1Or2Matches > 0) {
+            if (it.veryGoodMatches > 0) {
                 tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, it.tier1Or2Matches, arrayOf(it.tier1Or2Matches))
+                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
             }
-            if (it.tier3Matches > 0) {
+            if (it.goodMatches > 0) {
                 tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, it.tier3Matches, arrayOf(it.tier3Matches))
+                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, it.goodMatches, arrayOf(it.goodMatches))
             }
-            if (it.tier1Or2Matches < 1 && it.tier3Matches < 1 || it.tier4Matches > 1) {
+            if (it.veryGoodMatches < 1 && it.goodMatches < 1 || it.fairMatches > 1) {
                 tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, it.tier4Matches, arrayOf(it.tier4Matches))
+                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, it.fairMatches, arrayOf(it.fairMatches))
             }
             setIdentificationProgress(100)
         })

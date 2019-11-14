@@ -21,7 +21,6 @@ import org.koin.android.ext.android.inject
 
 class ConnectScannerActivity : FingerprintActivity() {
 
-    private lateinit var connectScannerRequest: ConnectScannerTaskRequest
     private val viewModel: ConnectScannerViewModel by inject()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
@@ -32,8 +31,9 @@ class ConnectScannerActivity : FingerprintActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        connectScannerRequest = this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
-            ?: throw InvalidRequestForConnectScannerActivityException()
+        val connectScannerRequest: ConnectScannerTaskRequest =
+            this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
+                ?: throw InvalidRequestForConnectScannerActivityException()
 
         observeScannerEvents()
         observeLifecycleEvents()

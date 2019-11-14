@@ -2,6 +2,7 @@ package com.simprints.id.data.db.person.local
 
 import android.content.Context
 import com.simprints.id.data.db.common.realm.PeopleRealmConfig
+import com.simprints.id.data.db.person.domain.FingerprintIdentity
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.fromDbToDomain
@@ -9,6 +10,7 @@ import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.await
 import com.simprints.id.tools.extensions.transactAwait
@@ -20,13 +22,14 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.io.Serializable
 
 @FlowPreview
 class PersonLocalDataSourceImpl(private val appContext: Context,
                                 val secureDataManager: SecureDataManager,
                                 val loginInfoManager: LoginInfoManager) : PersonLocalDataSource {
-
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
         const val PROJECT_ID_FIELD = "projectId"
@@ -75,6 +78,16 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             }
         }
 
+    override suspend fun loadFingerprintIdentities(query: Serializable): Flow<FingerprintIdentity> =
+        if (query is PersonLocalDataSource.Query) {
+            load(query).map { person ->
+                FingerprintIdentity(person.patientId, person.fingerprintSamples)
+            }
+        } else {
+            throw InvalidQueryToLoadRecordsException()
+        }
+
+
     override suspend fun delete(query: PersonLocalDataSource.Query) {
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
@@ -94,11 +107,10 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             .apply {
                 query?.let { query ->
                     query.projectId?.let { this.equalTo(PROJECT_ID_FIELD, it) }
-                    query.patientId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
+                    query.personId?.let { this.equalTo(PATIENT_ID_FIELD, it) }
                     query.userId?.let { this.equalTo(USER_ID_FIELD, it) }
                     query.moduleId?.let { this.equalTo(MODULE_ID_FIELD, it) }
                     query.toSync?.let { this.equalTo(TO_SYNC_FIELD, it) }
-                    query.sortBy?.let { this.sort(it.keys.toTypedArray(), it.values.toTypedArray()) }
                 }
             }
 }

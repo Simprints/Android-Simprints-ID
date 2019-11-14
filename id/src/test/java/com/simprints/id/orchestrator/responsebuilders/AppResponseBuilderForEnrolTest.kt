@@ -1,5 +1,7 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.person.domain.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppEnrolResponse
@@ -7,14 +9,14 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureResult
 import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
-import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintEnrolResponse
+import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureResult
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
@@ -38,7 +40,6 @@ class AppResponseBuilderForEnrolTest {
             )
 
             assertThat(response, instanceOf(AppEnrolResponse::class.java))
-            assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
         }
     }
 
@@ -67,7 +68,6 @@ class AppResponseBuilderForEnrolTest {
             )
 
             assertThat(response, instanceOf(AppEnrolResponse::class.java))
-            assertThat((response as AppEnrolResponse).guid, `is`(EXPECTED_GUID_FINGERPRINT))
         }
     }
 
@@ -102,16 +102,8 @@ class AppResponseBuilderForEnrolTest {
     }
 
     private fun mockFingerprintStep(): Step {
-        val request = FingerprintEnrolRequest(
-            "projectId",
-            "userId",
-            "moduleId",
-            "metadata",
-            "language",
-            mapOf(),
-            true,
-            "programmeName",
-            "organisationName"
+        val request = FingerprintCaptureRequest(
+            fingerprintsToCapture = listOf(FingerIdentifier.LEFT_THUMB, FingerIdentifier.LEFT_INDEX_FINGER)
         )
 
         return Step(
@@ -119,7 +111,19 @@ class AppResponseBuilderForEnrolTest {
             activityName = "com.simprints.id.MyFingerprintActivity",
             bundleKey = "BUNDLE_KEY",
             request = request,
-            result = FingerprintEnrolResponse(EXPECTED_GUID_FINGERPRINT),
+            result = FingerprintCaptureResponse(captureResult =
+                listOf(
+                    FingerprintCaptureResult(
+                        FingerIdentifier.LEFT_THUMB,
+                        FingerprintSample(
+                            FingerIdentifier.LEFT_THUMB,
+                            templateQualityScore = 10,
+                            template = "template".toByteArray(),
+                            imageRef = null
+                        )
+                    )
+                )
+            ),
             status = Step.Status.COMPLETED
         )
     }
@@ -143,10 +147,6 @@ class AppResponseBuilderForEnrolTest {
             result = response,
             status = Step.Status.COMPLETED
         )
-    }
-
-    private companion object {
-        const val EXPECTED_GUID_FINGERPRINT = "expected-guid"
     }
 
 }

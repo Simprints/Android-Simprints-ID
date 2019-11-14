@@ -5,8 +5,8 @@ import android.os.Parcelable
 import com.simprints.id.domain.moduleapi.core.requests.CoreRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceRequest
 import com.simprints.id.domain.moduleapi.face.requests.fromDomainToModuleApi
-import com.simprints.id.domain.moduleapi.fingerprint.DomainToModuleApiFingerprintRequest.fromDomainToModuleApiFingerprintRequest
 import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintRequest
+import com.simprints.id.domain.moduleapi.fingerprint.requests.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.Step.Status.COMPLETED
 import java.util.*
 
@@ -16,9 +16,17 @@ data class Step(
     val activityName: String,
     val bundleKey: String,
     val request: Request,
-    var result: Result? = null,
+    private var result: Result? = null,
     private var status: Status
 ) : Parcelable {
+
+    fun getResult() = result
+
+    fun setResult(result: Result?) {
+        if (result != null)
+            setStatus(COMPLETED)
+        this.result = result
+    }
 
     fun getStatus(): Status {
         updateStatusBasedOnResult()
@@ -75,7 +83,7 @@ data class Step(
 
 fun Step.Request.fromDomainToModuleApi(): Parcelable =
     when (this) {
-        is FingerprintRequest -> fromDomainToModuleApiFingerprintRequest(this)
+        is FingerprintRequest -> fromDomainToModuleApi()
         is FaceRequest -> fromDomainToModuleApi()
         is CoreRequest -> this
         else -> throw Throwable("Invalid Request $this")

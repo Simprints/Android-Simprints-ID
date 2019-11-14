@@ -12,24 +12,23 @@ import com.simprints.id.domain.moduleapi.face.FaceRequestFactory
 import com.simprints.id.domain.moduleapi.face.FaceRequestFactoryImpl
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactory
 import com.simprints.id.domain.moduleapi.fingerprint.FingerprintRequestFactoryImpl
-import com.simprints.id.domain.moduleapi.fingerprint.ModuleApiToDomainFingerprintResponse
 import com.simprints.id.orchestrator.*
 import com.simprints.id.orchestrator.cache.HotCache
 import com.simprints.id.orchestrator.cache.HotCacheImpl
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoderImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
+import com.simprints.id.orchestrator.cache.StepEncoderImpl
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessorImpl
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.secure.cryptography.HybridCipher
 import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
@@ -51,7 +50,7 @@ class OrchestratorModule {
     @Provides
     fun provideFingerprintStepProcessor(fingerprintRequestFactory: FingerprintRequestFactory,
                                         preferenceManager: PreferencesManager): FingerprintStepProcessor =
-        FingerprintStepProcessorImpl(fingerprintRequestFactory, ModuleApiToDomainFingerprintResponse, preferenceManager)
+        FingerprintStepProcessorImpl(fingerprintRequestFactory, preferenceManager)
 
     @Provides
     fun provideCoreStepProcessor(): CoreStepProcessor = CoreStepProcessorImpl()
@@ -74,8 +73,9 @@ class OrchestratorModule {
     @Named("ModalityFlowIdentify")
     fun provideModalityFlowIdentify(fingerprintStepProcessor: FingerprintStepProcessor,
                                     faceStepProcessor: FaceStepProcessor,
-                                    coreStepProcessor: CoreStepProcessor): ModalityFlow =
-        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
+                                    coreStepProcessor: CoreStepProcessor,
+                                    prefs: PreferencesManager): ModalityFlow =
+        ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, prefs)
 
     // Orchestration
     @Provides
@@ -85,9 +85,15 @@ class OrchestratorModule {
         ModalityFlowFactoryImpl(enrolFlow, verifyFlow, identifyFlow)
 
     @Provides
-    fun provideOrchestratorManager(modalityFlowFactory: ModalityFlowFactory,
-                                   appResponseFactory: AppResponseFactory,
-                                   hotCache: HotCache): OrchestratorManager =
+    fun provideOrchestratorManager(orchestratorManagerImpl: OrchestratorManagerImpl): OrchestratorManager {
+        return orchestratorManagerImpl
+    }
+
+    @Provides
+    @OrchestratorScope // Since OrchestratorManagerImpl is also a FlowProvider, it needs to be a Singleton
+    fun provideOrchestratorManagerImpl(modalityFlowFactory: ModalityFlowFactory,
+                                       appResponseFactory: AppResponseFactory,
+                                       hotCache: HotCache): OrchestratorManagerImpl =
         OrchestratorManagerImpl(modalityFlowFactory, appResponseFactory, hotCache)
 
     @Provides
@@ -113,14 +119,18 @@ class OrchestratorModule {
 
     @Provides
     fun provideHotCache(
-        preferences: SharedPreferences,
+        @Named("EncryptedSharedPreferences")  sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
-    ): HotCache = HotCacheImpl(preferences, stepEncoder)
+    ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
 
     @Provides
-    fun provideStepEncoder(
-        cipher: HybridCipher
-    ): StepEncoder = StepEncoderImpl(cipher)
+    fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
+
+    @Provides
+    open fun provideAppResponseBuilderFactory(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
 
     @Provides
     fun provideEnrolmentHelper(
@@ -128,5 +138,10 @@ class OrchestratorModule {
         sessionEventsManager: SessionEventsManager,
         timeHelper: TimeHelper
     ): EnrolmentHelper = EnrolmentHelperImpl(repository, sessionEventsManager, timeHelper)
+
+    @Provides
+    fun provideFlowManager(
+        orchestratorManagerImpl: OrchestratorManagerImpl
+    ): FlowProvider = orchestratorManagerImpl
 
 }

@@ -46,7 +46,7 @@ import org.koin.test.mock.declare
 @RunWith(AndroidJUnit4::class)
 class ConnectScannerActivityAndroidTest : KoinTest {
 
-    @get:Rule var permissionRule: GrantPermissionRule? = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    @get:Rule var permissionRule: GrantPermissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION)
 
     private lateinit var scenario: ActivityScenario<ConnectScannerActivity>
 
@@ -67,7 +67,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     private fun mockDefaultDbManager() {
-        whenever(dbManagerMock) { loadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.error(IllegalStateException())
+        whenever(dbManagerMock) { loadPeople(anyNotNull()) } thenReturn Single.error(IllegalStateException())
     }
 
     @Test
@@ -239,9 +239,7 @@ class ConnectScannerActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_LANGUAGE = "en"
-
-        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest(DEFAULT_LANGUAGE)
+        private fun connectScannerTaskRequest() = ConnectScannerTaskRequest()
 
         private fun ConnectScannerTaskRequest.toIntent() = Intent().also {
             it.setClassName(ApplicationProvider.getApplicationContext<Application>().packageName, ConnectScannerActivity::class.qualifiedName!!)

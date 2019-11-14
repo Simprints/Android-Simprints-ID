@@ -3,7 +3,6 @@ package com.simprints.id
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.facebook.soloader.SoLoader
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
@@ -17,6 +16,7 @@ import timber.log.Timber
 open class Application : MultiDexApplication() {
 
     lateinit var component: AppComponent
+    lateinit var orchestratorComponent: OrchestratorComponent
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -25,7 +25,12 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
-            .orchestratorModule(OrchestratorModule())
+            .build()
+    }
+
+    open fun createOrchestratorComponent() {
+        orchestratorComponent = component
+            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
             .build()
     }
 
@@ -52,7 +57,6 @@ open class Application : MultiDexApplication() {
 
         initFabric()
         handleUndeliverableExceptionInRxJava()
-        initConceal()
     }
 
     private fun initFabric() {
@@ -82,11 +86,6 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    private fun initConceal() {
-        val nativeExopackage = false
-        SoLoader.init(this, nativeExopackage)
-    }
-
     private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     private fun initServiceLocation() {
@@ -95,5 +94,4 @@ open class Application : MultiDexApplication() {
             androidContext(this@Application)
         }
     }
-
 }

@@ -15,9 +15,8 @@ interface IFingerprintResponse : Parcelable, IResponse {
 }
 
 enum class IFingerprintResponseType {
-    ENROL,
-    VERIFY,
-    IDENTIFY,
+    CAPTURE,
+    MATCH,
     REFUSAL,
     ERROR
 }
