@@ -188,6 +188,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
 
     private fun stopContinuousCapture() {
         scanningTask?.dispose()
+        cancelCaptureUI()
     }
 
     private fun handleNoFingerTemplateDetected() {
