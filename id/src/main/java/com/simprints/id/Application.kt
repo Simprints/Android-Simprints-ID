@@ -113,7 +113,7 @@ open class Application : MultiDexApplication() {
         factory { component.getImprovedSharedPreferences() }
         factory { component.getRemoteConfigWrapper() }
         factory { component.getAndroidResourcesHelper() }
-        factory { component.getFlowManager() }
+        factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
     }
 
