@@ -8,8 +8,6 @@ import androidx.test.rule.GrantPermissionRule
 import com.simprints.fingerprint.activities.collect.pressScanUntilDialogIsDisplayedAndClickConfirm
 import com.simprints.fingerprint.activities.collect.waitUntilCollectFingerprintsIsDisplayed
 import com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity
-import com.simprints.fingerprint.commontesttools.data.DEFAULT_PROJECT_ID
-import com.simprints.fingerprint.commontesttools.data.TestDbQuery
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.flow.Action
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
@@ -23,6 +21,7 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.SimulationMode
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintCaptureResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintMatchResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
@@ -85,8 +84,8 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun setupDbManagerMock() {
         with(dbManagerMock) {
             whenThis { loadPeople(anyNotNull()) } then {
-                val query = it.arguments[0] as TestDbQuery
-                val numberOfPeopleToLoad = if (query.patientId == null) NUMBER_OF_PEOPLE_IN_DB else 1
+                val query = it.arguments[0] as PersonLocalDataSource.Query
+                val numberOfPeopleToLoad = if (query.personId == null) NUMBER_OF_PEOPLE_IN_DB else 1
                 Single.just(
                     FingerprintGenerator.generateRandomFingerprintRecords(numberOfPeopleToLoad)
                 )
@@ -138,7 +137,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertIdentifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            TestDbQuery(projectId = DEFAULT_PROJECT_ID)
+            PersonLocalDataSource.Query(projectId = DEFAULT_PROJECT_ID)
         ))
 
         with(scenario.result) {
@@ -153,7 +152,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
     private fun assertVerifyFlowFinishesSuccessfully() {
         scenario = ActivityScenario.launch(createFingerprintMatchRequestIntent(
             FingerprintGenerator.generateRandomFingerprints(2),
-            TestDbQuery(patientId = UUID.randomUUID().toString())
+            PersonLocalDataSource.Query(personId = UUID.randomUUID().toString())
         ))
 
         with(scenario.result) {
@@ -173,5 +172,7 @@ class FingerprintFlowsIntegrationTest : KoinTest {
 
     companion object {
         private const val NUMBER_OF_PEOPLE_IN_DB = 120
+
+        private const val DEFAULT_PROJECT_ID = "TESTzbq8ZBOs1LLOOH6p"
     }
 }

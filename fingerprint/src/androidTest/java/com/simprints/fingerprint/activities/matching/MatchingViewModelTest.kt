@@ -7,8 +7,6 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.commontesttools.data.DEFAULT_PROJECT_ID
-import com.simprints.fingerprint.commontesttools.data.TestDbQuery
 import com.simprints.fingerprint.commontesttools.generators.FingerprintGenerator
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
@@ -37,6 +35,7 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import org.koin.test.mock.declare
 import org.koin.test.mock.declareMock
+import java.io.Serializable
 import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
@@ -99,7 +98,7 @@ class MatchingViewModelTest : KoinTest {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
-        val query = TestDbQuery(projectId = DEFAULT_PROJECT_ID)
+        val query = mock<Serializable>()
         val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
         val viewModel = createViewModelAndStart(matchingRequest, mockIdentificationLibMatcher)
         val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
@@ -118,7 +117,7 @@ class MatchingViewModelTest : KoinTest {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithoutProbe)
 
-        val query = TestDbQuery(projectId = DEFAULT_PROJECT_ID)
+        val query = mock<Serializable>()
         val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
         val viewModel = createViewModelAndStart(matchingRequest, mockIdentificationLibMatcher)
         val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
@@ -155,7 +154,7 @@ class MatchingViewModelTest : KoinTest {
 
         with(createViewModel()) {
             val progressTestObserver = progress.test()
-            start(identifyRequestWithinProjectGroup, mockIdentificationLibMatcher)
+            start(identifyRequest, mockIdentificationLibMatcher)
             result.test().awaitValue().assertValue { it.finishDelayMillis == IdentificationTask.matchingEndWaitTimeInMillis }
             hasLoadingBegun.test().assertValue { it }
             matchBeginningSummary.test().assertValue { it.matchSize == CANDIDATE_POOL + 1 }
@@ -186,7 +185,7 @@ class MatchingViewModelTest : KoinTest {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
-        val viewModel = createViewModelAndStart(identifyRequestWithinProjectGroup, mockErrorLibMatcher)
+        val viewModel = createViewModelAndStart(identifyRequest, mockErrorLibMatcher)
 
         with(viewModel) {
             result.test().awaitValue()
@@ -236,12 +235,12 @@ class MatchingViewModelTest : KoinTest {
         private val candidatesWithoutProbe = FingerprintGenerator.generateRandomFingerprintRecords(CANDIDATE_POOL)
         private val candidatesWithProbe = candidatesWithoutProbe + probeFingerprintRecord
 
-        private val identifyRequestWithinProjectGroup = MatchingTaskRequest(
+        private val identifyRequest = MatchingTaskRequest(
             probeFingerprintRecord.fingerprints,
-            TestDbQuery(projectId = DEFAULT_PROJECT_ID))
+            mock())
 
         private val verifyRequest = MatchingTaskRequest(
             probeFingerprintRecord.fingerprints,
-            TestDbQuery(patientId = probeFingerprintRecord.personId))
+            mock())
     }
 }
