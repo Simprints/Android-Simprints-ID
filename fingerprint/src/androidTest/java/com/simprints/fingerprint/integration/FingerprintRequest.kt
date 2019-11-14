@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import com.simprints.fingerprint.commontesttools.data.TestDbQuery
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToCore
+import com.simprints.fingerprint.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl

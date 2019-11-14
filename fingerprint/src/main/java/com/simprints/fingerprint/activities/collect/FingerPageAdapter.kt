@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.id.tools.AndroidResourcesHelper
 
 
 class FingerPageAdapter(fragmentManager: FragmentManager,

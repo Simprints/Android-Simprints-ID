@@ -124,13 +124,14 @@ class FingerprintFlowsIntegrationTest : KoinTest {
         waitUntilCollectFingerprintsIsDisplayed()
         pressScanUntilDialogIsDisplayedAndClickConfirm()
 
-        return with(scenario.result) {
+        with(scenario.result) {
             resultData.setExtrasClassLoader(IFingerprintCaptureResponse::class.java.classLoader)
             assertEquals(Activity.RESULT_OK, resultCode)
-            val captureResponse = resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)?.apply {
-                assertEquals(IFingerprintResponseType.CAPTURE, type)
+            val captureResponse = resultData?.extras?.getParcelable<IFingerprintCaptureResponse>(IFingerprintResponse.BUNDLE_KEY)
+            with(captureResponse) {
+                assertNotNull(captureResponse)
+                assertEquals(IFingerprintResponseType.CAPTURE, this?.type)
             }
-            assertNotNull(captureResponse)
         }
     }
 

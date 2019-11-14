@@ -5,5 +5,5 @@ class FingerprintIdentity(
     val fingerprints: List<Fingerprint>
 )
 
-fun FingerprintIdentity.fromDomainToMatcherPerson() =
+fun FingerprintIdentity.fromDomainToMatcher() =
     com.simprints.fingerprintmatcher.Person(personId, fingerprints.map { it.fromDomainToMatcher() })

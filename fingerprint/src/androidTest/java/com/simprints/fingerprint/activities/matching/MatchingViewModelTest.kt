@@ -97,38 +97,54 @@ class MatchingViewModelTest : KoinTest {
     @Test
     fun identificationRequest_startedAndAwaitedWithSuccessfulMatch_finishesWithProbeInMatchResult() {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
+        setupDbManagerLoadCandidates(candidatesWithProbe)
 
         val query = TestDbQuery(projectId = DEFAULT_PROJECT_ID)
-        testIdentification(true, query)
+        val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
+        val viewModel = createViewModelAndStart(matchingRequest, mockIdentificationLibMatcher)
+        val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
 
+        assertNotNull(result)
+        result?.let { matchingResult ->
+            assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, matchingResult.results.size)
+            val highestScoreCandidate = matchingResult.results.maxBy { it.confidence }?.guid
+            assertThat(highestScoreCandidate).isEqualTo(probeFingerprintRecord.personId)
+        }
         verifyOnce(dbManagerMock) { loadPeople(query) }
     }
 
     @Test
     fun identificationRequest_startedAndAwaitedWithoutSuccessfulMatch_finishesWithoutProbeInMatchResult() {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
+        setupDbManagerLoadCandidates(candidatesWithoutProbe)
 
         val query = TestDbQuery(projectId = DEFAULT_PROJECT_ID)
-        testIdentification(false, query)
+        val matchingRequest = MatchingTaskRequest(probeFingerprintRecord.fingerprints, query)
+        val viewModel = createViewModelAndStart(matchingRequest, mockIdentificationLibMatcher)
+        val result = viewModel.result.test().awaitValue().value().data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)
 
+        assertNotNull(result)
+        result?.let { matchingResult ->
+            assertThat(matchingResult.results).doesNotContain(probeFingerprintRecord.personId)
+        }
         verifyOnce(dbManagerMock) { loadPeople(query) }
     }
 
     @Test
     fun verificationRequest_startedAndAwaited_finishesWithCorrectResult() {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.VERIFY
-
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
-        with(createViewModelAndStart(verifyRequest, mockVerificationLibMatcher)) {
-            with(result.test().awaitValue().value()) {
-                assertEquals(ResultCode.OK, resultCode)
-                assertNotNull(
-                    data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.let {
-                        assertEquals(probeFingerprintRecord.personId, it.results.first().guid)
-                    }
-                )
-            }
+        val viewModel = createViewModelAndStart(verifyRequest, mockVerificationLibMatcher)
+        val result = viewModel.result.test().awaitValue().value()
+
+        with(result) {
+            assertEquals(ResultCode.OK, resultCode)
+            assertNotNull(
+                data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.let {
+                    assertEquals(probeFingerprintRecord.personId, it.results.first().guid)
+                }
+            )
         }
     }
 
@@ -153,7 +169,6 @@ class MatchingViewModelTest : KoinTest {
     @Test
     fun verificationRequest_startedAndAwaited_updatesViewCorrectly() {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.VERIFY
-
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
         with(createViewModel()) {
@@ -171,7 +186,9 @@ class MatchingViewModelTest : KoinTest {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
         setupDbManagerLoadCandidates(candidatesWithProbe)
 
-        with(createViewModelAndStart(identifyRequestWithinProjectGroup, mockErrorLibMatcher)) {
+        val viewModel = createViewModelAndStart(identifyRequestWithinProjectGroup, mockErrorLibMatcher)
+
+        with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
             verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
@@ -181,44 +198,15 @@ class MatchingViewModelTest : KoinTest {
     @Test
     fun verifyRequest_matchFailsToComplete_showsToastAndLogsError() {
         whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.VERIFY
-
         setupDbManagerLoadCandidates(listOf(probeFingerprintRecord))
 
-        with(createViewModelAndStart(verifyRequest, mockErrorLibMatcher)) {
+        val viewModel = createViewModelAndStart(verifyRequest, mockErrorLibMatcher)
+
+        with(viewModel) {
             result.test().awaitValue()
             hasMatchFailed.test().assertValue { it }
             verifyOnce(crashReportManagerMock) { logExceptionOrSafeException(anyNotNull()) }
         }
-    }
-
-    private fun testIdentification(shouldProbeInMatchingResult: Boolean,
-                                   query: TestDbQuery) {
-        whenever(masterFlowManager) { getCurrentAction() } thenReturn Action.IDENTIFY
-
-        if (shouldProbeInMatchingResult) {
-            setupDbManagerLoadCandidates(candidatesWithProbe)
-        } else {
-            setupDbManagerLoadCandidates(candidatesWithoutProbe)
-        }
-
-        with(createViewModelAndStart(MatchingTaskRequest(
-            probeFingerprintRecord.fingerprints,
-            query), mockIdentificationLibMatcher)
-        ) {
-            assertIdentificationResult(result.test().awaitValue().value(), probeFingerprintRecord, shouldProbeInMatchingResult)
-        }
-    }
-
-    private fun assertIdentificationResult(result: MatchingViewModel.FinishResult, probe: FingerprintIdentity, shouldProbeInMatchingResult: Boolean = true) {
-        assertNotNull(result.data?.getParcelableExtra<MatchingTaskResult>(MatchingTaskResult.BUNDLE_KEY)?.apply {
-            assertEquals(DEFAULT_NUMBER_OF_ID_RETURNS, results.size)
-            if (shouldProbeInMatchingResult) {
-                val highestScoreCandidate = results.maxBy { it.confidence }?.guid
-                assertThat(highestScoreCandidate).isEqualTo(probe.personId)
-            } else {
-                assertThat(results).doesNotContain(probe.personId)
-            }
-        })
     }
 
     private fun createViewModelAndStart(request: MatchingTaskRequest,

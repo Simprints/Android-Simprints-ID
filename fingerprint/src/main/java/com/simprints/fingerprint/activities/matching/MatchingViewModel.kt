@@ -16,7 +16,6 @@ import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelp
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcher
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToMatcherPerson
 import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -100,7 +99,7 @@ class MatchingViewModel(private val dbManager: FingerprintDbManager,
             val scores = mutableListOf<Float>()
             val callback = matchCallback(emitter, candidates, scores)
             val libProbe = LibPerson(UUID.randomUUID().toString(), probeFingerprints.map { it.fromDomainToMatcher() })
-            val libCandidates = candidates.map { it.fromDomainToMatcherPerson() }
+            val libCandidates = candidates.map { it.fromDomainToMatcher() }
             libMatcherConstructor(libProbe, libCandidates, matcherType, scores, callback, 1).start()
         }
 
