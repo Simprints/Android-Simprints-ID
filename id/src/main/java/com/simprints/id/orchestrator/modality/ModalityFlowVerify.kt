@@ -35,7 +35,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         modalities.map {
             with(appRequest) {
                 when (it) {
-                    FINGER -> fingerprintStepProcessor.buildStepToCapture(projectId, userId, projectId, metadata)
+                    FINGER -> fingerprintStepProcessor.buildStepToCapture()
                     FACE -> faceStepProcessor.buildCaptureStep()
                 }
             }
@@ -64,7 +64,7 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
 
         return stepRequested.also {
             if (result is FingerprintCaptureResponse) {
-                val query = Query(patientId = appRequest.verifyGuid)
+                val query = Query(personId = appRequest.verifyGuid)
                 addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
             } else if (result is FaceCaptureResponse) {
                 val query = Query(patientId = appRequest.verifyGuid)

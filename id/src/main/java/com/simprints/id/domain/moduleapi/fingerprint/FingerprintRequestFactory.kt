@@ -8,11 +8,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.requests.FingerprintMatchRe
 
 interface FingerprintRequestFactory {
 
-    fun buildFingerprintCaptureRequest(projectId: String,
-                                       userId: String,
-                                       moduleId: String,
-                                       metadata: String,
-                                       prefs: PreferencesManager): FingerprintCaptureRequest
+    fun buildFingerprintCaptureRequest(prefs: PreferencesManager): FingerprintCaptureRequest
 
     fun buildFingerprintMatchRequest(probeSamples: List<FingerprintSample>,
                                      query: PersonLocalDataSource.Query): FingerprintMatchRequest

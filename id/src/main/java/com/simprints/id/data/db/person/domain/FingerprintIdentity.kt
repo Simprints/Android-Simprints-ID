@@ -4,5 +4,5 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class FingerprintIdentity(val id: String,
+class FingerprintIdentity(val patientId: String,
                           val fingerprints: List<FingerprintSample>): Parcelable

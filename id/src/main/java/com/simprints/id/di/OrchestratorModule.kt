@@ -90,7 +90,7 @@ class OrchestratorModule {
     }
 
     @Provides
-    @Singleton // Since OrchestratorManagerImpl is also a FlowManager, it needs to be a Singleton
+    @Singleton // Since OrchestratorManagerImpl is also a FlowProvider, it needs to be a Singleton
     fun provideOrchestratorManagerImpl(modalityFlowFactory: ModalityFlowFactory,
                                        appResponseFactory: AppResponseFactory,
                                        hotCache: HotCache): OrchestratorManagerImpl =
@@ -136,6 +136,6 @@ class OrchestratorModule {
     @Provides
     fun provideFlowManager(
         orchestratorManagerImpl: OrchestratorManagerImpl
-    ): FlowManager = orchestratorManagerImpl
+    ): FlowProvider = orchestratorManagerImpl
 
 }

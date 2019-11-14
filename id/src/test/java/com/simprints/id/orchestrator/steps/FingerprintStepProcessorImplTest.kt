@@ -15,12 +15,9 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.CA
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintRequestCode.MATCH
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
-import com.simprints.id.orchestrator.verifyAppRequest
 import com.simprints.id.testtools.TestApplication
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse.Companion.BUNDLE_KEY
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.whenever
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -48,15 +45,15 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     @Before
     fun setUp() {
-        preferencesManagerMock = mock()
+        preferencesManagerMock = mockk()
 
         with(preferencesManagerMock) {
-            whenever(language) thenReturn "en"
-            whenever(fingerStatus) thenReturn emptyMap()
-            whenever(logoExists) thenReturn true
-            whenever(organizationName) thenReturn "some_org"
-            whenever(programName) thenReturn "some_name"
-            whenever(matchGroup) thenReturn GROUP.GLOBAL
+            every { language } returns "en"
+            every { fingerStatus } returns emptyMap()
+            every { logoExists } returns true
+            every { organizationName } returns "some_org"
+            every { programName } returns "some_name"
+            every { matchGroup } returns GROUP.GLOBAL
         }
 
         fingerprintStepProcess = FingerprintStepProcessorImpl(
@@ -69,20 +66,20 @@ class FingerprintStepProcessorImplTest : BaseStepProcessorTest() {
 
     private fun mockFromModuleApiToDomainExt() {
         mockkStatic("com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintResponseKt")
-        every { fingerprintResponseMock.fromModuleApiToDomain() } returns mock()
+        every { fingerprintResponseMock.fromModuleApiToDomain() } returns mockk()
     }
 
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForMatching() {
-        val step = fingerprintStepProcess.buildStepToMatch(mock(), mock())
+        val step = fingerprintStepProcess.buildStepToMatch(mockk(), mockk())
         verifyFingerprintIntent<FingerprintMatchRequest>(step, MATCH.value)
     }
 
     @Test
     fun stepProcessorShouldBuildTheRightStepForCapturing() {
         with(enrolAppRequest) {
-            val step = fingerprintStepProcess.buildStepToCapture(projectId, userId, moduleId, metadata)
+            val step = fingerprintStepProcess.buildStepToCapture()
             verifyFingerprintIntent<FingerprintCaptureRequest>(step, CAPTURE.value)
         }
     }

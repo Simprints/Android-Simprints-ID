@@ -12,10 +12,9 @@ data class FingerprintErrorResponse(val reason: FingerprintErrorReason) : Finger
 
 /**
  * If user presses a CLOSE button, we return a FingerprintResponse.
- * If user presses BACK, an ExitForm is shown, except for UNEXPECTED_ERROR and GUID_NOT_FOUND_ONLINE (same as CLOSE).
+ * If user presses BACK, an ExitForm is shown, except for UNEXPECTED_ERROR (same as CLOSE).
  */
 enum class FingerprintErrorReason {
-    GUID_NOT_FOUND_ONLINE,
     UNEXPECTED_ERROR,
     BLUETOOTH_NOT_SUPPORTED;
 

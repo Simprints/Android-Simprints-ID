@@ -29,7 +29,6 @@ fun IFingerprintErrorReason.fromModuleApiToDomain(): FingerprintErrorReason =
     when(this) {
         IFingerprintErrorReason.UNEXPECTED_ERROR -> FingerprintErrorReason.UNEXPECTED_ERROR
         IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED -> FingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
-        IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE -> FingerprintErrorReason.GUID_NOT_FOUND_ONLINE
     }
 
 fun FingerprintErrorReason.toAppErrorReason(): AppErrorResponse.Reason =

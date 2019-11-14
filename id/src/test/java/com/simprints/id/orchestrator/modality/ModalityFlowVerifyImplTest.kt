@@ -44,7 +44,7 @@ class ModalityFlowVerifyImplTest {
         whenever(verifyCoreStepMock) { activityName } thenReturn VERIFY_ACTIVITY_NAME
         whenever(consentCoreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
-        whenever(fingerprintStepProcessor) { buildStepToCapture(anyNotNull(), anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn fingerprintStepMock
+        whenever(fingerprintStepProcessor) { buildStepToCapture() } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull()) } thenReturn verifyCoreStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn consentCoreStepMock
