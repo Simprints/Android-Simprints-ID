@@ -11,8 +11,8 @@ import kotlinx.android.parcel.Parcelize
 class FaceCaptureSample (
     val faceId: String,
     val template: ByteArray,
-    val imageRef: SecuredImageRef?): Parcelable {
-}
+    val imageRef: SecuredImageRef?
+): Parcelable
 
 fun FaceCaptureSample.fromDomainToModuleApi(): IFaceSample =
     IFaceSampleImpl(faceId, template, imageRef?.fromDomainToModuleApi())
