@@ -6,7 +6,10 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,14 +20,18 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.tools.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_module_selection.*
+import org.jetbrains.anko.sdk27.coroutines.onEditorAction
+import org.jetbrains.anko.sdk27.coroutines.onFocusChange
 import javax.inject.Inject
 
 class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
-    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject
+    lateinit var viewModelFactory: ModuleViewModelFactory
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -67,9 +74,22 @@ class ModuleSelectionFragment(
     }
 
     private fun configureSearchView() {
+        configureSearchViewEditText()
         val queryListener = ModuleSelectionQueryListener(modules.getUnselected())
         searchView.setOnQueryTextListener(queryListener)
         observeSearchResults(queryListener)
+    }
+
+    private fun configureSearchViewEditText() {
+        val editText = requireActivity().findViewById<EditText>(
+            androidx.appcompat.R.id.search_src_text
+        )
+
+        with(editText) {
+            typeface = ResourcesCompat.getFont(requireContext(), R.font.muli)
+            observeSearchButton()
+            observeFocus()
+        }
     }
 
     private fun displaySelectedModules() {
@@ -97,6 +117,7 @@ class ModuleSelectionFragment(
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
         queryListener.searchResults.observe(this, Observer { searchResults ->
             adapter.submitList(searchResults)
+            rvModules.scrollToPosition(0)
 
             txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
         })
@@ -107,7 +128,8 @@ class ModuleSelectionFragment(
 
         val selectedModulesSize = modules.getSelected().size
         val noModulesSelected = lastModuleChanged.isSelected && selectedModulesSize == 1
-        val tooManyModulesSelected = !lastModuleChanged.isSelected && selectedModulesSize == maxSelectedModules
+        val tooManyModulesSelected = !lastModuleChanged.isSelected
+            && selectedModulesSize == maxSelectedModules
 
         when {
             noModulesSelected -> notifyNoModulesSelected()
@@ -150,5 +172,22 @@ class ModuleSelectionFragment(
     private fun List<Module>.getSelected() = filter { it.isSelected }
 
     private fun List<Module>.getUnselected() = filter { !it.isSelected }
+
+    private fun EditText.observeSearchButton() {
+        onEditorAction { v, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                requireActivity().hideKeyboard()
+                v?.clearFocus()
+            }
+        }
+    }
+
+    private fun EditText.observeFocus() {
+        onFocusChange { v, hasFocus ->
+            (v as EditText).isCursorVisible = hasFocus
+            if (!hasFocus)
+                rvModules.scrollToPosition(0)
+        }
+    }
 
 }
