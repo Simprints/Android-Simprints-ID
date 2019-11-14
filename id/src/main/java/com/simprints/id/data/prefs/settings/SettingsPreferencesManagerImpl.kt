@@ -81,6 +81,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
+
+        const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
+        const val FINGER_IMAGES_EXIST_DEFAULT = true
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -133,6 +136,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)
+
+    override var fingerImagesExist: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

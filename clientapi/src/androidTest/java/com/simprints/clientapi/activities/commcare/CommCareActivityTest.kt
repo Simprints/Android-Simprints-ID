@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 import org.koin.test.mock.declareMock
 
-@SmallTest
 @RunWith(AndroidJUnit4::class)
 class CommCareActivityTest : KoinTest {
 

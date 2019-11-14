@@ -11,11 +11,10 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.MatchEntry
 import com.simprints.fingerprint.controllers.core.eventData.model.OneToManyMatchEvent
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.MatchPoolType
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
+import com.simprints.fingerprint.data.domain.matching.MatchResult
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Completable
@@ -55,8 +54,18 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
     }
 
     override fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>) {
+        val topCandidates = extractTopCandidates(candidates, scores)
 
-        val topCandidates = candidates
+        saveOneToManyMatchEvent(candidates.size, topCandidates)
+        saveLastIdentificationDate()
+
+        postMatchFinishedSummary(topCandidates)
+        postFinalProgress()
+        postResultData(topCandidates)
+    }
+
+    private fun extractTopCandidates(candidates: List<FingerprintIdentity>, scores: List<Float>): List<MatchResult> =
+        candidates
             .zip(scores)
             .sortedByDescending { (_, score) -> score }
             .take(returnIdCount)
@@ -64,28 +73,37 @@ class IdentificationTask(private val viewModel: MatchingViewModel,
                 MatchResult(candidate.personId, score)
             }
 
+    private fun saveOneToManyMatchEvent(candidateSize: Int, topCandidates: List<MatchResult>) {
         sessionEventsManager.addEventInBackground(
             OneToManyMatchEvent(
                 matchStartTime,
                 timeHelper.now(),
-                OneToManyMatchEvent.MatchPool(MatchPoolType.fromMatchingQuery(matchingRequest.queryForCandidates), candidates.size),
+                matchingRequest.queryForCandidates,
+                candidateSize,
                 topCandidates.map { MatchEntry(it.guid, it.confidence) }))
+    }
 
+    private fun saveLastIdentificationDate() {
+        preferenceManager.lastIdentificationDate = Date()
+    }
 
+    private fun postMatchFinishedSummary(topCandidates: List<MatchResult>) {
         val veryGoodMatches = topCandidates.count { (_, score) -> veryGoodMatchThreshold <= score }
         val goodMatches = topCandidates.count { (_, score) -> goodMatchThreshold <= score && score < veryGoodMatchThreshold }
         val fairMatches = topCandidates.count { (_, score) -> fairMatchThreshold <= score && score < goodMatchThreshold }
-
-        preferenceManager.lastIdentificationDate = Date()
-
-        val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
-            MatchingTaskResult(topCandidates))
-
-        viewModel.progress.postValue(100)
-
         viewModel.matchFinishedSummary.postValue(MatchingViewModel.IdentificationFinishedSummary(
             topCandidates.size, veryGoodMatches, goodMatches, fairMatches
         ))
+    }
+
+    private fun postFinalProgress() {
+        viewModel.progress.postValue(100)
+    }
+
+    private fun postResultData(topCandidates: List<MatchResult>) {
+        val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
+            MatchingTaskResult(topCandidates))
+
         viewModel.result.postValue(MatchingViewModel.FinishResult(
             ResultCode.OK, resultData, matchingEndWaitTimeInMillis
         ))
