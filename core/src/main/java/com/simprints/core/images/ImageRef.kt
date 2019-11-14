@@ -1,3 +1,3 @@
 package com.simprints.core.images
 
-abstract class ImageRef(open val uri: String)
+abstract class ImageRef(open val path: String)

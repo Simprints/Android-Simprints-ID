@@ -1,4 +1,4 @@
-package com.simprints.id.secure.cryptography
+package com.simprints.id.core.images
 
 import java.math.BigInteger
 import java.security.MessageDigest

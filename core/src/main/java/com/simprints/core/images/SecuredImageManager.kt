@@ -1,9 +1,14 @@
 package com.simprints.core.images
 
-//TODO: to be developed
+import java.io.FileInputStream
+
 interface SecuredImageManager {
 
-    //Encryption involved
-    suspend fun saveSecurely(image: ByteArray): SecuredImageRef
+    fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef?
+
+    fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef?
+
+    fun readImage(path: SecuredImageRef): FileInputStream?
+
 }
 

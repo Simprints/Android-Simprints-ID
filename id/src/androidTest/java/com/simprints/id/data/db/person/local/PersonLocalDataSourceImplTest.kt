@@ -1,7 +1,6 @@
 package com.simprints.id.data.db.person.local
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
@@ -28,7 +27,6 @@ import java.io.Serializable
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
