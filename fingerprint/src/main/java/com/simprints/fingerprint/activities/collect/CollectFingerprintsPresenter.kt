@@ -22,6 +22,7 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.flow.Action.*
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
@@ -37,7 +38,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val sessionEventsManager: FingerprintSessionEventsManager,
                                    private val scannerManager: ScannerManager,
                                    private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
-                                   private val masterFlowManager: MasterFlowManager)
+                                   private val masterFlowManager: MasterFlowManager,
+                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -65,7 +67,8 @@ class CollectFingerprintsPresenter(private val context: Context,
             view,
             this,
             collectRequest.fingerprintsToCapture,
-            androidResourcesHelper)
+            androidResourcesHelper,
+            fingerprintPreferencesManager)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {

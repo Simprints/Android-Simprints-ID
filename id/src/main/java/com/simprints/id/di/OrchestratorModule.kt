@@ -22,6 +22,7 @@ import com.simprints.id.orchestrator.modality.ModalityFlowEnrolImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowIdentifyImpl
 import com.simprints.id.orchestrator.modality.ModalityFlowVerifyImpl
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
+import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessor
 import com.simprints.id.orchestrator.steps.core.CoreStepProcessorImpl
 import com.simprints.id.orchestrator.steps.face.FaceStepProcessor
@@ -32,7 +33,6 @@ import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 class OrchestratorModule {
@@ -90,7 +90,7 @@ class OrchestratorModule {
     }
 
     @Provides
-    @Singleton // Since OrchestratorManagerImpl is also a FlowProvider, it needs to be a Singleton
+    @OrchestratorScope // Since OrchestratorManagerImpl is also a FlowProvider, it needs to be a Singleton
     fun provideOrchestratorManagerImpl(modalityFlowFactory: ModalityFlowFactory,
                                        appResponseFactory: AppResponseFactory,
                                        hotCache: HotCache): OrchestratorManagerImpl =
@@ -125,6 +125,12 @@ class OrchestratorModule {
 
     @Provides
     fun provideStepEncoder(): StepEncoder = StepEncoderImpl()
+
+    @Provides
+    open fun provideAppResponseBuilderFactory(
+        enrolmentHelper: EnrolmentHelper,
+        timeHelper: TimeHelper
+    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
 
     @Provides
     fun provideEnrolmentHelper(
