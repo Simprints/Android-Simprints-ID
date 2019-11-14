@@ -18,5 +18,5 @@ open class FaceSample(
     }
 }
 
-fun FaceCaptureSample.fromModuleEntityToDomain() = FaceSample(template, imageRef)
+fun FaceCaptureSample.fromModuleApiToDomain() = FaceSample(template, imageRef)
 
