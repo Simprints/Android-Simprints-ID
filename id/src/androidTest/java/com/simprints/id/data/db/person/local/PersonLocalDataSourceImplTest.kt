@@ -23,7 +23,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.Serializable
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -112,7 +111,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = personLocalDataSource.count(PersonLocalDataSource.Query(patientId = fakePerson.patientId))
+        val count = personLocalDataSource.count(PersonLocalDataSource.Query(personId = fakePerson.patientId))
         assertEquals(count, 1)
     }
 
@@ -151,10 +150,10 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         realm.executeTransaction {
             with(fingerprintIdentities) {
                 assertThat(count()).isEqualTo(fakePerson1.fingerprintSamples.count() + fakePerson2.fingerprintSamples.count())
-                assertThat(get(0).id).isEqualTo(fakePerson1.patientId)
-                assertThat(get(1).id).isEqualTo(fakePerson1.patientId)
-                assertThat(get(2).id).isEqualTo(fakePerson2.patientId)
-                assertThat(get(3).id).isEqualTo(fakePerson2.patientId)
+                assertThat(get(0).patientId).isEqualTo(fakePerson1.patientId)
+                assertThat(get(1).patientId).isEqualTo(fakePerson1.patientId)
+                assertThat(get(2).patientId).isEqualTo(fakePerson2.patientId)
+                assertThat(get(3).patientId).isEqualTo(fakePerson2.patientId)
             }
         }
     }
@@ -163,7 +162,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     fun givenInvalidSerializableQuery_aThrowableIsThrown() = runBlocking {
         val fingerprintIdentityLocalDataSource =  (personLocalDataSource as FingerprintIdentityLocalDataSource)
         assertThrows<InvalidQueryToLoadRecordsException> {
-            fingerprintIdentityLocalDataSource.loadFingerprintIdentities(object : Serializable {} )
+            fingerprintIdentityLocalDataSource.loadFingerprintIdentities(mock())
         }
     }
 
