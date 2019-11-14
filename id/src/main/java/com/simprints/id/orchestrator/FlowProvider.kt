@@ -8,6 +8,6 @@ interface FlowProvider {
     fun getCurrentFlow(): AppRequestType
 
     companion object {
-        fun build(app: Application) = app.component.getFlowManager()
+        fun build(app: Application) = app.orchestratorComponent.getFlowManager()
     }
 }

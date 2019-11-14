@@ -16,12 +16,16 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.*
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.test.AutoCloseKoinTest
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CrashReportManagerImplTest: AutoCloseKoinTest() {
 
     @Test
