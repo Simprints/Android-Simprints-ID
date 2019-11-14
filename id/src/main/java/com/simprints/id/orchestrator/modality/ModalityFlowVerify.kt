@@ -28,16 +28,14 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
         super.startFlow(appRequest, modalities)
-        steps.addAll(buildStepsList(appRequest, modalities))
+        steps.addAll(buildStepsList(modalities))
     }
 
-    private fun buildStepsList(appRequest: AppVerifyRequest, modalities: List<Modality>) =
+    private fun buildStepsList(modalities: List<Modality>) =
         modalities.map {
-            with(appRequest) {
-                when (it) {
-                    FINGER -> fingerprintStepProcessor.buildStepToCapture()
-                    FACE -> faceStepProcessor.buildCaptureStep()
-                }
+            when (it) {
+                FINGER -> fingerprintStepProcessor.buildStepToCapture()
+                FACE -> faceStepProcessor.buildCaptureStep()
             }
         }
 
@@ -63,13 +61,17 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         stepRequested?.setResult(result)
 
         return stepRequested.also {
-            if (result is FingerprintCaptureResponse) {
-                val query = Query(personId = appRequest.verifyGuid)
-                addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
-            } else if (result is FaceCaptureResponse) {
-                val query = Query(patientId = appRequest.verifyGuid)
-                addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
-            }
+            buildQueryAndAddMatchingStepIfRequired(result, appRequest)
+        }
+    }
+
+    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
+        if (result is FingerprintCaptureResponse) {
+            val query = Query(personId = appRequest.verifyGuid)
+            addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
+        } else if (result is FaceCaptureResponse) {
+            val query = Query(personId = appRequest.verifyGuid)
+            addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
         }
     }
 
