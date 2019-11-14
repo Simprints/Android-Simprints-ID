@@ -156,7 +156,8 @@ class OrchestratorTest {
     private fun Orchestrator.okMatchingResult() {
         handleActivityTaskResult(ResultCode.OK) { key ->
             assertEquals(MatchingTaskResult.BUNDLE_KEY, key)
-            MatchingTaskResult(List(10) {
+            val numberOfMatchReturns = 10
+            MatchingTaskResult(List(numberOfMatchReturns) {
                 val score = Rand.nextInt(100).toFloat()
                 MatchResult(UUID.randomUUID().toString(), score)
             }.sortedByDescending { it.confidence })

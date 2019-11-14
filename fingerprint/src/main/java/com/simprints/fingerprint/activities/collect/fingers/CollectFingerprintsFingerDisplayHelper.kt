@@ -12,7 +12,7 @@ import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,
-                                             var fingerprintsToCapture: List<FingerIdentifier>,
+                                             private var fingerprintsToCapture: List<FingerIdentifier>,
                                              private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
 
 

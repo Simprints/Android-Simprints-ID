@@ -13,8 +13,8 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
     init {
         with(captureRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.ConnectScanner(CONNECT) { createConnectScannerTaskRequest() },
-                FingerprintTask.CollectFingerprints(COLLECT) { createCollectFingerprintsTaskRequest() }
+                FingerprintTask.ConnectScanner(CONNECT_TASK_KEY) { createConnectScannerTaskRequest() },
+                FingerprintTask.CollectFingerprints(COLLECT_TASK_KEY) { createCollectFingerprintsTaskRequest() }
             )
         }
     }
@@ -26,10 +26,10 @@ class CaptureTaskFlow(captureRequest: FingerprintCaptureRequest) : FingerprintTa
         CollectFingerprintsTaskRequest(fingerprintsToCapture)
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
-        finalResultBuilder.createCaptureResult(taskResults[COLLECT] as CollectFingerprintsTaskResult)
+        finalResultBuilder.createCaptureResult(taskResults[COLLECT_TASK_KEY] as CollectFingerprintsTaskResult)
 
     companion object {
-        private const val CONNECT = "connect"
-        private const val COLLECT = "collect"
+        private const val CONNECT_TASK_KEY = "connect"
+        private const val COLLECT_TASK_KEY = "collect"
     }
 }

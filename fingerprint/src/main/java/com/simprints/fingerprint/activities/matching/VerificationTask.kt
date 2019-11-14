@@ -52,7 +52,7 @@ class VerificationTask(private val viewModel: MatchingViewModel,
         sessionEventsManager.addEventInBackground(OneToOneMatchEvent(
             matchStartTime,
             timeHelper.now(),
-            candidates.first().personId,
+            matchingRequest.queryForCandidates,
             verificationResult))
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
