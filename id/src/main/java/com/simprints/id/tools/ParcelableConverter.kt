@@ -3,31 +3,25 @@ package com.simprints.id.tools
 import android.os.Parcel
 import android.os.Parcelable
 
-internal class ParcelableConverter {
+object ParcelableConverter {
 
-    private val parcel = Parcel.obtain()
-
-    constructor(parcelable: Parcelable) {
-        val flags = 0
-        parcelable.writeToParcel(parcel, flags)
-    }
-
-    constructor(bytes: ByteArray) {
-        with(parcel) {
-            val offset = 0
-            unmarshall(bytes, offset, bytes.size)
-            setDataPosition(0)
-        }
-    }
-
-    fun toBytes(): ByteArray = parcel.marshall()
-
-    fun toParcel(): Parcel = parcel.apply {
-        setDataPosition(0)
-    }
-
-    fun recycle() {
+    fun marshall(parceable: Parcelable): ByteArray {
+        val parcel = Parcel.obtain()
+        parceable.writeToParcel(parcel, 0)
+        val bytes = parcel.marshall()
         parcel.recycle()
+        return bytes
     }
 
+    fun <T : Parcelable> unmarshall(bytes: ByteArray, creator: Parcelable.Creator<T>): T {
+        val parcel = unmarshall(bytes)
+        return creator.createFromParcel(parcel)
+    }
+
+    fun unmarshall(bytes: ByteArray): Parcel {
+        val parcel = Parcel.obtain()
+        parcel.unmarshall(bytes, 0, bytes.size)
+        parcel.setDataPosition(0)
+        return parcel
+    }
 }

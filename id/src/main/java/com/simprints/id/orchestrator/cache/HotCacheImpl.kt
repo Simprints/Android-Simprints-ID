@@ -1,17 +1,16 @@
 package com.simprints.id.orchestrator.cache
 
 import android.content.SharedPreferences
-import com.simprints.id.orchestrator.cache.crypto.step.StepEncoder
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.tools.extensions.getMap
 import com.simprints.id.tools.extensions.putMap
 import com.simprints.id.tools.extensions.save
 
-class HotCacheImpl(private val preferences: SharedPreferences,
+class HotCacheImpl(private val sharedPrefs: SharedPreferences,
                    private val stepEncoder: StepEncoder) : HotCache {
 
     private val memoryCache
-        get() = LinkedHashMap(preferences.getMap(KEY_STEPS, emptyMap()))
+        get() = LinkedHashMap(sharedPrefs.getMap(KEY_STEPS, emptyMap()))
 
     override fun save(step: Step) {
         stepEncoder.encode(step).also { encodedStep ->
@@ -36,7 +35,7 @@ class HotCacheImpl(private val preferences: SharedPreferences,
     }
 
     private fun saveInSharedPrefs(transaction: (SharedPreferences.Editor) -> Unit) {
-        with(preferences) {
+        with(sharedPrefs) {
             save(transaction)
         }
     }

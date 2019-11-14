@@ -1,5 +1,7 @@
 package com.simprints.fingerprint.activities.collect.models
 
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+
 class DefaultScanConfig {
 
     private val defaultFingerConfigs: Map<FingerIdentifier, ScanConfigFingerEntry> =

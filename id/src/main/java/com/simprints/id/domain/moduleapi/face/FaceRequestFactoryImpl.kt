@@ -6,7 +6,7 @@ import com.simprints.id.domain.moduleapi.face.requests.FaceVerifyRequest
 
 class FaceRequestFactoryImpl: FaceRequestFactory {
 
-    override fun buildCaptureRequest(nFaceSamplesToCapture: Int) = FaceCaptureRequest(nFaceSamplesToCapture)
+    override fun buildCaptureRequest(nFaceSamplesToCapture: Int) = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
 
     override fun buildFaceVerifyRequest(projectId: String,
                                        userId: String,

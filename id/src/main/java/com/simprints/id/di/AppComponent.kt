@@ -27,7 +27,6 @@ import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
-import com.simprints.id.activities.orchestrator.OrchestratorActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
@@ -39,6 +38,7 @@ import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -60,7 +60,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class])
 @Singleton
 interface AppComponent {
 
@@ -73,10 +73,11 @@ interface AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
-        fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
 
         fun build(): AppComponent
     }
+
+    fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)
     fun inject(guidSelectionWorker: GuidSelectionWorker)
@@ -122,12 +123,12 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
-    fun inject(orchestratorActivity: OrchestratorActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
     fun getTimeHelper(): TimeHelper
     fun getPersonRepository(): PersonRepository
+    fun getFingerprintRecordLocalDataSource(): FingerprintIdentityLocalDataSource
     fun getPreferencesManager(): PreferencesManager
     fun getAnalyticsManager(): AnalyticsManager
     fun getSimNetworkUtils(): SimNetworkUtils
