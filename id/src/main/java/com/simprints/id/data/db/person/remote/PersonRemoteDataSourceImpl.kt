@@ -4,14 +4,18 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.PeopleCount
+import com.simprints.id.data.db.person.domain.PeopleOperationsCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.fromDomainToPostApi
-import com.simprints.id.data.db.person.remote.models.toDomainPeopleCount
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.*
+import com.simprints.id.data.db.person.remote.models.peopleoperations.response.toDomainPeopleCount
+import com.simprints.id.domain.GROUP
+import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.trace
@@ -46,15 +50,72 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 .trace("uploadPatientBatch")
         }
 
-    override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
-        getPeopleApiClient().flatMap { peopleRemoteInterface ->
-            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId,
-                syncScope.moduleIds?.toTypedArray()?.let { PipeSeparatorWrapperForURLListParam(*it) })
-                .retry(::retryCriteria)
-                .handleResponse(::defaultResponseErrorHandling)
-                .trace("countRequest")
-                .map { apiPeopleCount -> apiPeopleCount.map { it.toDomainPeopleCount() } }
+    override fun getDownSyncPeopleCount(countScopes: List<PeopleOperationsCount>): Single<List<PeopleCount>> {
+
+        return getPeopleApiClient().flatMap { peopleRemoteInterface ->
+            with(countScopes.first().subSyncScope) {
+                peopleRemoteInterface.requestPeopleOperations(
+                    projectId,
+                    buildApiPeopleOperations(countScopes))
+                    .retry(::retryCriteria)
+                    .handleResponse(::defaultResponseErrorHandling)
+                    .trace("countRequest")
+                    .map { response ->
+                        response.toDomainPeopleCount(
+                            projectId,
+                            userId,
+                            countScopes.map { it.subSyncScope.moduleId },
+                            listOf(Modes.FINGERPRINT))
+                    }
+            }
         }
+    }
+
+    private fun buildApiPeopleOperations(countScopes: List<PeopleOperationsCount>) =
+        ApiPeopleOperations(buildGroups(countScopes))
+
+    private fun buildGroups(countScopes: List<PeopleOperationsCount>) =
+        with(countScopes.first()) {
+            when (subSyncScope.group) {
+                GROUP.GLOBAL -> buildGroupForProjectSync(lastKnownPatientId, lastKnownPatientUpdatedAt)
+                GROUP.USER -> buildGroupForUserSync(subSyncScope.userId
+                    ?: "", lastKnownPatientId, lastKnownPatientUpdatedAt)
+                GROUP.MODULE -> buildGroupForModuleSync(countScopes)
+            }
+        }
+
+    private fun buildGroupForModuleSync(countScopes: List<PeopleOperationsCount>) =
+        countScopes.map { peopleOpsCount ->
+            ApiPeopleOperationGroup(
+                buildApiLastKnownPatient(peopleOpsCount.lastKnownPatientId, peopleOpsCount.lastKnownPatientUpdatedAt),
+                listOf(ApiPeopleOperationWhereLabel(WhereLabelKey.MODULE.key, peopleOpsCount.subSyncScope.moduleId
+                    ?: ""), buildWhereLabelForFingerprintMode()))
+        }
+
+    private fun buildGroupForUserSync(userId: String,
+                                      lastKnownPatientId: String?,
+                                      lastKnownPatientUpdatedAt: Long?) =
+        listOf(
+            ApiPeopleOperationGroup(
+                buildApiLastKnownPatient(lastKnownPatientId, lastKnownPatientUpdatedAt),
+                listOf(ApiPeopleOperationWhereLabel(WhereLabelKey.USER.key, userId), buildWhereLabelForFingerprintMode())
+            )
+        )
+
+    private fun buildGroupForProjectSync(lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?) = listOf(
+        ApiPeopleOperationGroup(buildApiLastKnownPatient(lastKnownPatientId, lastKnownPatientUpdatedAt),
+            listOf(buildWhereLabelForFingerprintMode()))
+    )
+
+    private fun buildApiLastKnownPatient(lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?) =
+        lastKnownPatientId?.let { lastKnownId ->
+            lastKnownPatientUpdatedAt?.let { lastKnownUpdatedAt ->
+                ApiLastKnownPatient(lastKnownId, lastKnownUpdatedAt)
+            }
+        }
+
+    private fun buildWhereLabelForFingerprintMode() =
+        ApiPeopleOperationWhereLabel(WhereLabelKey.MODE.key, PipeSeparatorWrapperForURLListParam(ApiModes.FINGERPRINT).toString())
 
     override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
         remoteDbManager.getCurrentToken()

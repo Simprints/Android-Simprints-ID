@@ -4,7 +4,6 @@ import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
-import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
@@ -41,15 +40,8 @@ interface PeopleRemoteInterface {
         @Path("projectId") projectId: String,
         @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<ApiGetPerson>>
 
-    @GET("projects/{projectId}/patients/count")
-    fun requestPeopleCount(
-        @Path("projectId") projectId: String,
-        @Query("userId") userId: String?,
-        @Query("moduleId") moduleId: PipeSeparatorWrapperForURLListParam<String>?, //moduleId = module1|module2|
-        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<List<ApiPeopleCount>>>
-
     @POST("projects/{projectId}/patient-operations/count")
     fun requestPeopleOperations(
         @Path("projectId") projectId: String,
-        @Body operationsJson: ApiPeopleOperations) : Single<ApiPeopleOperationsResponse>
+        @Body operationsJson: ApiPeopleOperations) : Single<Response<ApiPeopleOperationsResponse>>
 }
