@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FaceMatchResult(val guidFound: String,
-                           val confidence: Int) : Parcelable
+                           val confidence: Float) : Parcelable
 
 fun IFaceMatchResult.fromModuleApiToDomain() =
     FaceMatchResult(guid, confidence)

@@ -69,12 +69,11 @@ class FaceOrchestratorViewModel : ViewModel() {
     private fun generateFaceMatchResponse(): FaceMatchResponse {
 
         val faceMatchResults = listOf(
-            FaceMatchResult(UUID.randomUUID().toString(), 75),
-            FaceMatchResult(UUID.randomUUID().toString(), 50),
-            FaceMatchResult(UUID.randomUUID().toString(), 25)
+            FaceMatchResult(UUID.randomUUID().toString(), 75f),
+            FaceMatchResult(UUID.randomUUID().toString(), 50f),
+            FaceMatchResult(UUID.randomUUID().toString(), 25f)
         )
 
         return FaceMatchResponse(faceMatchResults)
     }
-
 }

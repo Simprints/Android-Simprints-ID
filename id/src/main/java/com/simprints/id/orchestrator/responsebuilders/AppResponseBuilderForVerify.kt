@@ -55,6 +55,6 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
 
     private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse) =
         AppVerifyResponse(faceResponse.result.map {
-            MatchResult(it.guidFound, it.confidence, Tier.computeTier(it.confidence.toFloat()))
+            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence.toFloat()))
         }.first())
 }
