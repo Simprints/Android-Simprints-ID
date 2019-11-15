@@ -6,8 +6,8 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-fun Completable.inBackground(onError: (Throwable) -> Unit = { Timber.d(it) },
-                             onComplete: () -> Unit = {}) =
+fun Completable.doInBackground(onError: (Throwable) -> Unit = { Timber.d(it) },
+                               onComplete: () -> Unit = {}) =
     this.subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribeBy(onError = onError, onComplete = onComplete)

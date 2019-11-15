@@ -1,5 +1,6 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
@@ -12,8 +13,6 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class PersonBuilderTest {
@@ -30,19 +29,19 @@ class PersonBuilderTest {
         val expectedFingerprints = fingerprintResponse.captureResult
 
         with(person) {
-            assertThat(projectId, `is`(request.projectId))
-            assertThat(moduleId, `is`(request.moduleId))
-            assertThat(userId, `is`(request.userId))
-            assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
+            assertThat(projectId).isEqualTo(request.projectId)
+            assertThat(moduleId).isEqualTo(request.moduleId)
+            assertThat(userId).isEqualTo(request.userId)
+            assertThat(fingerprintSamples.size).isEqualTo(expectedFingerprints.size)
             fingerprintSamples.forEachIndexed { index, actualSample ->
                 val expectedSample = expectedFingerprints[index]
-                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                assertThat(actualSample.fingerIdentifier.toString()).isEqualTo(expectedSample.identifier.toString())
                 expectedSample.sample?.template?.let { expectedTemplate ->
-                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                    assertThat(actualSample.template.contentEquals(expectedTemplate)).isEqualTo(true)
                 }
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.templateQualityScore))
+                assertThat(actualSample.templateQualityScore).isEqualTo(expectedSample.sample?.templateQualityScore)
             }
-            assertThat(faceSamples, `is`(emptyList()))
+            assertThat(faceSamples).isEqualTo(emptyList<FaceSample>())
         }
     }
 
@@ -59,13 +58,13 @@ class PersonBuilderTest {
         }
 
         with(person) {
-            assertThat(projectId, `is`(request.projectId))
-            assertThat(moduleId, `is`(request.moduleId))
-            assertThat(userId, `is`(request.userId))
-            assertThat(fingerprintSamples, `is`(emptyList()))
+            assertThat(projectId).isEqualTo(request.projectId)
+            assertThat(moduleId).isEqualTo(request.moduleId)
+            assertThat(userId).isEqualTo(request.userId)
+            assertThat(fingerprintSamples).isEqualTo(emptyList<FaceSample>())
             faceSamples.forEachIndexed { index, faceSample ->
-                assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
-                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+                assertThat(faceSample.id).isEqualTo(expectedFaceSamples[index].id)
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isEqualTo(true)
             }
         }
     }
@@ -85,21 +84,21 @@ class PersonBuilderTest {
         }
 
         with(person) {
-            assertThat(projectId, `is`(request.projectId))
-            assertThat(moduleId, `is`(request.moduleId))
-            assertThat(userId, `is`(request.userId))
-            assertThat(fingerprintSamples.size, `is`(expectedFingerprints.size))
+            assertThat(projectId).isEqualTo(request.projectId)
+            assertThat(moduleId).isEqualTo(request.moduleId)
+            assertThat(userId).isEqualTo(request.userId)
+            assertThat(fingerprintSamples.size).isEqualTo(expectedFingerprints.size)
             fingerprintSamples.forEachIndexed { index, actualSample ->
                 val expectedSample = expectedFingerprints[index]
-                assertThat(actualSample.fingerIdentifier.toString(), `is`(expectedSample.identifier.toString()))
+                assertThat(actualSample.fingerIdentifier.toString()).isEqualTo(expectedSample.identifier.toString())
                 expectedSample.sample?.template?.let { expectedTemplate ->
-                    assertThat(actualSample.template.contentEquals(expectedTemplate), `is`(true))
+                    assertThat(actualSample.template.contentEquals(expectedTemplate)).isEqualTo(true)
                 }
-                assertThat(actualSample.templateQualityScore, `is`(expectedSample.sample?.templateQualityScore))
+                assertThat(actualSample.templateQualityScore).isEqualTo(expectedSample.sample?.templateQualityScore)
             }
             faceSamples.forEachIndexed { index, faceSample ->
-                assertThat(faceSample.id, `is`(expectedFaceSamples[index].id))
-                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template), `is`(true))
+                assertThat(faceSample.id).isEqualTo(expectedFaceSamples[index].id)
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isEqualTo(true)
             }
         }
     }

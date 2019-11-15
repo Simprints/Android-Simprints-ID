@@ -22,11 +22,11 @@ import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
+import com.simprints.id.activities.guidselection.GuidSelectionActivity
 import com.simprints.id.activities.login.LoginActivity
 import com.simprints.id.activities.login.LoginPresenter
-import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
-import com.simprints.id.activities.orchestrator.OrchestratorActivity
+import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
@@ -43,7 +43,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.guidselection.GuidSelectionWorker
-import com.simprints.id.orchestrator.FlowManager
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
@@ -61,7 +60,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, OrchestratorModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class])
 @Singleton
 interface AppComponent {
 
@@ -74,10 +73,11 @@ interface AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
-        fun orchestratorModule(orchestratorModule: OrchestratorModule): Builder
 
         fun build(): AppComponent
     }
+
+    fun getOrchestratorComponent(): OrchestratorComponent.Builder
 
     fun inject(app: Application)
     fun inject(guidSelectionWorker: GuidSelectionWorker)
@@ -122,8 +122,7 @@ interface AppComponent {
     fun inject(fingerprintExitFormActivity: FingerprintExitFormActivity)
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
-    fun inject(orchestratorActivity: OrchestratorActivity)
-    fun inject(flowManager: FlowManager)
+    fun inject(guidSelectionActivity: GuidSelectionActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
@@ -136,6 +135,5 @@ interface AppComponent {
     fun getImprovedSharedPreferences(): ImprovedSharedPreferences
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
-    fun getFlowManager(): FlowManager
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
 }

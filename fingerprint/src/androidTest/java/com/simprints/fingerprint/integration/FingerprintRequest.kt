@@ -2,9 +2,8 @@ package com.simprints.fingerprint.integration
 
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
-import com.simprints.fingerprint.commontesttools.data.TestDbQuery
+import com.simprints.fingerprint.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToCore
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
 import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessorImpl
@@ -24,7 +23,7 @@ fun createFingerprintCaptureRequestIntent(fingerprintsToCapture: List<IFingerIde
         TestFingerprintCaptureRequest(fingerprintsToCapture))
 
 fun createFingerprintMatchRequestIntent(probeFingerprints: List<Fingerprint>,
-                                        queryForCandidates: TestDbQuery): Intent = Intent()
+                                        queryForCandidates: Serializable): Intent = Intent()
     .setClassName(ApplicationProvider.getApplicationContext<Application>().packageName,
         FingerprintStepProcessorImpl.ACTIVITY_CLASS_NAME)
     .putExtra(IFingerprintRequest.BUNDLE_KEY,

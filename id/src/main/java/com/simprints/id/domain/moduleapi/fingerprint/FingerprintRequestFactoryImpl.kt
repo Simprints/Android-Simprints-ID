@@ -8,11 +8,7 @@ import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.Fingerpr
 
 class FingerprintRequestFactoryImpl : FingerprintRequestFactory {
 
-    override fun buildFingerprintCaptureRequest(projectId: String,
-                                                userId: String,
-                                                moduleId: String,
-                                                metadata: String,
-                                                prefs: PreferencesManager): FingerprintCaptureRequest =
+    override fun buildFingerprintCaptureRequest(prefs: PreferencesManager): FingerprintCaptureRequest =
         with(prefs) {
             FingerprintCaptureRequest(
                 fingerprintsToCapture = fingerStatus.mapNotNull {

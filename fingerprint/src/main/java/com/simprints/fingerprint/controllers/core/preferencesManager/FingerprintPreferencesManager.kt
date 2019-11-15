@@ -7,4 +7,6 @@ interface FingerprintPreferencesManager {
     var lastScannerVersion: String
     var lastVerificationDate: Date?
     var lastIdentificationDate: Date?
+
+    val fingerImagesExist: Boolean
 }

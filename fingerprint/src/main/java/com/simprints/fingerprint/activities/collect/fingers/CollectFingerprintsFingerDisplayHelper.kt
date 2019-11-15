@@ -8,12 +8,14 @@ import com.simprints.fingerprint.activities.collect.models.DefaultScanConfig
 import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.tools.extensions.isFingerNotCollectable
 
 class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprintsContract.View,
                                              private val presenter: CollectFingerprintsContract.Presenter,
-                                             var fingerprintsToCapture: List<FingerIdentifier>,
-                                             private val androidResourcesHelper: FingerprintAndroidResourcesHelper) {
+                                             private var fingerprintsToCapture: List<FingerIdentifier>,
+                                             private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                                             private val fingerprintPreferencesManager: FingerprintPreferencesManager) {
 
 
     private val allFingers = ArrayList<Finger>(Finger.NB_OF_FINGERS)
@@ -60,7 +62,12 @@ class CollectFingerprintsFingerDisplayHelper(private val view: CollectFingerprin
     }
 
     private fun initPageAdapter() {
-        view.pageAdapter = FingerPageAdapter((view as AppCompatActivity).supportFragmentManager, presenter.activeFingers, androidResourcesHelper)
+        view.pageAdapter = FingerPageAdapter(
+            (view as AppCompatActivity).supportFragmentManager,
+            presenter.activeFingers,
+            androidResourcesHelper,
+            fingerprintPreferencesManager
+        )
     }
 
     private fun initViewPager() {
