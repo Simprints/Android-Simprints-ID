@@ -10,6 +10,7 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
@@ -40,12 +41,13 @@ class PersonRepositoryTest {
     @Mock lateinit var remoteDataSource: PersonRemoteDataSource
     @Mock lateinit var localDataSource: PersonLocalDataSource
     @Mock lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
+    @Mock lateinit var downSyncDao: DownSyncDao
     private lateinit var personRepository: PersonRepository
 
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
-        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, peopleUpSyncMaster)
+        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, peopleUpSyncMaster, downSyncDao)
     }
 
     @Test
