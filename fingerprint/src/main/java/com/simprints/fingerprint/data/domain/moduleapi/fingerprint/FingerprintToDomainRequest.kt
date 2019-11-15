@@ -1,6 +1,6 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
-import com.simprints.fingerprint.data.domain.fingerprint.toDomainClass
+import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
@@ -24,7 +24,7 @@ object FingerprintToDomainRequest {
     private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
             FingerprintCaptureRequest(
-                fingerprintsToCapture.map { it.toDomainClass() }
+                fingerprintsToCapture.map { it.fromModuleApiToDomain() }
             )
         }
 
@@ -32,7 +32,7 @@ object FingerprintToDomainRequest {
         with(iFingerprintRequest) {
             FingerprintMatchRequest(probeFingerprintSamples.map {
                 Fingerprint(
-                    it.fingerIdentifier.toDomainClass(),
+                    it.fingerIdentifier.fromModuleApiToDomain(),
                     it.template
                 )
             }, queryForCandidates)

@@ -14,7 +14,6 @@ import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAler
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
@@ -26,7 +25,6 @@ class MatchingActivity : FingerprintActivity() {
 
     private val viewModel: MatchingViewModel by viewModel()
     val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
-    val fingerprintSessionEventsManager: FingerprintSessionEventsManager by inject()
 
     private lateinit var matchingRequest: MatchingTaskRequest
 

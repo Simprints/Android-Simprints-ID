@@ -144,7 +144,7 @@ class OrchestratorManagerImplTest {
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
         verifyOnce(modalityFlowMock) { handleIntentResult(safeEq(enrolAppRequest), anyInt(), anyInt(), anyNotNull()) }
 
-    fun <T : Any> safeEq(value: T): T = eq(value) ?: value
+    private fun <T : Any> safeEq(value: T): T = eq(value) ?: value
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {

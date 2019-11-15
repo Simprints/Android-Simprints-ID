@@ -24,11 +24,8 @@ class FingerprintStepProcessorImpl(private val fingerprintRequestFactory: Finger
         const val ACTIVITY_CLASS_NAME = "com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
     }
 
-    override fun buildStepToCapture(projectId: String,
-                                    userId: String,
-                                    moduleId: String,
-                                    metadata: String): Step =
-        fingerprintRequestFactory.buildFingerprintCaptureRequest(projectId, userId, moduleId, metadata, prefs).run {
+    override fun buildStepToCapture(): Step =
+        fingerprintRequestFactory.buildFingerprintCaptureRequest(prefs).run {
             buildStep(CAPTURE, this)
         }
 

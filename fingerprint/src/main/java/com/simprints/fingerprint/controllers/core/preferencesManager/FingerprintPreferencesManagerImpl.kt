@@ -28,4 +28,7 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): 
             field = value
             prefs.lastScannerVersion = field
         }
+
+    override val fingerImagesExist: Boolean
+        get() = prefs.fingerImagesExist
 }

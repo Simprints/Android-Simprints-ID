@@ -5,7 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.crashlytics.android.core.CrashlyticsCore
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.any
-import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.FINGERS_SELECTED
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MALFUNCTION_MESSAGE
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.MODULE_IDS
@@ -13,17 +12,21 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.PROJECT_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.SESSION_ID
 import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Companion.USER_ID
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.*
-import org.junit.After
+import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
+import org.koin.test.AutoCloseKoinTest
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-class CrashReportManagerImplTest {
+@Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
+class CrashReportManagerImplTest: AutoCloseKoinTest() {
 
     @Test
     fun logMessageForCrashReportTest_shouldLogInRightFormat() {
@@ -178,10 +181,5 @@ class CrashReportManagerImplTest {
 
         verifyOnce(crashlyticsInstanceMock) { setString(MALFUNCTION_MESSAGE, userMessage) }
         verifyOnce(crashlyticsInstanceMock) { logException(any<MalfunctionException>()) }
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
     }
 }

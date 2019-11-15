@@ -12,7 +12,7 @@ class MatchTaskFlow(matchRequest: FingerprintMatchRequest) : FingerprintTaskFlow
     init {
         with(matchRequest) {
             fingerprintTasks = listOf(
-                FingerprintTask.Matching(MATCHING) { createMatchingTaskRequest() }
+                FingerprintTask.Matching(MATCHING_TASK_KEY) { createMatchingTaskRequest() }
             )
         }
     }
@@ -21,9 +21,9 @@ class MatchTaskFlow(matchRequest: FingerprintMatchRequest) : FingerprintTaskFlow
         MatchingTaskRequest(probeFingerprintSamples, queryForCandidates)
 
     override fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult =
-        finalResultBuilder.createMatchResult(taskResults[MATCHING] as MatchingTaskResult)
+        finalResultBuilder.createMatchResult(taskResults[MATCHING_TASK_KEY] as MatchingTaskResult)
 
     companion object {
-        private const val MATCHING = "matching"
+        private const val MATCHING_TASK_KEY = "matching"
     }
 }
