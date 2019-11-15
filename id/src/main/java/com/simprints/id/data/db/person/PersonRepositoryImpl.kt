@@ -4,7 +4,7 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.person.domain.PeopleCount
-import com.simprints.id.data.db.person.domain.PeopleOperationsCount
+import com.simprints.id.data.db.person.domain.PeopleOperationsParams
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -32,29 +32,29 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
     override fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
-        personRemoteDataSource.getDownSyncPeopleCount(buildPeopleOperationsCount(syncScope))
+        personRemoteDataSource.getDownSyncPeopleCount(buildPeopleOperationsParams(syncScope))
 
-    private fun buildPeopleOperationsCount(syncScope: SyncScope) = when (syncScope.group) {
-        GROUP.GLOBAL -> buildPeopleOperationsCountForProjectSync(syncScope)
-        GROUP.USER -> buildPeopleOperationsCountForUserSync(syncScope)
-        GROUP.MODULE -> buildPeopleOperationsCountForModuleSync(syncScope)
+    private fun buildPeopleOperationsParams(syncScope: SyncScope) = when (syncScope.group) {
+        GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectSync(syncScope)
+        GROUP.USER -> buildPeopleOperationsParamsForUserSync(syncScope)
+        GROUP.MODULE -> buildPeopleOperationsParamsForModuleSync(syncScope)
     }
 
-    private fun buildPeopleOperationsCountForProjectSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForProjectSync(syncScope: SyncScope) =
         with (syncScope.toSubSyncScopes().first()) {
-            listOf(PeopleOperationsCount(this, getLastKnownPatientId(projectId, userId, moduleId),
+            listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
                 getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
         }
 
-    private fun buildPeopleOperationsCountForUserSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForUserSync(syncScope: SyncScope) =
         with (syncScope.toSubSyncScopes().first()) {
-            listOf(PeopleOperationsCount(this, getLastKnownPatientId(projectId, userId, moduleId),
+            listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
                 getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
         }
 
-    private fun buildPeopleOperationsCountForModuleSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForModuleSync(syncScope: SyncScope) =
         syncScope.toSubSyncScopes().map {
-            PeopleOperationsCount(it, getLastKnownPatientId(it.projectId, it.userId, it.moduleId),
+            PeopleOperationsParams(it, getLastKnownPatientId(it.projectId, it.userId, it.moduleId),
                 getLastKnownPatientUpdatedAt(it.projectId, it.userId, it.moduleId))
         }
 
