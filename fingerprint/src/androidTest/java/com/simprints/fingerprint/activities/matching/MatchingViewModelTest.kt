@@ -40,7 +40,6 @@ import kotlin.random.Random
 import com.simprints.fingerprintmatcher.Person as LibPerson
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class MatchingViewModelTest : KoinTest {
 
     @get:Rule val taskExecutorRule = InstantTaskExecutorRule()
