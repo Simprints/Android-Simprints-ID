@@ -5,7 +5,7 @@ import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
 import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore
@@ -67,7 +67,7 @@ fun FingerprintCaptureEvent.Result.fromDomainToCore() =
     }
 
 fun Fingerprint.fromDomainToCore() =
-    FingerprintSample(fingerId.fromDomainToCore(), templateBytes, qualityScore)
+    FingerprintCaptureSample(fingerId.fromDomainToCore(), templateBytes, qualityScore)
 
 fun FingerIdentifier.fromDomainToCore(): FingerIdentifierCore =
     when (this) {
