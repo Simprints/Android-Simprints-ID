@@ -19,7 +19,7 @@ class SecuredImageManagerImpl(val ctx: Context,
         private const val IMAGES_FOLDER = "images"
     }
 
-    val imageFolderPath = "${ctx.filesDir}/$IMAGES_FOLDER"
+    private val imageFolderPath = "${ctx.filesDir}/$IMAGES_FOLDER"
 
     init {
         val imageFolder = File(imageFolderPath)
