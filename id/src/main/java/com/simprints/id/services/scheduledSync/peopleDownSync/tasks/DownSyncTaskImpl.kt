@@ -167,9 +167,21 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfPeople: List<ApiGetPerson>) {
         val batchOfPeopleToSaveInLocal = batchOfPeople.filter { !it.deleted }
         val batchOfPeopleToBeDeleted = batchOfPeople.filter { it.deleted }
-        
-        personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { it.fromGetApiToDomain() })
-        personLocalDataSource.delete(batchOfPeopleToBeDeleted.map { it.fromGetApiToDomain() })
+
+        savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
+        deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted)
+    }
+
+    private suspend fun savePeopleBatchInLocal(batchOfPeopleToSaveInLocal: List<ApiGetPerson>) {
+        if (batchOfPeopleToSaveInLocal.isNotEmpty()) {
+            personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { it.fromGetApiToDomain() })
+        }
+    }
+
+    private suspend fun deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted: List<ApiGetPerson>) {
+        if (batchOfPeopleToBeDeleted.isNotEmpty()) {
+            personLocalDataSource.delete(batchOfPeopleToBeDeleted.map { it.fromGetApiToDomain() })
+        }
     }
 
     private fun updateDownSyncTimestampOnBatchDownload() {
