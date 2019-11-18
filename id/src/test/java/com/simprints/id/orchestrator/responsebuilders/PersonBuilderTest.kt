@@ -64,7 +64,7 @@ class PersonBuilderTest {
             assertThat(fingerprintSamples).isEqualTo(emptyList<FaceSample>())
             faceSamples.forEachIndexed { index, faceSample ->
                 assertThat(faceSample.id).isEqualTo(expectedFaceSamples[index].id)
-                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isEqualTo(true)
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isTrue()
             }
         }
     }
@@ -98,7 +98,7 @@ class PersonBuilderTest {
             }
             faceSamples.forEachIndexed { index, faceSample ->
                 assertThat(faceSample.id).isEqualTo(expectedFaceSamples[index].id)
-                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isEqualTo(true)
+                assertThat(faceSample.template.contentEquals(expectedFaceSamples[index].template)).isTrue()
             }
         }
     }
