@@ -65,7 +65,8 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                             projectId,
                             userId,
                             peopleOperationsParams.map { it.subSyncScope.moduleId },
-                            listOf(Modes.FINGERPRINT))
+                            listOf(Modes.FINGERPRINT)
+                        )
                     }
             }
         }

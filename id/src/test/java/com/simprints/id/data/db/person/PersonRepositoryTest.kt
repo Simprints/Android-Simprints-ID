@@ -30,7 +30,6 @@ import org.mockito.MockitoAnnotations
 class PersonRepositoryTest {
 
     companion object {
-        const val LOCAL_PEOPLE_FOR_SUBSYNC = 5
         const val REMOTE_PEOPLE_FOR_SUBSYNC = 10
     }
 
@@ -51,26 +50,26 @@ class PersonRepositoryTest {
     }
 
     @Test
-    fun givenLocalAndRemoteCounts_countToDownSyncByProjectShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenRemoteCount_countToDownSyncByProjectShouldReturnTheRightTotal() = runBlockingTest {
 
         with(syncScopeByProject.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, LOCAL_PEOPLE_FOR_SUBSYNC) }, associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
+            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
         }
     }
 
     @Test
-    fun givenLocalAndRemoteCounts_countToDownSyncByUserShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenRemoteCount_countToDownSyncByUserShouldReturnTheRightTotal() = runBlockingTest {
 
         with(syncScopeByUser.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, LOCAL_PEOPLE_FOR_SUBSYNC) }, associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
+            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
         }
     }
 
     @Test
-    fun givenLocalAndRemoteCounts_countToDownSyncByModulesShouldReturnTheRightTotal() = runBlockingTest {
+    fun givenRemoteCount_countToDownSyncByModulesShouldReturnTheRightTotal() = runBlockingTest {
 
         with(syncScopeByModule.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, LOCAL_PEOPLE_FOR_SUBSYNC) }, associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
+            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
         }
     }
 
@@ -112,12 +111,7 @@ class PersonRepositoryTest {
         assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
     }
 
-
-    private fun assesDownSyncCount(localCounts: Map<SubSyncScope, Int>, remoteCounts: Map<SubSyncScope, Int>) {
-        localCounts.keys.forEach {
-            val query = createQuery(it)
-            wheneverOnSuspend(localDataSource) { count(query) } thenOnBlockingReturn localCounts.getOrDefault(it, 0)
-        }
+    private fun assesDownSyncCount(remoteCounts: Map<SubSyncScope, Int>) {
 
         whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull()) } thenReturn Single.just(remoteCounts.map {
             val subSync = it.component1()
@@ -134,25 +128,8 @@ class PersonRepositoryTest {
         assertThat(countForSyncScope.sumBy { it.count }).isEqualTo(remoteCounts.values.sum())
     }
 
-    private fun createQuery(subSyncScope: SubSyncScope) =
-        PersonLocalDataSource.Query(
-            projectId = subSyncScope.projectId,
-            userId = subSyncScope.userId,
-            moduleId = subSyncScope.moduleId)
-
     @After
     fun tearDown() {
         stopKoin()
     }
-
-
 }
-
-//interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource {
-//
-//    fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
-//    fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>>
-//
-//    suspend fun saveAndUpload(person: Person)
-//    suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult
-//}
