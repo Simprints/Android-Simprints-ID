@@ -11,10 +11,7 @@ import com.simprints.id.orchestrator.steps.Step
 interface FingerprintStepProcessor {
 
 
-    fun buildStepToCapture(projectId: String,
-                           userId: String,
-                           moduleId: String,
-                           metadata: String): Step
+    fun buildStepToCapture(): Step
 
     fun buildStepToMatch(probeSamples: List<FingerprintCaptureSample>, query: Query): Step
 

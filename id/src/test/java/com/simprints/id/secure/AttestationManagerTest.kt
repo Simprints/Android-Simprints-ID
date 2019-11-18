@@ -16,18 +16,17 @@ import com.simprints.id.secure.models.Nonce
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.observers.TestObserver
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.koin.core.context.stopKoin
+import org.koin.test.AutoCloseKoinTest
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.Spy
 
 @RunWith(AndroidJUnit4::class)
-class AttestationManagerTest {
+class AttestationManagerTest: AutoCloseKoinTest() {
 
     @Mock lateinit var safetyNetClientMock: SafetyNetClient
     @Spy lateinit var attestationManagerSpy: AttestationManager
@@ -91,10 +90,5 @@ class AttestationManagerTest {
 
     private fun mockSafetyNetResponseResult(result: String) {
         whenever { safetyNetAttestationResponseMock.jwsResult } thenReturn result
-    }
-
-    @After
-    fun tearDown() {
-        stopKoin()
     }
 }

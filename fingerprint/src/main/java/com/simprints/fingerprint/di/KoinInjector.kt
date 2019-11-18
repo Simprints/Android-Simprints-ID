@@ -38,13 +38,10 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
-import com.simprints.id.Application
-import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -106,7 +103,7 @@ object KoinInjector {
             AlertPresenter(view, get(), get(), get(), fingerprintAlert)
         }
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
-            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get())
+            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
@@ -116,7 +113,4 @@ object KoinInjector {
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
     }
-
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
 }

@@ -22,16 +22,14 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppEnrolRequest)
         super.startFlow(appRequest, modalities)
-        steps.addAll(buildStepsList(appRequest, modalities))
+        steps.addAll(buildStepsList(modalities))
     }
 
-    private fun buildStepsList(appRequest: AppEnrolRequest, modalities: List<Modality>) =
+    private fun buildStepsList(modalities: List<Modality>) =
         modalities.map {
-            with(appRequest) {
-                when (it) {
-                    Modality.FINGER -> fingerprintStepProcessor.buildStepToCapture(projectId, userId, moduleId, metadata)
-                    Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
-                }
+            when (it) {
+                Modality.FINGER -> fingerprintStepProcessor.buildStepToCapture()
+                Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
             }
         }
 

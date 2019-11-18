@@ -4,5 +4,5 @@ import android.os.Parcelable
 
 interface IFaceMatchResult: Parcelable {
     val guid: String
-    val confidence: Int
+    val confidence: Float
 }

@@ -20,6 +20,7 @@ import timber.log.Timber
 open class Application : MultiDexApplication() {
 
     lateinit var component: AppComponent
+    lateinit var orchestratorComponent: OrchestratorComponent
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -28,7 +29,12 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
-            .orchestratorModule(OrchestratorModule())
+            .build()
+    }
+
+    open fun createOrchestratorComponent() {
+        orchestratorComponent = component
+            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
             .build()
     }
 
@@ -107,7 +113,7 @@ open class Application : MultiDexApplication() {
         factory { component.getImprovedSharedPreferences() }
         factory { component.getRemoteConfigWrapper() }
         factory { component.getAndroidResourcesHelper() }
-        factory { component.getFlowManager() }
+        factory { orchestratorComponent.getFlowManager() }
         factory { component.getPersonRepository() }
     }
 

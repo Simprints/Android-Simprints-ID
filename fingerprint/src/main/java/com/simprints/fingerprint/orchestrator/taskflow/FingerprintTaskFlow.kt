@@ -35,10 +35,10 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
                 ResultCode.CANCELLED -> {
                 }
                 ResultCode.ALERT -> {
-                    taskResults[ALERT] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
+                    taskResults[ALERT_TASK_KEY] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
                 }
                 ResultCode.REFUSED -> {
-                    taskResults[REFUSED] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
+                    taskResults[REFUSED_TASK_KEY] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
                 }
             }
         }
@@ -48,8 +48,8 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult(finalResultBuilder)
             ResultCode.CANCELLED -> finalResultBuilder.createCancelledResult()
-            ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT] as AlertTaskResult)
-            ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED] as RefusalTaskResult)
+            ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT_TASK_KEY] as AlertTaskResult)
+            ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED_TASK_KEY] as RefusalTaskResult)
         }
 
     protected abstract fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult
@@ -60,8 +60,8 @@ abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRe
         )
 
     companion object {
-        private const val REFUSED = "refused"
-        private const val ALERT = "alert"
+        private const val REFUSED_TASK_KEY = "refused"
+        private const val ALERT_TASK_KEY = "alert"
 
         fun fromState(fingerprintTaskFlowState: FingerprintTaskFlowState) =
             with(fingerprintTaskFlowState) {

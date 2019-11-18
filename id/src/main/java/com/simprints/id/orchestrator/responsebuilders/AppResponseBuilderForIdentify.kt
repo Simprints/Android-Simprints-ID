@@ -52,14 +52,25 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
             sessionId)
 
     private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
-                                                       sessionId: String) =
-        AppIdentifyResponse(
-            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) },
-            sessionId)
+                                                       sessionId: String): AppIdentifyResponse {
+        val resultSortedByConfidence = fingerprintResponse.result.sortedBy {
+            it.confidenceScore
+        }
 
-    private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse, sessionId: String) =
-        AppIdentifyResponse(
-            faceResponse.result.map { MatchResult(it.guidFound, it.confidence, Tier.computeTier(it.confidence.toFloat())) },
+        return AppIdentifyResponse(resultSortedByConfidence.map {
+            MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore))
+        }, sessionId)
+    }
+
+    private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse,
+                                                sessionId: String): AppIdentifyResponse {
+        val resultsSortedByConfidence = faceResponse.result.sortedBy { it.confidence }
+
+        return AppIdentifyResponse(
+            resultsSortedByConfidence.map {
+                MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+            },
             sessionId
         )
+    }
 }

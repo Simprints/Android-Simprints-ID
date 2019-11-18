@@ -180,7 +180,7 @@ class StepEncoderImplTest {
     }
 
     companion object {
-        private const val REQUEST_CODE = 123
+        private const val REQUEST_CODE = 128
         private const val ACTIVITY_NAME = "com.simprints.id.MyActivity"
         private const val BUNDLE_KEY = "BUNDLE_KEY"
     }

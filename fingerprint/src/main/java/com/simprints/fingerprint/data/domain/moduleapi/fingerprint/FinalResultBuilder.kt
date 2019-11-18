@@ -6,6 +6,10 @@ import com.simprints.fingerprint.activities.alert.result.AlertTaskResult
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintCaptureResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintMatchResponse
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
@@ -21,7 +25,7 @@ class FinalResultBuilder {
 
     fun createAlertResult(alertTaskResult: AlertTaskResult) =
         FinalResult(Activity.RESULT_CANCELED, Intent().apply {
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintErrorResponse(
+            putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintErrorResponse(
                 with(alertTaskResult) {
                     FingerprintErrorReason.fromFingerprintAlertToErrorResponse(alert)
                 }
@@ -30,7 +34,7 @@ class FinalResultBuilder {
 
     fun createRefusalResult(refusalTaskResult: RefusalTaskResult) =
         FinalResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintRefusalFormResponse(
+            putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintRefusalFormResponse(
                 with(refusalTaskResult) {
                     FingerprintRefusalFormResponse(
                         answer.reason.toFingerprintRefusalFormReason(),
@@ -42,14 +46,14 @@ class FinalResultBuilder {
 
     fun createCaptureResult(collectFingerprintsTaskResult: CollectFingerprintsTaskResult): FinalResult =
         FinalResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintCaptureResponse(
+            putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintCaptureResponse(
                 FingerprintCaptureResponse(collectFingerprintsTaskResult.fingerprints)
             ))
         })
 
     fun createMatchResult(matchingTaskResult: MatchingTaskResult) =
         FinalResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(IFingerprintResponse.BUNDLE_KEY, DomainToFingerprintResponse.fromDomainToFingerprintMatchResponse(
+            putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintMatchResponse(
                 FingerprintMatchResponse(matchingTaskResult.results)
             ))
         })
