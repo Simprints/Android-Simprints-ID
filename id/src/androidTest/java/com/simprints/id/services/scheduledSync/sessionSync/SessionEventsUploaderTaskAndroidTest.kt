@@ -5,10 +5,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.Application
-import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
@@ -16,6 +17,7 @@ import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCalloutEvent
@@ -23,11 +25,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.En
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
@@ -211,8 +213,9 @@ class SessionEventsUploaderTaskAndroidTest {
     private fun SessionEvents.addFingerprintCaptureEvent() {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
+                val fakeTemplate = EncodingUtils.byteArrayToBase64(PeopleGeneratorUtils.getRandomFingerprintSample().template)
                 addEvent(FingerprintCaptureEvent(0, 0, fingerIdentifier, 0, result,
-                    FingerprintCaptureEvent.Fingerprint(fingerIdentifier, 0, "some_template")))
+                    FingerprintCaptureEvent.Fingerprint(fingerIdentifier, 0, fakeTemplate)))
             }
         }
     }
