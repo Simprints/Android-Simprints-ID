@@ -46,4 +46,10 @@ class SecuredImageManagerImplTest {
         val encryptedInputStream = securedImageManager.readImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
     }
+
+    @Test
+    fun encryptThrowsAnException_shouldBeHandled() {
+        val securedImageRef = securedImageManager.storeImage(emptyArray<Byte>().toByteArray(), "")
+        assertThat(securedImageRef).isNull()
+    }
 }
