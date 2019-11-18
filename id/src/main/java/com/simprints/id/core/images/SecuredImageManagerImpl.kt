@@ -30,40 +30,43 @@ class SecuredImageManagerImpl(val ctx: Context,
 
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
 
-    override fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef {
+    override fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef? {
         return storeImage(image, hasher.hash(template.toString()))
     }
 
-    override fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef {
+    override fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef? {
         val file = File(imageFolderPath, filename)
         Timber.d(file.absoluteFile.toString())
 
         file.deleteOnExit()
 
-        val encryptedFile = getEncryptedFile(file)
-        return encryptedFile?.openFileOutput().use {
-            it?.write(imageBytes)
-        }.run {
-            SecuredImageRef(file.absolutePath)
+        return try {
+            getEncryptedFile(file).openFileOutput().use { stream ->
+                stream.write(imageBytes)
+                SecuredImageRef(file.absolutePath)
+            }
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            null
         }
     }
 
     override fun readImage(path: SecuredImageRef): FileInputStream? {
         val file = File(path.path)
         val encryptedFile = getEncryptedFile(file)
-        return encryptedFile?.openFileInput()
-    }
-
-    private fun getEncryptedFile(file: File): EncryptedFile? =
-        try {
-            EncryptedFile.Builder(
-                file,
-                ctx,
-                masterKeyAlias,
-                AES256_GCM_HKDF_4KB
-            ).build()
+        return try {
+            encryptedFile.openFileInput()
         } catch (t: Throwable) {
             t.printStackTrace()
             null
         }
+    }
+
+    private fun getEncryptedFile(file: File): EncryptedFile =
+        EncryptedFile.Builder(
+            file,
+            ctx,
+            masterKeyAlias,
+            AES256_GCM_HKDF_4KB
+        ).build()
 }
