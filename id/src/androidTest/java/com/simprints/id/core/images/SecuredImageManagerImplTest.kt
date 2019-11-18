@@ -28,10 +28,11 @@ class SecuredImageManagerImplTest {
     fun givenAByteArray_storeIt_shouldCreateAFile() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
+        require(securedImageRef != null)
 
         val file = File(securedImageRef.path)
 
-        assertThat(file.absolutePath).isEqualTo(imagesFolder)
+        assertThat(file.absolutePath).isEqualTo("$imagesFolder/$FILENAME")
         assertThat(securedImageRef.path).contains(FILENAME)
         assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
@@ -40,8 +41,9 @@ class SecuredImageManagerImplTest {
     fun givenAEncryptedFile_decryptIt_shouldReturnTheRightContent() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
-        val encryptedInputStream = securedImageManager.readImage(securedImageRef)
+        require(securedImageRef != null)
 
+        val encryptedInputStream = securedImageManager.readImage(securedImageRef)
         assertThat(encryptedInputStream?.readBytes()).isEqualTo(byteArray)
     }
 }
