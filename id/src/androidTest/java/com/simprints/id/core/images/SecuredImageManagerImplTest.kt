@@ -16,25 +16,29 @@ class SecuredImageManagerImplTest {
 
     companion object {
         private const val FILENAME = "test"
+        private const val SIZE_IMAGE = 500000 //500kB
+        private const val IMAGES_FOLDER = "images"
     }
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
+    private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
     private val securedImageManager = SecuredImageManagerImpl(app)
 
     @Test
     fun givenAByteArray_storeIt_shouldCreateAFile() {
-        val byteArray = Random.Default.nextBytes(100)
+        val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
 
         val file = File(securedImageRef.path)
 
+        assertThat(file.absolutePath).isEqualTo(imagesFolder)
         assertThat(securedImageRef.path).contains(FILENAME)
         assertThat(file.readBytes()).isNotEqualTo(byteArray)
     }
 
     @Test
     fun givenAEncryptedFile_decryptIt_shouldReturnTheRightContent() {
-        val byteArray = Random.Default.nextBytes(100)
+        val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
         val encryptedInputStream = securedImageManager.readImage(securedImageRef)
 
