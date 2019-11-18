@@ -43,10 +43,10 @@ class AppResponseBuilderForEnrol(
     }
 
     private fun getFaceCaptureResponse(results: List<Step.Result?>): FaceCaptureResponse? =
-        results.filterIsInstance(FaceCaptureResponse::class.java).lastOrNull()
+        results.filterIsInstance<FaceCaptureResponse>().lastOrNull()
 
     private fun getFingerprintCaptureResponse(results: List<Step.Result?>): FingerprintCaptureResponse? =
-        results.filterIsInstance(FingerprintCaptureResponse::class.java).lastOrNull()
+        results.filterIsInstance<FingerprintCaptureResponse>().lastOrNull()
 
     object PersonBuilder {
         fun buildPerson(request: AppEnrolRequest,
@@ -125,12 +125,11 @@ class AppResponseBuilderForEnrol(
             }
         }
 
-        private fun extractFaceSamples(faceResponse: FaceCaptureResponse): List<FaceSample> {
-            return faceResponse.capturingResult.mapNotNull {
-                it.result?.template?.let { template ->
-                    FaceSample(template)
+        private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
+            faceResponse.capturingResult.mapNotNull { it ->
+                it.result?.let {
+                    FaceSample(it.template)
                 }
             }
-        }
     }
 }

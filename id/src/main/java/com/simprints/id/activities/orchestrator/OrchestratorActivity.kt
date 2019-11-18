@@ -53,7 +53,10 @@ class OrchestratorActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as Application).component.inject(this)
+        with((application as Application)) {
+            createOrchestratorComponent()
+            orchestratorComponent.inject(this@OrchestratorActivity)
+        }
         super.onCreate(savedInstanceState)
 
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)

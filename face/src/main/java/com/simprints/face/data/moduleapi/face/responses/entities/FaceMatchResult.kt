@@ -5,4 +5,4 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class FaceMatchResult(override val guid: String,
-                           override val confidence: Int) : IFaceMatchResult
+                           override val confidence: Float) : IFaceMatchResult

@@ -58,7 +58,6 @@ object DomainToFingerprintResponse {
         when (reason) {
             UNEXPECTED_ERROR -> IFingerprintErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IFingerprintErrorReason.BLUETOOTH_NOT_SUPPORTED
-            GUID_NOT_FOUND_ONLINE -> IFingerprintErrorReason.GUID_NOT_FOUND_ONLINE
         }
 
 }

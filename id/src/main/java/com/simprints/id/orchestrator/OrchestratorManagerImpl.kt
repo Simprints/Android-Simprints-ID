@@ -16,7 +16,7 @@ open class OrchestratorManagerImpl(
     private val flowModalityFactory: ModalityFlowFactory,
     private val appResponseFactory: AppResponseFactory,
     private val hotCache: HotCache
-) : OrchestratorManager, FlowManager {
+) : OrchestratorManager, FlowProvider {
 
     override val ongoingStep = MutableLiveData<Step?>()
     override val appResponse = MutableLiveData<AppResponse?>()

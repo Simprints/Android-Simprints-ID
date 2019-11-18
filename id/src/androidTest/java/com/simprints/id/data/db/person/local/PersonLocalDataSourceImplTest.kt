@@ -18,12 +18,9 @@ import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.Serializable
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -51,7 +48,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     fun changeLocalDbKey_shouldNotAllowedToUseFirstRealm() {
         saveFakePerson(realm, getFakePerson())
         val countNewRealm = runBlocking { personLocalDataSource.count() }
-        assertEquals(countNewRealm, 1)
+        assertThat(countNewRealm).isEqualTo(1)
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
@@ -62,7 +59,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val differentLocalDataSource = PersonLocalDataSourceImpl(testContext, differentSecureDataManagerMock, loginInfoManagerMock)
 
         val count = runBlocking { differentLocalDataSource.count() }
-        assertEquals(count, 0)
+        assertThat(count).isEqualTo(0)
     }
 
     @Test
@@ -70,7 +67,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePerson(realm, getFakePerson())
 
         val count = personLocalDataSource.count()
-        assertEquals(count, 1)
+        assertThat(count).isEqualTo(1)
     }
 
     @Test
@@ -78,7 +75,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count()
-        assertEquals(count, 20)
+        assertThat(count).isEqualTo(20)
     }
 
     @Test
@@ -87,7 +84,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count(PersonLocalDataSource.Query(userId = fakePerson.userId))
-        assertEquals(count, 1)
+        assertThat(count).isEqualTo(1)
     }
 
     @Test
@@ -96,7 +93,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count(PersonLocalDataSource.Query(moduleId = fakePerson.moduleId))
-        assertEquals(count, 1)
+        assertThat(count).isEqualTo(1)
     }
 
     @Test
@@ -104,7 +101,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val count = personLocalDataSource.count()
-        assertEquals(count, 20)
+        assertThat(count).isEqualTo(20)
     }
 
     @Test
@@ -112,8 +109,8 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val fakePerson = saveFakePerson(realm, getFakePerson())
         saveFakePeople(realm, getRandomPeople(20))
 
-        val count = personLocalDataSource.count(PersonLocalDataSource.Query(patientId = fakePerson.patientId))
-        assertEquals(count, 1)
+        val count = personLocalDataSource.count(PersonLocalDataSource.Query(personId = fakePerson.patientId))
+        assertThat(count).isEqualTo(1)
     }
 
     @Test
@@ -122,8 +119,8 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         personLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
 
         realm.executeTransaction {
-            assertEquals(realm.where(DbPerson::class.java).count(), 1)
-            assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+            assertThat(realm.where(DbPerson::class.java).count()).isEqualTo(1)
+            assertThat(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson)).isTrue()
         }
     }
 
@@ -134,8 +131,8 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         personLocalDataSource.insertOrUpdate(listOf(fakePerson.fromDbToDomain()))
 
         realm.executeTransaction {
-            assertEquals(realm.where(DbPerson::class.java).count(), 1)
-            assertTrue(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson))
+            assertThat(realm.where(DbPerson::class.java).count()).isEqualTo(1)
+            assertThat(realm.where(DbPerson::class.java).findFirst()!!.deepEquals(fakePerson)).isTrue()
         }
     }
 
@@ -146,26 +143,29 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         personLocalDataSource.insertOrUpdate(listOf(fakePerson1.fromDbToDomain()))
         personLocalDataSource.insertOrUpdate(listOf(fakePerson2.fromDbToDomain()))
 
-        val fingerprintIdentityLocalDataSource =  (personLocalDataSource as FingerprintIdentityLocalDataSource)
+        val fingerprintIdentityLocalDataSource = (personLocalDataSource as FingerprintIdentityLocalDataSource)
         val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(PersonLocalDataSource.Query()).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
                 assertThat(count()).isEqualTo(fakePerson1.fingerprintSamples.count() + fakePerson2.fingerprintSamples.count())
-                assertThat(get(0).id).isEqualTo(fakePerson1.patientId)
-                assertThat(get(1).id).isEqualTo(fakePerson1.patientId)
-                assertThat(get(2).id).isEqualTo(fakePerson2.patientId)
-                assertThat(get(3).id).isEqualTo(fakePerson2.patientId)
+                assertThat(get(0).patientId).isEqualTo(fakePerson1.patientId)
+                assertThat(get(1).patientId).isEqualTo(fakePerson1.patientId)
+                assertThat(get(2).patientId).isEqualTo(fakePerson2.patientId)
+                assertThat(get(3).patientId).isEqualTo(fakePerson2.patientId)
             }
         }
     }
 
     @Test
-    fun givenInvalidSerializableQuery_aThrowableIsThrown() = runBlocking {
-        val fingerprintIdentityLocalDataSource =  (personLocalDataSource as FingerprintIdentityLocalDataSource)
-        assertThrows<InvalidQueryToLoadRecordsException> {
-            fingerprintIdentityLocalDataSource.loadFingerprintIdentities(object : Serializable {} )
+    fun givenInvalidSerializableQuery_aThrowableIsThrown() {
+        runBlocking {
+            val fingerprintIdentityLocalDataSource = (personLocalDataSource as FingerprintIdentityLocalDataSource)
+            assertThrows<InvalidQueryToLoadRecordsException> {
+                fingerprintIdentityLocalDataSource.loadFingerprintIdentities(mock())
+            }
         }
     }
+
 
     @Test
     fun givenManyPeopleSaved_loadShouldReturnThem() = runBlocking {
@@ -174,7 +174,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
         val people = personLocalDataSource.load().toList()
 
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
+        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test
@@ -183,7 +183,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(userId = fakePerson.userId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
+        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test
@@ -192,7 +192,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(moduleId = fakePerson.moduleId)).toList()
-        listOf(fakePerson).zip(people).forEach { assertTrue(it.first.deepEquals(it.second.fromDomainToDb())) }
+        listOf(fakePerson).zip(people).forEach { assertThat(it.first.deepEquals(it.second.fromDomainToDb())).isTrue() }
     }
 
     @Test
@@ -200,7 +200,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true)).toList()
-        assertEquals(people.size, 20)
+        assertThat(people.size).isEqualTo(20)
     }
 
     @Test
@@ -208,6 +208,6 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         saveFakePeople(realm, getRandomPeople(20, toSync = true))
 
         val people = personLocalDataSource.load(PersonLocalDataSource.Query(toSync = false)).toList()
-        assertEquals(people.size, 0)
+        assertThat(people.size).isEqualTo(0)
     }
 }
