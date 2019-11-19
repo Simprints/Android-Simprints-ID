@@ -20,10 +20,11 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
+import com.simprints.fingerprint.controllers.core.flow.Action.*
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.Action.*
-import com.simprints.fingerprint.data.domain.person.Fingerprint
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
 import timber.log.Timber
 import java.util.*
@@ -36,7 +37,9 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val timeHelper: FingerprintTimeHelper,
                                    private val sessionEventsManager: FingerprintSessionEventsManager,
                                    private val scannerManager: ScannerManager,
-                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper)
+                                   private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                                   private val masterFlowManager: MasterFlowManager,
+                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -63,8 +66,9 @@ class CollectFingerprintsPresenter(private val context: Context,
         fingerDisplayHelper = CollectFingerprintsFingerDisplayHelper(
             view,
             this,
-            collectRequest.fingerStatus,
-            androidResourcesHelper)
+            collectRequest.fingerprintsToCapture,
+            androidResourcesHelper,
+            fingerprintPreferencesManager)
     }
 
     private fun initIndicatorsHelper(context: Context, view: CollectFingerprintsContract.View) {
@@ -155,13 +159,13 @@ class CollectFingerprintsPresenter(private val context: Context,
         activeFingers.filter { fingerHasSatisfiedTerminalCondition(it) }.size >= maximumTotalNumberOfFingersForAutoAdding
 
     private fun numberOfOriginalFingers() =
-        collectRequest.fingerStatus.filter { it.value }.size
+        collectRequest.fingerprintsToCapture.toSet().size
 
     override fun fingerHasSatisfiedTerminalCondition(finger: Finger) =
         ((tooManyBadScans(finger) || finger.isGoodScan || finger.isRescanGoodScan) && finger.template != null) || finger.isFingerSkipped
 
     override fun getTitle(): String =
-        when (collectRequest.action) {
+        when (masterFlowManager.getCurrentAction()) {
             ENROL -> androidResourcesHelper.getString(R.string.register_title)
             IDENTIFY ->  androidResourcesHelper.getString(R.string.identify_title)
             VERIFY -> androidResourcesHelper.getString(R.string.verify_title)
@@ -218,16 +222,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun proceedToFinish(fingerprints: List<Fingerprint>) {
-        val person = Person(
-            UUID.randomUUID().toString(),
-            collectRequest.projectId,
-            collectRequest.userId,
-            collectRequest.moduleId,
-            fingerprints)
-
-        sessionEventsManager.addPersonCreationEventInBackground(person)
-
-        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(person))
+        view.setResultAndFinishSuccess(CollectFingerprintsTaskResult(fingerprints))
     }
 
     override fun handleException(e: Throwable) {

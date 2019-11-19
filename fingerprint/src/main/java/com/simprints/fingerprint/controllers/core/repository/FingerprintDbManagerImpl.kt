@@ -1,36 +1,42 @@
 package com.simprints.fingerprint.controllers.core.repository
 
-import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.core.tools.extentions.singleWithSuspend
-import com.simprints.fingerprint.controllers.core.repository.models.PersonFetchResult
-import com.simprints.fingerprint.data.domain.person.Person
-import com.simprints.fingerprint.data.domain.person.fromDomainToCore
-import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import io.reactivex.Completable
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
+import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import io.reactivex.Single
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
+import java.io.Serializable
+import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 
-class FingerprintDbManagerImpl(private val personRepository: PersonRepository) : FingerprintDbManager {
+class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSource: FingerprintIdentityLocalDataSource) : FingerprintDbManager {
 
-    override fun loadPerson(projectId: String, verifyGuid: String): Single<PersonFetchResult> =
+    override fun loadPeople(query: Serializable): Single<List<FingerprintIdentity>> =
         singleWithSuspend {
-            val corePersonFetch = runBlocking { personRepository.loadFromRemoteIfNeeded(projectId = projectId, patientId = verifyGuid) }
-            PersonFetchResult.fromCoreToDomain(corePersonFetch)
-        }
-
-    override fun savePerson(person: Person): Completable =
-        completableWithSuspend {
-            person.toSync = true
-            personRepository.saveAndUpload(person.fromDomainToCore())
-        }
-
-    override fun loadPeople(projectId: String,
-                            userId: String?,
-                            moduleId: String?): Single<List<Person>> =
-        singleWithSuspend {
-            val peopleList = personRepository.load(PersonLocalDataSource.Query(projectId = projectId, userId = userId, moduleId = moduleId))
-            peopleList.toList().map { Person.fromCoreToDomain(it) }
+            coreFingerprintIdentityLocalDataSource
+                .loadFingerprintIdentities(query)
+                .toList()
+                .map {
+                    FingerprintIdentity(it.patientId, it.fingerprints.map { fingerprint -> fingerprint.fromCoreToDomain() })
+                }
         }
 }
+
+fun FingerprintSample.fromCoreToDomain() =
+    Fingerprint(fingerIdentifier.fromCoreToDomain(), template)
+
+fun FingerIdentifierCore.fromCoreToDomain(): FingerIdentifier =
+    when (this) {
+        FingerIdentifierCore.RIGHT_5TH_FINGER -> FingerIdentifier.RIGHT_5TH_FINGER
+        FingerIdentifierCore.RIGHT_4TH_FINGER -> FingerIdentifier.RIGHT_4TH_FINGER
+        FingerIdentifierCore.RIGHT_3RD_FINGER -> FingerIdentifier.RIGHT_3RD_FINGER
+        FingerIdentifierCore.RIGHT_INDEX_FINGER -> FingerIdentifier.RIGHT_INDEX_FINGER
+        FingerIdentifierCore.RIGHT_THUMB -> FingerIdentifier.RIGHT_THUMB
+        FingerIdentifierCore.LEFT_THUMB -> FingerIdentifier.LEFT_THUMB
+        FingerIdentifierCore.LEFT_INDEX_FINGER -> FingerIdentifier.LEFT_INDEX_FINGER
+        FingerIdentifierCore.LEFT_3RD_FINGER -> FingerIdentifier.LEFT_3RD_FINGER
+        FingerIdentifierCore.LEFT_4TH_FINGER -> FingerIdentifier.LEFT_4TH_FINGER
+        FingerIdentifierCore.LEFT_5TH_FINGER -> FingerIdentifier.LEFT_5TH_FINGER
+    }

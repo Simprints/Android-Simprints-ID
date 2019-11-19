@@ -4,9 +4,10 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppVerifyResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceVerifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintVerifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
 class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
@@ -19,9 +20,9 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
             return it
         }
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceResponseForVerify(results)
-        val fingerprintResponse = getFingerprintResponseForVerify(results)
+        val fingerprintResponse = getFingerprintResponseForMatching(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -37,20 +38,29 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
         }
     }
 
-    private fun getFaceResponseForVerify(results: List<Step.Result?>): FaceVerifyResponse? =
-        results.filterIsInstance(FaceVerifyResponse::class.java).lastOrNull()
+    private fun getFaceResponseForVerify(results: List<Step.Result?>): FaceMatchResponse? =
+        results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
-    private fun getFingerprintResponseForVerify(results: List<Step.Result?>): FingerprintVerifyResponse? =
-        results.filterIsInstance(FingerprintVerifyResponse::class.java).lastOrNull()
+    private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
+        results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceVerifyResponse,
-                                                            fingerprintResponse: FingerprintVerifyResponse) =
-        AppVerifyResponse(fingerprintResponse.matchingResult.toAppMatchResult())
+    private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceMatchResponse,
+                                                            fingerprintResponse: FingerprintMatchResponse) =
+        AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
 
-    private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintVerifyResponse) =
-        AppVerifyResponse(fingerprintResponse.matchingResult.toAppMatchResult())
+    private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
+        AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
 
-    private fun buildAppVerifyResponseForFace(faceResponse: FaceVerifyResponse): AppVerifyResponse {
-        TODO("Not implemented yet")
-    }
+    private fun getMatchResultForFingerprintResponse(fingerprintResponse: FingerprintMatchResponse) =
+        fingerprintResponse.result.map {
+            MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore))
+        }.first()
+
+    private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse) =
+        AppVerifyResponse(getMatchResultForFaceResponse(faceResponse))
+
+    private fun getMatchResultForFaceResponse(faceResponse: FaceMatchResponse) =
+        faceResponse.result.map {
+            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+        }.first()
 }

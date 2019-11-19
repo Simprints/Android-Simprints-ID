@@ -53,7 +53,10 @@ class OrchestratorActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as Application).component.inject(this)
+        with((application as Application)) {
+            createOrchestratorComponent()
+            orchestratorComponent.inject(this@OrchestratorActivity)
+        }
         super.onCreate(savedInstanceState)
 
         appRequest = this.intent.extras?.getParcelable(APP_REQUEST_BUNDLE_KEY)
@@ -80,6 +83,6 @@ class OrchestratorActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        vm.onModalStepRequestDone(requestCode, resultCode, data)
+        vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
     }
 }

@@ -1,13 +1,15 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.activities.collect.models.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
-import com.simprints.fingerprint.activities.collect.models.fromDomainToCore
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore
+import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 
 @Keep
 class FingerprintCaptureEvent(starTime: Long,
@@ -62,4 +64,21 @@ fun FingerprintCaptureEvent.Result.fromDomainToCore() =
         FingerprintCaptureEvent.Result.NO_FINGER_DETECTED -> ResultCore.NO_FINGER_DETECTED
         FingerprintCaptureEvent.Result.SKIPPED -> ResultCore.SKIPPED
         FingerprintCaptureEvent.Result.FAILURE_TO_ACQUIRE -> ResultCore.FAILURE_TO_ACQUIRE
+    }
+
+fun Fingerprint.fromDomainToCore() =
+    FingerprintSample(fingerId.fromDomainToCore(), templateBytes, qualityScore, null)
+
+fun FingerIdentifier.fromDomainToCore(): com.simprints.id.data.db.person.domain.FingerIdentifier =
+    when (this) {
+        FingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifierCore.RIGHT_5TH_FINGER
+        FingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifierCore.RIGHT_4TH_FINGER
+        FingerIdentifier.RIGHT_3RD_FINGER -> FingerIdentifierCore.RIGHT_3RD_FINGER
+        FingerIdentifier.RIGHT_INDEX_FINGER -> FingerIdentifierCore.RIGHT_INDEX_FINGER
+        FingerIdentifier.RIGHT_THUMB -> FingerIdentifierCore.RIGHT_THUMB
+        FingerIdentifier.LEFT_THUMB -> FingerIdentifierCore.LEFT_THUMB
+        FingerIdentifier.LEFT_INDEX_FINGER -> FingerIdentifierCore.LEFT_INDEX_FINGER
+        FingerIdentifier.LEFT_3RD_FINGER -> FingerIdentifierCore.LEFT_3RD_FINGER
+        FingerIdentifier.LEFT_4TH_FINGER -> FingerIdentifierCore.LEFT_4TH_FINGER
+        FingerIdentifier.LEFT_5TH_FINGER -> FingerIdentifierCore.LEFT_5TH_FINGER
     }

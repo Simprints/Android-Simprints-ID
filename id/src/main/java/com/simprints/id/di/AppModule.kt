@@ -47,14 +47,9 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
-import com.simprints.id.orchestrator.EnrolmentHelper
-import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
-import com.simprints.id.orchestrator.responsebuilders.AppResponseFactoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
-import com.simprints.id.secure.cryptography.HybridCipher
-import com.simprints.id.secure.cryptography.HybridCipherImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -223,9 +218,6 @@ open class AppModule {
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
 
     @Provides
-    fun provideHybridCipher(context: Context): HybridCipher = HybridCipherImpl(context)
-
-    @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
                                  syncInfoLocalDataSource: SyncInfoLocalDataSource,
                                  personRemoteDataSource: PersonRemoteDataSource,
@@ -235,12 +227,6 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager = RemoteSessionsManagerImpl(remoteDbManager)
-
-    @Provides
-    open fun provideAppResponseBuilderFactory(
-        enrolmentHelper: EnrolmentHelper,
-        timeHelper: TimeHelper
-    ): AppResponseFactory = AppResponseFactoryImpl(enrolmentHelper, timeHelper)
 
     @Provides
     open fun provideGuidSelectionManager(context: Context,

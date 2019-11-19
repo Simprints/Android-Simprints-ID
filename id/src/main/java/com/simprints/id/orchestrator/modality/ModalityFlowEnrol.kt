@@ -22,22 +22,20 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppEnrolRequest)
         super.startFlow(appRequest, modalities)
-        steps.addAll(buildStepsList(appRequest, modalities))
+        steps.addAll(buildStepsList(modalities))
     }
 
-    private fun buildStepsList(appRequest: AppEnrolRequest, modalities: List<Modality>) =
+    private fun buildStepsList(modalities: List<Modality>) =
         modalities.map {
-            with(appRequest) {
-                when (it) {
-                    Modality.FINGER -> fingerprintStepProcessor.buildStepEnrol(projectId, userId, moduleId, metadata)
-                    Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
-                }
+            when (it) {
+                Modality.FINGER -> fingerprintStepProcessor.buildStepToCapture()
+                Modality.FACE -> faceEnrolProcessor.buildCaptureStep()
             }
         }
 
     override fun getNextStepToLaunch(): Step? = steps.firstOrNull { it.getStatus() == NOT_STARTED }
 
-    override fun handleIntentResult(requestCode: Int, resultCode: Int, data: Intent?): Step? {
+    override fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?): Step? {
         val result = when {
             isCoreResult(requestCode) -> coreStepProcessor.processResult(data)
             isFingerprintResult(requestCode) -> fingerprintStepProcessor.processResult(requestCode, resultCode, data)
@@ -47,6 +45,6 @@ class ModalityFlowEnrolImpl(private val fingerprintStepProcessor: FingerprintSte
         completeAllStepsIfExitFormHappened(requestCode, resultCode, data)
 
         val stepForRequest = steps.firstOrNull { it.requestCode == requestCode }
-        return stepForRequest?.also { it.result = result }
+        return stepForRequest?.apply { setResult(result) }
     }
 }

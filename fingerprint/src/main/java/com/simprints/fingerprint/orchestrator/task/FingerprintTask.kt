@@ -10,20 +10,11 @@ import com.simprints.fingerprint.activities.matching.MatchingActivity
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
-import com.simprints.fingerprint.tasks.saveperson.SavePersonTaskRequest
 
 sealed class FingerprintTask(
     val taskResultKey: String,
     val createTaskRequest: () -> TaskRequest
 ) {
-
-    abstract class RunnableTask(
-        taskResultKey: String,
-        createTaskRequest: () -> TaskRequest
-    ) : FingerprintTask(taskResultKey, createTaskRequest)
-
-    class SavePerson(savePersonResultKey: String, createSavePersonTaskRequest: () -> SavePersonTaskRequest) :
-        RunnableTask(savePersonResultKey, createSavePersonTaskRequest)
 
     abstract class ActivityTask(
         taskResultKey: String,

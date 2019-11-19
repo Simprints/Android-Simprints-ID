@@ -1,15 +1,11 @@
 package com.simprints.fingerprint.orchestrator.taskflow
 
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.*
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
 
 fun FingerprintRequest.toFingerprintTaskFlow(): FingerprintTaskFlow =
     when (this) { // TODO : use safer method (either store type in enum or sealed class)
-        is FingerprintEnrolRequest -> EnrolTaskFlow(this)
-        is FingerprintIdentifyRequest -> IdentifyTaskFlow(this)
-        is FingerprintVerifyRequest -> VerifyTaskFlow(this)
+        is FingerprintCaptureRequest -> CaptureTaskFlow(this)
+        is FingerprintMatchRequest -> MatchTaskFlow(this)
         else -> throw InvalidRequestForFingerprintException("Could not get task flow for request")
     }

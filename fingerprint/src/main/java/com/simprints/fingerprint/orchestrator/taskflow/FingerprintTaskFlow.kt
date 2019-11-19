@@ -10,7 +10,7 @@ import com.simprints.fingerprint.orchestrator.state.FingerprintTaskFlowState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
 
-abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
+abstract class FingerprintTaskFlow(private val fingerprintRequest: FingerprintRequest) {
 
     protected var taskResults: MutableMap<String, TaskResult> = mutableMapOf()
 
@@ -35,19 +35,12 @@ abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
                 ResultCode.CANCELLED -> {
                 }
                 ResultCode.ALERT -> {
-                    taskResults[ALERT] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
+                    taskResults[ALERT_TASK_KEY] = getTaskResult(AlertTaskResult.BUNDLE_KEY)
                 }
                 ResultCode.REFUSED -> {
-                    taskResults[REFUSED] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
+                    taskResults[REFUSED_TASK_KEY] = getTaskResult(RefusalTaskResult.BUNDLE_KEY)
                 }
             }
-        }
-    }
-
-    fun handleRunnableTaskResult(taskResult: TaskResult) {
-        (getCurrentTask() as FingerprintTask.RunnableTask).apply {
-            taskResults[taskResultKey] = taskResult
-            currentTaskIndex++
         }
     }
 
@@ -55,8 +48,8 @@ abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
         when (lastResultCode) {
             ResultCode.OK -> getFinalOkResult(finalResultBuilder)
             ResultCode.CANCELLED -> finalResultBuilder.createCancelledResult()
-            ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT] as AlertTaskResult)
-            ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED] as RefusalTaskResult)
+            ResultCode.ALERT -> finalResultBuilder.createAlertResult(taskResults[ALERT_TASK_KEY] as AlertTaskResult)
+            ResultCode.REFUSED -> finalResultBuilder.createRefusalResult(taskResults[REFUSED_TASK_KEY] as RefusalTaskResult)
         }
 
     protected abstract fun getFinalOkResult(finalResultBuilder: FinalResultBuilder): FinalResult
@@ -67,8 +60,8 @@ abstract class FingerprintTaskFlow(val fingerprintRequest: FingerprintRequest) {
         )
 
     companion object {
-        private const val REFUSED = "refused"
-        private const val ALERT = "alert"
+        private const val REFUSED_TASK_KEY = "refused"
+        private const val ALERT_TASK_KEY = "alert"
 
         fun fromState(fingerprintTaskFlowState: FingerprintTaskFlowState) =
             with(fingerprintTaskFlowState) {

@@ -3,6 +3,7 @@ package com.simprints.id.orchestrator
 import android.app.Activity
 import android.app.Instrumentation.ActivityResult
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intending
@@ -14,6 +15,8 @@ import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.face.requests.FaceCaptureRequest
 import com.simprints.id.domain.moduleapi.face.responses.fromModuleApiToDomain
+import com.simprints.id.orchestrator.cache.HotCacheImpl
+import com.simprints.id.orchestrator.cache.StepEncoder
 import com.simprints.id.orchestrator.modality.ModalityFlow
 import com.simprints.id.orchestrator.responsebuilders.AppResponseFactory
 import com.simprints.id.orchestrator.steps.Step
@@ -139,7 +142,9 @@ class OrchestratorManagerImplTest {
         verify(modalityFlowMock, times(nTimes)).getNextStepToLaunch()
 
     private fun verifyOrchestratorForwardedResultsToModalityFlow() =
-        verifyOnce(modalityFlowMock) { handleIntentResult(anyInt(), anyInt(), anyNotNull()) }
+        verifyOnce(modalityFlowMock) { handleIntentResult(safeEq(enrolAppRequest), anyInt(), anyInt(), anyNotNull()) }
+
+    private fun <T : Any> safeEq(value: T): T = eq(value) ?: value
 
     private fun verifyOrchestratorDidntTryToBuildFinalAppResponse() =
         verifyNever(appResponseFactoryMock) {
@@ -163,7 +168,7 @@ class OrchestratorManagerImplTest {
         }
 
         val nFaceSamplesToCapture = 3
-        val request = FaceCaptureRequest(nFaceSamplesToCapture)
+        val request = FaceCaptureRequest(nFaceSamplesToCapture = nFaceSamplesToCapture)
 
         mockSteps.add(
             Step(
@@ -180,8 +185,13 @@ class OrchestratorManagerImplTest {
         val modalityFlowFactoryMock = mock<ModalityFlowFactory>().apply {
             whenever(this) { createModalityFlow(any(), any()) } thenReturn modalityFlowMock
         }
+        val preferences = mock<SharedPreferences>()
+        whenever(preferences) { edit() } thenReturn mock()
 
-        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, mock())
+        val stepEncoder = mock<StepEncoder>()
+        val hotCache = HotCacheImpl(preferences, stepEncoder)
+
+        return OrchestratorManagerImpl(modalityFlowFactoryMock, appResponseFactoryMock, hotCache)
     }
 
     private fun OrchestratorManager.startFlowForEnrol(
@@ -197,11 +207,12 @@ class OrchestratorManagerImplTest {
         response?.let {
             mockSteps.firstOrNull { step ->
                 step.getStatus() == ONGOING
-            }?.result = it.fromModuleApiToDomain()
+            }?.setResult(it.fromModuleApiToDomain())
         }
 
         runBlockingTest {
             handleIntentResult(
+                enrolAppRequest,
                 requestCode,
                 Activity.RESULT_OK,
                 Intent().putExtra(IFaceResponse.BUNDLE_KEY, response))

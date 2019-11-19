@@ -2,6 +2,7 @@ package com.simprints.id.data.db.person.domain
 
 import android.os.Parcelable
 import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.util.*
@@ -16,3 +17,6 @@ open class FaceSample(
         UUID.nameUUIDFromBytes(template).toString()
     }
 }
+
+fun FaceCaptureSample.fromModuleApiToDomain() = FaceSample(template, imageRef)
+

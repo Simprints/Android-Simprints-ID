@@ -4,6 +4,7 @@ import android.content.Context
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
+import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.local.PersonLocalDataSourceImpl
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -66,4 +67,8 @@ open class DataModule {
                                           secureDataManager: SecureDataManager,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =
         PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+
+    @Provides
+    open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =
+        personLocalDataSource
 }

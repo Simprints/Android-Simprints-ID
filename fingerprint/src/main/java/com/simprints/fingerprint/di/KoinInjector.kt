@@ -21,29 +21,27 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManagerImpl
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManagerImpl
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.flow.MasterFlowManagerImpl
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManagerImpl
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManagerImpl
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelperImpl
-import com.simprints.fingerprint.scanner.ScannerManager
-import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.FinalResultBuilder
 import com.simprints.fingerprint.orchestrator.Orchestrator
+import com.simprints.fingerprint.scanner.ScannerManager
+import com.simprints.fingerprint.scanner.ScannerManagerImpl
 import com.simprints.fingerprint.scanner.factory.ScannerFactory
 import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
-import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
-import com.simprints.id.Application
-import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -73,23 +71,11 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module(override = true) {
-            defineBuildersForCoreManagers()
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()
         }
 
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { appComponent().getPreferencesManager() }
-        factory { appComponent().getAnalyticsManager() }
-        factory { appComponent().getSessionEventsManager() }
-        factory { appComponent().getCrashReportManager() }
-        factory { appComponent().getTimeHelper() }
-        factory { appComponent().getPersonRepository() }
-        factory { appComponent().getImprovedSharedPreferences() }
-        factory { appComponent().getRemoteConfigWrapper() }
-        factory { appComponent().getAndroidResourcesHelper() }
-    }
 
     private fun Module.defineBuildersForFingerprintManagers() {
         factory<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
@@ -99,6 +85,7 @@ object KoinInjector {
         factory<FingerprintTimeHelper> { FingerprintTimeHelperImpl(get()) }
         factory<FingerprintDbManager> { FingerprintDbManagerImpl(get()) }
         factory<FingerprintAndroidResourcesHelper> { FingerprintAndroidResourcesHelperImpl(get()) }
+        factory<MasterFlowManager> { MasterFlowManagerImpl(get()) }
     }
 
     private fun Module.defineBuildersForDomainClasses() {
@@ -108,7 +95,6 @@ object KoinInjector {
         single<ScannerManager> { ScannerManagerImpl(get(), get()) }
 
         factory { FinalResultBuilder() }
-        factory { RunnableTaskDispatcher() }
         factory { Orchestrator(get()) }
     }
 
@@ -117,17 +103,14 @@ object KoinInjector {
             AlertPresenter(view, get(), get(), get(), fingerprintAlert)
         }
         factory<CollectFingerprintsContract.Presenter> { (context: Context, view: CollectFingerprintsContract.View, request: CollectFingerprintsTaskRequest) ->
-            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get())
+            CollectFingerprintsPresenter(context, view, request, get(), get(), get(), get(), get(), get(), get())
         }
         factory<RefusalContract.Presenter> { (view: RefusalContract.View) ->
             RefusalPresenter(view, get(), get(), get())
         }
 
-        viewModel { OrchestratorViewModel(get(), get()) }
+        viewModel { OrchestratorViewModel(get()) }
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
-        viewModel { MatchingViewModel(get(), get(), get(), get(), get()) }
+        viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
     }
-
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
 }

@@ -28,6 +28,8 @@ interface SettingsPreferencesManager {
     var modalities: List<Modality>
     var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
 
+    var fingerImagesExist: Boolean
+
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
 

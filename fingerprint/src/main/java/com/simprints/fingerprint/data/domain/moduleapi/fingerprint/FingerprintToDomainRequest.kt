@@ -1,55 +1,40 @@
 package com.simprints.fingerprint.data.domain.moduleapi.fingerprint
 
-import com.simprints.fingerprint.activities.collect.models.toDomainClass
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.fromModuleApiToDomain
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintEnrolRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintIdentifyRequest
+import com.simprints.fingerprint.data.domain.fingerprint.fromModuleApiToDomain
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintCaptureRequest
+import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintMatchRequest
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintVerifyRequest
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForFingerprintException
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintEnrolRequest
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintIdentifyRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintCaptureRequest
+import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintRequest
-import com.simprints.moduleapi.fingerprint.requests.IFingerprintVerifyRequest
 
 object FingerprintToDomainRequest {
 
     fun fromFingerprintToDomainRequest(iFingerprintRequest: IFingerprintRequest): FingerprintRequest =
         when (iFingerprintRequest) {
-            is IFingerprintEnrolRequest ->
-                fromFingerprintToDomainEnrolRequest(iFingerprintRequest)
-            is IFingerprintVerifyRequest ->
-                fromFingerprintToDomainVerifyRequest(iFingerprintRequest)
-            is IFingerprintIdentifyRequest ->
-                fromFingerprintToDomainIdentifyRequest(iFingerprintRequest)
+            is IFingerprintCaptureRequest ->
+                fromFingerprintToDomainCaptureRequest(iFingerprintRequest)
+            is IFingerprintMatchRequest ->
+                fromFingerprintToDomainMatchRequest(iFingerprintRequest)
             else -> throw InvalidRequestForFingerprintException("Could not convert to domain request")
         }
 
-    private fun fromFingerprintToDomainIdentifyRequest(iFingerprintRequest: IFingerprintIdentifyRequest): FingerprintIdentifyRequest =
+    private fun fromFingerprintToDomainCaptureRequest(iFingerprintRequest: IFingerprintCaptureRequest): FingerprintCaptureRequest =
         with(iFingerprintRequest) {
-            FingerprintIdentifyRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, organizationName, programName, matchGroup.fromModuleApiToDomain(), returnIdCount
+            FingerprintCaptureRequest(
+                fingerprintsToCapture.map { it.fromModuleApiToDomain() }
             )
         }
 
-
-    private fun fromFingerprintToDomainVerifyRequest(iFingerprintRequest: IFingerprintVerifyRequest): FingerprintVerifyRequest =
+    private fun fromFingerprintToDomainMatchRequest(iFingerprintRequest: IFingerprintMatchRequest): FingerprintMatchRequest =
         with(iFingerprintRequest) {
-            FingerprintVerifyRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, programName, organizationName, verifyGuid)
+            FingerprintMatchRequest(probeFingerprintSamples.map {
+                Fingerprint(
+                    it.fingerIdentifier.fromModuleApiToDomain(),
+                    it.template
+                )
+            }, queryForCandidates)
         }
-
-
-    private fun fromFingerprintToDomainEnrolRequest(iFingerprintRequest: IFingerprintEnrolRequest): FingerprintEnrolRequest =
-        with(iFingerprintRequest) {
-            FingerprintEnrolRequest(
-                projectId, userId, moduleId, metadata, language,
-                fingerStatus.mapKeys { it.key.toDomainClass() },
-                logoExists, programName, organizationName)
-        }
-
 }
