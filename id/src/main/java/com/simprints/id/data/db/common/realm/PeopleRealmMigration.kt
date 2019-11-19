@@ -167,13 +167,11 @@ internal class PeopleRealmMigration(val projectId: String) : RealmMigration {
             val faceSamplesScheme = schema.create(FACE_TABLE)
                 .addNewField<String>(FACE_FIELD_ID, REQUIRED)
                 .addNewField<ByteArray>(FACE_FIELD_TEMPLATE, REQUIRED)
-                .addNewField<String>(FACE_FIELD_IMAGEREF)
 
             schema.rename(PeopleSchemaV6.FINGERPRINT_TABLE, FINGERPRINT_TABLE)
                 .addNewField<String>(FINGERPRINT_FIELD_ID, REQUIRED)
                 .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_FINGER_IDENTIFIER, FINGERPRINT_FIELD_FINGER_IDENTIFIER)
                 .renameField(PeopleSchemaV6.FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE, FINGERPRINT_FIELD_TEMPLATE_QUALITY_SCORE)
-                .addNewField<String>(FINGERPRINT_FIELD_IMAGEREF)
                 .markAsRequired(FINGERPRINT_FIELD_TEMPLATE)
 
             schema.get(PERSON_TABLE)
