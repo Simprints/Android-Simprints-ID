@@ -1,11 +1,11 @@
 package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
-import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.activities.collect.models.FingerStatus.*
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
-import com.simprints.id.data.db.person.domain.FingerprintSample
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent as FingerprintCaptureEventCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Fingerprint as FingerprintCore
 import com.simprints.id.data.analytics.eventdata.models.domain.events.FingerprintCaptureEvent.Result as ResultCore
@@ -67,9 +67,9 @@ fun FingerprintCaptureEvent.Result.fromDomainToCore() =
     }
 
 fun Fingerprint.fromDomainToCore() =
-    FingerprintSample(fingerId.fromDomainToCore(), templateBytes, qualityScore, null)
+    FingerprintCaptureSample(fingerId.fromDomainToCore(), templateBytes, qualityScore)
 
-fun FingerIdentifier.fromDomainToCore(): com.simprints.id.data.db.person.domain.FingerIdentifier =
+fun FingerIdentifier.fromDomainToCore(): FingerIdentifierCore =
     when (this) {
         FingerIdentifier.RIGHT_5TH_FINGER -> FingerIdentifierCore.RIGHT_5TH_FINGER
         FingerIdentifier.RIGHT_4TH_FINGER -> FingerIdentifierCore.RIGHT_4TH_FINGER
