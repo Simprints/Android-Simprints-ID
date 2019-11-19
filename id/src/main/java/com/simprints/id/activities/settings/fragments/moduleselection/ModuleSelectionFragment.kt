@@ -193,6 +193,7 @@ class ModuleSelectionFragment(
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 requireActivity().hideKeyboard()
                 v?.clearFocus()
+                rvModules.requestFocus()
             }
         }
     }
