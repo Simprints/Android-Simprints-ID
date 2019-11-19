@@ -132,9 +132,8 @@ class ModuleSelectionFragment(
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
         queryListener.searchResults.observe(this, Observer { searchResults ->
             adapter.submitList(searchResults)
-            rvModules.scrollToPosition(0)
-
             txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
+            rvModules.scrollToPosition(0)
         })
     }
 
