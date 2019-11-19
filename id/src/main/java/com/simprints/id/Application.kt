@@ -10,7 +10,11 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import timber.log.Timber
 
 open class Application : MultiDexApplication() {
@@ -92,6 +96,29 @@ open class Application : MultiDexApplication() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
+            loadKoinModules(listOf(module(override = true) {
+                this.defineBuildersForCoreManagers()
+            }))
         }
+    }
+
+    
+    private fun Module.defineBuildersForCoreManagers() {
+        factory { component.getPreferencesManager() }
+        factory { component.getAnalyticsManager() }
+        factory { component.getSessionEventsManager() }
+        factory { component.getCrashReportManager() }
+        factory { component.getTimeHelper() }
+        factory { component.getFingerprintRecordLocalDataSource() }
+        factory { component.getImprovedSharedPreferences() }
+        factory { component.getRemoteConfigWrapper() }
+        factory { component.getAndroidResourcesHelper() }
+        factory { orchestratorComponent.getFlowManager() }
+        factory { component.getPersonRepository() }
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        stopKoin()
     }
 }
