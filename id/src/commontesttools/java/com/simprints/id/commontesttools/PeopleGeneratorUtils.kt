@@ -1,16 +1,14 @@
 package com.simprints.id.commontesttools
 
-import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import java.util.*
+import kotlin.random.Random
 
 object PeopleGeneratorUtils {
-
-    private val random = Random()
 
     fun getRandomPeople(nPeople: Int,
                         subSyncScope: SubSyncScope,
@@ -81,7 +79,7 @@ object PeopleGeneratorUtils {
     }
 
     fun getRandomFaceSample() =
-        FaceSample(kotlin.random.Random.nextBytes(20), SecuredImageRef(UUID.randomUUID().toString()))
+        FaceSample(Random.nextBytes(20))
 
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
@@ -91,5 +89,5 @@ object PeopleGeneratorUtils {
     }
 
     private fun <T> List<T>.takeRandom(): T =
-        this[random.nextInt(this.size)]
+        this[Random.nextInt(this.size)]
 }
