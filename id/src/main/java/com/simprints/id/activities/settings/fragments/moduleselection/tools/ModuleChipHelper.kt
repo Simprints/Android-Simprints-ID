@@ -1,6 +1,7 @@
 package com.simprints.id.activities.settings.fragments.moduleselection.tools
 
 import android.content.Context
+import android.text.TextUtils
 import androidx.core.view.children
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipDrawable
@@ -33,6 +34,7 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
             text = module.name
             tag = module.name
             isCheckable = false
+            ellipsize = TextUtils.TruncateAt.END
             setOnCloseIconClickListener {
                 listener.onChipClick(module)
             }
@@ -41,7 +43,7 @@ class ModuleChipHelper(private val context: Context, private val listener: ChipC
 
     private fun createChipDrawable(): ChipDrawable {
         return ChipDrawable.createFromResource(context, R.xml.module_selection_chip).apply {
-            setTextAppearanceResource(R.style.SimprintsStyle_TextView_White)
+            setTextAppearanceResource(R.style.SimprintsStyle_TextView_Chip)
             shapeAppearanceModel = ShapeAppearanceModel().also { shapeAppearanceModel ->
                 val cornerSize = context.dimen(R.dimen.chip_corner_size_module_selection)
                 shapeAppearanceModel.setAllCorners(CornerFamily.CUT, cornerSize)
