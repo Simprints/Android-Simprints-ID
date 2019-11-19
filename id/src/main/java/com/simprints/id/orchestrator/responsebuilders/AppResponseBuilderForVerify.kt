@@ -46,15 +46,21 @@ class AppResponseBuilderForVerify : BaseAppResponseBuilder() {
 
     private fun buildAppVerifyResponseForFingerprintAndFace(faceResponse: FaceMatchResponse,
                                                             fingerprintResponse: FingerprintMatchResponse) =
-        AppVerifyResponse(
-            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }.first())
+        AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
 
     private fun buildAppVerifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
-        AppVerifyResponse(
-            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }.first())
+        AppVerifyResponse(getMatchResultForFingerprintResponse(fingerprintResponse))
+
+    private fun getMatchResultForFingerprintResponse(fingerprintResponse: FingerprintMatchResponse) =
+        fingerprintResponse.result.map {
+            MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore))
+        }.first()
 
     private fun buildAppVerifyResponseForFace(faceResponse: FaceMatchResponse) =
-        AppVerifyResponse(faceResponse.result.map {
-            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence.toFloat()))
-        }.first())
+        AppVerifyResponse(getMatchResultForFaceResponse(faceResponse))
+
+    private fun getMatchResultForFaceResponse(faceResponse: FaceMatchResponse) =
+        faceResponse.result.map {
+            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+        }.first()
 }
