@@ -84,6 +84,7 @@ class ModuleSelectionFragment(
             configureSearchView()
             configureTextViewVisibility()
             displaySelectedModules()
+            rvModules.requestFocus()
         })
     }
 
