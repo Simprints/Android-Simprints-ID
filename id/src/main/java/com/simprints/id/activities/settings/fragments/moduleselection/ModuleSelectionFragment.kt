@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -66,8 +68,12 @@ class ModuleSelectionFragment(
 
     private fun configureRecyclerView() {
         rvModules.adapter = adapter
-        val dividerItemDecoration = DividerItemDecoration(requireContext(),
-            DividerItemDecoration.VERTICAL)
+        val context = requireContext()
+        val dividerItemDecoration = DividerItemDecoration(context,
+            DividerItemDecoration.VERTICAL).apply {
+            val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
+            setDrawable(ColorDrawable(colour))
+        }
         rvModules.addItemDecoration(dividerItemDecoration)
     }
 
