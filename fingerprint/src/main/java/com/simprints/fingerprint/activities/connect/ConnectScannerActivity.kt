@@ -17,12 +17,11 @@ import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.Vibrate.vibrate
 import kotlinx.android.synthetic.main.activity_connect_scanner.*
-import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class ConnectScannerActivity : FingerprintActivity() {
 
-    private lateinit var connectScannerRequest: ConnectScannerTaskRequest
-    private val viewModel: ConnectScannerViewModel by inject()
+    private val viewModel: ConnectScannerViewModel by viewModel()
 
     private var scannerErrorConfirmationDialog: AlertDialog? = null
 
@@ -32,8 +31,9 @@ class ConnectScannerActivity : FingerprintActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        connectScannerRequest = this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
-            ?: throw InvalidRequestForConnectScannerActivityException()
+        val connectScannerRequest: ConnectScannerTaskRequest =
+            this.intent.extras?.getParcelable(ConnectScannerTaskRequest.BUNDLE_KEY) as ConnectScannerTaskRequest?
+                ?: throw InvalidRequestForConnectScannerActivityException()
 
         observeScannerEvents()
         observeLifecycleEvents()

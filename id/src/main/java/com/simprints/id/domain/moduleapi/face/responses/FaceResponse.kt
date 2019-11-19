@@ -6,6 +6,8 @@ import com.simprints.moduleapi.face.responses.*
 
 interface FaceResponse : Parcelable, Result {
 
+    val type: FaceResponseType
+
     companion object {
         const val BUNDLE_KEY = "FaceResponseBundleKey"
     }
@@ -15,10 +17,15 @@ interface FaceResponse : Parcelable, Result {
 fun IFaceResponse.fromModuleApiToDomain(): FaceResponse =
     when (type) {
         IFaceResponseType.CAPTURE -> (this as IFaceCaptureResponse).fromModuleApiToDomain()
-        IFaceResponseType.VERIFY -> (this as IFaceVerifyResponse).fromModuleApiToDomain()
-        IFaceResponseType.IDENTIFY -> (this as IFaceIdentifyResponse).fromModuleApiToDomain()
-        IFaceResponseType.EXIT_FORM -> TODO() //STOPSHIP
-        IFaceResponseType.ERROR -> TODO() //STOPSHIP
+        IFaceResponseType.MATCH -> (this as IFaceMatchResponse).fromModuleApiToDomain()
+        IFaceResponseType.EXIT_FORM -> (this as IFaceExitFormResponse).formModuleApiToDomain()
+        IFaceResponseType.ERROR -> (this as IFaceErrorResponse).fromModuleApiToDomain()
     }
 
 
+enum class FaceResponseType {
+    CAPTURE,
+    MATCH,
+    EXIT_FORM,
+    ERROR
+}

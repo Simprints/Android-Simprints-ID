@@ -3,9 +3,7 @@ package com.simprints.fingerprint.activities.matching
 import android.content.Intent
 import android.util.Log
 import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
-import com.simprints.fingerprint.activities.matching.request.MatchingTaskVerifyRequest
 import com.simprints.fingerprint.activities.matching.result.MatchingTaskResult
-import com.simprints.fingerprint.activities.matching.result.MatchingTaskVerifyResult
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.MATCHING
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
@@ -15,31 +13,27 @@ import com.simprints.fingerprint.controllers.core.eventData.model.OneToOneMatchE
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.MatchingTier
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.matching.MatchResult
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 import java.util.*
 
 class VerificationTask(private val viewModel: MatchingViewModel,
-                       matchingRequest: MatchingTaskRequest,
+                       private val matchingRequest: MatchingTaskRequest,
                        private val dbManager: FingerprintDbManager,
                        private val sessionEventsManager: FingerprintSessionEventsManager,
                        private val crashReportManager: FingerprintCrashReportManager,
                        private val timeHelper: FingerprintTimeHelper,
                        private val preferenceManager: FingerprintPreferencesManager) : MatchTask {
 
-    private val matchingVerifyRequest = matchingRequest as MatchingTaskVerifyRequest
-
     override val matchStartTime = timeHelper.now()
 
-    override fun loadCandidates(): Single<List<Person>> =
-        with(matchingVerifyRequest) {
-            dbManager.loadPerson(this.queryForVerifyPool.projectId, this.verifyGuid).map { listOf(it.person) }
-        }
+    override fun loadCandidates(): Single<List<FingerprintIdentity>> =
+        dbManager.loadPeople(matchingRequest.queryForCandidates)
 
-    override fun handlesCandidatesLoaded(candidates: List<Person>) {
+    override fun handlesCandidatesLoaded(candidates: List<FingerprintIdentity>) {
         logMessageForCrashReport(String.format(Locale.UK,
             "Successfully loaded %d candidates", candidates.size))
     }
@@ -50,19 +44,19 @@ class VerificationTask(private val viewModel: MatchingViewModel,
         viewModel.progress.postValue(100)
     }
 
-    override fun handleMatchResult(candidates: List<Person>, scores: List<Float>) {
+    override fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>) {
         val candidate = candidates.first()
         val score = scores.first()
 
-        val verificationResult = MatchEntry(candidate.patientId, score)
+        val verificationResult = MatchEntry(candidate.personId, score)
         sessionEventsManager.addEventInBackground(OneToOneMatchEvent(
             matchStartTime,
             timeHelper.now(),
-            candidates.first().patientId,
+            matchingRequest.queryForCandidates,
             verificationResult))
 
         val resultData = Intent().putExtra(MatchingTaskResult.BUNDLE_KEY,
-            MatchingTaskVerifyResult(candidate.patientId, score.toInt(), MatchingTier.computeTier(score)))
+            MatchingTaskResult(listOf(MatchResult(candidate.personId, score))))
 
         preferenceManager.lastVerificationDate = Date()
         viewModel.result.postValue(MatchingViewModel.FinishResult(ResultCode.OK, resultData, 0))

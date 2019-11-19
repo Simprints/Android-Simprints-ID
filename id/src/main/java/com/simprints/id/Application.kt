@@ -3,7 +3,6 @@ package com.simprints.id
 import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
-import com.facebook.soloader.SoLoader
 import com.simprints.id.di.*
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
@@ -11,12 +10,17 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import timber.log.Timber
 
 open class Application : MultiDexApplication() {
 
     lateinit var component: AppComponent
+    lateinit var orchestratorComponent: OrchestratorComponent
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -25,7 +29,12 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
-            .orchestratorModule(OrchestratorModule())
+            .build()
+    }
+
+    open fun createOrchestratorComponent() {
+        orchestratorComponent = component
+            .getOrchestratorComponent().orchestratorModule(OrchestratorModule())
             .build()
     }
 
@@ -52,7 +61,6 @@ open class Application : MultiDexApplication() {
 
         initFabric()
         handleUndeliverableExceptionInRxJava()
-        initConceal()
     }
 
     private fun initFabric() {
@@ -82,18 +90,35 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    private fun initConceal() {
-        val nativeExopackage = false
-        SoLoader.init(this, nativeExopackage)
-    }
-
     private fun isReleaseWithLogfileVariant(): Boolean = BuildConfig.BUILD_TYPE == "releaseWithLogfile"
 
     private fun initServiceLocation() {
         startKoin {
             androidLogger()
             androidContext(this@Application)
+            loadKoinModules(listOf(module(override = true) {
+                this.defineBuildersForCoreManagers()
+            }))
         }
     }
 
+    
+    private fun Module.defineBuildersForCoreManagers() {
+        factory { component.getPreferencesManager() }
+        factory { component.getAnalyticsManager() }
+        factory { component.getSessionEventsManager() }
+        factory { component.getCrashReportManager() }
+        factory { component.getTimeHelper() }
+        factory { component.getFingerprintRecordLocalDataSource() }
+        factory { component.getImprovedSharedPreferences() }
+        factory { component.getRemoteConfigWrapper() }
+        factory { component.getAndroidResourcesHelper() }
+        factory { orchestratorComponent.getFlowManager() }
+        factory { component.getPersonRepository() }
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+        stopKoin()
+    }
 }

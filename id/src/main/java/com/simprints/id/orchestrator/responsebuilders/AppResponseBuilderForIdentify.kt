@@ -4,9 +4,11 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.responses.AppIdentifyResponse
 import com.simprints.id.domain.moduleapi.app.responses.AppResponse
-import com.simprints.id.domain.moduleapi.face.responses.FaceIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintIdentifyResponse
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.toAppMatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
+import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
+import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
+import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
 class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
@@ -19,9 +21,9 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
             return it
         }
 
-        val results = steps.map { it.result }
+        val results = steps.map { it.getResult() }
         val faceResponse = getFaceResponseForIdentify(results)
-        val fingerprintResponse = getFingerprintResponseForIdentify(results)
+        val fingerprintResponse = getFingerprintResponseForMatching(results)
 
         return when {
             fingerprintResponse != null && faceResponse != null -> {
@@ -37,22 +39,45 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
         }
     }
 
-    private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceIdentifyResponse? =
-        results.filterIsInstance(FaceIdentifyResponse::class.java).lastOrNull()
+    private fun getFaceResponseForIdentify(results: List<Step.Result?>): FaceMatchResponse? =
+        results.filterIsInstance(FaceMatchResponse::class.java).lastOrNull()
 
-    private fun getFingerprintResponseForIdentify(results: List<Step.Result?>): FingerprintIdentifyResponse? =
-        results.filterIsInstance(FingerprintIdentifyResponse::class.java).lastOrNull()
+    private fun getFingerprintResponseForMatching(results: List<Step.Result?>): FingerprintMatchResponse? =
+        results.filterIsInstance(FingerprintMatchResponse::class.java).lastOrNull()
 
-    private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceIdentifyResponse,
-                                                         fingerprintResponse: FingerprintIdentifyResponse,
+    private fun buildAppIdentifyResponseForFaceAndFinger(faceResponse: FaceMatchResponse,
+                                                         fingerprintResponse: FingerprintMatchResponse,
                                                          sessionId: String) =
-        AppIdentifyResponse(fingerprintResponse.identifications.map { it.toAppMatchResult() }, sessionId)
+        AppIdentifyResponse(
+            getSortedIdentificationsForFingerprint(fingerprintResponse),
+            sessionId)
 
-    private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintIdentifyResponse,
-                                                       sessionId: String) =
-        AppIdentifyResponse(fingerprintResponse.identifications.map { it.toAppMatchResult() }, sessionId)
+    private fun getSortedIdentificationsForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
+        fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }
 
-    private fun buildAppIdentifyResponseForFace(faceResponse: FaceIdentifyResponse, sessionId: String): AppIdentifyResponse {
-        TODO("Not implemented yet")
+    private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
+                                                       sessionId: String): AppIdentifyResponse {
+        val resultSortedByConfidence = fingerprintResponse.result.sortedBy {
+            it.confidenceScore
+        }
+
+        return AppIdentifyResponse(resultSortedByConfidence.map {
+            MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore))
+        }, sessionId)
     }
+
+    private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse,
+                                                sessionId: String): AppIdentifyResponse {
+        val resultsSortedByConfidence = faceResponse.result.sortedBy { it.confidence }
+
+        return AppIdentifyResponse(
+            getSortedIdentificationsForFace(resultsSortedByConfidence),
+            sessionId
+        )
+    }
+
+    private fun getSortedIdentificationsForFace(resultsSortedByConfidence: List<FaceMatchResult>) =
+        resultsSortedByConfidence.map {
+            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+        }
 }
