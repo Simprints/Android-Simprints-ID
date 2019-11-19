@@ -201,7 +201,8 @@ class ModuleSelectionFragment(
         onFocusChange { v, hasFocus ->
             (v as EditText).isCursorVisible = hasFocus
             if (!hasFocus)
-                rvModules.scrollToPosition(0)
+                rvModules?.scrollToPosition(0)
+            // The safe call above is necessary only when the 'up' action bar button is clicked
         }
     }
 
