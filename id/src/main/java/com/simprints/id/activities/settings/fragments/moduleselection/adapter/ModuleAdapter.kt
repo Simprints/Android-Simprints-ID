@@ -2,14 +2,20 @@ package com.simprints.id.activities.settings.fragments.moduleselection.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
 import com.simprints.id.moduleselection.model.Module
 
 open class ModuleAdapter(
     private val listener: ModuleSelectionListener
-) : ListAdapter<Module, ModuleViewHolder>(DiffCallback) {
+) : RecyclerView.Adapter<ModuleViewHolder>() {
+
+    private var list = emptyList<Module>()
+
+    fun submitList(list: List<Module>) {
+        this.list = list
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ModuleViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -18,18 +24,10 @@ open class ModuleAdapter(
     }
 
     override fun onBindViewHolder(holder: ModuleViewHolder, position: Int) {
-        val moduleName = getItem(position)
+        val moduleName = list[position]
         holder.bindTo(moduleName, listener)
     }
 
-    companion object DiffCallback : DiffUtil.ItemCallback<Module>() {
-        override fun areItemsTheSame(oldItem: Module, newItem: Module): Boolean {
-            return oldItem == newItem
-        }
-
-        override fun areContentsTheSame(oldItem: Module, newItem: Module): Boolean {
-            return oldItem.name == newItem.name && oldItem.isSelected && newItem.isSelected
-        }
-    }
+    override fun getItemCount(): Int = list.size
 
 }
