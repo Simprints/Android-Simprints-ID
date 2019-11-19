@@ -27,5 +27,4 @@ fun ApiFingerprintSample.fromApiToDomain(): FingerprintSample =
     FingerprintSample(
         fingerIdentifier = finger,
         template = EncodingUtils.base64ToBytes(template),
-        imageRef = null,
         templateQualityScore = quality)

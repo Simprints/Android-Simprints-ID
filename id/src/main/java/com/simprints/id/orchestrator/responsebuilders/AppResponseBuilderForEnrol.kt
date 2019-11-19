@@ -1,8 +1,8 @@
 package com.simprints.id.orchestrator.responsebuilders
 
+import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.person.domain.fromModuleApiToDomain
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
@@ -120,15 +120,16 @@ class AppResponseBuilderForEnrol(
             return fingerprintResponse.captureResult.mapNotNull { captureResult ->
                 val fingerId = captureResult.identifier
                 captureResult.sample?.let { sample ->
-                    val imageRef = sample.imageRef
-                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore, imageRef)
+                    FingerprintSample(fingerId, sample.template, sample.templateQualityScore)
                 }
             }
         }
 
         private fun extractFaceSamples(faceResponse: FaceCaptureResponse) =
-            faceResponse.capturingResult.mapNotNull {
-                it.result?.fromModuleApiToDomain()
+            faceResponse.capturingResult.mapNotNull { it ->
+                it.result?.let {
+                    FaceSample(it.template)
+                }
             }
     }
 }
