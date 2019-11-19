@@ -45,7 +45,7 @@
         <item name="android:fontFamily">@font/muli</item>
     </style>
 
-    <style name="SimprintsStyle.TextView.White">
+    <style name="SimprintsStyle.TextView.Chip">
         <item name="android:textColor">@color/simprints_white</item>
         <item name="android:textSize">14sp</item>
     </style>
