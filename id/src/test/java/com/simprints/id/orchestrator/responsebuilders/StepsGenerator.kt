@@ -85,7 +85,7 @@ fun mockFaceMatchStep(): Step {
     val request = FaceMatchRequest(mock(), mock())
 
     val response =
-        FaceMatchResponse(listOf(FaceMatchResult(guidFound = "guid", confidence = 75)))
+        FaceMatchResponse(listOf(FaceMatchResult(guidFound = "guid", confidence = 75f)))
 
     return Step(
         requestCode = 322,

@@ -7,6 +7,7 @@ import com.simprints.id.domain.moduleapi.app.responses.AppResponse
 import com.simprints.id.domain.moduleapi.app.responses.entities.MatchResult
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.domain.moduleapi.face.responses.FaceMatchResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceMatchResult
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.id.orchestrator.steps.Step
 
@@ -48,8 +49,11 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
                                                          fingerprintResponse: FingerprintMatchResponse,
                                                          sessionId: String) =
         AppIdentifyResponse(
-            fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) },
+            getSortedIdentificationsForFingerprint(fingerprintResponse),
             sessionId)
+
+    private fun getSortedIdentificationsForFingerprint(fingerprintResponse: FingerprintMatchResponse) =
+        fingerprintResponse.result.map { MatchResult(it.personId, it.confidenceScore.toInt(), Tier.computeTier(it.confidenceScore)) }
 
     private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
                                                        sessionId: String): AppIdentifyResponse {
@@ -67,10 +71,13 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
         val resultsSortedByConfidence = faceResponse.result.sortedBy { it.confidence }
 
         return AppIdentifyResponse(
-            resultsSortedByConfidence.map {
-                MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
-            },
+            getSortedIdentificationsForFace(resultsSortedByConfidence),
             sessionId
         )
     }
+
+    private fun getSortedIdentificationsForFace(resultsSortedByConfidence: List<FaceMatchResult>) =
+        resultsSortedByConfidence.map {
+            MatchResult(it.guidFound, it.confidence.toInt(), Tier.computeTier(it.confidence))
+        }
 }
