@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,10 +10,12 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
@@ -49,7 +52,7 @@ class ModuleSelectionFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rvModules.adapter = adapter
+        configureRecyclerView()
         application.component.inject(this)
         fetchData()
     }
@@ -63,6 +66,17 @@ class ModuleSelectionFragment(
         updateSelectionIfPossible(module)
     }
 
+    private fun configureRecyclerView() {
+        rvModules.adapter = adapter
+        val context = requireContext()
+        val dividerItemDecoration = DividerItemDecoration(context,
+            DividerItemDecoration.VERTICAL).apply {
+            val colour = ContextCompat.getColor(context, R.color.simprints_light_grey)
+            setDrawable(ColorDrawable(colour))
+        }
+        rvModules.addItemDecoration(dividerItemDecoration)
+    }
+
     private fun fetchData() {
         viewModel.getModules().observe(this, Observer { modules ->
             this.modules = modules
@@ -70,6 +84,7 @@ class ModuleSelectionFragment(
             configureSearchView()
             configureTextViewVisibility()
             displaySelectedModules()
+            rvModules.requestFocus()
         })
     }
 
@@ -117,9 +132,8 @@ class ModuleSelectionFragment(
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
         queryListener.searchResults.observe(this, Observer { searchResults ->
             adapter.submitList(searchResults)
-            rvModules.scrollToPosition(0)
-
             txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
+            rvModules.scrollToPosition(0)
         })
     }
 
@@ -178,6 +192,7 @@ class ModuleSelectionFragment(
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 requireActivity().hideKeyboard()
                 v?.clearFocus()
+                rvModules.requestFocus()
             }
         }
     }
@@ -186,7 +201,8 @@ class ModuleSelectionFragment(
         onFocusChange { v, hasFocus ->
             (v as EditText).isCursorVisible = hasFocus
             if (!hasFocus)
-                rvModules.scrollToPosition(0)
+                rvModules?.scrollToPosition(0)
+            // The safe call above is necessary only when the 'up' action bar button is clicked
         }
     }
 
