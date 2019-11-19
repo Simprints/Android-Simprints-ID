@@ -15,18 +15,6 @@ data class ApiGetPerson(val id: String,
                         var faces: List<ApiFaceSample>? = null,
                         val deleted: Boolean)
 
-fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
-    ApiGetPerson(
-        id = patientId,
-        projectId = projectId,
-        userId = userId,
-        moduleId = moduleId,
-        createdAt = createdAt,
-        updatedAt = updatedAt,
-        fingerprints = fingerprintSamples.map { it.fromDomainToApi() },
-        deleted = deleted
-    )
-
 fun ApiGetPerson.fromGetApiToDomain(): Person =
     Person(
         patientId = id,

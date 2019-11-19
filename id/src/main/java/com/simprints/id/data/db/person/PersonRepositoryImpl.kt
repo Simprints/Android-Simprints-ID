@@ -35,18 +35,12 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
         personRemoteDataSource.getDownSyncPeopleCount(buildPeopleOperationsParams(syncScope))
 
     private fun buildPeopleOperationsParams(syncScope: SyncScope) = when (syncScope.group) {
-        GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectSync(syncScope)
-        GROUP.USER -> buildPeopleOperationsParamsForUserSync(syncScope)
+        GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
+        GROUP.USER -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
         GROUP.MODULE -> buildPeopleOperationsParamsForModuleSync(syncScope)
     }
 
-    private fun buildPeopleOperationsParamsForProjectSync(syncScope: SyncScope) =
-        with (syncScope.toSubSyncScopes().first()) {
-            listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
-                getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
-        }
-
-    private fun buildPeopleOperationsParamsForUserSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForProjectOrUserSync(syncScope: SyncScope) =
         with (syncScope.toSubSyncScopes().first()) {
             listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
                 getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
