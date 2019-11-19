@@ -102,3 +102,15 @@ class ApiGetPersonTest {
         assertEquals(fingerprintJson.keySet().size, 3)
     }
 }
+
+fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
+    ApiGetPerson(
+        id = patientId,
+        projectId = projectId,
+        userId = userId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprints = fingerprintSamples.map { it.fromDomainToApi() },
+        deleted = deleted
+    )
