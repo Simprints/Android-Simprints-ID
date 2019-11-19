@@ -92,7 +92,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait {  realm ->
                     people.forEach {
-                        realm.buildQueryForPerson(PersonLocalDataSource.Query(patientId = it.patientId))
+                        realm.buildQueryForPerson(PersonLocalDataSource.Query(personId = it.patientId))
                             .findAll()
                             .deleteAllFromRealm()
                     }
