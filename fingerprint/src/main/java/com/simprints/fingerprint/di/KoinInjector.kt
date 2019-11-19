@@ -38,13 +38,10 @@ import com.simprints.fingerprint.scanner.factory.ScannerFactoryImpl
 import com.simprints.fingerprint.scanner.ui.ScannerUiHelper
 import com.simprints.fingerprintscanner.component.bluetooth.BluetoothComponentAdapter
 import com.simprints.fingerprintscanner.component.bluetooth.android.AndroidBluetoothAdapter
-import com.simprints.id.Application
-import org.koin.android.ext.koin.androidApplication
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import org.koin.core.module.Module
-import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -74,24 +71,11 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module(override = true) {
-            defineBuildersForCoreManagers()
             defineBuildersForFingerprintManagers()
             defineBuildersForDomainClasses()
             defineBuildersForPresentersAndViewModels()
         }
 
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { appComponent().getPreferencesManager() }
-        factory { appComponent().getAnalyticsManager() }
-        factory { appComponent().getSessionEventsManager() }
-        factory { appComponent().getCrashReportManager() }
-        factory { appComponent().getTimeHelper() }
-        factory { appComponent().getFingerprintRecordLocalDataSource() }
-        factory { appComponent().getImprovedSharedPreferences() }
-        factory { appComponent().getRemoteConfigWrapper() }
-        factory { appComponent().getAndroidResourcesHelper() }
-        factory { orchestratorComponent().getFlowManager() }
-    }
 
     private fun Module.defineBuildersForFingerprintManagers() {
         factory<FingerprintPreferencesManager> { FingerprintPreferencesManagerImpl(get()) }
@@ -129,10 +113,4 @@ object KoinInjector {
         viewModel { ConnectScannerViewModel(get(), get(), get(), get(), get(), get()) }
         viewModel { MatchingViewModel(get(), get(), get(), get(), get(), get()) }
     }
-
-    private fun Scope.appComponent() =
-        (androidApplication() as Application).component
-
-    private fun Scope.orchestratorComponent() =
-        (androidApplication() as Application).orchestratorComponent
 }

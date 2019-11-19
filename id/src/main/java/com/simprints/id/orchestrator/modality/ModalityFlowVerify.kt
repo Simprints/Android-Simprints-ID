@@ -9,6 +9,8 @@ import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
 import com.simprints.id.domain.moduleapi.core.response.FetchGUIDResponse
+import com.simprints.id.domain.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.id.domain.moduleapi.face.responses.entities.FaceCaptureSample
 import com.simprints.id.domain.moduleapi.fingerprint.responses.FingerprintCaptureResponse
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.Step.Status.NOT_STARTED
@@ -26,16 +28,14 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
     override fun startFlow(appRequest: AppRequest, modalities: List<Modality>) {
         require(appRequest is AppVerifyRequest)
         super.startFlow(appRequest, modalities)
-        steps.addAll(buildStepsList(appRequest, modalities))
+        steps.addAll(buildStepsList(modalities))
     }
 
-    private fun buildStepsList(appRequest: AppVerifyRequest, modalities: List<Modality>) =
+    private fun buildStepsList(modalities: List<Modality>) =
         modalities.map {
-            with(appRequest) {
-                when (it) {
-                    FINGER -> fingerprintStepProcessor.buildStepToCapture()
-                    FACE -> faceStepProcessor.buildStepVerify(projectId, userId, projectId)
-                }
+            when (it) {
+                FINGER -> fingerprintStepProcessor.buildStepToCapture()
+                FACE -> faceStepProcessor.buildCaptureStep()
             }
         }
 
@@ -61,15 +61,26 @@ class ModalityFlowVerifyImpl(private val fingerprintStepProcessor: FingerprintSt
         stepRequested?.setResult(result)
 
         return stepRequested.also {
-            if (result is FingerprintCaptureResponse) {
-                val query = Query(personId = appRequest.verifyGuid)
-                addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
-            }
+            buildQueryAndAddMatchingStepIfRequired(result, appRequest)
+        }
+    }
+
+    private fun buildQueryAndAddMatchingStepIfRequired(result: Step.Result?, appRequest: AppVerifyRequest) {
+        if (result is FingerprintCaptureResponse) {
+            val query = Query(personId = appRequest.verifyGuid)
+            addMatchingStep(result.captureResult.mapNotNull { it.sample }, query)
+        } else if (result is FaceCaptureResponse) {
+            val query = Query(personId = appRequest.verifyGuid)
+            addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)
         }
     }
 
     private fun addMatchingStep(probeSamples: List<FingerprintSample>, query: Query) {
         steps.add(fingerprintStepProcessor.buildStepToMatch(probeSamples, query))
+    }
+
+    private fun addMatchingStepForFace(probeSamples: List<FaceCaptureSample>, query: Query) {
+        steps.add(faceStepProcessor.buildStepMatch(probeSamples, query))
     }
 
     private fun completeAllStepsIfFetchGuidResponseAndFailed(result: Step.Result?) {
