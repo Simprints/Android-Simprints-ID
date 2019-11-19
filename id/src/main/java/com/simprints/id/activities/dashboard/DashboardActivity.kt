@@ -152,4 +152,8 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     override fun showToastForRecordsUpToDate() {
         showToast(androidResourcesHelper, R.string.records_up_to_date)
     }
+
+    override fun showToastForNoModulesSelected() {
+        showToast(androidResourcesHelper, R.string.settings_no_modules_toast)
+    }
 }
