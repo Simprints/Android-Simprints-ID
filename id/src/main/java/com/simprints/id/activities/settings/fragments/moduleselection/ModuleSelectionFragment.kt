@@ -13,6 +13,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
@@ -49,7 +50,7 @@ class ModuleSelectionFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rvModules.adapter = adapter
+        configureRecyclerView()
         application.component.inject(this)
         fetchData()
     }
@@ -61,6 +62,13 @@ class ModuleSelectionFragment(
 
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
+    }
+
+    private fun configureRecyclerView() {
+        rvModules.adapter = adapter
+        val dividerItemDecoration = DividerItemDecoration(requireContext(),
+            DividerItemDecoration.VERTICAL)
+        rvModules.addItemDecoration(dividerItemDecoration)
     }
 
     private fun fetchData() {
