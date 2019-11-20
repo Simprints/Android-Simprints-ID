@@ -25,7 +25,8 @@ data class AppErrorResponse(val reason: Reason) : AppResponse {
                     AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                     AlertType.SAFETYNET_ERROR -> UNEXPECTED_ERROR
                     AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
-                    AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_ONLINE //STOPSHIP: Fix me, should not return for this alert
+                    AlertType.GUID_NOT_FOUND_OFFLINE ->
+                        throw Throwable("No ErrorType associated. GUID_NOT_FOUND_OFFLINE should return a ExitForm, not a Error Response.")
                 }
         }
     }
