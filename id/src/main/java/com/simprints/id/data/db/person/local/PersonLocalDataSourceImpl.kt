@@ -87,12 +87,12 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             throw InvalidQueryToLoadRecordsException()
         }
 
-    override suspend fun delete(people: List<Person>) {
+    override suspend fun delete(queries: List<PersonLocalDataSource.Query>) {
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait {  realm ->
-                    people.forEach {
-                        realm.buildQueryForPerson(PersonLocalDataSource.Query(personId = it.patientId))
+                    queries.forEach {
+                        realm.buildQueryForPerson(PersonLocalDataSource.Query(personId = it.personId))
                             .findAll()
                             .deleteAllFromRealm()
                     }

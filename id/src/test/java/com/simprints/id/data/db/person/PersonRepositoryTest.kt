@@ -113,7 +113,7 @@ class PersonRepositoryTest {
 
     private fun assesDownSyncCount(remoteCounts: Map<SubSyncScope, Int>) {
 
-        whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull()) } thenReturn Single.just(remoteCounts.map {
+        whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull(), anyNotNull()) } thenReturn Single.just(remoteCounts.map {
             val subSync = it.component1()
             with(subSync) {
                 PeopleCount(projectId, userId, moduleId, listOf(Modes.FINGERPRINT), it.component2())

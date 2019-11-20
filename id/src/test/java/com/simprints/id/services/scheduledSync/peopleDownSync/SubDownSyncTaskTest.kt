@@ -282,7 +282,7 @@ class SubDownSyncTaskTest {
         val argForInsertOrUpdateInLocalDb = argumentCaptor<List<Person>>()
         wheneverOnSuspend(personLocalDataSourceMock) { insertOrUpdate(argForInsertOrUpdateInLocalDb.capture()) } thenOnBlockingReturn Unit
 
-        val argForDeleteInLocalDb = argumentCaptor<List<Person>>()
+        val argForDeleteInLocalDb = argumentCaptor<List<PersonLocalDataSource.Query>>()
         wheneverOnSuspend(personLocalDataSourceMock) { delete(argForDeleteInLocalDb.capture()) } thenOnBlockingReturn Unit
 
         val argForUpdateLastPatientIdInRoom = argumentCaptor<String>()

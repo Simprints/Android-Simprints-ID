@@ -95,7 +95,7 @@ class CountTaskTest {
     private fun makeFakeNumberOfPeopleToDownSyncCountRequest(peopleToDownload: List<PeopleCount>,
                                                              syncGroup: GROUP): TestObserver<List<PeopleCount>> {
 
-        whenever(personRemoteDataSourceMock.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleToDownload))
+        whenever(personRemoteDataSourceMock.getDownSyncPeopleCount(anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleToDownload))
         whenever(preferencesManagerMock.syncGroup).thenReturn(syncGroup)
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0", "1", "2"))
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
