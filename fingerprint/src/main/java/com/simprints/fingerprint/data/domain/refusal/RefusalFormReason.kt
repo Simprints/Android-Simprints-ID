@@ -1,9 +1,5 @@
 package com.simprints.fingerprint.data.domain.refusal
 
-import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
-import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
-
-
 enum class RefusalFormReason {
     REFUSED_RELIGION,
     REFUSED_DATA_CONCERNS,
@@ -13,26 +9,3 @@ enum class RefusalFormReason {
     REFUSED_YOUNG,
     OTHER
 }
-
-fun RefusalFormReason.toRefusalAnswerForEvent(): RefusalAnswer =
-    when(this){
-        RefusalFormReason.REFUSED_RELIGION -> RefusalAnswer.REFUSED_RELIGION
-        RefusalFormReason.REFUSED_DATA_CONCERNS -> RefusalAnswer.REFUSED_DATA_CONCERNS
-        RefusalFormReason.REFUSED_PERMISSION -> RefusalAnswer.REFUSED_PERMISSION
-        RefusalFormReason.SCANNER_NOT_WORKING -> RefusalAnswer.SCANNER_NOT_WORKING
-        RefusalFormReason.REFUSED_NOT_PRESENT -> RefusalAnswer.REFUSED_NOT_PRESENT
-        RefusalFormReason.REFUSED_YOUNG -> RefusalAnswer.REFUSED_YOUNG
-        RefusalFormReason.OTHER -> RefusalAnswer.OTHER
-    }
-
-fun RefusalFormReason.toFingerprintRefusalFormReason(): FingerprintRefusalFormReason =
-    when(this) {
-        RefusalFormReason.REFUSED_RELIGION -> FingerprintRefusalFormReason.REFUSED_RELIGION
-        RefusalFormReason.REFUSED_DATA_CONCERNS -> FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS
-        RefusalFormReason.REFUSED_PERMISSION -> FingerprintRefusalFormReason.REFUSED_PERMISSION
-        RefusalFormReason.SCANNER_NOT_WORKING -> FingerprintRefusalFormReason.SCANNER_NOT_WORKING
-        RefusalFormReason.REFUSED_NOT_PRESENT -> FingerprintRefusalFormReason.REFUSED_NOT_PRESENT
-        RefusalFormReason.REFUSED_YOUNG -> FingerprintRefusalFormReason.REFUSED_YOUNG
-        RefusalFormReason.OTHER -> FingerprintRefusalFormReason.OTHER
-    }
-

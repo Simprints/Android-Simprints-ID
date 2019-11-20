@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.simprints.fingerprint.data.domain.fingerprint.fromDomainToModuleApi
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.*
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason.*
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintRefusalFormReason
 import com.simprints.moduleapi.common.ISecuredImageRef
 import com.simprints.moduleapi.fingerprint.IFingerIdentifier
@@ -42,13 +43,13 @@ object DomainToFingerprintResponse {
     fun fromDomainToFingerprintRefusalFormResponse(refusalResponse: FingerprintRefusalFormResponse): IFingerprintExitFormResponse {
 
         val reason = when(refusalResponse.reason) {
-            FingerprintRefusalFormReason.REFUSED_RELIGION -> IFingerprintExitReason.REFUSED_RELIGION
-            FingerprintRefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintExitReason.REFUSED_DATA_CONCERNS
-            FingerprintRefusalFormReason.REFUSED_PERMISSION -> IFingerprintExitReason.REFUSED_PERMISSION
-            FingerprintRefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintExitReason.SCANNER_NOT_WORKING
-            FingerprintRefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintExitReason.REFUSED_NOT_PRESENT
-            FingerprintRefusalFormReason.REFUSED_YOUNG -> IFingerprintExitReason.REFUSED_YOUNG
-            FingerprintRefusalFormReason.OTHER -> IFingerprintExitReason.OTHER
+            RefusalFormReason.REFUSED_RELIGION -> IFingerprintExitReason.REFUSED_RELIGION
+            RefusalFormReason.REFUSED_DATA_CONCERNS -> IFingerprintExitReason.REFUSED_DATA_CONCERNS
+            RefusalFormReason.REFUSED_PERMISSION -> IFingerprintExitReason.REFUSED_PERMISSION
+            RefusalFormReason.SCANNER_NOT_WORKING -> IFingerprintExitReason.SCANNER_NOT_WORKING
+            RefusalFormReason.REFUSED_NOT_PRESENT -> IFingerprintExitReason.REFUSED_NOT_PRESENT
+            RefusalFormReason.REFUSED_YOUNG -> IFingerprintExitReason.REFUSED_YOUNG
+            RefusalFormReason.OTHER -> IFingerprintExitReason.OTHER
         }
 
         return IFingerprintExitFormResponseImpl(reason, refusalResponse.extra)

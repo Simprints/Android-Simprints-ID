@@ -14,7 +14,6 @@ import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.Fin
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintErrorReason
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintMatchResponse
 import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.responses.FingerprintRefusalFormResponse
-import com.simprints.fingerprint.data.domain.refusal.toFingerprintRefusalFormReason
 import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponse
 
@@ -37,7 +36,7 @@ class FinalResultBuilder {
             putExtra(IFingerprintResponse.BUNDLE_KEY, fromDomainToFingerprintRefusalFormResponse(
                 with(refusalTaskResult) {
                     FingerprintRefusalFormResponse(
-                        answer.reason.toFingerprintRefusalFormReason(),
+                        answer.reason,
                         answer.optionalText
                     )
                 }
