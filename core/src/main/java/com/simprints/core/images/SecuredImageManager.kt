@@ -1,6 +1,5 @@
 package com.simprints.core.images
 
-//TODO: to be developed
 interface SecuredImageManager {
 
     //Encryption involved
