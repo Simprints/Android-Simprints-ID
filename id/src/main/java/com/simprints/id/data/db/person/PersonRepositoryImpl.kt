@@ -32,7 +32,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
     override fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
-        personRemoteDataSource.getDownSyncPeopleCount(buildPeopleOperationsParams(syncScope))
+        personRemoteDataSource.getDownSyncPeopleCount(syncScope.projectId, buildPeopleOperationsParams(syncScope))
 
     private fun buildPeopleOperationsParams(syncScope: SyncScope) = when (syncScope.group) {
         GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)

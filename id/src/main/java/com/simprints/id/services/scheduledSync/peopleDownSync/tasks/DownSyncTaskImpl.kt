@@ -180,9 +180,14 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
 
     private suspend fun deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted: List<ApiGetPerson>) {
         if (batchOfPeopleToBeDeleted.isNotEmpty()) {
-            personLocalDataSource.delete(batchOfPeopleToBeDeleted.map { it.fromGetApiToDomain() })
+            personLocalDataSource.delete(buildQueryForPeopleById(batchOfPeopleToBeDeleted))
         }
     }
+
+    private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<ApiGetPerson>) =
+        batchOfPeopleToBeDeleted.map {
+            PersonLocalDataSource.Query(personId = it.id)
+        }
 
     private fun updateDownSyncTimestampOnBatchDownload() {
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
