@@ -9,4 +9,5 @@ interface FingerprintPreferencesManager {
     var lastIdentificationDate: Date?
 
     val fingerImagesExist: Boolean
+    val saveImages: Boolean
 }

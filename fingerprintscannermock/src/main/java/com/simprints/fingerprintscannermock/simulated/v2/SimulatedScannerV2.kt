@@ -15,7 +15,7 @@ import java.io.OutputStream
 
 class SimulatedScannerV2(simulatedScannerManager: SimulatedScannerManager,
                          scannerState: ScannerState = ScannerState())
-    : SimulatedScanner(scannerState) {
+    : SimulatedScanner(simulatedScannerManager, scannerState) {
 
     private lateinit var returnStream: OutputStream
 

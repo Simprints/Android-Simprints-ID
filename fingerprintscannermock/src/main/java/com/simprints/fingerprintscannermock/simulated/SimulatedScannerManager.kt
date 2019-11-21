@@ -3,6 +3,7 @@ package com.simprints.fingerprintscannermock.simulated
 import com.simprints.fingerprintscannermock.simulated.common.ScannerState
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
+import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothDevice
 import com.simprints.fingerprintscannermock.simulated.tools.OutputStreamInterceptor
 import com.simprints.fingerprintscannermock.simulated.v1.SimulatedScannerV1
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
 class SimulatedScannerManager(
     simulationMode: SimulationMode,
     scannerState: ScannerState = ScannerState(),
+    val simulationSpeedBehaviour: SimulationSpeedBehaviour = SimulationSpeedBehaviour.INSTANT,
     private val simulatedFingers: Array<SimulatedFinger> = SimulatedFinger.person1TwoFingersGoodScan,
     private val pairedScannerAddresses: Set<String> = setOf(DEFAULT_MAC_ADDRESS),
     var isAdapterNull: Boolean = false,
