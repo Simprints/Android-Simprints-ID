@@ -46,7 +46,7 @@ class CountTaskTest {
         val nPeopleInRemote = 22000
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
-            getMockListOfPeopleCountWithCounter(22000), GLOBAL
+            getMockListOfPeopleCountWithCounter(nPeopleInRemote), GLOBAL
         )
         testObserver.awaitTerminalEvent()
 
@@ -63,7 +63,7 @@ class CountTaskTest {
         val nPeopleInRemote = 2000
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
-            getMockListOfPeopleCountWithCounter(2000), USER
+            getMockListOfPeopleCountWithCounter(nPeopleInRemote), USER
         )
         testObserver.awaitTerminalEvent()
 

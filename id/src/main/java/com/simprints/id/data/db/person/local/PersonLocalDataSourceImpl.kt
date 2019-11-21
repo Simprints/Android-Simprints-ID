@@ -70,7 +70,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
     override suspend fun load(query: PersonLocalDataSource.Query?): Flow<Person> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
-                it.buildQueryForPerson(query)
+                it.buildRealmQueryForPerson(query)
                     .await()
                     ?.map { it.fromDbToDomain() }
                     ?.asFlow()
@@ -92,7 +92,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             Realm.getInstance(config).use { realmInstance ->
                 realmInstance.transactAwait {  realm ->
                     queries.forEach {
-                        realm.buildQueryForPerson(PersonLocalDataSource.Query(personId = it.personId))
+                        realm.buildRealmQueryForPerson(it)
                             .findAll()
                             .deleteAllFromRealm()
                     }
@@ -103,10 +103,10 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
 
     override fun count(query: PersonLocalDataSource.Query): Int =
         Realm.getInstance(config).use { realm ->
-            realm.buildQueryForPerson(query).count().toInt()
+            realm.buildRealmQueryForPerson(query).count().toInt()
         }
 
-    private fun Realm.buildQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =
+    private fun Realm.buildRealmQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =
         where(DbPerson::class.java)
             .apply {
                 query?.let { query ->

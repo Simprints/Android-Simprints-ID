@@ -85,19 +85,21 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
             val userId = it.subSyncScope.userId
             val moduleId = it.subSyncScope.moduleId
 
-            if((userId?.isNullOrEmpty()) == true) {
+            if (userId?.isNotEmpty() == true) {
                 whereLabels.add(ApiPeopleOperationWhereLabel(USER.key, userId))
             }
 
-            if(moduleId?.isNotEmpty() == true) {
+            if (moduleId?.isNotEmpty() == true) {
                 whereLabels.add(ApiPeopleOperationWhereLabel(MODULE.key, moduleId))
             }
 
             whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(FINGERPRINT).toString()))
 
-            val lastKnownInfo = if(it.lastKnownPatientId?.isNotEmpty() == true && it.lastKnownPatientUpdatedAt != null ) {
+            val lastKnownInfo = if (it.lastKnownPatientId?.isNotEmpty() == true && it.lastKnownPatientUpdatedAt != null) {
                 ApiLastKnownPatient(it.lastKnownPatientId, it.lastKnownPatientUpdatedAt)
-            } else { null }
+            } else {
+                null
+            }
 
             ApiPeopleOperationGroup(lastKnownInfo, whereLabels)
         }
