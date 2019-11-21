@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
@@ -28,6 +29,7 @@ class ModalityFlowIdentifyImplTest {
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
     @Mock lateinit var coreStepProcessor: CoreStepProcessor
     @Mock lateinit var preferencesManager: PreferencesManager
+    @Mock lateinit var sessionEventsManager: SessionEventsManager
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
     @Mock lateinit var coreStepMock: Step
@@ -41,10 +43,10 @@ class ModalityFlowIdentifyImplTest {
         whenever(coreStepMock) { activityName } thenReturn CONSENT_ACTIVITY_NAME
 
         whenever(fingerprintStepProcessor) { buildStepToCapture() } thenReturn fingerprintStepMock
-        whenever(faceStepProcessor) { buildStepIdentify(anyNotNull(), anyNotNull(), anyNotNull()) } thenReturn faceStepMock
+        whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
 
-        modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, preferencesManager)
+        modalityFlowIdentify = ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, preferencesManager, sessionEventsManager)
     }
 
     @Test

@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import java.util.*
 
-// TODO: improve language switching. Either don't go against android, or implement a bulletproof solution.
 object LanguageHelper {
 
     private fun configurationWithSpecificLocale(languageString: String): Configuration =
@@ -41,6 +40,6 @@ object LanguageHelper {
             }
         }
 
-    fun contextWithSpecificLanguage(context: Context, languageString: String) =
+    fun contextWithSpecificLanguage(context: Context, languageString: String): Context =
         context.createConfigurationContext(configurationWithSpecificLocale(languageString))
 }

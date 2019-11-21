@@ -3,7 +3,6 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.BasePresenter
 import com.simprints.id.activities.BaseView
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
-import com.simprints.id.domain.alert.AlertType
 
 interface DashboardContract {
 
@@ -13,6 +12,7 @@ interface DashboardContract {
         fun notifyCardViewChanged(position: Int)
         fun showToastForUserOffline()
         fun showToastForRecordsUpToDate()
+        fun showToastForNoModulesSelected()
         fun startCheckLoginActivityAndFinish()
     }
 

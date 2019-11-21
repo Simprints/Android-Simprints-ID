@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
+import com.simprints.id.data.db.person.domain.FingerprintIdentity
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
@@ -149,13 +150,15 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(PersonLocalDataSource.Query()).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
-                assertThat(count()).isEqualTo(fakePerson1.fingerprintSamples.count() + fakePerson2.fingerprintSamples.count())
-                assertThat(get(0).patientId).isEqualTo(fakePerson1.patientId)
-                assertThat(get(1).patientId).isEqualTo(fakePerson1.patientId)
-                assertThat(get(2).patientId).isEqualTo(fakePerson2.patientId)
-                assertThat(get(3).patientId).isEqualTo(fakePerson2.patientId)
+                verifyIdentity(fakePerson1, get(0))
+                verifyIdentity(fakePerson2, get(1))
             }
         }
+    }
+
+    private fun verifyIdentity(person: DbPerson, fingerprintIdentity: FingerprintIdentity) {
+        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(person.fingerprintSamples.count())
+        assertThat(fingerprintIdentity.patientId).isEqualTo(person.patientId)
     }
 
     @Test
