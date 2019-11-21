@@ -31,6 +31,7 @@ import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
@@ -113,6 +114,7 @@ interface AppComponent {
     fun inject(syncWorker: DownSyncMasterWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)
     fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
     fun inject(settingsAboutFragment: SettingsAboutFragment)

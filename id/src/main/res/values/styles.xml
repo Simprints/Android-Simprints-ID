@@ -1,5 +1,7 @@
 <resources>
 
+    <style name="SimprintsStyle" />
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -7,7 +9,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
-        <item name="android:textViewStyle">@style/SimprintsTextViewStyle</item>
+        <item name="android:textViewStyle">@style/SimprintsStyle.TextView</item>
     </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -31,9 +33,27 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="SimprintsTextViewStyle" parent="android:Widget.TextView">
+    <style name="AppTheme.NoActionBar.MaterialComponents" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:textViewStyle">@style/SimprintsStyle.TextView</item>
+    </style>
+
+    <!-- region TextView -->
+    <style name="SimprintsStyle.TextView" parent="android:Widget.TextView">
         <item name="android:fontFamily">@font/muli</item>
     </style>
+
+    <style name="SimprintsStyle.TextView.Chip">
+        <item name="android:textColor">@color/simprints_white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SimprintsStyle.TextView.Orange">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+    <!-- endregion -->
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -56,12 +76,12 @@
     </style>
 
     <!-- clientapi themes-->
-    <style name="ClientApiTheme" parent="AppTheme"/>
+    <style name="ClientApiTheme" parent="AppTheme" />
 
     <style name="ClientApiTheme.Launcher" parent="AppTheme.Launcher" />
 
     <style name="ClientApiTheme.NoActionBar" parent="AppTheme.NoActionBar" />
 
-    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent"/>
+    <style name="ClientApiTheme.Transparent" parent="AppTheme.Transparent" />
 
 </resources>
