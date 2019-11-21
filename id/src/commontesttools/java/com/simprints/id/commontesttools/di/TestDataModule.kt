@@ -9,6 +9,7 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.DataModule
@@ -42,8 +43,11 @@ class TestDataModule(private val syncInfoLocalDataSourceRule: DependencyRule = D
 
     override fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                          personRemoteDataSource: PersonRemoteDataSource,
-                                         peopleUpSyncMaster: PeopleUpSyncMaster): PersonRepository =
-        personRepositoryRule.resolveDependency { super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster) }
+                                         peopleUpSyncMaster: PeopleUpSyncMaster,
+                                         syncStatusDatabase: SyncStatusDatabase): PersonRepository =
+        personRepositoryRule.resolveDependency {
+            super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster, syncStatusDatabase)
+        }
 
 
     override fun providePersonLocalDataSource(ctx: Context,

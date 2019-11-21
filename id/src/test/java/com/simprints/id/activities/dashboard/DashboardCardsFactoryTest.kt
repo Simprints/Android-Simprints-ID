@@ -201,7 +201,7 @@ class DashboardCardsFactoryTest {
         listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 
     private fun mockNPeopleForSyncRequest(personRemoteDataSource: PersonRemoteDataSource, peopleCounts: List<PeopleCount>) {
-        whenever(personRemoteDataSource.getDownSyncPeopleCount(anyNotNull())).thenReturn(Single.just(peopleCounts))
+        whenever(personRemoteDataSource.getDownSyncPeopleCount(anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleCounts))
     }
 
     private fun mockNLocalPeople(personRepositoryMock: PersonRepository, nLocalPeople: Int) {
