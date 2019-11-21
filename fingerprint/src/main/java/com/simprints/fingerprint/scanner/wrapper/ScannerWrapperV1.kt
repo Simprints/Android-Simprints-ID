@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
 import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
@@ -114,6 +115,9 @@ class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
             else -> emitter.onError(UnexpectedScannerException.forScannerError(error, "ScannerWrapperV1"))
         }
     }
+
+    override fun acquireImage(): Single<AcquireImageResponse> =
+        Single.error(UnavailableVero2FeatureException(UnavailableVero2Feature.IMAGE_ACQUISITION))
 
     override fun setUiIdle(): Completable = Completable.create { result ->
         scannerV1.resetUI(ScannerCallbackWrapper({

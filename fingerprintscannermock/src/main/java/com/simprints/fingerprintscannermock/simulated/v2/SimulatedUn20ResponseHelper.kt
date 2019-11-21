@@ -8,12 +8,14 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateTy
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
+import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
+import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
 
 class SimulatedUn20ResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,
                                   private val simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<Un20Command, Un20Response> {
 
-    override fun createResponseToCommand(command: Un20Command): Un20Response =
-        when (command) {
+    override fun createResponseToCommand(command: Un20Command): Un20Response {
+        val response = when (command) {
             is GetUn20AppVersionCommand -> GetUn20AppVersionResponse(Un20AppVersion(2.toShort(), 0.toShort(), 6, byteArrayOf(0x12, 0x34, 0x56, 0x78)))
             is CaptureFingerprintCommand -> CaptureFingerprintResponse(
                 simulatedScannerManager.currentMockFinger().toV2()
@@ -28,4 +30,19 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             is GetImageCommand -> GetImageResponse(command.imageFormat, byteArrayOf()) // TODO
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")
         }
+
+        val delay = when (simulatedScannerManager.simulationSpeedBehaviour) {
+            SimulationSpeedBehaviour.INSTANT -> 0L
+            SimulationSpeedBehaviour.REALISTIC -> {
+                when (response) {
+                    is CaptureFingerprintResponse -> RealisticSpeedBehaviour.CAPTURE_FINGERPRINT_DELAY_MS
+                    else -> RealisticSpeedBehaviour.DEFAULT_RESPONSE_DELAY_MS
+                }
+            }
+        }
+
+        Thread.sleep(delay)
+
+        return response
+    }
 }

@@ -1,5 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
+import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
@@ -62,6 +63,12 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
             .andThen(scannerV2.getImageQuality())
             .flatMap {
                 imageQuality -> scannerV2.acquireTemplate().map { template -> CaptureFingerprintResponse(template, imageQuality.unsignedToInt()) }
+            }
+
+    override fun acquireImage(): Single<AcquireImageResponse> =
+        scannerV2.acquireImage()
+            .map { imageBytes ->
+                AcquireImageResponse(imageBytes)
             }
 
     override fun setUiIdle(): Completable = scannerV2.setSmileLedState(scannerUiHelper.idleLedState())

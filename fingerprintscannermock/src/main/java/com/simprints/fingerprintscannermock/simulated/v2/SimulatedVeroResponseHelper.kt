@@ -6,12 +6,14 @@ import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
+import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
+import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
 
 class SimulatedVeroResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,
                                   private val simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<VeroCommand, VeroResponse> {
 
-    override fun createResponseToCommand(command: VeroCommand): VeroResponse =
-        when (command) {
+    override fun createResponseToCommand(command: VeroCommand): VeroResponse {
+        val response = when (command) {
             is GetFirmwareVersionCommand -> GetFirmwareVersionResponse(FirmwareVersion(2.toShort(), 0.toShort(), 6, byteArrayOf(0x12, 0x34, 0x56, 0x78)))
             is GetUn20OnCommand -> GetUn20OnResponse(if (simulatedScannerV2.scannerState.isUn20On) DigitalValue.TRUE else DigitalValue.FALSE)
             is SetUn20OnCommand -> SetUn20OnResponse(OperationResultCode.OK)
@@ -34,4 +36,14 @@ class SimulatedVeroResponseHelper(private val simulatedScannerManager: Simulated
             is SetPowerLedStateCommand -> SetPowerLedStateResponse(OperationResultCode.OK)
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedVeroResponseHelper")
         }
+
+        val delay = when (simulatedScannerManager.simulationSpeedBehaviour) {
+            SimulationSpeedBehaviour.INSTANT -> 0L
+            SimulationSpeedBehaviour.REALISTIC -> RealisticSpeedBehaviour.DEFAULT_RESPONSE_DELAY_MS
+        }
+
+        Thread.sleep(delay)
+
+        return response
+    }
 }

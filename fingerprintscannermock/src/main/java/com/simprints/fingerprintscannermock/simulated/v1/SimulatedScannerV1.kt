@@ -8,7 +8,7 @@ import java.io.OutputStream
 
 class SimulatedScannerV1(simulatedScannerManager: SimulatedScannerManager,
                          scannerState: ScannerState = ScannerState())
-    : SimulatedScanner(scannerState) {
+    : SimulatedScanner(simulatedScannerManager, scannerState) {
 
     private val responseHelper = SimulatedResponseHelperV1(simulatedScannerManager, this)
 
