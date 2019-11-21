@@ -16,7 +16,6 @@ class EnrolmentHelperImpl(private val repository: PersonRepository,
 
     override fun registerEvent(person: Person) {
         with(sessionEventsManager) {
-            addPersonCreationEventInBackground(person)
             addEventInBackground(EnrolmentEvent(
                 timeHelper.now(),
                 person.patientId
