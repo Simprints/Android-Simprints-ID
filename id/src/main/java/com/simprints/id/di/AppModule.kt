@@ -9,6 +9,7 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -47,6 +48,8 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
+import com.simprints.id.moduleselection.ModuleRepository
+import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
@@ -216,6 +219,15 @@ open class AppModule {
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
+
+    @Provides
+    fun provideModuleViewModelFactory(repository: ModuleRepository) = ModuleViewModelFactory(repository)
+
+    @Provides
+    fun provideModuleRepository(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
