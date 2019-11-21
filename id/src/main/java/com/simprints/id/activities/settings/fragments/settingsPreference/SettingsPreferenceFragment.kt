@@ -67,12 +67,10 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 summary = getString(R.string.preference_summary_settings_fingers)
             }
 
-            val selectModulesPreference = (getPreferenceForSelectModules() as MultiSelectListPreference).apply {
+            getPreferenceForSelectModules().apply {
                 title = getString(R.string.preference_select_modules_title)
                 summary = getString(R.string.preference_summary_modules)
             }
-            selectModulesPreference.positiveButtonText = androidResourcesHelper.getString(R.string.ok)
-            selectModulesPreference.negativeButtonText = androidResourcesHelper.getString(R.string.cancel_button)
 
             getPreferenceForAbout().title = getString(R.string.preference_app_details_title)
         }

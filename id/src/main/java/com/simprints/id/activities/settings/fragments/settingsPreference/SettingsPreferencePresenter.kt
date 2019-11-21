@@ -3,10 +3,10 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
@@ -126,10 +126,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         } else {
             null
         }
-    }
-
-    internal fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
-        preference.values = preferencesManager.selectedModules
     }
 
     internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
