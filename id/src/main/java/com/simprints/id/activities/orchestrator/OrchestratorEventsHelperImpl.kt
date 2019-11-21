@@ -8,16 +8,18 @@ import com.simprints.id.tools.TimeHelper
 class OrchestratorEventsHelperImpl(private val sessionEventsManager: SessionEventsManager,
                                    private val timeHelper: TimeHelper) : OrchestratorEventsHelper {
 
-    override fun addCallbackEventInSessions(appResponse: AppResponse) =
-        sessionEventsManager.addEventInBackground(
-            when (appResponse.type) {
-                AppResponseType.ENROL -> buildEnrolmentCallbackEvent(appResponse as AppEnrolResponse)
-                AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
-                AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
-                AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
-                AppResponseType.CONFIRMATION -> buildConfirmationCallbackEvent(appResponse as AppConfirmationResponse)
-                AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
-            })
+    override fun addCallbackEventInSessions(appResponse: AppResponse) {
+        val callbackEvent = when (appResponse.type) {
+            AppResponseType.ENROL -> buildEnrolmentCallbackEvent(appResponse as AppEnrolResponse)
+            AppResponseType.IDENTIFY -> buildIdentificationCallbackEvent(appResponse as AppIdentifyResponse)
+            AppResponseType.REFUSAL -> buildRefusalCallbackEvent(appResponse as AppRefusalFormResponse)
+            AppResponseType.VERIFY -> buildVerificationCallbackEvent(appResponse as AppVerifyResponse)
+            AppResponseType.ERROR -> buildErrorCallbackEvent(appResponse as AppErrorResponse)
+            AppResponseType.CONFIRMATION -> null
+        }
+
+        callbackEvent?.let { sessionEventsManager.addEventInBackground(it) }
+    }
 
     private fun buildEnrolmentCallbackEvent(appResponse: AppEnrolResponse) =
         EnrolmentCallbackEvent(timeHelper.now(), appResponse.guid)
@@ -48,10 +50,4 @@ class OrchestratorEventsHelperImpl(private val sessionEventsManager: SessionEven
 
     private fun buildErrorCallbackEvent(appErrorResponse: AppErrorResponse) =
         ErrorCallbackEvent(timeHelper.now(), appErrorResponse.reason)
-
-    private fun buildConfirmationCallbackEvent(appConfirmationResponse: AppConfirmationResponse) =
-        ConfirmationCallbackEvent(
-            timeHelper.now(),
-            appConfirmationResponse.identificationOutcome
-        )
 }
