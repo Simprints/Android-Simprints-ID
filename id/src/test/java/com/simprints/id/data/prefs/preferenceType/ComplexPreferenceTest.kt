@@ -1,6 +1,6 @@
 package com.simprints.id.data.prefs.preferenceType
 
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.domain.GROUP
 import com.simprints.id.exceptions.unexpected.MismatchedTypeException

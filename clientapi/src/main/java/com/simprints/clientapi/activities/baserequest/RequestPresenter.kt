@@ -12,7 +12,7 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.domain.responses.ErrorResponse
 import com.simprints.clientapi.exceptions.*
-import com.simprints.clientapi.extensions.inBackground
+import com.simprints.clientapi.extensions.doInBackground
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
 
 
@@ -20,7 +20,7 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
                                 private var eventsManager: ClientApiSessionEventsManager)
     : RequestContract.Presenter {
 
-   override fun processEnrollRequest() = validateAndSendRequest(
+    override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))
     )
 
@@ -75,12 +75,12 @@ abstract class RequestPresenter(private val view: RequestContract.RequestView,
 
     private fun addSuspiciousEventIfRequired(request: ClientBase) {
         if (request.unknownExtras.isNotEmpty()) {
-            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).inBackground()
+            eventsManager.addSuspiciousIntentEvent(request.unknownExtras).doInBackground()
         }
     }
 
     private fun logInvalidSessionInBackground() {
         eventsManager.addInvalidIntentEvent(view.action ?: "", view.extras ?: emptyMap())
-            .inBackground()
+            .doInBackground()
     }
 }

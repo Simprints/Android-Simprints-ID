@@ -5,10 +5,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.ActivityTestRule
 import com.google.common.truth.Truth
+import com.simprints.core.tools.EncodingUtils
 import com.simprints.id.Application
-import com.simprints.id.FingerIdentifier
 import com.simprints.id.activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity
 import com.simprints.id.commontesttools.DefaultTestConstants
+import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
 import com.simprints.id.commontesttools.sessionEvents.createFakeClosedSession
@@ -16,6 +17,7 @@ import com.simprints.id.commontesttools.state.LoginStateMocker
 import com.simprints.id.commontesttools.state.setupRandomGeneratorToGenerateKey
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
+import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callback.*
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.ConfirmationCalloutEvent
@@ -23,11 +25,11 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.En
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.IdentificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.callout.VerificationCalloutEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.local.models.LocalDbKey
-import com.simprints.id.data.db.remote.RemoteDbManager
-import com.simprints.id.data.db.remote.sessions.RemoteSessionsManager
+import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
@@ -211,14 +213,15 @@ class SessionEventsUploaderTaskAndroidTest {
     private fun SessionEvents.addFingerprintCaptureEvent() {
         FingerprintCaptureEvent.Result.values().forEach { result ->
             FingerIdentifier.values().forEach { fingerIdentifier ->
+                val fakeTemplate = EncodingUtils.byteArrayToBase64(PeopleGeneratorUtils.getRandomFingerprintSample().template)
                 addEvent(FingerprintCaptureEvent(0, 0, fingerIdentifier, 0, result,
-                    FingerprintCaptureEvent.Fingerprint(fingerIdentifier, 0, "some_template")))
+                    FingerprintCaptureEvent.Fingerprint(fingerIdentifier, 0, fakeTemplate)))
             }
         }
     }
 
     private fun SessionEvents.addGuidSelectionEvent() {
-        addEvent(GuidSelectionEvent(0, "selected_id"))
+        addEvent(GuidSelectionEvent(0, RANDOM_GUID))
     }
 
     private fun SessionEvents.addIntentParsingEvent() {
@@ -264,14 +267,14 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addCallbackEvent() {
-        addEvent(EnrolmentCallbackEvent(0, "guid"))
+        addEvent(EnrolmentCallbackEvent(0, RANDOM_GUID))
 
         ErrorCallbackEvent.Reason.values().forEach {
             addEvent(ErrorCallbackEvent(0, it))
         }
 
         Tier.values().forEach {
-            addEvent(IdentificationCallbackEvent(0, "session_id", listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
+            addEvent(IdentificationCallbackEvent(0, RANDOM_GUID, listOf(CallbackComparisonScore(RANDOM_GUID, 0, it))))
         }
 
         addEvent(RefusalCallbackEvent(0, "reason", "other_text"))
@@ -280,10 +283,10 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(ConfirmationCalloutEvent(0, "projectId", "selected_guid", "session_id"))
+        addEvent(ConfirmationCalloutEvent(0, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(EnrolmentCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(0, "project_id", "user_id", "module_id", "verify_guid","metadata"))
+        addEvent(VerificationCalloutEvent(0, "project_id", "user_id", "module_id", RANDOM_GUID,"metadata"))
     }
 
 
@@ -304,7 +307,7 @@ class SessionEventsUploaderTaskAndroidTest {
         }
 
     private fun signOut() {
-        remoteDbManagerSpy.signOutOfRemoteDb()
+        remoteDbManagerSpy.signOut()
     }
 
     private fun mockBeingSignedIn() {

@@ -1,7 +1,7 @@
 package com.simprints.id.data.analytics.eventdata.models.domain.events
 
 import androidx.annotation.Keep
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 
 @Keep
 class FingerprintCaptureEvent(starTime: Long,

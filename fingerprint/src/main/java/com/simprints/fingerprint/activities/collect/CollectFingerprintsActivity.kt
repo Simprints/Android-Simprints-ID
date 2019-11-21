@@ -3,6 +3,7 @@ package com.simprints.fingerprint.activities.collect
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -18,6 +19,7 @@ import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
@@ -25,11 +27,14 @@ import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
 import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 
 class CollectFingerprintsActivity :
     FingerprintActivity(),
     CollectFingerprintsContract.View {
+
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
@@ -76,6 +81,12 @@ class CollectFingerprintsActivity :
         scanButton = scan_button
         progressBar = pb_timeout
         setListenerToMissingFinger()
+
+        with(androidResourcesHelper) {
+            scanButton.text = getString(R.string.scan)
+            missingFingerText.text = getString(R.string.missing_finger)
+            missingFingerText.paintFlags = missingFingerText.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        }
     }
 
     override fun onResume() {
@@ -110,7 +121,7 @@ class CollectFingerprintsActivity :
 
     override fun refreshScanButtonAndTimeoutBar() {
         val activeStatus = viewPresenter.currentFinger().status
-        scan_button.setText(activeStatus.buttonTextId)
+        scan_button.text = androidResourcesHelper.getString(activeStatus.buttonTextId)
         scan_button.setTextColor(activeStatus.buttonTextColor)
         scan_button.setBackgroundColor(ContextCompat.getColor(this, activeStatus.buttonBgColorRes))
 

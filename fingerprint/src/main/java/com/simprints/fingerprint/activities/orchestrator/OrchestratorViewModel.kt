@@ -12,10 +12,8 @@ import com.simprints.fingerprint.orchestrator.models.FinalResult
 import com.simprints.fingerprint.orchestrator.state.OrchestratorState
 import com.simprints.fingerprint.orchestrator.task.FingerprintTask
 import com.simprints.fingerprint.orchestrator.task.TaskResult
-import com.simprints.fingerprint.tasks.RunnableTaskDispatcher
 
-class OrchestratorViewModel(private val orchestrator: Orchestrator,
-                            private val runnableTaskDispatcher: RunnableTaskDispatcher) : ViewModel() {
+class OrchestratorViewModel(private val orchestrator: Orchestrator) : ViewModel() {
 
     val nextActivityCall = MutableLiveData<ActivityCall>()
     val finishedResult = MutableLiveData<ActivityResult>()
@@ -50,10 +48,6 @@ class OrchestratorViewModel(private val orchestrator: Orchestrator,
     private fun executeNextTask() =
         when (val task = orchestrator.getNextTask()) {
             is FingerprintTask.ActivityTask -> postNextTask(task)
-            is FingerprintTask.RunnableTask -> runnableTaskDispatcher.runTask(task) {
-                orchestrator.handleRunnableTaskResult(it)
-                executeNextTaskOrFinish()
-            }
         }
 
     private fun postNextTask(activityTask: FingerprintTask.ActivityTask) {

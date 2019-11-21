@@ -1,12 +1,16 @@
 package com.simprints.fingerprintscannermock
 
-import com.simprints.fingerprintscanner.Scanner
-import com.simprints.fingerprintscanner.ScannerCallback
-import com.simprints.fingerprintscanner.wrappedScannerCallback
-import com.simprints.fingerprintscannermock.simulated.ByteArrayUtils
-import com.simprints.fingerprintscannermock.simulated.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscanner.v1.Scanner
+import com.simprints.fingerprintscanner.v1.ScannerCallback
+import com.simprints.fingerprintscanner.v1.wrappedScannerCallback
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
+import com.simprints.fingerprintscannermock.simulated.SimulationMode
+import com.simprints.fingerprintscannermock.simulated.component.SimulatedBluetoothAdapter
+import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
+import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.observers.TestObserver
+import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.schedulers.Schedulers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -15,9 +19,8 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLooper
 import java.util.concurrent.LinkedBlockingQueue
 
-
 @RunWith(RobolectricTestRunner::class)
-class OutgoingMessagesToScannerTest : RxJavaTest {
+class OutgoingMessagesToScannerTest {
 
     private lateinit var testScanner: Scanner
     private lateinit var testObserver: TestObserver<ByteArray>
@@ -25,9 +28,12 @@ class OutgoingMessagesToScannerTest : RxJavaTest {
 
     @Before
     fun setup() {
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
+
         testObserver = TestObserver()
 
-        val simulatedScannerManager = SimulatedScannerManager(outgoingStreamObservers = setOf(testObserver))
+        val simulatedScannerManager = SimulatedScannerManager(SimulationMode.V1, outgoingStreamObservers = setOf(testObserver))
         val simulatedBluetoothAdapter = SimulatedBluetoothAdapter(simulatedScannerManager)
         testScanner = Scanner("F0:AC:D7:C0:00:00", simulatedBluetoothAdapter)
 
@@ -128,7 +134,7 @@ class OutgoingMessagesToScannerTest : RxJavaTest {
     }
 
     private fun assertOutgoingMessageIs(msgToScanner: String, position: Int = 0) {
-        assert(testObserver.values()[position]?.contentEquals(ByteArrayUtils.byteArrayFromHexString(msgToScanner))
+        assert(testObserver.values()[position]?.contentEquals(byteArrayFromHexString(msgToScanner))
             ?: false)
     }
 
