@@ -13,6 +13,26 @@ enum class AlertActivityViewModel(val type: Type,
                                   val rightButton: ButtonAction,
                                   @StringRes val message: Int) {
 
+    GUID_NOT_FOUND_ONLINE(
+        type = Type.DataError(
+            title = R.string.verify_guid_not_found_title,
+            hintDrawable = null
+        ),
+        leftButton = ButtonAction.Close,
+        rightButton = ButtonAction.None,
+        message = R.string.verify_guid_not_found_online_message
+    ),
+
+    GUID_NOT_FOUND_OFFLINE(
+        type = Type.DataError(
+            title = R.string.verify_guid_not_found_title,
+            hintDrawable = R.drawable.error_hint_wifi
+        ),
+        leftButton = ButtonAction.TryAgain,
+        rightButton = ButtonAction.WifiSettings,
+        message = R.string.verify_guid_not_found_offline_message
+    ),
+
     DIFFERENT_PROJECT_ID(
         type = Type.ConfigurationError(hintDrawable = R.drawable.error_hint_key),
         leftButton = ButtonAction.Close,
@@ -50,6 +70,8 @@ enum class AlertActivityViewModel(val type: Type,
                 AlertType.DIFFERENT_USER_ID_SIGNED_IN -> DIFFERENT_USER_ID
                 AlertType.UNEXPECTED_ERROR -> UNEXPECTED_ERROR
                 AlertType.SAFETYNET_ERROR -> SAFETYNET_ERROR
+                AlertType.GUID_NOT_FOUND_ONLINE -> GUID_NOT_FOUND_ONLINE
+                AlertType.GUID_NOT_FOUND_OFFLINE -> GUID_NOT_FOUND_OFFLINE
             }
     }
 
@@ -63,6 +85,14 @@ enum class AlertActivityViewModel(val type: Type,
                       @ColorRes val backgroundColor: Int,
                       @DrawableRes val mainDrawable: Int,
                       @DrawableRes val hintDrawable: Int? = null) {
+
+        @Keep
+        class DataError(title: Int,
+                        backgroundColor: Int = R.color.simprints_grey,
+                        mainDrawable: Int = R.drawable.error_icon,
+                        hintDrawable: Int? = null)
+            : Type(title, backgroundColor, mainDrawable, hintDrawable)
+
 
         @Keep
         class ConfigurationError(title: Int = R.string.configuration_error_title,
@@ -83,5 +113,7 @@ enum class AlertActivityViewModel(val type: Type,
     sealed class ButtonAction(@StringRes val buttonText: Int = R.string.empty) {
         object None : ButtonAction()
         object Close : ButtonAction(R.string.close)
+        object TryAgain : ButtonAction(R.string.try_again_label)
+        object WifiSettings : ButtonAction(R.string.settings_label)
     }
 }

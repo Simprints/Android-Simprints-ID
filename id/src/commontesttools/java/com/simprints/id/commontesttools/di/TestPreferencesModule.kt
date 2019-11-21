@@ -1,8 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.simprints.id.FingerIdentifier
-import com.simprints.testtools.common.di.DependencyRule.RealRule
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
@@ -12,10 +11,10 @@ import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 import com.simprints.testtools.common.di.DependencyRule
+import com.simprints.testtools.common.di.DependencyRule.RealRule
 
 class TestPreferencesModule(var remoteConfigRule: DependencyRule = RealRule,
-                            var settingsPreferencesManagerRule: DependencyRule = RealRule)
-    : PreferencesModule() {
+                            var settingsPreferencesManagerRule: DependencyRule = RealRule) : PreferencesModule() {
 
     override fun provideRemoteConfig(): FirebaseRemoteConfig =
         remoteConfigRule.resolveDependency { super.provideRemoteConfig() }
@@ -24,9 +23,9 @@ class TestPreferencesModule(var remoteConfigRule: DependencyRule = RealRule,
                                                        remoteConfigWrapper: RemoteConfigWrapper,
                                                        fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                        groupSerializer: Serializer<GROUP>,
-                                                       modalitySerializer: Serializer<Modality>,
+                                                       modalitiesSerializer: Serializer<List<Modality>>,
                                                        languagesStringArraySerializer: Serializer<Array<String>>,
                                                        moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                                        peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
-        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, modalitySerializer, languagesStringArraySerializer, moduleIdOptionsStringSetSerializer, peopleDownSyncTriggerToBooleanSerializer) }
+        settingsPreferencesManagerRule.resolveDependency { super.provideSettingsPreferencesManager(prefs, remoteConfigWrapper, fingerIdToBooleanSerializer, groupSerializer, modalitiesSerializer, languagesStringArraySerializer, moduleIdOptionsStringSetSerializer, peopleDownSyncTriggerToBooleanSerializer) }
 }

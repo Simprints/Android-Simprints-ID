@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.gson.JsonElement
 import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.data.db.DbManager
+import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
@@ -26,7 +26,8 @@ open class ProjectAuthenticator(component: AppComponent,
 
     @Inject lateinit var secureDataManager: SecureDataManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
+    @Inject lateinit var signerManager: SignerManager
     @Inject lateinit var remoteConfigWrapper: RemoteConfigWrapper
     @Inject lateinit var longConsentManager: LongConsentManager
     @Inject lateinit var preferencesManager: PreferencesManager
@@ -89,7 +90,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Single<out Token>.signIn(projectId: String, userId: String): Completable =
         flatMapCompletable { tokens ->
-            dbManager.signIn(projectId, userId, tokens)
+            signerManager.signIn(projectId, userId, tokens)
         }
 
     private fun createLocalDbKeyForProject(projectId: String) = Completable.fromAction {
@@ -98,7 +99,7 @@ open class ProjectAuthenticator(component: AppComponent,
 
     private fun Completable.fetchProjectRemoteConfigSettings(projectId: String): Single<JsonElement> =
         andThen(
-            dbManager.remoteProjectManager.loadProjectRemoteConfigSettingsJsonString(projectId)
+            projectRemoteDataSource.loadProjectRemoteConfigSettingsJsonString(projectId)
         )
 
     private fun Single<out JsonElement>.storeProjectRemoteConfigSettingsAndReturnProjectLanguages(): Single<Array<String>> =

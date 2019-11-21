@@ -19,7 +19,6 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.simprints.fingerprint.R
@@ -43,7 +42,6 @@ import org.koin.test.KoinTest
 import org.koin.test.mock.declare
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class AlertActivityTest : KoinTest {
 
     private val sessionEventManagerMock: FingerprintSessionEventsManager = mock()
@@ -119,20 +117,6 @@ class AlertActivityTest : KoinTest {
     }
 
     @Test
-    fun guidNotFoundOffline_theRightAlertShouldAppear() {
-        launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_OFFLINE))
-        ensureAlertScreenLaunched(AlertActivityViewModel.GUID_NOT_FOUND_OFFLINE)
-    }
-
-    @Test
-    fun guidNotFoundOffline_userClicksOpenSettings_settingsShouldAppear() {
-        launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_OFFLINE))
-        onView(withId(R.id.alertRightButton)).perform(click())
-
-        intended(hasAction(android.provider.Settings.ACTION_WIFI_SETTINGS))
-    }
-
-    @Test
     fun bluetoothNotSupported_theRightAlertShouldAppear() {
         launchAlertActivity(AlertTaskRequest(BLUETOOTH_NOT_SUPPORTED))
         ensureAlertScreenLaunched(AlertActivityViewModel.BLUETOOTH_NOT_SUPPORTED)
@@ -176,10 +160,10 @@ class AlertActivityTest : KoinTest {
 
     @Test
     fun pressBackButtonOnNonBluetoothError_shouldFinish() {
-        val scenario = launchAlertActivity(AlertTaskRequest(GUID_NOT_FOUND_ONLINE))
+        val scenario = launchAlertActivity(AlertTaskRequest(UNEXPECTED_ERROR))
         Espresso.pressBackUnconditionally()
 
-        verifyIntentReturned(scenario.result, GUID_NOT_FOUND_ONLINE, AlertTaskResult.CloseButtonAction.BACK, ResultCode.ALERT)
+        verifyIntentReturned(scenario.result, UNEXPECTED_ERROR, AlertTaskResult.CloseButtonAction.BACK, ResultCode.ALERT)
     }
 
     private fun launchAlertActivity(request: AlertTaskRequest? = null): ActivityScenario<AlertActivity> =

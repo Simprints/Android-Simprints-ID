@@ -32,44 +32,20 @@
     <string name="simprints_label" translatable="false">Simprints</string>
     <string name="libsimprints_label" translatable="false">LibSimprints</string>
     <!-- Content Descriptions -->
-    <string name="launch_background_description" translatable="false">Simprints\' logo as background image</string>
 
 
-    <!-- SetupActivity : the loading screen -->
-    <!-- Consent Text -->
-    <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your records. If that\'s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
-    <string name="confirm_consent">Tap here to confirm consent</string>
-    <string name="consent_enrol_only">I\'d like to use your fingerprints to enrol you in %1$s.&#160;</string>
-    <string name="consent_enrol">I\'d like to use your fingerprints to enrol you in %1$s and identify you in the future.&#160;</string>
-    <string name="consent_id_verify">I\'d like to use your fingerprints to find your records for %1$s.&#160;</string>
-    <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
-    <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your fingerprint information and current location.&#160;</string>
-    <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
-    <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
-    <string name="consent_confirmation">May I use your fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
-    <string name="consent_parental_enrol_only">I\'d like to use your child\'s fingerprints to enrol them in %1$s.&#160;</string>
-    <string name="consent_parental_enrol">I\'d like to use your child\'s fingerprints to enrol them in %1$s and identify them in the future.&#160;</string>
-    <string name="consent_parental_id_verify">I\'d like to use your child\'s fingerprints to find their records for %1$s.&#160;</string>
-    <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
-    <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their fingerprint information and current location.&#160;</string>
-    <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
-    <string name="consent_parental_confirmation">May I use your child\'s fingerprints? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
-    <string name="scanner_id_comfirmation_message">Is %1$s your scanner?</string>
+    <!-- ConnectScannerActivity : the activity for connecting to the scanner -->
+    <!-- Dialog messages -->
+    <string name="scanner_id_confirmation_message">Is %1$s your scanner?</string>
     <string name="scanner_confirmation_yes">Yes</string>
     <string name="scanner_confirmation_no">No</string>
     <!-- Loading Messages-->
-    <string name="loading">Loading</string>
-    <string name="updating_database">Updating project database…</string>
-    <string name="launch_checking_permissions">Checking permissions…</string>
-    <string name="launch_bt_connect">Connecting to Vero…</string>
-    <string name="launch_wake_un20">Waking up UN20…</string>
-    <string name="launch_setup">Setting up Vero…</string>
-    <string name="launch_checking_person_in_db">Checking person is in database…</string>
-    <string name="launch_consent_decline_button">Decline</string>
-    <string name="launch_consent_accept_button">Accept</string>
-    <string name="consent_general_title">General Consent</string>
-    <string name="consent_parental_title">Parental Consent</string>
-    <string name="privacy_notice_text"><u>Privacy Notice</u></string>
+    <string name="connect_scanner_loading">Loading</string>
+    <string name="connect_scanner_bt_connect">Connecting to Vero…</string>
+    <string name="connect_scanner_wake_un20">Waking up UN20…</string>
+    <string name="connect_scanner_setup">Setting up Vero…</string>
+    <string name="connect_scanner_finished">Connected</string>
+
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
@@ -265,46 +241,6 @@
     <string name="long_consent_failed_to_download">Failed to download privacy notice.</string>
     <!-- Long Consent -->
     <string name="developmentworker_consent_checkbox">I agree to Simprints using this data in these ways.</string>
-    <string name="long_consent">
-        <b><u>Privacy and Consent</u></b>\n\n
-        If you put your finger on the scanner, it will record information about your fingerprint. It will also record the approximate location where this scan took place, and the time and date of the scan. \n \n
-        All this information of yours will be stored by Simprints Technology Limited, which is a British NGO. \n\n
-        Simprints will use your information to help identify you in the future, and match you to your records. \n\n
-        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose. \n\n
-        Simprints may also use your information to apply a better understanding of service delivery in your location. \n\n
-        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share your information with those organisations for that purpose. \n\n
-        Simprints expects that its work here will last three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information. \n\n
-        Simprints will not store any fingerprint images. \n\n
-        Simprints will not give any information that it holds on you to any state, unless required to do so by law. \n\n
-        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future.\n\n
-        If you have previously been happy for Simprints to store and use your information, but you have changed your mind and you do not want this to continue, then please speak to me. \n\n
-
-        <b><u>Frequently asked Questions</u></b> \n\n
-        <b>I am no longer happy for Simprints to keep and use my information. What should I do?</b>\n\n
-        You are free to ask Simprints to delete your information at any time. To do so, you will have to give your fingerprints to the development worker one last time, so that Simprints can identify you. Once you have done that, Simprints will delete all the information it has that relates to you.\n\n
-        You should, however, bear in mind that if Simprints deletes your information then development organisations may find it harder to find your records.\n\n
-        <b>Who are Simprints?</b>\n\n
-        Simprints Technology Limited is a British NGO that is helping development organisations to match beneficiaries like you to their records.\n\n
-        <b>What information will Simprints store about me?</b>\n\n
-        Simprints will store information about your scanned fingerprints. It will also store the approximate location where any scan takes place, together with the time and date of any such scan.\n\n
-        Simprints will not store any other identifying information about you, such as your name or date of birth. Simprints will not store any of your personal records. Simprints will not store any images of your fingerprints.\n\n
-        <b>What will Simprints do with my information?</b>\n\n
-        Simprints will use your information to help development organisations identify you in the future, and match you to your records.\n\n
-        Simprints may also use your information to improve the accuracy of its service, and may share it with other experts for this purpose.\n\n
-        Simprints may also use your information to apply a better understanding of service delivery in your location.\n\n
-        In the future, Simprints may also use your information to help other partner development organisations to identify you, and may share this information with those organisations for that purpose.\n\n
-        <b>How long will Simprints keep my information for?</b>\n\n
-        Simprints expects that its work here will last for three years. Simprints will keep your information for the duration of its work here, and for 2 years after that work has finished. Simprints will then delete your information.\n\n
-        <b>Will Simprints store any fingerprint images?</b>\n\n
-        Simprints will not store any fingerprint images.\n\n
-        <b>Will Simprints give my information to the Government?</b>\n\n
-        Simprints will not give any information that it holds on you to the Government, unless required to do so by law.\n\n
-        <b>Do I have to agree to my fingerprints being taken?</b>\n\n
-        You do not have to agree to give Simprints any information to receive services. But if you do not then development organisations may find it harder to find your records in the future. \n\n
-
-        <b><u>Development Worker Consent</u></b>\n\n
-        Simprints Technology Limited will analyse data relating to your use of the Simprints app in order to improve that app for you, and other development workers. Simprints will also store the location where each fingerprint scan takes place, and the time when it occurs, in order to provide its services to beneficiaries.
-    </string>
 
 
     <!-- Notifications -->

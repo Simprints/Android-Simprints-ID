@@ -6,14 +6,23 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.simprints.fingerprint.activities.collect.models.Finger
+import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 
 
-class FingerPageAdapter(fragmentManager: FragmentManager, private val activeFingers: List<Finger>) :
+class FingerPageAdapter(fragmentManager: FragmentManager,
+                        private val activeFingers: List<Finger>,
+                        private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
+                        private val fingerprintPreferencesManager: FingerprintPreferencesManager) :
     FragmentStatePagerAdapter(fragmentManager) {
 
     private val fragmentSparseArray = SparseArray<FingerFragment>()
 
-    override fun getItem(pos: Int) = FingerFragment.newInstance(activeFingers[pos]).also {
+    override fun getItem(pos: Int) = FingerFragment.newInstance(
+        activeFingers[pos],
+        androidResourcesHelper,
+        fingerprintPreferencesManager
+    ).also {
         fragmentSparseArray.append(pos, it)
     }
 

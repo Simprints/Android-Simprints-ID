@@ -3,7 +3,7 @@ package com.simprints.id.di
 import android.content.SharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -15,6 +15,7 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
+import com.simprints.id.data.secure.EncryptedSharedPreferencesFactoryImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -42,6 +43,13 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
+    @Named("EncryptedSharedPreferences")
+    fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+
+
+    @Provides
+    @Singleton
     fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
     @Provides
@@ -58,7 +66,7 @@ open class PreferencesModule {
                                                remoteConfigWrapper: RemoteConfigWrapper,
                                                @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                                @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
-                                               @Named("ModalSerializer") modalitySerializer: Serializer<Modality>,
+                                               @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
                                                @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
                                                @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                                @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
@@ -66,7 +74,7 @@ open class PreferencesModule {
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
             groupSerializer,
-            modalitySerializer,
+            modalitiesSerializer,
             languagesStringArraySerializer,
             moduleIdOptionsStringSetSerializer,
             peopleDownSyncTriggerToBooleanSerializer)

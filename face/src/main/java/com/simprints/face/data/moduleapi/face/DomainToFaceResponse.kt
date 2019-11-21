@@ -1,70 +1,37 @@
 package com.simprints.face.data.moduleapi.face
 
-import android.os.Parcelable
-import com.simprints.face.data.moduleapi.face.responses.FaceEnrolResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceIdentifyResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceCaptureResponse
+import com.simprints.face.data.moduleapi.face.responses.FaceMatchResponse
 import com.simprints.face.data.moduleapi.face.responses.FaceResponse
-import com.simprints.face.data.moduleapi.face.responses.FaceVerifyResponse
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceMatchingResult
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier
-import com.simprints.face.data.moduleapi.face.responses.entities.FaceTier.*
-import com.simprints.face.exceptions.InvalidFaceResponseException
+import com.simprints.face.data.moduleapi.face.responses.FaceResponseType
 import com.simprints.moduleapi.face.responses.*
+import com.simprints.moduleapi.face.responses.entities.IFaceCaptureResult
 import kotlinx.android.parcel.Parcelize
 
 object DomainToFaceResponse {
 
-    fun fromDomainToFaceResponse(fingerprintResponse: FaceResponse): IFaceResponse =
-        when (fingerprintResponse) {
-            is FaceEnrolResponse ->
-                fromDomainToFaceEnrolResponse(fingerprintResponse)
-            is FaceVerifyResponse ->
-                fromDomainToFaceVerifyResponse(fingerprintResponse)
-            is FaceIdentifyResponse ->
-                fromDomainToFaceIdentifyResponse(fingerprintResponse)
-            else -> throw InvalidFaceResponseException()
+    fun fromDomainToFaceResponse(faceResponse: FaceResponse): IFaceResponse =
+        when (faceResponse.type) {
+            FaceResponseType.CAPTURE -> fromDomainToFaceCaptureResponse(faceResponse as FaceCaptureResponse)
+            FaceResponseType.MATCH -> fromDomainToFaceMatchResponse(faceResponse as FaceMatchResponse)
         }
-    
-    private fun fromDomainToFaceEnrolResponse(enrol: FaceEnrolResponse): IFaceEnrolResponse = IFaceEnrolResponseImpl(enrol.guid)
 
-    private fun fromDomainToFaceVerifyResponse(verify: FaceVerifyResponse): IFaceVerifyResponse {
-        val matchingResult = IFaceMatchingResultImpl(
-            verify.matchingResult.guidFound,
-            verify.matchingResult.confidence,
-            fromDomainToIFaceResponseTier(verify.matchingResult.tier))
+    private fun fromDomainToFaceCaptureResponse(faceCaptureResponse: FaceCaptureResponse): IFaceCaptureResponseImpl =
+        IFaceCaptureResponseImpl(faceCaptureResponse.capturingResult, IFaceResponseType.CAPTURE)
 
-        return IFaceVerifyResponseImpl(matchingResult)
-    }
+    private fun fromDomainToFaceMatchResponse(faceMatchResponse: FaceMatchResponse): IFaceMatchResponseImpl =
+        IFaceMatchResponseImpl(faceMatchResponse.result, IFaceResponseType.MATCH)
 
-    private fun fromDomainToFaceIdentifyResponse(identify: FaceIdentifyResponse): IFaceIdentifyResponse =
-        IFaceIdentifyResponseImpl(identify.identifications.map { fromDomainToFaceIdentificationResult(it) })
-
-    private fun fromDomainToFaceIdentificationResult(result: FaceMatchingResult): IFaceMatchingResult =
-        IFaceMatchingResultImpl(result.guidFound, result.confidence, fromDomainToIFaceResponseTier(result.tier))
-
-    private fun fromDomainToIFaceResponseTier(tier: FaceTier): IFaceTier =
-        when (tier) {
-            TIER_1 -> IFaceTier.TIER_1
-            TIER_2 -> IFaceTier.TIER_2
-            TIER_3 -> IFaceTier.TIER_3
-            TIER_4 -> IFaceTier.TIER_4
-            TIER_5 -> IFaceTier.TIER_5
-        }
 }
 
 @Parcelize
-private class IFaceEnrolResponseImpl(override val guid: String) : IFaceEnrolResponse
+private class IFaceCaptureResponseImpl(
+    override val capturingResult: List<IFaceCaptureResult>,
+    override val type: IFaceResponseType
+) : IFaceCaptureResponse
 
 @Parcelize
-private class IFaceIdentifyResponseImpl(
-    override val identifications: List<IFaceMatchingResult>) : IFaceIdentifyResponse
-
-
-@Parcelize
-private class IFaceVerifyResponseImpl(override val matchingResult: IFaceMatchingResult) : IFaceVerifyResponse
-
-@Parcelize
-private data class IFaceMatchingResultImpl(
-    override val guid: String,
-    override val confidence: Int,
-    override val tier: IFaceTier) : Parcelable, IFaceMatchingResult
+private class IFaceMatchResponseImpl(
+    override val result: List<IFaceMatchResult>,
+    override val type: IFaceResponseType
+): IFaceMatchResponse

@@ -28,8 +28,7 @@
         android:layout_height="0dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:layout_weight="0.55"
-        android:contentDescription="@string/main_error_graphic" />
+        android:layout_weight="0.55"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,8 +45,7 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             tools:ignore="NestedWeights"
-            android:layout_weight="1"
-            android:contentDescription="@string/hint_graphic"/>
+            android:layout_weight="1"/>
 
         <TextView
             android:id="@+id/message"

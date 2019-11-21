@@ -1,9 +1,10 @@
 package com.simprints.moduleapi.fingerprint.responses
 
 import android.os.Parcelable
+import com.simprints.moduleapi.IResponse
 
 
-interface IFingerprintResponse : Parcelable {
+interface IFingerprintResponse : Parcelable, IResponse {
 
     val type: IFingerprintResponseType
 
@@ -14,9 +15,8 @@ interface IFingerprintResponse : Parcelable {
 }
 
 enum class IFingerprintResponseType {
-    ENROL,
-    VERIFY,
-    IDENTIFY,
+    CAPTURE,
+    MATCH,
     REFUSAL,
     ERROR
 }

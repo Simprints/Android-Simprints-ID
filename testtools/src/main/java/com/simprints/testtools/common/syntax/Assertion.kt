@@ -1,9 +1,9 @@
 package com.simprints.testtools.common.syntax
 
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.*
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.TestObserver
+import io.reactivex.subscribers.TestSubscriber
 import junit.framework.AssertionFailedError
 import org.junit.Assert
 import org.mockito.Mockito
@@ -38,6 +38,19 @@ fun <T> verifyAtMost(times: Int, mock: T, methodCall: T.() -> Any?) =
 private fun <T> verify(mode: (Int) -> VerificationMode, times: Int, mock: T, methodCall: T.() -> Any?) =
     Mockito.verify(mock, mode(times)).methodCall()
 
+fun <T> verifyBlockingAtLeast(times: Int, mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, atLeast(times), methodCall)
+}
+
+fun <T> verifyBlockingNever(mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, never(), methodCall)
+}
+
+fun <T> verifyBlockingExactly(exactTimes: Int, mock: T, methodCall: suspend T.() -> Unit) {
+    verifyBlocking(mock, times(exactTimes), methodCall)
+}
+
+
 fun <T> verifyOnlyInteraction(mock: T, methodCall: T.() -> Any?) {
     verify(mock).methodCall()
     verifyNoMoreInteractions(mock)
@@ -59,7 +72,7 @@ inline fun <reified T : Throwable> assertThrows(executable: () -> Unit): T {
             else -> throw(exception)
         }
     }
-    throw AssertionFailedError("Expected an ${T::class.java.simpleName} to be thrown")
+    failTest("Expected an ${T::class.java.simpleName} to be thrown")
 }
 
 inline fun <reified T : Throwable> assertThrows(throwable: T, executable: () -> Unit): T {
@@ -72,6 +85,12 @@ fun <T> TestObserver<T>.awaitAndAssertSuccess(): Disposable = this
     .await()
     .assertComplete()
     .assertNoErrors()
+
+fun <T> TestSubscriber<T>.awaitCompletionWithNoErrors() {
+    awaitTerminalEvent()
+    assertComplete()
+    assertNoErrors()
+}
 
 fun failTest(message: String?): Nothing {
     Assert.fail(message)

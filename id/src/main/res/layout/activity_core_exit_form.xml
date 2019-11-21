@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/refusalScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/simprints_blue"
+    android:fitsSystemWindows="true"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.simprints.id.activities.coreexitform.CoreExitFormActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/exitFormText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:background="@color/simprints_white"
+            android:enabled="false"
+            android:gravity="top|start"
+            android:hint="@string/hint_other_reason"
+            android:imeOptions="actionDone"
+            android:inputType="textMultiLine"
+            android:maxLength="100"
+            android:maxLines="4"
+            android:minHeight="100dp"
+            android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exitFormRadioGroup" />
+
+        <LinearLayout
+            android:id="@+id/refusalButtonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exitFormText">
+
+            <Button
+                android:id="@+id/btGoBack"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="70dp"
+                android:onClick="handleGoBackClick"
+                android:text="@string/exit_form_return_to_simprints"
+                tools:ignore="ButtonStyle" />
+
+            <Button
+                android:id="@+id/btSubmitExitForm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:minHeight="70dp"
+                android:onClick="handleSubmitClick"
+                android:text="@string/button_submit"
+                tools:ignore="ButtonStyle" />
+
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/exitFormRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/whySkipBiometricsText">
+
+            <RadioButton
+                android:id="@+id/rbReligiousConcerns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_religious_concerns"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbDataConcerns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_data_concerns"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbDoesNotHavePermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_does_not_have_permission"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbAppNotWorking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_app_not_working"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbPersonNotPresent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_person_not_present"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbTooYoung"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_too_young"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/refusal_other"
+                android:textColor="@color/simprints_white"
+                android:textSize="20sp" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/whySkipBiometricsText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/why_did_you_skip_biometrics"
+            android:textAlignment="center"
+            android:textColor="@color/simprints_white"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -10,12 +10,11 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtraWithKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.simprints.fingerprint.activities.launch.request.LaunchTaskRequest
-import com.simprints.fingerprint.activities.launch.result.LaunchTaskResult
-import com.simprints.fingerprint.data.domain.Action
+import com.simprints.fingerprint.activities.connect.request.ConnectScannerTaskRequest
+import com.simprints.fingerprint.activities.connect.result.ConnectScannerTaskResult
 import com.simprints.fingerprint.di.KoinInjector.acquireFingerprintKoinModules
 import com.simprints.fingerprint.di.KoinInjector.releaseFingerprintKoinModules
-import com.simprints.fingerprint.integration.createFingerprintRequestIntent
+import com.simprints.fingerprint.integration.createFingerprintCaptureRequestIntent
 import com.simprints.fingerprint.orchestrator.Orchestrator
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.orchestrator.models.FinalResult
@@ -36,7 +35,7 @@ import org.koin.test.mock.declare
 class OrchestratorActivityAndroidTest : KoinTest {
 
     private val orchestratorMock = mock<Orchestrator>()
-    private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock, mock()))
+    private val orchestratorViewModel = spy(OrchestratorViewModel(orchestratorMock))
 
     private lateinit var scenario: ActivityScenario<OrchestratorActivity>
 
@@ -54,15 +53,15 @@ class OrchestratorActivityAndroidTest : KoinTest {
     @Test
     fun orchestratorActivityCallsNextActivity_returnsWithResult_handlesActivityResult() {
         whenever(orchestratorMock) { isFinished() } thenReturn false
-        whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.Launch("launch") {
-            launchTaskRequest(Action.IDENTIFY)
+        whenever(orchestratorMock) { getNextTask() } thenReturn FingerprintTask.ConnectScanner("connect") {
+            launchTaskRequest()
         }
 
-        intending(hasExtraWithKey(LaunchTaskRequest.BUNDLE_KEY))
+        intending(hasExtraWithKey(ConnectScannerTaskRequest.BUNDLE_KEY))
             .respondWith(Instrumentation.ActivityResult(ResultCode.OK.value,
-                Intent().putExtra(LaunchTaskResult.BUNDLE_KEY, LaunchTaskResult())))
+                Intent().putExtra(ConnectScannerTaskResult.BUNDLE_KEY, ConnectScannerTaskResult())))
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         whenever(orchestratorMock) { isFinished() } thenReturn true
         whenever(orchestratorMock) { getFinalResult() } thenReturn
@@ -78,7 +77,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         whenever(orchestratorMock) { getFinalResult() } thenReturn
             FinalResult(Activity.RESULT_OK, Intent().putExtra("test_key", 42))
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         assertNotNull(scenario.result.resultData.extras?.get("test_key") as Int?)
 
@@ -91,7 +90,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         val orchestratorState = OrchestratorState(FingerprintTaskFlowState(
             mock(),
             2,
-            mutableMapOf("launch" to mock(), "collect" to mock())
+            mutableMapOf("connect" to mock(), "collect" to mock())
         ))
 
         whenever(orchestratorMock) { getState() } thenReturn orchestratorState
@@ -99,7 +98,7 @@ class OrchestratorActivityAndroidTest : KoinTest {
         // Make sure other activities don't start appearing
         whenever(orchestratorViewModel) { start(anyNotNull()) } thenDoNothing {}
 
-        scenario = ActivityScenario.launch(createFingerprintRequestIntent(Action.IDENTIFY))
+        scenario = ActivityScenario.launch(createFingerprintCaptureRequestIntent())
 
         scenario.recreate()
 
@@ -116,16 +115,6 @@ class OrchestratorActivityAndroidTest : KoinTest {
     }
 
     companion object {
-        private const val DEFAULT_PROJECT_ID = "some_project_id"
-        private const val DEFAULT_LANGUAGE = "en"
-        private const val DEFAULT_LOGO_EXISTS = true
-        private const val DEFAULT_PROGRAM_NAME = "This program"
-        private const val DEFAULT_ORGANISATION_NAME = "This organisation"
-        private const val DEFAULT_VERIFY_GUID = "verify_guid"
-
-        private fun launchTaskRequest(action: Action) = LaunchTaskRequest(
-            DEFAULT_PROJECT_ID, action, DEFAULT_LANGUAGE, DEFAULT_LOGO_EXISTS, DEFAULT_PROGRAM_NAME,
-            DEFAULT_ORGANISATION_NAME, if (action == Action.VERIFY) DEFAULT_VERIFY_GUID else null
-        )
+        private fun launchTaskRequest() = ConnectScannerTaskRequest()
     }
 }
