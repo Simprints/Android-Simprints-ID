@@ -14,6 +14,6 @@ interface PersonLocalDataSource : FingerprintIdentityLocalDataSource {
 
     suspend fun insertOrUpdate(people: List<Person>)
     suspend fun load(query: Query? = null): Flow<Person>
-    suspend fun delete(query: Query)
+    suspend fun delete(queries: List<Query>)
     fun count(query: Query = Query()): Int
 }
