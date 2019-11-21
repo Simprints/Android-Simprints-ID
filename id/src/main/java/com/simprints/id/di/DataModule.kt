@@ -17,6 +17,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -56,8 +57,9 @@ open class DataModule {
     @Provides
     open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                      personRemoteDataSource: PersonRemoteDataSource,
-                                     peopleUpSyncMaster: PeopleUpSyncMaster): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, peopleUpSyncMaster)
+                                     peopleUpSyncMaster: PeopleUpSyncMaster,
+                                     syncStatusDatabase: SyncStatusDatabase): PersonRepository =
+        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, peopleUpSyncMaster, syncStatusDatabase.downSyncDao)
 
 
     @Provides

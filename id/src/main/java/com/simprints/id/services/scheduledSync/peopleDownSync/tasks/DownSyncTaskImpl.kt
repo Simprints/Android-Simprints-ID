@@ -113,7 +113,7 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
         flatMapCompletable { batchOfPeople ->
             completableWithSuspend {
-                personLocalDataSource.insertOrUpdate(batchOfPeople.map { it.fromGetApiToDomain() })
+                filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
                 Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
                 decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
                 updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
@@ -163,6 +163,31 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
             null
         }
     }
+
+    private suspend fun filterBatchOfPeopleToSyncWithLocal(batchOfPeople: List<ApiGetPerson>) {
+        val batchOfPeopleToSaveInLocal = batchOfPeople.filter { !it.deleted }
+        val batchOfPeopleToBeDeleted = batchOfPeople.filter { it.deleted }
+
+        savePeopleBatchInLocal(batchOfPeopleToSaveInLocal)
+        deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted)
+    }
+
+    private suspend fun savePeopleBatchInLocal(batchOfPeopleToSaveInLocal: List<ApiGetPerson>) {
+        if (batchOfPeopleToSaveInLocal.isNotEmpty()) {
+            personLocalDataSource.insertOrUpdate(batchOfPeopleToSaveInLocal.map { it.fromGetApiToDomain() })
+        }
+    }
+
+    private suspend fun deletePeopleBatchFromLocal(batchOfPeopleToBeDeleted: List<ApiGetPerson>) {
+        if (batchOfPeopleToBeDeleted.isNotEmpty()) {
+            personLocalDataSource.delete(buildQueryForPeopleById(batchOfPeopleToBeDeleted))
+        }
+    }
+
+    private fun buildQueryForPeopleById(batchOfPeopleToBeDeleted: List<ApiGetPerson>) =
+        batchOfPeopleToBeDeleted.map {
+            PersonLocalDataSource.Query(personId = it.id)
+        }
 
     private fun updateDownSyncTimestampOnBatchDownload() {
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())

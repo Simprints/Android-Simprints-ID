@@ -2,6 +2,7 @@ package com.simprints.moduleapi.face.responses
 
 import android.os.Parcelable
 
-interface IFaceEnrolResponse : Parcelable, IFaceResponse {
+interface IFaceMatchResult: Parcelable {
     val guid: String
+    val confidence: Float
 }

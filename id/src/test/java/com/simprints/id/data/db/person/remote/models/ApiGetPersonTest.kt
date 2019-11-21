@@ -12,6 +12,7 @@ import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.db.person.domain.Person
 import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
@@ -20,7 +21,7 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class ApiGetPersonTest {
 
-    private val apiPersonJson = "{\"id\":\"aeed3784-a399-445a-9dcd-0a373184709c\",\"projectId\":\"test10MProject\",\"moduleId\":\"module2\",\"userId\":\"user2\",\"createdAt\":1520621879620,\"updatedAt\":1520621879620,\"fingerprints\":[{\"quality\":52,\"template\":\"Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA\",\"finger\":\"LEFT_THUMB\"},{\"quality\":60,\"template\":\"Rk1SACAyMAAAAAGkAAABLAGQAMUAxQEAABBPQUAcACxpAEA3ADd4AEAsADv4AIAfAD5uAEA0AEh7AECPAFFzAIBkAF14AEA/AF54AEAZAGmHAEA0AG/7AEANAHkNAEBRAHn1AEAVAHqRAEBgAH11AIAbAH4GAEAjAISKAEAGAI8UAIBUAJF7AEC7AJnqAECWALDkAIAzALGQAEAVALMRAIByALZyAIAiALyeAECLAMnhAIBEAMuMAICDANBiAEA2ANMVAICqANdiAEAwANmuAEBuAOFxAIA8AOOhAIApAOgpAECqAO1nAEAZAO+zAEBFAPGzAEBdAPSbAEBjAPb0AIB6APZpAEDNAP5oAIB0AP9sAEBfAQH0AEBfAQPRAEBoAQroAIAhAQq7AEDYARd1AEDGARh4AIBfARhNAEB3ARnqAEBYARnZAIBuAR3kAEAYASO7AEDFASyGAICVAS5vAIBqATReAEA4ATjdAEAtATzaAEDGAUOGAEBGAUldAEDEAVCNAECjAVN9AEA4AVpiAEBPAWRoAECjAW6DAIBwAXl1AAAA\",\"finger\":\"LEFT_INDEX_FINGER\"}],\"faces\":[{\"template\":\"ECDAO/HAIBfAPVVAIBRAPZ4AECbAPvHAEC7AP5RAEBuAQFQAEB7AQJKAEBhAQRiAIBEAQeqAEA+ARPQAECMARZHAEB3ARxRAECrASpRAEBmAStiAECTATJUAEBiAUVsAEByAUloAECFAUldAIA0AUpoAECUAUxfAECRAWNzAEB7AWp1AECKAYN9AAAA\"}]}"
+    private val apiPersonJson = "{\"id\":\"aeed3784-a399-445a-9dcd-0a373184709c\",\"projectId\":\"test10MProject\",\"moduleId\":\"module2\",\"userId\":\"user2\",\"createdAt\":1520621879620,\"updatedAt\":1520621879620,\"fingerprints\":[{\"quality\":52,\"template\":\"Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA\",\"finger\":\"LEFT_THUMB\"},{\"quality\":60,\"template\":\"Rk1SACAyMAAAAAGkAAABLAGQAMUAxQEAABBPQUAcACxpAEA3ADd4AEAsADv4AIAfAD5uAEA0AEh7AECPAFFzAIBkAF14AEA/AF54AEAZAGmHAEA0AG/7AEANAHkNAEBRAHn1AEAVAHqRAEBgAH11AIAbAH4GAEAjAISKAEAGAI8UAIBUAJF7AEC7AJnqAECWALDkAIAzALGQAEAVALMRAIByALZyAIAiALyeAECLAMnhAIBEAMuMAICDANBiAEA2ANMVAICqANdiAEAwANmuAEBuAOFxAIA8AOOhAIApAOgpAECqAO1nAEAZAO+zAEBFAPGzAEBdAPSbAEBjAPb0AIB6APZpAEDNAP5oAIB0AP9sAEBfAQH0AEBfAQPRAEBoAQroAIAhAQq7AEDYARd1AEDGARh4AIBfARhNAEB3ARnqAEBYARnZAIBuAR3kAEAYASO7AEDFASyGAICVAS5vAIBqATReAEA4ATjdAEAtATzaAEDGAUOGAEBGAUldAEDEAVCNAECjAVN9AEA4AVpiAEBPAWRoAECjAW6DAIBwAXl1AAAA\",\"finger\":\"LEFT_INDEX_FINGER\"}],\"faces\":[{\"template\":\"ECDAO/HAIBfAPVVAIBRAPZ4AECbAPvHAEC7AP5RAEBuAQFQAEB7AQJKAEBhAQRiAIBEAQeqAEA+ARPQAECMARZHAEB3ARxRAECrASpRAEBmAStiAECTATJUAEBiAUVsAEByAUloAECFAUldAIA0AUpoAECUAUxfAECRAWNzAEB7AWp1AECKAYN9AAAA\"}],\"deleted\":true}"
 
     @Test
     fun buildApiPersonFromDbPerson() {
@@ -31,13 +32,13 @@ class ApiGetPersonTest {
 
         val apiPerson = dbPerson.fromDbToDomain().fromDomainToGetApi()
 
-        Assert.assertEquals(apiPerson.id, dbPerson.patientId)
-        Assert.assertEquals(apiPerson.userId, dbPerson.userId)
-        Assert.assertEquals(apiPerson.createdAt, dbPerson.createdAt)
-        Assert.assertEquals(apiPerson.updatedAt, dbPerson.updatedAt)
-        Assert.assertEquals(apiPerson.moduleId, dbPerson.moduleId)
-        Assert.assertEquals(apiPerson.projectId, dbPerson.projectId)
-        Assert.assertEquals(apiPerson.fingerprints?.size, dbPerson.fingerprintSamples.size)
+        assertEquals(apiPerson.id, dbPerson.patientId)
+        assertEquals(apiPerson.userId, dbPerson.userId)
+        assertEquals(apiPerson.createdAt, dbPerson.createdAt)
+        assertEquals(apiPerson.updatedAt, dbPerson.updatedAt)
+        assertEquals(apiPerson.moduleId, dbPerson.moduleId)
+        assertEquals(apiPerson.projectId, dbPerson.projectId)
+        assertEquals(apiPerson.fingerprints?.size, dbPerson.fingerprintSamples.size)
     }
 
     @Test
@@ -50,31 +51,31 @@ class ApiGetPersonTest {
 
         val apiPerson = domainPerson.fromDomainToGetApi()
 
-        Assert.assertEquals(apiPerson.id, domainPerson.patientId)
-        Assert.assertEquals(apiPerson.userId, "userId")
-        Assert.assertNull(apiPerson.createdAt)
-        Assert.assertNull(apiPerson.updatedAt)
-        Assert.assertEquals(apiPerson.moduleId, "moduleId")
-        Assert.assertEquals(apiPerson.projectId, "projectId")
-        Assert.assertEquals(apiPerson.fingerprints?.size, domainPerson.fingerprintSamples.size)
+        assertEquals(apiPerson.id, domainPerson.patientId)
+        assertEquals(apiPerson.userId, "userId")
+        assertNull(apiPerson.createdAt)
+        assertNull(apiPerson.updatedAt)
+        assertEquals(apiPerson.moduleId, "moduleId")
+        assertEquals(apiPerson.projectId, "projectId")
+        assertEquals(apiPerson.fingerprints?.size, domainPerson.fingerprintSamples.size)
     }
 
     @Test
     fun deserialiseApiPerson() {
         val apiPerson = JsonHelper.gson.fromJson(apiPersonJson, ApiGetPerson::class.java)
-        Assert.assertEquals(apiPerson.id, "aeed3784-a399-445a-9dcd-0a373184709c")
-        Assert.assertEquals(apiPerson.projectId, "test10MProject")
-        Assert.assertEquals(apiPerson.moduleId, "module2")
-        Assert.assertEquals(apiPerson.userId, "user2")
-        Assert.assertEquals(apiPerson.createdAt!!.time.toString(), "1520621879620")
-        Assert.assertEquals(apiPerson.updatedAt!!.time.toString(), "1520621879620")
-        Assert.assertEquals(apiPerson.fingerprints?.size, 2)
+        assertEquals(apiPerson.id, "aeed3784-a399-445a-9dcd-0a373184709c")
+        assertEquals(apiPerson.projectId, "test10MProject")
+        assertEquals(apiPerson.moduleId, "module2")
+        assertEquals(apiPerson.userId, "user2")
+        assertEquals(apiPerson.createdAt!!.time.toString(), "1520621879620")
+        assertEquals(apiPerson.updatedAt!!.time.toString(), "1520621879620")
+        assertEquals(apiPerson.fingerprints?.size, 2)
 
         val fingerprints = apiPerson.fingerprints
-        Assert.assertNotNull(fingerprints)
-        Assert.assertEquals(fingerprints?.first()?.finger, FingerIdentifier.LEFT_THUMB)
-        Assert.assertEquals(fingerprints?.first()?.quality, 52)
-        Assert.assertEquals(fingerprints?.first()?.template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
+        assertNotNull(fingerprints)
+        assertEquals(fingerprints?.first()?.finger, FingerIdentifier.LEFT_THUMB)
+        assertEquals(fingerprints?.first()?.quality, 52)
+        assertEquals(fingerprints?.first()?.template, "Rk1SACAyMAAAAADMAAABLAGQAMUAxQEAABA7HYBEAGUJAEBpAHaDAEBaAHcDAEBdAJCNAIAiAJARAIBDAJqUAIAoAKgRAIBFAKgUAEBWALOUAIA/AMsRAECQAMx7AEBMAOGgAECNAOeAAECPAQaxAECKAQaxAECRAQvDAEA5AQuxAECeAQ/aAEBEARO4AIAfARisAECOARzDAIC8AStfAEAhAS7DAICWATtaAICMAUFaAEBvAVdhAEBXAVxhAEA+AWFkAICLAWJ1AAAA")
     }
 
     @Test
@@ -83,20 +84,33 @@ class ApiGetPersonTest {
         val jsonString = JsonHelper.toJson(apiPerson)
         val personJson = JsonHelper.gson.fromJson(jsonString, JsonObject::class.java)
 
-        Assert.assertTrue(personJson.has("id"))
-        Assert.assertTrue(personJson.has("projectId"))
-        Assert.assertTrue(personJson.has("userId"))
-        Assert.assertTrue(personJson.has("moduleId"))
-        Assert.assertTrue(personJson.get("createdAt").asJsonPrimitive.isNumber)
-        Assert.assertTrue(personJson.get("updatedAt").asJsonPrimitive.isNumber)
-        Assert.assertTrue(personJson.has("fingerprints"))
+        assertTrue(personJson.has("id"))
+        assertTrue(personJson.has("projectId"))
+        assertTrue(personJson.has("userId"))
+        assertTrue(personJson.has("moduleId"))
+        assertTrue(personJson.get("createdAt").asJsonPrimitive.isNumber)
+        assertTrue(personJson.get("updatedAt").asJsonPrimitive.isNumber)
+        assertTrue(personJson.has("fingerprints"))
+        assert(personJson.has("deleted"))
 
         val fingerprintJson = personJson.get("fingerprints").asJsonArray.first().asJsonObject
-        Assert.assertTrue(fingerprintJson.has("finger"))
-        Assert.assertTrue(fingerprintJson.has("quality"))
-        Assert.assertTrue(fingerprintJson.has("template"))
+        assertTrue(fingerprintJson.has("finger"))
+        assertTrue(fingerprintJson.has("quality"))
+        assertTrue(fingerprintJson.has("template"))
 
-        Assert.assertEquals(personJson.keySet().size, 7)
-        Assert.assertEquals(fingerprintJson.keySet().size, 3)
+        assertEquals(personJson.keySet().size, 8)
+        assertEquals(fingerprintJson.keySet().size, 3)
     }
 }
+
+fun Person.fromDomainToGetApi(deleted: Boolean = false): ApiGetPerson =
+    ApiGetPerson(
+        id = patientId,
+        projectId = projectId,
+        userId = userId,
+        moduleId = moduleId,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        fingerprints = fingerprintSamples.map { it.fromDomainToApi() },
+        deleted = deleted
+    )

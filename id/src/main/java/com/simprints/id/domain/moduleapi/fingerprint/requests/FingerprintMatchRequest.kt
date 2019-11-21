@@ -1,7 +1,7 @@
 package com.simprints.id.domain.moduleapi.fingerprint.requests
 
-import com.simprints.id.data.db.person.domain.FingerprintSample
-import com.simprints.id.data.db.person.domain.fromDomainToModuleApi
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.FingerprintCaptureSample
+import com.simprints.id.domain.moduleapi.fingerprint.responses.entities.fromDomainToModuleApi
 import com.simprints.moduleapi.fingerprint.IFingerprintSample
 import com.simprints.moduleapi.fingerprint.requests.IFingerprintMatchRequest
 import com.simprints.moduleapi.fingerprint.responses.IFingerprintResponseType
@@ -10,7 +10,7 @@ import java.io.Serializable
 
 @Parcelize
 data class FingerprintMatchRequest(
-    val probeFingerprintSamples: List<FingerprintSample>,
+    val probeFingerprintSamples: List<FingerprintCaptureSample>,
     val queryForCandidates: Serializable,
     override val type: FingerprintRequestType = FingerprintRequestType.MATCH
 ) : FingerprintRequest

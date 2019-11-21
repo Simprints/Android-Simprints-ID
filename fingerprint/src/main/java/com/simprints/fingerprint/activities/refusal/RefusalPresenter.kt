@@ -6,11 +6,11 @@ import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashRe
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTag.REFUSAL
 import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportTrigger.UI
 import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
+import com.simprints.fingerprint.controllers.core.eventData.model.RefusalAnswer
 import com.simprints.fingerprint.controllers.core.eventData.model.RefusalEvent
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason.*
-import com.simprints.fingerprint.data.domain.refusal.toRefusalAnswerForEvent
 import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import io.reactivex.rxkotlin.subscribeBy
 
@@ -92,7 +92,7 @@ class RefusalPresenter(private val view: RefusalContract.View,
         sessionEventsManager.addEvent(RefusalEvent(
             refusalStartTime,
             timeHelper.now(),
-            refusalReason.toRefusalAnswerForEvent(),
+            RefusalAnswer.fromRefusalFormReason(refusalReason),
             refusalText))
 
 

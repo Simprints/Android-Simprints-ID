@@ -11,6 +11,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
+import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
@@ -83,6 +84,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
         viewModel.viewModelState.onSyncActionClicked = {
             crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
             when {
+                noModulesSelected() -> view.showToastForNoModulesSelected()
                 userIsOffline() -> view.showToastForUserOffline()
                 !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
                 viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
@@ -117,6 +119,12 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun userIsOffline() = !simNetworkUtils.isConnected()
+
+    private fun noModulesSelected() = if (preferencesManager.syncGroup == GROUP.MODULE) {
+        preferencesManager.selectedModules.isEmpty()
+    } else {
+        false
+    }
 
     private fun initOrUpdateAnalyticsKeys() {
         crashReportManager.apply {

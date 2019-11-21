@@ -128,8 +128,6 @@ class FaceExitFormActivity : AppCompatActivity() {
                 logRadioOptionForCrashReport("Other")
             }
         }
-        //STOPSHIP: Remove on actual implementation
-        faceRbReligiousConcerns.isChecked = true
     }
 
     private fun getExitFormText() = faceExitFormText.text.toString()
