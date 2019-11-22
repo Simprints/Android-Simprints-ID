@@ -20,7 +20,7 @@ class DefaultOkHttpClientBuilder {
                 }
             }
             .apply {
-                if (BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "releaseWithLogfile") {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
