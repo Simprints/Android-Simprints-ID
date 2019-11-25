@@ -14,6 +14,7 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import javax.inject.Inject
 
+// TODO: replace with PreferenceFragmentCompat
 class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContract.View {
 
     override lateinit var viewPresenter: SettingsPreferenceContract.Presenter
@@ -66,12 +67,10 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 summary = getString(R.string.preference_summary_settings_fingers)
             }
 
-            val selectModulesPreference = (getPreferenceForSelectModules() as MultiSelectListPreference).apply {
+            getPreferenceForSelectModules().apply {
                 title = getString(R.string.preference_select_modules_title)
                 summary = getString(R.string.preference_summary_modules)
             }
-            selectModulesPreference.positiveButtonText = androidResourcesHelper.getString(R.string.ok)
-            selectModulesPreference.negativeButtonText = androidResourcesHelper.getString(R.string.cancel_button)
 
             getPreferenceForAbout().title = getString(R.string.preference_app_details_title)
         }
@@ -147,6 +146,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun openSettingAboutActivity() {
         activity.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openSettingAboutActivity()
+        }
+    }
+
+    override fun openModuleSelectionActivity() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).openModuleSelectionActivity()
         }
     }
 }

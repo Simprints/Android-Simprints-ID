@@ -4,7 +4,7 @@ import com.simprints.id.Application
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.Event
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -22,7 +22,7 @@ interface SessionEventsManager : SessionEventsLocalDbManager {
     fun updateSessionInBackground(block: (sessionEvents: SessionEvents) -> Unit)
 
     fun addGuidSelectionEvent(selectedGuid: String, sessionId: String): Completable
-    fun addPersonCreationEventInBackground(person: Person)
+    fun addPersonCreationEventInBackground(fingerprintSamples: List<FingerprintSample>)
     fun updateHardwareVersionInScannerConnectivityEvent(hardwareVersion: String)
 
     companion object {

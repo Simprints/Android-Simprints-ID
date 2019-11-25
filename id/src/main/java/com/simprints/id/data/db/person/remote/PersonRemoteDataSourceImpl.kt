@@ -18,6 +18,7 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Wh
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.sumUp
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
@@ -54,6 +55,13 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
         }
 
     override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>> =
+        if (peopleOperationsParams.isNotEmpty()) {
+            makeRequestForPeopleOperations(projectId, peopleOperationsParams)
+        } else {
+            Single.error(EmptyPeopleOperationsParamsException())
+        }
+
+    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>> =
         getPeopleApiClient().flatMap { peopleRemoteInterface ->
 
             peopleRemoteInterface.requestPeopleOperations(

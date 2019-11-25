@@ -11,7 +11,7 @@ import com.simprints.id.data.analytics.eventdata.models.domain.events.EventType.
 import com.simprints.id.data.analytics.eventdata.models.domain.session.DatabaseInfo
 import com.simprints.id.data.analytics.eventdata.models.domain.session.Device
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
-import com.simprints.id.data.db.person.domain.Person
+import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.exceptions.safe.session.NoSessionsFoundException
 import com.simprints.id.exceptions.unexpected.AttemptedToModifyASessionAlreadyClosedException
@@ -134,11 +134,11 @@ open class SessionEventsManagerImpl(private val deviceId: String,
         }
     }
 
-    override fun addPersonCreationEventInBackground(person: Person) {
+    override fun addPersonCreationEventInBackground(fingerprintSamples: List<FingerprintSample>) {
         updateSessionInBackground { session ->
             session.addEvent(PersonCreationEvent(
                 timeHelper.now(),
-                extractCaptureEventIdsBasedOnPersonTemplate(session, person.fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
+                extractCaptureEventIdsBasedOnPersonTemplate(session, fingerprintSamples.map { EncodingUtils.byteArrayToBase64(it.template) })
             ))
         }
     }
