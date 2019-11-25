@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "name": "Abama",
+      "selected": true
+    },
+    {
+      "name": "Abama Dawet",
+      "selected": false
+    },
+    {
+      "name": "Achura Mazegaja",
+      "selected": false
+    },
+    {
+      "name": "Bangladesh rocks",
+      "selected": true
+    },
+    {
+      "name": "Dache Gofara",
+      "selected": false
+    },
+    {
+      "name": "Gara Goda",
+      "selected": false
+    },
+    {
+      "name": "Gurumo Koysha",
+      "selected": true
+    },
+    {
+      "name": "Hajo Salata",
+      "selected": false
+    },
+    {
+      "name": "Legama",
+      "selected": false
+    },
+    {
+      "name": "Madagascar",
+      "selected": true
+    },
+    {
+      "name": "Tadisa",
+      "selected": false
+    },
+    {
+      "name": "Wakanda",
+      "selected": true
+    }
+  ]
+}

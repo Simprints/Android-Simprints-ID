@@ -80,7 +80,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()
             PersonFetchResult(person, LOCAL)
         } catch (t: Throwable) {
-            tryToFetchPersonFromRemote(projectId, patientId)
+            tryToFetchPersonFromRemote(projectId, patientId).also { personFetchResult ->
+                personFetchResult.person?.let { savePersonInLocal(it) }
+            }
         }
 
     private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
@@ -93,6 +95,12 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                 )
             }
         }
+
+    private fun savePersonInLocal(person: Person) {
+        CoroutineScope(Dispatchers.IO).launch {
+            personLocalDataSource.insertOrUpdate(listOf(person))
+        }
+    }
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))

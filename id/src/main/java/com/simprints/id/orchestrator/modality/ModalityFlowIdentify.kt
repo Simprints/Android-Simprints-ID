@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import android.content.Intent
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.db.person.local.PersonLocalDataSource.Query
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -23,8 +24,9 @@ import com.simprints.id.orchestrator.steps.fingerprint.FingerprintStepProcessor
 class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: FingerprintStepProcessor,
                                private val faceStepProcessor: FaceStepProcessor,
                                private val coreStepProcessor: CoreStepProcessor,
-                               private val prefs: PreferencesManager) :
-    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor) {
+                               private val prefs: PreferencesManager,
+                               sessionEventsManager: SessionEventsManager) :
+    ModalityFlowBaseImpl(coreStepProcessor, fingerprintStepProcessor, faceStepProcessor, sessionEventsManager) {
 
     override val steps: MutableList<Step> = mutableListOf()
 
@@ -68,6 +70,7 @@ class ModalityFlowIdentifyImpl(private val fingerprintStepProcessor: Fingerprint
         if (result is FingerprintCaptureResponse) {
             val query = buildQuery(appRequest, prefs.matchGroup)
             addMatchingStepForFinger(result.captureResult.mapNotNull { it.sample }, query)
+            extractFingerprintAndAddPersonCreationEvent(result)
         } else if (result is FaceCaptureResponse) {
             val query = buildQuery(appRequest, prefs.matchGroup)
             addMatchingStepForFace(result.capturingResult.mapNotNull { it.result }, query)

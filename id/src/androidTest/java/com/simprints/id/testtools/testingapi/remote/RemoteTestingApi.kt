@@ -10,7 +10,7 @@ import retrofit2.http.*
 interface RemoteTestingApi {
 
     companion object {
-        const val baseUrl = "https://dev.simprints-apis.com/androidapi/v1/"
+        const val baseUrl = "https://dev.simprints-apis.com/androidapi/v2/"
         const val apiKey: String = BuildConfig.ANDROID_AUTH_API_KEY
     }
 
