@@ -283,10 +283,10 @@ class SessionEventsUploaderTaskAndroidTest {
     }
 
     private fun SessionEvents.addCalloutEvent() {
-        addEvent(ConfirmationCalloutEvent(0, "projectId", RANDOM_GUID, RANDOM_GUID))
-        addEvent(EnrolmentCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
+        addEvent(EnrolmentCalloutEvent(1, "project_id", "user_id", "module_id", "metadata"))
+        addEvent(ConfirmationCalloutEvent(10, "projectId", RANDOM_GUID, RANDOM_GUID))
         addEvent(IdentificationCalloutEvent(0, "project_id", "user_id", "module_id", "metadata"))
-        addEvent(VerificationCalloutEvent(0, "project_id", "user_id", "module_id", RANDOM_GUID,"metadata"))
+        addEvent(VerificationCalloutEvent(2, "project_id", "user_id", "module_id", RANDOM_GUID,"metadata"))
     }
 
 
