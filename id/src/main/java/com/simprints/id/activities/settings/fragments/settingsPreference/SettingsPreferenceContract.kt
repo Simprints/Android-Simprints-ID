@@ -19,6 +19,10 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForAbout(): Preference
 
+        fun getPreferenceForSyncInformation(): Preference
+
+        fun getKeyForSyncInfoPreference(): String
+
         fun getKeyForLanguagePreference(): String
 
         fun getKeyForSelectModulesPreference(): String
@@ -38,6 +42,8 @@ interface SettingsPreferenceContract {
         fun openSettingAboutActivity()
 
         fun openModuleSelectionActivity()
+
+        fun openSyncInfoActivity()
     }
 
     interface Presenter : BasePresenter

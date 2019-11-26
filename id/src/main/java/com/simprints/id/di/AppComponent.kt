@@ -35,6 +35,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSele
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -125,6 +126,7 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
+    fun inject(syncInformationActivity: SyncInformationActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

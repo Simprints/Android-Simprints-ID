@@ -72,6 +72,10 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
                 summary = getString(R.string.preference_summary_modules)
             }
 
+            getPreferenceForSyncInformation().apply {
+                title = androidResourcesHelper.getString(R.string.preference_sync_information_title)
+            }
+
             getPreferenceForAbout().title = getString(R.string.preference_app_details_title)
         }
     }
@@ -124,8 +128,14 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun getPreferenceForAbout(): Preference =
         findPreference(getKeyForAboutPreference())
 
+    override fun getPreferenceForSyncInformation(): Preference =
+        findPreference(getKeyForSyncInfoPreference())
+
     override fun getKeyForAboutPreference(): String =
         androidResourcesHelper.getString(R.string.preference_app_details_key)
+
+    override fun getKeyForSyncInfoPreference(): String =
+        androidResourcesHelper.getString(R.string.preference_sync_info_key)
 
     override fun setSelectModulePreferenceEnabled(enabled: Boolean) {
         getPreferenceForSelectModules().isEnabled = enabled
@@ -152,6 +162,12 @@ class SettingsPreferenceFragment : PreferenceFragment(), SettingsPreferenceContr
     override fun openModuleSelectionActivity() {
         activity.runOnUiThreadIfStillRunning {
             (activity as SettingsActivity).openModuleSelectionActivity()
+        }
+    }
+
+    override fun openSyncInfoActivity() {
+        activity.runOnUiThreadIfStillRunning {
+            (activity as SettingsActivity).openSyncInformationActivity()
         }
     }
 }

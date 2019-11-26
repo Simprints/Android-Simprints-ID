@@ -84,6 +84,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
         loadValueAndBindChangeListener(view.getPreferenceForAbout())
+        loadValueAndBindChangeListener(view.getPreferenceForSyncInformation())
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
@@ -101,6 +102,12 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             view.getKeyForDefaultFingersPreference() -> {
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+            }
+            view.getKeyForSyncInfoPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    view.openSyncInfoActivity()
+                    true
+                }
             }
             view.getKeyForAboutPreference() -> {
                 preference.setOnPreferenceClickListener {
