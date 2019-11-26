@@ -64,6 +64,8 @@ class OrchestratorActivity : AppCompatActivity() {
             ?: throw InvalidAppRequest()
 
         vm.startModalityFlow(appRequest)
+        syncSchedulerHelper.scheduleBackgroundSyncs()
+        syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
