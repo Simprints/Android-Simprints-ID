@@ -122,6 +122,7 @@
                 <category android:name="LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.settings.syncinformation.SyncInformationActivity" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

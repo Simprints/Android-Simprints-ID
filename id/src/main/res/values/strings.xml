@@ -417,6 +417,7 @@
     <string name="setting_others">OTHERS</string>
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
     <string name="title_activity_settings_about">About</string>
+    <string name="title_activity_sync_information">Sync Information</string>
 
     <!--Settings Preferences titles and summaries-->
     <string name="preference_app_details_title">About</string>
@@ -426,6 +427,7 @@
     <string name="preference_select_fingers_title">Select default fingers</string>
     <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_app_version_title">App Version</string>
+    <string name="preference_sync_information_title">Sync Information</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>

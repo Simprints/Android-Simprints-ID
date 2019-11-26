@@ -19,6 +19,10 @@
             android:key="@string/preference_select_modules_key"
             android:summary="@string/preference_summary_modules"
             android:title="@string/preference_select_modules_title"/>
+
+        <Preference
+            android:key="@string/preference_sync_info_key"
+            android:title="@string/preference_sync_information_title" />
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/line_separator" />
