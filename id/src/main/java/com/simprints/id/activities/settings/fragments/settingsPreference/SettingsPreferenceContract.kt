@@ -13,8 +13,6 @@ interface SettingsPreferenceContract {
 
         fun getPreferenceForLanguage(): Preference
 
-        fun getPreferenceForSelectModules(): Preference
-
         fun getPreferenceForDefaultFingers(): Preference
 
         fun getPreferenceForAbout(): Preference
@@ -25,23 +23,15 @@ interface SettingsPreferenceContract {
 
         fun getKeyForLanguagePreference(): String
 
-        fun getKeyForSelectModulesPreference(): String
-
         fun getKeyForDefaultFingersPreference(): String
 
         fun getKeyForAboutPreference(): String
 
         fun setSelectModulePreferenceEnabled(enabled: Boolean)
 
-        fun showToastForNoModulesSelected()
-
-        fun showToastForTooManyModulesSelected(maxModules: Int)
-
         fun showToastForInvalidSelectionOfFingers()
 
         fun openSettingAboutActivity()
-
-        fun openModuleSelectionActivity()
 
         fun openSyncInfoActivity()
     }
