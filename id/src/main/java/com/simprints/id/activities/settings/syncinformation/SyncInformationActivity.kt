@@ -8,9 +8,11 @@ import android.widget.TabHost
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
+import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -23,6 +25,8 @@ class SyncInformationActivity : AppCompatActivity() {
     @Inject lateinit var viewModelFactory: SyncInformationViewModelFactory
     @Inject lateinit var preferencesManager: PreferencesManager
 
+    private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
+    private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
     private lateinit var viewModel: SyncInformationViewModel
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
     private lateinit var unselectedModulesTabSpec: TabHost.TabSpec
@@ -39,10 +43,16 @@ class SyncInformationActivity : AppCompatActivity() {
 
         setTextInLayout()
         disableModuleSelectionButtonIfNecessary()
+        setupAdapters()
         setupToolbar()
         setupModulesTabs()
         setupClickListeners()
         observeUi()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.start()
     }
 
     private fun setTextInLayout() {
@@ -66,6 +76,18 @@ class SyncInformationActivity : AppCompatActivity() {
     private fun disableModuleSelectionButtonIfNecessary() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
             moduleSelectionButton.visibility = View.VISIBLE
+        }
+    }
+
+    private fun setupAdapters() {
+        with(selectedModulesView) {
+            adapter = moduleCountAdapterForSelected
+            layoutManager = LinearLayoutManager(applicationContext)
+        }
+
+        with(unselectedModulesView) {
+            adapter = moduleCountAdapterForUnselected
+            layoutManager = LinearLayoutManager(applicationContext)
         }
     }
 
@@ -108,6 +130,14 @@ class SyncInformationActivity : AppCompatActivity() {
 
         viewModel.recordsToDownSyncCount.observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
+        })
+
+        viewModel.selectedModulesCount.observe(this, Observer {
+            moduleCountAdapterForSelected.submitList(it)
+        })
+
+        viewModel.unselectedModulesCount.observe(this, Observer {
+            moduleCountAdapterForUnselected.submitList(it)
         })
     }
 

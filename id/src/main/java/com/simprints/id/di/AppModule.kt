@@ -292,7 +292,10 @@ open class AppModule {
     @Provides
     open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
                                                     personLocalDataSource: PersonLocalDataSource,
+                                                    preferencesManager: PreferencesManager,
+                                                    loginInfoManager: LoginInfoManager,
                                                     syncScopesBuilder: SyncScopesBuilder) =
-        SyncInformationViewModelFactory(personRepository, personLocalDataSource, syncScopesBuilder)
+        SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), syncScopesBuilder)
 }
 
