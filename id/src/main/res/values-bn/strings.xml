@@ -276,4 +276,12 @@
     <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
     <string name="consent_general_title">সাধারন সম্মতি</string>
 
+    <string name="refusal_app_not_working">অ্যাপ কাজ করছে না</string>
+    <string name="refusal_data_concerns">তথ্য দিতে আগ্রহী নন</string>
+    <string name="refusal_does_not_have_permission">অনুমতি নেই</string>
+    <string name="refusal_person_not_present">ব্যক্তি উপস্থিত নয়</string>
+    <string name="refusal_religious_concerns">"ধর্মীয় সমস্যা   "</string>
+    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
+    <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
+    <string name="refusal_too_young">বয়স কম</string>
 </resources>
