@@ -21,6 +21,7 @@ import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_face_exit_form.*
 import org.jetbrains.anko.inputMethodManager
+import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
 class FaceExitFormActivity : AppCompatActivity() {
@@ -43,6 +44,7 @@ class FaceExitFormActivity : AppCompatActivity() {
         setTextInLayout()
 
         setRadioGroupListener()
+        setLayoutChangeListener()
     }
 
     private fun injectDependencies() {
@@ -72,6 +74,16 @@ class FaceExitFormActivity : AppCompatActivity() {
             enableSubmitButton()
             enableFaceExitFormText()
             handleRadioOptionIdentifierClick(optionIdentifier)
+        }
+    }
+
+    //Changes in the layout occur when the keyboard shows up
+    private fun setLayoutChangeListener() {
+        with (faceExitFormScrollView) {
+            onLayoutChange { _, _, _, _,
+                             _, _, _, _, _ ->
+                fullScroll(View.FOCUS_DOWN)
+            }
         }
     }
 
