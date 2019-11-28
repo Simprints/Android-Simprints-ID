@@ -423,8 +423,8 @@
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
-    <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_app_version_title">App Version</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
     <string name="preference_device_id_title">Device ID</string>
@@ -451,4 +451,11 @@
     <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
     <string name="why_did_you_skip_face">Why did you skip face scanning?</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
+    <!-- region Module selection -->
+    <string name="hint_search_modules">Search modules</string>
+    <string name="no_modules_selected">No modules selected</string>
+    <string name="no_results">No results</string>
+    <string name="selected_modules">Selected modules</string>
+    <!-- endregion -->
+
 </resources>

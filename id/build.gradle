@@ -23,8 +23,8 @@ android {
         targetSdkVersion 28
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
-        versionName "2019.4.0"
-        versionCode 185
+        versionName "2019.4.0-rc3"
+        versionCode 192
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         ndk {
@@ -185,6 +185,8 @@ dependencies {
     api deps.realm.android
     kapt deps.realm.annotations_processor
     compileOnly deps.realm.glassfish_annotation
+    implementation deps.koin.android
+    implementation deps.fuzzywuzzy.core
 
     // Koin
     api deps.koin.core
@@ -258,6 +260,7 @@ dependencies {
         exclude group: 'org.robolectric'
         exclude group: 'org.jetbrains.kotlinx'
     }
+    androidTestImplementation deps.testing.kappuccino
 
     implementation deps.rxjava2.tasks
 }

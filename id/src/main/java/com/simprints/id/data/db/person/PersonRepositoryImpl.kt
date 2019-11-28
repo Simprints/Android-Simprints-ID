@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.person
 
+import com.simprints.core.tools.extentions.resumeSafely
+import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
@@ -20,8 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
@@ -80,7 +80,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             val person = personLocalDataSource.load(PersonLocalDataSource.Query(personId = patientId)).first()
             PersonFetchResult(person, LOCAL)
         } catch (t: Throwable) {
-            tryToFetchPersonFromRemote(projectId, patientId)
+            tryToFetchPersonFromRemote(projectId, patientId).also { personFetchResult ->
+                personFetchResult.person?.let { savePersonInLocal(it) }
+            }
         }
 
     private suspend fun tryToFetchPersonFromRemote(projectId: String, patientId: String): PersonFetchResult =
@@ -88,11 +90,17 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             CoroutineScope(Dispatchers.IO).launch {
                 personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
                     .subscribeBy(
-                    onSuccess = { cont.resume(PersonFetchResult(it, REMOTE)) },
-                    onError = { cont.resumeWithException(it) }
+                    onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
+                    onError = { cont.resumeWithExceptionSafely(it) }
                 )
             }
         }
+
+    private fun savePersonInLocal(person: Person) {
+        CoroutineScope(Dispatchers.IO).launch {
+            personLocalDataSource.insertOrUpdate(listOf(person))
+        }
+    }
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))

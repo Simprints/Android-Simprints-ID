@@ -15,6 +15,7 @@ interface SettingsPreferencesManager {
     var projectLanguages: Array<String>
     var moduleIdOptions: Set<String>
     var selectedModules: Set<String>
+    var maxNumberOfModules: Int
     var syncGroup: GROUP
     var matchGroup: GROUP
     /** @throws JsonSyntaxException */
@@ -32,6 +33,6 @@ interface SettingsPreferencesManager {
 
     fun getRemoteConfigStringPreference(key: String): String
     fun <T: Any>getRemoteConfigComplexPreference(key: String, serializer: Serializer<T>): T
-
     fun getRemoteConfigFingerStatus(): Map<FingerIdentifier, Boolean>
+
 }

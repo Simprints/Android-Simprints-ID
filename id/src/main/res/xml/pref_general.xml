@@ -15,11 +15,10 @@
             android:entryValues="@array/finger_values"
             android:key="@string/preference_select_fingers_key"/>
 
-        <MultiSelectListPreference
-            android:entries="@array/empty"
-            android:entryValues="@array/empty"
+        <Preference
             android:key="@string/preference_select_modules_key"
-            android:shouldDisableView="true"/>
+            android:summary="@string/preference_summary_modules"
+            android:title="@string/preference_select_modules_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/line_separator" />
