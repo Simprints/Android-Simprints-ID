@@ -109,6 +109,9 @@ class PersonRepositoryTest {
 
         assertThat(fetch.person).isEqualTo(person)
         assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
+        fetch.person?.let {
+            verifyOnce(localDataSource) { runBlocking { insertOrUpdate(listOf(it)) } }
+        }
     }
 
     private fun assesDownSyncCount(remoteCounts: Map<SubSyncScope, Int>) {

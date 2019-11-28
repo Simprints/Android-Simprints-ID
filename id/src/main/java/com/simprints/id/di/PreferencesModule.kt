@@ -35,11 +35,15 @@ open class PreferencesModule {
 
     @Provides
     @Singleton
-    fun provideRemoteConfigFetcher(remoteConfig: FirebaseRemoteConfig): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
+    fun provideRemoteConfigFetcher(
+        remoteConfig: FirebaseRemoteConfig
+    ): RemoteConfigFetcher = RemoteConfigFetcher(remoteConfig)
 
     @Provides
     @Singleton
-    fun provideSharedPreferences(app: Application): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
+    fun provideSharedPreferences(
+        app: Application
+    ): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
     @Provides
     @Singleton
@@ -47,29 +51,36 @@ open class PreferencesModule {
     fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 
+    @Provides
+    @Singleton
+    fun provideImprovedSharedPreferences(
+        basePrefs: SharedPreferences
+    ): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
 
     @Provides
     @Singleton
-    fun provideImprovedSharedPreferences(basePrefs: SharedPreferences): ImprovedSharedPreferences = ImprovedSharedPreferencesImpl(basePrefs)
+    fun provideRemoteConfigWrapper(
+        remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences
+    ): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
 
     @Provides
     @Singleton
-    fun provideRemoteConfigWrapper(remoteConfig: FirebaseRemoteConfig, prefs: ImprovedSharedPreferences): RemoteConfigWrapper = RemoteConfigWrapper(remoteConfig, prefs)
+    fun provideScannerAttributesPreferencesManager(
+        prefs: ImprovedSharedPreferences
+    ): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
 
     @Provides
     @Singleton
-    fun provideScannerAttributesPreferencesManager(prefs: ImprovedSharedPreferences): ScannerAttributesPreferencesManager = ScannerAttributesPreferencesManagerImpl(prefs)
-
-    @Provides
-    @Singleton
-    open fun provideSettingsPreferencesManager(prefs: ImprovedSharedPreferences,
-                                               remoteConfigWrapper: RemoteConfigWrapper,
-                                               @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
-                                               @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
-                                               @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>,
-                                               @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
-                                               @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
-                                               @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>): SettingsPreferencesManager =
+    open fun provideSettingsPreferencesManager(
+        prefs: ImprovedSharedPreferences,
+        remoteConfigWrapper: RemoteConfigWrapper,
+        @Named("FingerIdToBooleanSerializer") fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
+        @Named("GroupSerializer") groupSerializer: Serializer<GROUP>,
+        @Named("LanguagesStringArraySerializer") languagesStringArraySerializer: Serializer<Array<String>>,
+        @Named("ModuleIdOptionsStringSetSerializer") moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
+        @Named("PeopleDownSyncTriggerToBooleanSerializer") peopleDownSyncTriggerToBooleanSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>,
+        @Named("ModalitiesSerializer") modalitiesSerializer: Serializer<List<Modality>>
+    ): SettingsPreferencesManager =
         SettingsPreferencesManagerImpl(prefs,
             remoteConfigWrapper,
             fingerIdToBooleanSerializer,
@@ -85,4 +96,5 @@ open class PreferencesModule {
                                   lastEventsPreferencesManager: RecentEventsPreferencesManager,
                                   app: Application): PreferencesManager =
         PreferencesManagerImpl(settingsPreferencesManager, lastEventsPreferencesManager, app)
+
 }
