@@ -1,5 +1,7 @@
 package com.simprints.id.data.db.person
 
+import com.simprints.core.tools.extentions.resumeSafely
+import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
@@ -20,8 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
@@ -90,8 +90,8 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             CoroutineScope(Dispatchers.IO).launch {
                 personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
                     .subscribeBy(
-                    onSuccess = { cont.resume(PersonFetchResult(it, REMOTE)) },
-                    onError = { cont.resumeWithException(it) }
+                    onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
+                    onError = { cont.resumeWithExceptionSafely(it) }
                 )
             }
         }
