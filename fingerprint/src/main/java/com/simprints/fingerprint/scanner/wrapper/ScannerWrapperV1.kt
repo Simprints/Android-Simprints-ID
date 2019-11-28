@@ -1,9 +1,6 @@
 package com.simprints.fingerprint.scanner.wrapper
 
 import com.simprints.fingerprint.scanner.domain.AcquireImageResponse
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
