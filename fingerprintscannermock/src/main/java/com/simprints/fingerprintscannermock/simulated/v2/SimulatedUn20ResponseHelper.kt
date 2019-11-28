@@ -10,6 +10,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
 import com.simprints.fingerprintscannermock.simulated.common.RealisticSpeedBehaviour
 import com.simprints.fingerprintscannermock.simulated.common.SimulationSpeedBehaviour
+import kotlin.random.Random
 
 class SimulatedUn20ResponseHelper(private val simulatedScannerManager: SimulatedScannerManager,
                                   private val simulatedScannerV2: SimulatedScannerV2) : SimulatedResponseHelperV2<Un20Command, Un20Response> {
@@ -27,7 +28,7 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             is GetTemplateCommand -> GetTemplateResponse(command.templateType, simulatedScannerManager.currentMockFinger().toV2().templateBytes
                 .also { simulatedScannerManager.cycleToNextFinger() })
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
-            is GetImageCommand -> GetImageResponse(command.imageFormat, byteArrayOf()) // TODO
+            is GetImageCommand -> GetImageResponse(command.imageFormat, Random.nextBytes(120000)) // TODO
             else -> throw UnsupportedOperationException("Unmocked response to $command in SimulatedUn20ResponseHelper")
         }
 

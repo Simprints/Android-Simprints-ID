@@ -42,7 +42,7 @@ class CollectFingerprintsIndicatorsHelper(private val context: Context,
     }
 
     private fun handleIndicatorClick(fingerPosition: Int) {
-        if (presenter.currentFinger().status != FingerStatus.COLLECTING) {
+        if (presenter.currentFinger().status != FingerStatus.COLLECTING && presenter.currentFinger().status != FingerStatus.TRANSFERRING_IMAGE) {
             view.viewPager.currentItem = fingerPosition
         }
     }

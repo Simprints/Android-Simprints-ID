@@ -22,10 +22,12 @@ import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEv
 import com.simprints.fingerprint.controllers.core.eventData.model.FingerprintCaptureEvent
 import com.simprints.fingerprint.controllers.core.flow.Action.*
 import com.simprints.fingerprint.controllers.core.flow.MasterFlowManager
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageManager
 import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
 import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.scanner.ScannerManager
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.*
 import kotlin.math.min
@@ -39,7 +41,8 @@ class CollectFingerprintsPresenter(private val context: Context,
                                    private val scannerManager: ScannerManager,
                                    private val androidResourcesHelper: FingerprintAndroidResourcesHelper,
                                    private val masterFlowManager: MasterFlowManager,
-                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager)
+                                   private val fingerprintPreferencesManager: FingerprintPreferencesManager,
+                                   private val imageManager: FingerprintImageManager)
     : CollectFingerprintsContract.Presenter {
 
     private lateinit var scanningHelper: CollectFingerprintsScanningHelper
@@ -76,7 +79,15 @@ class CollectFingerprintsPresenter(private val context: Context,
     }
 
     private fun initScanningHelper(context: Context, view: CollectFingerprintsContract.View) {
-        scanningHelper = CollectFingerprintsScanningHelper(context, view, this, scannerManager, crashReportManager, androidResourcesHelper)
+        scanningHelper = CollectFingerprintsScanningHelper(
+            context,
+            view,
+            this,
+            scannerManager,
+            crashReportManager,
+            androidResourcesHelper,
+            fingerprintPreferencesManager
+        )
     }
 
     private fun initScanButtonListeners() {
@@ -209,7 +220,7 @@ class CollectFingerprintsPresenter(private val context: Context,
             Toast.makeText(context, androidResourcesHelper.getString(R.string.no_fingers_scanned), Toast.LENGTH_LONG).show()
             handleRestart()
         } else {
-            proceedToFinish(fingers.mapNotNull { it.template })
+            saveImagesAndProceedToFinish(fingers.filter { it.template != null })
         }
     }
 
@@ -218,6 +229,17 @@ class CollectFingerprintsPresenter(private val context: Context,
             if (it.isShowing) {
                 it.dismiss()
             }
+        }
+    }
+
+    private fun saveImagesAndProceedToFinish(fingerprints: List<Finger>) {
+        runBlocking {
+            fingerprints.forEach { finger ->
+                finger.imageBytes?.let { imageBytes ->
+                    finger.template?.imageRef = imageManager.save(imageBytes)
+                }
+            }
+            proceedToFinish(fingerprints.mapNotNull { it.template })
         }
     }
 
@@ -296,6 +318,7 @@ class CollectFingerprintsPresenter(private val context: Context,
         private const val maximumTotalNumberOfFingersForAutoAdding = 4
         const val numberOfBadScansRequiredToAutoAddNewFinger = 3
         const val qualityThreshold = 60
-        const val timeoutInMillis = 3000
+        const val scanningTimeoutMs = 3000L
+        const val imageTransferTimeoutMs = 3000L
     }
 }

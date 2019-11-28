@@ -2,6 +2,7 @@ package com.simprints.fingerprint.data.domain.fingerprint
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.simprints.fingerprint.controllers.core.image.FingerprintImageRef
 import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
 import java.nio.ByteBuffer
@@ -10,7 +11,8 @@ import com.simprints.fingerprintmatcher.Fingerprint as FingerprintMatcher
 
 @Parcelize
 class Fingerprint(val fingerId: FingerIdentifier,
-                  val template: ByteBuffer) : Parcelable {
+                  val template: ByteBuffer,
+                  var imageRef: FingerprintImageRef? = null) : Parcelable {
 
     /**
      * @return A newly allocated byte array containing the ISO 2005 template of
