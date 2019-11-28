@@ -36,7 +36,7 @@ interface CollectFingerprintsContract {
         // Scanning
         var scanButton: Button
         var progressBar: ProgressBar
-        var timeoutBar: com.simprints.fingerprint.activities.collect.views.TimeoutBar
+        var timeoutBar: com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
         var un20WakeupDialog: ProgressDialog
 
         // Indicators

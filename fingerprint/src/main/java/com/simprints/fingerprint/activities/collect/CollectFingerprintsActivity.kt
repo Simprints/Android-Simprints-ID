@@ -18,7 +18,7 @@ import com.simprints.fingerprint.activities.alert.FingerprintAlert
 import com.simprints.fingerprint.activities.base.FingerprintActivity
 import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
 import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
-import com.simprints.fingerprint.activities.collect.views.TimeoutBar
+import com.simprints.fingerprint.activities.collect.timeoutbar.ScanningTimeoutBar
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
 import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
 import com.simprints.fingerprint.orchestrator.domain.RequestCode
@@ -44,7 +44,7 @@ class CollectFingerprintsActivity :
     override lateinit var pageAdapter: FingerPageAdapter
     override lateinit var scanButton: Button
     override lateinit var progressBar: ProgressBar
-    override lateinit var timeoutBar: TimeoutBar
+    override lateinit var timeoutBar: ScanningTimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
 
     private var rightToLeft: Boolean = false

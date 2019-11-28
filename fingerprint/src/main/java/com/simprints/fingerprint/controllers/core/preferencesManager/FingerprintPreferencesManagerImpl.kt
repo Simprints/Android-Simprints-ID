@@ -33,5 +33,5 @@ class FingerprintPreferencesManagerImpl(private val prefs: PreferencesManager): 
         get() = prefs.fingerImagesExist
 
     override val saveImages: Boolean
-        get() = true // TODO : Delegate to core preferences manager
+        get() = false // TODO : Delegate to core preferences manager
 }
