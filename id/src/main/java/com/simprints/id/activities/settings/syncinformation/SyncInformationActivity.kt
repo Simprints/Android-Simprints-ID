@@ -27,6 +27,7 @@ class SyncInformationActivity : AppCompatActivity() {
 
     private val moduleCountAdapterForSelected by lazy { ModuleCountAdapter() }
     private val moduleCountAdapterForUnselected by lazy { ModuleCountAdapter() }
+
     private lateinit var viewModel: SyncInformationViewModel
     private lateinit var selectedModulesTabSpec: TabHost.TabSpec
     private lateinit var unselectedModulesTabSpec: TabHost.TabSpec
@@ -52,6 +53,7 @@ class SyncInformationActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        clearValues()
         viewModel.start()
     }
 
@@ -71,6 +73,13 @@ class SyncInformationActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun clearValues() {
+        recordsToUploadCount.text = androidResourcesHelper.getString(R.string.empty)
+        recordsToDownloadCount.text = androidResourcesHelper.getString(R.string.empty)
+        totalRecordsCount.text = androidResourcesHelper.getString(R.string.empty)
+        recordsToDeleteCount.text = androidResourcesHelper.getString(R.string.empty)
     }
 
     private fun disableModuleSelectionButtonIfNecessary() {
@@ -111,7 +120,6 @@ class SyncInformationActivity : AppCompatActivity() {
             .setContent(R.id.unselectedModulesView)
 
         modulesTabHost.addTab(selectedModulesTabSpec)
-        modulesTabHost.addTab(unselectedModulesTabSpec)
     }
 
     private fun setupClickListeners() {
@@ -119,30 +127,66 @@ class SyncInformationActivity : AppCompatActivity() {
             startActivity(Intent(this, ModuleSelectionActivity::class.java))
         }
     }
+
     private fun observeUi() {
+        observeLocalRecordCount()
+        observeUpSyncRecordCount()
+        observeDownSyncRecordCount()
+        observeSelectedModules()
+        observeUnselectedModules()
+    }
+
+    private fun observeLocalRecordCount() {
         viewModel.localRecordCount.observe(this, Observer {
             totalRecordsCount.text = it.toString()
         })
+    }
 
+    private fun observeUpSyncRecordCount() {
         viewModel.recordsToUpSyncCount.observe(this, Observer {
             recordsToUploadCount.text = it.toString()
         })
+    }
 
+    private fun observeDownSyncRecordCount() {
         viewModel.recordsToDownSyncCount.observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
         })
+    }
 
+    private fun observeSelectedModules() {
         viewModel.selectedModulesCount.observe(this, Observer {
             moduleCountAdapterForSelected.submitList(it)
         })
+    }
 
+    private fun observeUnselectedModules() {
         viewModel.unselectedModulesCount.observe(this, Observer {
-            moduleCountAdapterForUnselected.submitList(it)
+            if (it.isEmpty()) {
+                removeUnselectedModulesTab()
+            } else {
+                addUnselectedModulesTabIfNecessary()
+                moduleCountAdapterForUnselected.submitList(it)
+            }
         })
+    }
+
+    private fun removeUnselectedModulesTab() {
+        with(modulesTabHost.tabWidget) {
+            removeView(getChildTabViewAt(UNSELECTED_MODULES_TAB_INDEX))
+        }
+    }
+
+    private fun addUnselectedModulesTabIfNecessary() {
+        if (modulesTabHost.tabWidget.tabCount != MAX_MODULES_TAB_COUNT) {
+            modulesTabHost.addTab(unselectedModulesTabSpec)
+        }
     }
 
     companion object {
         private const val SELECTED_MODULES_TAB_TAG = "SelectedModules"
         private const val UNSELECTED_MODULES_TAB_TAG = "UnselectedModules"
+        private const val UNSELECTED_MODULES_TAB_INDEX = 1
+        private const val MAX_MODULES_TAB_COUNT = 2
     }
 }
