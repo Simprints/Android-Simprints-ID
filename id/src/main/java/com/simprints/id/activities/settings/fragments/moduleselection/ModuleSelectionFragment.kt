@@ -58,8 +58,14 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
+        searchView.setQuery("", false)
         updateSelectionIfPossible(module)
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+        scrollView.post {
+            scrollView.isSmoothScrollingEnabled = false
+            scrollView.fullScroll(View.FOCUS_DOWN)
+            scrollView.isSmoothScrollingEnabled = true
+        }
+        searchView.requestFocus()
     }
 
     override fun onChipClick(module: Module) {
@@ -116,9 +122,16 @@ class ModuleSelectionFragment(
 
             when {
                 isModuleSelected && !isModuleDisplayed -> addChipForModule(module)
-                !isModuleSelected && isModuleDisplayed -> removeChipForModule(module)
+                !isModuleSelected && isModuleDisplayed -> {
+                    removeChipForModule(module)
+                    hideKeyboard()
+                }
             }
         }
+    }
+
+    private fun hideKeyboard() {
+        requireActivity().hideKeyboard()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -190,7 +203,7 @@ class ModuleSelectionFragment(
     private fun EditText.observeSearchButton() {
         onEditorAction { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                requireActivity().hideKeyboard()
+                hideKeyboard()
                 v?.clearFocus()
                 rvModules.requestFocus()
             }
