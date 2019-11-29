@@ -119,4 +119,6 @@
     <string name="refusal_app_not_working">አፕልኬሽኑ አይሰራም</string>
     <string name="refusal_other">ተጨማሪ</string>
     <string name="why_did_you_skip_fingerprinting">የጣት አሻራውን ለምንድን ነው የሚዘሉት?</string>
+    <string name="button_scan_prints">የጣት አሻራውን እስካን ያድርጉ</string>
+    <string name="button_submit">ይላኩ</string>
 </resources>
