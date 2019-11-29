@@ -2,11 +2,13 @@ package com.simprints.id.activities.settings.syncinformation
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.simprints.id.R
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -14,8 +16,9 @@ import io.reactivex.schedulers.Schedulers
 class SyncInformationViewModel(private val personRepository: PersonRepository,
                                private val personLocalDataSource: PersonLocalDataSource,
                                private val preferencesManager: PreferencesManager,
+                               private val androidResourcesHelper: AndroidResourcesHelper,
                                private val projectId: String,
-                               private val selectedSyncScope: SyncScope?) : ViewModel() {
+                               private val syncScopesBuilder: SyncScopesBuilder) : ViewModel() {
 
     val localRecordCount = MutableLiveData<Int>()
     val recordsToUpSyncCount = MutableLiveData<Int>()
@@ -31,22 +34,16 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         fetchAndUpdatedUnselectedModulesCount()
     }
 
-    private fun fetchAndUpdateLocalRecordCount() =
-        selectedSyncScope?.let { syncScope ->
-            personRepository.localCountForSyncScope(syncScope).subscribeBy { peopleCounts ->
-                localRecordCount.postValue(peopleCounts.sumBy {
-                    it.count
-                })
-            }
-        }
+    internal fun fetchAndUpdateLocalRecordCount() {
+        localRecordCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(projectId = projectId))
+    }
 
-    private fun fetchAndUpdateRecordsToUpSyncCount() =
-        recordsToUpSyncCount.postValue(
-            personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
-        )
+    private fun fetchAndUpdateRecordsToUpSyncCount() {
+        recordsToUpSyncCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
+    }
 
-    private fun fetchAndUpdateRecordsToDownSyncCount() =
-        selectedSyncScope?.let { syncScope ->
+    internal fun fetchAndUpdateRecordsToDownSyncCount() =
+        syncScopesBuilder.buildSyncScope()?.let { syncScope ->
             personRepository.countToDownSync(syncScope)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -57,7 +54,7 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
                 }
         }
 
-    private fun fetchAndUpdateSelectedModulesCount() {
+    internal fun fetchAndUpdateSelectedModulesCount() {
             val moduleCounts = ArrayList<ModuleCount>()
             moduleCounts.addAll(
                 preferencesManager.selectedModules.map {
@@ -66,10 +63,11 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
                         moduleId = it)))
                 }
             )
-            val totalEntry = ModuleCount("Total records", moduleCounts.sumBy { it.count })
-            moduleCounts.add(0, totalEntry)
+            val totalRecordsEntry = ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+                moduleCounts.sumBy { it.count })
+            moduleCounts.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
-            selectedModulesCount.postValue(moduleCounts)
+            selectedModulesCount.value = moduleCounts
     }
 
     private fun fetchAndUpdatedUnselectedModulesCount() {
@@ -82,9 +80,14 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
                 moduleId = it)))
         }
         )
-        val totalEntry = ModuleCount("Total records", unselectedModulesWithCount.sumBy { it.count })
-        unselectedModulesWithCount.add(0, totalEntry)
+        val totalRecordsEntry = ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+            unselectedModulesWithCount.sumBy { it.count })
+        unselectedModulesWithCount.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
 
-        unselectedModulesCount.postValue(unselectedModulesWithCount.filter { it.count > 0 })
+        unselectedModulesCount.value = unselectedModulesWithCount.filter { it.count > 0 }
+    }
+
+    companion object {
+        private const val TOTAL_RECORDS_INDEX = 0
     }
 }

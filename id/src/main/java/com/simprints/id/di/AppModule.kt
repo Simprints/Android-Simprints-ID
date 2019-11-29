@@ -294,8 +294,9 @@ open class AppModule {
                                                     personLocalDataSource: PersonLocalDataSource,
                                                     preferencesManager: PreferencesManager,
                                                     loginInfoManager: LoginInfoManager,
-                                                    syncScopesBuilder: SyncScopesBuilder) =
+                                                    syncScopesBuilder: SyncScopesBuilder,
+                                                    androidResourcesHelper: AndroidResourcesHelper) =
         SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), syncScopesBuilder)
+            loginInfoManager.getSignedInProjectIdOrEmpty(), syncScopesBuilder, androidResourcesHelper)
 }
 
