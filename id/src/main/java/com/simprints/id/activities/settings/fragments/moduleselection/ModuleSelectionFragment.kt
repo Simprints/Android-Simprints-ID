@@ -122,9 +122,16 @@ class ModuleSelectionFragment(
 
             when {
                 isModuleSelected && !isModuleDisplayed -> addChipForModule(module)
-                !isModuleSelected && isModuleDisplayed -> removeChipForModule(module)
+                !isModuleSelected && isModuleDisplayed -> {
+                    removeChipForModule(module)
+                    hideKeyboard()
+                }
             }
         }
+    }
+
+    private fun hideKeyboard() {
+        requireActivity().hideKeyboard()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -196,7 +203,7 @@ class ModuleSelectionFragment(
     private fun EditText.observeSearchButton() {
         onEditorAction { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                requireActivity().hideKeyboard()
+                hideKeyboard()
                 v?.clearFocus()
                 rvModules.requestFocus()
             }
