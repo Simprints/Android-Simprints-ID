@@ -58,11 +58,13 @@ class PeopleUpSyncUploaderTask(
         updateLastUpSyncTime()
     }
 
-    private fun uploadPeople(people: List<Person>) =
+    private fun uploadPeople(people: List<Person>) {
         try {
-            personRemoteDataSource
-                .uploadPeople(projectId, people)
-                .blockingAwait()
+            if (people.isNotEmpty()) {
+                personRemoteDataSource
+                    .uploadPeople(projectId, people)
+                    .blockingAwait()
+            }
         } catch (exception: IOException) {
             throw TransientSyncFailureException(cause = exception)
         } catch (exception: SimprintsInternalServerException) {
@@ -74,6 +76,7 @@ class PeopleUpSyncUploaderTask(
                 exception
             }
         }
+    }
 
     private fun markPeopleAsSynced(people: List<Person>) {
         val updatedPeople = people.map { it.copy(toSync = false) }
