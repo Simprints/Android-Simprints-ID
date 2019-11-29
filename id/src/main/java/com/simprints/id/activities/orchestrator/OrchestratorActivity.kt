@@ -68,8 +68,14 @@ class OrchestratorActivity : AppCompatActivity() {
         syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        vm.saveState()
+    }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
+        vm.restoreState()
         orchestratorState = RESTORED
     }
 
@@ -78,17 +84,19 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
-        when (orchestratorState) {
-            STARTED -> vm.clearState()
-            RESTORED -> vm.restoreState()
-            RESUMED -> {}
+        if(orchestratorState == STARTED) {
+            vm.clearState()
         }
-
         orchestratorState = RESUMED
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vm.saveState()
     }
 }
