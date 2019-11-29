@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.OrchestratorState.*
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -29,7 +28,7 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var timeHelper: TimeHelper
 
-    private var orchestratorState = STARTED
+    private var newActivity = true
 
     private val observerForNextStep = Observer<Step?> {
         it?.let {
@@ -76,7 +75,7 @@ class OrchestratorActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
         vm.restoreState()
-        orchestratorState = RESTORED
+        newActivity = false
     }
 
     override fun onResume() {
@@ -84,10 +83,10 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
-        if(orchestratorState == STARTED) {
+        if(newActivity) {
             vm.clearState()
         }
-        orchestratorState = RESUMED
+        newActivity = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
