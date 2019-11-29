@@ -58,8 +58,14 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
+        searchView.setQuery("", false)
         updateSelectionIfPossible(module)
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+        scrollView.post {
+            scrollView.isSmoothScrollingEnabled = false
+            scrollView.fullScroll(View.FOCUS_DOWN)
+            scrollView.isSmoothScrollingEnabled = true
+        }
+        searchView.requestFocus()
     }
 
     override fun onChipClick(module: Module) {
