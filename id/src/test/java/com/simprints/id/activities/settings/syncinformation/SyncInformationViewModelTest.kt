@@ -11,8 +11,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncSc
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Single
@@ -32,7 +30,6 @@ class SyncInformationViewModelTest {
     @Mock lateinit var personRepositoryMock: PersonRepository
     @Mock lateinit var preferencesManagerMock: PreferencesManager
     @Mock lateinit var syncScopesBuilderMock: SyncScopesBuilder
-    @Mock lateinit var androidResourcesHelper: AndroidResourcesHelper
     private val projectId = "projectId"
 
     @Before
@@ -46,7 +43,7 @@ class SyncInformationViewModelTest {
         val totalRecordsInLocal = 322
         whenever(personLocalDataSourceMock) { count(any()) } thenReturn totalRecordsInLocal
 
-        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, mock(), projectId, syncScopesBuilderMock)
+        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, syncScopesBuilderMock)
         viewModel.fetchAndUpdateLocalRecordCount()
 
         assertThat(viewModel.localRecordCount.value).isEqualTo(totalRecordsInLocal)
@@ -59,7 +56,7 @@ class SyncInformationViewModelTest {
         whenever(syncScopesBuilderMock) { buildSyncScope() } thenReturn SyncScope(projectId, null, null)
         whenever(personRepositoryMock) { countToDownSync(any()) } thenReturn Single.just(listOf(peopleCount))
 
-        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, mock(), projectId, syncScopesBuilderMock)
+        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, syncScopesBuilderMock)
         viewModel.fetchAndUpdateRecordsToDownSyncCount()
 
         assertThat(viewModel.recordsToDownSyncCount.value).isEqualTo(countInRemote)
@@ -67,19 +64,15 @@ class SyncInformationViewModelTest {
 
     @Test
     fun fetchSelectedModulesCount_shouldUpdateValue() {
-        val totalRecordsText = "Total records"  
         val moduleName = "module1"
         val countForModule = 123
-
         whenever(preferencesManagerMock) { selectedModules } thenReturn setOf(moduleName)
         whenever(personLocalDataSourceMock) { count(any()) } thenReturn countForModule
 
-        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, mock(), projectId, syncScopesBuilderMock)
+        val viewModel = SyncInformationViewModel(personRepositoryMock, personLocalDataSourceMock, preferencesManagerMock, projectId, syncScopesBuilderMock)
         viewModel.fetchAndUpdateSelectedModulesCount()
 
-        assertThat(viewModel.selectedModulesCount.value?.first()?.name).isEqualTo("Total records")
+        assertThat(viewModel.selectedModulesCount.value?.first()?.name).isEqualTo(moduleName)
         assertThat(viewModel.selectedModulesCount.value?.first()?.count).isEqualTo(countForModule)
-        assertThat(viewModel.selectedModulesCount.value?.get(1)?.name).isEqualTo(moduleName)
-        assertThat(viewModel.selectedModulesCount.value?.get(1)?.count).isEqualTo(countForModule)
     }
 }
