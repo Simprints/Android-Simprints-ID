@@ -31,7 +31,7 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
 
         presenter.start(clientApiAlertType)
 
-        textView_close_button.setOnClickListener { presenter.handleCloseClick() }
+        textView_close_button.setOnClickListener { presenter.handleCloseOrBackClick() }
     }
 
     private fun setTextInLayout() {
@@ -56,5 +56,9 @@ class ErrorActivity : AppCompatActivity(), ErrorContract.View {
     }
 
     override fun getStringFromResources(res: Int): String = androidResHelper.getString(res)
+
+    override fun onBackPressed() {
+        presenter.handleCloseOrBackClick()
+    }
 
 }

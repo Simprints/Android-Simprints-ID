@@ -20,7 +20,7 @@ interface ErrorContract {
 
         fun start(clientApiAlert: ClientApiAlert)
 
-        fun handleCloseClick()
+        fun handleCloseOrBackClick()
 
     }
 
