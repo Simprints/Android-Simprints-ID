@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.ModuleSelectionActivity
+import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCount
 import com.simprints.id.activities.settings.syncinformation.modulecount.ModuleCountAdapter
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -54,6 +55,7 @@ class SyncInformationActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         clearValues()
+        setFocusOnDefaultModulesTab()
         viewModel.start()
     }
 
@@ -80,6 +82,10 @@ class SyncInformationActivity : AppCompatActivity() {
         recordsToDownloadCount.text = androidResourcesHelper.getString(R.string.empty)
         totalRecordsCount.text = androidResourcesHelper.getString(R.string.empty)
         recordsToDeleteCount.text = androidResourcesHelper.getString(R.string.empty)
+    }
+
+    private fun setFocusOnDefaultModulesTab() {
+        modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
     }
 
     private fun disableModuleSelectionButtonIfNecessary() {
@@ -156,7 +162,7 @@ class SyncInformationActivity : AppCompatActivity() {
 
     private fun observeSelectedModules() {
         viewModel.selectedModulesCount.observe(this, Observer {
-            moduleCountAdapterForSelected.submitList(it)
+            addTotalRowAndSubmitList(it, moduleCountAdapterForSelected)
         })
     }
 
@@ -166,9 +172,21 @@ class SyncInformationActivity : AppCompatActivity() {
                 removeUnselectedModulesTab()
             } else {
                 addUnselectedModulesTabIfNecessary()
-                moduleCountAdapterForUnselected.submitList(it)
+                addTotalRowAndSubmitList(it, moduleCountAdapterForUnselected)
             }
         })
+    }
+
+    private fun addTotalRowAndSubmitList(moduleCounts: List<ModuleCount>, moduleCountAdapter: ModuleCountAdapter) {
+        val moduleCountsArray = ArrayList<ModuleCount>().apply {
+            addAll(moduleCounts)
+        }
+
+        val totalRecordsEntry = ModuleCount(androidResourcesHelper.getString(R.string.sync_info_total_records),
+            moduleCounts.sumBy { it.count })
+        moduleCountsArray.add(TOTAL_RECORDS_INDEX, totalRecordsEntry)
+
+        moduleCountAdapter.submitList(moduleCountsArray)
     }
 
     private fun removeUnselectedModulesTab() {
@@ -188,5 +206,6 @@ class SyncInformationActivity : AppCompatActivity() {
         private const val UNSELECTED_MODULES_TAB_TAG = "UnselectedModules"
         private const val UNSELECTED_MODULES_TAB_INDEX = 1
         private const val MAX_MODULES_TAB_COUNT = 2
+        private const val TOTAL_RECORDS_INDEX = 0
     }
 }
