@@ -1,8 +1,9 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import androidx.security.crypto.EncryptedSharedPreferences
+import android.content.SharedPreferences
 import com.simprints.id.Application
+import com.simprints.id.commontesttools.state.setupFakeEncryptedSharedPreferences
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEventsLocalDbManager
@@ -18,8 +19,8 @@ import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
@@ -58,7 +59,8 @@ class TestAppModule(app: Application,
                     var countTaskRule: DependencyRule = RealRule,
                     var downSyncTaskRule: DependencyRule = RealRule,
                     var syncSchedulerHelperRule: DependencyRule = RealRule,
-                    var downSyncManagerRule: DependencyRule = RealRule) : AppModule() {
+                    var downSyncManagerRule: DependencyRule = RealRule,
+                    var encryptedSharedPreferencesRule: DependencyRule = DependencyRule.ReplaceRule { setupFakeEncryptedSharedPreferences(app) }) : AppModule() {
 
     override fun provideCrashManager(): CrashReportManager =
         crashReportManagerRule.resolveDependency { super.provideCrashManager() }
@@ -80,7 +82,7 @@ class TestAppModule(app: Application,
                                   database: SyncStatusDatabase): SignerManager =
         dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database) }
 
-    override fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: EncryptedSharedPreferences,
+    override fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: SharedPreferences,
                                                  randomGenerator: RandomGenerator,
                                                  unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
         secureDataManagerRule.resolveDependency { super.provideSecureLocalDbKeyProvider(encryptedSharedPrefs, randomGenerator, unsecuredLocalDbKeyProvider) }
@@ -145,4 +147,8 @@ class TestAppModule(app: Application,
 
     override fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
         downSyncManagerRule.resolveDependency { super.provideDownSyncManager(syncScopesBuilder) }
+
+    override fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        encryptedSharedPreferencesRule.resolveDependency { super.provideEncryptedSharedPreferences(app) }
+
 }

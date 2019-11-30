@@ -1,7 +1,6 @@
 package com.simprints.id.di
 
 import android.content.SharedPreferences
-import androidx.security.crypto.EncryptedSharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.FingerIdentifier
@@ -16,7 +15,6 @@ import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttribu
 import com.simprints.id.data.prefs.sessionState.scannerAttributes.ScannerAttributesPreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManagerImpl
-import com.simprints.id.data.secure.EncryptedSharedPreferencesFactoryImpl
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
@@ -45,10 +43,6 @@ open class PreferencesModule {
     fun provideSharedPreferences(
         app: Application
     ): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
-
-    @Provides
-    fun provideEncryptedSharedPreferences(app: Application): EncryptedSharedPreferences =
-        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 
     @Provides
     @Singleton

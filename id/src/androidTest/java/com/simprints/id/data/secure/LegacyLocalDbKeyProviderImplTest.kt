@@ -20,7 +20,7 @@ import org.mockito.Mockito.spy
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-class SecureDataManagerTest {
+class LegacyLocalDbKeyProviderImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
 

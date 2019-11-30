@@ -1,6 +1,6 @@
 package com.simprints.id.di
 
-import androidx.security.crypto.EncryptedSharedPreferences
+import android.content.SharedPreferences
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelper
 import com.simprints.id.activities.orchestrator.OrchestratorEventsHelperImpl
 import com.simprints.id.activities.orchestrator.OrchestratorViewModelFactory
@@ -124,7 +124,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideHotCache(
-        sharedPrefs: EncryptedSharedPreferences,
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
     ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
 

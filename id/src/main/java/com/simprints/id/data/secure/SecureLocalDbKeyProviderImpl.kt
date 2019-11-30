@@ -1,13 +1,13 @@
 package com.simprints.id.data.secure
 
+import android.content.SharedPreferences
 import android.util.Base64.*
-import androidx.security.crypto.EncryptedSharedPreferences
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import timber.log.Timber
 
-class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: EncryptedSharedPreferences,
+class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
                                    private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
                                    private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider {
 
@@ -23,27 +23,33 @@ class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: EncryptedSh
         }
     }
 
-    override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey =
+    override fun getLocalDbKeyOrThrow(projectId: String): LocalDbKey {
         try {
             val key = readRealmKeyFromSharedPrefs(projectId)
                 ?: throw MissingLocalDatabaseKeyException()
-            LocalDbKey(projectId, decode(key, DEFAULT))
+            return LocalDbKey(projectId, decode(key, DEFAULT))
         } catch (t: Throwable) {
-            if(t is MissingLocalDatabaseKeyException) {
-                migrateFromUnsecuredKey(projectId)
+            if (t is MissingLocalDatabaseKeyException) {
+                migrateFromUnsecuredKey(projectId)?.let {
+                    return it
+                }
             }
 
             throw t
         }
+    }
 
-    private fun migrateFromUnsecuredKey(projectId: String) {
+    private fun migrateFromUnsecuredKey(projectId: String):LocalDbKey? {
         try {
             val legacyLocalDbKey = unsecuredLocalDbKeyProvider.getLocalDbKeyOrThrow(projectId)
             val legacyRealmKey = encodeToString(legacyLocalDbKey.value, DEFAULT)
             encryptedSharedPrefs.edit().putString(getSharedPrefsKeyForRealm(projectId), legacyRealmKey).apply()
+            return legacyLocalDbKey
         } catch (t: Throwable) {
             Timber.e(t)
         }
+
+        return null
     }
 
     private fun getSharedPrefsKeyForRealm(projectId: String) = "${REALM_KEY}_$projectId"

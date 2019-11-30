@@ -35,15 +35,15 @@ open class DataModule {
 
     @Provides
     open fun provideSyncInfoLocalDataSource(ctx: Context,
-                                            secureDataManager: SecureLocalDbKeyProvider,
+                                            secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                             loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        SyncInfoLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureLocalDbKeyProvider,
+                                           secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                            loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        ProjectLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     open fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
@@ -64,9 +64,9 @@ open class DataModule {
 
     @Provides
     open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureLocalDbKeyProvider,
+                                          secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        PersonLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =

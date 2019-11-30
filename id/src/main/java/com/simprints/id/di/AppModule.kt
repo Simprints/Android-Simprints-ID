@@ -1,7 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
-import androidx.security.crypto.EncryptedSharedPreferences
+import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.LanguageHelper
@@ -43,10 +43,7 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureLocalDbKeyProvider
-import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
-import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
-import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
+import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -78,6 +75,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -148,7 +146,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: EncryptedSharedPreferences,
+    open fun provideSecureLocalDbKeyProvider(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
                                              randomGenerator: RandomGenerator,
                                              unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
         SecureLocalDbKeyProviderImpl(
@@ -300,5 +298,10 @@ open class AppModule {
                                               sessionEventsManager: SessionEventsManager,
                                               timeHelper: TimeHelper) =
         FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+
+    @Provides
+    @Named("EncryptedSharedPreferences")
+    open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 }
 
