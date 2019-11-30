@@ -156,8 +156,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideUnsecureLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): LegacyLocalDbKeyProvider =
-        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager, randomGenerator)
+    open fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
