@@ -30,7 +30,7 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.domain.moduleapi.app.responses.entities.Tier
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMasterTask.Companion.BATCH_SIZE
 import com.simprints.id.testtools.AndroidTestConfig
@@ -74,7 +74,7 @@ class SessionEventsUploaderTaskAndroidTest {
     @Inject lateinit var settingsPreferencesManagerSpy: SettingsPreferencesManager
     @Inject lateinit var remoteSessionsManager: RemoteSessionsManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var secureDataManagerSpy: LegacyLocalDbKeyProvider
+    @Inject lateinit var secureLocalDbKeyProviderSpy: SecureLocalDbKeyProvider
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
 
     private val remoteTestingManager: RemoteTestingManager = RemoteTestingManager.create()
@@ -314,7 +314,7 @@ class SessionEventsUploaderTaskAndroidTest {
         val token = remoteTestingManager.generateFirebaseToken(testProject.id, SIGNED_ID_USER)
         LoginStateMocker.setupLoginStateFullyToBeSignedIn(
             app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE),
-            secureDataManagerSpy,
+            secureLocalDbKeyProviderSpy,
             remoteDbManagerSpy,
             testProject.id,
             SIGNED_ID_USER,
