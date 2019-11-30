@@ -87,10 +87,9 @@ class TestAppModule(app: Application,
                                                  unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
         secureDataManagerRule.resolveDependency { super.provideSecureLocalDbKeyProvider(encryptedSharedPrefs, randomGenerator, unsecuredLocalDbKeyProvider) }
 
-    override fun provideUnsecureLocalDbKeyProvider(preferencesManager: PreferencesManager,
-                                                   keystoreManager: KeystoreManager,
-                                                   randomGenerator: RandomGenerator): LegacyLocalDbKeyProvider =
-        secureDataManagerRule.resolveDependency { super.provideUnsecureLocalDbKeyProvider(preferencesManager, keystoreManager, randomGenerator) }
+    override fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager,
+                                                   keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+        secureDataManagerRule.resolveDependency { super.provideLegacyLocalDbKeyProvider(preferencesManager, keystoreManager) }
 
     override fun provideKeystoreManager(ctx: Context): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager(ctx) }

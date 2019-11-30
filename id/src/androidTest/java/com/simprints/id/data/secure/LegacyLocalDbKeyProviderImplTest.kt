@@ -7,11 +7,8 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.testtools.AndroidTestConfig
-import com.simprints.id.tools.RandomGeneratorImpl
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.assertThrows
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotSame
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,36 +26,6 @@ class LegacyLocalDbKeyProviderImplTest {
     @Before
     fun setUp() {
         AndroidTestConfig(this).fullSetup()
-    }
-
-    @Test
-    fun createLocalDbKeyForDifferentProjects_shouldProduceDifferentKeys() {
-
-        val keystoreManager = KeystoreManagerImpl(app)
-        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager, RandomGeneratorImpl())
-
-        secureDataManager.setLocalDatabaseKey("project_id1")
-        val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id1")
-
-        secureDataManager.setLocalDatabaseKey("project_id2")
-        val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id2")
-
-        assertNotSame(firstLocalDbKey, secondLocalDbKey)
-    }
-
-    @Test
-    fun createLocalDbKeysForSameProjectId_shouldProduceTheSameLocalKey() {
-
-        val keystoreManager = KeystoreManagerImpl(app)
-        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
-
-        secureDataManager.setLocalDatabaseKey("project_id3")
-        val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
-
-        secureDataManager.setLocalDatabaseKey("project_id3")
-        val secondLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
-
-        assertEquals(firstLocalDbKey, secondLocalDbKey)
     }
 
     @Test
