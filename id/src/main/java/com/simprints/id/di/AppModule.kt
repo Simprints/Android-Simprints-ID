@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.LanguageHelper
@@ -42,8 +43,10 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
+import com.simprints.id.data.secure.LegacyLocalDbKeyProviderImpl
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
@@ -145,8 +148,18 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): SecureDataManager =
-        SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
+    open fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: EncryptedSharedPreferences,
+                                             randomGenerator: RandomGenerator,
+                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+        SecureLocalDbKeyProviderImpl(
+            encryptedSharedPrefs,
+            randomGenerator,
+            unsecuredLocalDbKeyProvider)
+
+    @Provides
+    @Singleton
+    open fun provideUnsecureLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): LegacyLocalDbKeyProvider =
+        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager, randomGenerator)
 
     @Provides
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
@@ -172,7 +185,7 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+                                                secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
         RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides

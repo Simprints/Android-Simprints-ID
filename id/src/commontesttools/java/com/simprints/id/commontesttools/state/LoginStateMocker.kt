@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
 import io.reactivex.Single
@@ -12,7 +12,7 @@ import io.reactivex.Single
 object LoginStateMocker {
 
     fun setupLoginStateFullyToBeSignedIn(sharedPrefs: SharedPreferences,
-                                         secureDataManagerMock: SecureDataManager,
+                                         secureDataManagerMock: LegacyLocalDbKeyProvider,
                                          remoteDbManagerMock: RemoteDbManager,
                                          projectId: String,
                                          userId: String,

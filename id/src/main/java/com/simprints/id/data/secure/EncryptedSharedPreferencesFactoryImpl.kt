@@ -1,7 +1,6 @@
 package com.simprints.id.data.secure
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 
 class EncryptedSharedPreferencesFactoryImpl(ctx: Context): EncryptedSharedPreferencesFactory {
@@ -12,7 +11,7 @@ class EncryptedSharedPreferencesFactoryImpl(ctx: Context): EncryptedSharedPrefer
 
     }
 
-    override val encryptedSharedPreferences: SharedPreferences by lazy {
+    override val encryptedSharedPreferences: EncryptedSharedPreferences by lazy {
         EncryptedSharedPreferences
             .create(
                 FILENAME,
@@ -20,6 +19,6 @@ class EncryptedSharedPreferencesFactoryImpl(ctx: Context): EncryptedSharedPrefer
                 ctx,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
+            ) as EncryptedSharedPreferences
     }
 }

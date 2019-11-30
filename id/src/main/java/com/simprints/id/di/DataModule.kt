@@ -19,7 +19,7 @@ import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
 import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
 import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import dagger.Module
 import dagger.Provides
@@ -35,13 +35,13 @@ open class DataModule {
 
     @Provides
     open fun provideSyncInfoLocalDataSource(ctx: Context,
-                                            secureDataManager: SecureDataManager,
+                                            secureDataManager: SecureLocalDbKeyProvider,
                                             loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
         SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
 
     @Provides
     open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureDataManager,
+                                           secureDataManager: SecureLocalDbKeyProvider,
                                            loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
         ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
 
@@ -64,7 +64,7 @@ open class DataModule {
 
     @Provides
     open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
+                                          secureDataManager: SecureLocalDbKeyProvider,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =
         PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
 

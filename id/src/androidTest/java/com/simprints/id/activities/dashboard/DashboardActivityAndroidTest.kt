@@ -25,7 +25,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.prefs.PreferencesManagerImpl
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -69,7 +69,7 @@ class DashboardActivityAndroidTest {
     @get:Rule val testProjectRule = TestProjectRule()
     private lateinit var testProject: TestProject
 
-    @Inject lateinit var secureDataManagerSpy: SecureDataManager
+    @Inject lateinit var secureDataManagerSpy: LegacyLocalDbKeyProvider
     @Inject lateinit var remoteDbManagerSpy: RemoteDbManager
     @Inject lateinit var personRemoteRemoteDataSource: PersonRemoteDataSource
     @Inject lateinit var personLocalDataSource: PersonLocalDataSource

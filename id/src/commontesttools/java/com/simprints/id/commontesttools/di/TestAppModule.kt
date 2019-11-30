@@ -1,6 +1,7 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
 import com.simprints.id.Application
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -17,7 +18,8 @@ import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
@@ -78,10 +80,15 @@ class TestAppModule(app: Application,
                                   database: SyncStatusDatabase): SignerManager =
         dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database) }
 
-    override fun provideSecureDataManager(preferencesManager: PreferencesManager,
-                                          keystoreManager: KeystoreManager,
-                                          randomGenerator: RandomGenerator): SecureDataManager =
-        secureDataManagerRule.resolveDependency { super.provideSecureDataManager(preferencesManager, keystoreManager, randomGenerator) }
+    override fun provideSecureLocalDbKeyProvider(encryptedSharedPrefs: EncryptedSharedPreferences,
+                                                 randomGenerator: RandomGenerator,
+                                                 unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+        secureDataManagerRule.resolveDependency { super.provideSecureLocalDbKeyProvider(encryptedSharedPrefs, randomGenerator, unsecuredLocalDbKeyProvider) }
+
+    override fun provideUnsecureLocalDbKeyProvider(preferencesManager: PreferencesManager,
+                                                   keystoreManager: KeystoreManager,
+                                                   randomGenerator: RandomGenerator): LegacyLocalDbKeyProvider =
+        secureDataManagerRule.resolveDependency { super.provideUnsecureLocalDbKeyProvider(preferencesManager, keystoreManager, randomGenerator) }
 
     override fun provideKeystoreManager(ctx: Context): KeystoreManager =
         keystoreManagerRule.resolveDependency { super.provideKeystoreManager(ctx) }
@@ -102,7 +109,7 @@ class TestAppModule(app: Application,
         sessionEventsManagerRule.resolveDependency { super.provideSessionEventsManager(ctx, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager) }
 
     override fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                    secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+                                                    secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
         sessionEventsLocalDbManagerRule.resolveDependency { super.provideSessionEventsLocalDbManager(ctx, secureDataManager) }
 
     override fun provideSimNetworkUtils(ctx: Context): SimNetworkUtils =

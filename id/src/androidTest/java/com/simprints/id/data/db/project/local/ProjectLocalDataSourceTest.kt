@@ -9,7 +9,7 @@ import com.simprints.id.data.db.project.local.models.DbProject
 import com.simprints.id.data.db.project.local.models.toRealmProject
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
@@ -35,7 +35,7 @@ class ProjectLocalDataSourceTest : RealmTestsBase() {
         whenever(this) { getSignedInProjectIdOrEmpty() }
             .thenReturn(DEFAULT_PROJECT_ID)
     }
-    private val secureDataManagerMock = mock<SecureDataManager>().apply {
+    private val secureDataManagerMock = mock<LegacyLocalDbKeyProvider>().apply {
         whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
             .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
     }

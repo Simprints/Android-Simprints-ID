@@ -12,7 +12,7 @@ import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.testtools.common.syntax.failTest
 import com.simprints.testtools.common.syntax.mock
@@ -36,7 +36,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         whenever(this) { getSignedInProjectIdOrEmpty() }
             .thenReturn(DEFAULT_PROJECT_ID)
     }
-    private val secureDataManagerMock = mock<SecureDataManager>().apply {
+    private val secureDataManagerMock = mock<LegacyLocalDbKeyProvider>().apply {
         whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
             .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
     }
@@ -55,7 +55,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
-        val differentSecureDataManagerMock = mock<SecureDataManager>().apply {
+        val differentSecureDataManagerMock = mock<LegacyLocalDbKeyProvider>().apply {
             whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
                 .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
         }

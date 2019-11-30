@@ -4,7 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.LegacyLocalDbKeyProvider
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.syntax.anyNotNull
@@ -35,7 +35,7 @@ class RealmSessionEventsDbManagerImplTest { // TODO : Tests are failing because 
     fun setUp() {
         AndroidTestConfig(this).fullSetup()
 
-        val secureDataManager: SecureDataManager = mock()
+        val secureDataManager: LegacyLocalDbKeyProvider = mock()
         whenever(secureDataManager) { getLocalDbKeyOrThrow(anyNotNull()) } thenReturn localDbKey
         realmSessionEventsManager = RealmSessionEventsDbManagerImpl(ApplicationProvider.getApplicationContext(), secureDataManager)
     }
