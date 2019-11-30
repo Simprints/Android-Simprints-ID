@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.simprints.id.Application
 import com.simprints.id.data.db.person.domain.FingerIdentifier
@@ -46,9 +47,7 @@ open class PreferencesModule {
     ): SharedPreferences = app.getSharedPreferences(PreferencesManagerImpl.PREF_FILE_NAME, PreferencesManagerImpl.PREF_MODE)
 
     @Provides
-    @Singleton
-    @Named("EncryptedSharedPreferences")
-    fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+    fun provideEncryptedSharedPreferences(app: Application): EncryptedSharedPreferences =
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 
     @Provides

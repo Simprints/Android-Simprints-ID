@@ -5,7 +5,7 @@ import com.simprints.id.data.db.common.realm.PeopleRealmConfig
 import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
@@ -13,7 +13,7 @@ import io.realm.Realm
 import io.realm.RealmConfiguration
 
 class SyncInfoLocalDataSourceImpl(private val appContext: Context,
-                                  val secureDataManager: SecureDataManager,
+                                  val secureDataManager: SecureLocalDbKeyProvider,
                                   val loginInfoManager: LoginInfoManager) : SyncInfoLocalDataSource {
 
     val config: RealmConfiguration by lazy {

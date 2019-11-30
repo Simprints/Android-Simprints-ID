@@ -2,7 +2,6 @@ package com.simprints.id.data.secure
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import com.simprints.id.Application
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
@@ -36,7 +35,7 @@ class SecureDataManagerTest {
     fun createLocalDbKeyForDifferentProjects_shouldProduceDifferentKeys() {
 
         val keystoreManager = KeystoreManagerImpl(app)
-        val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager, RandomGeneratorImpl())
+        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager, RandomGeneratorImpl())
 
         secureDataManager.setLocalDatabaseKey("project_id1")
         val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id1")
@@ -51,7 +50,7 @@ class SecureDataManagerTest {
     fun createLocalDbKeysForSameProjectId_shouldProduceTheSameLocalKey() {
 
         val keystoreManager = KeystoreManagerImpl(app)
-        val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
+        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
         secureDataManager.setLocalDatabaseKey("project_id3")
         val firstLocalDbKey = secureDataManager.getLocalDbKeyOrThrow("project_id3")
@@ -66,7 +65,7 @@ class SecureDataManagerTest {
     fun noLocalKey_shouldThrowAnError() {
 
         val keystoreManager = KeystoreManagerImpl(app)
-        val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
+        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
         assertThrows<MissingLocalDatabaseKeyException> {
             secureDataManager.getLocalDbKeyOrThrow("project_id4")
@@ -78,7 +77,7 @@ class SecureDataManagerTest {
 
         val keystoreManager = spy(KeystoreManagerImpl(app))
         doReturn("wrong_encryption").`when`(keystoreManager).encryptString(anyNotNull())
-        val secureDataManager = SecureDataManagerImpl(keystoreManager, preferencesManager)
+        val secureDataManager = LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
         assertThrows<MissingLocalDatabaseKeyException> {
             secureDataManager.getLocalDbKeyOrThrow("project_id4")
