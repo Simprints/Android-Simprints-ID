@@ -7,7 +7,7 @@ import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.RandomGeneratorImpl
 import timber.log.Timber
 
-class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
+open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
                                    private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
                                    private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider {
 
