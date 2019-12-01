@@ -8,8 +8,8 @@ import com.simprints.id.tools.RandomGeneratorImpl
 import timber.log.Timber
 
 open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: SharedPreferences,
-                                   private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
-                                   private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider {
+                                        private val randomGenerator: RandomGenerator = RandomGeneratorImpl(),
+                                        private val unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider) : SecureLocalDbKeyProvider {
 
     companion object {
         const val REALM_KEY = "REALM_KEY"
@@ -17,7 +17,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
 
     override fun setLocalDatabaseKey(projectId: String) {
         var key = readRealmKeyFromSharedPrefs(projectId)
-        if(key.isNullOrEmpty()) {
+        if (key.isNullOrEmpty()) {
             key = generateRealmKey()
             encryptedSharedPrefs.edit().putString(getSharedPrefsKeyForRealm(projectId), key).apply()
         }
@@ -39,7 +39,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
         }
     }
 
-    private fun migrateFromUnsecuredKey(projectId: String):LocalDbKey? {
+    private fun migrateFromUnsecuredKey(projectId: String): LocalDbKey? {
         try {
             val legacyLocalDbKey = unsecuredLocalDbKeyProvider.getLocalDbKeyOrThrow(projectId)
             val legacyRealmKey = encodeToString(legacyLocalDbKey.value, DEFAULT)
@@ -54,7 +54,7 @@ open class SecureLocalDbKeyProviderImpl(private val encryptedSharedPrefs: Shared
 
     private fun getSharedPrefsKeyForRealm(projectId: String) = "${REALM_KEY}_$projectId"
 
-    private fun readRealmKeyFromSharedPrefs(projectId: String):String? {
+    private fun readRealmKeyFromSharedPrefs(projectId: String): String? {
         val sharedPrefsKeyForRealm = getSharedPrefsKeyForRealm(projectId)
         return encryptedSharedPrefs.getString(sharedPrefsKeyForRealm, null)
     }
