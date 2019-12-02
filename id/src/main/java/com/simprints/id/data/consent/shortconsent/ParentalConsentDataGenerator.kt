@@ -13,6 +13,7 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
                                         val modalities: List<Modality>,
                                         val androidResourcesHelper: AndroidResourcesHelper) {
 
+    //First argument in consent text should always be program name, second is modality specific access/use case text
     fun assembleText(askConsentRequest: AskConsentRequest) = StringBuilder().apply {
         filterAppRequestForParentalConsent(askConsentRequest)
         extractDataSharingOptions()
@@ -29,11 +30,11 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
         with(parentalConsentOptions) {
             if (consentParentEnrolOnly) {
                 append(androidResourcesHelper.getString(R.string.consent_parental_enrol_only)
-                    .format(getModalitySpecificUseCaseText(), programName))
+                    .format(programName, getModalitySpecificUseCaseText()))
             }
             if (consentParentEnrol) {
                 append(androidResourcesHelper.getString(R.string.consent_parental_enrol)
-                    .format(getModalitySpecificUseCaseText(), programName))
+                    .format(programName, getModalitySpecificUseCaseText()))
             }
         }
     }
@@ -41,7 +42,7 @@ data class ParentalConsentDataGenerator(val parentalConsentExists: Boolean,
     private fun StringBuilder.appendTextForIdentifyOrVerify() {
         if (parentalConsentOptions.consentParentIdVerify) {
             append(androidResourcesHelper.getString(R.string.consent_parental_id_verify)
-                .format(getModalitySpecificUseCaseText(), programName))
+                .format(programName, getModalitySpecificUseCaseText()))
         }
     }
 
