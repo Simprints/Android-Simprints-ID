@@ -138,7 +138,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
+    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl()
 
     @Provides
     @Singleton

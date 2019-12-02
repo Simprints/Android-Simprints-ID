@@ -91,8 +91,8 @@ class TestAppModule(app: Application,
                                                    keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
         secureDataManagerRule.resolveDependency { super.provideLegacyLocalDbKeyProvider(preferencesManager, keystoreManager) }
 
-    override fun provideKeystoreManager(ctx: Context): KeystoreManager =
-        keystoreManagerRule.resolveDependency { super.provideKeystoreManager(ctx) }
+    override fun provideKeystoreManager(): KeystoreManager =
+        keystoreManagerRule.resolveDependency { super.provideKeystoreManager() }
 
     override fun provideSecureApiInterface(): SecureApiInterface =
         secureApiInterfaceRule.resolveDependency { super.provideSecureApiInterface() }
