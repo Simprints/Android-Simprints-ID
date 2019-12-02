@@ -81,8 +81,10 @@ class SecureLocalDbKeyProviderImplTest {
         every { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) } returns
             LocalDbKey(DEFAULT_PROJECT_ID, legacyKey)
 
+        secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
         val localKey = secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
 
+        verify(exactly = 1) { legacyLocalDbKeyProviderMock.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
         assertThat(localKey.value).isEqualTo(legacyKey)
         assertThat(realmKeyStored).isEqualTo(encodeToString(legacyKey, DEFAULT))
     }
