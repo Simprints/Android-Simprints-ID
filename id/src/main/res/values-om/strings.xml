@@ -122,4 +122,5 @@
     <string name="why_did_you_skip_fingerprinting">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
     <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
     <string name="button_submit">Ol ergi</string>
+    <string name="hint_other_reason">Odeeffannoo dabalataa</string>
 </resources>
