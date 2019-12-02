@@ -284,4 +284,5 @@
     <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
     <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
     <string name="refusal_too_young">বয়স কম</string>
+    <string name="refusal_other">অন্যান্য</string>
 </resources>
