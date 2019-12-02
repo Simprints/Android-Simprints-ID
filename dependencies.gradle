@@ -116,7 +116,7 @@ def koin = [
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
 ]
 
-def mockito_version = "2.23.0"
+def mockito_version = "2.24.0"
 def espresso_version = "3.2.0-alpha04"
 def robolectric_version = "4.1"
 def testing = [

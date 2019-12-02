@@ -14,7 +14,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
-import com.simprints.testtools.common.syntax.failTest
+import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.whenever
 import io.realm.Realm
@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
@@ -162,17 +161,11 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     }
 
     @Test
+    @SmallTest
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
-            val fingerprintIdentityLocalDataSource = (personLocalDataSource as FingerprintIdentityLocalDataSource)
-            val exception = try {
-                fingerprintIdentityLocalDataSource.loadFingerprintIdentities(mock())
-            } catch (t: Throwable) {
-                t
-            }
-
-            if (exception !is InvalidQueryToLoadRecordsException) {
-                failTest("InvalidQueryToLoadRecordsException not thrown")
+            assertThrows<InvalidQueryToLoadRecordsException> {
+                (personLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mock())
             }
         }
     }
