@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_REALM_KEY
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.tools.RandomGenerator
-import com.simprints.testtools.common.syntax.failTest
+import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -103,14 +103,8 @@ class SecureLocalDbKeyProviderImplTest {
     }
 
     private fun getLocalDbKeyAndVerifyThatMissingKeyWasThrown() {
-        val exception = try {
+        assertThrows<MissingLocalDatabaseKeyException> {
             secureLocalDbKeyProvider.getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID)
-        } catch (t: Throwable) {
-            t
-        }
-
-        if (exception !is MissingLocalDatabaseKeyException) {
-            failTest("MissingLocalDatabaseKeyException not thrown")
         }
     }
 
