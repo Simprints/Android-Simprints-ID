@@ -18,7 +18,6 @@ fun setupFakeKeyStore(keystoreManager: KeystoreManager) {
     val encryptAnswer = Answer<String> {
         "enc_" + it.arguments[0] as String
     }
-    whenever { keystoreManager.encryptString(anyNotNull()) } thenAnswer encryptAnswer
 
     val decryptAnswer = Answer<String> {
         (it.arguments[0] as String).replace("enc_", "")
