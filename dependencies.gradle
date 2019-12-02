@@ -14,7 +14,7 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.2.0-alpha05"
+def androidx_lifecycle_version = "2.2.0-rc02"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
