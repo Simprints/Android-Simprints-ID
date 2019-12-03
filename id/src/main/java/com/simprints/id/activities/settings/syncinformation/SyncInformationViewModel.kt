@@ -35,7 +35,7 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         localRecordCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(projectId = projectId))
     }
 
-    private fun fetchAndUpdateRecordsToUpSyncCount() {
+    internal fun fetchAndUpdateRecordsToUpSyncCount() {
         recordsToUpSyncCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
     }
 
@@ -58,7 +58,7 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         }
     }
 
-    private fun fetchAndUpdatedUnselectedModulesCount() {
+    internal fun fetchAndUpdatedUnselectedModulesCount() {
         val unselectedModules = preferencesManager.moduleIdOptions.minus(preferencesManager.selectedModules)
         val unselectedModulesWithCount = unselectedModules.map {
             ModuleCount(it, personLocalDataSource.count(PersonLocalDataSource.Query(

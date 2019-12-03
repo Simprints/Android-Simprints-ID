@@ -26,15 +26,15 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView2"
+        android:id="@+id/recordsToUploadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/cardView"
-        app:layout_constraintEnd_toStartOf="@+id/cardView"
+        app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/cardView">
+        app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,14 +64,14 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/recordsToDownloadCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
-        app:layout_constraintEnd_toStartOf="@+id/cardView3"
+        app:layout_constraintEnd_toStartOf="@+id/recordsToDeleteCardView"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/cardView2"
+        app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
         app:layout_constraintTop_toBottomOf="@+id/moduleSelectionButton">
 
         <LinearLayout
@@ -103,16 +103,16 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView3"
+        android:id="@+id/recordsToDeleteCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/cardView"
+        app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/cardView"
-        app:layout_constraintTop_toTopOf="@+id/cardView">
+        app:layout_constraintStart_toEndOf="@+id/recordsToDownloadCardView"
+        app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -142,14 +142,14 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView4"
+        android:id="@+id/recordsInLocalCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@id/modulesTabHost"
-        app:layout_constraintEnd_toEndOf="@+id/cardView3"
-        app:layout_constraintStart_toStartOf="@+id/cardView2"
-        app:layout_constraintTop_toBottomOf="@+id/cardView">
+        app:layout_constraintEnd_toEndOf="@+id/recordsToDeleteCardView"
+        app:layout_constraintStart_toStartOf="@+id/recordsToUploadCardView"
+        app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -205,7 +205,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView4"
+        app:layout_constraintTop_toBottomOf="@+id/recordsInLocalCardView"
         app:layout_goneMarginTop="40dp">
 
         <LinearLayout
