@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.person.remote
 
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.PeopleCount
@@ -15,8 +16,6 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.sumUp
-import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
@@ -25,6 +24,7 @@ import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -32,7 +32,7 @@ import java.io.IOException
 open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager) : PersonRemoteDataSource {
 
     override fun downloadPerson(patientId: String, projectId: String): Single<Person> =
-        getPeopleApiClient().flatMap { peopleRemoteInterface ->
+        singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
             peopleRemoteInterface.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
@@ -46,7 +46,7 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
         }
 
     override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
-        getPeopleApiClient().flatMapCompletable {
+        singleWithSuspend { getPeopleApiClient() }.flatMapCompletable {
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi)))
                 .retry(::retryCriteria)
                 .trace("uploadPatientBatch")
@@ -62,7 +62,7 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
         }
 
     private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>> =
-        getPeopleApiClient().flatMap { peopleRemoteInterface ->
+        singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
 
             peopleRemoteInterface.requestPeopleOperations(
                 projectId,
@@ -75,11 +75,10 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                         val requestedSyncScope = peopleOperationsParams[index].subSyncScope
                         val countsForSyncScope = responseGroup.counts
                         PeopleCount(
-                            projectId,
-                            requestedSyncScope.userId,
-                            requestedSyncScope.moduleId,
-                            listOf(Modes.FINGERPRINT),
-                            countsForSyncScope.sumUp())
+                            requestedSyncScope,
+                            countsForSyncScope.create,
+                            countsForSyncScope.update,
+                            countsForSyncScope.delete)
                     }
                 }
         }
@@ -112,10 +111,12 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
             ApiPeopleOperationGroup(lastKnownInfo, whereLabels)
         }
 
-    override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
-        remoteDbManager.getCurrentToken()
-            .flatMap {
-                Single.just(buildPeopleApi(it))
+    override suspend fun getPeopleApiClient(): PeopleRemoteInterface =
+        remoteDbManager
+            .getCurrentToken()
+            .subscribeOn(Schedulers.io())
+            .blockingGet().let {
+                buildPeopleApi(it)
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface =

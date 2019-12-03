@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.content.Context
 import android.widget.Toast
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
@@ -17,17 +17,20 @@ import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class SubDownSyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     companion object {
         const val SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT = "SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT"
     }
 
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var scopesBuilder: SyncScopesBuilder
-    @Inject lateinit var downSyncTask: DownSyncTask
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var scopesBuilder: SyncScopesBuilder
+    @Inject
+    lateinit var downSyncTask: DownSyncTask
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         inject()
 
         val input = inputData.getString(SUBDOWNSYNC_WORKER_SUB_SCOPE_INPUT)
@@ -37,7 +40,7 @@ class SubDownSyncWorker(context: Context, params: WorkerParameters) : Worker(con
 
         val result = try {
             logMessageForCrashReport("DownSyncing for $subSyncScope")
-            downSyncTask.execute(subSyncScope).blockingAwait()
+            downSyncTask.execute(subSyncScope)
             Result.success()
         } catch (e: Throwable) {
             e.printStackTrace()

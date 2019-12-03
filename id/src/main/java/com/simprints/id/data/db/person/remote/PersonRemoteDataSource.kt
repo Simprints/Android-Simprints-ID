@@ -11,5 +11,5 @@ interface PersonRemoteDataSource {
     fun downloadPerson(patientId: String, projectId: String): Single<Person>
     fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable
     fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>>
-    fun getPeopleApiClient(): Single<PeopleRemoteInterface>
+    suspend fun getPeopleApiClient(): PeopleRemoteInterface
 }

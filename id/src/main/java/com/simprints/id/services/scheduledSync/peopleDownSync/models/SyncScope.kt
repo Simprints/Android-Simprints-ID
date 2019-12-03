@@ -10,14 +10,15 @@ data class SyncScope(val projectId: String,
                      val moduleIds: Set<String>?,
                      val modes: List<Modes> = listOf(Modes.FINGERPRINT)) {
 
-    val uniqueKey: String = "${projectId}_${userId ?: ""}${moduleIds?.fold("") { acc, s -> "${acc}_$s"} ?: "_"}"
+    //StopShip: do we need migration in room?
+    val uniqueKey: String = "${projectId}_${userId ?: ""}_${moduleIds?.joinToString("_")}}"
 
     fun toSubSyncScopes(): List<SubSyncScope> =
         moduleIds?.let { moduleIds ->
             moduleIds.map { moduleId ->
-                SubSyncScope(projectId, userId, moduleId)
+                SubSyncScope(projectId, userId, moduleId, modes)
             }
-        } ?: listOf(SubSyncScope(projectId, userId, null))
+        } ?: listOf(SubSyncScope(projectId, userId, null, modes))
 
     val group: GROUP
         get() = when {

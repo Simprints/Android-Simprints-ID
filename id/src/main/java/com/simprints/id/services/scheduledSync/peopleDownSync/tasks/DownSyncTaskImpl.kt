@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
 
 import com.google.gson.stream.JsonReader
-import com.simprints.core.tools.extentions.completableWithSuspend
+import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
@@ -13,12 +13,12 @@ import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
-import com.simprints.id.exceptions.safe.sync.InterruptedSyncException
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.tools.TimeHelper
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
+import com.simprints.id.tools.extensions.bufferedChunks
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
@@ -42,90 +42,57 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
 
     private var reader: JsonReader? = null
 
-    override fun execute(subSyncScope: SubSyncScope): Completable {
+    override suspend fun execute(subSyncScope: SubSyncScope) {
         this.subSyncScope = subSyncScope
-        val syncNeeded = syncNeeded()
-        return if (syncNeeded) {
-            personRemoteDataSource.getPeopleApiClient()
-                .makeDownSyncApiCallAndGetResponse()
-                .setupJsonReaderFromResponse()
-                .createPeopleObservableFromJsonReader()
-                .splitIntoBatches()
-                .saveBatchAndUpdateDownSyncStatus()
-                .doOnError { it.printStackTrace() }
-                .doFinally { finishDownload() }
-        } else {
-            Completable.complete()
+
+        try {
+            val client = personRemoteDataSource.getPeopleApiClient()
+            val response = makeDownSyncApiCallAndGetResponse(client)
+            val reader = setupJsonReaderFromResponse(response)
+            val flowPeople = createPeopleFlowFromJsonReader(reader)
+            flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
+                saveBatchAndUpdateDownSyncStatus(it)
+                decrementAndSavePeopleToDownSyncCount(BATCH_SIZE_FOR_DOWNLOADING)
+            }
+
+        } catch (t: Throwable) {
+            t.printStackTrace()
+        } finally {
+            finishDownload()
         }
     }
 
-    private fun syncNeeded(): Boolean {
-        val counter = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
-        counter?.let {
-            return when {
-                counter > 0 -> {
-                    true
-                }
-                counter == 0 -> {
-                    false
-                }
-                else -> {
-                    throw InterruptedSyncException("DownCounter failed for $subSyncScope!")
-                }
+    private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
+        retryIO(times = RETRY_ATTEMPTS_FOR_NETWORK_CALLS) {
+            client.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt())
+        }
+
+    private fun setupJsonReaderFromResponse(response: ResponseBody): JsonReader =
+        JsonReader(InputStreamReader(response.byteStream()) as Reader?)
+            .also {
+                reader = it
+                it.beginArray()
             }
-        } ?: throw InterruptedSyncException("Counter failed for $subSyncScope!")
+
+
+    private fun createPeopleFlowFromJsonReader(reader: JsonReader): Flow<ApiGetPerson> =
+        flow {
+            while (reader.hasNext()) {
+                this.emit(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
+            }
+        }
+
+    private suspend fun saveBatchAndUpdateDownSyncStatus(batchOfPeople: List<ApiGetPerson>) {
+        filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
+        Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
+        updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
+        updateLastKnownPatientId(batchOfPeople.last().id)
+        updateDownSyncTimestampOnBatchDownload()
     }
-
-    private fun Single<out PeopleRemoteInterface>.makeDownSyncApiCallAndGetResponse(): Single<ResponseBody> =
-        flatMap {
-            it.downSync(projectId, userId, moduleId, getLastKnownPatientId(), getLastKnownPatientUpdatedAt())
-                .retry(RETRY_ATTEMPTS_FOR_NETWORK_CALLS.toLong())
-        }
-
-    private fun Single<out ResponseBody>.setupJsonReaderFromResponse(): Single<JsonReader> =
-        map { responseBody ->
-            JsonReader(InputStreamReader(responseBody.byteStream()) as Reader?)
-                .also {
-                    reader = it
-                    it.beginArray()
-                }
-        }
-
-    private fun Single<out JsonReader>.createPeopleObservableFromJsonReader(): Observable<ApiGetPerson> =
-        flatMapObservable { jsonReader ->
-            Observable.create<ApiGetPerson> { emitter ->
-                try {
-                    while (jsonReader.hasNext()) {
-                        emitter.onNext(JsonHelper.gson.fromJson(jsonReader, ApiGetPerson::class.java))
-                    }
-                    emitter.onComplete()
-                } catch (t: Throwable) {
-                    t.printStackTrace()
-                    emitter.onError(t)
-                }
-            }
-        }
-
-    private fun Observable<ApiGetPerson>.splitIntoBatches(): Observable<List<ApiGetPerson>> =
-        buffer(BATCH_SIZE_FOR_DOWNLOADING)
-            .doOnError { it.printStackTrace() }
-
-    private fun Observable<List<ApiGetPerson>>.saveBatchAndUpdateDownSyncStatus(): Completable =
-        flatMapCompletable { batchOfPeople ->
-            completableWithSuspend {
-                filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
-                Timber.d("Saved batch for ${subSyncScope.uniqueKey}")
-                decrementAndSavePeopleToDownSyncCount(batchOfPeople.size)
-                updateLastKnownPatientUpdatedAt(batchOfPeople.last().updatedAt)
-                updateLastKnownPatientId(batchOfPeople.last().id)
-                updateDownSyncTimestampOnBatchDownload()
-            }
-        }
 
 
     private fun finishDownload() {
         Timber.d("Download finished")
-        updateDownSyncTimestampOnBatchDownload()
         reader?.endArray()
         reader?.close()
     }
@@ -193,13 +160,6 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
         downSyncDao.updateLastSyncTime(getDownSyncId(), timeHelper.now())
     }
 
-    private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
-        val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
-        if (currentCount != null) {
-            downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
-        }
-    }
-
     private fun updateLastKnownPatientUpdatedAt(updatedAt: Date?) {
         downSyncDao.updateLastPatientUpdatedAt(getDownSyncId(), updatedAt?.time ?: 0L)
     }
@@ -209,6 +169,13 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
     }
 
     private fun getDownSyncId() = downSyncDao.getStatusId(projectId, userId, moduleId)
+
+    private fun decrementAndSavePeopleToDownSyncCount(decrement: Int) {
+        val currentCount = downSyncDao.getDownSyncStatusForId(getDownSyncId())?.totalToDownload
+        if (currentCount != null) {
+            downSyncDao.updatePeopleToDownSync(getDownSyncId(), currentCount - decrement)
+        }
+    }
 
     companion object {
         const val BATCH_SIZE_FOR_DOWNLOADING = 200

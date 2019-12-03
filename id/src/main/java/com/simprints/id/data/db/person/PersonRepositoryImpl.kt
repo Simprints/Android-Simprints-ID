@@ -17,6 +17,7 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -31,8 +32,11 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
-    override fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>> =
+    override suspend fun countToDownSync(syncScope: SyncScope): List<PeopleCount> = suspendCancellableCoroutine {
         personRemoteDataSource.getDownSyncPeopleCount(syncScope.projectId, buildPeopleOperationsParams(syncScope))
+            .subscribeOn(Schedulers.io())
+            .blockingGet()
+    }
 
     private fun buildPeopleOperationsParams(syncScope: SyncScope) = when (syncScope.group) {
         GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
@@ -41,7 +45,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     }
 
     private fun buildPeopleOperationsParamsForProjectOrUserSync(syncScope: SyncScope) =
-        with (syncScope.toSubSyncScopes().first()) {
+        with(syncScope.toSubSyncScopes().first()) {
             listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
                 getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
         }
@@ -64,10 +68,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     override fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
-                PeopleCount(it.projectId,
-                    it.userId,
-                    it.moduleId,
-                    syncScope.modes,
+                PeopleCount(it,
                     personLocalDataSource.count(PersonLocalDataSource.Query(
                         projectId = it.projectId,
                         userId = it.userId,
@@ -90,9 +91,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             CoroutineScope(Dispatchers.IO).launch {
                 personRemoteDataSource.downloadPerson(patientId = patientId, projectId = projectId)
                     .subscribeBy(
-                    onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
-                    onError = { cont.resumeWithExceptionSafely(it) }
-                )
+                        onSuccess = { cont.resumeSafely(PersonFetchResult(it, REMOTE)) },
+                        onError = { cont.resumeWithExceptionSafely(it) }
+                    )
             }
         }
 

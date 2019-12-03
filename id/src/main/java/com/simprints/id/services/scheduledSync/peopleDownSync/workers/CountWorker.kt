@@ -2,84 +2,67 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.content.Context
 import android.widget.Toast
+import androidx.work.CoroutineWorker
 import androidx.work.Data
-import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.SaveCountsTask
 import org.jetbrains.anko.runOnUiThread
 import timber.log.Timber
 import javax.inject.Inject
 
-class CountWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class CountWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     companion object {
         const val COUNT_WORKER_SCOPE_INPUT = "COUNT_WORKER_SCOPE_INPUT"
+        const val COUNT_RESULT = "COUNTS"
     }
 
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject lateinit var countTask: CountTask
-    @Inject lateinit var saveCountsTask: SaveCountsTask
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject
+    lateinit var countTask: CountTask
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         inject()
 
         val input = inputData.getString(COUNT_WORKER_SCOPE_INPUT)
             ?: throw IllegalArgumentException("input required")
         val syncScope = syncScopeBuilder.fromJsonToSyncScope(input)
             ?: throw IllegalArgumentException("SyncScope required")
-        val key = syncScope.uniqueKey
 
         return try {
             logMessageForCrashReport("Making count request for $syncScope")
-            val peopleCounts = getPeopleCountAndSaveInLocal(syncScope)
+            val peopleCountsJson = JsonHelper.gson.toJson(countTask.execute(syncScope))
 
-            val data = Data.Builder()
-                .putInt(key, getTotalCount(peopleCounts))
-                .build()
+            logToAnalyticsAndToastForDebugBuilds(syncScope, peopleCountsJson)
+            Result.success(buildData(peopleCountsJson))
 
-            logToAnalyticsAndToastForDebugBuilds(syncScope, data)
-            Result.success(data)
         } catch (e: Throwable) {
             e.printStackTrace()
-            logToAnalyticsAndToastForDebugBuilds(syncScope)
+            logToAnalyticsAndToastForDebugBuilds(syncScope, null)
             crashReportManager.logExceptionOrSafeException(e)
             Result.success()
         }
     }
 
-    private fun getPeopleCountAndSaveInLocal(syncScope: SyncScope)=
-        countTask.execute(syncScope).blockingGet().also {
-            saveCountsTask.execute(prepareInputForTask(it))
-        }
+    private fun buildData(peopleCountsJson: String): Data =
+        Data.Builder()
+            .putString(COUNT_RESULT, peopleCountsJson)
+            .build()
 
-    private fun getTotalCount(peopleCounts: List<PeopleCount>) = peopleCounts.sumBy { it.count }
-
-    private fun prepareInputForTask(peopleCounts: List<PeopleCount>): Map<SubSyncScope, Int> {
-        val inputForTask = mutableMapOf<SubSyncScope, Int>()
-        val scope = syncScopeBuilder.buildSyncScope()
-        scope?.toSubSyncScopes()?.forEachIndexed { index, subSyncScope ->
-            val counter = peopleCounts[index].count
-            counter.let { counterForSubSync ->
-                inputForTask[subSyncScope] = counterForSubSync
-            }
-        }
-        return inputForTask
-    }
-
-    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SyncScope, data: Data? = null) {
-        val message = "CountWorker($subSyncScope): Success - ${data?.keyValueMap}"
+    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SyncScope, jsonOutData: String?) {
+        val message = "CountWorker($subSyncScope): Success - $jsonOutData"
         logMessageForCrashReport(message)
         if (BuildConfig.DEBUG) {
             applicationContext.runOnUiThread {
