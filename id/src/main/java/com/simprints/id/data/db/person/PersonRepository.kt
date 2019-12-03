@@ -11,7 +11,7 @@ import io.reactivex.Single
 
 interface PersonRepository : PersonLocalDataSource, PersonRemoteDataSource, FingerprintIdentityLocalDataSource {
 
-    fun countToDownSync(syncScope: SyncScope): Single<List<PeopleCount>>
+    suspend fun countToDownSync(syncScope: SyncScope): List<PeopleCount>
     fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>>
 
     suspend fun saveAndUpload(person: Person)

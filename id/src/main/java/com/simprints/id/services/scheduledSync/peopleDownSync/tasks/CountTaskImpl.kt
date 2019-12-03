@@ -5,6 +5,6 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 
 class CountTaskImpl(private val personRepository: PersonRepository) : CountTask {
 
-    override fun execute(syncScope: SyncScope) =
+    override suspend fun execute(syncScope: SyncScope) =
         personRepository.countToDownSync(syncScope)
 }

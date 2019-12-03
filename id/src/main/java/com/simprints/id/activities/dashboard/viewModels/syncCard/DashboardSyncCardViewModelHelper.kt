@@ -1,7 +1,9 @@
 package com.simprints.id.activities.dashboard.viewModels.syncCard
 
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.domain.totalCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
@@ -105,10 +107,10 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
 
     private fun updateTotalDownSyncCount(): Completable =
         (syncScope?.let { syncScope ->
-            personRepository.countToDownSync(syncScope)
-                .map { peopleCounts -> peopleCounts.sumBy { it.count } }
+            singleWithSuspend {
+                personRepository.countToDownSync(syncScope).sumBy { it.totalCount() }
+            }
         } ?: Single.just(0))
-
         .doAfterSuccess { viewModel.updateState(peopleToDownload = it, emitState = true) }
         .ignoreElement()
         .subscribeOn(Schedulers.io())
@@ -116,7 +118,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private fun updateTotalLocalCount(): Completable =
         (syncScope?.let { syncScope ->
             personRepository.localCountForSyncScope(syncScope)
-                .doAfterSuccess { syncScopeCount -> viewModel.updateState(peopleInDb = syncScopeCount.sumBy { it.count }, emitState = true) }
+                .doAfterSuccess { syncScopeCount -> viewModel.updateState(peopleInDb = syncScopeCount.sumBy { it.totalCount() }, emitState = true) }
                 .ignoreElement()
         } ?: Completable.complete())
             .subscribeOn(Schedulers.io())

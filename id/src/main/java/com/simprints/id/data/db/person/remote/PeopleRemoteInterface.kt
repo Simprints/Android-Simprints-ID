@@ -22,13 +22,13 @@ interface PeopleRemoteInterface {
 
     @GET("projects/{projectId}/patients")
     @Streaming
-    fun downSync(
+    suspend fun downSync(
         @Path("projectId") projectId: String,
         @Query("userId") userId: String?,
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
         @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
-        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<ResponseBody>
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): ResponseBody
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -43,5 +43,5 @@ interface PeopleRemoteInterface {
     @POST("projects/{projectId}/patient-operations/count")
     fun requestPeopleOperations(
         @Path("projectId") projectId: String,
-        @Body operationsJson: ApiPeopleOperations) : Single<Response<ApiPeopleOperationsResponse>>
+        @Body operationsJson: ApiPeopleOperations): Single<Response<ApiPeopleOperationsResponse>>
 }

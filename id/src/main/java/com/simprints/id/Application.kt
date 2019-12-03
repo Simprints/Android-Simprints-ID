@@ -29,6 +29,7 @@ open class Application : MultiDexApplication() {
             .appModule(AppModule())
             .preferencesModule(PreferencesModule())
             .serializerModule(SerializerModule())
+            .syncModule(SyncModule())
             .build()
     }
 

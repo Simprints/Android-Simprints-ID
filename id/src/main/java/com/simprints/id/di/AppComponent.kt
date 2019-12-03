@@ -30,8 +30,8 @@ import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
@@ -61,7 +61,7 @@ import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class])
+@Component(modules = [AppModule::class, DataModule::class, PreferencesModule::class, SerializerModule::class, SyncModule::class])
 @Singleton
 interface AppComponent {
 
@@ -74,6 +74,7 @@ interface AppComponent {
         fun dataModule(dataModule: DataModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
+        fun syncModule(syncModule: SyncModule): Builder
 
         fun build(): AppComponent
     }
