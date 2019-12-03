@@ -12,11 +12,11 @@ class ModuleCountViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val moduleCountText: TextView = itemView.findViewById(R.id.moduleCountText)
 
 
-    fun bind(moduleCount: ModuleCount, isTotalCount: Boolean) {
+    fun bind(moduleCount: ModuleCount, isFirstElementForTotalCount: Boolean) {
         moduleNameText.text = moduleCount.name
         moduleCountText.text = moduleCount.count.toString()
 
-        if (isTotalCount) {
+        if (isFirstElementForTotalCount) {
             moduleNameText.setTypeface(null, Typeface.BOLD)
             moduleCountText.setTypeface(null, Typeface.BOLD)
         }
