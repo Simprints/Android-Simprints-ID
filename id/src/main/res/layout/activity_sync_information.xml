@@ -32,7 +32,6 @@
         android:layout_marginStart="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDownloadCardView"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
 
@@ -48,16 +47,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/recordsToUploadCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -70,7 +68,6 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="15dp"
         app:layout_constraintEnd_toStartOf="@+id/recordsToDeleteCardView"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/recordsToUploadCardView"
         app:layout_constraintTop_toBottomOf="@+id/moduleSelectionButton">
 
@@ -86,16 +83,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/recordsToDownloadCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -110,7 +106,6 @@
         android:layout_marginEnd="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/recordsToDownloadCardView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/recordsToDownloadCardView"
         app:layout_constraintTop_toTopOf="@+id/recordsToDownloadCardView">
 
@@ -126,16 +121,15 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="5dp"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/recordsToDeleteCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -164,8 +158,8 @@
                 android:layout_gravity="start"
                 android:layout_weight="0.8"
                 android:padding="5dp"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/totalRecordsCount"
@@ -174,8 +168,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="0.2"
                 android:gravity="center"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -191,8 +184,9 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="15dp"
         android:background="@drawable/button_rounded_corners"
+        android:fontFamily="@font/muli"
         android:textColor="@color/simprints_white"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -1,6 +1,6 @@
 package com.simprints.id.activities.settings.syncinformation.modulecount
 
-import android.graphics.Typeface
+import android.graphics.Color
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -17,8 +17,8 @@ class ModuleCountViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         moduleCountText.text = moduleCount.count.toString()
 
         if (isFirstElementForTotalCount) {
-            moduleNameText.setTypeface(null, Typeface.BOLD)
-            moduleCountText.setTypeface(null, Typeface.BOLD)
+            moduleNameText.setTextColor(Color.BLACK)
+            moduleCountText.setTextColor(Color.BLACK)
         }
     }
 }
