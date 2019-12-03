@@ -44,7 +44,7 @@ class SyncInformationActivity : AppCompatActivity() {
             .get(SyncInformationViewModel::class.java)
 
         setTextInLayout()
-        disableModuleSelectionButtonIfNecessary()
+        enableModuleSelectionButtonAndTabsIfNecessary()
         setupAdapters()
         setupToolbar()
         setupModulesTabs()
@@ -88,9 +88,10 @@ class SyncInformationActivity : AppCompatActivity() {
         modulesTabHost.setCurrentTabByTag(SELECTED_MODULES_TAB_TAG)
     }
 
-    private fun disableModuleSelectionButtonIfNecessary() {
+    private fun enableModuleSelectionButtonAndTabsIfNecessary() {
         if (isModuleSyncAndModuleIdOptionsNotEmpty()) {
             moduleSelectionButton.visibility = View.VISIBLE
+            modulesTabHost.visibility = View.VISIBLE
         }
     }
 

@@ -146,7 +146,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        app:layout_constraintBottom_toTopOf="@id/modulesTabHost"
+
         app:layout_constraintEnd_toEndOf="@+id/recordsToDeleteCardView"
         app:layout_constraintStart_toStartOf="@+id/recordsToUploadCardView"
         app:layout_constraintTop_toBottomOf="@+id/recordsToDownloadCardView">
@@ -193,6 +193,7 @@
         android:background="@drawable/button_rounded_corners"
         android:textColor="@color/simprints_white"
         android:textSize="18sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
@@ -202,6 +203,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
