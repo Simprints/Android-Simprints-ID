@@ -43,41 +43,59 @@ class CountTaskTest {
 
     @Test
     fun testCountForGlobalSync_shouldSucceed() {
-        val nPeopleInRemote = 22000
+        val nPeopleToDownload = 22000
+        val nPeopleToDelete = 100
+        val nPeopleToUpdate = 10
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
-            getMockListOfPeopleCountWithCounter(nPeopleInRemote), GLOBAL
+            getMockListOfPeopleCountWithCounter(nPeopleToDownload, nPeopleToDelete, nPeopleToUpdate), GLOBAL
         )
         testObserver.awaitTerminalEvent()
 
         testObserver
             .assertNoErrors()
             .assertComplete()
-            .assertValue { peopleToDownload ->
-                peopleToDownload.sumBy { it.count } == nPeopleInRemote
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.downloadCount } == nPeopleToDownload
+            }
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.deleteCount } == nPeopleToDelete
+            }
+            .assertValue {recordsCount ->
+                recordsCount.sumBy { it.updateCount } == nPeopleToUpdate
             }
     }
 
     @Test
     fun testCountForUserSync_shouldSucceed() {
-        val nPeopleInRemote = 2000
+        val nPeopleToDownload = 2000
+        val nPeopleToDelete = 20
+        val nPeopleToUpdate = 2
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
-            getMockListOfPeopleCountWithCounter(nPeopleInRemote), USER
+            getMockListOfPeopleCountWithCounter(nPeopleToDownload, nPeopleToDelete, nPeopleToUpdate), USER
         )
         testObserver.awaitTerminalEvent()
 
         testObserver
             .assertNoErrors()
             .assertComplete()
-            .assertValue { peopleToDownload ->
-                peopleToDownload.sumBy { it.count } == nPeopleInRemote
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.downloadCount } == nPeopleToDownload
+            }
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.deleteCount } == nPeopleToDelete
+            }
+            .assertValue {recordsCount ->
+                recordsCount.sumBy { it.updateCount } == nPeopleToUpdate
             }
     }
 
     @Test
     fun testCountForModuleSync_shouldSucceed() {
-        val nPeopleInRemote = 3000
+        val nPeopleToDownload = 3000
+        val nPeopleToDelete = 300
+        val nPeopleToUpdate = 60
 
         val testObserver = makeFakeNumberOfPeopleToDownSyncCountRequest(
             getMockListOfPeopleCountForModulesWithCounter(), MODULE
@@ -87,8 +105,14 @@ class CountTaskTest {
         testObserver
             .assertNoErrors()
             .assertComplete()
-            .assertValue { peopleToDownload ->
-                peopleToDownload.sumBy { it.count } == nPeopleInRemote
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.downloadCount } == nPeopleToDownload
+            }
+            .assertValue { recordsCount ->
+                recordsCount.sumBy { it.deleteCount } == nPeopleToDelete
+            }
+            .assertValue {recordsCount ->
+                recordsCount.sumBy { it.updateCount } == nPeopleToUpdate
             }
     }
 
@@ -100,20 +124,25 @@ class CountTaskTest {
         whenever(preferencesManagerMock.selectedModules).thenReturn(setOf("0", "1", "2"))
         whenever(loginInfoManagerMock.getSignedInUserIdOrEmpty()).thenReturn("")
         whenever(loginInfoManagerMock.getSignedInProjectIdOrEmpty()).thenReturn("")
-        whenever(personRepositoryMock) { countToDownSync(anyNotNull()) } thenReturn Single.just(getMockListOfPeopleCountWithCounter(peopleToDownload.sumBy { it.count }))
+        whenever(personRepositoryMock) { countToDownSync(anyNotNull()) } thenReturn Single.just(
+            with(peopleToDownload) {
+                getMockListOfPeopleCountWithCounter(sumBy { it.downloadCount }, sumBy { it.deleteCount }, sumBy { it.updateCount })
+            }
+        )
 
         val peopleToDownSyncTask = CountTaskImpl(personRepositoryMock)
         return peopleToDownSyncTask.execute(SyncScope(DEFAULT_PROJECT_ID, null, null)).test()
     }
 
-    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+    private fun getMockListOfPeopleCountWithCounter(downloadCount: Int, deleteCount: Int, updateCount: Int) =
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT),
+            downloadCount, deleteCount, updateCount))
 
     private fun getMockListOfPeopleCountForModulesWithCounter() =
         listOf(
-            PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), 1000),
-            PeopleCount("projectId", "userId", "1", listOf(Modes.FACE, Modes.FINGERPRINT), 1000),
-            PeopleCount("projectId", "userId", "2", listOf(Modes.FACE, Modes.FINGERPRINT), 1000)
+            PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), 1000, 100, 20),
+            PeopleCount("projectId", "userId", "1", listOf(Modes.FACE, Modes.FINGERPRINT), 1000, 100, 20),
+            PeopleCount("projectId", "userId", "2", listOf(Modes.FACE, Modes.FINGERPRINT), 1000, 100, 20)
         )
 
 }

@@ -53,14 +53,17 @@ class SyncInformationViewModelTest {
 
     @Test
     fun fetchCountFromRemote_shouldUpdateValue() {
-        val countInRemote = 123
-        val peopleCount = PeopleCount(projectId, null, null, null, countInRemote)
+        val countInRemoteForCreate = 123
+        val countInRemoteForUpdate = 0
+        val countInRemoteForDelete = 22
+        val peopleCount = PeopleCount(projectId, null, null, null, countInRemoteForCreate, countInRemoteForDelete, countInRemoteForUpdate)
         whenever(syncScopesBuilderMock) { buildSyncScope() } thenReturn SyncScope(projectId, null, null)
         whenever(personRepositoryMock) { countToDownSync(any()) } thenReturn Single.just(listOf(peopleCount))
 
-        viewModel.fetchAndUpdateRecordsToDownSyncCount()
+        viewModel.fetchAndUpdateRecordsToDownSyncAndDeleteCount()
 
-        assertThat(viewModel.recordsToDownSyncCount.value).isEqualTo(countInRemote)
+        assertThat(viewModel.recordsToDownSyncCount.value).isEqualTo(countInRemoteForCreate)
+        assertThat(viewModel.recordsToDeleteCount.value).isEqualTo(countInRemoteForDelete)
     }
 
     @Test

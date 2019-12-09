@@ -64,13 +64,13 @@ class CountWorker(context: Context, params: WorkerParameters) : Worker(context, 
             saveCountsTask.execute(prepareInputForTask(it))
         }
 
-    private fun getTotalCount(peopleCounts: List<PeopleCount>) = peopleCounts.sumBy { it.count }
+    private fun getTotalCount(peopleCounts: List<PeopleCount>) = peopleCounts.sumBy { it.downloadCount }
 
     private fun prepareInputForTask(peopleCounts: List<PeopleCount>): Map<SubSyncScope, Int> {
         val inputForTask = mutableMapOf<SubSyncScope, Int>()
         val scope = syncScopeBuilder.buildSyncScope()
         scope?.toSubSyncScopes()?.forEachIndexed { index, subSyncScope ->
-            val counter = peopleCounts[index].count
+            val counter = peopleCounts[index].downloadCount
             counter.let { counterForSubSync ->
                 inputForTask[subSyncScope] = counterForSubSync
             }
