@@ -13,10 +13,8 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSy
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMasterImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster

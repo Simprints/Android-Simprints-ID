@@ -10,7 +10,7 @@ import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTask
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig

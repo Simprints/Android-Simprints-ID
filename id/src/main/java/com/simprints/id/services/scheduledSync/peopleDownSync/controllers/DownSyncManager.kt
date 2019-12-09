@@ -7,9 +7,9 @@ import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
 
 interface DownSyncManager {
-    fun enqueueOneTimeDownSyncMasterWorker()
+    fun enqueueOneTimeDownSync()
     fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope): OneTimeWorkRequest
-    fun enqueuePeriodicDownSyncMasterWorker()
+    fun enqueuePeriodicDownSync()
     fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest
     fun dequeueAllSyncWorker()
     fun onSyncStateUpdated(): LiveData<SyncState>
