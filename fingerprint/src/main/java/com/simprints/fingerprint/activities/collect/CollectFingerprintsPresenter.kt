@@ -157,7 +157,7 @@ class CollectFingerprintsPresenter(private val context: Context,
     private fun everyActiveFingerHasSatisfiedTerminalCondition(): Boolean =
         activeFingers.all { fingerHasSatisfiedTerminalCondition(it) }
 
-    private fun tooManyBadScans(finger: Finger) =
+    override fun tooManyBadScans(finger: Finger) =
         finger.numberOfBadScans >= numberOfBadScansRequiredToAutoAddNewFinger
 
     private fun haveNotExceedMaximumNumberOfFingersToAutoAdd() =

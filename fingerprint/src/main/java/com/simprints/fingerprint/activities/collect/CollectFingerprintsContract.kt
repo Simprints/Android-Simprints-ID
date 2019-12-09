@@ -76,5 +76,6 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
+        fun tooManyBadScans(finger: Finger): Boolean
     }
 }
