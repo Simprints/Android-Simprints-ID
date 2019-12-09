@@ -19,6 +19,8 @@ class ScanningWithImageTransferTimeoutBar(
 
     override fun startTimeoutBar() {
         progressBar.progress = 0
+        scanningProgress = 0
+        imageTransferProgress = 0
         scanningCountDownTimer = createScanningTimer().also { it.start() }
         imageTransferCountDownTimer = createImageTransferTimer()
     }
@@ -56,6 +58,10 @@ class ScanningWithImageTransferTimeoutBar(
     }
 
     override fun handleAllStepsFinished() {
+        scanningCountDownTimer?.let {
+            it.cancel()
+            it.onFinish()
+        }
         imageTransferCountDownTimer?.let {
             it.cancel()
             it.onFinish()
