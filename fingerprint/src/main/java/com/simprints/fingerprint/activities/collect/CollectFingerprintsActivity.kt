@@ -1,6 +1,5 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Paint
@@ -151,9 +150,6 @@ class CollectFingerprintsActivity :
 
 
     override fun startRefusalActivity() = launchRefusalActivity()
-
-    override fun cancelAndFinish() =
-        setResult(Activity.RESULT_CANCELED).also { finish() }
 
     override fun onBackPressed() {
         viewPresenter.handleOnBackPressed()

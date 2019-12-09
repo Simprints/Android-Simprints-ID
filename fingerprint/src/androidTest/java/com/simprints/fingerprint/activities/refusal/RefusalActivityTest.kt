@@ -5,8 +5,7 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
@@ -77,7 +76,7 @@ class RefusalActivityTest {
 
         onView(withId(R.id.btSubmitRefusalForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
-        onView(withId(R.id.refusalText)).perform(typeText("Reason for other"))
+        onView(withId(R.id.refusalText)).perform(typeText("Reason for other"), closeSoftKeyboard())
         tryOnUiUntilTimeout(1000, 200) {
             onView(withId(R.id.btSubmitRefusalForm)).check(matches(isEnabled()))
         }
