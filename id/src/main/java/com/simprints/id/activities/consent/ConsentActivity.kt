@@ -61,6 +61,7 @@ class ConsentActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this, viewModelFactory.apply { askConsentRequest = askConsentRequestReceived })
             .get(ConsentViewModel::class.java)
 
+        showLogoIfNecessary()
         requestLocationPermission()
         setupTextInUi()
         setupTabs()
@@ -70,6 +71,14 @@ class ConsentActivity : AppCompatActivity() {
     private fun injectDependencies() {
         val component = (application as Application).component
         component.inject(this)
+    }
+
+    private fun showLogoIfNecessary() {
+        if (preferencesManager.logoExists) {
+            simprintsLogoWithTagLine.visibility = View.VISIBLE
+        } else {
+            simprintsLogoWithTagLine.visibility = View.GONE
+        }
     }
 
     private fun requestLocationPermission() {

@@ -12,6 +12,8 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
                                        val modalities: List<Modality>,
                                        val androidResourcesHelper: AndroidResourcesHelper) {
 
+
+    //First argument in consent text should always be program name, second is modality specific access/use case text
     fun assembleText(askConsentRequest: AskConsentRequest) = StringBuilder().apply {
         filterAppRequestForConsent(askConsentRequest)
         filterForDataSharingOptions()
@@ -28,11 +30,11 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
         with(generalConsentOptions) {
             if (consentEnrolOnly) {
                 append(androidResourcesHelper.getString(R.string.consent_enrol_only)
-                    .format(getModalitySpecificUseCaseText(), programName))
+                    .format(programName, getModalitySpecificUseCaseText()))
             }
             if (consentEnrol) {
                 append(androidResourcesHelper.getString(R.string.consent_enrol)
-                    .format(getModalitySpecificUseCaseText(), programName))
+                    .format(programName, getModalitySpecificUseCaseText()))
             }
         }
     }
@@ -40,7 +42,7 @@ data class GeneralConsentDataGenerator(val generalConsentOptions: GeneralConsent
     private fun StringBuilder.appendTextForConsentVerifyOrIdentify() {
         if (generalConsentOptions.consentIdVerify) {
             append(androidResourcesHelper.getString(R.string.consent_id_verify)
-                .format(getModalitySpecificUseCaseText(), programName))
+                .format(programName, getModalitySpecificUseCaseText()))
         }
     }
 

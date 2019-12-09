@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
@@ -164,9 +163,8 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     @Test
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
-            val fingerprintIdentityLocalDataSource = (personLocalDataSource as FingerprintIdentityLocalDataSource)
             assertThrows<InvalidQueryToLoadRecordsException> {
-                fingerprintIdentityLocalDataSource.loadFingerprintIdentities(mock())
+                (personLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mock())
             }
         }
     }

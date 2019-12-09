@@ -57,7 +57,7 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
 
     private fun buildAppIdentifyResponseForFingerprint(fingerprintResponse: FingerprintMatchResponse,
                                                        sessionId: String): AppIdentifyResponse {
-        val resultSortedByConfidence = fingerprintResponse.result.sortedBy {
+        val resultSortedByConfidence = fingerprintResponse.result.sortedByDescending {
             it.confidenceScore
         }
 
@@ -68,7 +68,7 @@ class AppResponseBuilderForIdentify : BaseAppResponseBuilder() {
 
     private fun buildAppIdentifyResponseForFace(faceResponse: FaceMatchResponse,
                                                 sessionId: String): AppIdentifyResponse {
-        val resultsSortedByConfidence = faceResponse.result.sortedBy { it.confidence }
+        val resultsSortedByConfidence = faceResponse.result.sortedByDescending { it.confidence }
 
         return AppIdentifyResponse(
             getSortedIdentificationsForFace(resultsSortedByConfidence),
