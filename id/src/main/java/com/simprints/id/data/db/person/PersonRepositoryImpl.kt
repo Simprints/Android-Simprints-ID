@@ -71,7 +71,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                     personLocalDataSource.count(PersonLocalDataSource.Query(
                         projectId = it.projectId,
                         userId = it.userId,
-                        moduleId = it.moduleId)))
+                        moduleId = it.moduleId)), 0,0)
             }
         )
 
