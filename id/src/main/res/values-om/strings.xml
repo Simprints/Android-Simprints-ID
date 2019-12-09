@@ -108,4 +108,19 @@
     <string name="consent_parental_confirmation">Mallattoo qubaa mucaa kee fayyadamuu nadanda\’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin qaba\”.</string>
     <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
     <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
+
+    <string name="refusal_label">Unka keessaa bahi</string>
+    <string name="refusal_toast_select_option_submit">"Maaloo tokko filachuun ol ergi "</string>
+    <string name="refusal_toast_submit">Maaloo unkicha ol ergi</string>
+    <string name="refusal_app_not_working">Mosaajichi hin hojjeetu</string>
+    <string name="refusal_data_concerns">Ragaa kennuu hin barbaanne</string>
+    <string name="refusal_does_not_have_permission">Eeyyama hin qabu</string>
+    <string name="refusal_other">Kan biraa</string>
+    <string name="refusal_person_not_present">Namichi hin argamne</string>
+    <string name="refusal_religious_concerns">Dhimmoota Amantaa</string>
+    <string name="refusal_too_young">Baay\'ee daa\'ima</string>
+    <string name="why_did_you_skip_fingerprinting">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
+    <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
+    <string name="button_submit">Ol ergi</string>
+    <string name="hint_other_reason">Odeeffannoo dabalataa</string>
 </resources>

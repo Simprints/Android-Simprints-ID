@@ -20,17 +20,22 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.faceexitform.FaceExitFormActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.fingerprintexitform.FingerprintExitFormActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.fetchguid.FetchGuidActivity" />
         <activity
             android:name=".activities.coreexitform.CoreExitFormActivity"
             android:label="@string/title_activity_exit_form"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.consent.ConsentActivity" />
+        <activity
+            android:name=".activities.consent.ConsentActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:launchMode="standard"
