@@ -17,8 +17,6 @@ import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
 import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
-import com.simprints.id.activities.debug.DebugActivity
-import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -30,11 +28,12 @@ import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
-import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
+import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutFragment
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -83,7 +82,6 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
-    fun inject(aboutActivity: DebugActivity)
     fun inject(privacyNoticeActivity: PrivacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -92,7 +90,6 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(aboutPresenter: DebugViewModel)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
@@ -125,6 +122,7 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
+    fun inject(syncInformationActivity: SyncInformationActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

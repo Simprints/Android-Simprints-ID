@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import javax.inject.Inject
 
@@ -27,27 +26,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
-        configureSelectModulePreference()
         configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
-    }
-
-    private fun configureSelectModulePreference() {
-        clearSelectModulePreferenceOfOldValues()
-        configureVisibilityOfSelectModulePreference()
-    }
-
-    private fun clearSelectModulePreferenceOfOldValues() {
-        preferencesManager.selectedModules = preferencesManager.selectedModules.filter {
-            preferencesManager.moduleIdOptions.contains(it)
-        }.toSet()
-    }
-
-    private fun configureVisibilityOfSelectModulePreference() {
-        val isModuleListNonEmpty = preferencesManager.moduleIdOptions.isNotEmpty()
-        val isModuleSync = preferencesManager.syncGroup == GROUP.MODULE
-
-        view.setSelectModulePreferenceEnabled(isModuleSync and isModuleListNonEmpty) // TODO : log in analytics if XOR these conditions is true
     }
 
     private fun configureAvailableLanguageEntriesFromProjectLanguages() {
@@ -81,9 +61,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
-        loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
         loadValueAndBindChangeListener(view.getPreferenceForAbout())
+        loadValueAndBindChangeListener(view.getPreferenceForSyncInformation())
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
@@ -92,15 +72,16 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadLanguagePreference(preference as ListPreference)
                 preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
             }
-            view.getKeyForSelectModulesPreference() -> {
-                preference.setOnPreferenceClickListener {
-                    view.openModuleSelectionActivity()
-                    true
-                }
-            }
+
             view.getKeyForDefaultFingersPreference() -> {
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+            }
+            view.getKeyForSyncInfoPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    view.openSyncInfoActivity()
+                    true
+                }
             }
             view.getKeyForAboutPreference() -> {
                 preference.setOnPreferenceClickListener {
