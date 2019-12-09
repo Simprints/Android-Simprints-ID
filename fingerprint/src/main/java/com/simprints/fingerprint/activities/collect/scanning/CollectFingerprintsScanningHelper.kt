@@ -222,16 +222,20 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         parseTemplateAndAddToCurrentFinger(captureFingerprintResponse.template)
         presenter.currentFinger().templateQuality = quality
         Vibrate.vibrate(context)
-        if (fingerprintPreferencesManager.saveImages && quality >= qualityThreshold) {
+        setGoodOrBadScanFingerStatusToCurrentFinger(quality)
+        if (shouldProceedToImageTransfer(quality)) {
             view.timeoutBar.handleScanningFinished()
             proceedToImageTransfer()
         } else {
             view.timeoutBar.handleAllStepsFinished()
-            setGoodOrBadScanFingerStatusToCurrentFinger(quality)
             presenter.refreshDisplay()
             presenter.handleCaptureSuccess()
         }
     }
+
+    private fun shouldProceedToImageTransfer(quality: Int) =
+        fingerprintPreferencesManager.saveImages &&
+            (quality >= qualityThreshold || presenter.tooManyBadScans(presenter.currentFinger()))
 
     private fun proceedToImageTransfer() {
         currentFingerStatus = TRANSFERRING_IMAGE
@@ -249,7 +253,8 @@ class CollectFingerprintsScanningHelper(private val context: Context,
         view.timeoutBar.handleAllStepsFinished()
         val imageBytes = acquireImageResponse.imageBytes
         presenter.currentFinger().imageBytes = imageBytes
-        setGoodOrBadScanFingerStatusToCurrentFinger(presenter.currentFinger().templateQuality ?: throw IllegalStateException("Must have set template quality before here"))
+        setGoodOrBadScanFingerStatusToCurrentFinger(presenter.currentFinger().templateQuality
+            ?: throw IllegalStateException("Must have set template quality before here"))
         Vibrate.vibrate(context)
         presenter.refreshDisplay()
         presenter.handleCaptureSuccess()
