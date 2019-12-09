@@ -8,7 +8,6 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
@@ -44,7 +43,7 @@ class DownSyncMasterWorkerTest {
     private val subSyncScope = SubSyncScope(projectId, userId, "moduleId1")
     private val numberOfEnqueuedSyncCountWorkers = 1
     private val numberOfBlockedDownSyncWorkers = 3
-    private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN}_${syncScope.uniqueKey}"
+    private val uniqueNameForChainWorkers = "${WorkManagerConstants.SYNC_WORKER_CHAIN_TAG}_${syncScope.uniqueKey}"
     private val workerKeyForSubDownSyncScope = "${WorkManagerConstants.SUBDOWNSYNC_WORKER_TAG}_${subSyncScope.uniqueKey}"
     private val workerKeyForSubCountScope = "${WorkManagerConstants.COUNT_WORKER_TAG}_${syncScope.uniqueKey}"
 

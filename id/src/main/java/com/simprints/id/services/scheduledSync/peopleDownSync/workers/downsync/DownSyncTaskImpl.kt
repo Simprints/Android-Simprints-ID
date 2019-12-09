@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
 
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.coroutines.retryIO

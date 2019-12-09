@@ -6,7 +6,6 @@ import androidx.work.WorkInfo
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
 import org.junit.Assert.assertEquals

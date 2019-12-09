@@ -143,7 +143,7 @@ class DashboardActivityAndroidTest {
 
         waitOnSystem(2000)
 
-        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
+        downSyncManager.enqueueOneTimeDownSync()
 
         tryOnUiUntilTimeout(UI_TIMEOUT, UI_POLLING_INTERVAL_SHORT) {
             onView(withId(R.id.dashboardSyncCardSyncButton)).check(matches(withText(R.string.dashboard_card_calculating)))
@@ -176,7 +176,7 @@ class DashboardActivityAndroidTest {
     @Test
     fun openDashboardInOffline_shouldNotShowDownloadCounter() {
         PeopleRemoteInterface.baseUrl = "http://wrong_url_simprints_com.com"
-        downSyncManager.enqueueOneTimeDownSyncMasterWorker()
+        downSyncManager.enqueueOneTimeDownSync()
 
         launchActivity(Intent())
         waitOnSystem(3000)

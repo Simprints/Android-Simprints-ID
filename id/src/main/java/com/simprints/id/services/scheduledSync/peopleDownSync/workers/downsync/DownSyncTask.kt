@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.tasks
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
 
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 

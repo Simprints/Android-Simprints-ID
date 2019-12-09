@@ -1,83 +1,65 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers
 
 import android.content.Context
-import android.widget.Toast
-import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.exceptions.unexpected.WorkerInjectionFailedException
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
-import org.jetbrains.anko.runOnUiThread
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.RESULT
 import timber.log.Timber
 import javax.inject.Inject
 
-class CountWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class CountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
 
     companion object {
         const val COUNT_WORKER_SCOPE_INPUT = "COUNT_WORKER_SCOPE_INPUT"
-        const val COUNT_RESULT = "COUNTS"
     }
 
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var syncScopeBuilder: SyncScopesBuilder
-    @Inject
-    lateinit var countTask: CountTask
+    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var syncScopeBuilder: SyncScopesBuilder
+    @Inject lateinit var personRepository: PersonRepository
 
     override suspend fun doWork(): Result {
-        inject()
-
-        val input = inputData.getString(COUNT_WORKER_SCOPE_INPUT)
-            ?: throw IllegalArgumentException("input required")
-        val syncScope = syncScopeBuilder.fromJsonToSyncScope(input)
-            ?: throw IllegalArgumentException("SyncScope required")
+        getComponent<CountWorker> { it.inject(this) }
+        val syncScope = extractSyncScopeFromInput(inputData)
+        logMessageForCrashReport("Making count request for $syncScope")
 
         return try {
-            logMessageForCrashReport("Making count request for $syncScope")
-            val peopleCountsJson = JsonHelper.gson.toJson(countTask.execute(syncScope))
+            val counts = execute(syncScope)
+            logSuccess(syncScope)
 
-            logToAnalyticsAndToastForDebugBuilds(syncScope, peopleCountsJson)
-            Result.success(buildData(peopleCountsJson))
-
-        } catch (e: Throwable) {
-            e.printStackTrace()
-            logToAnalyticsAndToastForDebugBuilds(syncScope, null)
-            crashReportManager.logExceptionOrSafeException(e)
-            Result.success()
+            Result.success(workDataOf(RESULT to JsonHelper.gson.toJson(counts)))
+        } catch (t: Throwable) {
+            logFailure(t, syncScope)
+            Result.retry()
         }
     }
 
-    private fun buildData(peopleCountsJson: String): Data =
-        Data.Builder()
-            .putString(COUNT_RESULT, peopleCountsJson)
-            .build()
-
-    private fun logToAnalyticsAndToastForDebugBuilds(subSyncScope: SyncScope, jsonOutData: String?) {
-        val message = "CountWorker($subSyncScope): Success - $jsonOutData"
-        logMessageForCrashReport(message)
-        if (BuildConfig.DEBUG) {
-            applicationContext.runOnUiThread {
-                Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
-                Timber.d(message)
-            }
-        }
+    private fun logSuccess(syncScope: SyncScope) {
+        showToastForDebug<CountWorker>(syncScope, Result.success())
     }
 
-    private fun inject() {
-        val context = applicationContext
-        if (context is Application) {
-            context.component.inject(this)
-        } else throw WorkerInjectionFailedException.forWorker<CountWorker>()
+    private fun logFailure(t: Throwable, syncScope: SyncScope) {
+        Timber.e(t)
+        showToastForDebug<CountWorker>(syncScope, Result.failure())
+        crashReportManager.logExceptionOrSafeException(t)
     }
+
+    private fun extractSyncScopeFromInput(inputData: Data): SyncScope {
+        val syncScopeJson = inputData.getString(COUNT_WORKER_SCOPE_INPUT)
+            ?: throw IllegalArgumentException("input required")
+        return syncScopeBuilder.fromJsonToSyncScope(syncScopeJson)
+            ?: throw IllegalArgumentException("SyncScope required")
+    }
+
+    private suspend fun execute(syncScope: SyncScope) =
+        personRepository.countToDownSync(syncScope)
 
     private fun logMessageForCrashReport(message: String) =
         crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
