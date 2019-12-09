@@ -16,6 +16,7 @@ class ScanningOnlyTimeoutBar(
 
     override fun startTimeoutBar() {
         progressBar.progress = 0
+        scanningProgress = 0
         countDownTimer = createScanningTimer().also { it.start() }
     }
 
