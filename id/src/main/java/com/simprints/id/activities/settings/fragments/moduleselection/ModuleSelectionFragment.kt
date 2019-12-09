@@ -23,6 +23,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
@@ -33,8 +34,8 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
-    @Inject
-    lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var syncHelper: SyncSchedulerHelper
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -58,8 +59,21 @@ class ModuleSelectionFragment(
     }
 
     override fun onModuleSelected(module: Module) {
+        searchView.setQuery("", false)
         updateSelectionIfPossible(module)
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+        scrollView.post {
+            scrollView.isSmoothScrollingEnabled = false
+            scrollView.fullScroll(View.FOCUS_DOWN)
+            scrollView.isSmoothScrollingEnabled = true
+        }
+        searchView.requestFocus()
+
+        refreshSyncWorkers()
+    }
+
+    private fun refreshSyncWorkers(){
+        syncHelper.cancelDownSyncWorkers()
+        syncHelper.scheduleBackgroundSyncs()
     }
 
     override fun onChipClick(module: Module) {
@@ -116,9 +130,16 @@ class ModuleSelectionFragment(
 
             when {
                 isModuleSelected && !isModuleDisplayed -> addChipForModule(module)
-                !isModuleSelected && isModuleDisplayed -> removeChipForModule(module)
+                !isModuleSelected && isModuleDisplayed -> {
+                    removeChipForModule(module)
+                    hideKeyboard()
+                }
             }
         }
+    }
+
+    private fun hideKeyboard() {
+        requireActivity().hideKeyboard()
     }
 
     private fun addChipForModule(selectedModule: Module) {
@@ -155,6 +176,8 @@ class ModuleSelectionFragment(
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
+
+        refreshSyncWorkers()
     }
 
     private fun notifyNoModulesSelected() {
@@ -190,7 +213,7 @@ class ModuleSelectionFragment(
     private fun EditText.observeSearchButton() {
         onEditorAction { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                requireActivity().hideKeyboard()
+                hideKeyboard()
                 v?.clearFocus()
                 rvModules.requestFocus()
             }

@@ -26,7 +26,6 @@ interface CollectFingerprintsContract {
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
         fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult)
-        fun cancelAndFinish()
 
         fun showSplashScreen()
 

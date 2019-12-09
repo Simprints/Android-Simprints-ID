@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
-import com.simprints.id.activities.orchestrator.OrchestratorState.*
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.moduleapi.app.requests.AppRequest
 import com.simprints.id.exceptions.unexpected.InvalidAppRequest
@@ -29,7 +28,7 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var timeHelper: TimeHelper
 
-    private var orchestratorState = STARTED
+    private var newActivity = true
 
     private val observerForNextStep = Observer<Step?> {
         it?.let {
@@ -68,9 +67,15 @@ class OrchestratorActivity : AppCompatActivity() {
         syncSchedulerHelper.startDownSyncOnLaunchIfPossible()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        vm.saveState()
+    }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
-        orchestratorState = RESTORED
+        vm.restoreState()
+        newActivity = false
     }
 
     override fun onResume() {
@@ -78,17 +83,19 @@ class OrchestratorActivity : AppCompatActivity() {
         vm.ongoingStep.observe(this, observerForNextStep)
         vm.appResponse.observe(this, observerForFinalResponse)
 
-        when (orchestratorState) {
-            STARTED -> vm.clearState()
-            RESTORED -> vm.restoreState()
-            RESUMED -> {}
+        if(newActivity) {
+            vm.clearState()
         }
-
-        orchestratorState = RESUMED
+        newActivity = false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         vm.onModalStepRequestDone(appRequest, requestCode, resultCode, data)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vm.saveState()
     }
 }

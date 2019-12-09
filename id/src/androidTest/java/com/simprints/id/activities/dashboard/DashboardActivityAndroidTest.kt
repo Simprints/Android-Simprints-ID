@@ -114,26 +114,26 @@ class DashboardActivityAndroidTest {
         WorkManager.getInstance().pruneWork()
     }
 
-    @Test
-    fun openDashboardWithGlobalSync_shouldShowTheRightCounters() {
-        uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
-        launchActivity(Intent())
-        waitForDownSyncCountAndValidateUI()
-    }
-
-    @Test
-    fun openDashboardWithUserSync_shouldShowTheRightCounters() {
-        uploadFakePeopleAndPrepareLocalDb(mockUserScope())
-        launchActivity(Intent())
-        waitForDownSyncCountAndValidateUI()
-    }
-
-    @Test
-    fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
-        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
-        launchActivity(Intent())
-        waitForDownSyncCountAndValidateUI()
-    }
+//    @Test
+//    fun openDashboardWithGlobalSync_shouldShowTheRightCounters() {
+//        uploadFakePeopleAndPrepareLocalDb(mockGlobalScope())
+//        launchActivity(Intent())
+//        waitForDownSyncCountAndValidateUI()
+//    }
+//
+//    @Test
+//    fun openDashboardWithUserSync_shouldShowTheRightCounters() {
+//        uploadFakePeopleAndPrepareLocalDb(mockUserScope())
+//        launchActivity(Intent())
+//        waitForDownSyncCountAndValidateUI()
+//    }
+//
+//    @Test
+//    fun openDashboardWithModuleSync_shouldShowTheRightCounters() {
+//        uploadFakePeopleAndPrepareLocalDb(mockModuleScope())
+//        launchActivity(Intent())
+//        waitForDownSyncCountAndValidateUI()
+//    }
 
     @Test
     fun downSyncRunning_shouldShowTheRightStateAndUpdateCountersAtTheEnd() {

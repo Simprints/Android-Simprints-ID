@@ -42,7 +42,7 @@ open class OrchestratorManagerImpl(
     }
 
     override suspend fun handleIntentResult(appRequest: AppRequest, requestCode: Int, resultCode: Int, data: Intent?) {
-        modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)?.let(hotCache::save)
+        modalitiesFlow.handleIntentResult(appRequest, requestCode, resultCode, data)
         proceedToNextStepOrAppResponse()
     }
 
@@ -54,6 +54,13 @@ open class OrchestratorManagerImpl(
 
     override fun clearState() {
         hotCache.clear()
+    }
+
+    override fun saveState() {
+        hotCache.clear()
+        modalitiesFlow.steps.forEach {
+            hotCache.save(it)
+        }
     }
 
     override fun getCurrentFlow() = flow
@@ -75,19 +82,13 @@ open class OrchestratorManagerImpl(
         step.setStatus(ONGOING)
         ongoingStep.value = step
         appResponse.value = null
-        hotCache.save(step)
     }
 
     private fun ModalityFlow.anyStepOngoing() =
         steps.any { it.getStatus() == ONGOING }
 
     private suspend fun buildAppResponse() {
-        val cachedSteps = hotCache.load()
-        val steps: List<Step> = if (cachedSteps.isEmpty()) {
-            modalitiesFlow.steps
-        } else {
-            cachedSteps
-        }
+        val steps = modalitiesFlow.steps
         val appResponseToReturn = appResponseFactory.buildAppResponse(
             modalities, appRequest, steps, sessionId
         )
