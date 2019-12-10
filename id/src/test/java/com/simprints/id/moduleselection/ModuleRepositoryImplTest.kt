@@ -37,7 +37,7 @@ class ModuleRepositoryImplTest {
             Module("5", true)
         )
 
-        repository.updateModules(selectedModules)
+        repository.saveModules(selectedModules)
 
         verify(crashReportManager).setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
     }

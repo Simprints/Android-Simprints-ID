@@ -1,7 +1,5 @@
 package com.simprints.id.moduleselection
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
@@ -13,14 +11,9 @@ class ModuleRepositoryImpl(
     val crashReportManager: CrashReportManager
 ): ModuleRepository {
 
-    private val modules = MutableLiveData<List<Module>>()
+    override fun getModules(): List<Module> = buildModulesList()
 
-    override fun getModules(): LiveData<List<Module>> = modules.apply {
-        value = buildModulesList()
-    }
-
-    override fun updateModules(modules: List<Module>) {
-        this.modules.value = modules
+    override fun saveModules(modules: List<Module>) {
         setSelectedModules(modules.filter { it.isSelected })
     }
 
