@@ -23,6 +23,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.AndroidResourcesHelper
@@ -41,6 +42,7 @@ class ModuleSelectionFragment(
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -181,12 +183,19 @@ class ModuleSelectionFragment(
     }
 
     fun showModuleSelectionDialogIfNecessary() {
-        if (isNoModulesSelected()) {
-            notifyNoModulesSelected()
-        } else {
+        if (isModuleSelectionChanged()) {
             activity?.runOnUiThreadIfStillRunning {
                 buildConfirmModuleSelectionDialog().show()
             }
+        } else {
+            activity?.finish()
+        }
+    }
+
+    private fun isModuleSelectionChanged() = with(modules.filter { it.isSelected }) {
+        when {
+            isEmpty() && preferencesManager.selectedModules.isEmpty() -> false
+            else -> map { it.name }.toSet() != preferencesManager.selectedModules
         }
     }
 
