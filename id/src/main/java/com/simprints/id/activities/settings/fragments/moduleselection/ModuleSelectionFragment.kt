@@ -1,5 +1,6 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
+import android.app.AlertDialog
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,7 +24,10 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.hideKeyboard
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
@@ -33,8 +37,9 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
-    @Inject
-    lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -84,7 +89,7 @@ class ModuleSelectionFragment(
     }
 
     private fun fetchData() {
-        viewModel.getModules().observe(this, Observer { modules ->
+        viewModel.modulesList.observe(this, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules.getUnselected())
             configureSearchView()
@@ -178,6 +183,43 @@ class ModuleSelectionFragment(
         ).show()
     }
 
+    fun showModuleSelectionDialogIfNecessary() {
+        if (isNoModulesSelected()) {
+            notifyNoModulesSelected()
+        } else {
+            activity?.runOnUiThreadIfStillRunning {
+                buildConfirmModuleSelectionDialog().show()
+            }
+        }
+    }
+
+    private fun buildConfirmModuleSelectionDialog() =
+        AlertDialog.Builder(activity)
+            .setTitle(androidResourcesHelper.getString(R.string.confirm_module_selection_title))
+            .setMessage(getModulesSelectedTextForDialog())
+            .setCancelable(false)
+            .setPositiveButton(androidResourcesHelper.getString(R.string.confirm_module_selection_yes))
+            { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(androidResourcesHelper.getString(R.string.confirm_module_selection_cancel))
+            { _, _ -> handleModuleSelectionCancelClick() }
+            .create()
+
+    private fun getModulesSelectedTextForDialog() = StringBuilder().also {
+        modules.filter { it.isSelected }.forEach { module ->
+            it.append(module.name + "\n")
+        }
+    }.toString()
+
+    private fun handleModulesConfirmClick() {
+        viewModel.saveModules(modules)
+        syncSchedulerHelper.startDownSyncOnUserActionIfPossible()
+        activity?.finish()
+    }
+
+    private fun handleModuleSelectionCancelClick() {
+        viewModel.resetModules()
+    }
+
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
@@ -187,7 +229,7 @@ class ModuleSelectionFragment(
     }
 
     private fun configureTextViewVisibility() {
-        if (modules.none { it.isSelected }) {
+        if (isNoModulesSelected()) {
             txtNoModulesSelected.visibility = VISIBLE
             txtSelectedModules.visibility = GONE
         } else {
@@ -195,6 +237,8 @@ class ModuleSelectionFragment(
             txtSelectedModules.visibility = VISIBLE
         }
     }
+
+    private fun isNoModulesSelected() = modules.none { it.isSelected }
 
     private fun List<Module>.getSelected() = filter { it.isSelected }
 
