@@ -53,7 +53,7 @@ class ModuleRepositoryImplTest {
 
         val actual = repository.getModules()
 
-        assertThat(actual.value).isEqualTo(expected)
+        assertThat(actual).isEqualTo(expected)
     }
 
     @Test
@@ -63,7 +63,7 @@ class ModuleRepositoryImplTest {
             Module("c", true)
         )
 
-        val actual = repository.getModules().value?.filter { it.isSelected }
+        val actual = repository.getModules().filter { it.isSelected }
 
         assertThat(actual).isEqualTo(expected)
     }
