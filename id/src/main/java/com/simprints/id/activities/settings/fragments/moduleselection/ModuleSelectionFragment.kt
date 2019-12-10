@@ -1,6 +1,5 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
-import android.app.AlertDialog
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
@@ -28,6 +28,7 @@ import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.hideKeyboard
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
@@ -176,11 +177,7 @@ class ModuleSelectionFragment(
     }
 
     private fun notifyNoModulesSelected() {
-        Toast.makeText(
-            application,
-            R.string.settings_no_modules_toast,
-            Toast.LENGTH_SHORT
-        ).show()
+        activity?.showToast(androidResourcesHelper, R.string.settings_no_modules_toast)
     }
 
     fun showModuleSelectionDialogIfNecessary() {
@@ -194,7 +191,7 @@ class ModuleSelectionFragment(
     }
 
     private fun buildConfirmModuleSelectionDialog() =
-        AlertDialog.Builder(activity)
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(androidResourcesHelper.getString(R.string.confirm_module_selection_title))
             .setMessage(getModulesSelectedTextForDialog())
             .setCancelable(false)
@@ -223,7 +220,7 @@ class ModuleSelectionFragment(
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            application.getString(R.string.settings_too_many_modules_toast, maxAllowed),
+            String.format(application.getString(R.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }
