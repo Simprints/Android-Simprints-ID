@@ -5,14 +5,11 @@ import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
-import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
-import com.simprints.id.domain.GROUP
 import com.simprints.id.data.db.syncscope.domain.DownSyncScope
+import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -25,53 +22,25 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
-                           private val peopleUpSyncMaster: PeopleUpSyncMaster,
-                           private val downSyncDao: DownSyncDao) :
+                           private val peopleUpSyncMaster: PeopleUpSyncMaster) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
-    override suspend fun countToDownSync(syncScope: DownSyncScope): List<PeopleCount> = suspendCancellableCoroutine {
-        personRemoteDataSource.getDownSyncPeopleCount(syncScope.projectId, buildPeopleOperationsParams(syncScope))
+    override suspend fun countToDownSync(downSyncScope: DownSyncScope): List<PeopleCount> = suspendCancellableCoroutine {
+        personRemoteDataSource.getDownSyncPeopleCount(downSyncScope.projectId, downSyncScope.getDownSyncOperations())
             .subscribeOn(Schedulers.io())
             .blockingGet()
     }
 
-    private fun buildPeopleOperationsParams(syncScope: DownSyncScope) = when (syncScope.group) {
-        GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
-        GROUP.USER -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
-        GROUP.MODULE -> buildPeopleOperationsParamsForModuleSync(syncScope)
-    }
-
-    private fun buildPeopleOperationsParamsForProjectOrUserSync(syncScope: DownSyncScope) =
-        with(syncScope.toSubSyncScopes().first()) {
-            listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
-                getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
-        }
-
-    private fun buildPeopleOperationsParamsForModuleSync(syncScope: DownSyncScope) =
-        syncScope.toSubSyncScopes().map {
-            PeopleOperationsParams(it, getLastKnownPatientId(it.projectId, it.userId, it.moduleId),
-                getLastKnownPatientUpdatedAt(it.projectId, it.userId, it.moduleId))
-        }
-
-    private fun getLastKnownPatientId(projectId: String, userId: String?, moduleId: String?): String? =
-        downSyncDao.getDownSyncStatusForId(getDownSyncId(projectId, userId, moduleId))?.lastPatientId
-
-    private fun getLastKnownPatientUpdatedAt(projectId: String, userId: String?, moduleId: String?): Long? =
-        downSyncDao.getDownSyncStatusForId(getDownSyncId(projectId, userId, moduleId))?.lastPatientUpdatedAt
-
-    private fun getDownSyncId(projectId: String, userId: String?, moduleId: String?) =
-        downSyncDao.getStatusId(projectId, userId, moduleId)
-
-    override fun localCountForSyncScope(syncScope: DownSyncScope): Single<List<PeopleCount>> =
+    override fun localCountForSyncScope(downSyncScope: DownSyncScope): Single<List<PeopleCount>> =
         Single.just(
-            syncScope.toSubSyncScopes().map {
-                PeopleCount(it,
+            downSyncScope.getDownSyncOperations().map {
+                PeopleCount(
                     personLocalDataSource.count(PersonLocalDataSource.Query(
                         projectId = it.projectId,
                         userId = it.userId,
-                        moduleId = it.moduleId)))
+                        moduleId = it.moduleId)), 0, 0)
             }
         )
 

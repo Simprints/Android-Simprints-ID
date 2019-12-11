@@ -2,24 +2,21 @@ package com.simprints.id.data.db.syncscope.domain
 
 import com.simprints.id.domain.modality.Modes
 
-sealed class DownSyncScope {
+sealed class DownSyncScope(open val projectId: String) {
 
-    open fun getDownSyncOperations(): Array<DownSyncOperation> = emptyArray()
+    open fun getDownSyncOperations(): List<DownSyncOperation> = emptyList()
 }
 
 data class ProjectSyncScope(
-    val projectId: String,
-    val modes: List<Modes>) : DownSyncScope() {
-}
+    override val projectId: String,
+    val modes: List<Modes>) : DownSyncScope(projectId)
 
 data class UserSyncScope(
-    val projectId: String,
+    override val projectId: String,
     val userId: String,
-    val modes: List<Modes>) : DownSyncScope() {
-}
+    val modes: List<Modes>) : DownSyncScope(projectId)
 
 data class ModuleSyncScope(
-    val projectId: String,
+    override val projectId: String,
     val modules: List<String>,
-    val modes: List<Modes>) : DownSyncScope() {
-}
+    val modes: List<Modes>) : DownSyncScope(projectId)

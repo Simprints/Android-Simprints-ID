@@ -4,7 +4,6 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
@@ -15,6 +14,8 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
+import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
+import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
@@ -53,14 +54,14 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 .trace("uploadPatientBatch")
         }
 
-    override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>> =
+    override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<DownSyncOperation>): Single<List<PeopleCount>> =
         if (peopleOperationsParams.isNotEmpty()) {
             makeRequestForPeopleOperations(projectId, peopleOperationsParams)
         } else {
             Single.error(EmptyPeopleOperationsParamsException())
         }
 
-    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleOperationsParams>): Single<List<PeopleCount>> =
+    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<DownSyncOperation>): Single<List<PeopleCount>> =
         singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
 
             peopleRemoteInterface.requestPeopleOperations(
@@ -70,11 +71,9 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
                 .map { response ->
-                    response.groups.mapIndexed { index, responseGroup ->
-                        val requestedSyncScope = peopleOperationsParams[index].subSyncScope
+                    response.groups.map{ responseGroup ->
                         val countsForSyncScope = responseGroup.counts
                         PeopleCount(
-                            requestedSyncScope,
                             countsForSyncScope.create,
                             countsForSyncScope.update,
                             countsForSyncScope.delete)
@@ -82,14 +81,14 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 }
         }
 
-    private fun buildApiPeopleOperations(peopleOperationsParams: List<PeopleOperationsParams>) =
+    private fun buildApiPeopleOperations(peopleOperationsParams: List<DownSyncOperation>) =
         ApiPeopleOperations(buildGroups(peopleOperationsParams))
 
-    private fun buildGroups(peopleOperationsParams: List<PeopleOperationsParams>) =
+    private fun buildGroups(peopleOperationsParams: List<DownSyncOperation>) =
         peopleOperationsParams.map {
             val whereLabels = mutableListOf<ApiPeopleOperationWhereLabel>()
-            val userId = it.subSyncScope.userId
-            val moduleId = it.subSyncScope.moduleId
+            val userId = it.userId
+            val moduleId = it.moduleId
 
             if (userId?.isNotEmpty() == true) {
                 whereLabels.add(ApiPeopleOperationWhereLabel(USER.key, userId))
@@ -101,10 +100,12 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
 
             whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(FINGERPRINT).toString()))
 
-            val lastKnownInfo = if (it.lastKnownPatientId?.isNotEmpty() == true && it.lastKnownPatientUpdatedAt != null) {
-                ApiLastKnownPatient(it.lastKnownPatientId, it.lastKnownPatientUpdatedAt)
-            } else {
-                null
+            val lastKnownInfo = with(it.syncInfo) {
+                if (this@with?.lastPatientId?.isNotEmpty() == true && this@with.lastPatientUpdatedAt != null) {
+                    ApiLastKnownPatient(this@with.lastPatientId, this@with.lastPatientUpdatedAt)
+                } else {
+                    null
+                }
             }
 
             ApiPeopleOperationGroup(lastKnownInfo, whereLabels)

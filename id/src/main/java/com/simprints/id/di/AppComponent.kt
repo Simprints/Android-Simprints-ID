@@ -15,10 +15,6 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
-import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModelHelper
-import com.simprints.id.activities.dashboard.views.DashboardSyncCardView
-import com.simprints.id.activities.debug.DebugActivity
-import com.simprints.id.activities.debug.DebugViewModel
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -46,7 +42,6 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker
@@ -84,7 +79,6 @@ interface AppComponent {
     fun inject(app: Application)
     fun inject(guidSelectionWorker: GuidSelectionWorker)
     fun inject(alertActivity: AlertActivity)
-    fun inject(aboutActivity: DebugActivity)
     fun inject(privacyNoticeActivity: PrivacyNoticeActivity)
     fun inject(loginActivity: LoginActivity)
     fun inject(checkLoginActivity: CheckLoginFromIntentActivity)
@@ -93,7 +87,6 @@ interface AppComponent {
     fun inject(checkLoginPresenter: CheckLoginPresenter)
     fun inject(checkLoginFromIntentPresenter: CheckLoginFromIntentPresenter)
     fun inject(checkLoginFromMainLauncherPresenter: CheckLoginFromMainLauncherPresenter)
-    fun inject(aboutPresenter: DebugViewModel)
     fun inject(dashboardCardsFactory: DashboardCardsFactory)
     fun inject(dashboardSyncCardViewModel: DashboardSyncCardViewModel)
     fun inject(loginPresenter: LoginPresenter)
@@ -106,11 +99,9 @@ interface AppComponent {
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
     fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
-    fun inject(dashboardSyncCardView: DashboardSyncCardView)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(countWorker: CountWorker)
-    fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)
