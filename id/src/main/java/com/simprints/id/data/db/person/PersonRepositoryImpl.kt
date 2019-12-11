@@ -5,15 +5,14 @@ import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
-import com.simprints.id.data.db.person.domain.PeopleCount
-import com.simprints.id.data.db.person.domain.PeopleOperationsParams
+import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -32,25 +31,25 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
-    override suspend fun countToDownSync(syncScope: SyncScope): List<PeopleCount> = suspendCancellableCoroutine {
+    override suspend fun countToDownSync(syncScope: DownSyncScope): List<PeopleCount> = suspendCancellableCoroutine {
         personRemoteDataSource.getDownSyncPeopleCount(syncScope.projectId, buildPeopleOperationsParams(syncScope))
             .subscribeOn(Schedulers.io())
             .blockingGet()
     }
 
-    private fun buildPeopleOperationsParams(syncScope: SyncScope) = when (syncScope.group) {
+    private fun buildPeopleOperationsParams(syncScope: DownSyncScope) = when (syncScope.group) {
         GROUP.GLOBAL -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
         GROUP.USER -> buildPeopleOperationsParamsForProjectOrUserSync(syncScope)
         GROUP.MODULE -> buildPeopleOperationsParamsForModuleSync(syncScope)
     }
 
-    private fun buildPeopleOperationsParamsForProjectOrUserSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForProjectOrUserSync(syncScope: DownSyncScope) =
         with(syncScope.toSubSyncScopes().first()) {
             listOf(PeopleOperationsParams(this, getLastKnownPatientId(projectId, userId, moduleId),
                 getLastKnownPatientUpdatedAt(projectId, userId, moduleId)))
         }
 
-    private fun buildPeopleOperationsParamsForModuleSync(syncScope: SyncScope) =
+    private fun buildPeopleOperationsParamsForModuleSync(syncScope: DownSyncScope) =
         syncScope.toSubSyncScopes().map {
             PeopleOperationsParams(it, getLastKnownPatientId(it.projectId, it.userId, it.moduleId),
                 getLastKnownPatientUpdatedAt(it.projectId, it.userId, it.moduleId))
@@ -65,7 +64,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     private fun getDownSyncId(projectId: String, userId: String?, moduleId: String?) =
         downSyncDao.getStatusId(projectId, userId, moduleId)
 
-    override fun localCountForSyncScope(syncScope: SyncScope): Single<List<PeopleCount>> =
+    override fun localCountForSyncScope(syncScope: DownSyncScope): Single<List<PeopleCount>> =
         Single.just(
             syncScope.toSubSyncScopes().map {
                 PeopleCount(it,

@@ -29,7 +29,7 @@ import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.testtools.AndroidTestConfig
 import com.simprints.id.testtools.testingapi.TestProjectRule
 import com.simprints.id.testtools.testingapi.models.TestProject
@@ -207,7 +207,7 @@ class DashboardActivityAndroidTest {
             .check(matches(withText("${peopleInDb.size}")))
     }
 
-    private fun peopleInDbForSyncScope(scope: SyncScope, toSync: Boolean): Int =
+    private fun peopleInDbForSyncScope(scope: DownSyncScope, toSync: Boolean): Int =
         peopleInDb.count {
             it.toSync == toSync &&
             it.projectId == scope.projectId &&
@@ -215,24 +215,24 @@ class DashboardActivityAndroidTest {
             if (!scope.moduleIds.isNullOrEmpty()) { scope.moduleIds?.contains(it.moduleId) ?: false } else { true }
         }
 
-    private fun mockGlobalScope(): SyncScope {
+    private fun mockGlobalScope(): DownSyncScope {
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.GLOBAL)
         return syncScope
     }
 
-    private fun mockUserScope(): SyncScope {
+    private fun mockUserScope(): DownSyncScope {
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.USER)
         return syncScope
     }
 
-    private fun mockModuleScope(): SyncScope {
+    private fun mockModuleScope(): DownSyncScope {
         whenever(settingsPreferencesManagerSpy.selectedModules).thenReturn(modules)
         whenever(settingsPreferencesManagerSpy.syncGroup).thenReturn(GROUP.MODULE)
         return syncScope
     }
 
 
-    private fun uploadFakePeopleAndPrepareLocalDb(syncScope: SyncScope) {
+    private fun uploadFakePeopleAndPrepareLocalDb(syncScope: DownSyncScope) {
         peopleOnServer = PeopleGeneratorUtils.getRandomPeople(N_PEOPLE_ON_SERVER_PER_MODULE, syncScope, listOf(false))
         val requests = peopleOnServer.chunked(PEOPLE_UPLOAD_BATCH_SIZE).map {
             personRemoteRemoteDataSource.uploadPeople(testProject.id, it).retry(3)

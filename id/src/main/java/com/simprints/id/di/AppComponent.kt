@@ -46,9 +46,11 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SubDownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
 import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
@@ -108,7 +110,6 @@ interface AppComponent {
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(downSyncTask: DownSyncTaskImpl)
     fun inject(countWorker: CountWorker)
-    fun inject(subDownSyncWorker: SubDownSyncWorker)
     fun inject(dashboardSyncCardViewModelManager: DashboardSyncCardViewModelHelper)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
@@ -122,6 +123,8 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
+    fun inject(downSyncMaster: DownSyncMasterWorker)
+    fun inject(downSyncWorker: DownSyncWorker)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
@@ -135,4 +138,5 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
+
 }

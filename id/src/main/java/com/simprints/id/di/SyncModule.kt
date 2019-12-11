@@ -1,18 +1,16 @@
 package com.simprints.id.di
 
-import com.simprints.id.data.db.person.PersonRepository
+import android.content.Context
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
+import com.simprints.id.data.db.syncscope.DownSyncScopeRepositoryImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -30,11 +28,14 @@ import javax.inject.Singleton
 open class SyncModule {
 
     @Provides
+    open fun provideDownSyncScopeRepository(): DownSyncScopeRepository =
+        DownSyncScopeRepositoryImpl()
+
+    @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
-                                 syncInfoLocalDataSource: SyncInfoLocalDataSource,
                                  personRemoteDataSource: PersonRemoteDataSource,
-                                 timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
+                                 downSyncScopeRepository: DownSyncScopeRepository,
+                                 timeHelper: TimeHelper): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
 
 
     @Provides
@@ -52,13 +53,8 @@ open class SyncModule {
 
     @Provides
     @Singleton
-    open fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
-        SyncScopesBuilderImpl(loginInfoManager, preferencesManager)
-
-    @Provides
-    @Singleton
-    open fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
-        DownSyncManagerImpl(syncScopesBuilder)
+    open fun provideDownSyncManager(ctx: Context): DownSyncManager =
+        DownSyncManagerImpl(ctx)
 
     @Provides
     @Singleton
@@ -67,9 +63,4 @@ open class SyncModule {
                                         sessionEventsSyncManager: SessionEventsSyncManager,
                                         downSyncManager: DownSyncManager): SyncSchedulerHelper =
         SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
-
-    @Provides
-    open fun provideCountTask(personRepository: PersonRepository): CountTask = CountTaskImpl(personRepository)
-
-
 }

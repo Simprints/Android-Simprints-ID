@@ -10,24 +10,22 @@ import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPerson
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
-import com.simprints.id.data.db.syncinfo.local.models.DbSyncInfo
+import com.simprints.id.data.db.syncscope.local.models.DbSyncInfo
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncscope.local.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.downsyncinfo.getStatusId
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
+import com.simprints.id.data.db.syncscope.local.SyncInfoLocalDataSource
 import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -94,7 +92,7 @@ class SubDownSyncTaskTest {
     fun downloadPatientsForGlobalSync_shouldSuccess() {
         val nPeopleToDownload = 407
         val nPeopleToDelete = 0
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -106,7 +104,7 @@ class SubDownSyncTaskTest {
     fun downloadPatientsForUserSync_shouldSuccess() {
         val nPeopleToDownload = 513
         val nPeopleToDelete = 0
-        val scope = SyncScope(projectId = PROJECT_ID, userId = USER_ID, moduleIds = null)
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = USER_ID, moduleIds = null)
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -119,7 +117,7 @@ class SubDownSyncTaskTest {
     fun downloadPatientsForModuleSync_shouldSuccess() {
         val nPeopleToDownload = 513
         val nPeopleToDelete = 0
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = setOf(MODULE_ID))
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = setOf(MODULE_ID))
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -132,7 +130,7 @@ class SubDownSyncTaskTest {
     fun deletePatientsForGlobalSync_shouldSuccess() {
         val nPeopleToDownload = 0
         val nPeopleToDelete = 300
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -144,7 +142,7 @@ class SubDownSyncTaskTest {
     fun deletePatientsForUserSync_shouldSuccess() {
         val nPeopleToDownload = 0
         val nPeopleToDelete = 212
-        val scope = SyncScope(projectId = PROJECT_ID, userId = USER_ID, moduleIds = setOf(MODULE_ID))
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = USER_ID, moduleIds = setOf(MODULE_ID))
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -157,7 +155,7 @@ class SubDownSyncTaskTest {
     fun deletePatientsForModuleSync_shouldSuccess() {
         val nPeopleToDownload = 0
         val nPeopleToDelete = 123
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = setOf(MODULE_ID))
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = setOf(MODULE_ID))
 
         runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, scope)
 
@@ -171,7 +169,7 @@ class SubDownSyncTaskTest {
         val personLocalDataSourceMock = mock<PersonLocalDataSource>()
         val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
         val nPeopleToDownload = 499
-        val scope = SyncScope(projectId = "projectIDTest", userId = null, moduleIds = null)
+        val scope = DownSyncScope(projectId = "projectIDTest", userId = null, moduleIds = null)
         val subScope = scope.toSubSyncScopes().first()
         doReturnScopeFromBuilder(scope)
         val peopleToDownload = prepareResponseForSubScopeForDownloading(subScope, nPeopleToDownload)
@@ -188,7 +186,7 @@ class SubDownSyncTaskTest {
     @Test
     fun continueFromAPreviousSync_shouldSuccess() {
         val nPeopleToDownload = 407
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
         val lastPatientIdFromRoom = "lastPatientId"
         val lastPatientUpdateAtFromRoom = 123123123L
 
@@ -220,7 +218,7 @@ class SubDownSyncTaskTest {
     @Test
     fun continueFromAPreviousSyncFromRealm_shouldSuccess() {
         val nPeopleToDownload = 1
-        val scope = SyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
+        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
         val lastPatientId = "lastPatientId"
         val lastPatientUpdateAt = Date()
 
@@ -257,7 +255,7 @@ class SubDownSyncTaskTest {
     private fun runDownSyncAndVerifyConditions(
         nPeopleToDownload: Int,
         nPeopleToDelete: Int,
-        scope: SyncScope,
+        scope: DownSyncScope,
         lastPatientId: String? = null,
         lastPatientUpdateAt: Long? = null) {
 
@@ -306,7 +304,7 @@ class SubDownSyncTaskTest {
         Assert.assertEquals(saved.last().patientId, inResponse.last().id)
     }
 
-    private fun doReturnScopeFromBuilder(scope: SyncScope) {
+    private fun doReturnScopeFromBuilder(scope: DownSyncScope) {
         whenever(syncScopeBuilderSpy) { buildSyncScope() } thenReturn scope
     }
 

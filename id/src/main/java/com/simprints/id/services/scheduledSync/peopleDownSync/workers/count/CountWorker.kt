@@ -10,7 +10,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.RESULT
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,6 +27,7 @@ class CountWorker(context: Context, params: WorkerParameters) : SimCoroutineWork
 
     override suspend fun doWork(): Result {
         getComponent<CountWorker> { it.inject(this) }
+
         val syncScope = extractSyncScopeFromInput(inputData)
         logMessageForCrashReport("Making count request for $syncScope")
 
@@ -41,24 +42,24 @@ class CountWorker(context: Context, params: WorkerParameters) : SimCoroutineWork
         }
     }
 
-    private fun logSuccess(syncScope: SyncScope) {
+    private fun logSuccess(syncScope: DownSyncScope) {
         showToastForDebug<CountWorker>(syncScope, Result.success())
     }
 
-    private fun logFailure(t: Throwable, syncScope: SyncScope) {
+    private fun logFailure(t: Throwable, syncScope: DownSyncScope) {
         Timber.e(t)
         showToastForDebug<CountWorker>(syncScope, Result.failure())
         crashReportManager.logExceptionOrSafeException(t)
     }
 
-    private fun extractSyncScopeFromInput(inputData: Data): SyncScope {
+    private fun extractSyncScopeFromInput(inputData: Data): DownSyncScope {
         val syncScopeJson = inputData.getString(COUNT_WORKER_SCOPE_INPUT)
             ?: throw IllegalArgumentException("input required")
         return syncScopeBuilder.fromJsonToSyncScope(syncScopeJson)
             ?: throw IllegalArgumentException("SyncScope required")
     }
 
-    private suspend fun execute(syncScope: SyncScope) =
+    private suspend fun execute(syncScope: DownSyncScope) =
         personRepository.countToDownSync(syncScope)
 
     private fun logMessageForCrashReport(message: String) =

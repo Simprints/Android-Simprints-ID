@@ -6,9 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.whenever
@@ -39,7 +37,7 @@ class DownSyncMasterWorkerTest {
     private val projectId = "projectId"
     private val userId = "userId"
     private val moduleId = setOf("moduleId1", "moduleId2", "moduleId3")
-    private val syncScope = SyncScope(projectId, userId, moduleId)
+    private val syncScope = DownSyncScope(projectId, userId, moduleId)
     private val subSyncScope = SubSyncScope(projectId, userId, "moduleId1")
     private val numberOfEnqueuedSyncCountWorkers = 1
     private val numberOfBlockedDownSyncWorkers = 3
@@ -91,7 +89,7 @@ class DownSyncMasterWorkerTest {
 
     @Test
     fun doWorkTest_shouldReturnSuccessImmediatelyWithEmptySubSyncScopeList() {
-        val noModuleSyncScope = SyncScope(projectId, null, setOf())
+        val noModuleSyncScope = DownSyncScope(projectId, null, setOf())
         whenever(workParams.inputData).thenReturn(workDataOf(DownSyncMasterWorker.SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(noModuleSyncScope)))
         downSyncMasterWorker = DownSyncMasterWorker(context, workParams)
 

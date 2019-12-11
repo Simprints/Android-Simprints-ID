@@ -1,20 +1,21 @@
-package com.simprints.id.data.db.syncstatus
+package com.simprints.id.data.db.syncscope.local
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.annotation.Keep
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import androidx.room.TypeConverters
+import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncOperationDao
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 
-@Database(entities = [DownSyncStatus::class, UpSyncStatus::class], version = 1, exportSchema = false)
+@Database(entities = [DbDownSyncOperation::class, UpSyncStatus::class], version = 1, exportSchema = false)
+@TypeConverters(DbDownSyncOperation.Converters::class)
 @Keep
 abstract class SyncStatusDatabase : RoomDatabase() {
 
-    abstract val downSyncDao: DownSyncDao
+    abstract val downSyncOperationDao: DownSyncOperationDao
 
     abstract val upSyncDao: UpSyncDao
 
