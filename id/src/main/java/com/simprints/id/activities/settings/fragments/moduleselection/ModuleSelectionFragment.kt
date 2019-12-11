@@ -92,7 +92,7 @@ class ModuleSelectionFragment(
     }
 
     private fun fetchData() {
-        viewModel.modulesList.observe(this, Observer { modules ->
+        viewModel.modulesList.observe(viewLifecycleOwner, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules.getUnselected())
             configureSearchView()
@@ -151,7 +151,7 @@ class ModuleSelectionFragment(
     }
 
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
-        queryListener.searchResults.observe(this, Observer { searchResults ->
+        queryListener.searchResults.observe(viewLifecycleOwner, Observer { searchResults ->
             adapter.submitList(searchResults)
             txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
             rvModules.scrollToPosition(0)
