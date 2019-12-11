@@ -10,6 +10,8 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.domain.DownSyncInfo
+import com.simprints.id.data.db.syncscope.domain.DownSyncInfo.DownSyncState.COMPLETE
+import com.simprints.id.data.db.syncscope.domain.DownSyncInfo.DownSyncState.FAILED
 import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
@@ -20,6 +22,7 @@ import okhttp3.ResponseBody
 import timber.log.Timber
 import java.io.InputStreamReader
 import java.io.Reader
+import java.util.*
 
 class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                        val personRemoteDataSource: PersonRemoteDataSource,
@@ -44,8 +47,10 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                 count += BATCH_SIZE_FOR_DOWNLOADING
                 downSyncWorkerProgressReporter.reportCount(count)
             }
+            updateDownSyncInfo(COMPLETE)
         } catch (t: Throwable) {
             t.printStackTrace()
+            updateDownSyncInfo(FAILED)
         } finally {
             finishDownload(reader)
         }
@@ -79,19 +84,26 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
         filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
         Timber.d("Saved batch for $downSyncOperation")
 
-        updateDownSyncInfo(batchOfPeople.last())
+        updateDownSyncInfo(DownSyncInfo.DownSyncState.RUNNING, batchOfPeople.last())
     }
 
-    private fun updateDownSyncInfo(lastPatient: ApiGetPerson) {
-        val newDownSyncInfo = lastPatient.updatedAt?.time?.let {
-            DownSyncInfo(
-                    DownSyncInfo.DownSyncState.RUNNING,
-                    lastPatient.id,
-                    it,
-                    timeHelper.now())
+    private fun updateDownSyncInfo(state: DownSyncInfo.DownSyncState, person: ApiGetPerson? = null) {
+        val syncInfo = downSyncOperation.syncInfo
+        var newSyncInfo = syncInfo?.apply {
+            syncInfo.copy(lastState = state)
+        } ?: DownSyncInfo(state, null, null, null)
+
+        if (person != null) {
+            newSyncInfo = person.let {
+                newSyncInfo.copy(
+                    lastPatientId = person.id,
+                    lastPatientUpdatedAt = person.updatedAt?.time,
+                    lastSyncTime = Date().time)
+            }
         }
-        downSyncOperation = downSyncOperation.copy(syncInfo = newDownSyncInfo)
-        downSyncScopeRepository.insertOrUpdate(downSyncOperation)
+
+
+        downSyncScopeRepository.insertOrUpdate(downSyncOperation.copy(syncInfo = newSyncInfo))
     }
 
 
