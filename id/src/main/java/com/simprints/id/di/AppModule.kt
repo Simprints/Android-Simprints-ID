@@ -31,6 +31,7 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -85,8 +86,9 @@ open class AppModule {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               peopleUpSyncMaster: PeopleUpSyncMaster,
+                              downSyncScopeRepository: DownSyncScopeRepository,
                               database: SyncStatusDatabase): SignerManager =
-        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database.downSyncDao, database.upSyncDao)
+        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, peopleUpSyncMaster, database.upSyncDao)
 
     @Provides
     @Singleton
@@ -162,7 +164,6 @@ open class AppModule {
                                          timeHelper: TimeHelper,
                                          crashReportManager: CrashReportManager): SessionEventsManager =
         SessionEventsManagerImpl(ctx.deviceId, ctx.packageVersionName, sessionEventsSyncManager, sessionEventsLocalDbManager, preferencesManager, timeHelper, crashReportManager)
-
 
 
     @Provides

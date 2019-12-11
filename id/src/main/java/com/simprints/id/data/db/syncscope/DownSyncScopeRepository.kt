@@ -10,4 +10,6 @@ interface DownSyncScopeRepository {
     fun getDownSyncOperations(syncScope: DownSyncScope): List<DownSyncOperation>
 
     fun insertOrUpdate(syncScopeOperation: DownSyncOperation)
+
+    fun deleteAll()
 }

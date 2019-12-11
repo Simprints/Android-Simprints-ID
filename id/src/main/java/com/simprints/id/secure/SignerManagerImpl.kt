@@ -3,7 +3,7 @@ package com.simprints.id.secure
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
+import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -16,8 +16,8 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
                              private val remote: RemoteDbManager,
                              private val loginInfoManager: LoginInfoManager,
                              private val preferencesManager: PreferencesManager,
+                             private val downSyncScopeRepository: DownSyncScopeRepository,
                              private val peopleUpSyncMaster: PeopleUpSyncMaster,
-                             private val downSyncDao: DownSyncDao,
                              private val upSyncDao: UpSyncDao) : SignerManager {
 
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
@@ -47,7 +47,7 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
         peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
         loginInfoManager.cleanCredentials()
         remote.signOut()
-        downSyncDao.deleteAll()
+        downSyncScopeRepository.deleteAll()
         upSyncDao.deleteAll()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }

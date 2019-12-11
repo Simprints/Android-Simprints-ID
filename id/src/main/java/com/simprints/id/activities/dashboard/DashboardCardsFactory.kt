@@ -67,14 +67,14 @@ class DashboardCardsFactory(private val component: AppComponent) {
             null
         }
 
-    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? =
-        Single.just(DashboardSyncCardViewModel(
-            DashboardCardType.SYNC_DB,
-            position,
-            component,
-            syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
-            syncStatusDatabase.upSyncDao.getUpSyncStatus(),
-            downSyncManager.onSyncStateUpdated()))
+    private fun createSyncInfoCard(position: Int = 3): Single<DashboardSyncCardViewModel>? = null
+//        Single.just(DashboardSyncCardViewModel(
+//            DashboardCardType.SYNC_DB,
+//            position,
+//            component,
+//            syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
+//            syncStatusDatabase.upSyncDao.getUpSyncStatus(),
+//            downSyncManager.onSyncStateUpdated()))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCardViewModel>? {
         return if (preferencesManager.lastScannerUsed.isNotEmpty()) {

@@ -2,10 +2,7 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
-import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -53,9 +50,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
             cardsFactory.createCards()
                 .map {
                     it.doOnSuccess { dashboardCard ->
-                        if (dashboardCard is DashboardSyncCardViewModel) {
-                            initSyncCardModel(dashboardCard)
-                        }
+//                        if (dashboardCard is DashboardSyncCardViewModel) {
+//                            initSyncCardModel(dashboardCard)
+//                        }
 
                         addCard(dashboardCard)
                     }
@@ -80,17 +77,17 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.stopRequestIfRequired()
     }
 
-    private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
-        viewModel.viewModelState.onSyncActionClicked = {
-            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
-            when {
-                noModulesSelected() -> view.showToastForNoModulesSelected()
-                userIsOffline() -> view.showToastForUserOffline()
-                !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
-                viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
-            }
-        }
-    }
+//    private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
+//        viewModel.viewModelState.onSyncActionClicked = {
+//            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
+//            when {
+//                noModulesSelected() -> view.showToastForNoModulesSelected()
+//                userIsOffline() -> view.showToastForUserOffline()
+//                !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
+//                viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
+//            }
+//        }
+//    }
 
     private fun addCard(dashboardCard: CardViewModel) {
         removeCardIfExist(dashboardCard.type)

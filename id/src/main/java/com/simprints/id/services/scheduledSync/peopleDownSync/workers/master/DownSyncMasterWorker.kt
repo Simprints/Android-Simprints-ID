@@ -55,7 +55,7 @@ class DownSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private fun buildChain(uniqueSyncID: String, operations: Array<DownSyncOperation>): List<WorkRequest> =
+    private fun buildChain(uniqueSyncID: String, operations: List<DownSyncOperation>): List<WorkRequest> =
         operations.map { buildDownSyncWorker(uniqueSyncID, it) } + listOf(buildCountWorker(uniqueSyncID))
 
     private fun isSyncRunning(): Boolean {

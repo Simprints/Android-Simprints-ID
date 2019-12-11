@@ -22,13 +22,13 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
     // LaunchPresenter
     override fun startDownSyncOnLaunchIfPossible() {
         if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT] == true) {
-            downSyncManager.enqueueOneTimeDownSync()
+            downSyncManager.sync()
         }
     }
 
     override fun startDownSyncOnUserActionIfPossible() {
         if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true) {
-            downSyncManager.enqueueOneTimeDownSync()
+            downSyncManager.sync()
         }
     }
 
@@ -42,11 +42,11 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
     }
 
     override fun cancelDownSyncWorkers() {
-        downSyncManager.dequeueAllSyncWorker()
+        downSyncManager.stop()
     }
 
     private fun scheduleDownSyncPeople() {
-        downSyncManager.enqueuePeriodicDownSync()
+        downSyncManager.scheduleSync()
     }
 
     private fun scheduleSessionsSync() {
