@@ -1,8 +1,9 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
 
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
 
 interface DownSyncTask {
 
-    suspend fun execute(subSyncScope: SubSyncScope)
+    suspend fun execute(downSyncOperation: DownSyncOperation,
+                        downSyncWorkerProgressReporter: DownSyncWorkerProgressReporter)
 }

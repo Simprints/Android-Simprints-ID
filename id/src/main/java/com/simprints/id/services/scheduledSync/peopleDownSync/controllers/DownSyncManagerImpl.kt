@@ -1,115 +1,109 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.*
 import androidx.work.*
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_INTERVAL
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_REPEAT_UNIT
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncMasterWorker.Companion.SYNC_WORKER_SYNC_SCOPE_INPUT
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.DOWNSYNC_MASTER_WORKER_ONE_TIME_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.DOWNSYNC_MASTER_WORKER_PERIODIC_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.DOWNSYNC_WORKER_CHAIN_UNIQUE_NAME
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SUBDOWNSYNC_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.WorkManagerConstants.Companion.SYNC_WORKER_TAG
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker.Companion.LAST_SYNC_ID
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
-// Class to enqueue and dequeue DownSyncMasterWorker
-class DownSyncManagerImpl(private val ctx: Context,
-                          private val syncScopesBuilder: SyncScopesBuilder) : DownSyncManager {
+class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
 
-    private val syncScope: SyncScope?
-        get() = syncScopesBuilder.buildSyncScope()
+    companion object {
+        const val MASTER_SYNC_SCHEDULER_ONE_TIME = "MASTER_SYNC_SCHEDULER_ONE_TIME"
+        const val MASTER_SYNC_SCHEDULER_PERIODIC_TIME = "MASTER_SYNC_SCHEDULER_PERIODIC_TIME"
+        const val MASTER_SYNC_SCHEDULER = "MASTER_SYNC_SCHEDULER"
 
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
+        const val SYNC_WORKER_TAG = "SYNC_WORKER_TAG"
+        const val DOWN_SYNC_WORKER_TAG = "DOWN_SYNC_WORKER_TAG"
+        const val COUNT_SYNC_WORKER_TAG = "COUNT_SYNC_WORKER_TAG"
 
-    override fun enqueueOneTimeDownSync() {
-        syncScope?.let {
-            wm.beginUniqueWork(
-                DOWNSYNC_WORKER_CHAIN_UNIQUE_NAME,
-                ExistingWorkPolicy.KEEP,
-                buildOneTimeDownSyncMasterWorker(it)
-            ).enqueue()
+        const val LAST_SYNC_SHARED_KEY = "LAST_SYNC_SHARED_KEY"
+        const val SYNC_WORKER_REPEAT_INTERVAL = 6L
+        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.HOURS
+    }
+
+    fun <A, B> LiveData<A>.combine(other: LiveData<B>): PairLiveData<A, B> {
+        return PairLiveData(this, other)
+    }
+
+    class PairLiveData<A, B>(first: LiveData<A>, second: LiveData<B>) : MediatorLiveData<Pair<A?, B?>>() {
+        init {
+            addSource(first) { value = it to second.value }
+            addSource(second) { value = first.value to it }
         }
     }
 
-    override fun enqueuePeriodicDownSync() {
-        syncScope?.let {
-            wm.enqueueUniquePeriodicWork(
-                DOWNSYNC_MASTER_WORKER_PERIODIC_TAG,
-                ExistingPeriodicWorkPolicy.KEEP,
-                buildPeriodicDownSyncMasterWorker(it))
-        }
-    }
+    override var lastSyncState: LiveData<SyncState?> = wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULER).map { workers ->
+        Timber.d("Received info for schedulers: ${workers.map { it.tags }}")
 
-    override fun onSyncStateUpdated(): LiveData<SyncState> {
-        val liveDataSyncWorkersInfo = WorkManager.getInstance().getWorkInfosByTagLiveData(SUBDOWNSYNC_WORKER_TAG)
+        val lastScheduler = workers.findLast { it.outputData.getString(LAST_SYNC_ID) != null }
+        val lastSyncId = lastScheduler?.outputData?.getString(LAST_SYNC_ID)
+        lastSyncId
+    }.switchMap {
+        Transformations.map(wm.getWorkInfosByTagLiveData(it ?: "")
+            .combine(MutableLiveData<String>().also { liveData -> liveData.value = it })) { syncIdAndWorkers ->
 
-        return Transformations.map(liveDataSyncWorkersInfo) {
+            val downWorkers = syncIdAndWorkers.first
+            val lastSyncId = syncIdAndWorkers.second
 
-            val isSyncCounting = it.any { workInfo -> workInfo.state == WorkInfo.State.BLOCKED }
-            val isSyncRunning = it.any { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
-            when {
-                isSyncCounting -> SyncState.CALCULATING
-                isSyncRunning -> SyncState.RUNNING
-                else -> SyncState.NOT_RUNNING
+            Timber.d("Received info for $lastSyncId: ${downWorkers?.map { it.tags }}}")
+
+            return@map if (downWorkers != null && lastSyncId != null) {
+                val anyRunning = downWorkers.firstOrNull { it.state == WorkInfo.State.RUNNING } != null
+                val anyEnqueued = downWorkers.firstOrNull { it.state == WorkInfo.State.ENQUEUED } != null
+                val anyNotSucceeding = downWorkers.firstOrNull { it.state != WorkInfo.State.SUCCEEDED } != null
+
+                SyncState(lastSyncId, anyRunning, anyEnqueued, anyNotSucceeding)
+            } else {
+                null
+            }.also {
+                Timber.d("Emitting $it")
             }
         }
     }
 
-    override fun dequeueAllSyncWorker() {
-        WorkManager.getInstance().cancelAllWorkByTag(SYNC_WORKER_TAG)
+    private val wm: WorkManager
+        get() = WorkManager.getInstance(ctx)
+
+    override fun sync() {
+        wm.beginUniqueWork(
+            MASTER_SYNC_SCHEDULER_ONE_TIME,
+            ExistingWorkPolicy.KEEP,
+            buildOneTimeRequest()
+        ).enqueue()
     }
 
-    override fun buildPeriodicDownSyncMasterWorker(syncScope: SyncScope): PeriodicWorkRequest =
-        PeriodicWorkRequest.Builder(DownSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
-            .setInputData(getDataForDownSyncMasterWorker(syncScope))
-            .setConstraints(getDownSyncMasterWorkerConstraints())
-            .addTag(DOWNSYNC_MASTER_WORKER_ONE_TIME_TAG)
-            .addTag(SYNC_WORKER_TAG)
-            .addTag("oneTime")
-            .build()
-
-
-    override fun buildOneTimeDownSyncMasterWorker(syncScope: SyncScope) {
-        val subSyncScopes = syncScope.toSubSyncScopes()
-        val firstSubSyncScope = subSyncScopes.first()
-
-        val chainDownSync = wm.beginWith(downSyncTask(firstSubSyncScope))
-        subSyncScopes.drop(1).forEach {
-            chainDownSync.then(downSyncTask(it))
-        }
-
-        val chainCount = wm.beginWith(countTask(syncScope))
-        val chain = WorkContinuation.combine(listOf(chainDownSync, chainCount))
-
-        wm.beginUniqueWork(DOWNSYNC_WORKER_CHAIN_UNIQUE_NAME, ExistingWorkPolicy.KEEP, chain)
-
-        chain.enqueue()
+    override fun scheduleSync() {
+        wm.enqueueUniquePeriodicWork(
+            MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            buildPeriodicRequest())
     }
 
-    private fun countTask(syncScope: SyncScope): OneTimeWorkRequest {
-
+    override fun stop() {
+        wm.cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 
-    private fun downSyncTask(subSyncScope: SubSyncScope?): OneTimeWorkRequest {
+    private fun buildOneTimeRequest(): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(DownSyncMasterWorker::class.java)
-            .setInputData(getDataForDownSyncMasterWorker(syncScope))
             .setConstraints(getDownSyncMasterWorkerConstraints())
-            .addTag(DOWNSYNC_MASTER_WORKER_ONE_TIME_TAG)
+            .addTag(MASTER_SYNC_SCHEDULER)
+            .addTag(MASTER_SYNC_SCHEDULER_ONE_TIME)
             .addTag(SYNC_WORKER_TAG)
-            .addTag("periodic")
             .build()
-    }
+
+    private fun buildPeriodicRequest(): PeriodicWorkRequest =
+        PeriodicWorkRequest.Builder(DownSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
+            .setConstraints(getDownSyncMasterWorkerConstraints())
+            .addTag(MASTER_SYNC_SCHEDULER)
+            .addTag(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+            .addTag(SYNC_WORKER_TAG)
+            .build()
 
     private fun getDownSyncMasterWorkerConstraints() =
         Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-
-    private fun getDataForDownSyncMasterWorker(scope: SyncScope) =
-        workDataOf(SYNC_WORKER_SYNC_SCOPE_INPUT to syncScopesBuilder.fromSyncScopeToJson(scope))
 }

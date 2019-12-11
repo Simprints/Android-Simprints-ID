@@ -4,8 +4,7 @@ import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.domain.PeopleCount
-import com.simprints.id.data.db.person.domain.PeopleOperationsParams
+import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT

@@ -8,7 +8,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.R
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 class LocalDbRecycleViewAdapter(val items: MutableList<LocalDbViewModel>, val context: Context) : RecyclerView.Adapter<LocalDbViewHolder>() {

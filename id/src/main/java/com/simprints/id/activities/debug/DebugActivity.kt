@@ -7,10 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.simprints.id.Application
 import com.simprints.id.BuildConfig
 import com.simprints.id.R
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.syncscope.local.DownSyncStatus
+import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import kotlinx.android.synthetic.main.activity_debug.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

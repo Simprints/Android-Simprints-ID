@@ -5,7 +5,7 @@ import androidx.work.NetworkType
 import androidx.work.WorkInfo
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.TestApplication
 import org.junit.Assert.assertEquals
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class DownSyncManagerTest {
 
-    @Mock lateinit var syncScope: SyncScope
+    @Mock lateinit var syncScope: DownSyncScope
 
     @Inject lateinit var downSyncManager: DownSyncManager
 

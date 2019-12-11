@@ -7,13 +7,10 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
@@ -33,9 +30,9 @@ class PersonRepositoryTest {
         const val REMOTE_PEOPLE_FOR_SUBSYNC = 10
     }
 
-    private val syncScopeByProject = SyncScope(DEFAULT_PROJECT_ID, null, null)
-    private val syncScopeByUser = SyncScope(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null)
-    private val syncScopeByModule = SyncScope(DEFAULT_PROJECT_ID, null, setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2))
+    private val syncScopeByProject = DownSyncScope(DEFAULT_PROJECT_ID, null, null)
+    private val syncScopeByUser = DownSyncScope(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, null)
+    private val syncScopeByModule = DownSyncScope(DEFAULT_PROJECT_ID, null, setOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2))
 
     @Mock lateinit var remoteDataSource: PersonRemoteDataSource
     @Mock lateinit var localDataSource: PersonLocalDataSource

@@ -3,16 +3,15 @@ package com.simprints.id.activities.dashboard.viewModels.syncCard
 import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.activities.dashboard.viewModels.syncCard.SyncCardState.*
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.domain.totalCount
+import com.simprints.id.data.db.syncscope.domain.totalCount
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncStatus
+import com.simprints.id.data.db.syncscope.local.DownSyncStatus
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 import com.simprints.id.di.AppComponent
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncState
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncState
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,7 +32,7 @@ class DashboardSyncCardViewModelHelper(private val viewModel: DashboardSyncCardV
     private val state: DashboardSyncCardViewModelState
         get() = viewModel.viewModelState
 
-    private val syncScope: SyncScope?
+    private val syncScope: DownSyncScope?
         get() = syncScopesBuilder.buildSyncScope()
 
     private var latestDownSyncTime: Long? = null

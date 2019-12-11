@@ -3,8 +3,7 @@ package com.simprints.id.commontesttools
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import java.util.*
 import kotlin.random.Random
 
@@ -27,7 +26,7 @@ object PeopleGeneratorUtils {
 
 
     fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
-                        syncScope: SyncScope,
+                        syncScope: DownSyncScope,
                         toSync: List<Boolean>): MutableList<Person> =
         mutableListOf<Person>().also { fakePeople ->
             syncScope.toSubSyncScopes().forEach { subScope ->
