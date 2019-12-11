@@ -1,25 +1,13 @@
-package com.simprints.id.data.db.syncinfo.domain
+package com.simprints.id.data.db.syncscope.domain
 
-import com.simprints.id.data.db.syncinfo.local.DbDownSyncOperation
+import com.simprints.id.data.db.syncscope.local.DbDownSyncOperation
 import com.simprints.id.domain.modality.Modes
 
-abstract class DownSyncInfo(open val lastState: DownSyncState,
-                            open val lastPatientId: String,
-                            open val lastPatientUpdatedAt: Long,
-                            open val lastSyncTime: Long? = null) {
-
-    enum class DownSyncState {
-        RUNNING,
-        COMPLETE,
-        ERROR
-    }
-}
-
-class DownSyncOperation(val projectId: String,
-                        val userId: String?,
-                        val moduleId: String?,
-                        val modes: List<Modes>,
-                        val syncInfo: DownSyncInfo?) {
+data class DownSyncOperation(val projectId: String,
+                             val userId: String?,
+                             val moduleId: String?,
+                             val modes: List<Modes>,
+                             val syncInfo: DownSyncInfo?) {
     companion object {
         fun buildProjectOperation(projectId: String,
                                   modes: List<Modes>,

@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.syncinfo.domain
+package com.simprints.id.data.db.syncscope.domain
 
 import com.simprints.id.domain.modality.Modes
 

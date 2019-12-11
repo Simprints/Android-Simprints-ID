@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
+package com.simprints.id.services.scheduledSync.peopleDownSync.workers.master
 
 import android.content.Context
 import androidx.work.*
@@ -7,13 +7,13 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
 import com.simprints.id.data.db.syncscope.domain.DownSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl.Companion.SYNC_WORKER_TAG
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SimCoroutineWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncMasterWorker.Companion.MIN_BACKOFF_MILLIS
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker.Companion.MIN_BACKOFF_MILLIS
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -22,11 +22,11 @@ class DownSyncMasterWorker(private val appContext: Context,
                            params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
     @Inject lateinit var downSyncScopeRepository: DownSyncScopeRepository
-    @Inject lateinit var downSyncManager: DownSyncManager
 
     companion object {
         private const val MAX_BACKOFF_MILLIS = (5 * 60 * 1000) // 5 minutes
         const val MIN_BACKOFF_MILLIS = 15L //15 seconds
+        const val LAST_SYNC_ID = "LAST_SYNC_ID"
 
         const val MAX_ATTEMPTS = MAX_BACKOFF_MILLIS / MIN_BACKOFF_MILLIS
     }
@@ -39,16 +39,20 @@ class DownSyncMasterWorker(private val appContext: Context,
 
     override suspend fun doWork(): Result {
         getComponent<DownSyncMasterWorker> { it.inject(this) }
+        Timber.d("DownSyncMasterWorker - started")
 
         val operations = downSyncScope.getDownSyncOperations()
-        if (!isSyncRunning()) {
+        return if (!isSyncRunning()) {
             val uniqueSyncID = UUID.randomUUID().toString()
-            downSyncManager.lastSyncId = uniqueSyncID
             val chain = buildChain(uniqueSyncID, operations)
             wm.enqueue(chain.toList())
-        }
 
-        return Result.success()
+            Timber.d("DownSyncMasterWorker - completed: $uniqueSyncID")
+            Result.success(workDataOf(LAST_SYNC_ID to uniqueSyncID))
+        } else {
+            Timber.d("DownSyncMasterWorker - completed: already running")
+            Result.success()
+        }
     }
 
     private fun buildChain(uniqueSyncID: String, operations: Array<DownSyncOperation>): List<WorkRequest> =
