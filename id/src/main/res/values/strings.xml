@@ -418,6 +418,7 @@
     <string name="setting_others">OTHERS</string>
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
     <string name="title_activity_settings_about">About</string>
+    <string name="title_activity_sync_information">Sync Information</string>
 
     <!--Settings Preferences titles and summaries-->
     <string name="preference_app_details_title">About</string>
@@ -427,14 +428,27 @@
     <string name="preference_select_fingers_title">Select default fingers</string>
     <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_app_version_title">App Version</string>
+    <string name="preference_sync_information_title">Sync Information</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
+    <string name="preference_summary_sync_information">Further details on sync</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
     <string name="title_activity_exit_form">ExitFormActivity</string>
     <string name="preferences_general_key">preferences_general</string>
     <string name="preferences_app_details_key">app_details_key</string>
+    
+    <!--Sync Information Activity-->
+    <string name="select_modules_button_title">Select modules</string>
+    <string name="sync_info_records_to_upload">Records to upload</string>
+    <string name="sync_info_records_to_download">Records to download</string>
+    <string name="sync_info_records_to_delete">Records to delete</string>
+    <string name="sync_info_total_records_on_device">Total records on device</string>
+    <string name="sync_info_selected_modules">Selected modules</string>
+    <string name="sync_info_unselected_modules">Unselected modules</string>
+    <string name="sync_info_total_records">Total records</string>
+
 
     <!--Exit form-->
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
