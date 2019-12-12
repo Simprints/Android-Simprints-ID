@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.syncscope.domain
+package com.simprints.id.data.db.down_sync_info.domain
 
 import androidx.annotation.Keep
 
