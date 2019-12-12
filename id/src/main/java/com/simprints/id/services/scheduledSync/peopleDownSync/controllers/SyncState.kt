@@ -3,7 +3,8 @@ package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 import androidx.annotation.Keep
 
 @Keep
-class SyncState(val syncId: String, state: State) {
+class SyncState(val syncId: String,
+                val state: State) {
 
     constructor(syncId: String, anyRunning: Boolean, anyEnqueued: Boolean, anyNotSucceeded: Boolean) : this(
         syncId = syncId,

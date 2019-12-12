@@ -21,8 +21,8 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         val possibleUserId: String? = loginInfoManager.getSignedInUserIdOrEmpty()
         val possibleModuleIds: List<String>? = preferencesManager.selectedModules.toList()
 
-        require(projectId.isEmpty()) { "ProjectId required" }
-        require(possibleUserId.isNullOrEmpty()) { "Login required" }
+        require(projectId.isNotBlank()) { "ProjectId required" }
+        require(possibleUserId?.isNotBlank() ?: false) { "Login required" }
 
         return when (preferencesManager.syncGroup) {
             GROUP.GLOBAL -> {
@@ -42,17 +42,46 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     //StopShip: consider to make suspend
     override fun getDownSyncOperations(syncScope: DownSyncScope): List<DownSyncOperation> =
         runBlocking {
+            val dbOperations = fetchDownSyncOperationsFromDb(syncScope)
+            return@runBlocking if (dbOperations.isEmpty()) {
+                createOperations(syncScope).also {
+                    it.forEach {
+                        downSyncOperationDao.insertOrReplaceDownSyncOperation(it.fromDomainToDb())
+                    }
+                }
+            } else {
+                dbOperations.map { it.fromDbToDomain() }
+            }
+        }
+
+
+    private fun createOperations(syncScope: DownSyncScope): List<DownSyncOperation> =
+        when (syncScope) {
+            is ProjectSyncScope -> {
+                listOf(DownSyncOperation.buildProjectOperation(syncScope.projectId, syncScope.modes, null))
+            }
+            is UserSyncScope ->
+                listOf(DownSyncOperation.buildUserOperation(syncScope.projectId, syncScope.userId, syncScope.modes, null))
+            is ModuleSyncScope ->
+                syncScope.modules.map {
+                    DownSyncOperation.buildModuleOperation(syncScope.projectId, it, syncScope.modes, null)
+                }.toList()
+        }
+
+    private fun fetchDownSyncOperationsFromDb(syncScope: DownSyncScope) =
+        runBlocking {
             with(downSyncOperationDao) {
                 when (syncScope) {
-                    is ProjectSyncScope ->
+                    is ProjectSyncScope -> {
                         getDownSyncOperation(syncScope.projectId, syncScope.modes)
+                    }
                     is UserSyncScope ->
                         getDownSyncOperation(syncScope.projectId, syncScope.modes, userId = syncScope.userId)
                     is ModuleSyncScope ->
                         syncScope.modules.fold(emptyList()) { operations, moduleId ->
                             operations + getDownSyncOperation(syncScope.projectId, syncScope.modes, moduleId = moduleId)
                         }
-                }.map { it.fromDbToDomain() }
+                }
             }
         }
 

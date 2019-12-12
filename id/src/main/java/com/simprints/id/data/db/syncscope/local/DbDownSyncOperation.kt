@@ -38,11 +38,13 @@ data class DbDownSyncOperation(
             modes.joinToString(separator = MODES_STRING_SEPARATOR) { it.name }
 
         @TypeConverter
-        fun fromStringToDownSyncState(string: String): DownSyncInfo.DownSyncState =
-            DownSyncInfo.DownSyncState.valueOf(string)
+        fun fromStringToDownSyncState(string: String?): DownSyncInfo.DownSyncState? =
+            string?.let {
+                DownSyncInfo.DownSyncState.valueOf(string)
+            }
 
         @TypeConverter
-        fun fromDownSyncStateToString(downSyncState: DownSyncInfo.DownSyncState): String =
+        fun fromDownSyncStateToString(downSyncState: DownSyncInfo.DownSyncState?): String? =
             downSyncState.toString()
     }
 }

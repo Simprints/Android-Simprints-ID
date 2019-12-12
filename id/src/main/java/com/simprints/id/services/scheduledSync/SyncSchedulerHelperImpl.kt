@@ -42,7 +42,7 @@ class SyncSchedulerHelperImpl(val preferencesManager: PreferencesManager,
     }
 
     override fun cancelDownSyncWorkers() {
-        downSyncManager.stop()
+        downSyncManager.cancelScheduledSync()
     }
 
     private fun scheduleDownSyncPeople() {
