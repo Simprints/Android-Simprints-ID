@@ -5,6 +5,7 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.DownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -27,9 +28,12 @@ import javax.inject.Singleton
 @Module
 open class SyncModule {
 
+
     @Provides
-    open fun provideDownSyncScopeRepository(): DownSyncScopeRepository =
-        DownSyncScopeRepositoryImpl()
+    open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
+                                            preferencesManager: PreferencesManager,
+                                            syncStatusDatabase: SyncStatusDatabase): DownSyncScopeRepository =
+        DownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationDao)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,

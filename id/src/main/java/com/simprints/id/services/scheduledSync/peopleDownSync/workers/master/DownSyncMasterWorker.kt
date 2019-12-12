@@ -41,7 +41,7 @@ class DownSyncMasterWorker(private val appContext: Context,
         getComponent<DownSyncMasterWorker> { it.inject(this) }
         Timber.d("DownSyncMasterWorker - started")
 
-        val operations = downSyncScope.getDownSyncOperations()
+        val operations = downSyncScopeRepository.getDownSyncOperations(downSyncScope)
         return if (!isSyncRunning()) {
             val uniqueSyncID = UUID.randomUUID().toString()
             val chain = buildChain(uniqueSyncID, operations)

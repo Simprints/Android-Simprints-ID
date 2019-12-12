@@ -8,6 +8,7 @@ import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
@@ -22,20 +23,21 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 
 class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                            val personLocalDataSource: PersonLocalDataSource,
+                           val downSyncScopeRepository: DownSyncScopeRepository,
                            private val peopleUpSyncMaster: PeopleUpSyncMaster) :
     PersonRepository,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
     override suspend fun countToDownSync(downSyncScope: DownSyncScope): List<PeopleCount> = suspendCancellableCoroutine {
-        personRemoteDataSource.getDownSyncPeopleCount(downSyncScope.projectId, downSyncScope.getDownSyncOperations())
+        personRemoteDataSource.getDownSyncPeopleCount(downSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(downSyncScope))
             .subscribeOn(Schedulers.io())
             .blockingGet()
     }
 
     override fun localCountForSyncScope(downSyncScope: DownSyncScope): Single<List<PeopleCount>> =
         Single.just(
-            downSyncScope.getDownSyncOperations().map {
+            downSyncScopeRepository.getDownSyncOperations(downSyncScope).map {
                 PeopleCount(
                     personLocalDataSource.count(PersonLocalDataSource.Query(
                         projectId = it.projectId,

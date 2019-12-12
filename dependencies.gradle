@@ -23,7 +23,9 @@ def androidx = [
     legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
     room     : [
         core    : "androidx.room:room-runtime:$androidx_room_version",
-        compiler: "androidx.room:room-compiler:$androidx_room_version"
+        compiler: "androidx.room:room-compiler:$androidx_room_version",
+        coroutines: "androidx.room:room-coroutines:$androidx_room_version"
+
     ],
     lifecycle: [
         livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",

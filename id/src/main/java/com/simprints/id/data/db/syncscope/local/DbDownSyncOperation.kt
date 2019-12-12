@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.simprints.id.data.db.syncscope.domain.DownSyncInfo
+import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
 import com.simprints.id.domain.modality.Modes
 
 @Entity(tableName = "DbDownSyncOperation")
@@ -27,14 +28,14 @@ data class DbDownSyncOperation(
         }
 
         @TypeConverter
-        fun fromStrigToModes(stringStored: String): List<Modes> =
+        fun fromStringToModes(stringStored: String): List<Modes> =
             stringStored.split(MODES_STRING_SEPARATOR).map {
                 Modes.valueOf(it)
             }
 
         @TypeConverter
         fun fromModeToString(modes: List<Modes>): String =
-            modes.map { it.name }.joinToString(separator = MODES_STRING_SEPARATOR)
+            modes.joinToString(separator = MODES_STRING_SEPARATOR) { it.name }
 
         @TypeConverter
         fun fromStringToDownSyncState(string: String): DownSyncInfo.DownSyncState =
@@ -45,3 +46,20 @@ data class DbDownSyncOperation(
             downSyncState.toString()
     }
 }
+
+fun DbDownSyncOperation.fromDbToDomain() =
+    DownSyncOperation(
+        projectId,
+        userId,
+        moduleId,
+        modes,
+        lastState?.let {
+            DownSyncInfo(
+                it,
+                lastPatientId,
+                lastPatientUpdatedAt,
+                lastSyncTime
+            )
+        }
+
+    )
