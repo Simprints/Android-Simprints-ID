@@ -15,6 +15,7 @@ import com.simprints.id.activities.dashboard.DashboardActivity
 import com.simprints.id.activities.dashboard.DashboardCardsFactory
 import com.simprints.id.activities.dashboard.DashboardPresenter
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.faceexitform.FaceExitFormActivity
 import com.simprints.id.activities.fetchguid.FetchGuidActivity
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormActivity
@@ -116,6 +117,7 @@ interface AppComponent {
     fun inject(guidSelectionActivity: GuidSelectionActivity)
     fun inject(downSyncMaster: DownSyncMasterWorker)
     fun inject(downSyncWorker: DownSyncWorker)
+    fun inject(debugActivity: DebugActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

@@ -6,7 +6,10 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
+import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiModes
+import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncscope.domain.DownSyncInfo
@@ -62,7 +65,8 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                 client.downSync(
                     projectId, userId, moduleId,
                     syncInfo?.lastPatientId,
-                    syncInfo?.lastPatientUpdatedAt)
+                    syncInfo?.lastPatientUpdatedAt,
+                    PipeSeparatorWrapperForURLListParam(modes.map { it.fromDomainToApi() }.toTypedArray())
             }
         }
 

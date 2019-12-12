@@ -20,8 +20,8 @@ class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
         const val COUNT_SYNC_WORKER_TAG = "COUNT_SYNC_WORKER_TAG"
 
         const val LAST_SYNC_SHARED_KEY = "LAST_SYNC_SHARED_KEY"
-        const val SYNC_WORKER_REPEAT_INTERVAL = 6L
-        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.HOURS
+        const val SYNC_WORKER_REPEAT_INTERVAL = 15L
+        val SYNC_WORKER_REPEAT_UNIT = TimeUnit.MINUTES
     }
 
     fun <A, B> LiveData<A>.combine(other: LiveData<B>): PairLiveData<A, B> {
@@ -35,34 +35,41 @@ class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
         }
     }
 
-    override var lastSyncState: LiveData<SyncState?> = wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULER).map { workers ->
-        Timber.d("Received info for schedulers: ${workers.map { it.tags }}")
-
-        val lastScheduler = workers.findLast { it.outputData.getString(LAST_SYNC_ID) != null }
-        val lastSyncId = lastScheduler?.outputData?.getString(LAST_SYNC_ID)
-        lastSyncId
-    }.switchMap {
-        Transformations.map(wm.getWorkInfosByTagLiveData(it ?: "")
-            .combine(MutableLiveData<String>().also { liveData -> liveData.value = it })) { syncIdAndWorkers ->
-
-            val downWorkers = syncIdAndWorkers.first
-            val lastSyncId = syncIdAndWorkers.second
-
-            Timber.d("Received info for $lastSyncId: ${downWorkers?.map { it.tags }}}")
-
-            return@map if (downWorkers != null && lastSyncId != null) {
-                val anyRunning = downWorkers.firstOrNull { it.state == WorkInfo.State.RUNNING } != null
-                val anyEnqueued = downWorkers.firstOrNull { it.state == WorkInfo.State.ENQUEUED } != null
-                val anyNotSucceeding = downWorkers.firstOrNull { it.state != WorkInfo.State.SUCCEEDED } != null
-
-                SyncState(lastSyncId, anyRunning, anyEnqueued, anyNotSucceeding)
+    override var lastSyncState: LiveData<SyncState?> =
+        wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULER).map { workers ->
+            Timber.d("Received info for schedulers: ${workers.map { it.tags }}")
+            val activeWorkers = workers.filter { it.state == WorkInfo.State.SUCCEEDED }
+            return@map if (activeWorkers.isNotEmpty()) {
+                val lastScheduler = activeWorkers.findLast { it.outputData.getString(LAST_SYNC_ID) != null }
+                val lastSyncId = lastScheduler?.outputData?.getString(LAST_SYNC_ID)
+                lastSyncId
             } else {
                 null
-            }.also {
-                Timber.d("Emitting $it")
             }
+        }.switchMap { lastSyncId ->
+            lastSyncId?.let {
+                Transformations.map(wm.getWorkInfosByTagLiveData(it)
+                    .combine(MutableLiveData<String>().also { liveData -> liveData.value = it })) { syncIdAndWorkers ->
+
+                    val downWorkers = syncIdAndWorkers.first
+                    val lastSyncId = syncIdAndWorkers.second
+
+                    Timber.d("Received info for $lastSyncId: ${downWorkers?.map { it.tags }}}")
+
+                    return@map if (downWorkers != null && lastSyncId != null) {
+                        val anyRunning = downWorkers.firstOrNull { it.state == WorkInfo.State.RUNNING } != null
+                        val anyEnqueued = downWorkers.firstOrNull { it.state == WorkInfo.State.ENQUEUED } != null
+                        val anyNotSucceeding = downWorkers.firstOrNull { it.state != WorkInfo.State.SUCCEEDED } != null
+
+                        SyncState(lastSyncId, anyRunning, anyEnqueued, anyNotSucceeding)
+                    } else {
+                        null
+                    }.also {
+                        Timber.d("Emitting $it")
+                    }
+                }
+            } ?: MutableLiveData<SyncState>()
         }
-    }
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(ctx)
@@ -80,6 +87,10 @@ class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
             MASTER_SYNC_SCHEDULER_PERIODIC_TIME,
             ExistingPeriodicWorkPolicy.KEEP,
             buildPeriodicRequest())
+    }
+
+    override fun cancelScheduledSync() {
+        wm.cancelAllWorkByTag(MASTER_SYNC_SCHEDULER)
     }
 
     override fun stop() {

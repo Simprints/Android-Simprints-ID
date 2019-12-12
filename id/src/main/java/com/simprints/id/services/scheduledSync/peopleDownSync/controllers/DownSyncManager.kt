@@ -9,4 +9,5 @@ interface DownSyncManager {
     fun sync()
     fun stop()
     fun scheduleSync()
+    fun cancelScheduledSync()
 }
