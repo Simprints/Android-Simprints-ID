@@ -1,22 +1,23 @@
-package com.simprints.id.data.db.syncscope.local
+package com.simprints.id.data.db.down_sync_info.local
 
 import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.simprints.id.data.db.syncscope.domain.DownSyncInfo
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperationResult
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperationResult.DownSyncState
 import com.simprints.id.domain.modality.Modes
 
 @Entity(tableName = "DbDownSyncOperation")
 @Keep
 data class DbDownSyncOperation(
-    @PrimaryKey var id: String,
+    @PrimaryKey var id: DbDownSyncOperationKey,
     var projectId: String,
     var userId: String? = null,
     var moduleId: String? = null,
     var modes: List<Modes> = emptyList(),
-    var lastState: DownSyncInfo.DownSyncState?,
+    var lastState: DownSyncState?,
     var lastPatientId: String?,
     var lastPatientUpdatedAt: Long?,
     var lastSyncTime: Long? = null
@@ -38,15 +39,34 @@ data class DbDownSyncOperation(
             modes.joinToString(separator = MODES_STRING_SEPARATOR) { it.name }
 
         @TypeConverter
-        fun fromStringToDownSyncState(string: String?): DownSyncInfo.DownSyncState? =
+        fun fromStringToDownSyncState(string: String?): DownSyncState? =
             string?.let {
-                DownSyncInfo.DownSyncState.valueOf(string)
+                DownSyncState.valueOf(it)
             }
 
         @TypeConverter
-        fun fromDownSyncStateToString(downSyncState: DownSyncInfo.DownSyncState?): String? =
-            downSyncState.toString()
+        fun fromDownSyncStateToString(downSyncState: DownSyncState?): String? =
+            downSyncState?.toString()
+
+        @TypeConverter
+        fun fromDbDownSyncOperationKeyToString(dbDownSyncOperationKey: DbDownSyncOperationKey): String =
+            dbDownSyncOperationKey.key
+
+        @TypeConverter
+        fun fromStringToDbDownSyncOperationKey(key: String): DbDownSyncOperationKey =
+            DbDownSyncOperationKey(key)
     }
+}
+
+class DbDownSyncOperationKey(val key: String) {
+
+    companion object {
+        const val SEPARATOR_PARAMS_KEY = "||"
+    }
+
+    constructor(projectId: String, modes: List<Modes>, userId: String? = null, moduleId: String? = null) : this(
+        key = listOf(projectId, userId, moduleId, modes.joinToString(SEPARATOR_PARAMS_KEY)).joinToString(SEPARATOR_PARAMS_KEY)
+    )
 }
 
 fun DbDownSyncOperation.fromDbToDomain() =
@@ -56,7 +76,7 @@ fun DbDownSyncOperation.fromDbToDomain() =
         moduleId,
         modes,
         lastState?.let {
-            DownSyncInfo(
+            DownSyncOperationResult(
                 it,
                 lastPatientId,
                 lastPatientUpdatedAt,

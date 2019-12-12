@@ -2,31 +2,24 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
-import com.simprints.id.data.db.syncscope.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.di.DataModule
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.di.DependencyRule
 
-class TestDataModule(private val syncInfoLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+class TestDataModule(private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
                      private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
                      private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
                      private val personLocalDataSource: DependencyRule = DependencyRule.RealRule,
                      private val personRepositoryRule: DependencyRule = DependencyRule.RealRule) : DataModule() {
-
-    override fun provideSyncInfoLocalDataSource(ctx: Context,
-                                                secureDataManager: SecureDataManager,
-                                                loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        syncInfoLocalDataSourceRule.resolveDependency { super.provideSyncInfoLocalDataSource(ctx, secureDataManager, loginInfoManager) }
 
     override fun provideProjectLocalDataSource(ctx: Context,
                                                secureDataManager: SecureDataManager,
@@ -44,9 +37,9 @@ class TestDataModule(private val syncInfoLocalDataSourceRule: DependencyRule = D
     override fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                          personRemoteDataSource: PersonRemoteDataSource,
                                          peopleUpSyncMaster: PeopleUpSyncMaster,
-                                         syncStatusDatabase: SyncStatusDatabase): PersonRepository =
+                                         downSyncScopeRepository: DownSyncScopeRepository): PersonRepository =
         personRepositoryRule.resolveDependency {
-            super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster, syncStatusDatabase)
+            super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster, downSyncScopeRepository)
         }
 
 

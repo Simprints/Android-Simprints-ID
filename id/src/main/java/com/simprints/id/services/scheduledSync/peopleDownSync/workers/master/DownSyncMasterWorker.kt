@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.work.*
 import androidx.work.WorkRequest.Builder
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
-import com.simprints.id.data.db.syncscope.domain.DownSyncScope
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl.Companion.SYNC_WORKER_TAG
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SimCoroutineWorker
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker.Companion.MIN_BACKOFF_MILLIS
@@ -71,7 +72,7 @@ class DownSyncMasterWorker(private val appContext: Context,
             .build()
 
     private fun buildCountWorker(uniqueSyncID: String): WorkRequest =
-        OneTimeWorkRequest.Builder(DownSyncWorker::class.java)
+        OneTimeWorkRequest.Builder(CountWorker::class.java)
             .setDownSyncWorker(uniqueSyncID, getDownSyncWorkerConstraints())
             .build()
 

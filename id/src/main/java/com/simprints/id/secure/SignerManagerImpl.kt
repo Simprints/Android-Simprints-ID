@@ -2,8 +2,8 @@ package com.simprints.id.secure
 
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager

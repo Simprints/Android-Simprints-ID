@@ -1,6 +1,7 @@
 package com.simprints.id.data.db.syncscope.domain
 
 import com.simprints.id.data.db.syncscope.local.DbDownSyncOperation
+import com.simprints.id.data.db.syncscope.local.DbDownSyncOperationKey
 import com.simprints.id.domain.modality.Modes
 
 data class DownSyncOperation(val projectId: String,
@@ -9,6 +10,7 @@ data class DownSyncOperation(val projectId: String,
                              val modes: List<Modes>,
                              val syncInfo: DownSyncInfo?) {
     companion object {
+
         fun buildProjectOperation(projectId: String,
                                   modes: List<Modes>,
                                   syncInfo: DownSyncInfo?) =
@@ -48,7 +50,7 @@ data class DownSyncOperation(val projectId: String,
 
 fun DownSyncOperation.fromDomainToDb(): DbDownSyncOperation =
     DbDownSyncOperation(
-        listOf(projectId, userId, moduleId, modes.joinToString("_")).joinToString("_"),
+        DbDownSyncOperationKey(projectId, modes, userId, moduleId),
         projectId, userId, moduleId, modes,
         syncInfo?.lastState,
         syncInfo?.lastPatientId,

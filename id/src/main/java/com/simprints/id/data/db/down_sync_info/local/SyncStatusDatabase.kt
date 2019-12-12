@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.syncscope.local
+package com.simprints.id.data.db.down_sync_info.local
 
 import android.content.Context
 import androidx.annotation.Keep
@@ -6,7 +6,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncOperationDao
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
 

@@ -5,14 +5,13 @@ import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncScope
+import com.simprints.id.data.db.down_sync_info.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
-import com.simprints.id.data.db.syncscope.domain.DownSyncScope
-import com.simprints.id.data.db.syncscope.domain.PeopleCount
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
@@ -29,22 +28,19 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
-    override suspend fun countToDownSync(downSyncScope: DownSyncScope): List<PeopleCount> = suspendCancellableCoroutine {
+    override suspend fun countToDownSync(downSyncScope: DownSyncScope): List<PeopleCount> =
         personRemoteDataSource.getDownSyncPeopleCount(downSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(downSyncScope))
             .subscribeOn(Schedulers.io())
             .blockingGet()
-    }
 
-    override fun localCountForSyncScope(downSyncScope: DownSyncScope): Single<List<PeopleCount>> =
-        Single.just(
-            downSyncScopeRepository.getDownSyncOperations(downSyncScope).map {
-                PeopleCount(
-                    personLocalDataSource.count(PersonLocalDataSource.Query(
-                        projectId = it.projectId,
-                        userId = it.userId,
-                        moduleId = it.moduleId)), 0, 0)
-            }
-        )
+    override suspend fun localCountForSyncScope(downSyncScope: DownSyncScope): List<PeopleCount> =
+        downSyncScopeRepository.getDownSyncOperations(downSyncScope).map {
+            PeopleCount(
+                personLocalDataSource.count(PersonLocalDataSource.Query(
+                    projectId = it.projectId,
+                    userId = it.userId,
+                    moduleId = it.moduleId)), 0, 0)
+        }
 
     override suspend fun loadFromRemoteIfNeeded(projectId: String, patientId: String): PersonFetchResult =
         try {

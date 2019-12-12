@@ -1,100 +1,61 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.worker
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.ListenableWorker
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
-import com.simprints.id.commontesttools.di.TestAppModule
-import com.simprints.id.commontesttools.di.TestDataModule
-import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.syncscope.domain.PeopleCount
-import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+import androidx.test.filters.SmallTest
+import androidx.work.testing.TestListenableWorkerBuilder
+import com.nhaarman.mockitokotlin2.any
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker.Companion.COUNT_WORKER_SCOPE_INPUT
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.di.DependencyRule
-import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.reactivex.Single
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
-import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class CountWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-
-    @Inject lateinit var context: Context
-    @Inject lateinit var syncScopesBuilder: SyncScopesBuilder
-    @Inject lateinit var crashReportManager: CrashReportManager
-
-    @Mock lateinit var workParams: WorkerParameters
-
-    private val countTaskMock: CountTask = mock()
-
     private lateinit var countWorker: CountWorker
-    private val subSyncScope = SubSyncScope("projectId", "userId", "moduleId")
-
-    private val module by lazy {
-        TestAppModule(app,
-            crashReportManagerRule = DependencyRule.MockRule,
-            countTaskRule = DependencyRule.ReplaceRule { countTaskMock }
-        )
-    }
-
-    private val dataModule by lazy {
-        TestDataModule(projectLocalDataSourceRule = DependencyRule.MockRule)
-    }
-
 
     @Before
     fun setUp() {
-        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
-
+        UnitTestConfig(this).fullSetup()
         MockitoAnnotations.initMocks(this)
-        countWorker = CountWorker(context, workParams)
-        whenever(workParams.inputData).thenReturn(
-            workDataOf(
-                COUNT_WORKER_SCOPE_INPUT to syncScopesBuilder.fromSubSyncScopeToJson(
-                    subSyncScope
-                )
-            )
-        )
+        countWorker = TestListenableWorkerBuilder<CountWorker>(app).build()
+        app.component = mock()
+        whenever(app.component) { this.inject(any<CountWorker>()) } thenDoNothing {}
+        countWorker.downSyncScopeRepository = mock()
+        countWorker.crashReportManager = mock()
     }
 
     @Test
-    fun testWorkerSuccessAndOutputData_shouldSucceedWithCorrectData() {
-        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(5)))
-        val workerResult = countWorker.doWork()
+    fun countWorker_shouldExtractTheDownSyncScopeFromTheRepo() = runBlockingTest {
+        countWorker.downSyncScopeRepository = mock()
 
-        assert(
-            workerResult is ListenableWorker.Result.Success &&
-                workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5
-        )
+        countWorker.doWork()
+
+        verifyOnce(countWorker.downSyncScopeRepository) { getDownSyncScope() }
     }
 
-    @Test
-    fun testWorkerWithCountFailure_shouldLogErrorAndSucceed() {
-        whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
-        val workerResult = countWorker.doWork()
-
-        verifyOnce(crashReportManager) { logExceptionOrSafeException(anyNotNull()) }
-        assert(workerResult is ListenableWorker.Result.Success)
-    }
-
-    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+//    @Test
+//    fun testWorkerWithCountFailure_shouldLogErrorAndSucceed() {
+//        whenever(countTaskMock.execute(anyNotNull())).thenReturn(null)
+//        val workerResult = countWorker.doWork()
+//
+//        verifyOnce(crashReportManager) { logExceptionOrSafeException(anyNotNull()) }
+//        assert(workerResult is ListenableWorker.Result.Success)
+//    }
+//
+//    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
+//        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
 }

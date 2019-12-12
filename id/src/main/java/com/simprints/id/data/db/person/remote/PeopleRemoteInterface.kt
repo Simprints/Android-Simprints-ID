@@ -3,7 +3,6 @@ package com.simprints.id.data.db.person.remote
 import com.simprints.core.network.NetworkConstants
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.ApiModes
-import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
 import com.simprints.id.data.db.person.remote.models.ApiPostPerson
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
@@ -28,7 +27,7 @@ interface PeopleRemoteInterface {
         @Query("moduleId") moduleId: String?,
         @Query("lastKnownPatientId") lastKnownPatientId: String?,
         @Query("lastKnownPatientUpdatedAt") lastKnownPatientUpdatedAt: Long?,
-        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): ResponseBody
+        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(ApiModes.FINGERPRINT)): ResponseBody
 
     @POST("projects/{projectId}/patients")
     fun uploadPeople(@Path("projectId") projectId: String,
@@ -37,8 +36,7 @@ interface PeopleRemoteInterface {
     @GET("projects/{projectId}/patients/{patientId}")
     fun requestPerson(
         @Path("patientId") patientId: String,
-        @Path("projectId") projectId: String,
-        @Query("mode") modes: PipeSeparatorWrapperForURLListParam<ApiModes> = PipeSeparatorWrapperForURLListParam(FINGERPRINT)): Single<Response<ApiGetPerson>>
+        @Path("projectId") projectId: String): Single<Response<ApiGetPerson>>
 
     @POST("projects/{projectId}/patient-operations/count")
     fun requestPeopleOperations(

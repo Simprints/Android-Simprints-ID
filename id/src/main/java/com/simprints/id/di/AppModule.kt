@@ -31,8 +31,8 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
-import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager

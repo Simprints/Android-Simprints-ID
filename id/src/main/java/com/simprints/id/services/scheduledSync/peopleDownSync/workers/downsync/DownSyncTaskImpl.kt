@@ -8,14 +8,13 @@ import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.ApiModes
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
-import com.simprints.id.data.db.syncscope.domain.DownSyncInfo
-import com.simprints.id.data.db.syncscope.domain.DownSyncInfo.DownSyncState.COMPLETE
-import com.simprints.id.data.db.syncscope.domain.DownSyncInfo.DownSyncState.FAILED
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperationResult
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperationResult.DownSyncState.COMPLETE
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperationResult.DownSyncState.FAILED
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.flow.Flow
@@ -53,10 +52,12 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
             updateDownSyncInfo(COMPLETE)
         } catch (t: Throwable) {
             t.printStackTrace()
-            updateDownSyncInfo(FAILED)
-        } finally {
             finishDownload(reader)
+            updateDownSyncInfo(FAILED)
+            throw t
         }
+
+        finishDownload(reader)
     }
 
     private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
@@ -64,9 +65,9 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
             with(downSyncOperation) {
                 client.downSync(
                     projectId, userId, moduleId,
-                    syncInfo?.lastPatientId,
-                    syncInfo?.lastPatientUpdatedAt,
-                    PipeSeparatorWrapperForURLListParam(modes.map { it.fromDomainToApi() }.toTypedArray())
+                    syncOperationResult?.lastPatientId,
+                    syncOperationResult?.lastPatientUpdatedAt,
+                    PipeSeparatorWrapperForURLListParam(*modes.map { it.fromDomainToApi() }.toTypedArray()))
             }
         }
 
@@ -88,26 +89,31 @@ class DownSyncTaskImpl(val personLocalDataSource: PersonLocalDataSource,
         filterBatchOfPeopleToSyncWithLocal(batchOfPeople)
         Timber.d("Saved batch for $downSyncOperation")
 
-        updateDownSyncInfo(DownSyncInfo.DownSyncState.RUNNING, batchOfPeople.last())
+        updateDownSyncInfo(DownSyncOperationResult.DownSyncState.RUNNING, batchOfPeople.lastOrNull(), Date())
     }
 
-    private fun updateDownSyncInfo(state: DownSyncInfo.DownSyncState, person: ApiGetPerson? = null) {
-        val syncInfo = downSyncOperation.syncInfo
+    private suspend fun updateDownSyncInfo(state: DownSyncOperationResult.DownSyncState, person: ApiGetPerson? = null, lastSyncTime: Date? = null) {
+        val syncInfo = downSyncOperation.syncOperationResult
         var newSyncInfo = syncInfo?.apply {
             syncInfo.copy(lastState = state)
-        } ?: DownSyncInfo(state, null, null, null)
+        } ?: DownSyncOperationResult(state, null, null, null)
 
         if (person != null) {
             newSyncInfo = person.let {
                 newSyncInfo.copy(
                     lastPatientId = person.id,
-                    lastPatientUpdatedAt = person.updatedAt?.time,
-                    lastSyncTime = Date().time)
+                    lastPatientUpdatedAt = person.updatedAt?.time)
             }
         }
 
+        if (lastSyncTime != null) {
+            newSyncInfo = lastSyncTime.let {
+                newSyncInfo.copy(
+                    lastSyncTime = it.time)
+            }
+        }
 
-        downSyncScopeRepository.insertOrUpdate(downSyncOperation.copy(syncInfo = newSyncInfo))
+        downSyncScopeRepository.insertOrUpdate(downSyncOperation.copy(syncOperationResult = newSyncInfo))
     }
 
 

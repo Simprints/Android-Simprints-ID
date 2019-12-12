@@ -6,7 +6,6 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.ApiModes.FINGERPRINT
 import com.simprints.id.data.db.person.remote.models.fromDomainToPostApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiLastKnownPatient
@@ -14,8 +13,8 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
-import com.simprints.id.data.db.syncscope.domain.PeopleCount
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.PeopleCount
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
@@ -98,9 +97,9 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 whereLabels.add(ApiPeopleOperationWhereLabel(MODULE.key, moduleId))
             }
 
-            whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(FINGERPRINT).toString()))
+            whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(*it.modes.toTypedArray()).toString()))
 
-            val lastKnownInfo = with(it.syncInfo) {
+            val lastKnownInfo = with(it.syncOperationResult) {
                 if (this@with?.lastPatientId?.isNotEmpty() == true && this@with.lastPatientUpdatedAt != null) {
                     ApiLastKnownPatient(this@with.lastPatientId, this@with.lastPatientUpdatedAt)
                 } else {

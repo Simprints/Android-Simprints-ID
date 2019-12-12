@@ -37,7 +37,7 @@ class DefaultOkHttpClientBuilder {
     private fun buildLoggingInterceptor(): Interceptor {
         val logger = TimberLogger()
         return HttpLoggingInterceptor(logger).apply {
-            level = HttpLoggingInterceptor.Level.HEADERS
+            level = HttpLoggingInterceptor.Level.BODY
         }
     }
 

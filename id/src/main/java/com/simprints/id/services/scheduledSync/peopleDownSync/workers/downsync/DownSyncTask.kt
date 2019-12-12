@@ -1,6 +1,6 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
 
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
 
 interface DownSyncTask {
 

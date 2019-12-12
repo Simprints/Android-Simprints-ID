@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -28,7 +28,7 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
-    @MockK lateinit var downSyncDao: DownSyncDao
+    @MockK lateinit var downSyncScopeRepository: DownSyncScopeRepository
     @MockK lateinit var upSyncDao: UpSyncDao
     private lateinit var signerManager: SignerManagerImpl
 
@@ -38,7 +38,7 @@ class SignerManagerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        signerManager = SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncDao, upSyncDao)
+        signerManager = SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, peopleUpSyncMaster, upSyncDao)
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
         every { any<Completable>().trace(any()) }.answers { this.value }
     }
@@ -194,7 +194,7 @@ class SignerManagerTest {
     private fun verifyUpSyncGotPaused() = verify { peopleUpSyncMaster.pause(DEFAULT_PROJECT_ID) }
     private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastDownSyncInfoGotDeleted() = verify { downSyncDao.deleteAll() }
+    private fun verifyLastDownSyncInfoGotDeleted() = verify { downSyncScopeRepository.deleteAll() }
     private fun verifyLastUpSyncInfoGotDeleted() = verify { upSyncDao.deleteAll() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 
