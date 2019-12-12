@@ -15,10 +15,17 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
+import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import com.simprints.id.tools.TimeHelper
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -62,4 +69,28 @@ open class DataModule {
     @Provides
     open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =
         personLocalDataSource
+
+    open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager, syncStatusDatabase: SyncStatusDatabase): DownSyncScopeRepository {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource, personRemoteDataSource: PersonRemoteDataSource, downSyncScopeRepository: DownSyncScopeRepository, timeHelper: TimeHelper): DownSyncTask {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    open fun providePeopleUpSyncMaster(): PeopleUpSyncMaster {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    open fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    open fun provideDownSyncManager(ctx: Context): DownSyncManager {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    open fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager, loginInfoManager: LoginInfoManager, sessionEventsSyncManager: SessionEventsSyncManager, downSyncManager: DownSyncManager): SyncSchedulerHelper {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

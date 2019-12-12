@@ -23,11 +23,17 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<ResponseBody> {
+    override suspend fun downSync(projectId: String,
+                          userId: String?,
+                          moduleId: String?,
+                          lastKnownPatientId: String?,
+                          lastKnownPatientUpdatedAt: Long?,
+                          modes: PipeSeparatorWrapperForURLListParam<ApiModes>): ResponseBody {
         return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun requestPerson(patientId: String, projectId: String, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<Response<ApiGetPerson>> {
+    override fun requestPerson(patientId: String,
+                               projectId: String): Single<Response<ApiGetPerson>> {
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 

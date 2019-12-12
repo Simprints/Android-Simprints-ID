@@ -3,7 +3,7 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
+import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher

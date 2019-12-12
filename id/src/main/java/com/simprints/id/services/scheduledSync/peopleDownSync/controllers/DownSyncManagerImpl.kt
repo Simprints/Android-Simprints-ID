@@ -1,6 +1,7 @@
 package com.simprints.id.services.scheduledSync.peopleDownSync.controllers
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.work.*
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker
@@ -97,7 +98,8 @@ class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
         wm.cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 
-    private fun buildOneTimeRequest(): OneTimeWorkRequest =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildOneTimeRequest(): OneTimeWorkRequest =
         OneTimeWorkRequest.Builder(DownSyncMasterWorker::class.java)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(MASTER_SYNC_SCHEDULER)
@@ -105,7 +107,8 @@ class DownSyncManagerImpl(private val ctx: Context) : DownSyncManager {
             .addTag(SYNC_WORKER_TAG)
             .build()
 
-    private fun buildPeriodicRequest(): PeriodicWorkRequest =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun buildPeriodicRequest(): PeriodicWorkRequest =
         PeriodicWorkRequest.Builder(DownSyncMasterWorker::class.java, SYNC_WORKER_REPEAT_INTERVAL, SYNC_WORKER_REPEAT_UNIT)
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(MASTER_SYNC_SCHEDULER)

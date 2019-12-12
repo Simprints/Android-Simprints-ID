@@ -1,8 +1,9 @@
-package com.simprints.id.data.db.syncscope
+package com.simprints.id.data.db.down_sync_info
 
-import com.simprints.id.data.db.syncscope.domain.*
-import com.simprints.id.data.db.syncscope.local.fromDbToDomain
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncOperationDao
+import com.simprints.id.data.db.down_sync_info.domain.*
+import com.simprints.id.data.db.down_sync_info.local.DbDownSyncOperationKey
+import com.simprints.id.data.db.down_sync_info.local.DownSyncOperationDao
+import com.simprints.id.data.db.down_sync_info.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -40,19 +41,18 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     }
 
     //StopShip: consider to make suspend
-    override fun getDownSyncOperations(syncScope: DownSyncScope): List<DownSyncOperation> =
-        runBlocking {
-            val dbOperations = fetchDownSyncOperationsFromDb(syncScope)
-            return@runBlocking if (dbOperations.isEmpty()) {
-                createOperations(syncScope).also {
-                    it.forEach {
-                        downSyncOperationDao.insertOrReplaceDownSyncOperation(it.fromDomainToDb())
-                    }
+    override suspend fun getDownSyncOperations(syncScope: DownSyncScope): List<DownSyncOperation> {
+        val downSyncOpsStoredInDb = fetchDownSyncOperationsFromDb(syncScope)
+        return if (downSyncOpsStoredInDb.isEmpty()) {
+            createOperations(syncScope).also {
+                it.forEach {
+                    downSyncOperationDao.insertOrReplaceDownSyncOperation(it.fromDomainToDb())
                 }
-            } else {
-                dbOperations.map { it.fromDbToDomain() }
             }
+        } else {
+            downSyncOpsStoredInDb.map { it.fromDbToDomain() }
         }
+    }
 
 
     private fun createOperations(syncScope: DownSyncScope): List<DownSyncOperation> =
@@ -68,27 +68,23 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                 }.toList()
         }
 
-    private fun fetchDownSyncOperationsFromDb(syncScope: DownSyncScope) =
-        runBlocking {
-            with(downSyncOperationDao) {
-                when (syncScope) {
-                    is ProjectSyncScope -> {
-                        getDownSyncOperation(syncScope.projectId, syncScope.modes)
-                    }
-                    is UserSyncScope ->
-                        getDownSyncOperation(syncScope.projectId, syncScope.modes, userId = syncScope.userId)
-                    is ModuleSyncScope ->
-                        syncScope.modules.fold(emptyList()) { operations, moduleId ->
-                            operations + getDownSyncOperation(syncScope.projectId, syncScope.modes, moduleId = moduleId)
-                        }
+    private suspend fun fetchDownSyncOperationsFromDb(syncScope: DownSyncScope) =
+        with(downSyncOperationDao) {
+            when (syncScope) {
+                is ProjectSyncScope -> {
+                    listOf(getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes)))
                 }
+                is UserSyncScope ->
+                    listOf(getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, userId = syncScope.userId)))
+                is ModuleSyncScope ->
+                    syncScope.modules.fold(emptyList()) { operations, moduleId ->
+                        operations + getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, moduleId = moduleId))
+                    }
             }
         }
 
-    override fun insertOrUpdate(syncScopeOperation: DownSyncOperation) =
-        runBlocking {
-            downSyncOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
-        }
+    override suspend fun insertOrUpdate(syncScopeOperation: DownSyncOperation) =
+        downSyncOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
 
     override fun deleteAll() {
         runBlocking {

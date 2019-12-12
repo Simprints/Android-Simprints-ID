@@ -1,11 +1,11 @@
 package com.simprints.id.di
 
 import android.content.Context
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepository
-import com.simprints.id.data.db.syncscope.DownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.syncscope.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
@@ -30,6 +30,7 @@ open class SyncModule {
 
 
     @Provides
+    @Singleton
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
                                             syncStatusDatabase: SyncStatusDatabase): DownSyncScopeRepository =

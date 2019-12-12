@@ -8,6 +8,7 @@ import com.google.firebase.FirebaseApp
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.commontesttools.di.TestDataModule
 import com.simprints.id.commontesttools.di.TestPreferencesModule
+import com.simprints.id.commontesttools.di.TestSyncModule
 import com.simprints.id.testtools.di.AppComponentForTests
 import com.simprints.id.testtools.di.DaggerAppComponentForTests
 import com.simprints.testtools.common.di.DependencyRule
@@ -19,8 +20,9 @@ class UnitTestConfig<T : Any>(
     private val test: T,
     private val appModule: TestAppModule? = null,
     private val preferencesModule: TestPreferencesModule? = null,
-    private val dataModule: TestDataModule? = null
-): BaseUnitTestConfig() {
+    private val dataModule: TestDataModule? = null,
+    private val syncModule: TestSyncModule? = null
+    ): BaseUnitTestConfig() {
 
     private val defaultAppModuleWithoutRealm by lazy {
         TestAppModule(app,
@@ -75,6 +77,7 @@ class UnitTestConfig<T : Any>(
             .appModule(appModule ?: defaultAppModuleWithoutRealm)
             .preferencesModule(preferencesModule ?: TestPreferencesModule())
             .dataModule(dataModule ?: TestDataModule())
+            .syncModule(syncModule ?: TestSyncModule())
             .build()
 
         app.component = testAppComponent

@@ -7,7 +7,7 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.syncscope.domain.DownSyncOperation
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.SimCoroutineWorker
 import timber.log.Timber
 import javax.inject.Inject

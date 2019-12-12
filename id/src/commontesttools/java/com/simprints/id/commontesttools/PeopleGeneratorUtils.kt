@@ -3,34 +3,24 @@ package com.simprints.id.commontesttools
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.syncscope.domain.DownSyncScope
+import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
 import java.util.*
 import kotlin.random.Random
 
 object PeopleGeneratorUtils {
 
     fun getRandomPeople(nPeople: Int,
-                        subSyncScope: SubSyncScope,
+                        downSyncOp: DownSyncOperation,
                         toSync: List<Boolean>): MutableList<Person> =
         mutableListOf<Person>().also { fakePeople ->
             repeat(nPeople) {
                 fakePeople.add(
                     getRandomPerson(
                         UUID.randomUUID().toString(),
-                        subSyncScope.projectId,
-                        subSyncScope.userId ?: "",
-                        subSyncScope.moduleId ?: "",
+                        downSyncOp.projectId,
+                        downSyncOp.userId ?: "",
+                        downSyncOp.moduleId ?: "",
                         toSync.takeRandom()))
-            }
-        }
-
-
-    fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
-                        syncScope: DownSyncScope,
-                        toSync: List<Boolean>): MutableList<Person> =
-        mutableListOf<Person>().also { fakePeople ->
-            syncScope.toSubSyncScopes().forEach { subScope ->
-                fakePeople.addAll(getRandomPeople(numberOfPeopleForEachSubScope, subScope, toSync))
             }
         }
 
