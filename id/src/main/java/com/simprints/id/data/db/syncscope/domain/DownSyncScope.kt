@@ -2,10 +2,7 @@ package com.simprints.id.data.db.syncscope.domain
 
 import com.simprints.id.domain.modality.Modes
 
-sealed class DownSyncScope(open val projectId: String) {
-
-    open fun getDownSyncOperations(): List<DownSyncOperation> = emptyList()
-}
+sealed class DownSyncScope(open val projectId: String)
 
 data class ProjectSyncScope(
     override val projectId: String,

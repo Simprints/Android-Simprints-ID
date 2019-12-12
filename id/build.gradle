@@ -138,6 +138,7 @@ dependencies {
     implementation deps.androidx.appcompat
     implementation deps.androidx.legacy
     implementation deps.androidx.room.core
+    implementation deps.androidx.room.coroutines
     implementation deps.androidx.lifecycle.ktx
     implementation deps.androidx.lifecycle.ext
     implementation deps.androidx.lifecycle.livedata

@@ -48,7 +48,7 @@ data class DownSyncOperation(val projectId: String,
 
 fun DownSyncOperation.fromDomainToDb(): DbDownSyncOperation =
     DbDownSyncOperation(
-        projectId,
+        listOf(projectId, userId, moduleId, modes.joinToString("_")).joinToString("_"),
         projectId, userId, moduleId, modes,
         syncInfo?.lastState,
         syncInfo?.lastPatientId,
