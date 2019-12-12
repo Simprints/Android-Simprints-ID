@@ -1,9 +1,9 @@
-package com.simprints.id.data.db.syncscope.domain
+package com.simprints.id.data.db.down_sync_info.domain
 
-data class DownSyncInfo(val lastState: DownSyncState,
-                        val lastPatientId: String?,
-                        val lastPatientUpdatedAt: Long?,
-                        val lastSyncTime: Long? = null) {
+data class DownSyncOperationResult(val lastState: DownSyncState,
+                                   val lastPatientId: String?,
+                                   val lastPatientUpdatedAt: Long?,
+                                   val lastSyncTime: Long? = null) {
 
     enum class DownSyncState {
         RUNNING,
