@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import androidx.work.WorkRequest.Builder
 import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
 import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
 import com.simprints.id.data.db.down_sync_info.domain.DownSyncScope
@@ -23,6 +24,7 @@ class DownSyncMasterWorker(private val appContext: Context,
                            params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
     @Inject lateinit var downSyncScopeRepository: DownSyncScopeRepository
+    @Inject override lateinit var crashReportManager: CrashReportManager
 
     companion object {
         private const val MAX_BACKOFF_MILLIS = (5 * 60 * 1000) // 5 minutes
