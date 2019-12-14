@@ -5,12 +5,11 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.tools.AndroidResourcesHelper
 import io.reactivex.Single
 import java.text.DateFormat
@@ -23,7 +22,6 @@ class DashboardCardsFactory(private val component: AppComponent) {
         DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.SHORT, Locale.getDefault())
     }
 
-    @Inject lateinit var downSyncManager: DownSyncManager
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var projectRepository: ProjectRepository
     @Inject lateinit var loginInfoManager: LoginInfoManager

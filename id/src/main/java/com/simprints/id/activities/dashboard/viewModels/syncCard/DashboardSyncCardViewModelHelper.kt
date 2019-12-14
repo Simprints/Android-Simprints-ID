@@ -6,12 +6,12 @@
 //import com.simprints.id.data.db.syncscope.domain.totalCount
 //import com.simprints.id.data.db.person.local.PersonLocalDataSource
 //import com.simprints.id.data.db.syncscope.local.DownSyncStatus
-//import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncStatus
+//import com.simprints.id.data.db.upsync_info.UpSyncStatus
 //import com.simprints.id.di.AppComponent
 //import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-//import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+//import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.SyncScopesBuilder
 //import com.simprints.id.data.db.syncscope.domain.DownSyncScope
-//import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncState
+//import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.SyncState
 //import io.reactivex.Completable
 //import io.reactivex.Single
 //import io.reactivex.android.schedulers.AndroidSchedulers

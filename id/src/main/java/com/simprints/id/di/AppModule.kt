@@ -29,10 +29,10 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -53,7 +53,7 @@ import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
@@ -85,10 +85,10 @@ open class AppModule {
                               remoteDbManager: RemoteDbManager,
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
-                              peopleUpSyncMaster: PeopleUpSyncMaster,
+                              syncManager: SyncManager,
                               downSyncScopeRepository: DownSyncScopeRepository,
                               database: SyncStatusDatabase): SignerManager =
-        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, peopleUpSyncMaster, database.upSyncDao)
+        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, syncManager)
 
     @Provides
     @Singleton

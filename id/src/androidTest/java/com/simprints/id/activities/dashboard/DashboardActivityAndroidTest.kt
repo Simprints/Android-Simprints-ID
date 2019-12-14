@@ -27,8 +27,8 @@
 //import com.simprints.id.data.secure.LocalDbKey
 //import com.simprints.id.data.secure.SecureDataManager
 //import com.simprints.id.domain.GROUP
-//import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-//import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
+//import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.DownSyncManager
+//import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.SyncScopesBuilder
 //import com.simprints.id.data.db.syncscope.domain.DownSyncScope
 //import com.simprints.id.testtools.AndroidTestConfig
 //import com.simprints.id.testtools.testingapi.TestProjectRule

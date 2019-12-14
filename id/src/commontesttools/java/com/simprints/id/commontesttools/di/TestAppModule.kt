@@ -9,8 +9,8 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessio
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -19,7 +19,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper

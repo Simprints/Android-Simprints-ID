@@ -3,13 +3,14 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,7 +27,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val cardsFactory = DashboardCardsFactory(component)
 
@@ -102,7 +103,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToDownSync() {
-        syncSchedulerHelper.startDownSyncOnUserActionIfPossible()
+        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true) {
+            peopleSyncManager.sync()
+        }
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {

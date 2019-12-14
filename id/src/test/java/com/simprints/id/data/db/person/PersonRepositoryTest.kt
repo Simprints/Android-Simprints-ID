@@ -7,12 +7,13 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
 import com.simprints.id.data.db.down_sync_info.domain.*
+import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.syntax.*
 import io.reactivex.Single
 import kotlinx.coroutines.flow.flowOf
@@ -105,7 +106,7 @@ class PersonRepositoryTest {
         }
     }
 
-    private suspend fun assesDownSyncCount(downSyncScope: DownSyncScope) {
+    private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
         val ops = downSyncScopeRepository.getDownSyncOperations(downSyncScope)
         whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull(), anyNotNull()) } thenReturn Single.just(ops.map {
             PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0)

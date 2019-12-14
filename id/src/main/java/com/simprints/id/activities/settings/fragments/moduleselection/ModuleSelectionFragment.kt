@@ -23,6 +23,7 @@ import com.simprints.id.activities.settings.fragments.moduleselection.adapter.Mo
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
 import com.simprints.id.moduleselection.model.Module
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.extensions.hideKeyboard
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
@@ -33,8 +34,8 @@ class ModuleSelectionFragment(
     private val application: Application
 ) : Fragment(), ModuleSelectionListener, ChipClickListener {
 
-    @Inject
-    lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var viewModelFactory: ModuleViewModelFactory
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -168,6 +169,7 @@ class ModuleSelectionFragment(
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
+        peopleSyncManager.configChanged()
     }
 
     private fun notifyNoModulesSelected() {

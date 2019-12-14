@@ -15,7 +15,7 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.models.PeopleDownSyncTrigger
 import com.simprints.id.testtools.TestApplication
 import com.simprints.testtools.common.syntax.*
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
