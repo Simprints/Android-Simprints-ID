@@ -4,14 +4,14 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
+import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.extensions.trace
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.*
@@ -29,7 +29,7 @@ class SignerManagerTest {
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
     @MockK lateinit var downSyncScopeRepository: DownSyncScopeRepository
-    @MockK lateinit var upSyncDao: UpSyncDao
+    @MockK lateinit var upSyncDao: PeopleUpSyncDao
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token("some_token")

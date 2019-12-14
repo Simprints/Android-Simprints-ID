@@ -42,13 +42,11 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.master.DownSyncMasterWorker
-import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherWorker
-import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderWorker
+import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker
+import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsMasterWorker
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
@@ -95,14 +93,10 @@ interface AppComponent {
     fun inject(projectAuthenticator: ProjectAuthenticator)
     fun inject(dashboardPresenter: DashboardPresenter)
     fun inject(alertPresenter: AlertPresenter)
-    fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
-    fun inject(peopleUpSyncPeriodicFlusherWorker: PeopleUpSyncPeriodicFlusherWorker)
     fun inject(settingsPreferencePresenter: SettingsPreferencePresenter)
     fun inject(privacyNoticePresenter: PrivacyNoticePresenter)
-    fun inject(syncSchedulerHelper: SyncSchedulerHelperImpl)
+    fun inject(syncSchedulerHelper: SyncSchedulerImpl)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
-    fun inject(downSyncTask: DownSyncTaskImpl)
-    fun inject(countWorker: CountWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)
@@ -115,9 +109,11 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
-    fun inject(downSyncMaster: DownSyncMasterWorker)
-    fun inject(downSyncWorker: DownSyncWorker)
     fun inject(debugActivity: DebugActivity)
+    fun inject(peopleDownSyncCountWorker: PeopleDownSyncCountWorker)
+    fun inject(peopleDownSyncDownloaderWorker: PeopleDownSyncDownloaderWorker)
+    fun inject(peopleSyncMasterWorker: PeopleSyncMasterWorker)
+    fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
@@ -131,5 +127,4 @@ interface AppComponent {
     fun getRemoteConfigWrapper(): RemoteConfigWrapper
     fun getContext(): Context
     fun getAndroidResourcesHelper(): AndroidResourcesHelper
-
 }

@@ -10,7 +10,7 @@ import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
 
 
@@ -19,7 +19,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var syncSchedulerHelper: SyncManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
     init {

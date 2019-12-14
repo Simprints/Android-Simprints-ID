@@ -13,8 +13,8 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
-import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
-import com.simprints.id.data.db.down_sync_info.domain.PeopleCount
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
@@ -53,14 +53,14 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 .trace("uploadPatientBatch")
         }
 
-    override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<DownSyncOperation>): Single<List<PeopleCount>> =
+    override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): Single<List<PeopleCount>> =
         if (peopleOperationsParams.isNotEmpty()) {
             makeRequestForPeopleOperations(projectId, peopleOperationsParams)
         } else {
             Single.error(EmptyPeopleOperationsParamsException())
         }
 
-    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<DownSyncOperation>): Single<List<PeopleCount>> =
+    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): Single<List<PeopleCount>> =
         singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
 
             peopleRemoteInterface.requestPeopleOperations(
@@ -80,10 +80,10 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 }
         }
 
-    private fun buildApiPeopleOperations(peopleOperationsParams: List<DownSyncOperation>) =
+    private fun buildApiPeopleOperations(peopleOperationsParams: List<PeopleDownSyncOperation>) =
         ApiPeopleOperations(buildGroups(peopleOperationsParams))
 
-    private fun buildGroups(peopleOperationsParams: List<DownSyncOperation>) =
+    private fun buildGroups(peopleOperationsParams: List<PeopleDownSyncOperation>) =
         peopleOperationsParams.map {
             val whereLabels = mutableListOf<ApiPeopleOperationWhereLabel>()
             val userId = it.userId
@@ -99,7 +99,7 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
 
             whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(*it.modes.toTypedArray()).toString()))
 
-            val lastKnownInfo = with(it.syncOperationResult) {
+            val lastKnownInfo = with(it.lastResult) {
                 if (this@with?.lastPatientId?.isNotEmpty() == true && this@with.lastPatientUpdatedAt != null) {
                     ApiLastKnownPatient(this@with.lastPatientId, this@with.lastPatientUpdatedAt)
                 } else {

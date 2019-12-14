@@ -1,23 +1,30 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
+import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMasterImpl
-import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
-import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
+import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManagerImpl
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImpl
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManagerImpl
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
 import com.simprints.id.tools.TimeHelper
@@ -40,32 +47,52 @@ open class SyncModule {
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
                                  personRemoteDataSource: PersonRemoteDataSource,
                                  downSyncScopeRepository: DownSyncScopeRepository,
-                                 timeHelper: TimeHelper): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
-
-
-    @Provides
-    @Singleton
-    open fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
-        PeopleUpSyncMasterImpl(
-            PeopleUpSyncUploaderMaster(),
-            PeopleUpSyncPeriodicFlusherMaster()
-        )
+                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
+        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
 
     @Provides
-    @Singleton
     open fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
         SessionEventsSyncManagerImpl()
 
-    @Provides
-    @Singleton
-    open fun provideDownSyncManager(ctx: Context): DownSyncManager =
-        DownSyncManagerImpl(ctx)
 
     @Provides
-    @Singleton
+    open fun providePeopleSyncStateProcessor(ctx: Context,
+                                             personRepository: PersonRepository): PeopleSyncStateProcessor =
+        PeopleSyncStateProcessorImpl(ctx, personRepository)
+
+    @Provides
+    open fun provideDownSyncManager(ctx: Context,
+                                    peopleSyncStateProcessor: PeopleSyncStateProcessor): PeopleSyncManager =
+        PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor)
+
+    @Provides
     open fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager,
-                                        loginInfoManager: LoginInfoManager,
                                         sessionEventsSyncManager: SessionEventsSyncManager,
-                                        downSyncManager: DownSyncManager): SyncSchedulerHelper =
-        SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
+                                        peopleSyncManager: PeopleSyncManager,
+                                        peopleUpSyncDao: PeopleUpSyncDao,
+                                        peopleDownSyncDao: PeopleDownSyncDao): SyncManager =
+        SyncSchedulerImpl(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncDao, peopleDownSyncDao)
+
+
+    @Provides
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: DownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
+        PeopleDownSyncWorkersBuilderImpl(downSyncScopeRepository)
+
+
+    @Provides
+    open fun providePeopleUpSyncWorkerBuilder(downSyncScopeRepository: DownSyncScopeRepository): PeopleUpSyncWorkersBuilder =
+        PeopleUpSyncWorkersBuilderImpl()
+
+    @Provides
+    open fun providePeopleUpSyncDao(database: SyncStatusDatabase): PeopleUpSyncDao =
+        database.upSyncDao
+
+    @Provides
+    open fun providePeopleDownSyncDao(database: SyncStatusDatabase): PeopleDownSyncDao =
+        database.downSyncOperationDao
+
+    @Provides
+    open fun providePeopleUpSyncManager(ctx: Context,
+                                        peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncManager =
+        PeopleUpSyncManagerImpl(ctx, peopleUpSyncWorkersBuilder)
 }

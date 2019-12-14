@@ -3,14 +3,14 @@ package com.simprints.id.commontesttools
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import java.util.*
 import kotlin.random.Random
 
 object PeopleGeneratorUtils {
 
     fun getRandomPeople(nPeople: Int,
-                        downSyncOp: DownSyncOperation,
+                        downSyncOp: PeopleDownSyncOperation,
                         toSync: List<Boolean>): MutableList<Person> =
         mutableListOf<Person>().also { fakePeople ->
             repeat(nPeople) {

@@ -3,12 +3,12 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.preference.Preference
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.consent.LongConsentManager
-import com.simprints.id.secure.SignerManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.secure.SignerManager
+import com.simprints.id.services.scheduledSync.SyncManager
 import javax.inject.Inject
 
 
@@ -18,7 +18,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var syncSchedulerHelper: SyncManager
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var longConsentManager: LongConsentManager
@@ -87,7 +87,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override fun logout() {
         signerManager.signOut()
-        syncSchedulerHelper.cancelDownSyncWorkers()
+        syncSchedulerHelper.cancelBackgroundSyncs()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
 

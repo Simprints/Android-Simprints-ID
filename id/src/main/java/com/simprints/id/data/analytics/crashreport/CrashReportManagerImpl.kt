@@ -12,7 +12,7 @@ import com.simprints.id.data.analytics.crashreport.CrashlyticsKeyConstants.Compa
 import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.exceptions.safe.MalfunctionException
 import com.simprints.id.exceptions.safe.SafeException
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
 
 open class CrashReportManagerImpl: CrashReportManager {
 

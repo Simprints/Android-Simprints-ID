@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
-import com.simprints.id.services.scheduledSync.peopleDownSync.worker.CountWorkerTest
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.worker.CountWorkerTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

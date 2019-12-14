@@ -1,17 +1,17 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.id.data.db.down_sync_info.DownSyncScopeRepository
-import com.simprints.id.data.db.down_sync_info.local.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.SyncStatusDatabase
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTask
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.SyncManager
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.controllers.DownSyncManager
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync.DownSyncTask
+import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
@@ -50,6 +50,6 @@ class TestSyncModule(private val downSyncScopeRepositoryRule: DependencyRule = D
     override fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager,
                                             loginInfoManager: LoginInfoManager,
                                             sessionEventsSyncManager: SessionEventsSyncManager,
-                                            downSyncManager: DownSyncManager): SyncSchedulerHelper =
+                                            downSyncManager: DownSyncManager): SyncManager =
         syncSchedulerHelper.resolveDependency { super.provideSyncSchedulerHelper(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager) }
 }
