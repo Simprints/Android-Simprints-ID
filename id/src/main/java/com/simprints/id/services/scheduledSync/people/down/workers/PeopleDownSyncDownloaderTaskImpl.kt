@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.down.workers.downsync
+package com.simprints.id.services.scheduledSync.people.down.workers
 
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.coroutines.retryIO
@@ -16,7 +16,6 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.flow.Flow
@@ -37,7 +36,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     private var count = 0
 
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
-                                 downSyncWorkerProgressReporter: WorkerProgressCountReporter) {
+                                 downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
         this.downSyncOperation = downSyncOperation
 
         var reader: JsonReader? = null
@@ -48,7 +47,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             val flowPeople = createPeopleFlowFromJsonReader(reader)
             flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
                 saveBatchAndUpdateDownSyncStatus(it)
-                count += BATCH_SIZE_FOR_DOWNLOADING
+                count += it.size
                 downSyncWorkerProgressReporter.reportCount(count)
             }
             updateDownSyncInfo(COMPLETE)
@@ -60,9 +59,10 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         }
 
         finishDownload(reader)
+        return count
     }
 
-    suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
+    private suspend fun makeDownSyncApiCallAndGetResponse(client: PeopleRemoteInterface): ResponseBody =
         retryIO(times = RETRY_ATTEMPTS_FOR_NETWORK_CALLS) {
             with(downSyncOperation) {
                 client.downSync(
@@ -94,7 +94,9 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         updateDownSyncInfo(PeopleDownSyncOperationResult.DownSyncState.RUNNING, batchOfPeople.lastOrNull(), Date())
     }
 
-    private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState, person: ApiGetPerson? = null, lastSyncTime: Date? = null) {
+    private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
+                                           person: ApiGetPerson? = null,
+                                           lastSyncTime: Date? = null) {
         val syncInfo = downSyncOperation.lastResult
         var newSyncInfo = syncInfo?.apply {
             syncInfo.copy(lastState = state)
@@ -114,8 +116,8 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
                     lastSyncTime = it.time)
             }
         }
-
-        downSyncScopeRepository.insertOrUpdate(downSyncOperation.copy(lastResult = newSyncInfo))
+        downSyncOperation = downSyncOperation.copy(lastResult = newSyncInfo)
+        downSyncScopeRepository.insertOrUpdate(downSyncOperation)
     }
 
 

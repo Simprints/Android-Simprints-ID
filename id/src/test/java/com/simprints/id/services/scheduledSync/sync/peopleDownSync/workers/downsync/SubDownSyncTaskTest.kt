@@ -1,4 +1,4 @@
-//package com.simprints.id.services.scheduledSync.peopleDownSync
+//package com.simprints.id.services.scheduledSync.sync.peopleDownSync
 //
 //import androidx.test.core.app.ApplicationProvider
 //import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,7 +19,7 @@
 //import com.simprints.id.data.db.person.domain.Person
 //import com.simprints.id.data.db.person.local.PersonLocalDataSource
 //import com.simprints.id.exceptions.safe.data.db.NoSuchDbSyncInfoException
-//import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncTaskImpl
+//import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync.DownSyncTaskImpl
 //import com.simprints.id.testtools.TestApplication
 //import com.simprints.id.testtools.UnitTestConfig
 //import com.simprints.id.tools.TimeHelperImpl

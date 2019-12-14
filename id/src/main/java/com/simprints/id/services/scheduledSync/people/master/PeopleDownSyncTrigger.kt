@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.down.models
+package com.simprints.id.services.scheduledSync.people.master
 
 import androidx.annotation.Keep
 

@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.people.master
+package com.simprints.id.services.scheduledSync.people.common
 
 import android.content.Context
 import android.widget.Toast
@@ -39,7 +39,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     protected inline fun <reified T> showToastForDebug(input: Any, result: Result) {
         if (BuildConfig.DEBUG) {
-            val message = "${T::class.java.canonicalName} - Input: ($input) Result: $result"
+            val message = "${T::class.java.simpleName} - Input: ($input) Result: $result"
 
             applicationContext.runOnUiThread {
                 Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
@@ -50,6 +50,6 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
 
     protected inline fun <reified T> logMessageForCrashReport(message: Any) {
         crashReportManager.logMessageForCrashReport(
-            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "${T::class.java.canonicalName} - $message")
+            CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "${T::class.java.simpleName} - $message")
     }
 }

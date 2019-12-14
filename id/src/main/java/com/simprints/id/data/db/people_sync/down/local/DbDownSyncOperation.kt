@@ -83,5 +83,4 @@ fun DbDownSyncOperation.fromDbToDomain() =
                 lastSyncTime
             )
         }
-
     )

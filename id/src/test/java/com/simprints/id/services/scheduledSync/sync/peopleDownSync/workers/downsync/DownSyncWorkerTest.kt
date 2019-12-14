@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync
+package com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -9,9 +9,9 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.down_sync_info.domain.DownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.downsync.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -32,7 +32,7 @@ class DownSyncWorkerTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var downSyncWorker: DownSyncWorker
 
-    private val projectSyncOp = DownSyncOperation(
+    private val projectSyncOp = PeopleDownSyncOperation(
         DEFAULT_PROJECT_ID,
         null,
         null,
