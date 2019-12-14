@@ -9,8 +9,8 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
-import timber.log.Timber
 import javax.inject.Inject
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
@@ -18,7 +18,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     companion object {
         const val INPUT_DOWN_SYNC_OPS = "INPUT_DOWN_SYNC_OPS"
         const val PROGRESS_DOWN_SYNC = "PROGRESS_DOWN_SYNC"
-        const val PROGRESS_DOWN_SYNC_OPS = "PROGRESS_DOWN_SYNC_OPS"
+        const val OUTPUT_DOWN_SYNC = "OUTPUT_DOWN_SYNC"
     }
 
     @Inject override lateinit var crashReportManager: CrashReportManager
@@ -47,11 +47,13 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     private suspend fun execute(downSyncOperation: PeopleDownSyncOperation): Result {
         return try {
-            peopleDownSyncDownloaderTask.execute(downSyncOperation, this)
+            val totalDownloaded = peopleDownSyncDownloaderTask.execute(downSyncOperation, this)
             logSuccess<PeopleDownSyncDownloaderWorker>("Sync - Executing task done for $downSyncOperation")
 
-            resultSetter.success()
+            resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
+
         } catch (t: Throwable) {
+            t.printStackTrace()
             logFailure<PeopleDownSyncDownloaderWorker>("Sync - Failed on executing task for  $downSyncOperation", t)
 
             resultSetter.retry()
@@ -63,13 +65,17 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     }
 
     override suspend fun reportCount(count: Int) {
-        Timber.d("Sync - Progress: $count")
-        setProgressAsync(
-            workDataOf(
-                PROGRESS_DOWN_SYNC to count)
+        setProgress(
+            workDataOf(PROGRESS_DOWN_SYNC to count)
         )
     }
 }
 
-fun WorkInfo.extractSyncProgress(): Int =
-    this.progress.getInt(PROGRESS_DOWN_SYNC, 0)
+fun WorkInfo.extractDownSyncProgress(): Int {
+    val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
+    return if (progress < 0) {
+        this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
+    } else {
+        progress
+    }
+}

@@ -1,10 +1,10 @@
-package com.simprints.id.data.db.down_sync_info
+package com.simprints.id.data.db.people_sync.down
 
-import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
-import com.simprints.id.data.db.down_sync_info.local.DownSyncOperationDao
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.db.people_sync.down.domain.*
+import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -14,7 +14,7 @@ import kotlinx.coroutines.runBlocking
 
 class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                   val preferencesManager: PreferencesManager,
-                                  private val downSyncOperationDao: DownSyncOperationDao) : DownSyncScopeRepository {
+                                  private val downSyncOperationDao: PeopleDownSyncDao) : DownSyncScopeRepository {
 
     override fun getDownSyncScope(): PeopleDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -44,10 +44,10 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     //StopShip: consider to make suspend
     override suspend fun getDownSyncOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation> {
         val downSyncOpsStoredInDb = fetchDownSyncOperationsFromDb(syncScope)
-        return if (downSyncOpsStoredInDb.isEmpty()) {
+        return if (downSyncOpsStoredInDb.isNullOrEmpty()) {
             createOperations(syncScope).also {
-                it.forEach {
-                    downSyncOperationDao.insertOrReplaceDownSyncOperation(it.fromDomainToDb())
+                it.forEach { op ->
+                    downSyncOperationDao.insertOrReplaceDownSyncOperation(op.fromDomainToDb())
                 }
             }
         } else {
@@ -69,23 +69,24 @@ class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                 }.toList()
         }
 
-    private suspend fun fetchDownSyncOperationsFromDb(syncScope: PeopleDownSyncScope) =
+    private suspend fun fetchDownSyncOperationsFromDb(syncScope: PeopleDownSyncScope): List<DbDownSyncOperation> =
         with(downSyncOperationDao) {
             when (syncScope) {
                 is ProjectSyncScope -> {
-                    listOf(getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes)))
+                    getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes))
                 }
                 is UserSyncScope ->
-                    listOf(getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, userId = syncScope.userId)))
+                    getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, userId = syncScope.userId))
                 is ModuleSyncScope ->
-                    syncScope.modules.fold(emptyList()) { operations, moduleId ->
-                        operations + getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, moduleId = moduleId))
+                    syncScope.modules.mapNotNull {
+                        getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, moduleId = it)).firstOrNull()
                     }
             }
         }
 
-    override suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation) =
+    override suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation) {
         downSyncOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
+    }
 
     override fun deleteAll() {
         runBlocking {

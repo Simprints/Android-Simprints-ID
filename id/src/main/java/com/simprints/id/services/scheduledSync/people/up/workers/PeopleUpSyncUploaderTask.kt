@@ -10,6 +10,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
+import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -35,14 +36,20 @@ class PeopleUpSyncUploaderTask(
      * the sync to fail.
      */
 
-    suspend fun execute() {
+    var count = 0
+
+    suspend fun execute(workerProgressCountReporter: WorkerProgressCountReporter): Int {
         checkUserIsSignedIn()
 
         personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
             .bufferedChunks(batchSize)
             .collect {
                 upSyncBatch(it)
+                count += it.size
+                workerProgressCountReporter.reportCount(count)
             }
+
+        return count
     }
 
     private fun checkUserIsSignedIn() {
@@ -85,10 +92,11 @@ class PeopleUpSyncUploaderTask(
     }
 
     private suspend fun updateLastUpSyncTime() {
-        upSyncStatusModel.insertOrReplaceUpSyncOperation(DbUpSyncOperation(
-            DbUpSyncOperationKey(projectId),
-            projectId,
-            lastSyncTime = System.currentTimeMillis()))
+        upSyncStatusModel.insertOrReplaceUpSyncOperation(
+            DbUpSyncOperation(
+                DbUpSyncOperationKey(projectId),
+                projectId,
+                lastSyncTime = System.currentTimeMillis()))
     }
 
 }

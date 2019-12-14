@@ -1,16 +1,20 @@
 package com.simprints.id.services.scheduledSync.people.down.controllers
 
 import androidx.work.WorkRequest
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_WORKERS
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 
-interface PeopleDownSyncWorkerBuilder {
+interface PeopleDownSyncWorkersBuilder {
 
     companion object {
 
-        const val TAG_PEOPLE_DOWN_SYNC_WORKERS = "DOWN_${TAG_PEOPLE_SYNC_WORKERS}"
-        const val TAG_PEOPLE_DOWN_SYNC_DOWNLOADER = "TAG_PEOPLE_DOWN_SYNC_DOWNLOADER"
-        const val TAG_PEOPLE_DOWN_SYNC_COUNTER = "TAG_PEOPLE_DOWN_SYNC_COUNTER"
+        const val TAG_DOWN_MASTER_SYNC_ID = "TAG_DOWN_MASTER_SYNC_ID_"
+
+        const val TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS = "DOWN_${TAG_PEOPLE_SYNC_ALL_WORKERS}"
+        const val TAG_PEOPLE_DOWN_SYNC_ALL_DOWNLOADERS = "TAG_PEOPLE_DOWN_SYNC_ALL_DOWNLOADERS"
+        const val TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS = "TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS"
+
     }
 
-    suspend fun buildDownSyncWorkerChain(uniqueSyncID: String): List<WorkRequest>
+    suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<WorkRequest>
+
 }

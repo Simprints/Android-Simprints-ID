@@ -6,5 +6,5 @@ import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCount
 interface PeopleDownSyncDownloaderTask {
 
     suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
-                        downSyncWorkerProgressReporter: WorkerProgressCountReporter)
+                        downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int
 }

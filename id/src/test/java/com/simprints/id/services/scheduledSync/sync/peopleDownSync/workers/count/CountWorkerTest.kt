@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.peopleDownSync.worker
+package com.simprints.id.services.scheduledSync.sync.peopleDownSync.worker
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -7,10 +7,10 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.down_sync_info.domain.PeopleCount
-import com.simprints.id.data.db.down_sync_info.domain.ProjectSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleDownSync.workers.count.CountWorker
+import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.count.CountWorker
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
