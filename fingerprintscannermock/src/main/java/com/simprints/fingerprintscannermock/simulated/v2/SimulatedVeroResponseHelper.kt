@@ -14,26 +14,25 @@ class SimulatedVeroResponseHelper(private val simulatedScannerManager: Simulated
 
     override fun createResponseToCommand(command: VeroCommand): VeroResponse {
         val response = when (command) {
-            is GetFirmwareVersionCommand -> GetFirmwareVersionResponse(FirmwareVersion(2.toShort(), 0.toShort(), 6, byteArrayOf(0x12, 0x34, 0x56, 0x78)))
+            is GetStmFirmwareVersionCommand -> GetStmFirmwareVersionResponse(StmFirmwareVersion(2.toShort(), 0.toShort(), 6.toShort(), 0.toShort()))
             is GetUn20OnCommand -> GetUn20OnResponse(if (simulatedScannerV2.scannerState.isUn20On) DigitalValue.TRUE else DigitalValue.FALSE)
             is SetUn20OnCommand -> SetUn20OnResponse(OperationResultCode.OK)
             is GetTriggerButtonActiveCommand -> GetTriggerButtonActiveResponse(DigitalValue.TRUE)
             is SetTriggerButtonActiveCommand -> SetTriggerButtonActiveResponse(OperationResultCode.OK)
             is GetSmileLedStateCommand -> GetSmileLedStateResponse(SmileLedState(
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00),
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00),
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00),
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00),
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00)))
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)))
             is GetBluetoothLedStateCommand -> GetBluetoothLedStateResponse(
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00)
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
             )
             is GetPowerLedStateCommand -> GetPowerLedStateResponse(
-                LedState(LedMode.OFF, 0x00, 0x00, 0x00)
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
             )
             is SetSmileLedStateCommand -> SetSmileLedStateResponse(OperationResultCode.OK)
-            is SetBluetoothLedStateCommand -> SetBluetoothLedStateResponse(OperationResultCode.OK)
-            is SetPowerLedStateCommand -> SetPowerLedStateResponse(OperationResultCode.OK)
+            is GetBatteryPercentChargeCommand -> GetBatteryPercentChargeResponse(BatteryPercentCharge(80.toShort()))
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedVeroResponseHelper")
         }
 

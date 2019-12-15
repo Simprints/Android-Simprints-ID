@@ -3,7 +3,7 @@ package com.simprints.fingerprintscanner.v2.domain.message.vero.models
 enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
 
     // 0x1_ : Versioning
-    GET_FIRMWARE_VERSION(0x10, 0x00),
+    GET_STM_FIRMWARE_VERSION(0x10, 0x00),
 
     // 0x2_ : UN20 control
     GET_UN20_ON(0x20, 0x10),
@@ -21,8 +21,9 @@ enum class VeroMessageType(val majorByte: Byte, val minorByte: Byte) {
     GET_POWER_LED_STATE(0x40, 0x30),
 
     SET_SMILE_LED_STATE(0x41, 0x10),
-    SET_BLUETOOTH_LED_STATE(0x41, 0x20),
-    SET_POWER_LED_STATE(0x41, 0x30);
+
+    // 0x5_ : Gas gauge information
+    GET_BATTERY_PERCENT_CHARGE(0x50, 0x10);
 
     fun getBytes() = byteArrayOf(majorByte, minorByte)
 
