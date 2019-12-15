@@ -4,6 +4,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Command
 import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.*
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20AppVersion
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
@@ -23,9 +24,12 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
                     .also { if (it == SimulatedFingerV2.NO_FINGER) simulatedScannerManager.cycleToNextFinger() }
                     .captureFingerprintResponseCode
             )
-            is GetImageQualityCommand -> GetImageQualityResponse(simulatedScannerManager.currentMockFinger().toV2().imageQuality)
             is GetSupportedTemplateTypesCommand -> GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
-            is GetTemplateCommand -> GetTemplateResponse(command.templateType, simulatedScannerManager.currentMockFinger().toV2().templateBytes
+            is GetTemplateCommand -> GetTemplateResponse(TemplateData(
+                command.templateType,
+                simulatedScannerManager.currentMockFinger().toV2().imageQuality,
+                simulatedScannerManager.currentMockFinger().toV2().templateBytes
+            )
                 .also { simulatedScannerManager.cycleToNextFinger() })
             is GetSupportedImageFormatsCommand -> GetSupportedImageFormatsResponse(setOf(ImageFormat.RAW))
             is GetImageCommand -> GetImageResponse(command.imageFormat, Random.nextBytes(120000)) // TODO

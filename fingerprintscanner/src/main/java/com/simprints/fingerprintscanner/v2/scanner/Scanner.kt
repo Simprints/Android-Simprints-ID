@@ -3,10 +3,7 @@ package com.simprints.fingerprintscanner.v2.scanner
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.*
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Dpi
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
-import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20AppVersion
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.*
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
@@ -154,8 +151,10 @@ class Scanner(
             .doOnSuccess { state.batteryPercentCharge = it }
 
     fun getUn20AppVersion(): Single<Un20AppVersion> =
-        sendCommandAndReceiveResponse<GetUn20AppVersionResponse>(
-            GetUn20AppVersionCommand()
+        assertUn20On().andThen(
+            sendCommandAndReceiveResponse<GetUn20AppVersionResponse>(
+                GetUn20AppVersionCommand()
+            )
         ).map { it.un20AppVersion }
 
     fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Completable =
@@ -165,20 +164,26 @@ class Scanner(
             )
         ).completeOnceReceived()
 
-    fun getImageQuality(): Single<Short> =
+    fun getSupportedTemplateTypes(): Single<Set<TemplateType>> =
         assertUn20On().andThen(
-            sendCommandAndReceiveResponse<GetImageQualityResponse>(
-                GetImageQualityCommand()
+            sendCommandAndReceiveResponse<GetSupportedTemplateTypesResponse>(
+                GetSupportedTemplateTypesCommand()
             )
-        ).map { it.imageQuality }
+        ).map { it.supportedTemplateTypes }
 
-    fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<ByteArray> =
+    fun acquireTemplate(templateType: TemplateType = DEFAULT_TEMPLATE_TYPE): Single<TemplateData> =
         assertUn20On().andThen(
             sendCommandAndReceiveResponse<GetTemplateResponse>(
                 GetTemplateCommand(templateType)
             )
-        ).map { it.template }
+        ).map { it.templateData }
 
+    fun getSupportedImageFormats(): Single<Set<ImageFormat>> =
+        assertUn20On().andThen(
+            sendCommandAndReceiveResponse<GetSupportedImageFormatsResponse>(
+                GetSupportedImageFormatsCommand()
+            )
+        ).map { it.supportedImageFormats }
 
     fun acquireImage(imageFormat: ImageFormat = DEFAULT_IMAGE_FORMAT): Single<ByteArray> =
         assertUn20On().andThen(
