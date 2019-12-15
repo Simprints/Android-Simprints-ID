@@ -6,7 +6,7 @@ import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexStri
 
 enum class SimulatedFingerV2(
     val captureFingerprintResponseCode: CaptureFingerprintResponse.ResponseCode = CaptureFingerprintResponse.ResponseCode.OK,
-    val imageQuality: Short = 80.toShort(),
+    val imageQuality: Int = 80,
     val templateBytes: ByteArray = byteArrayOf()) {
 
     PERSON_1_FINGER_1_VERSION_1_GOOD_SCAN(templateBytes = byteArrayFromHexString(
