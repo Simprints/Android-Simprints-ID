@@ -2,25 +2,20 @@ package com.simprints.fingerprintscanner.v2.scanner
 
 import com.simprints.fingerprintscanner.v2.domain.message.IncomingMessage
 import com.simprints.fingerprintscanner.v2.domain.message.OutgoingMessage
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageQualityCommand
-import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.*
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Dpi
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.ImageFormat
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateType
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageQualityResponse
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetTemplateResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetSmileLedStateCommand
-import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.SetUn20OnCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.Un20AppVersion
+import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.*
+import com.simprints.fingerprintscanner.v2.domain.message.vero.commands.*
 import com.simprints.fingerprintscanner.v2.domain.message.vero.events.TriggerButtonPressedEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.events.Un20StateChangeEvent
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.DigitalValue
+import com.simprints.fingerprintscanner.v2.domain.message.vero.models.LedState
 import com.simprints.fingerprintscanner.v2.domain.message.vero.models.SmileLedState
-import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetSmileLedStateResponse
-import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.SetUn20OnResponse
+import com.simprints.fingerprintscanner.v2.domain.message.vero.models.StmFirmwareVersion
+import com.simprints.fingerprintscanner.v2.domain.message.vero.responses.*
 import com.simprints.fingerprintscanner.v2.incoming.MessageInputStream
 import com.simprints.fingerprintscanner.v2.outgoing.MessageOutputStream
 import com.simprints.fingerprintscanner.v2.tools.reactive.completeOnceReceived
@@ -42,7 +37,8 @@ class Scanner(
         connected = false,
         un20On = null,
         triggerButtonActive = false,
-        smileLedState = null
+        smileLedState = null,
+        batteryPercentCharge = null
     )
 
     val triggerButtonListeners = mutableSetOf<Observer<Unit>>()
@@ -76,11 +72,16 @@ class Scanner(
                 triggerButtonListeners.forEach { it.onNext(Unit) }
             })
 
-    fun setSmileLedState(smileLedState: SmileLedState): Completable =
-        sendCommandAndReceiveResponse<SetSmileLedStateResponse>(
-            SetSmileLedStateCommand(smileLedState)
-        ).completeOnceReceived()
-            .doOnComplete { state.smileLedState = smileLedState }
+    fun getStmFirmwareVersion(): Single<StmFirmwareVersion> =
+        sendCommandAndReceiveResponse<GetStmFirmwareVersionResponse>(
+            GetStmFirmwareVersionCommand()
+        ).map { it.stmFirmwareVersion }
+
+    fun getUn20Status(): Single<Boolean> =
+        sendCommandAndReceiveResponse<GetUn20OnResponse>(
+            GetUn20OnCommand()
+        ).map { it.value == DigitalValue.TRUE }
+            .doOnSuccess { state.un20On = it }
 
     fun turnUn20OnAndAwaitStateChangeEvent(): Completable =
         sendCommandAndReceiveResponse<SetUn20OnResponse>(
@@ -105,6 +106,57 @@ class Scanner(
             TODO("exception handling")
         }
     }
+
+    fun getTriggerButtonStatus(): Single<Boolean> =
+        sendCommandAndReceiveResponse<GetTriggerButtonActiveResponse>(
+            GetTriggerButtonActiveCommand()
+        ).map { it.value == DigitalValue.TRUE }
+            .doOnSuccess { state.triggerButtonActive = it }
+
+    fun activateTriggerButton(): Completable =
+        sendCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
+            SetTriggerButtonActiveCommand(DigitalValue.TRUE)
+        ).completeOnceReceived()
+            .doOnComplete { state.triggerButtonActive = true }
+
+    fun deactivateTriggerButton(): Completable =
+        sendCommandAndReceiveResponse<SetTriggerButtonActiveResponse>(
+            SetTriggerButtonActiveCommand(DigitalValue.FALSE)
+        ).completeOnceReceived()
+            .doOnComplete { state.triggerButtonActive = false }
+
+    fun getSmileLedState(): Single<SmileLedState> =
+        sendCommandAndReceiveResponse<GetSmileLedStateResponse>(
+            GetSmileLedStateCommand()
+        ).map { it.smileLedState }
+            .doOnSuccess { state.smileLedState = it }
+
+    fun getPowerLedState(): Single<LedState> =
+        sendCommandAndReceiveResponse<GetPowerLedStateResponse>(
+            GetPowerLedStateCommand()
+        ).map { it.ledState }
+
+    fun getBluetoothLedState(): Single<LedState> =
+        sendCommandAndReceiveResponse<GetBluetoothLedStateResponse>(
+            GetBluetoothLedStateCommand()
+        ).map { it.ledState }
+
+    fun setSmileLedState(smileLedState: SmileLedState): Completable =
+        sendCommandAndReceiveResponse<SetSmileLedStateResponse>(
+            SetSmileLedStateCommand(smileLedState)
+        ).completeOnceReceived()
+            .doOnComplete { state.smileLedState = smileLedState }
+
+    fun getBatteryPercentCharge(): Single<Int> =
+        sendCommandAndReceiveResponse<GetBatteryPercentChargeResponse>(
+            GetBatteryPercentChargeCommand()
+        ).map { it.batteryPercentCharge.percentCharge.toInt() }
+            .doOnSuccess { state.batteryPercentCharge = it }
+
+    fun getUn20AppVersion(): Single<Un20AppVersion> =
+        sendCommandAndReceiveResponse<GetUn20AppVersionResponse>(
+            GetUn20AppVersionCommand()
+        ).map { it.un20AppVersion }
 
     fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Completable =
         assertUn20On().andThen(
