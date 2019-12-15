@@ -6,6 +6,6 @@ enum class DigitalValue(val byte: Byte) {
     TRUE(0xFF.toByte());
 
     companion object {
-        fun fromBytes(bytes: ByteArray) = values().find { it.byte == bytes[0] } ?: TODO("exception handling")
+        fun fromBytes(bytes: ByteArray) = if (bytes[0] == 0x00.toByte()) FALSE else TRUE
     }
 }

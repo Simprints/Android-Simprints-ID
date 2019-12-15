@@ -121,11 +121,11 @@ class ScannerTest {
         scanner.connect(mock(), mock())
 
         val smileLedState = SmileLedState(
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04),
-            LedState(LedMode.ON, 0x00, 0x00 ,0x04)
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04),
+            LedState(DigitalValue.FALSE, 0x00, 0x00 ,0x04)
         )
 
         scanner.setSmileLedState(smileLedState).testSubscribe().awaitAndAssertSuccess()

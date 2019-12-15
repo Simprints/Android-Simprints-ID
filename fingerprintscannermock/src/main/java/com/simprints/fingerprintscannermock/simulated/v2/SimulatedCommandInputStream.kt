@@ -50,7 +50,7 @@ class SimulatedCommandInputStream {
         override fun parse(messageBytes: ByteArray): VeroCommand =
             VeroMessageProtocol.getDataBytes(messageBytes).let { data ->
                 when (VeroMessageProtocol.getMessageType(messageBytes)) {
-                    GET_FIRMWARE_VERSION -> GetFirmwareVersionCommand.fromBytes(data)
+                    GET_STM_FIRMWARE_VERSION -> GetStmFirmwareVersionCommand.fromBytes(data)
                     GET_UN20_ON -> GetUn20OnCommand.fromBytes(data)
                     SET_UN20_ON -> SetUn20OnCommand.fromBytes(data)
                     GET_TRIGGER_BUTTON_ACTIVE -> GetTriggerButtonActiveCommand.fromBytes(data)
@@ -59,8 +59,7 @@ class SimulatedCommandInputStream {
                     GET_BLUETOOTH_LED_STATE -> GetBluetoothLedStateCommand.fromBytes(data)
                     GET_POWER_LED_STATE -> GetPowerLedStateCommand.fromBytes(data)
                     SET_SMILE_LED_STATE -> SetSmileLedStateCommand.fromBytes(data)
-                    SET_BLUETOOTH_LED_STATE -> SetBluetoothLedStateCommand.fromBytes(data)
-                    SET_POWER_LED_STATE -> SetPowerLedStateCommand.fromBytes(data)
+                    GET_BATTERY_PERCENT_CHARGE -> GetBatteryPercentChargeCommand.fromBytes(data)
                     UN20_STATE_CHANGE, TRIGGER_BUTTON_PRESSED -> throw IllegalArgumentException("Should not send events")
                 }
             }
