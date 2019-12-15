@@ -14,7 +14,7 @@ class SimulatedVeroResponseHelper(private val simulatedScannerManager: Simulated
 
     override fun createResponseToCommand(command: VeroCommand): VeroResponse {
         val response = when (command) {
-            is GetStmFirmwareVersionCommand -> GetStmFirmwareVersionResponse(StmFirmwareVersion(2.toShort(), 0.toShort(), 6.toShort(), 0.toShort()))
+            is GetStmFirmwareVersionCommand -> GetStmFirmwareVersionResponse(StmFirmwareVersion(0.toShort(), 1.toShort(), 6.toShort(), 0.toShort()))
             is GetUn20OnCommand -> GetUn20OnResponse(if (simulatedScannerV2.scannerState.isUn20On) DigitalValue.TRUE else DigitalValue.FALSE)
             is SetUn20OnCommand -> SetUn20OnResponse(OperationResultCode.OK)
             is GetTriggerButtonActiveCommand -> GetTriggerButtonActiveResponse(DigitalValue.TRUE)

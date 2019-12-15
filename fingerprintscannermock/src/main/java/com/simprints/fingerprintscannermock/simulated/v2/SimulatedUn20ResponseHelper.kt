@@ -17,7 +17,7 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
 
     override fun createResponseToCommand(command: Un20Command): Un20Response {
         val response = when (command) {
-            is GetUn20AppVersionCommand -> GetUn20AppVersionResponse(Un20AppVersion(2.toShort(), 0.toShort(), 6, byteArrayOf(0x12, 0x34, 0x56, 0x78)))
+            is GetUn20AppVersionCommand -> GetUn20AppVersionResponse(Un20AppVersion(0.toShort(), 1.toShort(), 6.toShort(), 0.toShort()))
             is CaptureFingerprintCommand -> CaptureFingerprintResponse(
                 simulatedScannerManager.currentMockFinger().toV2()
                     .also { if (it == SimulatedFingerV2.NO_FINGER) simulatedScannerManager.cycleToNextFinger() }
