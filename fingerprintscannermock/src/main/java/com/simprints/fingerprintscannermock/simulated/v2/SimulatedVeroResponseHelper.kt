@@ -17,22 +17,19 @@ class SimulatedVeroResponseHelper(private val simulatedScannerManager: Simulated
             is GetStmFirmwareVersionCommand -> GetStmFirmwareVersionResponse(StmFirmwareVersion(0.toShort(), 1.toShort(), 6.toShort(), 0.toShort()))
             is GetUn20OnCommand -> GetUn20OnResponse(if (simulatedScannerV2.scannerState.isUn20On) DigitalValue.TRUE else DigitalValue.FALSE)
             is SetUn20OnCommand -> SetUn20OnResponse(OperationResultCode.OK)
-            is GetTriggerButtonActiveCommand -> GetTriggerButtonActiveResponse(DigitalValue.TRUE)
+            is GetTriggerButtonActiveCommand -> GetTriggerButtonActiveResponse(
+                if (simulatedScannerV2.scannerState.isTriggerButtonActive) DigitalValue.TRUE else DigitalValue.FALSE
+            )
             is SetTriggerButtonActiveCommand -> SetTriggerButtonActiveResponse(OperationResultCode.OK)
-            is GetSmileLedStateCommand -> GetSmileLedStateResponse(SmileLedState(
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00),
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)))
+            is GetSmileLedStateCommand -> GetSmileLedStateResponse(simulatedScannerV2.scannerState.smileLedState)
             is GetBluetoothLedStateCommand -> GetBluetoothLedStateResponse(
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+                LedState(DigitalValue.FALSE, 0x00, 0x00, 0xFF.toByte())
             )
             is GetPowerLedStateCommand -> GetPowerLedStateResponse(
-                LedState(DigitalValue.FALSE, 0x00, 0x00, 0x00)
+                LedState(DigitalValue.FALSE, 0x00, 0xFF.toByte(), 0x00)
             )
             is SetSmileLedStateCommand -> SetSmileLedStateResponse(OperationResultCode.OK)
-            is GetBatteryPercentChargeCommand -> GetBatteryPercentChargeResponse(BatteryPercentCharge(80.toShort()))
+            is GetBatteryPercentChargeCommand -> GetBatteryPercentChargeResponse(BatteryPercentCharge(simulatedScannerV2.scannerState.batteryPercentCharge.toShort()))
             else -> throw UnsupportedOperationException("Un-mocked response to $command in SimulatedVeroResponseHelper")
         }
 

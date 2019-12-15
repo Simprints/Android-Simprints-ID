@@ -3,11 +3,10 @@ package com.simprints.fingerprintscannermock.simulated.v1
 import com.simprints.fingerprintscanner.v1.Message
 import com.simprints.fingerprintscanner.v1.enums.MESSAGE_TYPE.*
 import com.simprints.fingerprintscannermock.simulated.SimulatedScannerManager
-import com.simprints.fingerprintscannermock.simulated.common.SimulatedScanner
 import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
 
 class SimulatedResponseHelperV1(private val simulatedScannerManager: SimulatedScannerManager,
-                                private val simulatedScanner: SimulatedScanner) {
+                                private val simulatedScanner: SimulatedScannerV1) {
 
     fun createMockResponse(message: Message): ByteArray =
         when (message.messageType) {
