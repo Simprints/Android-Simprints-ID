@@ -31,6 +31,7 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         private const val VERIFICATION_GUID_KEY = "guid"
         private const val EXIT_REASON = "exitReason"
         private const val EXIT_EXTRA = "exitExtra"
+        private const val SIMPRINTS_SESSION_ID = "sessionId"
 
         private const val CONFIRM_IDENTITY_ACTION = "com.simprints.commcare.CONFIRM_IDENTITY"
     }
@@ -49,9 +50,10 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         loadClientApiKoinModules()
     }
 
-    override fun returnRegistration(guid: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnRegistration(guid: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
+            putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(REGISTRATION_GUID_KEY, guid)
         }
 
@@ -59,8 +61,9 @@ class CommCareActivity : RequestActivity(), CommCareContract.View {
         sendOkResult(it)
     }
 
-    override fun returnVerification(confidence: Int, tier: Tier, guid: String, flowCompletedCheck: Boolean) = Intent().let {
+    override fun returnVerification(confidence: Int, tier: Tier, guid: String, sessionId: String, flowCompletedCheck: Boolean) = Intent().let {
         val data = Bundle().apply {
+            putString(SIMPRINTS_SESSION_ID, sessionId)
             putString(BIOMETRICS_COMPLETE_CHECK_KEY, flowCompletedCheck.toString())
             putString(VERIFICATION_CONFIDENCE_KEY, confidence.toString())
             putString(VERIFICATION_TIER_KEY, tier.name)

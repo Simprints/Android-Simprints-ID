@@ -96,7 +96,9 @@ class LibSimprintsPresenterTest {
     @Test
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
 
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSession() } thenOnBlockingReturn sessionId
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, clientApiSessionEventsManager, mock())
             .handleEnrollResponse(EnrollResponse(registerId))
 
@@ -105,6 +107,7 @@ class LibSimprintsPresenterTest {
                 argThat {
                     assertThat(it.guid).isEqualTo(registerId)
                 },
+                eq(sessionId),
                 eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
         verifyCompletionCheckEventWasAdded()
@@ -141,7 +144,9 @@ class LibSimprintsPresenterTest {
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val sessionId = UUID.randomUUID().toString()
 
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSession() } thenOnBlockingReturn sessionId
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, clientApiSessionEventsManager, mock()).apply {
             handleVerifyResponse(verification)
         }
@@ -158,6 +163,7 @@ class LibSimprintsPresenterTest {
                     assertThat(it.tier).isEqualTo(libVerification.tier)
                     assertThat(it.guid).isEqualTo(libVerification.guid)
                 },
+                eq(sessionId),
                 eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
         }
         verifyCompletionCheckEventWasAdded()

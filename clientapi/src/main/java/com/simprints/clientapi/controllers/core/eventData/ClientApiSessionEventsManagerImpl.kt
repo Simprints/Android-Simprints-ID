@@ -60,6 +60,16 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     private fun addEvent(event: Event): Completable =
         coreSessionEventsManager.addEvent(event)
 
+    override suspend fun getCurrentSession(): String =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeWithExceptionSafely(it) }
+                )
+            }
+        }
+
 }
 
 fun ClientApiAlert.fromAlertToAlertTypeEvent(): CoreAlertScreenEventType =
