@@ -122,5 +122,4 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
         companion object {
         private const val DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL = 0
     }
-    }
 }
