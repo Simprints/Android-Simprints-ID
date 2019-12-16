@@ -71,7 +71,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
                     personLocalDataSource.count(PersonLocalDataSource.Query(
                         projectId = it.projectId,
                         userId = it.userId,
-                        moduleId = it.moduleId)), 0,0)
+                        moduleId = it.moduleId)),
+                    DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL,
+                    DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL)
             }
         )
 
@@ -110,5 +112,9 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     @Suppress("UNUSED_PARAMETER")
     private fun scheduleUpsync(projectId: String, userId: String) {
         peopleUpSyncMaster.schedule(projectId/*, userId*/)
+    }
+
+    companion object {
+        private const val DEFAULT_DELETE_UPDATE_COUNT_FOR_LOCAL = 0
     }
 }
