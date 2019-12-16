@@ -139,6 +139,7 @@ class SyncInformationActivity : AppCompatActivity() {
         observeLocalRecordCount()
         observeUpSyncRecordCount()
         observeDownSyncRecordCount()
+        observeDeleteRecordCount()
         observeSelectedModules()
         observeUnselectedModules()
     }
@@ -158,6 +159,12 @@ class SyncInformationActivity : AppCompatActivity() {
     private fun observeDownSyncRecordCount() {
         viewModel.recordsToDownSyncCount.observe(this, Observer {
             recordsToDownloadCount.text = it.toString()
+        })
+    }
+
+    private fun observeDeleteRecordCount() {
+        viewModel.recordsToDeleteCount.observe(this, Observer {
+            recordsToDeleteCount.text = it.toString()
         })
     }
 
