@@ -210,9 +210,9 @@ class ModuleSelectionFragment(
             { _, _ -> handleModuleSelectionCancelClick() }
             .create()
 
-    private fun getModulesSelectedTextForDialog() = StringBuilder().also {
+    private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
         modules.filter { it.isSelected }.forEach { module ->
-            it.append(module.name + "\n")
+            append(module.name + "\n")
         }
     }.toString()
 
