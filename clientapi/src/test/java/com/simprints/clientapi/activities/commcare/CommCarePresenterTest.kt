@@ -98,7 +98,7 @@ class CommCarePresenterTest {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
-        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
@@ -129,7 +129,7 @@ class CommCarePresenterTest {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
-        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         CommCarePresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs()).handleVerifyResponse(verification)
 
         verifyOnce(view) {

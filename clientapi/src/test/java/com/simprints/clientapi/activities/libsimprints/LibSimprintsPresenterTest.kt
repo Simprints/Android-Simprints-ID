@@ -98,7 +98,7 @@ class LibSimprintsPresenterTest {
         val registerId = UUID.randomUUID().toString()
         val sessionId = UUID.randomUUID().toString()
 
-        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         LibSimprintsPresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, clientApiSessionEventsManager, mock())
             .handleEnrollResponse(EnrollResponse(registerId))
 
@@ -146,7 +146,7 @@ class LibSimprintsPresenterTest {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
         val sessionId = UUID.randomUUID().toString()
 
-        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         LibSimprintsPresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, clientApiSessionEventsManager, mock()).apply {
             handleVerifyResponse(verification)
         }
