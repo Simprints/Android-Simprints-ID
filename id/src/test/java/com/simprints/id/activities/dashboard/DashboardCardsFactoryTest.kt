@@ -198,7 +198,7 @@ class DashboardCardsFactoryTest {
     }
 
     private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+        listOf(PeopleCount("projectId", "userId", "0", listOf(Modes.FACE, Modes.FINGERPRINT), counter, 0, 0))
 
     private fun mockNPeopleForSyncRequest(personRemoteDataSource: PersonRemoteDataSource, peopleCounts: List<PeopleCount>) {
         whenever(personRemoteDataSource.getDownSyncPeopleCount(anyNotNull(), anyNotNull())).thenReturn(Single.just(peopleCounts))

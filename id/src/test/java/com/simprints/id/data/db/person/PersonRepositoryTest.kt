@@ -12,7 +12,6 @@ import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
 import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.testtools.common.syntax.*
@@ -30,7 +29,9 @@ import org.mockito.MockitoAnnotations
 class PersonRepositoryTest {
 
     companion object {
-        const val REMOTE_PEOPLE_FOR_SUBSYNC = 10
+        const val REMOTE_PEOPLE_FOR_SUBSYNC_CREATE = 100
+        const val REMOTE_PEOPLE_FOR_SUBSYNC_DELETE = 10
+        const val REMOTE_PEOPLE_FOR_SUBSYNC_UPDATE = 2
     }
 
     private val syncScopeByProject = SyncScope(DEFAULT_PROJECT_ID, null, null)
@@ -51,26 +52,17 @@ class PersonRepositoryTest {
 
     @Test
     fun givenRemoteCount_countToDownSyncByProjectShouldReturnTheRightTotal() = runBlockingTest {
-
-        with(syncScopeByProject.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
-        }
+        assessPeopleOperationsCount(syncScopeByProject)
     }
 
     @Test
     fun givenRemoteCount_countToDownSyncByUserShouldReturnTheRightTotal() = runBlockingTest {
-
-        with(syncScopeByUser.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
-        }
+        assessPeopleOperationsCount(syncScopeByUser)
     }
 
     @Test
     fun givenRemoteCount_countToDownSyncByModulesShouldReturnTheRightTotal() = runBlockingTest {
-
-        with(syncScopeByModule.toSubSyncScopes()) {
-            assesDownSyncCount(associate { Pair(it, REMOTE_PEOPLE_FOR_SUBSYNC) })
-        }
+        assessPeopleOperationsCount(syncScopeByModule)
     }
 
     @Test
@@ -114,21 +106,25 @@ class PersonRepositoryTest {
         }
     }
 
-    private fun assesDownSyncCount(remoteCounts: Map<SubSyncScope, Int>) {
-
-        whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull(), anyNotNull()) } thenReturn Single.just(remoteCounts.map {
-            val subSync = it.component1()
-            with(subSync) {
-                PeopleCount(projectId, userId, moduleId, listOf(Modes.FINGERPRINT), it.component2())
+    private fun assessPeopleOperationsCount(syncScope: SyncScope) {
+        whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull(), anyNotNull()) } thenReturn Single.just(
+            syncScope.toSubSyncScopes().map {
+                PeopleCount(it.projectId, it.userId, it.moduleId, listOf(Modes.FINGERPRINT),
+                    REMOTE_PEOPLE_FOR_SUBSYNC_CREATE, REMOTE_PEOPLE_FOR_SUBSYNC_DELETE, REMOTE_PEOPLE_FOR_SUBSYNC_UPDATE)
             }
-        })
+        )
 
         val tester = personRepository.countToDownSync(syncScopeByProject).test()
         tester.awaitAndAssertSuccess()
 
         assertThat(tester.values().size).isEqualTo(1)
         val countForSyncScope = tester.values().first()
-        assertThat(countForSyncScope.sumBy { it.count }).isEqualTo(remoteCounts.values.sum())
+
+        with(countForSyncScope) {
+            assertThat(sumBy { it.downloadCount }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC_CREATE * size)
+            assertThat(sumBy { it.deleteCount }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC_DELETE * size)
+            assertThat(sumBy { it.updateCount }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC_UPDATE * size)
+        }
     }
 
     @After

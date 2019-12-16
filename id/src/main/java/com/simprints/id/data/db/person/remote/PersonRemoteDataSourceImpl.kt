@@ -15,7 +15,6 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
-import com.simprints.id.data.db.person.remote.models.peopleoperations.response.sumUp
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
@@ -79,7 +78,9 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                             requestedSyncScope.userId,
                             requestedSyncScope.moduleId,
                             listOf(Modes.FINGERPRINT),
-                            countsForSyncScope.sumUp())
+                            downloadCount = countsForSyncScope.create,
+                            deleteCount = countsForSyncScope.delete,
+                            updateCount = countsForSyncScope.update)
                     }
                 }
         }

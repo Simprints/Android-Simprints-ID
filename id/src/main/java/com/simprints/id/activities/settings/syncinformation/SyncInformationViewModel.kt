@@ -20,13 +20,14 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
     val localRecordCount = MutableLiveData<Int>()
     val recordsToUpSyncCount = MutableLiveData<Int>()
     val recordsToDownSyncCount = MutableLiveData<Int>()
+    val recordsToDeleteCount = MutableLiveData<Int>()
     val selectedModulesCount = MutableLiveData<List<ModuleCount>>()
     val unselectedModulesCount = MutableLiveData<List<ModuleCount>>()
 
     fun start() {
         fetchAndUpdateLocalRecordCount()
         fetchAndUpdateRecordsToUpSyncCount()
-        fetchAndUpdateRecordsToDownSyncCount()
+        fetchAndUpdateRecordsToDownSyncAndDeleteCount()
         fetchAndUpdateSelectedModulesCount()
         fetchAndUpdatedUnselectedModulesCount()
     }
@@ -39,14 +40,17 @@ class SyncInformationViewModel(private val personRepository: PersonRepository,
         recordsToUpSyncCount.value = personLocalDataSource.count(PersonLocalDataSource.Query(toSync = true))
     }
 
-    internal fun fetchAndUpdateRecordsToDownSyncCount() =
+    internal fun fetchAndUpdateRecordsToDownSyncAndDeleteCount() =
         syncScopesBuilder.buildSyncScope()?.let { syncScope ->
             personRepository.countToDownSync(syncScope)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy { peopleCounts ->
                     recordsToDownSyncCount.postValue(peopleCounts.sumBy {
-                        it.count
+                        it.downloadCount
+                    })
+                    recordsToDeleteCount.postValue(peopleCounts.sumBy {
+                        it.deleteCount
                     })
                 }
         }
