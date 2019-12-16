@@ -12,9 +12,9 @@ import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.toMode
 import kotlinx.coroutines.runBlocking
 
-class DownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
-                                  val preferencesManager: PreferencesManager,
-                                  private val downSyncOperationDao: PeopleDownSyncDao) : DownSyncScopeRepository {
+class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
+                                        val preferencesManager: PreferencesManager,
+                                        private val downSyncOperationDao: PeopleDownSyncDao) : PeopleDownSyncScopeRepository {
 
     override fun getDownSyncScope(): PeopleDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
