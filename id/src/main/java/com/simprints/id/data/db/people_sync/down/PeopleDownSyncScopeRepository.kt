@@ -3,7 +3,7 @@ package com.simprints.id.data.db.people_sync.down
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 
-interface DownSyncScopeRepository {
+interface PeopleDownSyncScopeRepository {
 
     fun getDownSyncScope(): PeopleDownSyncScope
 
