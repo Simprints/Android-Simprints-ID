@@ -26,9 +26,11 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnRegistration(registration: Registration,
+                                    sessionId: String,
                                     flowCompletedCheck: Boolean) = Intent().let {
 
         it.putExtra(Constants.SIMPRINTS_REGISTRATION, registration)
+        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
         sendOkResult(it)
     }
@@ -44,8 +46,10 @@ class LibSimprintsActivity : RequestActivity(), LibSimprintsContract.View {
     }
 
     override fun returnVerification(verification: Verification,
+                                    sessionId: String,
                                     flowCompletedCheck: Boolean) = Intent().let {
         it.putExtra(Constants.SIMPRINTS_VERIFICATION, verification)
+        it.putExtra(Constants.SIMPRINTS_SESSION_ID, sessionId)
         it.putExtra(Constants.SIMPRINTS_BIOMETRICS_COMPLETE_CHECK, flowCompletedCheck)
         sendOkResult(it)
     }
