@@ -33,11 +33,14 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
                                        val timeHelper: TimeHelper) : PeopleDownSyncDownloaderTask {
 
     private lateinit var downSyncOperation: PeopleDownSyncOperation
+    private lateinit var downSyncWorkerProgressReporter: WorkerProgressCountReporter
+
     private var count = 0
 
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
                                  downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
         this.downSyncOperation = downSyncOperation
+        this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
 
         var reader: JsonReader? = null
         try {
@@ -47,8 +50,6 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             val flowPeople = createPeopleFlowFromJsonReader(reader)
             flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
                 saveBatchAndUpdateDownSyncStatus(it)
-                count += it.size
-                downSyncWorkerProgressReporter.reportCount(count)
             }
             updateDownSyncInfo(COMPLETE)
         } catch (t: Throwable) {
@@ -84,6 +85,8 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         flow {
             while (reader.hasNext()) {
                 this.emit(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
+                count += 1
+                downSyncWorkerProgressReporter.reportCount(count)
             }
         }
 

@@ -1,8 +1,11 @@
 package com.simprints.id.services.scheduledSync.people.up.workers
 
 import com.google.firebase.FirebaseNetworkException
-import com.simprints.id.data.db.people_sync.up.local.DbUpSyncOperation
-import com.simprints.id.data.db.people_sync.up.local.DbUpSyncOperationKey
+import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperation
+import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult
+import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState
+import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState.*
+import com.simprints.id.data.db.people_sync.up.domain.fromDbToDomain
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -17,6 +20,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.io.IOException
+import java.util.*
 
 // TODO: uncomment userId when multitenancy is properly implemented
 
@@ -39,16 +43,24 @@ class PeopleUpSyncUploaderTask(
     var count = 0
 
     suspend fun execute(workerProgressCountReporter: WorkerProgressCountReporter): Int {
-        checkUserIsSignedIn()
+        try {
+            checkUserIsSignedIn()
 
-        personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
-            .bufferedChunks(batchSize)
-            .collect {
-                upSyncBatch(it)
-                count += it.size
-                workerProgressCountReporter.reportCount(count)
-            }
+            personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
+                .bufferedChunks(batchSize)
+                .collect {
+                    upSyncBatch(it)
+                    count += it.size
+                    workerProgressCountReporter.reportCount(count)
+                }
 
+        } catch (t: Throwable) {
+            t.printStackTrace()
+            updateState(FAILED)
+            throw t
+        }
+
+        updateState(COMPLETE)
         return count
     }
 
@@ -63,7 +75,17 @@ class PeopleUpSyncUploaderTask(
         Timber.d("Uploaded a batch of ${people.size} people")
         markPeopleAsSynced(people)
         Timber.d("Marked a batch of ${people.size} people as synced")
-        updateLastUpSyncTime()
+        updateState(RUNNING)
+    }
+
+    private suspend fun updateState(state: UpSyncState) {
+        updateLastUpSyncTime(PeopleUpSyncOperation(
+            projectId,
+            PeopleUpSyncOperationResult(
+                state,
+                Date().time
+            )
+        ))
     }
 
     private fun uploadPeople(people: List<Person>) {
@@ -91,12 +113,8 @@ class PeopleUpSyncUploaderTask(
         runBlocking { personLocalDataSource.insertOrUpdate(updatedPeople) }
     }
 
-    private suspend fun updateLastUpSyncTime() {
-        upSyncStatusModel.insertOrReplaceUpSyncOperation(
-            DbUpSyncOperation(
-                DbUpSyncOperationKey(projectId),
-                projectId,
-                lastSyncTime = System.currentTimeMillis()))
+    private suspend fun updateLastUpSyncTime(peopleUpSyncOperation: PeopleUpSyncOperation) {
+        upSyncStatusModel.insertOrReplaceUpSyncOperation(peopleUpSyncOperation.fromDbToDomain())
     }
 
 }
