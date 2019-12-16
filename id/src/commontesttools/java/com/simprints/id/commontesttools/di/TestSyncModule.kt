@@ -1,8 +1,8 @@
 package com.simprints.id.commontesttools.di
 
 import android.content.Context
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -25,12 +25,12 @@ class TestSyncModule(private val downSyncScopeRepositoryRule: DependencyRule = D
 
     override fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                                 preferencesManager: PreferencesManager,
-                                                syncStatusDatabase: SyncStatusDatabase): DownSyncScopeRepository =
+                                                syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
         downSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase) }
 
     override fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
                                      personRemoteDataSource: PersonRemoteDataSource,
-                                     downSyncScopeRepository: DownSyncScopeRepository,
+                                     downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                      timeHelper: TimeHelper): DownSyncTask =
         downSyncTaskRule.resolveDependency { super.provideDownSyncTask(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper) }
 

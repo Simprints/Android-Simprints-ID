@@ -1,9 +1,9 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.person.PersonRepository
@@ -40,13 +40,13 @@ open class SyncModule {
     @Singleton
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
-                                            syncStatusDatabase: SyncStatusDatabase): DownSyncScopeRepository =
-        DownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationDao)
+                                            syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
+        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationDao)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
                                  personRemoteDataSource: PersonRemoteDataSource,
-                                 downSyncScopeRepository: DownSyncScopeRepository,
+                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                  timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
         PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
 
@@ -75,20 +75,20 @@ open class SyncModule {
 
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: DownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
         PeopleDownSyncWorkersBuilderImpl(downSyncScopeRepository)
 
 
     @Provides
-    open fun providePeopleUpSyncWorkerBuilder(downSyncScopeRepository: DownSyncScopeRepository): PeopleUpSyncWorkersBuilder =
+    open fun providePeopleUpSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleUpSyncWorkersBuilder =
         PeopleUpSyncWorkersBuilderImpl()
 
     @Provides
-    open fun providePeopleUpSyncDao(database: SyncStatusDatabase): PeopleUpSyncDao =
+    open fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncDao =
         database.upSyncDao
 
     @Provides
-    open fun providePeopleDownSyncDao(database: SyncStatusDatabase): PeopleDownSyncDao =
+    open fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncDao =
         database.downSyncOperationDao
 
     @Provides

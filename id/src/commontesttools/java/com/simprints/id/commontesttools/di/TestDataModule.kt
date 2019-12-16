@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -37,7 +37,7 @@ class TestDataModule(private val projectLocalDataSourceRule: DependencyRule = De
     override fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                          personRemoteDataSource: PersonRemoteDataSource,
                                          peopleUpSyncMaster: PeopleUpSyncMaster,
-                                         downSyncScopeRepository: DownSyncScopeRepository): PersonRepository =
+                                         downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
         personRepositoryRule.resolveDependency {
             super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncMaster, downSyncScopeRepository)
         }

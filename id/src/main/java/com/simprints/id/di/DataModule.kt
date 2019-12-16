@@ -2,7 +2,7 @@ package com.simprints.id.di
 
 import android.content.Context
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
@@ -49,7 +49,7 @@ open class DataModule {
     open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                      personRemoteDataSource: PersonRemoteDataSource,
                                      peopleUpSyncManager: PeopleUpSyncManager,
-                                     downSyncScopeRepository: DownSyncScopeRepository): PersonRepository =
+                                     downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
         PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, downSyncScopeRepository, peopleUpSyncManager)
 
 

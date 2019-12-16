@@ -7,7 +7,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.down_sync_info.domain.*
 import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -40,7 +40,7 @@ class PersonRepositoryTest {
     @Mock lateinit var remoteDataSource: PersonRemoteDataSource
     @Mock lateinit var localDataSource: PersonLocalDataSource
     @Mock lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
-    @Mock lateinit var downSyncScopeRepository: DownSyncScopeRepository
+    @Mock lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
     private lateinit var personRepository: PersonRepository
 

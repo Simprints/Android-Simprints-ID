@@ -7,7 +7,7 @@ import androidx.work.workDataOf
 import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
@@ -23,7 +23,7 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var personRepository: PersonRepository
-    @Inject lateinit var downSyncScopeRepository: DownSyncScopeRepository
+    @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
     override suspend fun doWork(): Result {
         return try {

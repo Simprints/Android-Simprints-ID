@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.tools.TimeHelper
@@ -14,7 +14,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
     private val personLocalDataSource: PersonLocalDataSource = mockk()
     private val personRemoteDataSource: PersonRemoteDataSource = mockk()
-    private val downSyncScopeRepository: DownSyncScopeRepository = mockk()
+    private val downSyncScopeRepository: PeopleDownSyncScopeRepository = mockk()
     private val timeHelper: TimeHelper = mockk()
 
     lateinit var downSyncTask: DownSyncTaskImpl

@@ -29,8 +29,8 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -86,8 +86,8 @@ open class AppModule {
                               loginInfoManager: LoginInfoManager,
                               preferencesManager: PreferencesManager,
                               syncManager: SyncManager,
-                              downSyncScopeRepository: DownSyncScopeRepository,
-                              database: SyncStatusDatabase): SignerManager =
+                              downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                              database: PeopleSyncStatusDatabase): SignerManager =
         SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, syncManager)
 
     @Provides
@@ -168,8 +168,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
-        SyncStatusDatabase.getDatabase(ctx)
+    open fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
+        PeopleSyncStatusDatabase.getDatabase(ctx)
 
 
     @Provides

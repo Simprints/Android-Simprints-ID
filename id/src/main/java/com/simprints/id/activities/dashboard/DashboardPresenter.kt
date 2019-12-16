@@ -3,7 +3,7 @@ package com.simprints.id.activities.dashboard
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
@@ -26,7 +26,7 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncStatusDatabase: PeopleSyncStatusDatabase
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val cardsFactory = DashboardCardsFactory(component)

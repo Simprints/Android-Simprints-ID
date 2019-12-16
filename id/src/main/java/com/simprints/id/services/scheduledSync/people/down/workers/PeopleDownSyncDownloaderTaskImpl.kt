@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 import com.google.gson.stream.JsonReader
 import com.simprints.core.tools.coroutines.retryIO
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
@@ -29,7 +29,7 @@ import java.util.*
 
 class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                                        val personRemoteDataSource: PersonRemoteDataSource,
-                                       private val downSyncScopeRepository: DownSyncScopeRepository,
+                                       private val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                        val timeHelper: TimeHelper) : PeopleDownSyncDownloaderTask {
 
     private lateinit var downSyncOperation: PeopleDownSyncOperation
