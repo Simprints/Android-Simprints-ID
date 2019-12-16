@@ -87,7 +87,7 @@ class OdkPresenterTest {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
-        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         OdkPresenter(view, ACTION_REGISTER, sessionEventsManagerMock, mock()).apply {
             handleEnrollResponse(EnrollResponse(registerId))
         }
@@ -121,7 +121,7 @@ class OdkPresenterTest {
         val sessionId = UUID.randomUUID().toString()
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
-        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSession() } thenOnBlockingReturn sessionId
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
         OdkPresenter(view, ACTION_IDENTIFY, sessionEventsManagerMock, mock()).apply {
             handleVerifyResponse(verification)

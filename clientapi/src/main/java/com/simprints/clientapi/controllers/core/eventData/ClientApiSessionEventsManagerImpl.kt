@@ -60,7 +60,7 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     private fun addEvent(event: Event): Completable =
         coreSessionEventsManager.addEvent(event)
 
-    override suspend fun getCurrentSession(): String =
+    override suspend fun getCurrentSessionId(): String =
         suspendCancellableCoroutine { cont ->
             CoroutineScope(Dispatchers.IO).launch {
                 coreSessionEventsManager.getCurrentSession().subscribeBy(

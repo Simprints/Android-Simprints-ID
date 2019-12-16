@@ -53,7 +53,7 @@ class OdkPresenter(private val view: OdkContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, sessionEventsManager.getCurrentSession(), flowCompletedCheck)
+            view.returnRegistration(enroll.guid, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -79,7 +79,7 @@ class OdkPresenter(private val view: OdkContract.View,
                 verify.matchResult.guidFound,
                 verify.matchResult.confidence.toString(),
                 verify.matchResult.tier.toString(),
-                sessionEventsManager.getCurrentSession(),
+                sessionEventsManager.getCurrentSessionId(),
                 flowCompletedCheck
             )
         }
