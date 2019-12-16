@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
@@ -28,7 +28,7 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
-    @MockK lateinit var downSyncScopeRepository: DownSyncScopeRepository
+    @MockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @MockK lateinit var upSyncDao: PeopleUpSyncDao
     private lateinit var signerManager: SignerManagerImpl
 

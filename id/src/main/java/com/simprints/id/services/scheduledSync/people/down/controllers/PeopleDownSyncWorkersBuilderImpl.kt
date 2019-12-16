@@ -2,7 +2,7 @@ package com.simprints.id.services.scheduledSync.people.down.controllers
 
 import androidx.work.*
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
@@ -20,7 +20,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerTyp
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: DownSyncScopeRepository) : PeopleDownSyncWorkersBuilder {
+class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSyncScopeRepository) : PeopleDownSyncWorkersBuilder {
 
     private val downSyncScope: PeopleDownSyncScope
         get() = downSyncScopeRepository.getDownSyncScope()

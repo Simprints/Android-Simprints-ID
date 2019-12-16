@@ -9,8 +9,8 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessio
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.people_sync.down.DownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -60,8 +60,8 @@ class TestAppModule(app: Application,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
                                   peopleUpSyncMaster: PeopleUpSyncMaster,
-                                  downSyncScopeRepository: DownSyncScopeRepository,
-                                  database: SyncStatusDatabase): SignerManager =
+                                  downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                  database: PeopleSyncStatusDatabase): SignerManager =
         dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncScopeRepository, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
@@ -97,7 +97,7 @@ class TestAppModule(app: Application,
     override fun provideRemoteSessionsManager(remoteDbManager: RemoteDbManager): RemoteSessionsManager =
         remoteSessionsManagerRule.resolveDependency { super.provideRemoteSessionsManager(remoteDbManager) }
 
-    override fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
+    override fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
         syncStatusDatabaseRule.resolveDependency { super.provideSyncStatusDatabase(ctx) }
 
 }

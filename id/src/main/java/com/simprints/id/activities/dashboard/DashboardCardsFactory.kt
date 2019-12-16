@@ -5,7 +5,7 @@ import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -26,7 +26,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
     @Inject lateinit var projectRepository: ProjectRepository
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
+    @Inject lateinit var syncStatusDatabase: PeopleSyncStatusDatabase
 
     init {
         component.inject(this)

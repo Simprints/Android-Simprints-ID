@@ -13,8 +13,7 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.fromDomainToDb
 import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
 import com.simprints.id.data.db.down_sync_info.local.DownSyncOperationDao
-import com.simprints.id.data.db.people_sync.SyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.domain.modality.Modes
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -27,7 +26,7 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class SyncStatusDatabaseTest {
     private lateinit var downSyncOperationDao: DownSyncOperationDao
-    private lateinit var db: SyncStatusDatabase
+    private lateinit var db: PeopleSyncStatusDatabase
 
     private val projectSyncOp = PeopleDownSyncOperation(
         DEFAULT_PROJECT_ID,
@@ -84,7 +83,7 @@ class SyncStatusDatabaseTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
-            context, SyncStatusDatabase::class.java).build()
+            context, PeopleSyncStatusDatabase::class.java).build()
         downSyncOperationDao = db.downSyncOperationDao
     }
 

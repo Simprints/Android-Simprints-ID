@@ -14,7 +14,7 @@ import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 @Database(entities = [DbDownSyncOperation::class, DbUpSyncOperation::class], version = 1, exportSchema = false)
 @TypeConverters(DbDownSyncOperation.Converters::class, DbUpSyncOperation.Converters::class)
 @Keep
-abstract class SyncStatusDatabase : RoomDatabase() {
+abstract class PeopleSyncStatusDatabase : RoomDatabase() {
 
     abstract val downSyncOperationDao: PeopleDownSyncDao
 
@@ -23,8 +23,8 @@ abstract class SyncStatusDatabase : RoomDatabase() {
     companion object {
         private const val SYNC_STATUS_DB_NAME = "people_sync_db"
 
-        fun getDatabase(context: Context): SyncStatusDatabase = Room
-            .databaseBuilder(context.applicationContext, SyncStatusDatabase::class.java, SYNC_STATUS_DB_NAME)
+        fun getDatabase(context: Context): PeopleSyncStatusDatabase = Room
+            .databaseBuilder(context.applicationContext, PeopleSyncStatusDatabase::class.java, SYNC_STATUS_DB_NAME)
             .fallbackToDestructiveMigration()
             .allowMainThreadQueries()
             .build()
