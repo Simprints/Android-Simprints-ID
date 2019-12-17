@@ -7,8 +7,8 @@ import androidx.work.workDataOf
 import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
@@ -51,6 +51,7 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
                 OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(downCount))
             )
         } catch (t: Throwable) {
+            t. printStackTrace()
             logFailure<PeopleDownSyncCountWorker>("Sync - Failed on executing task for  $downSyncScope ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}", t)
 
             resultSetter.retry()

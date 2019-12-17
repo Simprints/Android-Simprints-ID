@@ -6,18 +6,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.simprints.core.tools.json.JsonHelper
+import com.simprints.id.data.db.common.models.fromDownSync
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
-import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress
 import com.simprints.id.services.scheduledSync.people.down.workers.getDownCountsFromOutput
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULERS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.OUTPUT_LAST_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState.WorkerState
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.*
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
+import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFromOutput
 import timber.log.Timber
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
@@ -26,23 +29,22 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private val wm: WorkManager
         get() = WorkManager.getInstance(ctx)
 
-    //STopShip: the total number of patients to Upload can change while the Uploader progress
-    private val totalToUpload = personRepository.count(PersonLocalDataSource.Query(toSync = true))
-
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
         observerForLastDowSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
                 Timber.d("Sync - Received info for $lastSyncId: ${syncWorkers?.map { it.tags }}}")
 
                 MutableLiveData<PeopleSyncState>().apply {
-                    val progress = syncWorkers.calculateProgressForDownSync() + syncWorkers.calculateProgressForUpSync()
-                    val total = syncWorkers.calculateTotal()
-                    val upSyncStates = syncWorkers.upSyncStates()
-                    val downSyncStates = syncWorkers.downSyncStates() + syncWorkers.downCountSyncStates()
+                    with(syncWorkers) {
+                        val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
+                        val total = calculateTotalForDownSync() + calculateTotalForUpSync()
+                        val upSyncStates = uploadersStates() + upSyncCountersStates()
+                        val downSyncStates = downloadersStates() + downSyncCountersStates()
 
-                    val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
-                    this.postValue(syncState)
-                    Timber.d("Sync - Emitting $syncState")
+                        val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
+                        this@apply.postValue(syncState)
+                        Timber.d("Sync - Emitting ${JsonHelper.toJson(syncState)}")
+                    }
                 }
             }
         }
@@ -70,30 +72,36 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.completedWorkers() =
         this.filter { it.state == WorkInfo.State.SUCCEEDED }
 
-    private fun List<WorkInfo>.calculateTotal(): Int? {
-        val countersCompleted = this.filterByTags(tagForType(COUNTER)).completedWorkers()
+    private fun List<WorkInfo>.calculateTotalForDownSync(): Int {
+        val countersCompleted = this.filterByTags(tagForType(DOWN_COUNTER)).completedWorkers()
         val counter = countersCompleted.firstOrNull()
-        val totalToDownload = counter?.getDownCountsFromOutput()?.sumBy { it.totalCount() }
-        return totalToDownload?.let {
-            it + totalToUpload
-        }
+        return counter?.getDownCountsFromOutput()?.sumBy { it.fromDownSync() } ?: -1
     }
 
-    private fun List<WorkInfo>.upSyncStates(): List<PeopleSyncState.WorkerState> =
-        this.filterByTags(tagForType(UPLOADER)).groupBy { it }.values.flatten().map { PeopleSyncState.WorkerState(UPLOADER, it.state) }
+    private fun List<WorkInfo>.calculateTotalForUpSync(): Int {
+        val countersCompleted = this.filterByTags(tagForType(UP_COUNTER)).completedWorkers()
+        val counter = countersCompleted.firstOrNull()
+        return counter?.getUpCountsFromOutput()?.totalCount() ?: -1
+    }
 
-    private fun List<WorkInfo>.downSyncStates(): List<PeopleSyncState.WorkerState> =
-        this.filterByTags(tagForType(DOWNLOADER)).groupBy { it }.values.flatten().map { PeopleSyncState.WorkerState(DOWNLOADER, it.state) }
+    private fun List<WorkInfo>.uploadersStates(): List<WorkerState> =
+        this.filterByTags(tagForType(UPLOADER)).groupBy { it }.values.flatten().map { WorkerState(UPLOADER, it.state) }
 
-    private fun List<WorkInfo>.downCountSyncStates(): List<PeopleSyncState.WorkerState> =
-        this.filterByTags(tagForType(COUNTER)).groupBy { it }.values.flatten().map { PeopleSyncState.WorkerState(COUNTER, it.state) }
+    private fun List<WorkInfo>.downloadersStates(): List<WorkerState> =
+        this.filterByTags(tagForType(DOWNLOADER)).groupBy { it }.values.flatten().map { WorkerState(DOWNLOADER, it.state) }
+
+    private fun List<WorkInfo>.downSyncCountersStates(): List<WorkerState> =
+        this.filterByTags(tagForType(DOWN_COUNTER)).groupBy { it }.values.flatten().map { WorkerState(DOWN_COUNTER, it.state) }
+
+    private fun List<WorkInfo>.upSyncCountersStates(): List<WorkerState> =
+        this.filterByTags(tagForType(UP_COUNTER)).groupBy { it }.values.flatten().map { WorkerState(UP_COUNTER, it.state) }
 
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER)).groupBy { it.id }
-        val progresses = downWorkers.map {
+        val progresses = downWorkers.mapNotNull {
             val infos = it.value
-            val maxWorker = infos.maxBy { it.extractDownSyncProgress() }
-            maxWorker?.extractDownSyncProgress() ?: 0
+            val maxWorker = infos.maxBy { it.extractDownSyncProgress() ?: 0 }
+            maxWorker?.extractDownSyncProgress()
         }
         return progresses.sum()
     }
@@ -102,7 +110,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         val upWorkers = this.filterByTags(tagForType(UPLOADER)).groupBy { it.id }
         val progresses = upWorkers.map {
             val infos = it.value
-            val maxWorker = infos.maxBy { it.extractUpSyncProgress() }
+            val maxWorker = infos.maxBy { it.extractUpSyncProgress() ?: 0 }
             maxWorker?.extractUpSyncProgress() ?: 0
         }
         return progresses.sum()

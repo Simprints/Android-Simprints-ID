@@ -5,9 +5,9 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWor
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.COUNTER
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.UPLOADER
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.UP_COUNTER
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_COUNTERS
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_UPLOADERS
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder.Companion.TAG_PEOPLE_UP_SYNC_ALL_WORKERS
@@ -38,7 +38,7 @@ class PeopleUpSyncWorkersBuilderImpl : PeopleUpSyncWorkersBuilder {
                                  uniqueUpSyncID: String): WorkRequest =
         OneTimeWorkRequest.Builder(PeopleUpSyncCountWorker::class.java)
             .upSyncWorker(uniqueSyncID, uniqueUpSyncID)
-            .addTag(tagForType(COUNTER))
+            .addTag(tagForType(UP_COUNTER))
             .addTag(TAG_PEOPLE_UP_SYNC_ALL_COUNTERS)
             .build()
 

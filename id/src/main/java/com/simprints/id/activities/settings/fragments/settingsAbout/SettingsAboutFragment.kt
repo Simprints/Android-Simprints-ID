@@ -16,9 +16,8 @@ import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 
 class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
@@ -109,7 +108,7 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
             .setPositiveButton(
                 androidResourcesHelper.getString(R.string.logout)
             ) { _, _ ->
-                lifecycleScope.launch {
+                CoroutineScope(Dispatchers.Main).launch {
                      viewPresenter.logout()
                 }
             }
