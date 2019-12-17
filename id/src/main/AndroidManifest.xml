@@ -29,9 +29,7 @@
         <activity android:name=".activities.fetchguid.FetchGuidActivity" />
         <activity
             android:name=".activities.coreexitform.CoreExitFormActivity"
-            android:label="@string/title_activity_exit_form"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.consent.ConsentActivity"
