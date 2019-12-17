@@ -7,7 +7,7 @@ import androidx.work.workDataOf
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -28,7 +28,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @Inject lateinit var personLocalDataSource: PersonLocalDataSource
     @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var syncStatusDatabase: PeopleSyncStatusDatabase
+    @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
 
     override suspend fun doWork(): Result {
         getComponent<PeopleUpSyncUploaderWorker> { it.inject(this) }
@@ -37,7 +37,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
         val task = PeopleUpSyncUploaderTask(
             loginInfoManager, personLocalDataSource, personRemoteDataSource,
             loginInfoManager.getSignedInProjectIdOrEmpty(), /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
-            syncStatusDatabase.upSyncDao
+            peopleUpSyncScopeRepository
         )
 
         return try {

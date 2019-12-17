@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.people_sync.down.domain
+package com.simprints.id.data.db.common.models
 
 import androidx.annotation.Keep
 

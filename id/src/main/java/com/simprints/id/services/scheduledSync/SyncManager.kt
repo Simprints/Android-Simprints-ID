@@ -4,5 +4,5 @@ interface SyncManager {
 
     fun scheduleBackgroundSyncs()
     fun cancelBackgroundSyncs()
-    fun deleteSyncHistory()
+    suspend fun deleteSyncHistory()
 }

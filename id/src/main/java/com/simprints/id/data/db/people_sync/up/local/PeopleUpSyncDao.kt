@@ -15,5 +15,5 @@ interface PeopleUpSyncDao {
     suspend fun insertOrReplaceUpSyncOperation(upSyncStatus: DbUpSyncOperation)
 
     @Query("delete from UpSyncStatus")
-    fun deleteAll()
+    suspend fun deleteAll()
 }

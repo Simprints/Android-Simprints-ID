@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.simprints.id.data.db.people_sync.down.domain.totalCount
+import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.services.scheduledSync.people.down.workers.extractDownSyncProgress

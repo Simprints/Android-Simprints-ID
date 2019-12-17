@@ -14,7 +14,11 @@ import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
 import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import javax.inject.Inject
+import kotlin.coroutines.suspendCoroutine
 
 
 class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
@@ -104,7 +108,11 @@ class SettingsAboutFragment : PreferenceFragment(), SettingsAboutContract.View {
             .setMessage(androidResourcesHelper.getString(R.string.confirmation_logout_message))
             .setPositiveButton(
                 androidResourcesHelper.getString(R.string.logout)
-            ) { _, _ -> viewPresenter.logout() }
+            ) { _, _ ->
+                lifecycleScope.launch {
+                     viewPresenter.logout()
+                }
+            }
             .setNegativeButton(
                 androidResourcesHelper.getString(R.string.confirmation_logout_cancel), null
             ).create()

@@ -8,7 +8,7 @@
 //import com.simprints.id.commontesttools.di.TestDataModule
 //import com.simprints.id.data.db.common.RemoteDbManager
 //import com.simprints.id.data.db.person.PersonRepository
-//import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+//import com.simprints.id.data.db.common.models.PeopleCount
 //import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 //import com.simprints.id.data.db.project.ProjectRepository
 //import com.simprints.id.data.db.project.domain.Project

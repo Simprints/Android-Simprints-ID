@@ -85,7 +85,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
         view.showConfirmationDialogForLogout()
     }
 
-    override fun logout() {
+    override suspend fun logout() {
         signerManager.signOut()
         syncSchedulerHelper.cancelBackgroundSyncs()
         longConsentManager.deleteLongConsents()

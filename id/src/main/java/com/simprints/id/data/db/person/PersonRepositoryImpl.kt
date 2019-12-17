@@ -6,7 +6,7 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource

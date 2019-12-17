@@ -14,7 +14,7 @@ def dagger = [
     javax   : "javax.inject:javax.inject:1@jar"
 ]
 
-def androidx_lifecycle_version = "2.2.0-rc02"
+def androidx_lifecycle_version = "2.2.0-rc03"
 def androidx_room_version = "2.1.0-alpha04"
 def androidx = [
     core     : "androidx.core:core-ktx:1.0.2",
@@ -22,8 +22,8 @@ def androidx = [
     appcompat: "androidx.appcompat:appcompat:1.0.2",
     legacy   : "androidx.legacy:legacy-support-v4: 1.0.0",
     room     : [
-        core    : "androidx.room:room-runtime:$androidx_room_version",
-        compiler: "androidx.room:room-compiler:$androidx_room_version",
+        core      : "androidx.room:room-runtime:$androidx_room_version",
+        compiler  : "androidx.room:room-compiler:$androidx_room_version",
         coroutines: "androidx.room:room-coroutines:$androidx_room_version"
 
     ],
@@ -31,6 +31,7 @@ def androidx = [
         livedata : "androidx.lifecycle:lifecycle-livedata:$androidx_lifecycle_version",
         compiler : "androidx.lifecycle:lifecycle-compiler:$androidx_lifecycle_version",
         viewmodel: "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_lifecycle_version",
+        scope    : "androidx.lifecycle:lifecycle-runtime-ktx:$androidx_lifecycle_version",
         ktx      : "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_lifecycle_version",
         ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
     ],
@@ -40,7 +41,7 @@ def androidx = [
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
     ],
-    security: ['androidx.security:security-crypto:1.0.0-alpha02']
+    security : ['androidx.security:security-crypto:1.0.0-alpha02']
 ]
 
 def support = [

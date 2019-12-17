@@ -39,7 +39,7 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
             syncManager.scheduleBackgroundSyncs()
         }
 
-    override fun signOut() {
+    override suspend fun signOut() {
         //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
         loginInfoManager.cleanCredentials()

@@ -16,7 +16,7 @@
 //import com.simprints.id.commontesttools.di.TestPreferencesModule
 //import com.simprints.id.data.db.common.RemoteDbManager
 //import com.simprints.id.data.db.person.PersonRepository
-//import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+//import com.simprints.id.data.db.common.models.PeopleCount
 //import com.simprints.id.data.db.project.ProjectRepository
 //import com.simprints.id.data.db.people_sync.SyncStatusDatabase
 //import com.simprints.id.data.db.syncscope.local.DownSyncStatus
