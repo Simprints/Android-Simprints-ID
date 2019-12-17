@@ -60,6 +60,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         }
 
         finishDownload(reader)
+        downSyncWorkerProgressReporter.reportCount(count)
         return count
     }
 

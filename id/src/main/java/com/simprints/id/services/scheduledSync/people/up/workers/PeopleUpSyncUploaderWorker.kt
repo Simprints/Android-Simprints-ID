@@ -78,10 +78,15 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 }
 
-fun WorkInfo.extractUpSyncProgress(): Int {
+fun WorkInfo.extractUpSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     return if (progress < 0) {
-        this.outputData.getInt(OUTPUT_UP_SYNC, -1)
+        val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
+        if(output < 0) {
+            null
+        } else {
+            output
+        }
     } else {
         progress
     }

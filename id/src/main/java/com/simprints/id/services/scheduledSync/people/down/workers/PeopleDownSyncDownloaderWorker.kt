@@ -71,10 +71,15 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     }
 }
 
-fun WorkInfo.extractDownSyncProgress(): Int {
+fun WorkInfo.extractDownSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     return if (progress < 0) {
-        this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
+        val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
+        if(output < 0) {
+            null
+        } else {
+            output
+        }
     } else {
         progress
     }

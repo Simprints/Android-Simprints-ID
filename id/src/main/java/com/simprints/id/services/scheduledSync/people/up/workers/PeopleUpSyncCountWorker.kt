@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.models.PeopleCount
@@ -56,8 +55,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         PeopleCount(created = personRepository.count(PersonLocalDataSource.Query(toSync = true)))
 }
 
-fun WorkInfo.getUpCountsFromOutput(): List<PeopleCount>? {
+fun WorkInfo.getUpCountsFromOutput(): PeopleCount? {
     val outputJson = this.outputData.getString(PeopleUpSyncCountWorker.OUTPUT_COUNT_WORKER_UP)
-    val listType = object : TypeToken<ArrayList<PeopleCount?>?>() {}.type
-    return JsonHelper.gson.fromJson<List<PeopleCount>>(outputJson, listType)
+    return JsonHelper.gson.fromJson<PeopleCount>(outputJson, PeopleCount::class.java)
 }

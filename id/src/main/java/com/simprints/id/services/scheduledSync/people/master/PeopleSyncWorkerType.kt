@@ -5,7 +5,8 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerTyp
 
 
 enum class PeopleSyncWorkerType {
-    COUNTER,
+    DOWN_COUNTER,
+    UP_COUNTER,
     UPLOADER,
     DOWNLOADER;
 

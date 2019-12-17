@@ -16,9 +16,9 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWor
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.COUNTER
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWNLOADER
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWN_COUNTER
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +47,7 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
                                  uniqueDownSyncID: String): WorkRequest =
         OneTimeWorkRequest.Builder(PeopleDownSyncCountWorker::class.java)
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addTag(tagForType(COUNTER))
+            .addTag(tagForType(DOWN_COUNTER))
             .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS)
             .build()
 
