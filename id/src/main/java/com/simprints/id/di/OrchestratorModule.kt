@@ -61,16 +61,18 @@ class OrchestratorModule {
     fun provideModalityFlow(fingerprintStepProcessor: FingerprintStepProcessor,
                             faceStepProcessor: FaceStepProcessor,
                             coreStepProcessor: CoreStepProcessor,
-                            sessionEventsManager: SessionEventsManager): ModalityFlow =
-        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager)
+                            sessionEventsManager: SessionEventsManager,
+                            preferenceManager: PreferencesManager): ModalityFlow =
+        ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager, preferenceManager.consentRequired)
 
     @Provides
     @Named("ModalityFlowVerify")
     fun provideModalityFlowVerify(fingerprintStepProcessor: FingerprintStepProcessor,
                                   faceStepProcessor: FaceStepProcessor,
                                   coreStepProcessor: CoreStepProcessor,
-                                  sessionEventsManager: SessionEventsManager): ModalityFlow =
-        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager)
+                                  sessionEventsManager: SessionEventsManager,
+                                  preferenceManager: PreferencesManager): ModalityFlow =
+        ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor, sessionEventsManager, preferenceManager.consentRequired)
 
     @Provides
     @Named("ModalityFlowIdentify")
@@ -80,7 +82,7 @@ class OrchestratorModule {
                                     prefs: PreferencesManager,
                                     sessionEventsManager: SessionEventsManager): ModalityFlow =
         ModalityFlowIdentifyImpl(fingerprintStepProcessor, faceStepProcessor,
-            coreStepProcessor, prefs, sessionEventsManager)
+            coreStepProcessor, prefs.matchGroup, sessionEventsManager, prefs.consentRequired)
 
     // Orchestration
     @Provides
