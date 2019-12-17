@@ -14,7 +14,7 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.request.Ap
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
 import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException

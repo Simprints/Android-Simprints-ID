@@ -2,7 +2,7 @@ package com.simprints.id.data.db.person.remote
 
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import io.reactivex.Completable
 import io.reactivex.Single
 

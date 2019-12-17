@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
@@ -61,6 +61,7 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
         personRepository.countToDownSync(syncScope)
 
 }
+
 fun WorkInfo.getDownCountsFromOutput(): List<PeopleCount>? {
     val outputJson = this.outputData.getString(PeopleDownSyncCountWorker.OUTPUT_COUNT_WORKER_DOWN)
     val listType = object : TypeToken<ArrayList<PeopleCount?>?>() {}.type

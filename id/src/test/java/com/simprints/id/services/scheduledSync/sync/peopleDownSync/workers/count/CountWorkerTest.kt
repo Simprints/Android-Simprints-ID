@@ -7,7 +7,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.data.db.people_sync.down.domain.PeopleCount
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.count.CountWorker

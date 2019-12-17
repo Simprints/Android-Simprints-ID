@@ -27,7 +27,7 @@ class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
         peopleSyncManager.cancelScheduledSync()
     }
 
-    override fun deleteSyncHistory() {
+    override suspend fun deleteSyncHistory() {
         peopleUpSyncDao.deleteAll()
         peopleDownSyncDao.deleteAll()
     }

@@ -1,10 +1,12 @@
 package com.simprints.id.di
 
 import android.content.Context
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -95,4 +97,13 @@ open class SyncModule {
     open fun providePeopleUpSyncManager(ctx: Context,
                                         peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncManager =
         PeopleUpSyncManagerImpl(ctx, peopleUpSyncWorkersBuilder)
+
+
+    @Provides
+    @Singleton
+    open fun provideUpSyncScopeRepository(loginInfoManager: LoginInfoManager,
+                                          dao: PeopleUpSyncDao): PeopleUpSyncScopeRepository =
+        PeopleUpSyncScopeRepositoryImpl(loginInfoManager, dao)
+
+
 }

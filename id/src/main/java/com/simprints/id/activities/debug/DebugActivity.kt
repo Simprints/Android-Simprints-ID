@@ -1,5 +1,6 @@
 package com.simprints.id.activities.debug
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -12,6 +13,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import kotlinx.android.synthetic.main.activity_debug.*
 import java.util.*
 import javax.inject.Inject
+
 
 class DebugActivity : AppCompatActivity() {
 
@@ -31,10 +33,10 @@ class DebugActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_debug)
 
-
         peopleSyncManager.getLastSyncState().observe(this, Observer {
             val states = (it.downSyncStates.map { it.state } + it.upSyncStates.map { it.state })
 
+            logs.setTextColor(getRandomColor(it.syncId))
             logs.text =
                 "${logs.text}\n" +
                     "${it.syncId?.takeLast(3)} - " +
@@ -63,6 +65,11 @@ class DebugActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun getRandomColor(seed: String): Int {
+        val rnd = Random(seed.toCharArray().sumBy { it.toInt() }.toLong())
+        return Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+    }
 
     private fun List<WorkInfo.State>.toDebugActivitySyncState(): DebugActivitySyncState =
         when {

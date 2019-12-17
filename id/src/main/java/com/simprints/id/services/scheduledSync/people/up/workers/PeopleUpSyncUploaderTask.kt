@@ -1,12 +1,11 @@
 package com.simprints.id.services.scheduledSync.people.up.workers
 
 import com.google.firebase.FirebaseNetworkException
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperation
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState
 import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncOperationResult.UpSyncState.*
-import com.simprints.id.data.db.people_sync.up.domain.fromDbToDomain
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -32,7 +31,7 @@ class PeopleUpSyncUploaderTask(
     private val projectId: String,
     /*private val userId: String,*/
     private val batchSize: Int,
-    private val upSyncStatusModel: PeopleUpSyncDao
+    private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
 ) {
 
     /**
@@ -114,7 +113,7 @@ class PeopleUpSyncUploaderTask(
     }
 
     private suspend fun updateLastUpSyncTime(peopleUpSyncOperation: PeopleUpSyncOperation) {
-        upSyncStatusModel.insertOrReplaceUpSyncOperation(peopleUpSyncOperation.fromDbToDomain())
+        peopleUpSyncScopeRepository.insertOrUpdate(peopleUpSyncOperation)
     }
 
 }

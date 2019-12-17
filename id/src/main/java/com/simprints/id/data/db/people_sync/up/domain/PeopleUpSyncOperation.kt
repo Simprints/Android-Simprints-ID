@@ -11,5 +11,6 @@ fun PeopleUpSyncOperation.fromDbToDomain() =
     DbUpSyncOperation(
         DbUpSyncOperationKey(projectId),
         projectId,
+        lastResult?.lastState,
         lastResult?.lastSyncTime)
 

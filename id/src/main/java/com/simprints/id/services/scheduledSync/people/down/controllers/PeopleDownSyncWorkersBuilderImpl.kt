@@ -16,7 +16,9 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWor
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.COUNTER
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.Companion.tagForType
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerType.DOWNLOADER
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -28,7 +30,7 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
     override suspend fun buildDownSyncWorkerChain(uniqueSyncId: String?): List<WorkRequest> {
         val downSyncOps = downSyncScopeRepository.getDownSyncOperations(downSyncScope)
         val uniqueDownSyncId = UUID.randomUUID().toString()
-        return downSyncOps.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) } + listOf(buildCountWorker(uniqueSyncId, uniqueDownSyncId))
+        return downSyncOps.map { buildDownSyncWorkers(uniqueSyncId, uniqueDownSyncId, it) } + buildCountWorker(uniqueSyncId, uniqueDownSyncId)
     }
 
     private fun buildDownSyncWorkers(uniqueSyncID: String?,
@@ -37,7 +39,7 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
         OneTimeWorkRequest.Builder(PeopleDownSyncDownloaderWorker::class.java)
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to JsonHelper.gson.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addTag(PeopleSyncWorkerType.tagForType(PeopleSyncWorkerType.DOWNLOADER))
+            .addTag(tagForType(DOWNLOADER))
             .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_DOWNLOADERS)
             .build()
 
@@ -45,7 +47,7 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
                                  uniqueDownSyncID: String): WorkRequest =
         OneTimeWorkRequest.Builder(PeopleDownSyncCountWorker::class.java)
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
-            .addTag(PeopleSyncWorkerType.tagForType(PeopleSyncWorkerType.COUNTER))
+            .addTag(tagForType(COUNTER))
             .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS)
             .build()
 
@@ -54,17 +56,17 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-    private fun WorkRequest.Builder<*, *>.setDownSyncWorker(uniqueMasterSyncID: String?,
-                                                            uniqueDownMasterSyncID: String,
+    private fun WorkRequest.Builder<*, *>.setDownSyncWorker(uniqueMasterSyncId: String?,
+                                                            uniqueDownMasterSyncId: String,
                                                             constraints: Constraints) =
         this.setConstraints(constraints)
-            .addTag("${TAG_DOWN_MASTER_SYNC_ID}${uniqueDownMasterSyncID}")
+            .addTag("${TAG_DOWN_MASTER_SYNC_ID}${uniqueDownMasterSyncId}")
             .addTag("${TAG_SCHEDULED_AT}${Date().time}")
             .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
             .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.SECONDS).also { builder ->
-                uniqueMasterSyncID?.let {
-                    builder.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncID}")
+                uniqueMasterSyncId?.let {
+                    builder.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}")
                 }
             }
 
