@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
-import com.simprints.id.services.scheduledSync.sync.peopleDownSync.worker.CountWorkerTest
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorkerTest
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -41,10 +41,9 @@ interface AppComponentForTests : AppComponent {
     fun inject(projectAuthenticatorTest: ProjectAuthenticatorTest)
     fun inject(alertActivityTest: AlertActivityTest)
     fun inject(settingsPreferencesManagerTest: SettingsPreferencesManagerTest)
-    fun inject(subCountWorkerTest: CountWorkerTest)
     fun inject(settingsAboutFragmentTest: SettingsAboutFragmentTest)
     fun inject(longConsentManagerImplTest: LongConsentManagerImplTest)
     fun inject(moduleViewModelTest: ModuleViewModelTest)
     fun inject(consentActivityTest: ConsentActivityTest)
-
+    fun inject(peopleDownSyncCountWorkerTest: PeopleDownSyncCountWorkerTest)
 }

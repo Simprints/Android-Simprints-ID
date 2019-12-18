@@ -6,8 +6,6 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_DOWNLOADERS
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
@@ -40,7 +38,6 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
             .setInputData(workDataOf(INPUT_DOWN_SYNC_OPS to JsonHelper.gson.toJson(downSyncOperation)))
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
             .addTag(tagForType(DOWNLOADER))
-            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_DOWNLOADERS)
             .build()
 
     private fun buildCountWorker(uniqueSyncID: String?,
@@ -48,7 +45,6 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
         OneTimeWorkRequest.Builder(PeopleDownSyncCountWorker::class.java)
             .setDownSyncWorker(uniqueSyncID, uniqueDownSyncID, getDownSyncWorkerConstraints())
             .addTag(tagForType(DOWN_COUNTER))
-            .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_COUNTERS)
             .build()
 
     private fun getDownSyncWorkerConstraints() =

@@ -12,7 +12,6 @@ import com.simprints.id.data.db.people_sync.up.domain.PeopleUpSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import javax.inject.Inject
 
 class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -30,21 +29,20 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
             getComponent<PeopleUpSyncCountWorker> { it.inject(this) }
 
             val upSyncScope = peopleUpSyncScopeRepository.getUpSyncScope()
-            logMessageForCrashReport<PeopleUpSyncCountWorker>("Sync - Preparing request for $upSyncScope")
+            crashlyticsLog("Preparing upSync counter for $upSyncScope")
 
             execute(upSyncScope)
         } catch (t: Throwable) {
-            t.printStackTrace()
-            logFailure<PeopleUpSyncCountWorker>("Sync - Failed ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}", t)
-
+            logFailure(t)
             resultSetter.failure()
         }
     }
 
     private fun execute(upSyncScope: PeopleUpSyncScope): Result {
         val upCount = getUpCount(upSyncScope)
+        val output = JsonHelper.gson.toJson(upCount)
 
-        logSuccess<PeopleUpSyncCountWorker>("Sync - Executing task done for $upSyncScope ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}")
+        logSuccess("Up count task done for $upSyncScope: $output")
 
         return resultSetter.success(workDataOf(
             OUTPUT_COUNT_WORKER_UP to JsonHelper.gson.toJson(upCount))
@@ -53,6 +51,16 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
 
     private fun getUpCount(syncScope: PeopleUpSyncScope) =
         PeopleCount(created = personRepository.count(PersonLocalDataSource.Query(toSync = true)))
+
+    private fun logFailure(t: Throwable) =
+        logFailure<PeopleUpSyncUploaderWorker>(t)
+
+    private fun logSuccess(message: String) =
+        logSuccess<PeopleUpSyncUploaderWorker>(message)
+
+    private fun crashlyticsLog(message: String) =
+        crashlyticsLog<PeopleUpSyncUploaderWorker>(message)
+
 }
 
 fun WorkInfo.getUpCountsFromOutput(): PeopleCount? {

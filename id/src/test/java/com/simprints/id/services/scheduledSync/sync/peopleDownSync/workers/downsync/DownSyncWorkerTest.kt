@@ -6,19 +6,20 @@ import androidx.test.filters.SmallTest
 import androidx.work.Data
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
-import com.google.common.truth.Truth.assertThat
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync.DownSyncWorker.Companion.DOWN_SYNC_WORKER_INPUT
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +31,7 @@ import org.robolectric.annotation.Config
 class DownSyncWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
-    private lateinit var downSyncWorker: DownSyncWorker
+    private lateinit var peopleDownSyncDownloaderWorker: PeopleDownSyncDownloaderWorker
 
     private val projectSyncOp = PeopleDownSyncOperation(
         DEFAULT_PROJECT_ID,
@@ -45,45 +46,45 @@ class DownSyncWorkerTest {
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         app.component = mockk(relaxed = true)
-        downSyncWorker = createWorker()
+        peopleDownSyncDownloaderWorker = createWorker()
     }
 
     @Test
-    fun downSyncWorker_shouldExecuteTheTask() = runBlockingTest {
+    fun downSyncWorker_shouldExecuteTheTask() = runBlocking {
         val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
-        downSyncWorker = createWorker(workDataOf(DOWN_SYNC_WORKER_INPUT to correctInputData))
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
-        downSyncWorker.doWork()
+        peopleDownSyncDownloaderWorker.doWork()
 
-        coVerify { downSyncWorker.downSyncTask.execute(any(), any()) }
-        verify { downSyncWorker.resultSetter.success() }
+        coVerify { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any()) }
+        verify { peopleDownSyncDownloaderWorker.resultSetter.success() }
     }
 
 
     @Test
-    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlockingTest {
+    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlocking {
         val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
-        downSyncWorker = createWorker(workDataOf(DOWN_SYNC_WORKER_INPUT to correctInputData))
+        peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
-        val data = downSyncWorker.jsonForOp
+        peopleDownSyncDownloaderWorker.doWork()
 
-        assertThat(data).isEqualTo(correctInputData)
+        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(projectSyncOp, any()) }
     }
 
     @Test
-    fun downSyncWorker_wrongInput_shouldFail() = runBlockingTest {
-        downSyncWorker.doWork()
+    fun downSyncWorker_wrongInput_shouldFail() = runBlocking {
+        peopleDownSyncDownloaderWorker.doWork()
 
-        verify { downSyncWorker.resultSetter.failure() }
+        verify { peopleDownSyncDownloaderWorker.resultSetter.failure() }
     }
 
     private fun createWorker(inputData: Data? = null) =
         (inputData?.let {
-            TestListenableWorkerBuilder<DownSyncWorker>(app, inputData = it).build()
-        } ?: TestListenableWorkerBuilder<DownSyncWorker>(app).build()).apply {
+            TestListenableWorkerBuilder<PeopleDownSyncDownloaderWorker>(app, inputData = it).build()
+        } ?: TestListenableWorkerBuilder<PeopleDownSyncDownloaderWorker>(app).build()).apply {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            downSyncTask = mockk(relaxed = true)
+            peopleDownSyncDownloaderTask = mockk(relaxed = true)
         }
 }
 

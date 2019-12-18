@@ -8,6 +8,9 @@ import com.simprints.testtools.common.syntax.mock
 import com.simprints.testtools.common.syntax.verifyOnce
 import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -120,25 +123,25 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_dbManagerShouldSignOut() {
+    fun presenterLogout_dbManagerShouldSignOut() = runBlocking {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
-        verifyOnce(presenter.signerManager) { signOut() }
+        coVerify { presenter.signerManager.signOut() }
     }
 
     @Test
-    fun presenterLogout_downSyncWorkersAreCancelled() {
+    fun presenterLogout_downSyncWorkersAreCancelled() = runBlocking {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
-        verifyOnce(presenter.syncSchedulerHelper) { cancelDownSyncWorkers() }
+        coVerify { presenter.syncSchedulerHelper.cancelBackgroundSyncs() }
     }
 
     @Test
-    fun presenterLogout_longConsentsAreDeleted() {
+    fun presenterLogout_longConsentsAreDeleted() = runBlocking {
         mockDepsForLogout(presenter)
 
         presenter.logout()
@@ -147,7 +150,7 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_sessionsManagerSignsOut() {
+    fun presenterLogout_sessionsManagerSignsOut() = runBlocking {
         mockDepsForLogout(presenter)
 
         presenter.logout()
@@ -155,10 +158,10 @@ class SettingsAboutPresenterTest {
         verifyOnce(presenter.sessionEventManager) { signOut() }
     }
 
-    private fun mockDepsForLogout(presenter: SettingsAboutPresenter){
-        presenter.signerManager = mock()
-        presenter.syncSchedulerHelper = mock()
-        presenter.longConsentManager = mock()
-        presenter.sessionEventManager = mock()
+    private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
+        presenter.signerManager = mockk()
+        presenter.syncSchedulerHelper = mockk()
+        presenter.longConsentManager = mockk()
+        presenter.sessionEventManager = mockk()
     }
 }

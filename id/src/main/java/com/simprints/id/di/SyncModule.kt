@@ -46,14 +46,14 @@ open class SyncModule {
         PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationDao)
 
     @Provides
-    open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
-                                 personRemoteDataSource: PersonRemoteDataSource,
-                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
+    open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
+                                                 personRemoteDataSource: PersonRemoteDataSource,
+                                                 downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                                 timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
         PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
 
     @Provides
-    open fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
+    open fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
         SessionEventsSyncManagerImpl()
 
 
@@ -63,12 +63,12 @@ open class SyncModule {
         PeopleSyncStateProcessorImpl(ctx, personRepository)
 
     @Provides
-    open fun provideDownSyncManager(ctx: Context,
-                                    peopleSyncStateProcessor: PeopleSyncStateProcessor): PeopleSyncManager =
+    open fun providePeopleSyncManager(ctx: Context,
+                                      peopleSyncStateProcessor: PeopleSyncStateProcessor): PeopleSyncManager =
         PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor)
 
     @Provides
-    open fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager,
+    open fun provideSyncManager(preferencesManager: PreferencesManager,
                                         sessionEventsSyncManager: SessionEventsSyncManager,
                                         peopleSyncManager: PeopleSyncManager,
                                         peopleUpSyncDao: PeopleUpSyncDao,
@@ -82,7 +82,7 @@ open class SyncModule {
 
 
     @Provides
-    open fun providePeopleUpSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleUpSyncWorkersBuilder =
+    open fun providePeopleUpSyncWorkerBuilder(): PeopleUpSyncWorkersBuilder =
         PeopleUpSyncWorkersBuilderImpl()
 
     @Provides

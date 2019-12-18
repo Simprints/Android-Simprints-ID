@@ -22,7 +22,7 @@ import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.NonceScope
 import com.simprints.id.secure.models.remote.ApiAuthenticationData
 import com.simprints.id.secure.models.remote.ApiToken
-import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.testtools.state.RobolectricTestMocker
@@ -57,7 +57,7 @@ class ProjectAuthenticatorTest {
 
     @Inject lateinit var remoteDbManagerMock: RemoteDbManager
     @Inject lateinit var remoteSessionsManagerMock: RemoteSessionsManager
-    @Inject lateinit var peopleUpSyncMasterMock: PeopleUpSyncMaster
+    @Inject lateinit var peopleSyncManagerMock: PeopleSyncManager
 
     private val projectId = "project_id"
     private val userId = "user_id"
@@ -113,7 +113,7 @@ class ProjectAuthenticatorTest {
             .assertNoErrors()
             .assertComplete()
 
-        verifyOnce(peopleUpSyncMasterMock) { resume(projectId/*, userId*/) } // TODO: uncomment userId when multitenancy is properly implemented
+        verifyOnce(peopleSyncManagerMock) { scheduleSync() } // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test
