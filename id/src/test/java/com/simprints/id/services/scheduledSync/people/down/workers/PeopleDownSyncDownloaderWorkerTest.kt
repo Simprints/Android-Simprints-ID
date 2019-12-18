@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync
+package com.simprints.id.services.scheduledSync.people.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,7 +10,6 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
