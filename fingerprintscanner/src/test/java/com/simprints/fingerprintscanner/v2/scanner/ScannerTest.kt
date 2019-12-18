@@ -6,6 +6,7 @@ import com.simprints.fingerprintscanner.v2.domain.message.un20.Un20Response
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.CaptureFingerprintCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetImageCommand
 import com.simprints.fingerprintscanner.v2.domain.message.un20.commands.GetTemplateCommand
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscanner.v2.domain.message.un20.models.TemplateData
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
 import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.GetImageResponse
@@ -146,7 +147,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResponse.ResponseCode.OK))
+                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
                 }
             }
         }
@@ -171,7 +172,7 @@ class ScannerTest {
         val mockMessageOutputStream = setupMock<MessageOutputStream> {
             whenThis { sendMessage(isA<CaptureFingerprintCommand>()) } then {
                 Completable.complete().doAfterTerminate {
-                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResponse.ResponseCode.OK))
+                    responseSubject.onNext(CaptureFingerprintResponse(CaptureFingerprintResult.OK))
                 }
             }
         }

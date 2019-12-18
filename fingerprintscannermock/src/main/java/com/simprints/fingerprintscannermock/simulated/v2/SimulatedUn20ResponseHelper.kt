@@ -22,7 +22,7 @@ class SimulatedUn20ResponseHelper(private val simulatedScannerManager: Simulated
             is CaptureFingerprintCommand -> CaptureFingerprintResponse(
                 simulatedScannerManager.currentMockFinger().toV2()
                     .also { if (it == SimulatedFingerV2.NO_FINGER) simulatedScannerManager.cycleToNextFinger() }
-                    .captureFingerprintResponseCode
+                    .captureFingerprintResult
             )
             is GetSupportedTemplateTypesCommand -> GetSupportedTemplateTypesResponse(setOf(TemplateType.ISO_19794_2_2011))
             is GetTemplateCommand -> GetTemplateResponse(TemplateData(
