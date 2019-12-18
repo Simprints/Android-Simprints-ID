@@ -7,13 +7,14 @@ import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.spyk
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.spy
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
@@ -42,16 +43,16 @@ class SettingsAboutFragmentTest {
     }
 
     @Test
-    fun logoutDialogShown_userClicksOk_presenterShouldPerformLogout() {
+    fun logoutDialogShown_userClicksOk_presenterShouldPerformLogout() = runBlocking {
         val fragmentManager = settingsAboutActivity.fragmentManager
         val fragment = fragmentManager.findFragmentById(com.simprints.id.R.id.prefContent) as SettingsAboutFragment
-        fragment.viewPresenter = spy(fragment.viewPresenter)
-        whenever(fragment.viewPresenter) { logout() } thenDoNothing {}
+        fragment.viewPresenter = spyk(fragment.viewPresenter)
+        coEvery { fragment.viewPresenter.logout() } coAnswers { }
         val dialog = fragment.buildConfirmationDialogForLogout()
 
         dialog.show()
         dialog.getButton(BUTTON_POSITIVE).performClick()
 
-        verifyOnce(fragment.viewPresenter) { logout() }
+        coVerify { fragment.viewPresenter.logout() }
     }
 }

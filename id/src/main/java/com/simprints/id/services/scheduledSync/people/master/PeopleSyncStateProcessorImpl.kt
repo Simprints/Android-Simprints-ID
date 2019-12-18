@@ -32,8 +32,6 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
         observerForLastDowSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
-                Timber.d("Sync - Received info for $lastSyncId: ${syncWorkers?.map { it.tags }}}")
-
                 MutableLiveData<PeopleSyncState>().apply {
                     with(syncWorkers) {
                         val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
@@ -43,7 +41,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
                         val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
-                        Timber.d("Sync - Emitting ${JsonHelper.toJson(syncState)}")
+                        Timber.d("I/Sync Emitting ${JsonHelper.toJson(syncState)}")
                     }
                 }
             }
@@ -52,13 +50,14 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
     private fun observerForLastDowSyncId(): LiveData<String> {
         return wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULERS).switchMap { masterWorkers ->
-            Timber.d("Sync - Received info for schedulers: ${masterWorkers.map { it.tags }}")
+            Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS}")
 
             val completedSyncMaster = masterWorkers.completedWorkers()
             MutableLiveData<String>().apply {
                 if (completedSyncMaster.isNotEmpty()) {
                     val lastSyncId = completedSyncMaster.mapNotNull { it.outputData.getString(OUTPUT_LAST_SYNC_ID) }.firstOrNull()
                     if (!lastSyncId.isNullOrBlank()) {
+                        Timber.d("I/SYNC Last sync id $lastSyncId}")
                         this.postValue(lastSyncId)
                     }
                 }

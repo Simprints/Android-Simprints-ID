@@ -1,15 +1,14 @@
 package com.simprints.id.services.scheduledSync.sync.peopleUpsync
 
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.sync.peopleUpsync.uploader.PeopleUpSyncUploaderTask
+import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderTask
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import io.mockk.coEvery
@@ -27,7 +26,7 @@ class PeopleUpSyncUploaderTaskTest {
     private val loginInfoManager: LoginInfoManager = mock()
     private val personLocalDataSource: PersonLocalDataSource = mockk()
     private val personRemoteDataSource: PersonRemoteDataSource = mock()
-    private val upSyncDao: PeopleUpSyncDao = mock()
+    private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mock()
 
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
@@ -35,7 +34,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, personLocalDataSource, personRemoteDataSource,
-        projectIdToSync, /*userIdToSync, */batchSize, upSyncDao // TODO: uncomment userId when multitenancy is properly implemented
+        projectIdToSync, /*userIdToSync, */batchSize, peopleUpSyncScopeRepository // TODO: uncomment userId when multitenancy is properly implemented
     )
 
     private val differentProjectId = "differentProjectId"
@@ -63,7 +62,7 @@ class PeopleUpSyncUploaderTaskTest {
 
         runBlocking {
             assertThrows<IllegalStateException> {
-                task.execute()
+                task.execute(mockk(relaxed = true))
             }
         }
     }
@@ -88,7 +87,7 @@ class PeopleUpSyncUploaderTaskTest {
 
         runBlocking {
             assertThrows<TransientSyncFailureException> {
-                task.execute()
+                task.execute(mockk(relaxed = true))
             }
         }
     }
@@ -152,7 +151,7 @@ class PeopleUpSyncUploaderTaskTest {
         mockSyncStatusModel()
 
         runBlocking {
-            task.execute()
+            task.execute(mockk(relaxed = true))
         }
 
         verifyLocalPeopleQueries(*localQueryResults)
@@ -182,7 +181,7 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSyncStatusModel() {
-        whenever(upSyncDao.insertLastUpSyncTime(any())).then { }
+        coVerify { peopleUpSyncScopeRepository.insertOrUpdate(any()) }
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {

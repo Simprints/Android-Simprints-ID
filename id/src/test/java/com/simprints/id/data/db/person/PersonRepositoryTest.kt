@@ -10,13 +10,17 @@ import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.down_sync_info.domain.*
-import com.simprints.id.data.db.people_sync.down.domain.*
+import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
+import com.simprints.id.data.db.people_sync.down.domain.UserSyncScope
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.testtools.common.syntax.*
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
+import com.simprints.id.testtools.UnitTestConfig
+import io.mockk.*
+import io.mockk.impl.annotations.RelaxedMockK
 import io.reactivex.Single
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -25,8 +29,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.koin.core.context.stopKoin
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class PersonRepositoryTest {
 
@@ -39,17 +41,18 @@ class PersonRepositoryTest {
     private val syncScopeByUser = UserSyncScope(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes)
     private val syncScopeByModule = ModuleSyncScope(DEFAULT_PROJECT_ID, listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2), modes)
 
-    @Mock lateinit var remoteDataSource: PersonRemoteDataSource
-    @Mock lateinit var localDataSource: PersonLocalDataSource
-    @Mock lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
-    @Mock lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @RelaxedMockK lateinit var remoteDataSource: PersonRemoteDataSource
+    @RelaxedMockK lateinit var localDataSource: PersonLocalDataSource
+    @RelaxedMockK lateinit var peopleUpSyncManager: PeopleUpSyncManager
+    @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
     private lateinit var personRepository: PersonRepository
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
-        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncMaster)
+        UnitTestConfig(this).coroutinesMainThread()
+        MockKAnnotations.init(this, relaxUnitFun = true)
+        personRepository = PersonRepositoryImpl(remoteDataSource, localDataSource, downSyncScopeRepository, peopleUpSyncManager)
     }
 
     @Test
@@ -70,20 +73,17 @@ class PersonRepositoryTest {
     @Test
     fun givenANewPatient_shouldBeSavedAndUploaded() = runBlockingTest {
         val person = PeopleGeneratorUtils.getRandomPerson()
-        wheneverOnSuspend(localDataSource) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
-        whenever(peopleUpSyncMaster) { schedule(anyNotNull()) } thenDoNothing {}
 
         personRepository.saveAndUpload(person)
 
-        verifyBlockingExactly(1, localDataSource) { insertOrUpdate(listOf(person)) }
-        verifyBlockingExactly(1, peopleUpSyncMaster) { schedule(person.projectId) }
+        coVerify { localDataSource.insertOrUpdate(listOf(person)) }
+        verify { peopleUpSyncManager.sync() }
     }
 
     @Test
     fun givenAPatientInLocal_shouldBeLoaded() = runBlockingTest {
         val person = PeopleGeneratorUtils.getRandomPerson()
-        wheneverOnSuspend(localDataSource) { load(anyNotNull()) } thenOnBlockingReturn flowOf(person)
-
+        coEvery { localDataSource.load(any()) } returns flowOf(person)
 
         val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
@@ -92,32 +92,34 @@ class PersonRepositoryTest {
     }
 
     @Test
-    fun givenAPatientOnlyInRemote_shouldBeLoaded() = runBlockingTest {
-        val person = PeopleGeneratorUtils.getRandomPerson()
-        wheneverOnSuspend(localDataSource) { load(anyNotNull()) } thenOnBlockingReturn flowOf()
-        whenever(remoteDataSource) { downloadPerson(anyNotNull(), anyNotNull()) } thenReturn Single.just(person)
+    fun givenAPatientOnlyInRemote_shouldBeLoaded() {
+        runBlocking {
+            val person = PeopleGeneratorUtils.getRandomPerson()
+            coEvery { localDataSource.load(any()) } returns flowOf()
+            every { remoteDataSource.downloadPerson(any(), any()) } returns Single.just(person)
 
-        val fetch = runBlocking {
-            personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
-        }
+            val fetch = personRepository.loadFromRemoteIfNeeded(person.projectId, person.patientId)
 
-        assertThat(fetch.person).isEqualTo(person)
-        assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
-        fetch.person?.let {
-            verifyOnce(localDataSource) { runBlocking { insertOrUpdate(listOf(it)) } }
+            assertThat(fetch.person).isEqualTo(person)
+            assertThat(fetch.personSource).isEqualTo(PersonFetchResult.PersonSource.REMOTE)
+
+            fetch.person?.let {
+                coVerify { localDataSource.insertOrUpdate(listOf(it)) }
+            }
         }
     }
-
+    
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
-        val ops = downSyncScopeRepository.getDownSyncOperations(downSyncScope)
-        whenever(remoteDataSource) { getDownSyncPeopleCount(anyNotNull(), anyNotNull()) } thenReturn Single.just(ops.map {
-            PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0)
-        })
+        val ops = listOf(
+            PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0))
+
+        coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
+        every { remoteDataSource.getDownSyncPeopleCount(any(), any()) } returns Single.just(ops)
 
         val counts = personRepository.countToDownSync(downSyncScope)
 
         assertThat(counts.size).isEqualTo(ops.size)
-        assertThat(counts.map { it.totalCount() }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC * ops.size)
+        assertThat(counts.sumBy { it.totalCount() }).isEqualTo(REMOTE_PEOPLE_FOR_SUBSYNC * ops.size)
     }
 
     @After

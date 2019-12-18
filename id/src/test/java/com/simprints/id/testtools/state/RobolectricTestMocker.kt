@@ -79,7 +79,7 @@ object RobolectricTestMocker {
         PeopleRemoteInterface.baseUrl = mockServer?.url("/").toString()
         wheneverOnSuspend(personRepository) { insertOrUpdate(anyNotNull()) } thenOnBlockingReturn Unit
         wheneverOnSuspend(personRepository) { load(anyNotNull()) } thenOnBlockingThrow IllegalStateException::class.java
-        wheneverOnSuspend(personRepository) { localCountForSyncScope(anyNotNull()) } thenOnBlockingThrow  IllegalStateException::class.java
+        wheneverOnSuspend(personRepository) { count(anyNotNull()) } thenOnBlockingThrow  IllegalStateException::class.java
 
         setupSessionEventsManagerToAvoidRealmCall(sessionEventsLocalDbManagerMock)
 

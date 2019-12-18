@@ -5,8 +5,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -17,7 +15,6 @@ import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCount
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.InternalCoroutinesApi
-import timber.log.Timber
 import javax.inject.Inject
 
 // TODO: uncomment userId when multitenancy is properly implemented
@@ -31,45 +28,43 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
 
     override suspend fun doWork(): Result {
-        getComponent<PeopleUpSyncUploaderWorker> { it.inject(this) }
-        logMessageForCrashReport("PeopleUpSyncUploaderWorker - running")
-
-        val task = PeopleUpSyncUploaderTask(
-            loginInfoManager, personLocalDataSource, personRemoteDataSource,
-            loginInfoManager.getSignedInProjectIdOrEmpty(), /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
-            peopleUpSyncScopeRepository
-        )
-
         return try {
+            getComponent<PeopleUpSyncUploaderWorker> { it.inject(this) }
+            crashlyticsLog("Preparing upSync")
+
+            val task = PeopleUpSyncUploaderTask(
+                loginInfoManager, personLocalDataSource, personRemoteDataSource,
+                loginInfoManager.getSignedInProjectIdOrEmpty(), /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
+                peopleUpSyncScopeRepository
+            )
+
             val peopleUploaded = task.execute(this)
-            logMessageForCrashReport("PeopleUpSyncUploaderWorker - success")
-            logSuccess<PeopleUpSyncUploaderWorker>("Sync - Upsync task down")
+            logSuccess("Upsync task done: $peopleUploaded uploaded")
 
             resultSetter.success(workDataOf(OUTPUT_UP_SYNC to peopleUploaded))
-        } catch (exception: TransientSyncFailureException) {
-            Timber.e(exception)
-            logFailure<PeopleUpSyncUploaderWorker>("Sync - Upsync task failed, but retry", exception)
-
+        } catch (t: TransientSyncFailureException) {
+            logFailure(t)
             resultSetter.retry()
-        } catch (throwable: Throwable) {
-            Timber.e(throwable)
-            logMessageForCrashReport("PeopleUpSyncUploaderWorker - failure")
-            logFailure<PeopleUpSyncUploaderWorker>("Sync - Upsync task failed", throwable)
-
-            crashReportManager.logExceptionOrSafeException(throwable)
+        } catch (t: Throwable) {
+            logFailure(t)
             resultSetter.failure()
         }
     }
-
-
-    private fun logMessageForCrashReport(message: String) =
-        crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = message)
 
     override suspend fun reportCount(count: Int) {
         setProgress(
             workDataOf(PROGRESS_UP_SYNC to count)
         )
     }
+
+    private fun logFailure(t: Throwable) =
+        logFailure<PeopleUpSyncUploaderWorker>(t)
+
+    private fun logSuccess(message: String) =
+        logSuccess<PeopleUpSyncUploaderWorker>(message)
+
+    private fun crashlyticsLog(message: String) =
+        crashlyticsLog<PeopleUpSyncUploaderWorker>(message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80
@@ -82,7 +77,7 @@ fun WorkInfo.extractUpSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     return if (progress < 0) {
         val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
-        if(output < 0) {
+        if (output < 0) {
             null
         } else {
             output

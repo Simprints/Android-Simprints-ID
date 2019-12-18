@@ -12,7 +12,6 @@ import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import javax.inject.Inject
 
 class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params) {
@@ -30,13 +29,11 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
             getComponent<PeopleDownSyncCountWorker> { it.inject(this) }
 
             val downSyncScope = downSyncScopeRepository.getDownSyncScope()
-            logMessageForCrashReport<PeopleDownSyncCountWorker>("Sync - Preparing request for $downSyncScope")
+            crashlyticsLog("Preparing count request for $downSyncScope")
 
             execute(downSyncScope)
         } catch (t: Throwable) {
-            t.printStackTrace()
-            logFailure<PeopleDownSyncCountWorker>("Sync - Failed ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}", t)
-
+            logFailure(t)
             resultSetter.failure()
         }
     }
@@ -44,22 +41,30 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
     private suspend fun execute(downSyncScope: PeopleDownSyncScope): Result {
         return try {
             val downCount = getDownCount(downSyncScope)
+            val output = JsonHelper.gson.toJson(downCount)
 
-            logSuccess<PeopleDownSyncCountWorker>("Sync - Executing task done for $downSyncScope ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}")
+            logSuccess("Count done for $downSyncScope: $output}")
 
             resultSetter.success(workDataOf(
-                OUTPUT_COUNT_WORKER_DOWN to JsonHelper.gson.toJson(downCount))
+                OUTPUT_COUNT_WORKER_DOWN to output)
             )
         } catch (t: Throwable) {
-            t. printStackTrace()
-            logFailure<PeopleDownSyncCountWorker>("Sync - Failed on executing task for  $downSyncScope ${tags.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }}", t)
-
+            logFailure(t)
             resultSetter.retry()
         }
     }
 
     private suspend fun getDownCount(syncScope: PeopleDownSyncScope) =
         personRepository.countToDownSync(syncScope)
+
+    private fun logFailure(t: Throwable) =
+        logFailure<PeopleDownSyncCountWorker>(t)
+
+    private fun logSuccess(message: String) =
+        logSuccess<PeopleDownSyncCountWorker>(message)
+
+    private fun crashlyticsLog(message: String) =
+        crashlyticsLog<PeopleDownSyncCountWorker>(message)
 
 }
 

@@ -7,7 +7,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
@@ -47,26 +46,25 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     override suspend fun doWork(): Result {
         return try {
             getComponent<PeopleSyncMasterWorker> { it.inject(this) }
-            Timber.d("Sync - started")
+            crashlyticsLog("Preparing master work")
 
             return if (!isSyncRunning()) {
                 val uniqueSyncID = generateUniqueMasterSyncId()
                 val chain = upSyncWorkersChain(uniqueSyncID) + downSyncWorkersChain(uniqueSyncID)
                 wm.enqueue(chain)
 
-                Timber.d("Sync - completed: $uniqueSyncID")
+                logSuccess("Master work done: new id $uniqueSyncID")
                 resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncID))
             } else {
                 val lastSyncId = getLastSyncId()
 
-                Timber.d("Sync - completed: $lastSyncId")
+                logSuccess("Master work done: id already exists $lastSyncId")
                 resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId))
             }.also {
                 clearWorkerHistory()
             }
         } catch (t: Throwable) {
-            t.printStackTrace()
-            Timber.d("Sync - failed")
+            logFailure(t)
             resultSetter.failure()
         }
     }
@@ -105,10 +103,18 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     private fun getTagWithSyncId(tags: Set<String>?) =
         tags?.firstOrNull { it.contains(TAG_MASTER_SYNC_ID) }
 
-
     private fun isSyncRunning(): Boolean = !getWorkInfoForRunningSyncWorkers().isNullOrEmpty()
 
     private fun getWorkInfoForRunningSyncWorkers(): List<WorkInfo>? {
         return syncWorkers?.filter { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
     }
+
+    private fun logFailure(t: Throwable) =
+        logFailure<PeopleSyncMasterWorker>(t)
+
+    private fun logSuccess(message: String) =
+        logSuccess<PeopleSyncMasterWorker>(message)
+
+    private fun crashlyticsLog(message: String) =
+        crashlyticsLog<PeopleSyncMasterWorker>(message)
 }

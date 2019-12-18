@@ -8,9 +8,9 @@ import com.simprints.id.data.analytics.eventdata.controllers.local.SessionEvents
 import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessionsManager
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
@@ -19,7 +19,7 @@ import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
-import com.simprints.id.services.scheduledSync.sync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -59,10 +59,10 @@ class TestAppModule(app: Application,
                                   remoteDbManager: RemoteDbManager,
                                   loginInfoManager: LoginInfoManager,
                                   preferencesManager: PreferencesManager,
-                                  peopleUpSyncMaster: PeopleUpSyncMaster,
+                                  syncManager: SyncManager,
                                   downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                   database: PeopleSyncStatusDatabase): SignerManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncScopeRepository, database) }
+        dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager, downSyncScopeRepository, database) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,

@@ -33,14 +33,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         return try {
             getComponent<PeopleDownSyncDownloaderWorker> { it.inject(this) }
             val downSyncOperation = extractSubSyncScopeFromInput()
-
-            logMessageForCrashReport<PeopleDownSyncDownloaderWorker>("Sync - Preparing request for $downSyncOperation")
+            crashlyticsLog("Preparing downSync request for $downSyncOperation")
 
             execute(downSyncOperation)
         } catch (t: Throwable) {
-            logFailure<PeopleDownSyncDownloaderWorker>("Sync - Failed to prepare request.", t)
+            logFailure(t)
 
-            t.printStackTrace()
             resultSetter.failure()
         }
     }
@@ -48,13 +46,11 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
     private suspend fun execute(downSyncOperation: PeopleDownSyncOperation): Result {
         return try {
             val totalDownloaded = peopleDownSyncDownloaderTask.execute(downSyncOperation, this)
-            logSuccess<PeopleDownSyncDownloaderWorker>("Sync - Executing task done for $downSyncOperation")
+            logSuccess("DownSync done for $downSyncOperation: $totalDownloaded downloaded")
 
             resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
-
         } catch (t: Throwable) {
-            t.printStackTrace()
-            logFailure<PeopleDownSyncDownloaderWorker>("Sync - Failed on executing task for  $downSyncOperation", t)
+            logFailure(t)
 
             resultSetter.retry()
         }
@@ -69,13 +65,22 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
             workDataOf(PROGRESS_DOWN_SYNC to count)
         )
     }
+
+    private fun logFailure(t: Throwable) =
+        logFailure<PeopleDownSyncDownloaderWorker>(t)
+
+    private fun logSuccess(message: String) =
+        logSuccess<PeopleDownSyncDownloaderWorker>(message)
+
+    private fun crashlyticsLog(message: String) =
+        crashlyticsLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
 fun WorkInfo.extractDownSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     return if (progress < 0) {
         val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
-        if(output < 0) {
+        if (output < 0) {
             null
         } else {
             output
