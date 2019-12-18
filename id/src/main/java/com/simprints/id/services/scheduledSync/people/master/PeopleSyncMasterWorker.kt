@@ -25,7 +25,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         const val MASTER_SYNC_SCHEDULER_ONE_TIME = "MASTER_SYNC_SCHEDULER_ONE_TIME"
         const val MASTER_SYNC_SCHEDULER_PERIODIC_TIME = "MASTER_SYNC_SCHEDULER_PERIODIC_TIME"
 
-        const val TAG_PEOPLE_SYNC_ALL_WORKERS = "TAG_SYNC_WORKERS"
+        const val TAG_PEOPLE_SYNC_ALL_WORKERS = "TAG_PEOPLE_SYNC_ALL_WORKERS"
         const val TAG_MASTER_SYNC_ID = "TAG_MASTER_SYNC_ID_"
         const val TAG_SCHEDULED_AT = "TAG_SCHEDULED_AT_"
 
@@ -37,8 +37,14 @@ class PeopleSyncMasterWorker(private val appContext: Context,
 
     private val syncWorkers
         get() = wm.getWorkInfosByTag(TAG_PEOPLE_SYNC_ALL_WORKERS).get().apply {
-            this.sortBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
+            if (this.isNullOrEmpty()) {
+                this.sortBy { it -> it.tags.first { it.contains(TAG_SCHEDULED_AT) } }
+            }
         }
+
+    val uniqueSyncId by lazy {
+        UUID.randomUUID().toString()
+    }
 
     private val isPeriodicMasterWorker
         get() = tags.contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
@@ -49,12 +55,11 @@ class PeopleSyncMasterWorker(private val appContext: Context,
             crashlyticsLog("Preparing master work")
 
             return if (!isSyncRunning()) {
-                val uniqueSyncID = generateUniqueMasterSyncId()
-                val chain = upSyncWorkersChain(uniqueSyncID) + downSyncWorkersChain(uniqueSyncID)
+                val chain = upSyncWorkersChain(uniqueSyncId) + downSyncWorkersChain(uniqueSyncId)
                 wm.enqueue(chain)
 
-                logSuccess("Master work done: new id $uniqueSyncID")
-                resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncID))
+                logSuccess("Master work done: new id $uniqueSyncId")
+                resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId))
             } else {
                 val lastSyncId = getLastSyncId()
 
@@ -68,8 +73,6 @@ class PeopleSyncMasterWorker(private val appContext: Context,
             resultSetter.failure()
         }
     }
-
-    private fun generateUniqueMasterSyncId() = UUID.randomUUID().toString()
 
     private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> =
         if (preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == false && isPeriodicMasterWorker) {

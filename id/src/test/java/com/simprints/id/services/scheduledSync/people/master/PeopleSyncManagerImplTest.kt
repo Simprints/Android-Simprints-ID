@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.*
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
@@ -39,10 +38,6 @@ class PeopleSyncManagerImplTest {
 
     private val syncWorkers
         get() = wm.getWorkInfosByTag(TAG_PEOPLE_SYNC_ALL_WORKERS).get()
-
-    val testDriver by lazy {
-        WorkManagerTestInitHelper.getTestDriver(ctx)
-    }
 
     @Before
     fun setUp() {
