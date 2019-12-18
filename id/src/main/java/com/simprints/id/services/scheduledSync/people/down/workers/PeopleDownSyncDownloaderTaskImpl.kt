@@ -101,26 +101,24 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
                                            person: ApiGetPerson? = null,
                                            lastSyncTime: Date? = null) {
-        val syncInfo = downSyncOperation.lastResult
-        var newSyncInfo = syncInfo?.apply {
-            syncInfo.copy(lastState = state)
-        } ?: PeopleDownSyncOperationResult(state, null, null, null)
+        var newResultInfo = downSyncOperation.lastResult?.copy(lastState = state)
+            ?: PeopleDownSyncOperationResult(state, null, null, null)
 
         if (person != null) {
-            newSyncInfo = person.let {
-                newSyncInfo.copy(
+            newResultInfo = person.let {
+                newResultInfo.copy(
                     lastPatientId = person.id,
                     lastPatientUpdatedAt = person.updatedAt?.time)
             }
         }
 
         if (lastSyncTime != null) {
-            newSyncInfo = lastSyncTime.let {
-                newSyncInfo.copy(
+            newResultInfo = lastSyncTime.let {
+                newResultInfo.copy(
                     lastSyncTime = it.time)
             }
         }
-        downSyncOperation = downSyncOperation.copy(lastResult = newSyncInfo)
+        downSyncOperation = downSyncOperation.copy(lastResult = newResultInfo)
         downSyncScopeRepository.insertOrUpdate(downSyncOperation)
     }
 

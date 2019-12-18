@@ -2,9 +2,9 @@ package com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.down
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.json.JsonHelper
-import com.simprints.id.commontesttools.DefaultTestConstants
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
@@ -15,6 +15,8 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
@@ -32,6 +34,7 @@ import com.simprints.testtools.unit.mockserver.assertPathUrlParam
 import com.simprints.testtools.unit.mockserver.assertQueryUrlParam
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.mockk.*
+import io.mockk.impl.annotations.RelaxedMockK
 import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
@@ -42,7 +45,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-import org.robolectric.shadows.ShadowLog
+import java.util.*
 import kotlin.math.ceil
 
 @RunWith(AndroidJUnit4::class)
@@ -51,9 +54,25 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
     private val modes = listOf(Modes.FACE, Modes.FINGERPRINT)
     private val projectSyncOp = PeopleDownSyncOperation(
-        DefaultTestConstants.DEFAULT_PROJECT_ID,
+        DEFAULT_PROJECT_ID,
         null,
         null,
+        listOf(Modes.FINGERPRINT),
+        null
+    )
+
+    private val userSyncOp = PeopleDownSyncOperation(
+        DEFAULT_PROJECT_ID,
+        DEFAULT_USER_ID,
+        null,
+        listOf(Modes.FINGERPRINT),
+        null
+    )
+
+    private val moduleSyncOp = PeopleDownSyncOperation(
+        DEFAULT_PROJECT_ID,
+        null,
+        DEFAULT_MODULE_ID,
         listOf(Modes.FINGERPRINT),
         null
     )
@@ -61,9 +80,13 @@ class PeopleDownSyncDownloaderTaskImplTest {
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
-    private val remoteDbManagerSpy: RemoteDbManager = spyk(FirebaseManagerImpl(mockk()))
-    private val personRemoteDataSourceMock: PersonRemoteDataSource = mockk(relaxed = true)
-    private val downSyncScopeRepository: PeopleDownSyncScopeRepository = mockk(relaxed = true)
+    private val peopleInFakeDb = mutableListOf<List<Person>>()
+    private val syncOpsInFakeDb = mutableListOf<PeopleDownSyncOperation>()
+
+    private lateinit var remoteDbManagerSpy: RemoteDbManager
+    @RelaxedMockK lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
+    @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
+    @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
 
     private val module by lazy {
         TestAppModule(app,
@@ -77,11 +100,15 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
     @Before
     fun setUp() {
-        ShadowLog.stream = System.out
-
         UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
+        MockKAnnotations.init(this, relaxUnitFun = true)
 
+        remoteDbManagerSpy = spyk(FirebaseManagerImpl(mockk()))
         every { remoteDbManagerSpy.getCurrentToken() } returns Single.just("")
+
+        coEvery { personLocalDataSourceMock.insertOrUpdate(capture(peopleInFakeDb)) } returns Unit
+        coEvery { downSyncScopeRepository.insertOrUpdate(capture(syncOpsInFakeDb)) } returns Unit
+
         mockServer.start()
 
         PeopleRemoteInterface.baseUrl = this.mockServer.url("/").toString()
@@ -109,7 +136,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
 
             val peopleRequestUrl = mockServer.takeRequest().requestUrl
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
@@ -123,7 +150,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             val nPeopleToDownload = 513
             val nPeopleToDelete = 0
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
 
             val peopleRequestUrl = mockServer.takeRequest().requestUrl
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
@@ -150,7 +177,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             val nPeopleToDownload = 0
             val nPeopleToDelete = 212
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
 
             val peopleRequestUrl = mockServer.takeRequest().requestUrl
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
@@ -164,7 +191,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             val nPeopleToDownload = 0
             val nPeopleToDelete = 123
 
-            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
+            runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
 
             val peopleRequestUrl = mockServer.takeRequest().requestUrl
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
@@ -175,10 +202,9 @@ class PeopleDownSyncDownloaderTaskImplTest {
     @Test
     fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
         runBlocking {
-            val personLocalDataSourceMock = mockk<PersonLocalDataSource>()
             val nPeopleToDownload = 499
             val projectDownSyncOp = PeopleDownSyncOperation.buildProjectOperation(DEFAULT_PROJECT_ID, modes, null)
-            val peopleToDownload = prepareResponseForSubScopeForDownloading(projectDownSyncOp, nPeopleToDownload)
+            val peopleToDownload = prepareResponseForDownSyncOperation(projectDownSyncOp, nPeopleToDownload)
             mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
 
             val sync = PeopleDownSyncDownloaderTaskImpl(
@@ -193,93 +219,41 @@ class PeopleDownSyncDownloaderTaskImplTest {
         }
     }
 
-    //    @Test
-//    fun continueFromAPreviousSync_shouldSuccess() {
-//        val nPeopleToDownload = 407
-//        val scope = ProjectSyncScope(PROJECT_ID, listOf(Modes.FINGERPRINT))
-//        val lastPatientIdFromRoom = "lastPatientId"
-//        val lastPatientUpdateAtFromRoom = 123123123L
-//
-//        val personLocalDataSourceMock = mockk<PersonLocalDataSource>()
-//        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
-//        val subScope = scope.toSubSyncScopes().first()
-//        doReturnScopeFromBuilder(scope)
-//
-//        val peopleToDownload = prepareResponseForSubScopeForDownloading(subScope, nPeopleToDownload)
-//        mockServer.enqueue(mockSuccessfulResponseForPatients(peopleToDownload))
-//
-//        mockDbDependencies(
-//            syncLocalDataSourceMock,
-//            personLocalDataSourceMock,
-//            DownSyncStatus(
-//                subScope, lastPatientId = lastPatientIdFromRoom,
-//                lastPatientUpdatedAt = lastPatientUpdateAtFromRoom,
-//                totalToDownload = nPeopleToDownload))
-//
-//        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
-//        sync.execute(subScope).test().awaitAndAssertSuccess()
-//
-//        val peopleRequestUrl = mockServer.takeRequest().requestUrl
-//        assertPathUrlParam(peopleRequestUrl, PROJECT_ID)
-//        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastPatientIdFromRoom)
-//        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", "$lastPatientUpdateAtFromRoom")
-//    }
-//
-//    @Test
-//    fun continueFromAPreviousSyncFromRealm_shouldSuccess() {
-//        val nPeopleToDownload = 1
-//        val scope = DownSyncScope(projectId = PROJECT_ID, userId = null, moduleIds = null)
-//        val lastPatientId = "lastPatientId"
-//        val lastPatientUpdateAt = Date()
-//
-//        val personLocalDataSourceMock = mock<PersonLocalDataSource>()
-//        val syncLocalDataSourceMock = mock<SyncInfoLocalDataSource>()
-//        val subScope = scope.toSubSyncScopes().first()
-//        doReturnScopeFromBuilder(scope)
-//        mockDbDependencies(syncLocalDataSourceMock, personLocalDataSourceMock, DownSyncStatus(subScope, totalToDownload = nPeopleToDownload))
-//
-//        whenever(syncLocalDataSourceMock) { load(subScope) } thenReturn
-//            DbSyncInfo(scope.group, getRandomPerson(lastPatientId, updateAt = lastPatientUpdateAt).fromDomainToDb(), null)
-//
-//        val argForInsertOrReplaceDownSyncStatus = argumentCaptor<DownSyncStatus>()
-//        whenever(downSyncDao) { insertOrReplaceDownSyncStatus(argForInsertOrReplaceDownSyncStatus.capture()) } thenDoNothing {}
-//
-//        val peopleToDownload = prepareResponseForSubScopeForDownloading(subScope, nPeopleToDownload)
-//        mockServer.enqueue(mockSuccessfulResponseForPatients(peopleToDownload))
-//
-//        val sync = DownSyncTaskImpl(personLocalDataSourceMock, syncLocalDataSourceMock, personRemoteDataSourceSpy, TimeHelperImpl(), downSyncDao)
-//        sync.execute(subScope).test().awaitAndAssertSuccess()
-//
-//        val peopleRequestUrl = mockServer.takeRequest().requestUrl
-//        assertPathUrlParam(peopleRequestUrl, PROJECT_ID)
-//        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastPatientId)
-//        assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", "${lastPatientUpdateAt.time}")
-//
-//        val downSyncStatusAfterRealmMigration = argForInsertOrReplaceDownSyncStatus.firstValue
-//        Assert.assertEquals(downSyncStatusAfterRealmMigration.id, downSyncDao.getStatusId(subScope))
-//        Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientUpdatedAt, lastPatientUpdateAt.time)
-//        Assert.assertEquals(downSyncStatusAfterRealmMigration.lastPatientId, lastPatientId)
-//        verifyBlockingAtLeast(1, syncLocalDataSourceMock) { delete(anyNotNull()) }
-//    }
-//
+    @Test
+    fun continueFromAPreviousSync_shouldSuccess() {
+        runBlocking {
+            runBlocking {
+                val nPeopleToDownload = 407
+                val nPeopleToDelete = 0
+                val lastPatientId = "lastPatientId"
+                val lastPatientUpdateAt = 123123123L
+
+                val syncOp = projectSyncOp.copy(lastResult =
+                    PeopleDownSyncOperationResult(COMPLETE, lastPatientId, lastPatientUpdateAt, Date().time))
+
+                runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, syncOp)
+
+                val peopleRequestUrl = mockServer.takeRequest().requestUrl
+                assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
+                assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastPatientId)
+                assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", "$lastPatientUpdateAt")
+            }
+        }
+    }
+
     private suspend fun runDownSyncAndVerifyConditions(
         nPeopleToDownload: Int,
         nPeopleToDelete: Int,
-        downSyncOps: PeopleDownSyncOperation,
-        lastPatientId: String? = null,
-        lastPatientUpdateAt: Long? = null) {
+        downSyncOps: PeopleDownSyncOperation) {
 
-        val personLocalDataSourceMock = mockk<PersonLocalDataSource>(relaxed = true)
         val batchesForSavingInLocal = calculateCorrectNumberOfBatches(nPeopleToDownload)
         val batchesForDeletion = calculateCorrectNumberOfBatches(nPeopleToDelete)
         val batchesForOperations = calculateCorrectNumberOfBatches(nPeopleToDownload + nPeopleToDelete)
 
-        val peopleToDownload = prepareResponseForSubScopeForDownloading(downSyncOps, nPeopleToDownload)
+        val peopleToDownload = prepareResponseForDownSyncOperation(downSyncOps, nPeopleToDownload)
         val peopleToDelete = peopleResponseForSubScopeForDeletion(downSyncOps, nPeopleToDelete)
-        mockServer.enqueue(mockSuccessfulResponseForPatients(peopleToDelete.plus(peopleToDownload)))
-
-        val list = mutableListOf<List<Person>>()
-        coEvery { personLocalDataSourceMock.insertOrUpdate(capture(list)) } returns Unit
+        val opsStream = peopleToDelete.plus(peopleToDownload)
+        mockServer.enqueue(mockSuccessfulResponseForPatients(opsStream))
 
         val syncTask = PeopleDownSyncDownloaderTaskImpl(
             personLocalDataSourceMock,
@@ -291,17 +265,31 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
         coVerify(exactly = batchesForSavingInLocal) { personLocalDataSourceMock.insertOrUpdate(any()) }
         coVerify(exactly = batchesForDeletion) { personLocalDataSourceMock.delete(any()) }
-        coVerify { downSyncScopeRepository.insertOrUpdate(any()) }
 
-        verifyLastPatientSaveIsTheRightOne(list.flatten(), peopleToDownload)
+        val lastPatient = opsStream.lastOrNull()
+        val lastDownSyncOpResult = syncOpsInFakeDb.last()
+        with(lastDownSyncOpResult) {
+            assertThat(projectId).isEqualTo(downSyncOps.projectId)
+            assertThat(userId).isEqualTo(downSyncOps.userId)
+            assertThat(moduleId).isEqualTo(downSyncOps.moduleId)
+            assertThat(lastResult?.lastState).isEqualTo(COMPLETE)
+            assertThat(lastResult?.lastPatientId).isEqualTo(lastPatient?.id)
+            assertThat(lastResult?.lastPatientUpdatedAt).isEqualTo(lastPatient?.updatedAt?.time)
+            assertThat(lastResult?.lastSyncTime).isNotNull()
+        }
+
+        if (nPeopleToDownload > 0) {
+            verifyLastPatientSaveIsTheRightOne(peopleInFakeDb.flatten(), peopleToDownload)
+        }
     }
+
 
     private fun verifyLastPatientSaveIsTheRightOne(saved: List<Person>, inResponse: List<ApiGetPerson>) {
         Assert.assertEquals(saved.last().patientId, inResponse.last().id)
         Assert.assertEquals(saved.last().patientId, inResponse.last().id)
     }
 
-    private fun prepareResponseForSubScopeForDownloading(downSyncOp: PeopleDownSyncOperation, nPeople: Int) =
+    private fun prepareResponseForDownSyncOperation(downSyncOp: PeopleDownSyncOperation, nPeople: Int) =
         getRandomPeople(nPeople, downSyncOp, listOf(false)).map { it.fromDomainToGetApi() }.sortedBy { it.updatedAt }
 
     private fun peopleResponseForSubScopeForDeletion(downSyncOp: PeopleDownSyncOperation, nPeople: Int) =
