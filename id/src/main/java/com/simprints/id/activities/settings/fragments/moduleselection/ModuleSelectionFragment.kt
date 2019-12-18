@@ -169,7 +169,7 @@ class ModuleSelectionFragment(
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
-        peopleSyncManager.configChanged()
+        peopleSyncManager.cancelAndRescheduleSync()
     }
 
     private fun notifyNoModulesSelected() {
