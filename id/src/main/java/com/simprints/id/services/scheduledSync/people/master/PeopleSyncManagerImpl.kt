@@ -8,6 +8,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWor
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_PERIODIC_TIME
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -44,7 +45,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
         wm.cancelAllWorkByTag(MASTER_SYNC_SCHEDULERS)
     }
 
-    override fun configChanged() {
+    override fun cancelAndRescheduleSync() {
         cancelScheduledSync()
         stop()
         wm.pruneWork()
@@ -62,7 +63,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(MASTER_SYNC_SCHEDULERS)
             .addTag(MASTER_SYNC_SCHEDULER_ONE_TIME)
-            .addTag("${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}")
+            .addTag("${TAG_SCHEDULED_AT}${Date().time}")
             .build()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -71,7 +72,7 @@ class PeopleSyncManagerImpl(private val ctx: Context,
             .setConstraints(getDownSyncMasterWorkerConstraints())
             .addTag(MASTER_SYNC_SCHEDULERS)
             .addTag(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
-            .addTag("${PeopleSyncMasterWorker.TAG_SCHEDULED_AT}${Date().time}")
+            .addTag("${TAG_SCHEDULED_AT}${Date().time}")
             .build()
 
     private fun getDownSyncMasterWorkerConstraints() =

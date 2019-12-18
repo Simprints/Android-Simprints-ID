@@ -8,12 +8,13 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
 import com.simprints.id.data.db.people_sync.down.domain.fromDomainToDb
 import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
-import com.simprints.id.data.db.down_sync_info.local.DownSyncOperationDao
-import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.domain.modality.Modes
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -25,7 +26,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class SyncStatusDatabaseTest {
-    private lateinit var downSyncOperationDao: DownSyncOperationDao
+    private lateinit var downSyncOperationDao: PeopleDownSyncDao
     private lateinit var db: PeopleSyncStatusDatabase
 
     private val projectSyncOp = PeopleDownSyncOperation(
@@ -95,22 +96,22 @@ class SyncStatusDatabaseTest {
 
     @Test
     fun writeUserAndReadProjectSyncOp() = runBlocking {
-        assessSaveAndRead(projectSyncOp)
+        assertSaveAndRead(projectSyncOp)
     }
 
     @Test
     fun writeUserAndReadUserSyncOp() = runBlocking {
-        assessSaveAndRead(userSyncOp)
+        assertSaveAndRead(userSyncOp)
     }
 
     @Test
     fun writeUserAndReadModuleSyncOp() = runBlocking {
-        assessSaveAndRead(moduleSyncOp)
+        assertSaveAndRead(moduleSyncOp)
     }
 
     @Test
     fun writeUserAndReadModuleFailedSyncOp() = runBlocking {
-        assessSaveAndRead(moduleSyncOpFailed)
+        assertSaveAndRead(moduleSyncOpFailed)
     }
 
     @Test
@@ -122,10 +123,10 @@ class SyncStatusDatabaseTest {
         assertThat(opStored).isEqualTo(newOp.fromDomainToDb())
     }
 
-    private suspend fun assessSaveAndRead(downSyncOp: PeopleDownSyncOperation) {
+    private suspend fun assertSaveAndRead(downSyncOp: PeopleDownSyncOperation) {
         downSyncOperationDao.insertOrReplaceDownSyncOperation(downSyncOp.fromDomainToDb())
         val operation = downSyncOperationDao.getDownSyncOperation(extractKeyFrom(downSyncOp))
-        assertThat(operation.fromDbToDomain()).isEqualTo(downSyncOp)
+        assertThat(operation.first().fromDbToDomain()).isEqualTo(downSyncOp)
     }
 
     private fun extractKeyFrom(downSyncOp: PeopleDownSyncOperation): DbDownSyncOperationKey =

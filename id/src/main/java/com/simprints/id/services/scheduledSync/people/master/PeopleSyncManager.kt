@@ -11,5 +11,5 @@ interface PeopleSyncManager {
 
     fun scheduleSync()
     fun cancelScheduledSync()
-    fun configChanged() 
+    fun cancelAndRescheduleSync()
 }

@@ -13,8 +13,8 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImplTest.Companion.peopleDownSyncCountWorker
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImplTest.Companion.peopleDownSyncDownloaderWorker
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_SCHEDULED_AT
@@ -28,11 +28,6 @@ import org.junit.Before
 import org.junit.Test
 
 class PeopleDownSyncWorkersBuilderImplTest {
-
-    companion object {
-        const val peopleDownSyncDownloaderWorker = "com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker"
-        const val peopleDownSyncCountWorker = "com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker"
-    }
 
     private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
     private val opsForProjectDownSync = listOf(buildProjectOperation(DEFAULT_PROJECT_ID, modes, null))
@@ -87,8 +82,8 @@ class PeopleDownSyncWorkersBuilderImplTest {
         val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(peopleDownSyncDownloaderWorker) }.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic()
-        chain.first { it.tags.contains(peopleDownSyncCountWorker) }.assertPeopleDownSyncCountWorkerTagsForPeriodic()
+        chain.first { it.tags.contains(PeopleDownSyncDownloaderWorker::class.simpleName) }.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic()
+        chain.first { it.tags.contains(PeopleDownSyncCountWorker::class.simpleName) }.assertPeopleDownSyncCountWorkerTagsForPeriodic()
     }
 
     @Test
@@ -98,8 +93,8 @@ class PeopleDownSyncWorkersBuilderImplTest {
         val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain(null)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
-        chain.first { it.tags.contains(peopleDownSyncDownloaderWorker) }.assertPeopleDownSyncDownloaderWorkerTagsForOneTime()
-        chain.first { it.tags.contains(peopleDownSyncCountWorker) }.assertPeopleDownSyncCountWorkerTagsForOneTime()
+        chain.first { it.tags.contains(PeopleDownSyncDownloaderWorker::class.simpleName) }.assertPeopleDownSyncDownloaderWorkerTagsForOneTime()
+        chain.first { it.tags.contains(PeopleDownSyncCountWorker::class.simpleName) }.assertPeopleDownSyncCountWorkerTagsForOneTime()
     }
 }
 
@@ -160,7 +155,7 @@ private fun WorkRequest.assertUniqueDownSyncMasterTag() =
     assertThat(tags.firstOrNull { it.contains(TAG_DOWN_MASTER_SYNC_ID) }).isNotNull()
 
 private fun List<WorkRequest>.assertNumberOfDownSyncDownloaderWorker(count: Int) =
-    assertThat(count { it.tags.contains(peopleDownSyncDownloaderWorker) }).isEqualTo(count)
+    assertThat(count { it.tags.contains(PeopleDownSyncDownloaderWorker::class.simpleName) }).isEqualTo(count)
 
 private fun List<WorkRequest>.assertPeopleDownSyncCountWorkerTagsForPeriodic(count: Int) =
-    assertThat(count { it.tags.contains(peopleDownSyncCountWorker) }).isEqualTo(count)
+    assertThat(count { it.tags.contains(PeopleDownSyncCountWorker::class.simpleName) }).isEqualTo(count)

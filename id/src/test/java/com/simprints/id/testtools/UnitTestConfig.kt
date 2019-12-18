@@ -1,5 +1,6 @@
 package com.simprints.id.testtools
 
+import android.content.Context
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Configuration
@@ -33,6 +34,10 @@ class UnitTestConfig<T : Any>(
         ApplicationProvider.getApplicationContext() as TestApplication
     }
 
+    private val ctx by lazy {
+        ApplicationProvider.getApplicationContext() as Context
+    }
+
     private lateinit var testAppComponent: AppComponentForTests
 
     fun fullSetup() =
@@ -52,19 +57,19 @@ class UnitTestConfig<T : Any>(
     }
 
     fun setupFirebase() = also {
-        FirebaseApp.initializeApp(app)
+        FirebaseApp.initializeApp(ctx)
     }
 
     fun setupWorkManager() = also {
         try {
-            WorkManagerTestInitHelper.initializeTestWorkManager(app, Configuration.Builder().build())
+            WorkManagerTestInitHelper.initializeTestWorkManager(ctx, Configuration.Builder().build())
         } catch (e: IllegalStateException) {
             Log.d("TestConfig", "WorkManager already initialized")
         }
     }
 
     fun setupCrashlytics() = also {
-        Fabric.with(app)
+        Fabric.with(ctx)
     }
 
     fun initAndInjectComponent() =
