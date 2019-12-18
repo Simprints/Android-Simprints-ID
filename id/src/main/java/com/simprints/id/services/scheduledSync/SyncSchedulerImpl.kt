@@ -1,7 +1,7 @@
 package com.simprints.id.services.scheduledSync
 
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
@@ -10,8 +10,8 @@ import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncMana
 class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
                         private val sessionEventsSyncManager: SessionEventsSyncManager,
                         private val peopleSyncManager: PeopleSyncManager,
-                        private val peopleUpSyncDao: PeopleUpSyncDao,
-                        private val peopleDownSyncDao: PeopleDownSyncDao) : SyncManager {
+                        private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+                        private val peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository) : SyncManager {
 
 
     override fun scheduleBackgroundSyncs() {
@@ -27,8 +27,8 @@ class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
         peopleSyncManager.cancelScheduledSync()
     }
 
-    override suspend fun deleteSyncHistory() {
-        peopleUpSyncDao.deleteAll()
-        peopleDownSyncDao.deleteAll()
+    override suspend fun deleteLastSyncInfo() {
+        peopleUpSyncScopeRepository.deleteAll()
+        peopleDownSyncScopeRepository.deleteAll()
     }
 }

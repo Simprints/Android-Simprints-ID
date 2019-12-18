@@ -11,6 +11,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
+import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
@@ -18,7 +19,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,19 +50,20 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun downSyncWorker_shouldExecuteTheTask() = runBlocking {
+    fun downSyncWorker_shouldExecuteTheTask() = runBlockingTest {
         val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
+        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any()) } returns 0
 
         peopleDownSyncDownloaderWorker.doWork()
 
         coVerify { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any()) }
-        verify { peopleDownSyncDownloaderWorker.resultSetter.success() }
+        verify { peopleDownSyncDownloaderWorker.resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
     }
 
 
     @Test
-    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlocking {
+    fun downSyncWorker_shouldParseInputDataCorrectly() = runBlockingTest {
         val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
 
@@ -71,7 +73,7 @@ class PeopleDownSyncDownloaderWorkerTest {
     }
 
     @Test
-    fun downSyncWorker_wrongInput_shouldFail() = runBlocking {
+    fun downSyncWorker_wrongInput_shouldFail() = runBlockingTest {
         peopleDownSyncDownloaderWorker.doWork()
 
         verify { peopleDownSyncDownloaderWorker.resultSetter.failure() }

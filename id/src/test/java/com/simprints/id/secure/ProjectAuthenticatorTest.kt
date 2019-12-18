@@ -112,8 +112,6 @@ class ProjectAuthenticatorTest {
         testObserver
             .assertNoErrors()
             .assertComplete()
-
-        verifyOnce(peopleSyncManagerMock) { scheduleSync() } // TODO: uncomment userId when multitenancy is properly implemented
     }
 
     @Test

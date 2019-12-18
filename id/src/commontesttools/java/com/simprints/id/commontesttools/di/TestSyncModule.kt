@@ -63,9 +63,9 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
     override fun provideSyncManager(preferencesManager: PreferencesManager,
                                     sessionEventsSyncManager: SessionEventsSyncManager,
                                     peopleSyncManager: PeopleSyncManager,
-                                    peopleUpSyncDao: PeopleUpSyncDao,
-                                    peopleDownSyncDao: PeopleDownSyncDao): SyncManager =
-        syncManagerRule.resolveDependency { super.provideSyncManager(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncDao, peopleDownSyncDao) }
+                                    peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+                                    peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
+        syncManagerRule.resolveDependency { super.provideSyncManager(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository) }
 
     override fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
         peopleDownSyncWorkersBuilderRule.resolveDependency { super.provideDownSyncWorkerBuilder(downSyncScopeRepository) }
