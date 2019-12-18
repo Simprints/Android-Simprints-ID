@@ -62,6 +62,11 @@ class SecuredImageManagerImpl(val ctx: Context,
         }
     }
 
+    override fun listImages(): List<SecuredImageRef> {
+        val imageFolder = File(imageFolderPath)
+        return imageFolder.list().map(::SecuredImageRef)
+    }
+
     private fun getEncryptedFile(file: File): EncryptedFile =
         EncryptedFile.Builder(
             file,
@@ -69,4 +74,5 @@ class SecuredImageManagerImpl(val ctx: Context,
             masterKeyAlias,
             AES256_GCM_HKDF_4KB
         ).build()
+
 }

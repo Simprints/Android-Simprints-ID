@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
+import java.util.*
 import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
@@ -16,7 +17,7 @@ class SecuredImageManagerImplTest {
 
     companion object {
         private const val FILENAME = "test"
-        private const val SIZE_IMAGE = 500000 //500kB
+        private const val SIZE_IMAGE = 500 * 1024 //500kB
         private const val IMAGES_FOLDER = "images"
     }
 
@@ -38,7 +39,7 @@ class SecuredImageManagerImplTest {
     }
 
     @Test
-    fun givenAEncryptedFile_decryptIt_shouldReturnTheRightContent() {
+    fun givenAnEncryptedFile_decryptIt_shouldReturnTheRightContent() {
         val byteArray = Random.Default.nextBytes(SIZE_IMAGE)
         val securedImageRef = securedImageManager.storeImage(byteArray, FILENAME)
         require(securedImageRef != null)
@@ -52,4 +53,22 @@ class SecuredImageManagerImplTest {
         val securedImageRef = securedImageManager.storeImage(emptyArray<Byte>().toByteArray(), "")
         assertThat(securedImageRef).isNull()
     }
+
+    @Test
+    fun shouldListImageFiles() {
+        val expectedFileCount = 10
+        createImageFiles(expectedFileCount)
+        val actualFileCount = securedImageManager.listImages().size
+
+        assertThat(actualFileCount).isEqualTo(expectedFileCount)
+    }
+
+    @Suppress("SameParameterValue")
+    private fun createImageFiles(count: Int) {
+        for (i in 0 until count) {
+            val byteArray = Random.nextBytes(SIZE_IMAGE)
+            securedImageManager.storeImage(byteArray, UUID.randomUUID().toString())
+        }
+    }
+
 }
