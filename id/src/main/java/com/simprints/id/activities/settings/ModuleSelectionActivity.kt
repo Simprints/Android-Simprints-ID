@@ -10,14 +10,16 @@ import kotlinx.android.synthetic.main.settings_toolbar.*
 
 class ModuleSelectionActivity : AppCompatActivity() {
 
+    lateinit var moduleSelectionFragment: ModuleSelectionFragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_toolbar)
         configureToolbar()
-        val fragment = ModuleSelectionFragment(application as Application)
+        moduleSelectionFragment = ModuleSelectionFragment(application as Application)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.prefContent, fragment)
+            .replace(R.id.prefContent, moduleSelectionFragment)
             .commit()
     }
 
@@ -36,4 +38,7 @@ class ModuleSelectionActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
+    override fun onBackPressed() {
+        moduleSelectionFragment.showModuleSelectionDialogIfNecessary()
+    }
 }
