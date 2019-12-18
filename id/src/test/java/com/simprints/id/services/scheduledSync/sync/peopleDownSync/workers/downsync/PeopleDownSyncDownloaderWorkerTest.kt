@@ -28,7 +28,7 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
-class DownSyncWorkerTest {
+class PeopleDownSyncDownloaderWorkerTest {
 
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
     private lateinit var peopleDownSyncDownloaderWorker: PeopleDownSyncDownloaderWorker
