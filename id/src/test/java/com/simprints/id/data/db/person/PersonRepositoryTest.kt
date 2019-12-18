@@ -108,7 +108,7 @@ class PersonRepositoryTest {
             }
         }
     }
-    
+
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
         val ops = listOf(
             PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0))
