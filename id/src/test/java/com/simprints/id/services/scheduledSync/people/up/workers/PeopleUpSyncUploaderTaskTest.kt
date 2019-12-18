@@ -9,10 +9,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.testtools.UnitTestConfig
-import com.simprints.testtools.common.syntax.*
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
+import com.simprints.testtools.common.syntax.assertThrows
+import io.mockk.*
 import io.reactivex.Completable
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.runBlocking
@@ -22,10 +20,10 @@ import java.util.*
 
 class PeopleUpSyncUploaderTaskTest {
 
-    private val loginInfoManager: LoginInfoManager = mock()
-    private val personLocalDataSource: PersonLocalDataSource = mockk()
-    private val personRemoteDataSource: PersonRemoteDataSource = mock()
-    private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mock()
+    private val loginInfoManager: LoginInfoManager = mockk(relaxed = true)
+    private val personLocalDataSource: PersonLocalDataSource = mockk(relaxed = true)
+    private val personRemoteDataSource: PersonRemoteDataSource = mockk(relaxed = true)
+    private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mockk(relaxed = true)
 
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
@@ -81,8 +79,7 @@ class PeopleUpSyncUploaderTaskTest {
     fun simprintsInternalServerException_shouldWrapInTransientSyncFailureException() {
         mockSignedInUser(projectIdToSync, userIdToSync)
         mockSuccessfulLocalPeopleQueries(listOf(notYetSyncedPerson1))
-        whenever(personRemoteDataSource.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)))
-            .thenThrow(SimprintsInternalServerException())
+        every { personRemoteDataSource.uploadPeople(projectIdToSync, listOf(notYetSyncedPerson1)) } throws SimprintsInternalServerException()
 
         runBlocking {
             assertThrows<TransientSyncFailureException> {
@@ -159,8 +156,8 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSignedInUser(projectId: String, userId: String) {
-        whenever(loginInfoManager.signedInProjectId).thenReturn(projectId)
-        whenever(loginInfoManager.signedInUserId).thenReturn(userId)
+        every { loginInfoManager.signedInProjectId } returns projectId
+        every { loginInfoManager.signedInUserId } returns userId
     }
 
     private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Person>) {
@@ -170,7 +167,7 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSuccessfulPeopleUploads(vararg batches: List<Person>) {
-        whenever(personRemoteDataSource.uploadPeople(anyNotNull(), anyNotNull())).thenReturn(Completable.complete())
+        every { personRemoteDataSource.uploadPeople(any(), any()) } returns Completable.complete()
     }
 
     private fun mockSuccessfulLocalPeopleUpdates(vararg updates: List<Person>) {
@@ -180,7 +177,7 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSyncStatusModel() {
-        coVerify { peopleUpSyncScopeRepository.insertOrUpdate(any()) }
+        coEvery { peopleUpSyncScopeRepository.insertOrUpdate(any()) } returns Unit
     }
 
     private fun verifyLocalPeopleQueries(vararg queryResults: List<Person>) {
@@ -193,7 +190,7 @@ class PeopleUpSyncUploaderTaskTest {
 
     private fun verifyPeopleUploads(vararg batches: List<Person>) {
         batches.forEach { batch ->
-            verifyOnce(personRemoteDataSource) { uploadPeople(projectIdToSync, batch) }
+            verify(exactly = 1) { personRemoteDataSource.uploadPeople(projectIdToSync, batch) }
         }
     }
 

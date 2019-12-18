@@ -3,20 +3,13 @@ package com.simprints.id.activities.settings.fragments.settingsAbout
 import android.preference.Preference
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.testtools.TestApplication
-import com.simprints.testtools.common.syntax.anyNotNull
-import com.simprints.testtools.common.syntax.mock
-import com.simprints.testtools.common.syntax.verifyOnce
-import com.simprints.testtools.common.syntax.whenever
 import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
-import io.mockk.coVerify
-import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import io.mockk.*
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.spy
 import org.robolectric.annotation.Config
 
 @Suppress("UsePropertyAccessSyntax")
@@ -33,84 +26,88 @@ class SettingsAboutPresenterTest {
     }
 
     private lateinit var presenter: SettingsAboutPresenter
-    private val viewMock: SettingsAboutContract.View = mock(SettingsAboutContract.View::class.java)
+    private val viewMock: SettingsAboutContract.View = mockk(relaxed = true)
 
     @Before
     fun setUp() {
-        presenter = spy(SettingsAboutPresenter(viewMock, mock()))
+        presenter = SettingsAboutPresenter(viewMock, mockk(relaxed = true))
     }
 
     @Test
     fun syncAndSearchPreference_loadValue_preferenceShouldHaveValues() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getKeyForSyncAndSearchConfigurationPreference()).thenReturn(PREFERENCE_KEY_FOR_SYNC_AND_SEARCH)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_SYNC_AND_SEARCH)
-        whenever(presenter) { loadSyncAndSearchConfigurationPreference(anyNotNull()) } thenDoNothing {}
+        presenter = spyk(SettingsAboutPresenter(viewMock, mockk(relaxed = true)))
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getKeyForSyncAndSearchConfigurationPreference() } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_SYNC_AND_SEARCH
+        every { presenter.loadSyncAndSearchConfigurationPreference(any()) } returns Unit
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(presenter) { loadSyncAndSearchConfigurationPreference(anyNotNull()) }
+        verify(exactly = 1) { presenter.loadSyncAndSearchConfigurationPreference(any()) }
     }
 
     @Test
     fun appVersionPreference_loadValue_preferenceShouldHaveValues() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getKeyForAppVersionPreference()).thenReturn(PREFERENCE_KEY_FOR_APP_VERSION)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_APP_VERSION)
-        whenever(presenter) { loadAppVersionInPreference(anyNotNull()) } thenDoNothing {}
+        presenter = spyk(SettingsAboutPresenter(viewMock, mockk(relaxed = true)))
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getKeyForAppVersionPreference() } returns PREFERENCE_KEY_FOR_APP_VERSION
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_APP_VERSION
+        every { presenter.loadAppVersionInPreference(any()) } returns Unit
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(presenter) { loadAppVersionInPreference(anyNotNull()) }
+        verify(exactly = 1) { presenter.loadAppVersionInPreference(any()) }
     }
 
     @Test
     fun scannerVersionPreference_loadValue_preferenceShouldHaveValues() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getScannerVersionPreference()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForScannerVersionPreference()).thenReturn(PREFERENCE_KEY_FOR_SCANNER_VERSION)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_SCANNER_VERSION)
-        whenever(presenter) { loadScannerVersionInPreference(anyNotNull()) } thenDoNothing {}
+        presenter = spyk(SettingsAboutPresenter(viewMock, mockk(relaxed = true)))
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getScannerVersionPreference() } returns mockPreference
+        every { viewMock.getKeyForScannerVersionPreference() } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_SCANNER_VERSION
+        every { presenter.loadScannerVersionInPreference(any()) } returns Unit
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(presenter) { loadScannerVersionInPreference(anyNotNull()) }
+        verify(exactly = 1) { presenter.loadScannerVersionInPreference(any()) }
     }
 
     @Test
     fun deviceIdPreference_loadValue_preferenceShouldHaveValues() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getDeviceIdPreference()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForDeviceIdPreference()).thenReturn(PREFERENCE_KEY_FOR_DEVICE_ID)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_DEVICE_ID)
-        whenever(presenter) { loadDeviceIdInPreference(anyNotNull()) } thenDoNothing {}
+        presenter = spyk(SettingsAboutPresenter(viewMock, mockk(relaxed = true)))
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getDeviceIdPreference() } returns mockPreference
+        every { viewMock.getKeyForDeviceIdPreference() } returns PREFERENCE_KEY_FOR_DEVICE_ID
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_DEVICE_ID
+        every { presenter.loadDeviceIdInPreference(any()) } returns Unit
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(presenter) { loadDeviceIdInPreference(anyNotNull()) }
+        verify(exactly = 1) { presenter.loadDeviceIdInPreference(any()) }
     }
 
     @Test
     fun logoutPreference_bindClickListener_shouldHaveListenerBounded() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getLogoutPreference()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForLogoutPreference()).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getLogoutPreference() } returns mockPreference
+        every { viewMock.getKeyForLogoutPreference() } returns PREFERENCE_KEY_FOR_LOGOUT
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_LOGOUT
 
         presenter.loadValueAndBindChangeListener(mockPreference)
 
-        verifyOnce(mockPreference) { setOnPreferenceClickListener(anyNotNull()) }
+        verify(exactly = 1) { mockPreference.setOnPreferenceClickListener(any()) }
     }
 
     @Test
     fun logoutPreference_userClicksOnIt_viewShouldShowDialog() {
-        val mockPreference = mock(Preference::class.java)
-        whenever(viewMock.getLogoutPreference()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForLogoutPreference()).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_LOGOUT)
+        val mockPreference: Preference = mockk(relaxed = true)
+        every { viewMock.getLogoutPreference() } returns mockPreference
+        every { viewMock.getKeyForLogoutPreference() } returns PREFERENCE_KEY_FOR_LOGOUT
+        every { mockPreference.key } returns PREFERENCE_KEY_FOR_LOGOUT
         var actionForLogoutPreference: Preference.OnPreferenceClickListener? = null
-        whenever(mockPreference) { setOnPreferenceClickListener(anyNotNull()) } thenAnswer {
-            actionForLogoutPreference = it.arguments.first() as Preference.OnPreferenceClickListener
+        every { mockPreference.setOnPreferenceClickListener(any()) } answers {
+            actionForLogoutPreference = this.args.first() as Preference.OnPreferenceClickListener
             null
         }
 
@@ -118,12 +115,12 @@ class SettingsAboutPresenterTest {
 
         actionForLogoutPreference?.let {
             it.onPreferenceClick(mockPreference)
-            verifyOnce(viewMock) { showConfirmationDialogForLogout() }
+            verify(exactly = 1) { viewMock.showConfirmationDialogForLogout() }
         } ?: fail("Action for logout preference not set.")
     }
 
     @Test
-    fun presenterLogout_dbManagerShouldSignOut() = runBlocking {
+    fun presenterLogout_dbManagerShouldSignOut() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
@@ -132,7 +129,7 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_downSyncWorkersAreCancelled() = runBlocking {
+    fun presenterLogout_downSyncWorkersAreCancelled() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
@@ -141,27 +138,27 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_longConsentsAreDeleted() = runBlocking {
+    fun presenterLogout_longConsentsAreDeleted() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
-        verifyOnce(presenter.longConsentManager) { deleteLongConsents() }
+        verify(exactly = 1) { presenter.longConsentManager.deleteLongConsents() }
     }
 
     @Test
-    fun presenterLogout_sessionsManagerSignsOut() = runBlocking {
+    fun presenterLogout_sessionsManagerSignsOut() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
-        verifyOnce(presenter.sessionEventManager) { signOut() }
+        verify(exactly = 1) { presenter.sessionEventManager.signOut() }
     }
 
     private fun mockDepsForLogout(presenter: SettingsAboutPresenter) {
-        presenter.signerManager = mockk()
-        presenter.syncSchedulerHelper = mockk()
-        presenter.longConsentManager = mockk()
-        presenter.sessionEventManager = mockk()
+        presenter.signerManager = mockk(relaxed = true)
+        presenter.syncSchedulerHelper = mockk(relaxed = true)
+        presenter.longConsentManager = mockk(relaxed = true)
+        presenter.sessionEventManager = mockk(relaxed = true)
     }
 }

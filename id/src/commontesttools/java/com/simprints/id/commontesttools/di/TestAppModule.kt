@@ -9,7 +9,6 @@ import com.simprints.id.data.analytics.eventdata.controllers.remote.RemoteSessio
 import com.simprints.id.data.consent.LongConsentManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -55,14 +54,12 @@ class TestAppModule(app: Application,
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
-    override fun provideDbManager(projectRepository: ProjectRepository,
-                                  remoteDbManager: RemoteDbManager,
-                                  loginInfoManager: LoginInfoManager,
-                                  preferencesManager: PreferencesManager,
-                                  syncManager: SyncManager,
-                                  downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                                  database: PeopleSyncStatusDatabase): SignerManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager, downSyncScopeRepository, database) }
+    override fun provideSignerManager(projectRepository: ProjectRepository,
+                                      remoteDbManager: RemoteDbManager,
+                                      loginInfoManager: LoginInfoManager,
+                                      preferencesManager: PreferencesManager,
+                                      syncManager: SyncManager): SignerManager =
+        dbManagerRule.resolveDependency { super.provideSignerManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager) }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,

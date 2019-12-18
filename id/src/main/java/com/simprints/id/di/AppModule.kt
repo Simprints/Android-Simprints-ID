@@ -30,7 +30,6 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -81,14 +80,12 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideDbManager(projectRepository: ProjectRepository,
-                              remoteDbManager: RemoteDbManager,
-                              loginInfoManager: LoginInfoManager,
-                              preferencesManager: PreferencesManager,
-                              syncManager: SyncManager,
-                              downSyncScopeRepository: PeopleDownSyncScopeRepository,
-                              database: PeopleSyncStatusDatabase): SignerManager =
-        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, downSyncScopeRepository, syncManager)
+    open fun provideSignerManager(projectRepository: ProjectRepository,
+                                  remoteDbManager: RemoteDbManager,
+                                  loginInfoManager: LoginInfoManager,
+                                  preferencesManager: PreferencesManager,
+                                  syncManager: SyncManager): SignerManager =
+        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, syncManager)
 
     @Provides
     @Singleton

@@ -71,9 +71,9 @@ open class SyncModule {
     open fun provideSyncManager(preferencesManager: PreferencesManager,
                                         sessionEventsSyncManager: SessionEventsSyncManager,
                                         peopleSyncManager: PeopleSyncManager,
-                                        peopleUpSyncDao: PeopleUpSyncDao,
-                                        peopleDownSyncDao: PeopleDownSyncDao): SyncManager =
-        SyncSchedulerImpl(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncDao, peopleDownSyncDao)
+                                        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+                                        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
+        SyncSchedulerImpl(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository)
 
 
     @Provides

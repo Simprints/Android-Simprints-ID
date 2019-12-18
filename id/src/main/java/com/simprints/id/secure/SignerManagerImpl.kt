@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -15,7 +14,6 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
                              private val remote: RemoteDbManager,
                              private val loginInfoManager: LoginInfoManager,
                              private val preferencesManager: PreferencesManager,
-                             private val downSyncScopeRepository: PeopleDownSyncScopeRepository,
                              private val syncManager: SyncManager) : SignerManager {
 
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
@@ -44,9 +42,8 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
         loginInfoManager.cleanCredentials()
         remote.signOut()
-        downSyncScopeRepository.deleteAll()
         syncManager.cancelBackgroundSyncs()
-        syncManager.deleteSyncHistory()
+        syncManager.deleteLastSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 }

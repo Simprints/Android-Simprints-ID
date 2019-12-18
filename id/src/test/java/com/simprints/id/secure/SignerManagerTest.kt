@@ -4,8 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -29,8 +27,6 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var syncManager: SyncManager
-    @MockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
-    @MockK lateinit var upSyncDao: PeopleUpSyncDao
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token("some_token")
@@ -44,7 +40,6 @@ class SignerManagerTest {
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            downSyncScopeRepository,
             syncManager)
 
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
@@ -155,8 +150,7 @@ class SignerManagerTest {
         verifyUpSyncGotPaused()
         verifyStoredCredentialsGotCleaned()
         verifyRemoteManagerGotSignedOut()
-        verifyLastDownSyncInfoGotDeleted()
-        verifyLastUpSyncInfoGotDeleted()
+        verifyLastSyncInfoGotDeleted()
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
     }
 
@@ -202,8 +196,7 @@ class SignerManagerTest {
     private fun verifyUpSyncGotPaused() = verify { syncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastDownSyncInfoGotDeleted() = verify { downSyncScopeRepository.deleteAll() }
-    private fun verifyLastUpSyncInfoGotDeleted() = coVerify { upSyncDao.deleteAll() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { syncManager.deleteLastSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 
     private fun verifySignedInFailed(it: TestObserver<Void>) {
