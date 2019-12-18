@@ -24,10 +24,8 @@ import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFrom
 import timber.log.Timber
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
-                                   val personRepository: PersonRepository) : PeopleSyncStateProcessor {
-
-    private val wm: WorkManager
-        get() = WorkManager.getInstance(ctx)
+                                   val personRepository: PersonRepository,
+                                   private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
         observerForLastDowSyncId().switchMap { lastSyncId ->
@@ -36,8 +34,8 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
                     with(syncWorkers) {
                         val progress = calculateProgressForDownSync() + calculateProgressForUpSync()
                         val total = calculateTotalForDownSync() + calculateTotalForUpSync()
-                        val upSyncStates = uploadersStates() + upSyncCountersStates()
-                        val downSyncStates = downloadersStates() + downSyncCountersStates()
+                        val upSyncStates = upSyncUploadersStates() + upSyncCountersStates()
+                        val downSyncStates = downSyncDownloadersStates() + downSyncCountersStates()
 
                         val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
@@ -49,7 +47,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
 
     private fun observerForLastDowSyncId(): LiveData<String> {
-        return wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULERS).switchMap { masterWorkers ->
+        return syncWorkersLiveDataProvider.getMasterWorkersLiveData().switchMap { masterWorkers ->
             Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS}")
 
             val completedSyncMaster = masterWorkers.completedWorkers()
@@ -66,7 +64,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     }
 
     private fun observerForLastSyncIdWorkers(lastSyncId: String) =
-        wm.getWorkInfosByTagLiveData("${TAG_MASTER_SYNC_ID}${lastSyncId}")
+        syncWorkersLiveDataProvider.getSyncWorkersLiveData(lastSyncId)
 
     private fun List<WorkInfo>.completedWorkers() =
         this.filter { it.state == WorkInfo.State.SUCCEEDED }
@@ -83,10 +81,10 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         return counter?.getUpCountsFromOutput()?.totalCount() ?: -1
     }
 
-    private fun List<WorkInfo>.uploadersStates(): List<WorkerState> =
+    private fun List<WorkInfo>.upSyncUploadersStates(): List<WorkerState> =
         this.filterByTags(tagForType(UPLOADER)).groupBy { it }.values.flatten().map { WorkerState(UPLOADER, it.state) }
 
-    private fun List<WorkInfo>.downloadersStates(): List<WorkerState> =
+    private fun List<WorkInfo>.downSyncDownloadersStates(): List<WorkerState> =
         this.filterByTags(tagForType(DOWNLOADER)).groupBy { it }.values.flatten().map { WorkerState(DOWNLOADER, it.state) }
 
     private fun List<WorkInfo>.downSyncCountersStates(): List<WorkerState> =
@@ -119,4 +117,22 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         this.filter { it.tags.firstOrNull { tagsToFilter.contains(it) } != null }.sortedBy { it ->
             it.tags.first { it.contains(TAG_SCHEDULED_AT) }
         }
+}
+
+interface SyncWorkersLiveDataProvider {
+    fun getMasterWorkersLiveData(): LiveData<List<WorkInfo>>
+    fun getSyncWorkersLiveData(uniqueSyncId: String): LiveData<List<WorkInfo>>
+}
+
+class SyncWorkersLiveDataProviderImpl(val ctx: Context) : SyncWorkersLiveDataProvider {
+
+    private val wm: WorkManager
+        get() = WorkManager.getInstance(ctx)
+
+
+    override fun getMasterWorkersLiveData(): LiveData<List<WorkInfo>> =
+        wm.getWorkInfosByTagLiveData(MASTER_SYNC_SCHEDULERS)
+
+    override fun getSyncWorkersLiveData(uniqueSyncId: String): LiveData<List<WorkInfo>> =
+        wm.getWorkInfosByTagLiveData("${TAG_MASTER_SYNC_ID}${uniqueSyncId}")
 }

@@ -31,6 +31,10 @@ import org.robolectric.annotation.Config
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleSyncMasterWorkerTest {
 
+    companion object {
+        const val UNIQUE_SYNC_ID = "UNIQUE_SYNC_ID"
+    }
+
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private val wm: WorkManager
@@ -105,14 +109,22 @@ class PeopleSyncMasterWorkerTest {
 
     @Test
     fun doWork_syncGoing_shouldReturnTheExistingUniqueSync() = runBlockingTest {
-        val existingSyncId = "existingSyncId"
-        enqueueASyncWorker(existingSyncId)
+        enqueueASyncWorker(UNIQUE_SYNC_ID)
 
         masterWorker.doWork()
 
-        assertWorkerOutput(existingSyncId)
+        assertWorkerOutput(UNIQUE_SYNC_ID)
         assertSyncChainWasBuilt(0)
-        assertSyncWorkersAreEnqueued(existingSyncId)
+        assertSyncWorkersAreEnqueued(UNIQUE_SYNC_ID)
+    }
+
+    @Test
+    fun doWork_errorOccurs_shouldWorkerFail() = runBlockingTest {
+        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
+
+        masterWorker.doWork()
+
+        verify { masterWorker.resultSetter.failure(any()) }
     }
 
     private fun enqueueASyncWorker(existingSyncId: String) {
