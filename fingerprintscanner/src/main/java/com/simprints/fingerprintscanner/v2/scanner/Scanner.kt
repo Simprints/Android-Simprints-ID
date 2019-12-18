@@ -157,12 +157,12 @@ class Scanner(
             )
         ).map { it.un20AppVersion }
 
-    fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Completable =
+    fun captureFingerprint(dpi: Dpi = DEFAULT_DPI): Single<CaptureFingerprintResult> =
         assertUn20On().andThen(
             sendCommandAndReceiveResponse<CaptureFingerprintResponse>(
                 CaptureFingerprintCommand(dpi)
             )
-        ).completeOnceReceived()
+        ).map { it.captureFingerprintResult }
 
     fun getSupportedTemplateTypes(): Single<Set<TemplateType>> =
         assertUn20On().andThen(

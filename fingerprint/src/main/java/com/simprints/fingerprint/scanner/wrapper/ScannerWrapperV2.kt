@@ -58,7 +58,7 @@ class ScannerWrapperV2(private val scannerV2: ScannerV2,
     override fun sensorShutDown(): Completable = scannerV2.turnUn20OffAndAwaitStateChangeEvent()
 
     override fun captureFingerprint(timeOutMs: Int, qualityThreshold: Int): Single<CaptureFingerprintResponse> =
-        scannerV2.captureFingerprint()
+        scannerV2.captureFingerprint().ignoreElement() // TODO : Add in error propagation for no finger detected etc.
             .andThen(scannerV2.acquireTemplate())
             .map { templateData ->
                 CaptureFingerprintResponse(templateData.template, templateData.quality)

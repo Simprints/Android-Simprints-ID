@@ -1,11 +1,11 @@
 package com.simprints.fingerprintscannermock.simulated.v2
 
-import com.simprints.fingerprintscanner.v2.domain.message.un20.responses.CaptureFingerprintResponse
+import com.simprints.fingerprintscanner.v2.domain.message.un20.models.CaptureFingerprintResult
 import com.simprints.fingerprintscannermock.simulated.common.SimulatedFinger
 import com.simprints.fingerprintscannermock.simulated.tools.byteArrayFromHexString
 
 enum class SimulatedFingerV2(
-    val captureFingerprintResponseCode: CaptureFingerprintResponse.ResponseCode = CaptureFingerprintResponse.ResponseCode.OK,
+    val captureFingerprintResult: CaptureFingerprintResult = CaptureFingerprintResult.OK,
     val imageQuality: Int = 80,
     val templateBytes: ByteArray = byteArrayOf()) {
 
@@ -64,7 +64,7 @@ enum class SimulatedFingerV2(
         "40 6f 01 11 07 00 40 d1 01 41 87 00 40 df 01 4d 03 00 00 00 "
     )),
 
-    NO_FINGER(imageQuality = 0, captureFingerprintResponseCode = CaptureFingerprintResponse.ResponseCode.FINGERPRINT_NOT_FOUND)
+    NO_FINGER(imageQuality = 0, captureFingerprintResult = CaptureFingerprintResult.FINGERPRINT_NOT_FOUND)
 }
 
 fun SimulatedFinger.toV2(): SimulatedFingerV2 =
