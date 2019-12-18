@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.sync.peopleUpsync
+package com.simprints.id.services.scheduledSync.people.up.workers
 
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
@@ -8,7 +8,6 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
-import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderTask
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.*
 import io.mockk.coEvery

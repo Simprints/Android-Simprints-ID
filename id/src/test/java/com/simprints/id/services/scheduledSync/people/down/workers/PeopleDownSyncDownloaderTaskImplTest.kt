@@ -1,4 +1,4 @@
-package com.simprints.id.services.scheduledSync.sync.peopleDownSync.workers.downsync
+package com.simprints.id.services.scheduledSync.people.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -24,7 +24,6 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
