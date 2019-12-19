@@ -25,6 +25,7 @@ import com.simprints.id.activities.login.LoginPresenter
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticePresenter
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
+import com.simprints.id.activities.settings.ModuleSelectionActivity
 import com.simprints.id.activities.settings.SettingsAboutActivity
 import com.simprints.id.activities.settings.SettingsActivity
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleSelectionFragment
@@ -32,6 +33,7 @@ import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAbou
 import com.simprints.id.activities.settings.fragments.settingsAbout.SettingsAboutPresenter
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferenceFragment
 import com.simprints.id.activities.settings.fragments.settingsPreference.SettingsPreferencePresenter
+import com.simprints.id.activities.settings.syncinformation.SyncInformationActivity
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
@@ -99,6 +101,7 @@ interface AppComponent {
     fun inject(syncSchedulerHelper: SyncSchedulerImpl)
     fun inject(sessionsSyncMasterWorker: SessionEventsMasterWorker)
     fun inject(settingsAboutPresenter: SettingsAboutPresenter)
+    fun inject(moduleSelectionActivity: ModuleSelectionActivity)
     fun inject(moduleSelectionActivity: ModuleSelectionFragment)
     fun inject(settingsActivity: SettingsActivity)
     fun inject(settingsPreferenceFragment: SettingsPreferenceFragment)
@@ -116,6 +119,7 @@ interface AppComponent {
     fun inject(peopleSyncMasterWorker: PeopleSyncMasterWorker)
     fun inject(peopleUpSyncUploaderWorker: PeopleUpSyncUploaderWorker)
     fun inject(peopleUpSyncCountWorker: PeopleUpSyncCountWorker)
+    fun inject(syncInformationActivity: SyncInformationActivity)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager

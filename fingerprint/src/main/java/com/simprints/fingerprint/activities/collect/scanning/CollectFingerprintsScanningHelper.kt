@@ -58,6 +58,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     private var scanningTask: Disposable? = null
+    private var reconnectingTask: Disposable? = null
 
     private fun shouldEnableScanButton() = !presenter.isBusyWithFingerTransitionAnimation
 
@@ -83,17 +84,16 @@ class CollectFingerprintsScanningHelper(private val context: Context,
             dialog.isIndeterminate = true
             dialog.setCanceledOnTouchOutside(false)
             dialog.setMessage(androidResourcesHelper.getString(R.string.reconnecting_message))
-            dialog.setOnCancelListener { view.cancelAndFinish() }
+            dialog.setOnCancelListener { presenter.handleOnBackPressed() }
         }
 
-    @SuppressLint("CheckResult")
     fun reconnect() {
         scannerManager.onScanner { unregisterTriggerListener(scannerTriggerListener) }
         (view as Activity).runOnUiThreadIfStillRunning {
             view.un20WakeupDialog.show()
         }
 
-        scannerManager.scanner { disconnect() }
+        reconnectingTask = scannerManager.scanner { disconnect() }
             .andThen(scannerManager.checkBluetoothStatus())
             .andThen(scannerManager.initScanner())
             .andThen(scannerManager.scanner { connect() })
@@ -238,6 +238,7 @@ class CollectFingerprintsScanningHelper(private val context: Context,
     }
 
     fun stopReconnecting() {
+        reconnectingTask?.dispose()
         scannerManager.scanner { disconnect() }.doInBackground()
     }
 

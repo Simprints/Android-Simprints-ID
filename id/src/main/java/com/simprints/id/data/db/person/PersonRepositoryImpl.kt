@@ -5,8 +5,8 @@ import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.LOCAL
 import com.simprints.id.data.db.PersonFetchResult.PersonSource.REMOTE
-import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.common.models.PeopleCount
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -28,8 +28,8 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
     PersonLocalDataSource by personLocalDataSource,
     PersonRemoteDataSource by personRemoteDataSource {
 
-    override suspend fun countToDownSync(downSyncScope: PeopleDownSyncScope): List<PeopleCount> =
-        personRemoteDataSource.getDownSyncPeopleCount(downSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(downSyncScope))
+    override suspend fun countToDownSync(peopleDownSyncScope: PeopleDownSyncScope): List<PeopleCount> =
+        personRemoteDataSource.getDownSyncPeopleCount(peopleDownSyncScope.projectId, downSyncScopeRepository.getDownSyncOperations(peopleDownSyncScope))
             .subscribeOn(Schedulers.io())
             .blockingGet()
 
@@ -55,11 +55,7 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
             }
         }
 
-    private fun savePersonInLocal(person: Person) {
-        CoroutineScope(Dispatchers.IO).launch {
-            personLocalDataSource.insertOrUpdate(listOf(person))
-        }
-    }
+    private suspend fun savePersonInLocal(person: Person) = personLocalDataSource.insertOrUpdate(listOf(person))
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))

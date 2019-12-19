@@ -1,22 +1,18 @@
 package com.simprints.id.data.db.person
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
+import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
+import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.commontesttools.PeopleGeneratorUtils
 import com.simprints.id.data.db.PersonFetchResult
 import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.data.db.common.models.totalCount
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
-import com.simprints.id.data.db.people_sync.down.domain.UserSyncScope
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
-import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.id.testtools.UnitTestConfig
 import io.mockk.*
@@ -28,18 +24,15 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 
+@RunWith(AndroidJUnit4::class)
 class PersonRepositoryTest {
 
     companion object {
-        const val REMOTE_PEOPLE_FOR_SUBSYNC = 10
+        const val REMOTE_PEOPLE_FOR_SUBSYNC = 100
     }
-
-    private val modes = listOf(Modes.FACE, Modes.FINGERPRINT)
-    private val syncScopeByProject = ProjectSyncScope(DEFAULT_PROJECT_ID, modes)
-    private val syncScopeByUser = UserSyncScope(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes)
-    private val syncScopeByModule = ModuleSyncScope(DEFAULT_PROJECT_ID, listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2), modes)
 
     @RelaxedMockK lateinit var remoteDataSource: PersonRemoteDataSource
     @RelaxedMockK lateinit var localDataSource: PersonLocalDataSource
@@ -57,17 +50,17 @@ class PersonRepositoryTest {
 
     @Test
     fun givenRemoteCount_countToDownSyncByProjectShouldReturnTheRightTotal() = runBlockingTest {
-        assesDownSyncCount(syncScopeByProject)
+        assesDownSyncCount(projectSyncScope)
     }
 
     @Test
     fun givenRemoteCount_countToDownSyncByUserShouldReturnTheRightTotal() = runBlockingTest {
-        assesDownSyncCount(syncScopeByProject)
+        assesDownSyncCount(userSyncScope)
     }
 
     @Test
     fun givenRemoteCount_countToDownSyncByModulesShouldReturnTheRightTotal() = runBlockingTest {
-        assesDownSyncCount(syncScopeByProject)
+        assesDownSyncCount(moduleSyncScope)
     }
 
     @Test
@@ -109,9 +102,9 @@ class PersonRepositoryTest {
         }
     }
 
+
     private suspend fun assesDownSyncCount(downSyncScope: PeopleDownSyncScope) {
-        val ops = listOf(
-            PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0))
+        val ops = listOf(PeopleCount(REMOTE_PEOPLE_FOR_SUBSYNC, 0, 0))
 
         coEvery { downSyncScopeRepository.getDownSyncOperations(any()) } returns emptyList()
         every { remoteDataSource.getDownSyncPeopleCount(any(), any()) } returns Single.just(ops)

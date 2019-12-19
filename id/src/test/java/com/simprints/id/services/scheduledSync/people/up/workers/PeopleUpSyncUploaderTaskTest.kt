@@ -30,8 +30,8 @@ class PeopleUpSyncUploaderTaskTest {
     private val batchSize = 2
 
     private val task = PeopleUpSyncUploaderTask(
-        loginInfoManager, personLocalDataSource, personRemoteDataSource,
-        projectIdToSync, /*userIdToSync, */batchSize, peopleUpSyncScopeRepository // TODO: uncomment userId when multitenancy is properly implemented
+        loginInfoManager, personLocalDataSource, personRemoteDataSource ,
+        batchSize, peopleUpSyncScopeRepository // TODO: uncomment userId when multitenancy is properly implemented
     )
 
     private val differentProjectId = "differentProjectId"
@@ -55,8 +55,6 @@ class PeopleUpSyncUploaderTaskTest {
 
     @Test
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
-        mockSignedInUser(differentProjectId, userIdToSync)
-
         runBlocking {
             assertThrows<IllegalStateException> {
                 task.execute(mockk(relaxed = true))
@@ -156,8 +154,8 @@ class PeopleUpSyncUploaderTaskTest {
     }
 
     private fun mockSignedInUser(projectId: String, userId: String) {
-        every { loginInfoManager.signedInProjectId } returns projectId
-        every { loginInfoManager.signedInUserId } returns userId
+        every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns projectId
+        every { loginInfoManager.getSignedInUserIdOrEmpty() } returns userId
     }
 
     private fun mockSuccessfulLocalPeopleQueries(vararg queryResults: List<Person>) {

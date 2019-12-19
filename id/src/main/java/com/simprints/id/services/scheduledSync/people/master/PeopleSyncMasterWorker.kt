@@ -88,7 +88,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         val downSyncWorkersTags = syncWorkers.filter { it.state != WorkInfo.State.CANCELLED }.map { it.tags }.flatten().distinct()
         val syncIds = downSyncWorkersTags.filter { it.contains(TAG_MASTER_SYNC_ID) }
         if (syncIds.size > 1) {
-            val toKeep = syncIds.takeLast(1)
+            val toKeep = syncIds.first()
             val toRemove = syncIds - toKeep
             toRemove.forEach { wm.cancelAllWorkByTag(it) }
         }

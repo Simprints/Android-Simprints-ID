@@ -24,7 +24,7 @@ import com.simprints.testtools.unit.robolectric.ShadowAndroidXMultiDex
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.observers.TestObserver
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.ResponseBody
@@ -216,7 +216,7 @@ class SessionEventsUploaderTaskTest {
 
 
     private fun createFailureUploadResponse(code: Int = 500) =
-        Result.response<Void>(Response.error(ResponseBody.create(MediaType.parse("application/json"), ""), okhttp3.Response.Builder() //
+        Result.response<Void>(Response.error(ResponseBody.create("application/json".toMediaTypeOrNull(), ""), okhttp3.Response.Builder() //
             .code(code)
             .message("AppResponse.reason()")
             .protocol(Protocol.HTTP_1_1)
