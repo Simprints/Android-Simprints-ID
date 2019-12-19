@@ -2,67 +2,46 @@ package com.simprints.fingerprint.activities.matching
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
-import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
+import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.matching.request.MatchingTaskRequest
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.controllers.core.crashreport.FingerprintCrashReportManager
-import com.simprints.fingerprint.controllers.core.eventData.FingerprintSessionEventsManager
-import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
-import com.simprints.fingerprint.controllers.core.repository.FingerprintDbManager
-import com.simprints.fingerprint.controllers.core.timehelper.FingerprintTimeHelper
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForMatchingActivityException
-import com.simprints.id.Application
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForMatchingActivityException
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode.*
 import kotlinx.android.synthetic.main.activity_matching.*
-import timber.log.Timber
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class MatchingActivity : AppCompatActivity(), MatchingContract.View, OrchestratorCallback {
+class MatchingActivity : FingerprintActivity() {
 
-    override val context: Context by lazy { this }
+    private val viewModel: MatchingViewModel by viewModel()
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
-    override lateinit var viewPresenter: MatchingContract.Presenter
-
-    @Inject lateinit var dbManager: FingerprintDbManager
-    @Inject lateinit var sessionEventsManager: FingerprintSessionEventsManager
-    @Inject lateinit var crashReportManager: FingerprintCrashReportManager
-    @Inject lateinit var timeHelper: FingerprintTimeHelper
-    @Inject lateinit var preferencesManager: FingerprintPreferencesManager
-    @Inject lateinit var orchestrator: Orchestrator
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+    private lateinit var matchingRequest: MatchingTaskRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
-        val matchingRequest: MatchingActRequest = this.intent.extras?.getParcelable(MatchingActRequest.BUNDLE_KEY)
+
+        matchingRequest = this.intent.extras?.getParcelable(MatchingTaskRequest.BUNDLE_KEY)
             ?: throw InvalidRequestForMatchingActivityException()
 
         setContentView(R.layout.activity_matching)
         setTextInLayout()
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        val extras = intent.extras
-        if (extras == null) {
-            crashReportManager.logExceptionOrSafeException(FingerprintSimprintsException("Null extras passed to MatchingActivity"))
-            launchAlertActivity()
-            return
-        }
-
-        viewPresenter = MatchingPresenter(this, matchingRequest, dbManager, sessionEventsManager, crashReportManager, preferencesManager, timeHelper)
+        observeResult()
+        observeProgress()
+        observeTextViewUpdates()
+        observeErrorHandlingCases()
     }
 
     private fun setTextInLayout() {
@@ -71,98 +50,83 @@ class MatchingActivity : AppCompatActivity(), MatchingContract.View, Orchestrato
 
     override fun onResume() {
         super.onResume()
-        viewPresenter.start()
+        viewModel.start(matchingRequest)
+    }
+
+    private fun observeResult() {
+        viewModel.result.observe(this, Observer {
+            setResult(it.resultCode.value, it.data)
+            Handler().postDelayed({ finish() }, it.finishDelayMillis.toLong())
+        })
+    }
+
+    private fun observeProgress() {
+        viewModel.progress.observe(this, Observer {
+            setIdentificationProgress(it)
+        })
+    }
+
+    private fun observeTextViewUpdates() {
+        viewModel.hasLoadingBegun.observe(this, Observer {
+            if (it) tv_matchingProgressStatus1.setText(R.string.loading_candidates)
+        })
+
+        viewModel.matchBeginningSummary.observe(this, Observer {
+            tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, it.matchSize, arrayOf(it.matchSize))
+            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
+        })
+
+        viewModel.matchFinishedSummary.observe(this, Observer {
+            tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, it.returnSize, arrayOf(it.returnSize))
+
+            if (it.veryGoodMatches > 0) {
+                tv_matchingResultStatus1.visibility = View.VISIBLE
+                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, it.veryGoodMatches, arrayOf(it.veryGoodMatches))
+            }
+            if (it.goodMatches > 0) {
+                tv_matchingResultStatus2.visibility = View.VISIBLE
+                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, it.goodMatches, arrayOf(it.goodMatches))
+            }
+            if (it.veryGoodMatches < 1 && it.goodMatches < 1 || it.fairMatches > 1) {
+                tv_matchingResultStatus3.visibility = View.VISIBLE
+                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, it.fairMatches, arrayOf(it.fairMatches))
+            }
+            setIdentificationProgress(100)
+        })
+    }
+
+    private fun observeErrorHandlingCases() {
+        viewModel.alert.observe(this, Observer { launchAlert(this, it) })
+
+        viewModel.hasMatchFailed.observe(this, Observer {
+            if (it) {
+                Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
     @SuppressLint("ObjectAnimatorBinding")
-    override fun setIdentificationProgress(progress: Int) =
+    private fun setIdentificationProgress(progress: Int) =
         runOnUiThread {
             ObjectAnimator.ofInt(pb_identification, "progress", pb_identification.progress, progress)
                 .setDuration((progress * 10).toLong())
                 .start()
         }
 
-    override fun setVerificationProgress() =
-        runOnUiThread {
-            setIdentificationProgress(100)
-        }
-
-    override fun setIdentificationProgressLoadingStart() =
-        runOnUiThread {
-            tv_matchingProgressStatus1.text = androidResourcesHelper.getString(R.string.loading_candidates)
-            setIdentificationProgress(25)
-        }
-
-    override fun setIdentificationProgressMatchingStart(matchSize: Int) =
-        runOnUiThread {
-            tv_matchingProgressStatus1.text = androidResourcesHelper.getStringPlural(R.string.loaded_candidates_quantity_key, matchSize, arrayOf(matchSize))
-            tv_matchingProgressStatus2.setText(R.string.matching_fingerprints)
-            setIdentificationProgress(50)
-        }
-
-    override fun setIdentificationProgressReturningStart() =
-        runOnUiThread {
-            tv_matchingProgressStatus2.setText(R.string.returning_results)
-            setIdentificationProgress(90)
-        }
-
-    override fun setIdentificationProgressFinished(returnSize: Int, tier1Or2Matches: Int, tier3Matches: Int, tier4Matches: Int, matchingEndWaitTimeMillis: Int) =
-        runOnUiThread {
-            tv_matchingProgressStatus2.text = androidResourcesHelper.getStringPlural(R.string.returned_results_quantity_key, returnSize, arrayOf(returnSize))
-
-            if (tier1Or2Matches > 0) {
-                tv_matchingResultStatus1.visibility = View.VISIBLE
-                tv_matchingResultStatus1.text = androidResourcesHelper.getStringPlural(R.string.tier1or2_matches_quantity_key, tier1Or2Matches, arrayOf(tier1Or2Matches))
-            }
-            if (tier3Matches > 0) {
-                tv_matchingResultStatus2.visibility = View.VISIBLE
-                tv_matchingResultStatus2.text = androidResourcesHelper.getStringPlural(R.string.tier3_matches_quantity_key, tier3Matches, arrayOf(tier3Matches))
-            }
-            if (tier1Or2Matches < 1 && tier3Matches < 1 || tier4Matches > 1) {
-                tv_matchingResultStatus3.visibility = View.VISIBLE
-                tv_matchingResultStatus3.text = androidResourcesHelper.getStringPlural(R.string.tier4_matches_quantity_key, tier4Matches, arrayOf(tier4Matches))
-            }
-            setIdentificationProgress(100)
-
-            val handler = Handler()
-            handler.postDelayed({ finish() }, matchingEndWaitTimeMillis.toLong())
-        }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() {}
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            doSetResult(it, data)
+        when (ResultCode.fromValue(resultCode)) {
+            REFUSED -> setResultAndFinish(REFUSED, data)
+            ALERT -> setResultAndFinish(ALERT, data)
+            CANCELLED -> setResultAndFinish(CANCELLED, data)
+            OK -> {
+            }
         }
-        doFinish()
     }
 
-    override fun launchAlertActivity() {
-        launchAlert(this, FingerprintAlert.UNEXPECTED_ERROR)
-    }
-
-    override fun makeToastMatchFailed() {
-        Toast.makeText(this@MatchingActivity, "Matching failed", Toast.LENGTH_LONG).show()
-    }
-
-    override fun doSetResult(resultCode: Int, resultData: Intent?) {
-        setResult(resultCode, resultData)
-    }
-
-    override fun doFinish() {
-        Timber.d("MatchingAct: done")
+    private fun setResultAndFinish(resultCode: ResultCode, resultData: Intent?) {
+        setResult(resultCode.value, resultData)
         finish()
-    }
-
-    override fun onDestroy() {
-        viewPresenter.dispose()
-        super.onDestroy()
     }
 
     override fun onBackPressed() {}

@@ -10,7 +10,15 @@
         <dist:fusing dist:include="true" />
     </dist:module>
 
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application tools:ignore="GoogleAppIndexingWarning">
+
+        <activity
+            android:name="com.simprints.fingerprint.activities.orchestrator.OrchestratorActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name="com.simprints.fingerprint.activities.matching.MatchingActivity"
             android:label="Matching"
@@ -20,18 +28,18 @@
 
         <activity
             android:name="com.simprints.fingerprint.activities.collect.CollectFingerprintsActivity"
-            android:label="Main"
+            android:label="Collect Fingerprints"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity
             android:name="com.simprints.fingerprint.activities.alert.AlertActivity"
-            android:label="Main"
+            android:label="Alert"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name="com.simprints.fingerprint.activities.launch.LaunchActivity"
+            android:name="com.simprints.fingerprint.activities.connect.ConnectScannerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />

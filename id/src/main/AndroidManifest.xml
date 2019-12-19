@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.simprints.id">
-
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -11,7 +10,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
-
     <application
         android:name=".Application"
         android:allowBackup="false"
@@ -20,23 +18,39 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
+        <activity
+            android:name=".activities.faceexitform.FaceExitFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.fingerprintexitform.FingerprintExitFormActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".activities.fetchguid.FetchGuidActivity" />
+        <activity
+            android:name=".activities.coreexitform.CoreExitFormActivity"
+            android:label="@string/title_activity_exit_form"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.consent.ConsentActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.orchestrator.OrchestratorActivity"
             android:launchMode="standard"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Launcher" />
-
         <activity
             android:name=".activities.checkLogin.openedByIntent.CheckLoginFromIntentActivity"
             android:launchMode="standard"
@@ -58,7 +72,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.alert.AlertActivity"
             android:launchMode="singleTop"
@@ -87,16 +100,20 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
+        <activity android:name=".activities.settings.ModuleSelectionActivity"
+            android:label="@string/preference_select_modules_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
 
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activities.longConsent.LongConsentActivity"
+            android:name=".activities.longConsent.PrivacyNoticeActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activities.guidselection.GuidSelectionActivity"
             android:exported="true"

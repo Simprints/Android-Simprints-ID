@@ -4,5 +4,7 @@ they can be launched only from Android Studio. Because CI needs to be able to ru
 then our junit tests need to sit in the Android Tests package (unfortunately they will be slower).
 Annotations are useful to run just a small set of android tests on local machines.
 
-E.g @MediumTest
-./gradlew fingerprint:connectedCheck  -Pandroid.testInstrumentationRunnerArguments.size=medium
+Currently using `@SmallTest` for unit tests in the AndroidTest folder.
+
+E.g @SmallTest
+`./gradlew fingerprint:connectedCheck  -Pandroid.testInstrumentationRunnerArguments.size=small`

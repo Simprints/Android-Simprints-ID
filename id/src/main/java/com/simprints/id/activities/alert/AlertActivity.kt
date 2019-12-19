@@ -15,8 +15,12 @@ import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.request.AlertActRequest
 import com.simprints.id.activities.alert.response.AlertActResponse
+import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertActivityViewModel
 import com.simprints.id.domain.alert.AlertType
+import com.simprints.id.domain.moduleapi.core.response.CoreResponse
+import com.simprints.id.exitformhandler.ExitFormHelper
+import com.simprints.id.orchestrator.steps.core.CoreRequestCode
 import com.simprints.id.tools.AndroidResourcesHelper
 import kotlinx.android.synthetic.main.activity_alert.*
 import javax.inject.Inject
@@ -26,6 +30,7 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
     override lateinit var viewPresenter: AlertContract.Presenter
     private lateinit var alertTypeType: AlertType
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var exitFormHelper: ExitFormHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +41,18 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val app = application as Application
 
+        injectDependencies(app.component)
+
         alertTypeType = intent.extras?.let {
             it.get(AlertActRequest.BUNDLE_KEY) as AlertActRequest
         }?.alertType ?: AlertType.UNEXPECTED_ERROR
 
         viewPresenter = AlertPresenter(this, app.component, alertTypeType)
         viewPresenter.start()
+    }
+
+    private fun injectDependencies(component: AppComponent) {
+        component.inject(this)
     }
 
     override fun getColorForColorRes(@ColorRes colorRes: Int) = ResourcesCompat.getColor(resources, colorRes, null)
@@ -80,14 +91,53 @@ class AlertActivity : AppCompatActivity(), AlertContract.View {
 
     override fun onBackPressed() {
         viewPresenter.handleBackButton()
-        super.onBackPressed()
+    }
+
+    override fun startExitForm(exitFormActivityClass: String?) {
+        exitFormActivityClass?.let {
+            startActivityForResult(
+                Intent().setClassName(this, exitFormActivityClass),
+                CoreRequestCode.EXIT_FORM.value
+            )
+        }
     }
 
     override fun closeActivityAfterCloseButton() {
         setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType))
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.CLOSE))
         })
 
         finish()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        exitFormHelper.buildExitFormResponseForCore(data)?.let {
+            setResultAndFinish(it)
+        }
+    }
+
+    override fun finishWithTryAgain() {
+        setResult(Activity.RESULT_OK, Intent().apply {
+            putExtra(AlertActResponse.BUNDLE_KEY, AlertActResponse(alertTypeType, AlertActResponse.ButtonAction.TRY_AGAIN))
+        })
+
+        finish()
+    }
+
+    override fun openWifiSettings() {
+        val intent = Intent().apply {
+            action = android.provider.Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivity(intent)
+    }
+
+    private fun setResultAndFinish(coreResponse: CoreResponse) {
+        setResult(Activity.RESULT_OK, buildIntentForResponse(coreResponse))
+        finish()
+    }
+
+    private fun buildIntentForResponse(coreResponse: CoreResponse) = Intent().apply {
+        putExtra(CoreResponse.CORE_STEP_BUNDLE, coreResponse)
     }
 }

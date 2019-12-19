@@ -1,7 +1,8 @@
 package com.simprints.fingerprint.activities.collect.models
 
 import android.os.Parcelable
-import com.simprints.fingerprint.data.domain.person.Fingerprint
+import com.simprints.fingerprint.data.domain.fingerprint.FingerIdentifier
+import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import kotlinx.android.parcel.Parcelize
 
 /**
@@ -22,7 +23,7 @@ data class Finger(val id: FingerIdentifier,
                   var numberOfBadScans: Int = 0) : Comparable<Finger>, Parcelable {
 
     companion object {
-        val NB_OF_FINGERS = 10
+        const val NB_OF_FINGERS = 10
     }
 
     val isGoodScan: Boolean

@@ -13,11 +13,13 @@ import com.simprints.fingerprint.activities.collect.models.Finger
 import com.simprints.fingerprint.activities.collect.models.FingerRes
 import com.simprints.fingerprint.activities.collect.models.FingerStatus
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
+import com.simprints.fingerprint.controllers.core.preferencesManager.FingerprintPreferencesManager
 import com.simprints.fingerprint.tools.extensions.activityIsPresentAndFragmentIsAdded
 
 class FingerFragment : Fragment() {
 
     lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+    lateinit var fingerprintPreferencesManager: FingerprintPreferencesManager
 
     lateinit var finger: Finger
     private lateinit var fingerImage: ImageView
@@ -37,12 +39,20 @@ class FingerFragment : Fragment() {
         fingerDirectionText = view.findViewById(R.id.fingerDirectionText)
         fingerNumberText = view.findViewById(R.id.fingerNumberText)
 
-        if(activityIsPresentAndFragmentIsAdded()) {
-            updateFingerImageAccordingToStatus()
+        if (activityIsPresentAndFragmentIsAdded()) {
+            updateOrHideFingerImageAccordingToSettings()
             updateTextAccordingToStatus()
         }
 
         return view
+    }
+
+    private fun updateOrHideFingerImageAccordingToSettings() {
+        if (fingerprintPreferencesManager.fingerImagesExist) {
+            updateFingerImageAccordingToStatus()
+        } else {
+            fingerImage.visibility = View.INVISIBLE
+        }
     }
 
     private fun updateFingerImageAccordingToStatus() {
@@ -81,12 +91,17 @@ class FingerFragment : Fragment() {
 
         private const val FINGER_ARG = "finger"
 
-        fun newInstance(finger: Finger, androidResourcesHelper: FingerprintAndroidResourcesHelper): FingerFragment {
+        fun newInstance(
+            finger: Finger,
+            androidResourcesHelper: FingerprintAndroidResourcesHelper,
+            fingerprintPreferencesManager: FingerprintPreferencesManager
+        ): FingerFragment {
             val fingerFragment = FingerFragment()
             val bundle = Bundle()
             bundle.putParcelable(FINGER_ARG, finger)
             fingerFragment.arguments = bundle
             fingerFragment.androidResourcesHelper = androidResourcesHelper
+            fingerFragment.fingerprintPreferencesManager = fingerprintPreferencesManager
             return fingerFragment
         }
     }

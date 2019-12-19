@@ -1,20 +1,20 @@
 package com.simprints.fingerprint.activities.matching
 
-import com.simprints.fingerprint.data.domain.person.Person
+import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.fingerprintmatcher.LibMatcher
 import io.reactivex.Single
 
-internal interface MatchTask {
+interface MatchTask {
 
     val matchStartTime: Long
 
-    fun loadCandidates(): Single<List<Person>>
+    fun loadCandidates(): Single<List<FingerprintIdentity>>
 
-    fun handlesCandidatesLoaded(candidates: List<Person>)
+    fun handlesCandidatesLoaded(candidates: List<FingerprintIdentity>)
 
     fun getMatcherType(): LibMatcher.MATCHER_TYPE
 
     fun onMatchProgressDo(progress: Int)
 
-    fun handleMatchResult(candidates: List<Person>, scores: List<Float>)
+    fun handleMatchResult(candidates: List<FingerprintIdentity>, scores: List<Float>)
 }

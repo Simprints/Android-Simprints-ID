@@ -1,7 +1,7 @@
 package com.simprints.clientapi.activities.errors
 
 import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEventsManager
-import com.simprints.clientapi.extensions.inBackground
+import com.simprints.clientapi.extensions.doInBackground
 import com.simprints.id.R as Rid
 
 class ErrorPresenter(val view: ErrorContract.View,
@@ -9,7 +9,7 @@ class ErrorPresenter(val view: ErrorContract.View,
     : ErrorContract.Presenter {
 
     override fun start(clientApiAlert: ClientApiAlert) {
-        sessionEventsManager.addAlertScreenEvent(clientApiAlert).inBackground()
+        sessionEventsManager.addAlertScreenEvent(clientApiAlert).doInBackground()
         view.setErrorMessageText(getErrorMessage(clientApiAlert))
     }
 
@@ -29,6 +29,6 @@ class ErrorPresenter(val view: ErrorContract.View,
 
     override suspend fun start() {}
 
-    override fun handleCloseClick() = view.closeActivity()
+    override fun handleCloseOrBackClick() = view.closeActivity()
 
 }

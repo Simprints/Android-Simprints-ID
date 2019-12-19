@@ -7,24 +7,22 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-import androidx.appcompat.app.AppCompatActivity
 import com.simprints.fingerprint.R
+import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.refusal.result.RefusalTaskResult
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.data.domain.refusal.RefusalActResult
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
 import com.simprints.fingerprint.tools.extensions.showToast
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_refusal.*
 import org.jetbrains.anko.inputMethodManager
 import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
+class RefusalActivity : FingerprintActivity(), RefusalContract.View {
 
-class RefusalActivity : AppCompatActivity(), RefusalContract.View {
+    override val viewPresenter: RefusalContract.Presenter by inject{ parametersOf(this) }
 
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
-
-    override lateinit var viewPresenter: RefusalContract.Presenter
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
     private val textWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -40,14 +38,10 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
         setContentView(R.layout.activity_refusal)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setTextInLayout()
-
-        viewPresenter = RefusalPresenter(this, component)
 
         setButtonClickListeners()
         setLayoutChangeListeners()
@@ -133,14 +127,14 @@ class RefusalActivity : AppCompatActivity(), RefusalContract.View {
         refusalText.addTextChangedListener(textWatcher)
     }
 
-    override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalActResult) {
+    override fun setResultAndFinish(activityResult: Int, refusalResult: RefusalTaskResult) {
         setResult(activityResult, getIntentForResultData(refusalResult))
         finish()
     }
 
-    private fun getIntentForResultData(refusalResult: RefusalActResult) =
+    private fun getIntentForResultData(refusalResult: RefusalTaskResult) =
         Intent().putExtra(
-            RefusalActResult.BUNDLE_KEY,
+            RefusalTaskResult.BUNDLE_KEY,
             refusalResult)
 
     private fun getRefusalText() = refusalText.text.toString()

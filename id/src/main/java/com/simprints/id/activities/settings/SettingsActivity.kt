@@ -71,4 +71,9 @@ class SettingsActivity : AppCompatPreferenceActivity() {
     fun openSettingAboutActivity() {
         startActivityForResult(Intent(this, SettingsAboutActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
     }
+
+    fun openModuleSelectionActivity() {
+        val intent = Intent(this, ModuleSelectionActivity::class.java)
+        startActivityForResult(intent, SETTINGS_ACTIVITY_REQUEST_CODE)
+    }
 }

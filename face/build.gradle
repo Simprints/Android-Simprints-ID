@@ -13,6 +13,8 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
     buildTypes {
         releaseWithLogfile {
@@ -23,6 +25,11 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
     }
 }
 
@@ -51,9 +58,62 @@ repositories {
 }
 
 dependencies {
+    // https://issuetracker.google.com/issues/132906456
+    // When Unit tests are launched in CL, the classes.jar for the base module is not included in the final testing classes.jar file.
+    // So the tests that have references to the base module fail with java.lang.NoClassDefFoundError exceptions.
+    // The following line includes the base module classes.jar into the final one.
+    // To run unit tests from CL: ./gradlew fingerprint:test
+    testRuntimeOnly (files("${projectDir}/../id/build/intermediates/app_classes/debug/bundleDebugClasses/classes.jar"))
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':id')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation deps.androidx.appcompat
+
+    // Android X
+    androidTestImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestUtil deps.testing.androidx.orchestrator
+
+    // Espresso
+    androidTestImplementation deps.testing.espresso.core
+    androidTestImplementation deps.testing.espresso.intents
+    androidTestImplementation(deps.testing.espresso.barista) {
+        exclude group: "com.android.support"
+        exclude group: "com.google.code.findbugs"
+        exclude group: "org.jetbrains.kotlin"
+        exclude group: "com.google.guava"
+    }
+
+    // Koin
+    androidTestImplementation deps.koin.core_ext
+    androidTestImplementation deps.testing.koin
+
+    // ######################################################
+    //                      Unit test
+    // ######################################################
+
+    // Simprints
+    testImplementation project(':testtools')
+    testImplementation(deps.testing.junit) {
+        exclude group: "com.android.support"
+    }
+
+    // Android X
+    testImplementation deps.testing.androidx.ext_junit
+    testImplementation deps.testing.androidx.core
+    testImplementation deps.testing.androidx.core_testing
+    testImplementation deps.testing.androidx.runner
+
+    // Kotlin
+    testImplementation deps.testing.coroutines_test
+
+    // Mockk
+    testImplementation deps.testing.mockk
+    testImplementation deps.testing.truth
 }

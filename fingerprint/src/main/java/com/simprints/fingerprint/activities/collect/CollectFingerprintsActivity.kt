@@ -1,8 +1,6 @@
 package com.simprints.fingerprint.activities.collect
 
-import android.app.Activity
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Bundle
@@ -11,38 +9,33 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.ViewPager
 import com.simprints.fingerprint.R
 import com.simprints.fingerprint.activities.alert.AlertActivityHelper.launchAlert
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
+import com.simprints.fingerprint.activities.base.FingerprintActivity
+import com.simprints.fingerprint.activities.collect.request.CollectFingerprintsTaskRequest
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 import com.simprints.fingerprint.activities.collect.views.TimeoutBar
-import com.simprints.fingerprint.activities.matching.MatchingActivity
-import com.simprints.fingerprint.activities.orchestrator.Orchestrator
-import com.simprints.fingerprint.activities.orchestrator.OrchestratorCallback
 import com.simprints.fingerprint.controllers.core.androidResources.FingerprintAndroidResourcesHelper
-import com.simprints.fingerprint.data.domain.InternalConstants.RequestIntents.Companion.MATCHING_ACTIVITY_REQUEST
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.data.domain.moduleapi.fingerprint.requests.FingerprintRequest
-import com.simprints.fingerprint.di.FingerprintComponentBuilder
-import com.simprints.fingerprint.exceptions.unexpected.InvalidRequestForFingerprintException
+import com.simprints.fingerprint.exceptions.unexpected.request.InvalidRequestForCollectFingerprintsActivityException
+import com.simprints.fingerprint.orchestrator.domain.RequestCode
+import com.simprints.fingerprint.orchestrator.domain.ResultCode
 import com.simprints.fingerprint.tools.extensions.launchRefusalActivity
-import com.simprints.id.Application
 import kotlinx.android.synthetic.main.activity_collect_fingerprints.*
 import kotlinx.android.synthetic.main.content_main.*
-import javax.inject.Inject
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.core.parameter.parametersOf
 
 class CollectFingerprintsActivity :
-    AppCompatActivity(),
-    CollectFingerprintsContract.View,
-    OrchestratorCallback {
+    FingerprintActivity(),
+    CollectFingerprintsContract.View {
 
-    override val context: Context by lazy { this }
-    @Inject lateinit var orchestrator: Orchestrator
-    @Inject lateinit var androidResourcesHelper: FingerprintAndroidResourcesHelper
+    val androidResourcesHelper: FingerprintAndroidResourcesHelper by inject()
 
+    private lateinit var fingerprintRequest: CollectFingerprintsTaskRequest
     override lateinit var viewPresenter: CollectFingerprintsContract.Presenter
 
     override lateinit var viewPager: ViewPagerCustom
@@ -52,24 +45,20 @@ class CollectFingerprintsActivity :
     override lateinit var progressBar: ProgressBar
     override lateinit var timeoutBar: TimeoutBar
     override lateinit var un20WakeupDialog: ProgressDialog
-    private lateinit var fingerprintRequest: FingerprintRequest
 
     private var rightToLeft: Boolean = false
-    private val resultIntent = Intent()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_collect_fingerprints)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        val component = FingerprintComponentBuilder.getComponent(application as Application)
-        component.inject(this)
 
-        fingerprintRequest = this.intent.extras?.getParcelable(FingerprintRequest.BUNDLE_KEY)
-            ?: throw InvalidRequestForFingerprintException()
+        fingerprintRequest = this.intent.extras?.getParcelable(CollectFingerprintsTaskRequest.BUNDLE_KEY)
+            ?: throw InvalidRequestForCollectFingerprintsActivityException()
 
         configureRightToLeft()
 
-        viewPresenter = CollectFingerprintsPresenter(this, this, fingerprintRequest, component)
+        viewPresenter = get { parametersOf(this, this, fingerprintRequest) }
         initBar()
         initViewFields()
         viewPresenter.start()
@@ -153,32 +142,14 @@ class CollectFingerprintsActivity :
         }
     }
 
-    override fun finishSuccessEnrol(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) =
-        setCollectResultInIntent(bundleKey, fingerprintsActResult).also {
-            setResult(Activity.RESULT_OK, resultIntent)
-            finish()
-        }
-
-    override fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) =
-        setCollectResultInIntent(bundleKey, fingerprintsActResult).also {
-            startMatchingActivity(viewPresenter.getExtraForMatchingActivity(fingerprintsActResult))
-        }
-
-    private fun setCollectResultInIntent(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult) {
-        resultIntent.putExtra(bundleKey, fingerprintsActResult)
+    override fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult) {
+        setResultAndFinish(ResultCode.OK, Intent().apply {
+            putExtra(CollectFingerprintsTaskResult.BUNDLE_KEY, fingerprintsActResult)
+        })
     }
+
 
     override fun startRefusalActivity() = launchRefusalActivity()
-
-    private fun startMatchingActivity(extra: MatchingActRequest) {
-        val matchingIntent = Intent(this, MatchingActivity::class.java)
-        matchingIntent.putExtra(MatchingActRequest.BUNDLE_KEY, extra)
-        startActivityForResult(matchingIntent, MATCHING_ACTIVITY_REQUEST)
-    }
-
-
-    override fun cancelAndFinish() =
-        setResult(Activity.RESULT_CANCELED).also { finish() }
 
     override fun onBackPressed() {
         viewPresenter.handleOnBackPressed()
@@ -186,19 +157,20 @@ class CollectFingerprintsActivity :
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        orchestrator.onActivityResult(this, requestCode, resultCode, data)
-    }
-
-    override fun tryAgain() {
-        viewPresenter.handleTryAgainFromDifferentActivity()
-    }
-
-    override fun onActivityResultReceived() {}
-    override fun resultNotHandleByOrchestrator(resultCode: Int?, data: Intent?) {}
-    override fun setResultDataAndFinish(resultCode: Int?, data: Intent?) {
-        resultCode?.let {
-            setResult(it, data)
+        if (requestCode == RequestCode.REFUSAL.value || requestCode == RequestCode.ALERT.value) {
+            when (ResultCode.fromValue(resultCode)) {
+                ResultCode.REFUSED -> setResultAndFinish(ResultCode.REFUSED, data)
+                ResultCode.ALERT -> setResultAndFinish(ResultCode.ALERT, data)
+                ResultCode.CANCELLED -> setResultAndFinish(ResultCode.CANCELLED, data)
+                ResultCode.OK -> {
+                    viewPresenter.handleTryAgainFromDifferentActivity()
+                }
+            }
         }
+    }
+
+    private fun setResultAndFinish(resultCode: ResultCode, data: Intent?) {
+        setResult(resultCode.value, data)
         finish()
     }
 
@@ -214,5 +186,10 @@ class CollectFingerprintsActivity :
     override fun showSplashScreen() {
         startActivity(Intent(this, SplashScreenActivity::class.java))
         overridePendingTransition(R.anim.slide_in, R.anim.slide_out)
+    }
+
+    override fun onDestroy() {
+        viewPresenter.disconnectScannerIfNeeded()
+        super.onDestroy()
     }
 }

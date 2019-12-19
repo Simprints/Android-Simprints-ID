@@ -5,7 +5,12 @@ import com.simprints.id.domain.alert.AlertType
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class AlertActResponse(val alertType: AlertType): Parcelable {
+data class AlertActResponse(val alertType: AlertType, val buttonAction: ButtonAction): Parcelable {
+
+    enum class ButtonAction {
+        CLOSE,
+        TRY_AGAIN
+    }
 
     companion object {
         const val BUNDLE_KEY = "AlertActResponseBundleKey"

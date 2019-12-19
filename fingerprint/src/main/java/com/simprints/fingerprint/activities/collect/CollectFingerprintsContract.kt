@@ -1,18 +1,14 @@
 package com.simprints.fingerprint.activities.collect
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import com.simprints.fingerprint.activities.BasePresenter
-import com.simprints.fingerprint.activities.BaseView
 import com.simprints.fingerprint.activities.alert.FingerprintAlert
-import com.simprints.fingerprint.activities.alert.response.AlertActResult
+import com.simprints.fingerprint.activities.base.BasePresenter
+import com.simprints.fingerprint.activities.base.BaseView
 import com.simprints.fingerprint.activities.collect.models.Finger
-import com.simprints.fingerprint.data.domain.collect.CollectFingerprintsActResult
-import com.simprints.fingerprint.data.domain.matching.request.MatchingActRequest
-import com.simprints.fingerprint.exceptions.FingerprintSimprintsException
+import com.simprints.fingerprint.activities.collect.result.CollectFingerprintsTaskResult
 
 interface CollectFingerprintsContract {
 
@@ -29,12 +25,9 @@ interface CollectFingerprintsContract {
         fun initViewPager(onPageSelected: (Int) -> Unit, onTouch: () -> Boolean)
         fun doLaunchAlert(fingerprintAlert: FingerprintAlert)
         fun startRefusalActivity()
-        fun finishSuccessEnrol(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
-        fun finishSuccessAndStartMatching(bundleKey: String, fingerprintsActResult: CollectFingerprintsActResult)
-        fun cancelAndFinish()
+        fun setResultAndFinishSuccess(fingerprintsActResult: CollectFingerprintsTaskResult)
 
         fun showSplashScreen()
-        fun setResultDataAndFinish(resultCode: Int?, data: Intent?)
 
         // Fingers
         var pageAdapter: FingerPageAdapter
@@ -63,11 +56,12 @@ interface CollectFingerprintsContract {
         fun handleConfirmFingerprintsAndContinue()
         fun handleOnBackPressed()
         fun handleTryAgainFromDifferentActivity()
-        fun handleException(simprintsException: FingerprintSimprintsException)
+        fun handleException(e: Throwable)
 
         // Scanning
         var isConfirmDialogShown: Boolean
         fun isScanning(): Boolean
+        fun disconnectScannerIfNeeded()
 
         // Indicators
         fun initIndicators()
@@ -82,7 +76,5 @@ interface CollectFingerprintsContract {
         fun fingerHasSatisfiedTerminalCondition(finger: Finger): Boolean
         fun handleCaptureSuccess()
         fun handleScannerButtonPressed()
-
-        fun getExtraForMatchingActivity(fingerprintsActResult: CollectFingerprintsActResult): MatchingActRequest
     }
 }

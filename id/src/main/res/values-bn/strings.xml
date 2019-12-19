@@ -25,12 +25,12 @@
     <string name="short_consent">আমি আপনার আঙুলের ছাপ এবং অবস্থান ব্যবহার করতে চাই যেন সিমপ্রিন্টস আপনার স্বাস্থ্য তথ্য সমূহ খুঁজে পায়। যদি আপনি এতে রাজী থাকেন অথবা আপনার কোন প্রশ্ন থেকে থাকে তবে আমাকে জানান অন্যথায় আপনার বামহাতের তর্জনী সেন্সরে সমানভাবে রাখুন"</string>
     <string name="confirm_consent">সম্মতি নিশ্চিত করতে এখানে ট্যাপ করুন</string>
     <!-- Loading Messages-->
-    <string name="loading">লোড হচ্ছে</string>
+    <string name="connect_scanner_loading">লোড হচ্ছে</string>
     <string name="updating_database">সিঙ্ক করা হচ্ছেপ্রজক্টে ডাটাবসে আপডটে করা হচ্ছ…</string>
     <string name="launch_checking_permissions">অনুমতি পরীক্ষা করা হচ্ছে…</string>
-    <string name="launch_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
-    <string name="launch_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
-    <string name="launch_setup">सेट अप Vero</string>
+    <string name="connect_scanner_bt_connect">Vero সংযুক্ত হচ্ছে…</string>
+    <string name="connect_scanner_wake_un20">UN20 নিদ্রাভঙ্গ আপ…</string>
+    <string name="connect_scanner_setup">सेट अप Vero</string>
     <string name="launch_checking_person_in_db">চেক করা ব্যক্তি ডাটাবেসে আছে…</string>
 
 
@@ -270,6 +270,19 @@
     <string name="title_activity_settings">সেটিংস</string>
     <string name="title_activity_settings_about">সম্বন্ধে</string>
     <string name="privacy_notice_title">গোপনীয়তা নোটিশ</string>
+    <string name="privacy_notice_text"><u>গোপনীয়তা নোটিশ</u></string>
+    <string name="launch_consent_accept_button">গ্রহণ করুন</string>
+    <string name="launch_consent_decline_button"> প্রত্যাখ্যান করুন</string>
+    <string name="consent_parental_title">মাতা-পিতার সম্মতি</string>
+    <string name="consent_general_title">সাধারন সম্মতি</string>
 
-
+    <string name="refusal_app_not_working">অ্যাপ কাজ করছে না</string>
+    <string name="refusal_data_concerns">তথ্য দিতে আগ্রহী নন</string>
+    <string name="refusal_does_not_have_permission">অনুমতি নেই</string>
+    <string name="refusal_person_not_present">ব্যক্তি উপস্থিত নয়</string>
+    <string name="refusal_religious_concerns">"ধর্মীয় সমস্যা   "</string>
+    <string name="refusal_toast_select_option_submit">একটি অপশন সিলেক্ট করুন এবং সাবমিট করুন</string>
+    <string name="refusal_toast_submit">ফরম সাবমিট করুন</string>
+    <string name="refusal_too_young">বয়স কম</string>
+    <string name="refusal_other">অন্যান্য</string>
 </resources>

@@ -2,6 +2,7 @@ package com.simprints.clientapi.activities.baserequest
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
@@ -19,9 +20,15 @@ import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsConfirmati
 import com.simprints.clientapi.routers.AppRequestRouter.routeSimprintsRequest
 import com.simprints.clientapi.routers.ClientRequestErrorRouter.launchAlert
 import com.simprints.moduleapi.app.responses.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestView {
+
+    private var isActivityRestored = false
+    private var requestProcessed = false
 
     abstract val guidSelectionNotifier: GuidSelectionNotifier
 
@@ -56,6 +63,19 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
     }
 
     override fun returnErrorToClient(errorResponse: ErrorResponse, flowCompletedCheck: Boolean) = sendCancelResult()
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        isActivityRestored = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isActivityRestored && !requestProcessed) {
+            requestProcessed = true
+            CoroutineScope(Dispatchers.Main).launch { presenter.start() }
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
