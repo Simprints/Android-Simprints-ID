@@ -19,7 +19,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     @Inject lateinit var preferenceManager: PreferencesManager
 
     companion object {
-        const val MIN_BACKOFF_MILLIS = 15L //15 seconds
+        var MIN_BACKOFF_SECS = 15L
 
         const val MASTER_SYNC_SCHEDULERS = "MASTER_SYNC_SCHEDULERS"
         const val MASTER_SYNC_SCHEDULER_ONE_TIME = "MASTER_SYNC_SCHEDULER_ONE_TIME"

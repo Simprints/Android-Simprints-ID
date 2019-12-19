@@ -34,7 +34,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
 
             val task = PeopleUpSyncUploaderTask(
                 loginInfoManager, personLocalDataSource, personRemoteDataSource,
-                loginInfoManager.getSignedInProjectIdOrEmpty(), /*userId, */PATIENT_UPLOAD_BATCH_SIZE,
+                PATIENT_UPLOAD_BATCH_SIZE,
                 peopleUpSyncScopeRepository
             )
 

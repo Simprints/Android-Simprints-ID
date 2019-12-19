@@ -94,7 +94,7 @@ class SessionEventsUploaderTaskAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, module, preferencesModule).fullSetup()
+        AndroidTestConfig(this, module, preferencesModule = preferencesModule).fullSetup()
 
         whenever(settingsPreferencesManagerSpy.fingerStatus).thenReturn(hashMapOf(
             FingerIdentifier.LEFT_THUMB to true,

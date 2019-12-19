@@ -55,7 +55,7 @@ class PeopleUpSyncWorkersBuilderImpl : PeopleUpSyncWorkersBuilder {
             .addTag("${TAG_SCHEDULED_AT}${Date().time}")
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
             .addTag(TAG_PEOPLE_UP_SYNC_ALL_WORKERS)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, PeopleSyncMasterWorker.MIN_BACKOFF_MILLIS, TimeUnit.SECONDS).also { builder ->
+            .setBackoffCriteria(BackoffPolicy.LINEAR, PeopleSyncMasterWorker.MIN_BACKOFF_SECS, TimeUnit.SECONDS).also { builder ->
                 uniqueMasterSyncId?.let {
                     builder.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}")
                 }

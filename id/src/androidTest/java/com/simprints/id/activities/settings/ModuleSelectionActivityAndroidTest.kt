@@ -26,7 +26,7 @@ class ModuleSelectionActivityAndroidTest {
 
     @Before
     fun setUp() {
-        AndroidTestConfig(this, null, preferencesModule).fullSetup()
+        AndroidTestConfig(this, null, preferencesModule = preferencesModule).fullSetup()
         preferencesManagerMock = app.component.getPreferencesManager()
     }
 

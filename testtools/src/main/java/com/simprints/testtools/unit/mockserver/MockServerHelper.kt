@@ -9,7 +9,7 @@ fun assertQueryUrlParam(url: HttpUrl, paramName: String, expected: Any, transfor
 }
 
 fun assertPathUrlParam(url: HttpUrl, expected: String) {
-    Assert.assertTrue(url.pathSegments().contains(expected))
+    Assert.assertTrue(url.pathSegments.contains(expected))
 }
 
 fun mockSuccessfulResponse(): MockResponse =

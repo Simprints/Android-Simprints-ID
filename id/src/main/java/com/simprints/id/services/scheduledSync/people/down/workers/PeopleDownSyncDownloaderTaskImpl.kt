@@ -50,6 +50,8 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             val flowPeople = createPeopleFlowFromJsonReader(reader)
             flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
                 saveBatchAndUpdateDownSyncStatus(it)
+                count += it.size
+                downSyncWorkerProgressReporter.reportCount(count)
             }
             updateDownSyncInfo(COMPLETE)
         } catch (t: Throwable) {
@@ -86,8 +88,6 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         flow {
             while (reader.hasNext()) {
                 this.emit(JsonHelper.gson.fromJson(reader, ApiGetPerson::class.java))
-                count += 1
-                downSyncWorkerProgressReporter.reportCount(count)
             }
         }
 

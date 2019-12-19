@@ -39,7 +39,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
 
                         val syncState = PeopleSyncState(lastSyncId, progress, total, upSyncStates, downSyncStates)
                         this@apply.postValue(syncState)
-                        Timber.d("I/Sync Emitting ${JsonHelper.toJson(syncState)}")
+                        Timber.d("I/SYNC Emitting ${JsonHelper.toJson(syncState)}")
                     }
                 }
             }

@@ -1,4 +1,3 @@
-def kotlin_version = "1.3.61"
 def kotlin = [
     reflect           : "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version", //TODO: remove it when we drop the legacy code around Firebase,
     stdlib            : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version",
@@ -75,7 +74,7 @@ def crashlytics = [
 ]
 
 def retrofit_version = "2.6.0"
-def okttp_version = "3.13.1"
+def okttp_version = "4.2.2"
 def retrofit = [
     core         : "com.squareup.retrofit2:retrofit:$retrofit_version",
     adapter      : "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version",
@@ -136,8 +135,11 @@ def testing = [
         kotlin                     : "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0",
         mockito_inline_androidtests: "com.linkedin.dexmaker:dexmaker-mockito-inline:2.25.0" //Mockito-inline works only in unit tests. Required to mock final attributes in android tests
     ],
-    mockk          : "io.mockk:mockk:1.9",
-    mockwebserver  : "com.squareup.okhttp3:mockwebserver:3.10.0",
+    mockk          : [
+        core   : "io.mockk:mockk:1.9",
+        android: "io.mockk:mockk-android:1.9"
+    ],
+    mockwebserver  : "com.squareup.okhttp3:mockwebserver:$okttp_version",
     espresso       : [
         core   : "androidx.test.espresso:espresso-core:$espresso_version",
         intents: "androidx.test.espresso:espresso-intents:$espresso_version",
@@ -166,7 +168,8 @@ def testing = [
     coroutines_test: 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.1',
     koin           : "org.koin:koin-test:$koin_version",
     live_data      : "com.jraska.livedata:testing-ktx:1.1.0",
-    kappuccino     : "br.com.concretesolutions:kappuccino:1.2.1"
+    kappuccino     : "br.com.concretesolutions:kappuccino:1.2.1",
+    awaitility     : "org.awaitility:awaitility-kotlin:4.0.1"
 ]
 
 //Not using Realm plugin: https://github.com/realm/realm-java/issues/5982

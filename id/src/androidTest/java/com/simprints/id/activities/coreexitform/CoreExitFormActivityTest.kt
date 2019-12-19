@@ -66,7 +66,6 @@ class CoreExitFormActivityTest {
     }
 
     @Test
-    @SmallTest
     fun chooseOtherOptionAndEnterText_shouldEnableSubmitButton() {
         launchCoreExitFormActivity()
 

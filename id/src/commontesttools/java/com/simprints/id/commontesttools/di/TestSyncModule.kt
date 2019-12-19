@@ -22,6 +22,7 @@ import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyn
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.TimeHelper
 import com.simprints.testtools.common.di.DependencyRule
+import javax.inject.Singleton
 
 class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRule = DependencyRule.RealRule,
                      private val peopleDownSyncDownloaderTaskRule: DependencyRule = DependencyRule.RealRule,
@@ -36,30 +37,34 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
                      private val peopleUpSyncManagerRule: DependencyRule = DependencyRule.RealRule,
                      private val peopleUpSyncScopeRepositoryRule: DependencyRule = DependencyRule.RealRule) : SyncModule() {
 
+    @Singleton
     override fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                                 preferencesManager: PreferencesManager,
                                                 syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
         peopleDownSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase) }
 
+    @Singleton
     override fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
                                                      personRemoteDataSource: PersonRemoteDataSource,
                                                      downSyncScopeRepository: PeopleDownSyncScopeRepository,
                                                      timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
         peopleDownSyncDownloaderTaskRule.resolveDependency { super.providePeopleDownSyncDownloaderTask(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper) }
 
-
+    @Singleton
     override fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
         peopleSessionEventsSyncManager.resolveDependency { super.provideSessionEventsSyncManager() }
 
+    @Singleton
     override fun providePeopleSyncStateProcessor(ctx: Context,
                                                  personRepository: PersonRepository): PeopleSyncStateProcessor =
         peopleSyncStateProcessor.resolveDependency { super.providePeopleSyncStateProcessor(ctx, personRepository) }
 
-
+    @Singleton
     override fun providePeopleSyncManager(ctx: Context,
                                           peopleSyncStateProcessor: PeopleSyncStateProcessor): PeopleSyncManager =
         peopleSyncManagerRule.resolveDependency { super.providePeopleSyncManager(ctx, peopleSyncStateProcessor) }
 
+    @Singleton
     override fun provideSyncManager(preferencesManager: PreferencesManager,
                                     sessionEventsSyncManager: SessionEventsSyncManager,
                                     peopleSyncManager: PeopleSyncManager,
@@ -67,22 +72,28 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
                                     peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
         syncManagerRule.resolveDependency { super.provideSyncManager(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository) }
 
+    @Singleton
     override fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
         peopleDownSyncWorkersBuilderRule.resolveDependency { super.provideDownSyncWorkerBuilder(downSyncScopeRepository) }
 
+    @Singleton
     override fun providePeopleUpSyncWorkerBuilder(): PeopleUpSyncWorkersBuilder =
         peopleUpSyncWorkersBuilderRule.resolveDependency { super.providePeopleUpSyncWorkerBuilder() }
 
+    @Singleton
     override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncDao =
         peopleUpSyncDaoRule.resolveDependency { super.providePeopleUpSyncDao(database) }
 
+    @Singleton
     override fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncDao =
         peopleDownSyncDaoRule.resolveDependency { super.providePeopleDownSyncDao(database) }
 
+    @Singleton
     override fun providePeopleUpSyncManager(ctx: Context,
                                             peopleUpSyncWorkersBuilder: PeopleUpSyncWorkersBuilder): PeopleUpSyncManager =
         peopleUpSyncManagerRule.resolveDependency { super.providePeopleUpSyncManager(ctx, peopleUpSyncWorkersBuilder) }
 
+    @Singleton
     override fun provideUpSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                               dao: PeopleUpSyncDao): PeopleUpSyncScopeRepository =
         peopleUpSyncScopeRepositoryRule.resolveDependency { super.provideUpSyncScopeRepository(loginInfoManager, dao) }

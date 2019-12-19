@@ -2,6 +2,7 @@ package com.simprints.testtools.android
 
 import android.app.Activity
 import android.view.WindowManager
+import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
@@ -25,5 +26,12 @@ fun getCurrentActivity(): Activity? {
             activity[0] = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).firstOrNull()
         }
         return activity[0]
+    }
+}
+
+inline fun <reified T : Activity> runOnActivity(crossinline block: (T) -> Unit) {
+    val scenario = ActivityScenario.launch(T::class.java)
+    scenario.onActivity {
+        block(it)
     }
 }
