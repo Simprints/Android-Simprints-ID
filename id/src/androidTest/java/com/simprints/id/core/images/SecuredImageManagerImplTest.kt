@@ -74,6 +74,13 @@ class SecuredImageManagerImplTest {
         assertThat(remainingFiles.size).isEqualTo(2)
     }
 
+    @Test
+    fun shouldHandleDeletionOfNonExistentImageFiles() {
+        val file = SecuredImageRef("non/existent/path")
+
+        assertThat(securedImageManager.deleteImage(file)).isFalse()
+    }
+
     private fun createImageFiles(count: Int): List<SecuredImageRef> {
         val createdFiles = arrayListOf<SecuredImageRef>()
 
