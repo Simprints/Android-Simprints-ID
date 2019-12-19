@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import com.simprints.core.images.SecuredImageRef
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -56,19 +57,32 @@ class SecuredImageManagerImplTest {
 
     @Test
     fun shouldListImageFiles() {
-        val expectedFileCount = 10
-        createImageFiles(expectedFileCount)
+        val expectedFileCount = createImageFiles(10).size
         val actualFileCount = securedImageManager.listImages().size
 
         assertThat(actualFileCount).isEqualTo(expectedFileCount)
     }
 
-    @Suppress("SameParameterValue")
-    private fun createImageFiles(count: Int) {
+    @Test
+    fun shouldDeleteImageFiles() {
+        val files = createImageFiles(3)
+        val fileToDelete = files.first()
+        securedImageManager.deleteImage(fileToDelete)
+        val remainingFiles = securedImageManager.listImages()
+
+        assertThat(remainingFiles.none { it.path == fileToDelete.path }).isTrue()
+        assertThat(remainingFiles.size).isEqualTo(2)
+    }
+
+    private fun createImageFiles(count: Int): List<SecuredImageRef> {
+        val createdFiles = arrayListOf<SecuredImageRef>()
+
         for (i in 0 until count) {
             val byteArray = Random.nextBytes(SIZE_IMAGE)
-            securedImageManager.storeImage(byteArray, UUID.randomUUID().toString())
+            securedImageManager.storeImage(byteArray, UUID.randomUUID().toString())?.let(createdFiles::add)
         }
+
+        return createdFiles
     }
 
 }

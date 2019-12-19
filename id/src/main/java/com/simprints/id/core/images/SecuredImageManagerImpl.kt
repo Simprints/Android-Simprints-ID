@@ -64,7 +64,14 @@ class SecuredImageManagerImpl(val ctx: Context,
 
     override fun listImages(): List<SecuredImageRef> {
         val imageFolder = File(imageFolderPath)
-        return imageFolder.list().map(::SecuredImageRef)
+        return imageFolder.listFiles().map {
+            SecuredImageRef(it.absolutePath)
+        }
+    }
+
+    override fun deleteImage(path: SecuredImageRef): Boolean {
+        val file = File(path.path)
+        return file.delete()
     }
 
     private fun getEncryptedFile(file: File): EncryptedFile =
