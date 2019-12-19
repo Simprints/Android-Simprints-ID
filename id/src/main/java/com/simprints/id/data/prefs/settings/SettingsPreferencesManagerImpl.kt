@@ -75,6 +75,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
 
+        const val CONSENT_REQUIRED_KEY = "ConsentRequired"
+        const val CONSENT_REQUIRED_DEFAULT = true
+
         const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
         val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
             PeopleDownSyncTrigger.MANUAL to true,
@@ -135,6 +138,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Whether to show the Simprints logo at the top of the launch activity
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
+
+    override var consentRequired: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, CONSENT_REQUIRED_KEY, CONSENT_REQUIRED_DEFAULT)
 
     override var modalities: List<Modality>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
