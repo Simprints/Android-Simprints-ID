@@ -8,4 +8,6 @@ data class PeopleCount(val projectId: String,
                        val userId: String?,
                        val moduleId: String?,
                        val modes: List<Modes>?,
-                       var count: Int)
+                       var downloadCount: Int,
+                       var deleteCount: Int,
+                       var updateCount: Int)

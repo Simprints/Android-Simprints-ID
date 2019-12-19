@@ -79,12 +79,16 @@ class CountWorkerTest {
 
     @Test
     fun testWorkerSuccessAndOutputData_shouldSucceedWithCorrectData() {
-        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(5)))
+        val nPeopleToDownload = 50
+        val nPeopleToDelete = 5
+        val nPeopleToUpdate = 2
+        whenever(countTaskMock.execute(anyNotNull())).thenReturn(Single.just(getMockListOfPeopleCountWithCounter(nPeopleToDownload, nPeopleToDelete, nPeopleToUpdate)))
+
         val workerResult = countWorker.doWork()
 
         assert(
             workerResult is ListenableWorker.Result.Success &&
-                workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == 5
+                workerResult.outputData.getInt(subSyncScope.uniqueKey, 0) == nPeopleToDownload
         )
     }
 
@@ -97,6 +101,7 @@ class CountWorkerTest {
         assert(workerResult is ListenableWorker.Result.Success)
     }
 
-    private fun getMockListOfPeopleCountWithCounter(counter: Int) =
-        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT), counter))
+    private fun getMockListOfPeopleCountWithCounter(nPeopleToDownload: Int, nPeopleToDelete: Int, nPeopleToUpdate: Int) =
+        listOf(PeopleCount("projectId", "userId", "moduleId", listOf(Modes.FACE, Modes.FINGERPRINT),
+            nPeopleToDownload, nPeopleToDelete, nPeopleToUpdate))
 }

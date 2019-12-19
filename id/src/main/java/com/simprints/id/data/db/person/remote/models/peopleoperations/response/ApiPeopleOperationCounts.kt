@@ -8,5 +8,3 @@ data class ApiPeopleOperationCounts(
     val delete: Int,
     val update: Int
 )
-
-fun ApiPeopleOperationCounts.sumUp() = create + update + delete
