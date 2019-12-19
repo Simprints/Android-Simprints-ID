@@ -38,6 +38,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -124,7 +125,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestUrl ?: throw Throwable("No requests done")
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
         }
     }
@@ -137,7 +138,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestUrl ?: throw Throwable("No requests done")
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
             assertQueryUrlParam(peopleRequestUrl, "userId", DEFAULT_USER_ID)
         }
@@ -151,7 +152,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
             assertQueryUrlParam(peopleRequestUrl, "moduleId", DEFAULT_MODULE_ID)
         }
@@ -165,7 +166,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
         }
     }
@@ -178,7 +179,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
             assertQueryUrlParam(peopleRequestUrl, "userId", DEFAULT_USER_ID)
         }
@@ -192,7 +193,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, moduleSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+            val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
             assertQueryUrlParam(peopleRequestUrl, "moduleId", DEFAULT_MODULE_ID)
         }
@@ -232,7 +233,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
                 runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, syncOp)
 
-                val peopleRequestUrl = mockServer.takeRequest().requestUrl
+                val peopleRequestUrl = mockServer.takeRequest().requestedUrl()
                 assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
                 assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientId", lastPatientId)
                 assertQueryUrlParam(peopleRequestUrl, "lastKnownPatientUpdatedAt", "$lastPatientUpdateAt")
@@ -294,7 +295,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     private fun peopleResponseForSubScopeForDeletion(downSyncOp: PeopleDownSyncOperation, nPeople: Int) =
         getRandomPeople(nPeople, downSyncOp, listOf(false)).map { it.fromDomainToGetApi(true) }.sortedBy { it.updatedAt }
 
-    private fun mockSuccessfulResponseForPatients(patients: List<ApiGetPerson>): MockResponse? {
+    private fun mockSuccessfulResponseForPatients(patients: List<ApiGetPerson>): MockResponse {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         return MockResponse().let {
             it.setResponseCode(200)
@@ -302,7 +303,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
         }
     }
 
-    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiGetPerson>): MockResponse? {
+    private fun mockSuccessfulResponseWithIncorrectModels(patients: List<ApiGetPerson>): MockResponse {
         val fbPersonJson = JsonHelper.gson.toJson(patients)
         val badFbPersonJson = fbPersonJson.replace("id", "id_wrong")
         return MockResponse().let {
@@ -321,3 +322,5 @@ class PeopleDownSyncDownloaderTaskImplTest {
         mockServer.shutdown()
     }
 }
+
+fun RecordedRequest.requestedUrl() = this.requestUrl ?: throw Throwable("No request done")

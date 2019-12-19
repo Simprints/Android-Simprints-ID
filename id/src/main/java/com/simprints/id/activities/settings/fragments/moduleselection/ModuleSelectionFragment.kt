@@ -16,15 +16,20 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleAdapter
 import com.simprints.id.activities.settings.fragments.moduleselection.adapter.ModuleSelectionListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ChipClickListener
 import com.simprints.id.activities.settings.fragments.moduleselection.tools.ModuleChipHelper
+import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.moduleselection.model.Module
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.extensions.hideKeyboard
+import com.simprints.id.tools.extensions.runOnUiThreadIfStillRunning
+import com.simprints.id.tools.extensions.showToast
 import kotlinx.android.synthetic.main.fragment_module_selection.*
 import org.jetbrains.anko.sdk27.coroutines.onEditorAction
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
@@ -36,6 +41,8 @@ class ModuleSelectionFragment(
 
     @Inject lateinit var viewModelFactory: ModuleViewModelFactory
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var preferencesManager: PreferencesManager
 
     private val adapter by lazy { ModuleAdapter(listener = this) }
 
@@ -69,6 +76,10 @@ class ModuleSelectionFragment(
         searchView.requestFocus()
     }
 
+    private fun refreshSyncWorkers(){
+        peopleSyncManager.cancelAndRescheduleSync()
+    }
+
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
     }
@@ -85,7 +96,7 @@ class ModuleSelectionFragment(
     }
 
     private fun fetchData() {
-        viewModel.getModules().observe(this, Observer { modules ->
+        viewModel.modulesList.observe(viewLifecycleOwner, Observer { modules ->
             this.modules = modules
             adapter.submitList(modules.getUnselected())
             configureSearchView()
@@ -144,7 +155,7 @@ class ModuleSelectionFragment(
     }
 
     private fun observeSearchResults(queryListener: ModuleSelectionQueryListener) {
-        queryListener.searchResults.observe(this, Observer { searchResults ->
+        queryListener.searchResults.observe(viewLifecycleOwner, Observer { searchResults ->
             adapter.submitList(searchResults)
             txtNoResults.visibility = if (searchResults.isEmpty()) VISIBLE else GONE
             rvModules.scrollToPosition(0)
@@ -173,23 +184,63 @@ class ModuleSelectionFragment(
     }
 
     private fun notifyNoModulesSelected() {
-        Toast.makeText(
-            application,
-            R.string.settings_no_modules_toast,
-            Toast.LENGTH_SHORT
-        ).show()
+        activity?.showToast(androidResourcesHelper, R.string.settings_no_modules_toast)
+    }
+
+    fun showModuleSelectionDialogIfNecessary() {
+        if (isModuleSelectionChanged()) {
+            activity?.runOnUiThreadIfStillRunning {
+                buildConfirmModuleSelectionDialog().show()
+            }
+        } else {
+            refreshSyncWorkers()
+            activity?.finish()
+        }
+    }
+
+    private fun isModuleSelectionChanged() = with(modules.filter { it.isSelected }) {
+        when {
+            isEmpty() && preferencesManager.selectedModules.isEmpty() -> false
+            else -> map { it.name }.toSet() != preferencesManager.selectedModules
+        }
+    }
+
+    private fun buildConfirmModuleSelectionDialog() =
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(androidResourcesHelper.getString(R.string.confirm_module_selection_title))
+            .setMessage(getModulesSelectedTextForDialog())
+            .setCancelable(false)
+            .setPositiveButton(androidResourcesHelper.getString(R.string.confirm_module_selection_yes))
+            { _, _ -> handleModulesConfirmClick() }
+            .setNegativeButton(androidResourcesHelper.getString(R.string.confirm_module_selection_cancel))
+            { _, _ -> handleModuleSelectionCancelClick() }
+            .create()
+
+    private fun getModulesSelectedTextForDialog() = StringBuilder().apply {
+        modules.filter { it.isSelected }.forEach { module ->
+            append(module.name + "\n")
+        }
+    }.toString()
+
+    private fun handleModulesConfirmClick() {
+        viewModel.saveModules(modules)
+        activity?.finish()
+    }
+
+    private fun handleModuleSelectionCancelClick() {
+        viewModel.resetModules()
     }
 
     private fun notifyTooManyModulesSelected(maxAllowed: Int) {
         Toast.makeText(
             application,
-            application.getString(R.string.settings_too_many_modules_toast, maxAllowed),
+            String.format(application.getString(R.string.settings_too_many_modules_toast), maxAllowed),
             Toast.LENGTH_SHORT
         ).show()
     }
 
     private fun configureTextViewVisibility() {
-        if (modules.none { it.isSelected }) {
+        if (isNoModulesSelected()) {
             txtNoModulesSelected.visibility = VISIBLE
             txtSelectedModules.visibility = GONE
         } else {
@@ -197,6 +248,8 @@ class ModuleSelectionFragment(
             txtSelectedModules.visibility = VISIBLE
         }
     }
+
+    private fun isNoModulesSelected() = modules.none { it.isSelected }
 
     private fun List<Module>.getSelected() = filter { it.isSelected }
 

@@ -10,6 +10,7 @@ import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
 import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
+import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -30,7 +31,9 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
@@ -230,5 +233,14 @@ open class AppModule {
                                               sessionEventsManager: SessionEventsManager,
                                               timeHelper: TimeHelper) =
         FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+
+    @Provides
+    open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
+                                                    personLocalDataSource: PersonLocalDataSource,
+                                                    preferencesManager: PreferencesManager,
+                                                    loginInfoManager: LoginInfoManager,
+                                                    peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository) =
+        SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository)
 }
 

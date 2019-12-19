@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.simprints.id.Application
-import com.simprints.id.BuildConfig
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
 import com.simprints.id.activities.dashboard.views.WrapContentLinearLayoutManager
@@ -105,9 +104,6 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
-        if(BuildConfig.DEBUG){
-            menu?.findItem(R.id.debug)?.isVisible = true
-        }
 
         menu?.findItem(R.id.menuSettings)?.title = androidResourcesHelper.getString(R.string.menu_settings)
         menu?.findItem(R.id.menuPrivacyNotice)?.title = androidResourcesHelper.getString(R.string.menu_privacy_notice)
@@ -118,11 +114,10 @@ class DashboardActivity : AppCompatActivity(), DashboardContract.View {
     private fun setMenuItemClickListener() {
         dashboardToolbar.setOnMenuItemClickListener { menuItem ->
 
-            val id = menuItem.itemId
-            when (id) {
+            when (menuItem.itemId) {
                 R.id.menuPrivacyNotice -> startActivity(Intent(this, PrivacyNoticeActivity::class.java))
                 R.id.menuSettings -> startActivityForResult(Intent(this, SettingsActivity::class.java), SETTINGS_ACTIVITY_REQUEST_CODE)
-                R.id.debug -> if(BuildConfig.DEBUG) startActivity(Intent(this, DebugActivity::class.java))
+                R.id.debug -> startActivity(Intent(this, DebugActivity::class.java))
             }
             true
         }

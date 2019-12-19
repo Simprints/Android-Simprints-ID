@@ -19,10 +19,13 @@ class ModuleSelectionActivityAndroidTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val preferencesModule = TestPreferencesModule(
-        settingsPreferencesManagerRule = DependencyRule.MockRule
+        settingsPreferencesManagerRule = DependencyRule.SpyRule
     )
 
-    private lateinit var preferencesManagerMock: PreferencesManager
+    private lateinit var preferencesManagerSpy: PreferencesManager
+
+    private val moduleOptions = setOf("a", "b", "c", "d", "e")
+    private val selectedModules = setOf("b")
 
     @Before
     fun setUp() {
@@ -44,7 +47,7 @@ class ModuleSelectionActivityAndroidTest {
         launchWithModulesSelected()
 
         recyclerView(R.id.rvModules) {
-            atPosition(0) {
+            atPosition(FIRST_MODULE_INDEX) {
                 click()
             }
         }
@@ -103,28 +106,32 @@ class ModuleSelectionActivityAndroidTest {
         }
     }
 
+
     private fun launchWithModulesSelected() {
         whenever {
-            preferencesManagerMock.moduleIdOptions
-        } thenReturn setOf("a", "b", "c", "d", "e")
+            preferencesManagerSpy.moduleIdOptions
+        } thenReturn moduleOptions
 
         whenever {
-            preferencesManagerMock.selectedModules
-        } thenReturn setOf("b")
+            preferencesManagerSpy.selectedModules
+        } thenReturn selectedModules
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
     private fun launchWithoutModulesSelected() {
         whenever {
-            preferencesManagerMock.moduleIdOptions
-        } thenReturn setOf("a", "b", "c", "d", "e")
+            preferencesManagerSpy.moduleIdOptions
+        } thenReturn moduleOptions
 
         whenever {
-            preferencesManagerMock.selectedModules
+            preferencesManagerSpy.selectedModules
         } thenReturn emptySet()
 
         ActivityScenario.launch(ModuleSelectionActivity::class.java)
     }
 
+    companion object {
+        private const val FIRST_MODULE_INDEX = 0
+    }
 }

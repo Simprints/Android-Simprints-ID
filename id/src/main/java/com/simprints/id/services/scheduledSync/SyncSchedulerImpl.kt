@@ -3,7 +3,6 @@ package com.simprints.id.services.scheduledSync
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 
@@ -16,10 +15,7 @@ class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
 
     override fun scheduleBackgroundSyncs() {
         sessionEventsSyncManager.scheduleSessionsSync()
-
-        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true) {
-            peopleSyncManager.scheduleSync()
-        }
+        peopleSyncManager.scheduleSync()
     }
 
     override fun cancelBackgroundSyncs() {

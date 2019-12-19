@@ -58,6 +58,10 @@ dependencies {
 
     // Mockito
     testImplementation deps.testing.mockito.kotlin
+    testImplementation deps.testing.mockito.core
+    testImplementation deps.testing.mockito.inline
+
+    // Truth
     testImplementation deps.testing.truth
 }
 
