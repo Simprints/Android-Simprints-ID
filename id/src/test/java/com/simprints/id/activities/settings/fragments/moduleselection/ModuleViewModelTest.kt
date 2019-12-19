@@ -1,6 +1,5 @@
 package com.simprints.id.activities.settings.fragments.moduleselection
 
-import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.moduleselection.ModuleRepository
@@ -17,11 +16,12 @@ import org.koin.core.context.stopKoin
 class ModuleViewModelTest {
 
     private val repository: ModuleRepository = mock()
-    private val viewModel = ModuleViewModel(repository)
+    private lateinit var viewModel: ModuleViewModel
 
     @Before
     fun setUp() {
         configureMock()
+        viewModel = ModuleViewModel(repository)
     }
 
     @Test
@@ -33,7 +33,7 @@ class ModuleViewModelTest {
             Module("d", false)
         )
 
-        val actual = viewModel.getModules().value
+        val actual = viewModel.modulesList.value
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -45,7 +45,7 @@ class ModuleViewModelTest {
             Module("c", true)
         )
 
-        val actual = viewModel.getModules().value?.filter { it.isSelected }
+        val actual = viewModel.modulesList.value?.filter { it.isSelected }
 
         assertThat(actual).isEqualTo(expected)
     }
@@ -58,14 +58,11 @@ class ModuleViewModelTest {
     private fun configureMock() {
         whenever {
             repository.getModules()
-        } thenReturn MutableLiveData<List<Module>>().apply {
-            value = listOf(
+        } thenReturn listOf(
                 Module("a", false),
                 Module("b", true),
                 Module("c", true),
                 Module("d", false)
             )
-        }
     }
-
 }
