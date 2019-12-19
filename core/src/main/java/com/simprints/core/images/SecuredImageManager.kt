@@ -8,6 +8,7 @@ interface SecuredImageManager {
     fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef?
     fun readImage(path: SecuredImageRef): FileInputStream?
     fun listImages(): List<SecuredImageRef>
+    fun deleteImage(path: SecuredImageRef): Boolean
 
 }
 
