@@ -19,6 +19,8 @@ inline fun <reified T> mock(setup: (T) -> Unit): T = mock<T>().apply(setup)
 inline fun <reified T> spy(setup: (T) -> Unit): T = spy<T>().apply(setup)
 inline fun <T> spy(t: T, setup: (T) -> Unit): T = spy(t).apply(setup)
 
+inline fun <reified T> setupMock(setup: T.() -> Unit): T = mock<T>().apply(setup)
+
 /** For mocks only */
 fun <T> whenever(methodCall: T): InfixOngoingStubbing<T> =
     InfixOngoingStubbing(Mockito.`when`(methodCall))
@@ -31,6 +33,9 @@ fun <T> whenever(methodCall: () -> T): InfixOngoingStubbing<T> =
 fun <T, R> whenever(mock: T, methodCall: T.() -> R): InfixStubber<T, R> =
     InfixStubber(mock, methodCall)
 
+fun <T, R> T.whenThis(methodCall: T.() -> R): InfixStubber<T, R> =
+    InfixStubber(this, methodCall)
+
 fun <T : Any, R> wheneverOnSuspend(mock: T, methodCall: suspend T.() -> R): InfixStubberOnSuspend<T, R> =
     InfixStubberOnSuspend(mock, methodCall)
 
@@ -41,6 +46,17 @@ class InfixStubberOnSuspend<T : Any, R>(private val obj: T, private val methodCa
         obj.stub {
             this.onBlocking(methodCall).thenReturn(value)
         }
+
+    infix fun <T : Exception> thenOnBlockingThrow(e: Class<T>) =
+        obj.stub {
+            this.onBlocking(methodCall).thenThrow(e)
+        }
+
+    infix fun thenOnBlockingAnswer(answer: Answer<*>) =
+        obj.stub {
+            this.onBlocking(methodCall).thenAnswer(answer)
+        }
+
 }
 
 /**

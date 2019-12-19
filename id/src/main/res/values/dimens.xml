@@ -1,5 +1,29 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+    <!-- region Chip -->
+    <dimen name="chip_spacing_default">8dp</dimen>
+    <dimen name="chip_corner_size_module_selection">0dp</dimen>
+    <!-- endregion -->
+
+    <!-- region Margin -->
+    <dimen name="margin_default">8dp</dimen>
+    <dimen name="margin_large">16dp</dimen>
+    <dimen name="margin_extra_large">24dp</dimen>
+    <dimen name="margin_huge">32dp</dimen>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="consent_image_height">140dp</dimen>
+    <!-- endregion -->
+
+    <!-- region Padding -->
+    <dimen name="padding_chip">8dp</dimen>
+    <dimen name="padding_default">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <!-- endregion -->
+
+    <!-- region Text size -->
+    <dimen name="text_size_chip">14sp</dimen>
+    <dimen name="text_size_toolbar_title">18sp</dimen>
+    <dimen name="text_size_large">16sp</dimen>
+    <!-- endregion -->
 </resources>

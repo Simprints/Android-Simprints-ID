@@ -4,7 +4,7 @@ import com.simprints.id.commontesttools.sessionEvents.createFakeSession
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.data.db.local.LocalDbManager
+import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.domain.moduleapi.app.requests.AppEnrolRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppIdentifyRequest
 import com.simprints.id.domain.moduleapi.app.requests.AppVerifyRequest
@@ -26,12 +26,12 @@ class CheckLoginFromIntentPresenterTest {
 
     @Test
     fun givenCheckLoginFromIntentPresenter_setupIsCalled_shouldAddCalloutEvent() {
-        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view , "device_id", mock())).apply {
+        val checkLoginFromIntentPresenter = spy(CheckLoginFromIntentPresenter(view, "device_id", mock())).apply {
 
             whenever(view) { parseRequest() } thenReturn mock<AppEnrolRequest>()
             remoteConfigFetcher = mock()
             analyticsManager = mock()
-            dbManager = mock()
+            personLocalDataSource = mock()
             preferencesManager = mock()
 
             analyticsManager = mock<AnalyticsManager>().apply {
@@ -119,8 +119,8 @@ class CheckLoginFromIntentPresenterTest {
             analyticsManager = mock()
             preferencesManager = mock()
 
-            dbManager = mock<LocalDbManager>().apply {
-                whenever(this) { getPeopleCountFromLocal() } thenReturn Single.just(0)
+            personLocalDataSource = mock<PersonLocalDataSource>().apply {
+                wheneverOnSuspend(this) { count() } thenOnBlockingReturn 0
             }
 
             crashReportManager = mock<CrashReportManager>().apply {

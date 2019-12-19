@@ -1,11 +1,12 @@
 package com.simprints.id.activities.dashboard
 
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardViewModel
 import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
-import com.simprints.id.data.db.DbManager
-import com.simprints.id.data.db.local.room.SyncStatusDatabase
+import com.simprints.id.data.db.project.ProjectRepository
+import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
@@ -24,7 +25,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
 
     @Inject lateinit var downSyncManager: DownSyncManager
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var dbManager: DbManager
+    @Inject lateinit var projectRepository: ProjectRepository
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
@@ -44,16 +45,16 @@ class DashboardCardsFactory(private val component: AppComponent) {
     ).filterNotNull()
 
     private fun createProjectInfoCard(position: Int = 0): Single<DashboardCardViewModel> =
-        dbManager
-            .loadProject(loginInfoManager.getSignedInProjectIdOrEmpty())
-            .map {
-                DashboardCardViewModel(DashboardCardType.PROJECT_INFO,
-                    position,
-                    DashboardCardViewModel.State(
-                        R.drawable.simprints_logo_blue,
-                        it.name,
-                        it.description))
-            }.doOnError { it.printStackTrace() }
+        singleWithSuspend {
+            projectRepository.loadAndRefreshCache(loginInfoManager.getSignedInProjectIdOrEmpty())
+        }.map {
+            DashboardCardViewModel(DashboardCardType.PROJECT_INFO,
+                position,
+                DashboardCardViewModel.State(
+                    R.drawable.simprints_logo_blue,
+                    it.name,
+                    it.description))
+        }.doOnError { it.printStackTrace() }
 
     private fun createCurrentUserInfoCard(position: Int = 1): Single<DashboardCardViewModel>? =
         if (loginInfoManager.getSignedInUserIdOrEmpty().isNotEmpty()) {

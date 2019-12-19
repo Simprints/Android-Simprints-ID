@@ -2,7 +2,6 @@ package com.simprints.id.secure
 
 import android.util.Base64
 import android.util.Base64.NO_WRAP
-import com.auth0.jwt.JWT
 import com.google.android.gms.safetynet.SafetyNetApi
 import com.google.android.gms.safetynet.SafetyNetClient
 import com.google.android.gms.tasks.Tasks
@@ -10,11 +9,12 @@ import com.simprints.id.BuildConfig
 import com.simprints.id.exceptions.safe.secure.SafetyNetException
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.INVALID_CLAIMS
 import com.simprints.id.exceptions.safe.secure.SafetyNetExceptionReason.SERVICE_UNAVAILABLE
+import com.simprints.id.secure.JwtTokenHelper.Companion.extractTokenPayloadAsJson
 import com.simprints.id.secure.models.AttestToken
 import com.simprints.id.secure.models.Nonce
 import io.reactivex.Single
 
-class AttestationManager {
+open class AttestationManager {
 
     fun requestAttestation(safetyNetClient: SafetyNetClient, nonce: Nonce): Single<AttestToken> {
         return Single.fromCallable<AttestToken> {
@@ -22,7 +22,7 @@ class AttestationManager {
             val result = getSafetyNetAttestationResponse(safetyNetClient, nonce)
 
             result.let {
-                checkForErrorClaimAndThrow(it.jwsResult)
+                checkForErrorClaimAndThrow(it)
                 AttestToken(it.jwsResult)
             }
         }
@@ -36,9 +36,15 @@ class AttestationManager {
         }
     }
 
-    private fun checkForErrorClaimAndThrow(jwsResult: String?) {
-        if (JWT.decode(jwsResult).claims.containsKey("error")) {
-            throw SafetyNetException(reason = INVALID_CLAIMS)
+    private fun checkForErrorClaimAndThrow(safetyNetResponse: SafetyNetApi.AttestationResponse) {
+        extractTokenPayloadAsJson(safetyNetResponse.jwsResult)?.let {
+            if (it.has(SAFETYNET_TOKEN_ERROR_FILED)) {
+                throw SafetyNetException(reason = INVALID_CLAIMS)
+            }
         }
+    }
+
+    companion object {
+        const val SAFETYNET_TOKEN_ERROR_FILED = "error"
     }
 }

@@ -1,7 +1,7 @@
 package com.simprints.id.data.prefs.settings
 
 import com.google.gson.JsonSyntaxException
-import com.simprints.id.FingerIdentifier
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
 import com.simprints.id.data.prefs.preferenceType.ComplexPreference
@@ -20,7 +20,7 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
                                           private val remoteConfigWrapper: RemoteConfigWrapper,
                                           private val fingerIdToBooleanSerializer: Serializer<Map<FingerIdentifier, Boolean>>,
                                           groupSerializer: Serializer<GROUP>,
-                                          modalitySerializer: Serializer<Modality>,
+                                          modalitySerializer: Serializer<List<Modality>>,
                                           languagesStringArraySerializer: Serializer<Array<String>>,
                                           moduleIdOptionsStringSetSerializer: Serializer<Set<String>>,
                                           peopleDownSyncTriggerToSerializer: Serializer<Map<PeopleDownSyncTrigger, Boolean>>)
@@ -42,6 +42,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val SELECTED_MODULES_KEY = "SelectedModules"
         val SELECTED_MODULES_DEFAULT = setOf<String>()
+
+        const val MAX_NUMBER_OF_MODULES_KEY = "MaxNbOfModules"
+        const val MAX_NUMBER_OF_MODULES_DEFAULT = 6
 
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = GROUP.USER
@@ -79,8 +82,11 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
             PeopleDownSyncTrigger.ON_LAUNCH_CALLOUT to false
         )
 
-        val MODALITY_DEFAULT = Modality.FINGER
+        val MODALITY_DEFAULT = listOf(Modality.FINGER)
         const val MODALITY_KEY = "Modality"
+
+        const val FINGER_IMAGES_EXIST_KEY = "FingerImagesExist"
+        const val FINGER_IMAGES_EXIST_DEFAULT = true
     }
 
     // Number of GUIDs to be returned to the calling app as the result of an identification
@@ -102,6 +108,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // What modules were selected by the user
     override var selectedModules: Set<String>
         by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
+
+    override var maxNumberOfModules: Int
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MAX_NUMBER_OF_MODULES_KEY, MAX_NUMBER_OF_MODULES_DEFAULT)
 
     // Sync group. Default is user
     override var syncGroup: GROUP
@@ -127,12 +136,15 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
 
-    override var modality: Modality
+    override var modalities: List<Modality>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)
 
 
     override var peopleDownSyncTriggers: Map<PeopleDownSyncTrigger, Boolean>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, PEOPLE_DOWN_SYNC_TRIGGERS_KEY, PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT, peopleDownSyncTriggerToSerializer)
+
+    override var fingerImagesExist: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, FINGER_IMAGES_EXIST_KEY, FINGER_IMAGES_EXIST_DEFAULT)
 
     init {
         remoteConfigWrapper.registerAllPreparedDefaultValues()

@@ -19,12 +19,6 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
-import com.simprints.id.Application
-import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
-import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
-import com.simprints.id.tools.AndroidResourcesHelper
-import com.simprints.id.tools.TimeHelper
-import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -52,18 +46,10 @@ object KoinInjector {
 
     private fun buildKoinModule() =
         module(override = true) {
-            defineBuildersForCoreManagers()
             defineBuildersForDomainManagers()
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
         }
-
-    private fun Module.defineBuildersForCoreManagers() {
-        factory { SessionEventsManager.build(androidApplication() as Application) }
-        factory { CoreCrashReportManager.build(androidApplication() as Application) }
-        factory { AndroidResourcesHelper.build(androidApplication() as Application) }
-        factory { TimeHelper.build(androidApplication() as Application) }
-    }
 
     private fun Module.defineBuildersForDomainManagers() {
         factory<ClientApiSessionEventsManager> { ClientApiSessionEventsManagerImpl(get(), get()) }

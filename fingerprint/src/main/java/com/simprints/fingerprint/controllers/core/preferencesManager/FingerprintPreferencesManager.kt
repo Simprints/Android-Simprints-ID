@@ -5,7 +5,8 @@ import java.util.*
 interface FingerprintPreferencesManager {
     var lastScannerUsed: String
     var lastScannerVersion: String
-    var lastEnrolDate: Date?
     var lastVerificationDate: Date?
     var lastIdentificationDate: Date?
+
+    val fingerImagesExist: Boolean
 }

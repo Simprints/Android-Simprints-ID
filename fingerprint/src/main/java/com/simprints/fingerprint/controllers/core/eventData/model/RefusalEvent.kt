@@ -1,8 +1,10 @@
-package com.simprints.fingerprint.controllers.core.eventData.model;
+package com.simprints.fingerprint.controllers.core.eventData.model
 
 import androidx.annotation.Keep
+import com.simprints.fingerprint.data.domain.refusal.RefusalFormReason
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent as CoreRefusalEvent
 import com.simprints.id.data.analytics.eventdata.models.domain.events.RefusalEvent.Answer as CoreRefusalAnswer
+
 @Keep
 class RefusalEvent(starTime: Long,
                    endTime: Long,
@@ -17,14 +19,27 @@ enum class RefusalAnswer {
     SCANNER_NOT_WORKING,
     REFUSED_NOT_PRESENT,
     REFUSED_YOUNG,
-    OTHER
+    OTHER;
+
+    companion object {
+        fun fromRefusalFormReason(refusalFormReason: RefusalFormReason) =
+            when (refusalFormReason) {
+                RefusalFormReason.REFUSED_RELIGION -> REFUSED_RELIGION
+                RefusalFormReason.REFUSED_DATA_CONCERNS -> REFUSED_DATA_CONCERNS
+                RefusalFormReason.REFUSED_PERMISSION -> REFUSED_PERMISSION
+                RefusalFormReason.SCANNER_NOT_WORKING -> SCANNER_NOT_WORKING
+                RefusalFormReason.REFUSED_NOT_PRESENT -> REFUSED_NOT_PRESENT
+                RefusalFormReason.REFUSED_YOUNG -> REFUSED_YOUNG
+                RefusalFormReason.OTHER -> OTHER
+            }
+    }
 }
 
 fun RefusalEvent.fromDomainToCore() =
     CoreRefusalEvent(starTime, endTime, reason.fromDomainToCore(), otherText)
 
 fun RefusalAnswer.fromDomainToCore(): CoreRefusalAnswer =
-    when(this) {
+    when (this) {
         RefusalAnswer.REFUSED_RELIGION -> CoreRefusalAnswer.REFUSED_RELIGION
         RefusalAnswer.REFUSED_DATA_CONCERNS -> CoreRefusalAnswer.REFUSED_DATA_CONCERNS
         RefusalAnswer.REFUSED_PERMISSION -> CoreRefusalAnswer.REFUSED_PERMISSION

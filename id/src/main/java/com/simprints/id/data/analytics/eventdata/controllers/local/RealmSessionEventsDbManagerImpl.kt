@@ -4,7 +4,7 @@ import android.content.Context
 import com.simprints.id.data.analytics.eventdata.models.domain.session.SessionEvents
 import com.simprints.id.data.analytics.eventdata.models.local.DbSession
 import com.simprints.id.data.analytics.eventdata.models.local.toDomain
-import com.simprints.id.data.db.local.models.LocalDbKey
+import com.simprints.id.data.secure.LocalDbKey
 import com.simprints.id.data.secure.SecureDataManager
 import com.simprints.id.exceptions.safe.secure.MissingLocalDatabaseKeyException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException

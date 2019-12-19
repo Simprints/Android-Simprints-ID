@@ -4,7 +4,6 @@ import android.content.DialogInterface.BUTTON_POSITIVE
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.simprints.id.activities.settings.SettingsAboutActivity
-import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.id.commontesttools.di.TestAppModule
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
@@ -28,8 +27,7 @@ class SettingsAboutFragmentTest {
     private lateinit var settingsAboutActivity: SettingsAboutActivity
 
     private val module by lazy {
-        TestAppModule(app,
-            localDbManagerRule = DependencyRule.MockRule)
+        TestAppModule(app)
     }
 
     @Before

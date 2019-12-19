@@ -91,5 +91,36 @@
     <string name="title_activity_settings">Mijeessaa</string>
     <string name="settings_title">Mijeessaa</string>
     <string name="close">Cufi</string>
+
+    <string name="launch_consent_accept_button">Fudhadheera</string>
+    <string name="launch_consent_decline_button">Hin fudhanne</string>
+    <string name="consent_enrol">%1$s keessatti sigalmeessuu fi gara fula duraatti ragaa kee adda sibaasuuf mallattoon qubaakee na barbaachisa.&#160;</string>
+    <string name="consent_parental_enrol">%1$s keessatti daa\’ima kee galmeessuu fi gara fula duraatti odeeffanno daa\’ima kee adda baasuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
+    <string name="consent_id_verify">Odeeffannoo kee %1$s keessaa barbaadee argachuuf mallattoon qubaakee na barbaachisa.&#160;</string>
+    <string name="consent_parental_id_verify">Odeeffannoo daa\’ima kee %1$s keessaa barbaadee argachuuf mallattoon qubaa isaanii na barbaachisa.&#160;</string>
+    <string name="consent_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \‘UK-based nonprofit\’ qofatu fayyadama.&#160;</string>
+    <string name="consent_parental_share_data_yes">Odeeffannoo qubaa fi argama iddoo sassaabame %1$s fi Simprints, a \'UK-based nonprofit\' qofatu fayyadama.&#160;</string>
+    <string name="consent_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
+    <string name="consent_parental_privacy_rights">Erga tole jette mallattoo qubaa kee kennitee booda, yoo yaada kee jijjiirtee ragaan daa\’ima kee akka siif haaqamuuf gaafate yeroo kamitti iyyuu siif haqamuu ni danda\’aa.&#160;</string>
+    <string name="consent_confirmation">Mallattoo qubakee fayyadamuu nadanda’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin dabalataa qaba\".</string>
+    <string name="consent_general_title">Waliigaltee</string>
+    <string name="consent_parental_title">Waliigaltee maatii</string>
+    <string name="consent_parental_confirmation">Mallattoo qubaa mucaa kee fayyadamuu nadanda\’aa? Maaloo gaafilee kana deebisi \“Fudhadheera\”, \“Hin Fudhanne\”, ykn \“Gaaffiin qaba\”.</string>
+    <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
     <string name="privacy_notice_title">Yaadachiisa iccitiin eegamu</string>
+
+    <string name="refusal_label">Unka keessaa bahi</string>
+    <string name="refusal_toast_select_option_submit">"Maaloo tokko filachuun ol ergi "</string>
+    <string name="refusal_toast_submit">Maaloo unkicha ol ergi</string>
+    <string name="refusal_app_not_working">Mosaajichi hin hojjeetu</string>
+    <string name="refusal_data_concerns">Ragaa kennuu hin barbaanne</string>
+    <string name="refusal_does_not_have_permission">Eeyyama hin qabu</string>
+    <string name="refusal_other">Kan biraa</string>
+    <string name="refusal_person_not_present">Namichi hin argamne</string>
+    <string name="refusal_religious_concerns">Dhimmoota Amantaa</string>
+    <string name="refusal_too_young">Baay\'ee daa\'ima</string>
+    <string name="why_did_you_skip_fingerprinting">Ashaaraa qubaa fudhuu maaliif addaan kutta?</string>
+    <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
+    <string name="button_submit">Ol ergi</string>
+    <string name="hint_other_reason">Odeeffannoo dabalataa</string>
 </resources>
