@@ -28,8 +28,6 @@ class PeopleUpSyncUploaderTask(
     private val loginInfoManager: LoginInfoManager,
     private val personLocalDataSource: PersonLocalDataSource,
     private val personRemoteDataSource: PersonRemoteDataSource,
-    private val projectId: String,
-    /*private val userId: String,*/
     private val batchSize: Int,
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
 ) {
@@ -41,10 +39,18 @@ class PeopleUpSyncUploaderTask(
 
     var count = 0
 
+    val projectId: String
+        get() {
+            val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
+            return if (projectId.isEmpty() /*|| userId != loginInfoManager.signedInUserId*/) {
+                throw IllegalStateException("Only people enrolled by the currently signed in user can be up-synced")
+            } else {
+                projectId
+            }
+        }
+
     suspend fun execute(workerProgressCountReporter: WorkerProgressCountReporter): Int {
         try {
-            checkUserIsSignedIn()
-
             personLocalDataSource.load(PersonLocalDataSource.Query(toSync = true))
                 .bufferedChunks(batchSize)
                 .collect {
@@ -61,12 +67,6 @@ class PeopleUpSyncUploaderTask(
 
         updateState(COMPLETE)
         return count
-    }
-
-    private fun checkUserIsSignedIn() {
-        if (projectId != loginInfoManager.signedInProjectId /*|| userId != loginInfoManager.signedInUserId*/) {
-            throw IllegalStateException("Only people enrolled by the currently signed in user can be up-synced")
-        }
     }
 
     private suspend fun upSyncBatch(people: List<Person>) {

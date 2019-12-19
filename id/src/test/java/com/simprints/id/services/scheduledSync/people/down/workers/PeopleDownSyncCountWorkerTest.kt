@@ -2,7 +2,6 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
@@ -24,7 +23,6 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@SmallTest
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleDownSyncCountWorkerTest {
 

@@ -37,6 +37,7 @@ open class DataModule {
         ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
 
     @Provides
+    @Singleton
     open fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
         ProjectRemoteDataSourceImpl(remoteDbManager)
 
@@ -54,6 +55,7 @@ open class DataModule {
 
 
     @Provides
+    @Singleton
     open fun providePersonLocalDataSource(ctx: Context,
                                           secureDataManager: SecureDataManager,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =

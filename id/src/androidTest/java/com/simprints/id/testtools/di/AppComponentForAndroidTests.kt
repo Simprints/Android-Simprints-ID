@@ -6,6 +6,7 @@ import com.simprints.id.activities.settings.ModuleSelectionActivityAndroidTest
 import com.simprints.id.data.analytics.eventdata.controllers.local.RealmSessionEventsDbManagerImplTest
 import com.simprints.id.data.secure.SecureDataManagerTest
 import com.simprints.id.di.*
+import com.simprints.id.services.people.PeopleSyncIntegrationTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImplAndroidTest
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsUploaderTaskAndroidTest
 import dagger.BindsInstance
@@ -26,6 +27,7 @@ interface AppComponentForAndroidTests : AppComponent {
         fun appModule(appModule: AppModule): Builder
         fun preferencesModule(preferencesModule: PreferencesModule): Builder
         fun serializerModule(serializerModule: SerializerModule): Builder
+        fun syncModule(syncModule: SyncModule): Builder
 
         fun build(): AppComponentForAndroidTests
     }
@@ -36,4 +38,6 @@ interface AppComponentForAndroidTests : AppComponent {
     fun inject(localSessionEventsManagerImplTest: RealmSessionEventsDbManagerImplTest)
     fun inject(sessionEventsSyncManagerImplTest: SessionEventsSyncManagerImplAndroidTest)
     fun inject(moduleSelectionActivityAndroidTest: ModuleSelectionActivityAndroidTest)
+    fun inject(peopleSyncIntegrationTest: PeopleSyncIntegrationTest)
+
 }

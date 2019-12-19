@@ -76,7 +76,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager = LoginInfoManagerImpl(improvedSharedPreferences)
+    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
+        LoginInfoManagerImpl(improvedSharedPreferences)
 
     @Provides
     @Singleton

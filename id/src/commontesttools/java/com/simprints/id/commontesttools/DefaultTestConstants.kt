@@ -2,7 +2,7 @@ package com.simprints.id.commontesttools
 
 import android.util.Base64
 import com.simprints.id.commontesttools.models.TestCalloutCredentials
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.ModuleSyncScope
 import com.simprints.id.data.db.people_sync.down.domain.ProjectSyncScope
 import com.simprints.id.data.db.people_sync.down.domain.UserSyncScope
 import com.simprints.id.data.secure.LocalDbKey
@@ -20,23 +20,21 @@ object DefaultTestConstants {
         moduleId = DEFAULT_MODULE_ID,
         userId = DEFAULT_USER_ID)
 
-    val projectSyncOp = ProjectSyncScope(
+    val projectSyncScope = ProjectSyncScope(
         DEFAULT_PROJECT_ID,
         listOf(Modes.FINGERPRINT)
     )
 
-    val userSyncOp = UserSyncScope(
+    val userSyncScope = UserSyncScope(
         DEFAULT_PROJECT_ID,
         DEFAULT_USER_ID,
         listOf(Modes.FINGERPRINT)
     )
 
-    val moduleSyncOp = PeopleDownSyncOperation(
+    val moduleSyncScope = ModuleSyncScope(
         DEFAULT_PROJECT_ID,
-        DEFAULT_USER_ID,
-        DEFAULT_MODULE_ID,
-        listOf(Modes.FINGERPRINT),
-        null
+        listOf(DEFAULT_MODULE_ID, DEFAULT_MODULE_ID_2),
+        listOf(Modes.FINGERPRINT)
     )
 
     private const val DEFAULT_REALM_KEY_STRING = "Jk1P0NPgwjViIhnvrIZTN3eIpjWRrok5zBZUw1CiQGGWhTFgnANiS87J6asyTksjCHe4SHJo0dHeawAPz3JtgQ=="

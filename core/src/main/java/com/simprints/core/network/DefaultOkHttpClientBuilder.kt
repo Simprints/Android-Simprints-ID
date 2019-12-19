@@ -37,7 +37,7 @@ class DefaultOkHttpClientBuilder {
     private fun buildLoggingInterceptor(): Interceptor {
         val logger = TimberLogger()
         return HttpLoggingInterceptor(logger).apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = HttpLoggingInterceptor.Level.HEADERS
         }
     }
 
@@ -47,7 +47,7 @@ class DefaultOkHttpClientBuilder {
             val initialRequest = chain.request()
             val initialResponse = chain.proceed(initialRequest)
 
-            if (initialResponse.code() != 307) {
+            if (initialResponse.code != 307) {
                 return@Interceptor initialResponse
             }
 
