@@ -16,6 +16,7 @@ import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToApi
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.tools.TimeHelper
 import com.simprints.id.tools.extensions.bufferedChunks
 import kotlinx.coroutines.flow.Flow
@@ -30,17 +31,21 @@ import java.util.*
 class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDataSource,
                                        val personRemoteDataSource: PersonRemoteDataSource,
                                        private val downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                       private val cache: PeopleSyncProgressCache,
                                        val timeHelper: TimeHelper) : PeopleDownSyncDownloaderTask {
 
     private lateinit var downSyncOperation: PeopleDownSyncOperation
     private lateinit var downSyncWorkerProgressReporter: WorkerProgressCountReporter
 
     private var count = 0
-
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
+                                 workerId: String,
                                  downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
         this.downSyncOperation = downSyncOperation
         this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
+
+        count = cache.getProgress(workerId)
+        downSyncWorkerProgressReporter.reportCount(count)
 
         var reader: JsonReader? = null
         try {
@@ -51,6 +56,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
             flowPeople.bufferedChunks(BATCH_SIZE_FOR_DOWNLOADING).collect {
                 saveBatchAndUpdateDownSyncStatus(it)
                 count += it.size
+                cache.setProgress(workerId, count)
                 downSyncWorkerProgressReporter.reportCount(count)
             }
             updateDownSyncInfo(COMPLETE)
@@ -62,7 +68,6 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
         }
 
         finishDownload(reader)
-        downSyncWorkerProgressReporter.reportCount(count)
         return count
     }
 

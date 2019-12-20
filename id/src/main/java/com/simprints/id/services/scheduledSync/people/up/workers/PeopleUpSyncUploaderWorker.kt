@@ -12,10 +12,12 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.OUTPUT_UP_SYNC
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
+import kotlin.math.max
 
 // TODO: uncomment userId when multitenancy is properly implemented
 @InternalCoroutinesApi
@@ -26,6 +28,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     @Inject lateinit var personRemoteDataSource: PersonRemoteDataSource
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository
+    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     override suspend fun doWork(): Result {
         return try {
@@ -35,13 +38,14 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
             val task = PeopleUpSyncUploaderTask(
                 loginInfoManager, personLocalDataSource, personRemoteDataSource,
                 PATIENT_UPLOAD_BATCH_SIZE,
-                peopleUpSyncScopeRepository
+                peopleUpSyncScopeRepository,
+                peopleSyncProgressCache
             )
 
-            val peopleUploaded = task.execute(this)
-            logSuccess("Upsync task done: $peopleUploaded uploaded")
+            val totalUploaded = task.execute(this.id.toString(), this)
+            logSuccess("Upsync task done $totalUploaded")
 
-            resultSetter.success(workDataOf(OUTPUT_UP_SYNC to peopleUploaded))
+            resultSetter.success(workDataOf(OUTPUT_UP_SYNC to totalUploaded))
         } catch (t: TransientSyncFailureException) {
             logFailure(t)
             resultSetter.retry()
@@ -75,14 +79,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
 
 fun WorkInfo.extractUpSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
-    return if (progress < 0) {
-        val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
-        if (output < 0) {
-            null
-        } else {
-            output
-        }
-    } else {
-        progress
-    }
+    val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
+
+    return max(max(progress, output), 0)
 }
