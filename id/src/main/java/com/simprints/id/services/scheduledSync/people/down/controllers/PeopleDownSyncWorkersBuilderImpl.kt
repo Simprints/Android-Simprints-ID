@@ -60,8 +60,9 @@ class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSy
             .addTag("${TAG_SCHEDULED_AT}${Date().time}")
             .addTag(TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS)
             .addTag(TAG_PEOPLE_SYNC_ALL_WORKERS)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_SECS, TimeUnit.SECONDS).also { builder ->
+            .also { builder ->
                 uniqueMasterSyncId?.let {
+                    builder.setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_SECS, TimeUnit.SECONDS)
                     builder.addTag("${TAG_MASTER_SYNC_ID}${uniqueMasterSyncId}")
                 }
             }

@@ -61,6 +61,7 @@ class PeopleSyncMasterWorkerTest {
             resultSetter = mockk(relaxed = true)
             downSyncWorkerBuilder = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
+            peopleSyncProgressCache = mockk(relaxed = true)
         }
         mockBackgroundTrigger(true)
     }

@@ -12,7 +12,7 @@ interface PeopleDownSyncDao {
     suspend fun getDownSyncOperation(key: DbDownSyncOperationKey): List<DbDownSyncOperation>
 
     @Query("select * from DbDownSyncOperation")
-    suspend fun getDownSyncOperationAll(): List<DbDownSyncOperation>
+    suspend fun getDownSyncOperationsAll(): List<DbDownSyncOperation>
 
     @Query("select * from DbDownSyncOperation")
     fun getDownSyncOperation(): List<DbDownSyncOperation>

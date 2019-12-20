@@ -50,7 +50,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         return try {
             val totalDownloaded = peopleDownSyncDownloaderTask.execute(
                 downSyncOperation,
-                this.id.toString(),
+                id.toString(),
                 this)
 
             logSuccess("DownSync done for $downSyncOperation $totalDownloaded")
@@ -65,7 +65,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     private suspend fun extractSubSyncScopeFromInput(): PeopleDownSyncOperation {
         val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
-        return downSyncScopeRepository.refreshFromDb(op) ?: op
+        return downSyncScopeRepository.refreshDownSyncOperationFromDb(op) ?: op
     }
 
     override suspend fun reportCount(count: Int) {

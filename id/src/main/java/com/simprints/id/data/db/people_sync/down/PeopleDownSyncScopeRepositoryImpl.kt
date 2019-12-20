@@ -1,8 +1,9 @@
 package com.simprints.id.data.db.people_sync.down
 
 import com.simprints.id.data.db.people_sync.down.domain.*
-import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildModuleSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildProjectSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildUserSyncOperation
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -10,7 +11,6 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.toMode
-import kotlinx.coroutines.runBlocking
 
 class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                         val preferencesManager: PreferencesManager,
@@ -42,65 +42,39 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     }
 
     override suspend fun getDownSyncOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation> {
-        val downSyncOpsStoredInDb = fetchDownSyncOperationsFromDb(syncScope)
-        return if (downSyncOpsStoredInDb.isNullOrEmpty()) {
-            createOperations(syncScope).also {
-                it.forEach { op ->
-                    downSyncOperationDao.insertOrReplaceDownSyncOperation(op.fromDomainToDb())
-                }
-            }
-        } else {
-            downSyncOpsStoredInDb.map { it.fromDbToDomain() }
-        }
+        val downSyncOpsStored = createOperations(syncScope)
+        return downSyncOpsStored.map { refreshDownSyncOperationFromDb(it) }
     }
 
-    override suspend fun refreshFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation? {
-        val ops = downSyncOperationDao.getDownSyncOperationAll()
+    override suspend fun refreshDownSyncOperationFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation {
+        val ops = downSyncOperationDao.getDownSyncOperationsAll()
         return ops.firstOrNull {
             it.projectId == opToRefresh.projectId &&
-            it.userId == opToRefresh.userId &&
-            it.moduleId == opToRefresh.moduleId &&
-            it.modes.containsAll(opToRefresh.modes)
-        }?.fromDbToDomain()
+                it.userId == opToRefresh.userId &&
+                it.moduleId == opToRefresh.moduleId &&
+                it.modes.toTypedArray() contentEquals opToRefresh.modes.toTypedArray()
+        }?.fromDbToDomain() ?: opToRefresh
     }
-
 
     private fun createOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation> =
         when (syncScope) {
             is ProjectSyncScope -> {
-                listOf(PeopleDownSyncOperation.buildProjectOperation(syncScope.projectId, syncScope.modes, null))
+                listOf(buildProjectSyncOperation(syncScope.projectId, syncScope.modes, null))
             }
             is UserSyncScope ->
-                listOf(PeopleDownSyncOperation.buildUserOperation(syncScope.projectId, syncScope.userId, syncScope.modes, null))
+                listOf(buildUserSyncOperation(syncScope.projectId, syncScope.userId, syncScope.modes, null))
             is ModuleSyncScope ->
                 syncScope.modules.map {
-                    PeopleDownSyncOperation.buildModuleOperation(syncScope.projectId, it, syncScope.modes, null)
+                    buildModuleSyncOperation(syncScope.projectId, it, syncScope.modes, null)
                 }.toList()
-        }
-
-    private suspend fun fetchDownSyncOperationsFromDb(syncScope: PeopleDownSyncScope): List<DbDownSyncOperation> =
-        with(downSyncOperationDao) {
-            when (syncScope) {
-                is ProjectSyncScope -> {
-                    getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes))
-                }
-                is UserSyncScope ->
-                    getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, userId = syncScope.userId))
-                is ModuleSyncScope ->
-                    syncScope.modules.mapNotNull {
-                        getDownSyncOperation(DbDownSyncOperationKey(syncScope.projectId, syncScope.modes, moduleId = it)).firstOrNull()
-                    }
-            }
         }
 
     override suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation) {
         downSyncOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
     }
 
-    override fun deleteAll() {
-        runBlocking {
-            downSyncOperationDao.deleteAll()
-        }
+    override suspend fun deleteAll() {
+        downSyncOperationDao.deleteAll()
     }
 
 }

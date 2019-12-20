@@ -16,6 +16,7 @@ import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
@@ -47,8 +48,9 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
     override fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
                                                      personRemoteDataSource: PersonRemoteDataSource,
                                                      downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                                     progressCache: PeopleSyncProgressCache,
                                                      timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
-        peopleDownSyncDownloaderTaskRule.resolveDependency { super.providePeopleDownSyncDownloaderTask(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper) }
+        peopleDownSyncDownloaderTaskRule.resolveDependency { super.providePeopleDownSyncDownloaderTask(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, progressCache, timeHelper) }
 
     @Singleton
     override fun provideSessionEventsSyncManager(): SessionEventsSyncManager =

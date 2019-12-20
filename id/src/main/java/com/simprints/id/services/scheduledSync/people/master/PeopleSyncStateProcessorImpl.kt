@@ -28,7 +28,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
                                    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
-        observerForLastDowSyncId().switchMap { lastSyncId ->
+        observerForLastSyncId().switchMap { lastSyncId ->
             observerForLastSyncIdWorkers(lastSyncId).switchMap { syncWorkers ->
                 MutableLiveData<PeopleSyncState>().apply {
                     with(syncWorkers) {
@@ -46,7 +46,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
         }
 
 
-    private fun observerForLastDowSyncId(): LiveData<String> {
+    private fun observerForLastSyncId(): LiveData<String> {
         return syncWorkersLiveDataProvider.getMasterWorkersLiveData().switchMap { masterWorkers ->
             Timber.d("I/SYNC Update from MASTER_SYNC_SCHEDULERS}")
 

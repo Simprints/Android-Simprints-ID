@@ -5,6 +5,7 @@ import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
+import timber.log.Timber
 
 class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
                         private val sessionEventsSyncManager: SessionEventsSyncManager,
@@ -14,11 +15,13 @@ class SyncSchedulerImpl(private val preferencesManager: PreferencesManager,
 
 
     override fun scheduleBackgroundSyncs() {
+        Timber.d("Background schedules synced")
         sessionEventsSyncManager.scheduleSessionsSync()
         peopleSyncManager.scheduleSync()
     }
 
     override fun cancelBackgroundSyncs() {
+        Timber.d("Background schedules canceled")
         sessionEventsSyncManager.cancelSyncWorkers()
         peopleSyncManager.cancelScheduledSync()
     }
