@@ -22,12 +22,10 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerTyp
 import com.simprints.id.services.scheduledSync.people.up.workers.extractUpSyncProgress
 import com.simprints.id.services.scheduledSync.people.up.workers.getUpCountsFromOutput
 import timber.log.Timber
-import java.util.*
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
                                    val personRepository: PersonRepository,
                                    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
-    private val cacheProgress = mutableMapOf<UUID, Int>()
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
         observerForLastDowSyncId().switchMap { lastSyncId ->
@@ -58,7 +56,6 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
                     val lastSyncId = completedSyncMaster.mapNotNull { it.outputData.getString(OUTPUT_LAST_SYNC_ID) }.firstOrNull()
                     if (!lastSyncId.isNullOrBlank()) {
                         Timber.d("I/SYNC Last sync id $lastSyncId}")
-                        cacheProgress.clear()
                         this.postValue(lastSyncId)
                     }
                 }
@@ -99,25 +96,19 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
         val progresses = downWorkers.map { worker ->
-            val progress = worker.extractDownSyncProgress()
-            val newProgress = (cacheProgress[worker.id] ?: 0) + (progress ?: 0)
-            cacheProgress[worker.id] = newProgress
-            newProgress
+            worker.extractDownSyncProgress()
         }
 
-        return progresses.sum()
+        return progresses.filterNotNull().sum()
     }
 
     private fun List<WorkInfo>.calculateProgressForUpSync(): Int {
         val upWorkers = this.filterByTags(tagForType(UPLOADER))
         val progresses = upWorkers.map { worker ->
-            val progress = worker.extractUpSyncProgress()
-            val newProgress = (cacheProgress[worker.id] ?: 0) + (progress ?: 0)
-            cacheProgress[worker.id] = newProgress
-            newProgress
+            worker.extractUpSyncProgress()
         }
 
-        return progresses.sum()
+        return progresses.filterNotNull().sum()
     }
 
     private fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =

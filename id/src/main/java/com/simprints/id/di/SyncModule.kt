@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
@@ -19,10 +20,7 @@ import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDow
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManagerImpl
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessor
-import com.simprints.id.services.scheduledSync.people.master.PeopleSyncStateProcessorImpl
+import com.simprints.id.services.scheduledSync.people.master.*
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManagerImpl
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
@@ -49,8 +47,9 @@ open class SyncModule {
     open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
                                                  personRemoteDataSource: PersonRemoteDataSource,
                                                  downSyncScopeRepository: PeopleDownSyncScopeRepository,
+                                                 progressCache: PeopleSyncProgressCache,
                                                  timeHelper: TimeHelper): PeopleDownSyncDownloaderTask =
-        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, timeHelper)
+        PeopleDownSyncDownloaderTaskImpl(personLocalDataSource, personRemoteDataSource, downSyncScopeRepository, progressCache, timeHelper)
 
     @Provides
     open fun provideSessionEventsSyncManager(): SessionEventsSyncManager =
@@ -69,10 +68,10 @@ open class SyncModule {
 
     @Provides
     open fun provideSyncManager(preferencesManager: PreferencesManager,
-                                        sessionEventsSyncManager: SessionEventsSyncManager,
-                                        peopleSyncManager: PeopleSyncManager,
-                                        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-                                        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
+                                sessionEventsSyncManager: SessionEventsSyncManager,
+                                peopleSyncManager: PeopleSyncManager,
+                                peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+                                peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
         SyncSchedulerImpl(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository)
 
 
@@ -100,10 +99,12 @@ open class SyncModule {
 
 
     @Provides
-    @Singleton
     open fun provideUpSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                           dao: PeopleUpSyncDao): PeopleUpSyncScopeRepository =
         PeopleUpSyncScopeRepositoryImpl(loginInfoManager, dao)
 
+    @Provides
+    open fun providePeopleSyncProgressCache(ctx: Context): PeopleSyncProgressCache =
+        PeopleSyncProgressCacheImpl(ctx)
 
 }

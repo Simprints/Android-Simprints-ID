@@ -6,12 +6,14 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
 import javax.inject.Inject
+import kotlin.math.max
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
@@ -23,6 +25,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     @Inject override lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var peopleDownSyncDownloaderTask: PeopleDownSyncDownloaderTask
+    @Inject lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
 
     private val jsonForOp by lazy {
         inputData.getString(INPUT_DOWN_SYNC_OPS)
@@ -45,8 +48,12 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
     private suspend fun execute(downSyncOperation: PeopleDownSyncOperation): Result {
         return try {
-            val totalDownloaded = peopleDownSyncDownloaderTask.execute(downSyncOperation, this)
-            logSuccess("DownSync done for $downSyncOperation: $totalDownloaded downloaded")
+            val totalDownloaded = peopleDownSyncDownloaderTask.execute(
+                downSyncOperation,
+                this.id.toString(),
+                this)
+
+            logSuccess("DownSync done for $downSyncOperation $totalDownloaded")
 
             resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to totalDownloaded))
         } catch (t: Throwable) {
@@ -56,8 +63,9 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         }
     }
 
-    private fun extractSubSyncScopeFromInput(): PeopleDownSyncOperation {
-        return JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
+    private suspend fun extractSubSyncScopeFromInput(): PeopleDownSyncOperation {
+        val op = JsonHelper.gson.fromJson(jsonForOp, PeopleDownSyncOperation::class.java)
+        return downSyncScopeRepository.refreshFromDb(op) ?: op
     }
 
     override suspend fun reportCount(count: Int) {
@@ -78,14 +86,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
 
 fun WorkInfo.extractDownSyncProgress(): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
-    return if (progress < 0) {
-        val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
-        if (output < 0) {
-            null
-        } else {
-            output
-        }
-    } else {
-        progress
-    }
+    val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
+
+    return max(max(progress, output), 0)
 }

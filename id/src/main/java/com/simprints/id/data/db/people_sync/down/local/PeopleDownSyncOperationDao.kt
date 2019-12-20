@@ -12,6 +12,9 @@ interface PeopleDownSyncDao {
     suspend fun getDownSyncOperation(key: DbDownSyncOperationKey): List<DbDownSyncOperation>
 
     @Query("select * from DbDownSyncOperation")
+    suspend fun getDownSyncOperationAll(): List<DbDownSyncOperation>
+
+    @Query("select * from DbDownSyncOperation")
     fun getDownSyncOperation(): List<DbDownSyncOperation>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

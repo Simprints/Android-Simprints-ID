@@ -41,7 +41,6 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         }
     }
 
-    //StopShip: consider to make suspend
     override suspend fun getDownSyncOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation> {
         val downSyncOpsStoredInDb = fetchDownSyncOperationsFromDb(syncScope)
         return if (downSyncOpsStoredInDb.isNullOrEmpty()) {
@@ -53,6 +52,16 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         } else {
             downSyncOpsStoredInDb.map { it.fromDbToDomain() }
         }
+    }
+
+    override suspend fun refreshFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation? {
+        val ops = downSyncOperationDao.getDownSyncOperationAll()
+        return ops.firstOrNull {
+            it.projectId == opToRefresh.projectId &&
+            it.userId == opToRefresh.userId &&
+            it.moduleId == opToRefresh.moduleId &&
+            it.modes.containsAll(opToRefresh.modes)
+        }?.fromDbToDomain()
     }
 
 

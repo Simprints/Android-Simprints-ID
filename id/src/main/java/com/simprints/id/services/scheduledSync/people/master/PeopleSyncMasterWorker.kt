@@ -17,6 +17,7 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     @Inject lateinit var downSyncWorkerBuilder: PeopleDownSyncWorkersBuilder
     @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
     @Inject lateinit var preferenceManager: PreferencesManager
+    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     companion object {
         var MIN_BACKOFF_SECS = 15L
@@ -57,16 +58,15 @@ class PeopleSyncMasterWorker(private val appContext: Context,
             return if (!isSyncRunning()) {
                 val chain = upSyncWorkersChain(uniqueSyncId) + downSyncWorkersChain(uniqueSyncId)
                 wm.enqueue(chain)
-
+                peopleSyncProgressCache.clear()
                 logSuccess("Master work done: new id $uniqueSyncId")
+                clearWorkerHistory(uniqueSyncId)
                 resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to uniqueSyncId))
             } else {
                 val lastSyncId = getLastSyncId()
 
                 logSuccess("Master work done: id already exists $lastSyncId")
                 resultSetter.success(workDataOf(OUTPUT_LAST_SYNC_ID to lastSyncId))
-            }.also {
-                clearWorkerHistory()
             }
         } catch (t: Throwable) {
             logFailure(t)
@@ -84,17 +84,10 @@ class PeopleSyncMasterWorker(private val appContext: Context,
     private fun upSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)
 
-    private fun clearWorkerHistory() {
-        val downSyncWorkersTags = syncWorkers.filter { it.state != WorkInfo.State.CANCELLED }.map { it.tags }.flatten().distinct()
-        val syncIds = downSyncWorkersTags.filter { it.contains(TAG_MASTER_SYNC_ID) }
-        if (syncIds.size > 1) {
-            val toKeep = syncIds.first()
-            val toRemove = syncIds - toKeep
-            toRemove.forEach { wm.cancelAllWorkByTag(it) }
-        }
-
+    private fun clearWorkerHistory(uniqueId: String) {
+        val otherDownSyncWorkers = syncWorkers.filter { !it.tags.contains("${TAG_MASTER_SYNC_ID}$uniqueId") }
         val syncWorkersWithoutSyncId = syncWorkers.filter { getTagWithSyncId(it.tags) == null && it.state != WorkInfo.State.CANCELLED }
-        syncWorkersWithoutSyncId.forEach { wm.cancelWorkById(it.id) }
+        (otherDownSyncWorkers + syncWorkersWithoutSyncId).forEach { wm.cancelWorkById(it.id) }
     }
 
 
