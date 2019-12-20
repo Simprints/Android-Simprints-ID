@@ -8,6 +8,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.sync.TransientSyncFailureException
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.syntax.assertThrows
 import io.mockk.*
@@ -24,18 +25,18 @@ class PeopleUpSyncUploaderTaskTest {
     private val personLocalDataSource: PersonLocalDataSource = mockk(relaxed = true)
     private val personRemoteDataSource: PersonRemoteDataSource = mockk(relaxed = true)
     private val peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository = mockk(relaxed = true)
+    private val peopleSyncProgressCache: PeopleSyncProgressCache = mockk(relaxed = true)
 
+    private val uniqueWorkerId = "uniqueWorkerId"
     private val projectIdToSync = "projectIdToSync"
     private val userIdToSync = "userIdToSync"
     private val batchSize = 2
 
     private val task = PeopleUpSyncUploaderTask(
         loginInfoManager, personLocalDataSource, personRemoteDataSource ,
-        batchSize, peopleUpSyncScopeRepository // TODO: uncomment userId when multitenancy is properly implemented
+        batchSize, peopleUpSyncScopeRepository,
+        peopleSyncProgressCache
     )
-
-    private val differentProjectId = "differentProjectId"
-//    private val differentUserId = "differentUserId" // TODO: uncomment userId when multitenancy is properly implemented
 
     private val notYetSyncedPerson1 = Person(
         "patientId1", "projectId", "userId", "moduleId", Date(1), null, true
@@ -57,7 +58,7 @@ class PeopleUpSyncUploaderTaskTest {
     fun userNotSignedIn1_shouldThrowIllegalStateException() {
         runBlocking {
             assertThrows<IllegalStateException> {
-                task.execute(mockk(relaxed = true))
+                task.execute(uniqueWorkerId, mockk(relaxed = true))
             }
         }
     }
@@ -81,7 +82,7 @@ class PeopleUpSyncUploaderTaskTest {
 
         runBlocking {
             assertThrows<TransientSyncFailureException> {
-                task.execute(mockk(relaxed = true))
+                task.execute(uniqueWorkerId, mockk(relaxed = true))
             }
         }
     }
@@ -145,7 +146,7 @@ class PeopleUpSyncUploaderTaskTest {
         mockSyncStatusModel()
 
         runBlocking {
-            task.execute(mockk(relaxed = true))
+            task.execute(uniqueWorkerId, mockk(relaxed = true))
         }
 
         verifyLocalPeopleQueries(*localQueryResults)

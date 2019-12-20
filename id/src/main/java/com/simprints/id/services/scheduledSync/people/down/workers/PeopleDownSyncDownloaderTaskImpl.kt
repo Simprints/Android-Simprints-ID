@@ -41,6 +41,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     override suspend fun execute(downSyncOperation: PeopleDownSyncOperation,
                                  workerId: String,
                                  downSyncWorkerProgressReporter: WorkerProgressCountReporter): Int {
+
         this.downSyncOperation = downSyncOperation
         this.downSyncWorkerProgressReporter = downSyncWorkerProgressReporter
 
@@ -106,7 +107,7 @@ class PeopleDownSyncDownloaderTaskImpl(val personLocalDataSource: PersonLocalDat
     private suspend fun updateDownSyncInfo(state: PeopleDownSyncOperationResult.DownSyncState,
                                            person: ApiGetPerson? = null,
                                            lastSyncTime: Date? = null) {
-        var newResultInfo = downSyncOperation.lastResult?.copy(lastState = state)
+        var newResultInfo = downSyncOperation.lastResult?.copy(state = state)
             ?: PeopleDownSyncOperationResult(state, null, null, null)
 
         if (person != null) {

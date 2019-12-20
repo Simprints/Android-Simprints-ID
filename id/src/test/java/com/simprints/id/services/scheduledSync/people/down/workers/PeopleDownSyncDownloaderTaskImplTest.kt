@@ -24,6 +24,7 @@ import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToGetApi
 import com.simprints.id.domain.modality.Modes
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.id.tools.TimeHelperImpl
@@ -77,6 +78,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
         null
     )
 
+    private val uniqueWorkerId = "uniqueWorkerId"
     private val app = ApplicationProvider.getApplicationContext() as TestApplication
 
     private var mockServer = MockWebServer()
@@ -87,6 +89,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     @RelaxedMockK lateinit var personRemoteDataSourceMock: PersonRemoteDataSource
     @RelaxedMockK lateinit var downSyncScopeRepository: PeopleDownSyncScopeRepository
     @RelaxedMockK lateinit var personLocalDataSourceMock: PersonLocalDataSource
+    @RelaxedMockK lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     private val module by lazy {
         TestAppModule(app,
@@ -203,7 +206,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
         runBlocking {
             val nPeopleToDownload = 499
-            val projectDownSyncOp = PeopleDownSyncOperation.buildProjectOperation(DEFAULT_PROJECT_ID, modes, null)
+            val projectDownSyncOp = PeopleDownSyncOperation.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null)
             val peopleToDownload = prepareResponseForDownSyncOperation(projectDownSyncOp, nPeopleToDownload)
             mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
 
@@ -211,10 +214,11 @@ class PeopleDownSyncDownloaderTaskImplTest {
                 personLocalDataSourceMock,
                 personRemoteDataSourceMock,
                 downSyncScopeRepository,
+                peopleSyncProgressCache,
                 TimeHelperImpl())
 
             assertThrows<Throwable> {
-                sync.execute(projectDownSyncOp, mockk(relaxed = true))
+                sync.execute(projectDownSyncOp, uniqueWorkerId, mockk(relaxed = true))
             }
         }
     }
@@ -259,9 +263,10 @@ class PeopleDownSyncDownloaderTaskImplTest {
             personLocalDataSourceMock,
             personRemoteDataSourceMock,
             downSyncScopeRepository,
+            peopleSyncProgressCache,
             TimeHelperImpl())
 
-        syncTask.execute(downSyncOps, mockk(relaxed = true))
+        syncTask.execute(downSyncOps, uniqueWorkerId, mockk(relaxed = true))
 
         coVerify(exactly = batchesForSavingInLocal) { personLocalDataSourceMock.insertOrUpdate(any()) }
         coVerify(exactly = batchesForDeletion) { personLocalDataSourceMock.delete(any()) }
@@ -272,7 +277,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
             assertThat(projectId).isEqualTo(downSyncOps.projectId)
             assertThat(userId).isEqualTo(downSyncOps.userId)
             assertThat(moduleId).isEqualTo(downSyncOps.moduleId)
-            assertThat(lastResult?.lastState).isEqualTo(COMPLETE)
+            assertThat(lastResult?.state).isEqualTo(COMPLETE)
             assertThat(lastResult?.lastPatientId).isEqualTo(lastPatient?.id)
             assertThat(lastResult?.lastPatientUpdatedAt).isEqualTo(lastPatient?.updatedAt?.time)
             assertThat(lastResult?.lastSyncTime).isNotNull()

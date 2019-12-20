@@ -123,17 +123,6 @@ class PeopleSyncStateProcessorImplTest {
         lastSyncState!!.assertConnectingSyncState()
     }
 
-    @Test
-    fun processor_allWorkersSucceedWithMultiRetries_shouldSyncStateBeSuccess() = runBlockingTest {
-        masterWorkersLiveData.value = successfulMasterWorkers
-        syncWorkersLiveData.value = createWorkInfosHistoryForSuccessfulSyncInMultiAttempts()
-
-        val syncStates = peopleSyncStateProcessor.getLastSyncState().testObserver().observedValues
-
-        val lastSyncState = syncStates.last()
-        lastSyncState!!.assertSuccessfulSyncState()
-    }
-
 
     private fun createSyncMasterWorker(state: WorkInfo.State,
                                        uniqueMasterSyncId: String) =

@@ -11,9 +11,9 @@ data class PeopleDownSyncOperation(val projectId: String,
                                    val lastResult: PeopleDownSyncOperationResult?) {
     companion object {
 
-        fun buildProjectOperation(projectId: String,
-                                  modes: List<Modes>,
-                                  syncOperationResult: PeopleDownSyncOperationResult?) =
+        fun buildProjectSyncOperation(projectId: String,
+                                      modes: List<Modes>,
+                                      syncOperationResult: PeopleDownSyncOperationResult?) =
             PeopleDownSyncOperation(
                 projectId = projectId,
                 userId = null,
@@ -22,10 +22,10 @@ data class PeopleDownSyncOperation(val projectId: String,
                 lastResult = syncOperationResult
             )
 
-        fun buildUserOperation(projectId: String,
-                               userId: String,
-                               modes: List<Modes>,
-                               syncOperationResult: PeopleDownSyncOperationResult?) =
+        fun buildUserSyncOperation(projectId: String,
+                                   userId: String,
+                                   modes: List<Modes>,
+                                   syncOperationResult: PeopleDownSyncOperationResult?) =
             PeopleDownSyncOperation(
                 projectId = projectId,
                 userId = userId,
@@ -34,10 +34,10 @@ data class PeopleDownSyncOperation(val projectId: String,
                 lastResult = syncOperationResult
             )
 
-        fun buildModuleOperation(projectId: String,
-                                 moduleId: String,
-                                 modes: List<Modes>,
-                                 syncOperationResult: PeopleDownSyncOperationResult?) =
+        fun buildModuleSyncOperation(projectId: String,
+                                     moduleId: String,
+                                     modes: List<Modes>,
+                                     syncOperationResult: PeopleDownSyncOperationResult?) =
             PeopleDownSyncOperation(
                 projectId = projectId,
                 userId = null,
@@ -52,7 +52,7 @@ fun PeopleDownSyncOperation.fromDomainToDb(): DbDownSyncOperation =
     DbDownSyncOperation(
         DbDownSyncOperationKey(projectId, modes, userId, moduleId),
         projectId, userId, moduleId, modes,
-        lastResult?.lastState,
+        lastResult?.state,
         lastResult?.lastPatientId,
         lastResult?.lastPatientUpdatedAt,
         lastResult?.lastSyncTime)

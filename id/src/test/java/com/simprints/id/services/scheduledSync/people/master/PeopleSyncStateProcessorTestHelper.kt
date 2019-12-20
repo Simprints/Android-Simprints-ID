@@ -57,10 +57,10 @@ private fun assertProgressAndTotal(syncId: String, total: Int?, progress: Int) {
 fun createWorkInfosHistoryForSuccessfulSyncInMultiAttempts(): List<WorkInfo> {
     val successedWorkInfo = createWorkInfosHistoryForSuccessfulSync()
     return listOf(
-        createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID, "", successedWorkInfo[0].id),
-        createDownSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, "", successedWorkInfo[1].id),
-        createUpSyncUploaderWorker(FAILED, UNIQUE_SYNC_ID, "", successedWorkInfo[2].id),
-        createUpSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, "", successedWorkInfo[3].id)
+        createDownSyncDownloaderWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createDownSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createUpSyncUploaderWorker(FAILED, UNIQUE_SYNC_ID, ""),
+        createUpSyncCounterWorker(FAILED, UNIQUE_SYNC_ID, "")
     ) + successedWorkInfo
 }
 

@@ -8,9 +8,10 @@ interface PeopleDownSyncScopeRepository {
     fun getDownSyncScope(): PeopleDownSyncScope
 
     suspend fun getDownSyncOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation>
-    suspend fun refreshFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation?
+
+    suspend fun refreshDownSyncOperationFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation?
 
     suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation)
 
-    fun deleteAll()
+    suspend fun deleteAll()
 }

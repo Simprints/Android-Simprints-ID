@@ -193,7 +193,6 @@ class ModuleSelectionFragment(
                 buildConfirmModuleSelectionDialog().show()
             }
         } else {
-            refreshSyncWorkers()
             activity?.finish()
         }
     }
@@ -224,6 +223,7 @@ class ModuleSelectionFragment(
 
     private fun handleModulesConfirmClick() {
         viewModel.saveModules(modules)
+        refreshSyncWorkers()
         activity?.finish()
     }
 

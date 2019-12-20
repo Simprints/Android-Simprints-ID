@@ -2,7 +2,6 @@ package com.simprints.id.services.scheduledSync.people.down.workers
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.SmallTest
 import androidx.work.Data
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
@@ -52,11 +51,12 @@ class PeopleDownSyncDownloaderWorkerTest {
     fun downSyncWorker_shouldExecuteTheTask() = runBlockingTest {
         val correctInputData = JsonHelper.gson.toJson(projectSyncOp)
         peopleDownSyncDownloaderWorker = createWorker(workDataOf(INPUT_DOWN_SYNC_OPS to correctInputData))
-        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any()) } returns 0
+        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any(), any()) } returns 0
+        coEvery { peopleDownSyncDownloaderWorker.downSyncScopeRepository.refreshDownSyncOperationFromDb(any()) } returns null
 
         peopleDownSyncDownloaderWorker.doWork()
 
-        coVerify { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any()) }
+        coVerify { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(any(), any(), any()) }
         verify { peopleDownSyncDownloaderWorker.resultSetter.success(workDataOf(OUTPUT_DOWN_SYNC to 0)) }
     }
 
@@ -68,7 +68,7 @@ class PeopleDownSyncDownloaderWorkerTest {
 
         peopleDownSyncDownloaderWorker.doWork()
 
-        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(projectSyncOp, any()) }
+        coEvery { peopleDownSyncDownloaderWorker.peopleDownSyncDownloaderTask.execute(projectSyncOp, any(), any()) }
     }
 
     @Test
@@ -85,6 +85,7 @@ class PeopleDownSyncDownloaderWorkerTest {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
             peopleDownSyncDownloaderTask = mockk(relaxed = true)
+            downSyncScopeRepository = mockk(relaxed = true)
         }
 }
 
