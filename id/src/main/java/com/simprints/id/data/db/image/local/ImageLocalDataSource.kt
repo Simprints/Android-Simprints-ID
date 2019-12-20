@@ -1,8 +1,9 @@
-package com.simprints.core.images
+package com.simprints.id.data.db.image.local
 
+import com.simprints.core.images.SecuredImageRef
 import java.io.FileInputStream
 
-interface SecuredImageManager {
+interface ImageLocalDataSource {
 
     fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef?
     fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef?

@@ -1,19 +1,20 @@
-package com.simprints.id.core.images
+package com.simprints.id.data.db.image.local
 
 import android.content.Context
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
-import com.simprints.core.images.SecuredImageManager
 import com.simprints.core.images.SecuredImageRef
+import com.simprints.id.core.images.Hasher
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 
-
-class SecuredImageManagerImpl(val ctx: Context,
-                              private val hasher: Hasher = Hasher()) : SecuredImageManager {
+class ImageLocalDataSourceImpl(
+    val ctx: Context,
+    private val hasher: Hasher = Hasher()
+) : ImageLocalDataSource {
 
     companion object {
         private const val IMAGES_FOLDER = "images"

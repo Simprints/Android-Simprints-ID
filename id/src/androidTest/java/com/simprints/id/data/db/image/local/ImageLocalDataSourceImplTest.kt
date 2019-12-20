@@ -1,4 +1,4 @@
-package com.simprints.id.core.images
+package com.simprints.id.data.db.image.local
 
 import android.app.Application
 import androidx.test.core.app.ApplicationProvider
@@ -14,7 +14,7 @@ import kotlin.random.Random
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class SecuredImageManagerImplTest {
+class ImageLocalDataSourceImplTest {
 
     companion object {
         private const val FILENAME = "test"
@@ -24,7 +24,7 @@ class SecuredImageManagerImplTest {
 
     private val app = ApplicationProvider.getApplicationContext<Application>()
     private val imagesFolder = "${app.filesDir}/$IMAGES_FOLDER"
-    private val securedImageManager = SecuredImageManagerImpl(app)
+    private val securedImageManager = ImageLocalDataSourceImpl(app)
 
     @Test
     fun givenAByteArray_storeIt_shouldCreateAFile() {
