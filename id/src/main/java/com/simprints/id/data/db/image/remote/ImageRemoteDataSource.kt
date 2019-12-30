@@ -4,10 +4,11 @@ import com.simprints.core.images.SecuredImageRef
 
 interface ImageRemoteDataSource {
 
-    fun uploadImage(image: SecuredImageRef, callback: Callback)
-
-    interface Callback {
-        fun onImageUploaded(image: SecuredImageRef)
-    }
+    /**
+     * Uploads an image
+     *
+     * @return true if successful
+     */
+    suspend fun uploadImage(image: SecuredImageRef): Boolean
 
 }
