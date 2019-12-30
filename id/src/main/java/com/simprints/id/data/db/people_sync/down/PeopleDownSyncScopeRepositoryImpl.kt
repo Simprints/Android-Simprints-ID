@@ -4,40 +4,42 @@ import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildModuleSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildProjectSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildUserSyncOperation
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.domain.modality.toMode
+import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeException
 
 class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                         val preferencesManager: PreferencesManager,
-                                        private val downSyncOperationDao: PeopleDownSyncDao) : PeopleDownSyncScopeRepository {
+                                        private val downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao) : PeopleDownSyncScopeRepository {
 
     override fun getDownSyncScope(): PeopleDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
         val modes: List<Modes> = preferencesManager.modalities.map { it.toMode() }
 
         val possibleUserId: String? = loginInfoManager.getSignedInUserIdOrEmpty()
-        val possibleModuleIds: List<String>? = preferencesManager.selectedModules.toList()
+        val possibleModuleIds: List<String> = preferencesManager.selectedModules.toList()
 
-        require(projectId.isNotBlank()) { "ProjectId required" }
-        require(possibleUserId?.isNotBlank() ?: false) { "Login required" }
+        if (projectId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("ProjectId required")
+        }
+
+        if (possibleUserId == null || possibleUserId.isBlank()) {
+            throw MissingArgumentForDownSyncScopeException("UserId required")
+        }
 
         return when (preferencesManager.syncGroup) {
             GROUP.GLOBAL -> {
                 ProjectSyncScope(projectId, modes)
             }
             GROUP.USER ->
-                possibleUserId?.let {
-                    UserSyncScope(projectId, it, modes)
-                } ?: throw IllegalArgumentException("UserId required") //TODO: create exception
+                UserSyncScope(projectId, possibleUserId, modes)
             GROUP.MODULE ->
-                possibleModuleIds?.let {
-                    ModuleSyncScope(projectId, possibleModuleIds, modes)
-                } ?: throw IllegalArgumentException("ModuleIds required") //TODO: create exception
+                ModuleSyncScope(projectId, possibleModuleIds, modes)
         }
     }
 
@@ -47,7 +49,7 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     }
 
     override suspend fun refreshDownSyncOperationFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation {
-        val ops = downSyncOperationDao.getDownSyncOperationsAll()
+        val ops = downSyncOperationOperationDaoDb.getDownSyncOperationsAll()
         return ops.firstOrNull {
             it.projectId == opToRefresh.projectId &&
                 it.userId == opToRefresh.userId &&
@@ -70,11 +72,11 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         }
 
     override suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation) {
-        downSyncOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
+        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
     }
 
     override suspend fun deleteAll() {
-        downSyncOperationDao.deleteAll()
+        downSyncOperationOperationDaoDb.deleteAll()
     }
 
 }

@@ -15,7 +15,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.simprints.id.Application
 import com.simprints.id.R
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import kotlinx.android.synthetic.main.activity_debug.*
 import javax.inject.Inject
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class DebugActivity : AppCompatActivity() {
 
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
-    @Inject lateinit var peopleDownSyncDao: PeopleDownSyncDao
+    @Inject lateinit var dbPeopleDownSyncOperationDao: DbPeopleDownSyncOperationDao
 
     private val wm: WorkManager
         get() = WorkManager.getInstance(this)
@@ -66,7 +66,7 @@ class DebugActivity : AppCompatActivity() {
             peopleSyncManager.stop()
             wm.pruneWork()
 
-            peopleDownSyncDao.deleteAll()
+            dbPeopleDownSyncOperationDao.deleteAll()
         }
     }
 

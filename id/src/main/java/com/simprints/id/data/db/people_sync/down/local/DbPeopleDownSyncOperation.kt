@@ -9,10 +9,10 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationR
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState
 import com.simprints.id.domain.modality.Modes
 
-@Entity(tableName = "DbDownSyncOperation")
+@Entity(tableName = "DbPeopleDownSyncOperation")
 @Keep
-data class DbDownSyncOperation(
-    @PrimaryKey var id: DbDownSyncOperationKey,
+data class DbPeopleDownSyncOperation(
+    @PrimaryKey var id: DbPeopleDownSyncOperationKey,
     var projectId: String,
     var userId: String? = null,
     var moduleId: String? = null,
@@ -49,16 +49,16 @@ data class DbDownSyncOperation(
             downSyncState?.toString()
 
         @TypeConverter
-        fun fromDbDownSyncOperationKeyToString(dbDownSyncOperationKey: DbDownSyncOperationKey): String =
-            dbDownSyncOperationKey.key
+        fun fromDbPeopleDownSyncOperationKeyToString(DbPeopleDownSyncOperationKey: DbPeopleDownSyncOperationKey): String =
+            DbPeopleDownSyncOperationKey.key
 
         @TypeConverter
-        fun fromStringToDbDownSyncOperationKey(key: String): DbDownSyncOperationKey =
-            DbDownSyncOperationKey(key)
+        fun fromStringToDbPeopleDownSyncOperationKey(key: String): DbPeopleDownSyncOperationKey =
+            DbPeopleDownSyncOperationKey(key)
     }
 }
 
-class DbDownSyncOperationKey(val key: String) {
+class DbPeopleDownSyncOperationKey(val key: String) {
 
     companion object {
         const val SEPARATOR_PARAMS_KEY = "||"
@@ -69,7 +69,7 @@ class DbDownSyncOperationKey(val key: String) {
     )
 }
 
-fun DbDownSyncOperation.fromDbToDomain() =
+fun DbPeopleDownSyncOperation.fromDbToDomain() =
     PeopleDownSyncOperation(
         projectId,
         userId,
