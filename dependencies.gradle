@@ -33,7 +33,7 @@ def androidx = [
         ext      : "androidx.lifecycle:lifecycle-extensions:$androidx_lifecycle_version"
     ],
     ui       : [
-        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta1",
+        constraintlayout: "androidx.constraintlayout:constraintlayout:2.0.0-beta4",
         cardview        : "androidx.cardview:cardview:1.0.0",
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
