@@ -9,6 +9,6 @@ interface ImageRemoteDataSource {
      *
      * @return true if successful
      */
-    suspend fun uploadImage(image: SecuredImageRef): Boolean
+    suspend fun uploadImage(image: SecuredImageRef): UploadResult
 
 }

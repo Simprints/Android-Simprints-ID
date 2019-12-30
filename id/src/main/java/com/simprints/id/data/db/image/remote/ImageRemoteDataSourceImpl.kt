@@ -8,7 +8,7 @@ import java.io.File
 
 class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
 
-    override suspend fun uploadImage(image: SecuredImageRef): Boolean {
+    override suspend fun uploadImage(image: SecuredImageRef): UploadResult {
         val rootRef = FirebaseStorage.getInstance().reference
         val file = File(image.path)
         val uri = Uri.fromFile(file)
@@ -16,7 +16,13 @@ class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         val fileRef = rootRef.child(file.name)
         val uploadTask = fileRef.putFile(uri).await()
 
-        return uploadTask.bytesTransferred == file.length()
+        val status = if (uploadTask.bytesTransferred == file.length()) {
+            UploadResult.Status.SUCCESSFUL
+        } else {
+            UploadResult.Status.FAILED
+        }
+
+        return UploadResult(image, status)
     }
 
 }
