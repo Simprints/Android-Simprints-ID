@@ -1,11 +1,10 @@
 package com.simprints.id.di
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
@@ -41,7 +40,7 @@ open class SyncModule {
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
                                             syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
-        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationDao)
+        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDaoDb)
 
     @Provides
     open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
@@ -89,8 +88,8 @@ open class SyncModule {
         database.upSyncDao
 
     @Provides
-    open fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncDao =
-        database.downSyncOperationDao
+    open fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): DbPeopleDownSyncOperationDao =
+        database.downSyncOperationOperationDaoDb
 
     @Provides
     open fun providePeopleUpSyncManager(ctx: Context,

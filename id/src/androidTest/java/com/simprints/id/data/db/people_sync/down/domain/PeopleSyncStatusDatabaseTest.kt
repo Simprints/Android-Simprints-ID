@@ -1,4 +1,4 @@
-package com.simprints.id.data.db.syncscope.local
+package com.simprints.id.data.db.people_sync.down.domain
 
 import android.content.Context
 import androidx.room.Room
@@ -9,11 +9,8 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
-import com.simprints.id.data.db.people_sync.down.domain.fromDomainToDb
-import com.simprints.id.data.db.people_sync.down.local.DbDownSyncOperationKey
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationKey
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.domain.modality.Modes
 import kotlinx.coroutines.runBlocking
@@ -25,8 +22,8 @@ import java.io.IOException
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
-class SyncStatusDatabaseTest {
-    private lateinit var downSyncOperationDao: PeopleDownSyncDao
+class PeopleSyncStatusDatabaseTest {
+    private lateinit var downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao
     private lateinit var db: PeopleSyncStatusDatabase
 
     private val projectSyncOp = PeopleDownSyncOperation(
@@ -85,7 +82,7 @@ class SyncStatusDatabaseTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
             context, PeopleSyncStatusDatabase::class.java).build()
-        downSyncOperationDao = db.downSyncOperationDao
+        downSyncOperationOperationDaoDb = db.downSyncOperationOperationDaoDb
     }
 
     @After
@@ -116,22 +113,22 @@ class SyncStatusDatabaseTest {
 
     @Test
     fun insertOrReplaceDownSyncOperation() = runBlocking {
-        downSyncOperationDao.insertOrReplaceDownSyncOperation(projectSyncOp.fromDomainToDb())
+        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(projectSyncOp.fromDomainToDb())
         val newOp = projectSyncOp.copy(lastResult = downSyncOperationResult)
-        downSyncOperationDao.insertOrReplaceDownSyncOperation(newOp.fromDomainToDb())
-        val opStored = downSyncOperationDao.getDownSyncOperation(extractKeyFrom(newOp))
+        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(newOp.fromDomainToDb())
+        val opStored = downSyncOperationOperationDaoDb.getDownSyncOperation(extractKeyFrom(newOp))
         assertThat(opStored).isEqualTo(newOp.fromDomainToDb())
     }
 
     private suspend fun assertSaveAndRead(downSyncOp: PeopleDownSyncOperation) {
-        downSyncOperationDao.insertOrReplaceDownSyncOperation(downSyncOp.fromDomainToDb())
-        val operation = downSyncOperationDao.getDownSyncOperation(extractKeyFrom(downSyncOp))
+        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(downSyncOp.fromDomainToDb())
+        val operation = downSyncOperationOperationDaoDb.getDownSyncOperation(extractKeyFrom(downSyncOp))
         assertThat(operation.first().fromDbToDomain()).isEqualTo(downSyncOp)
     }
 
-    private fun extractKeyFrom(downSyncOp: PeopleDownSyncOperation): DbDownSyncOperationKey =
+    private fun extractKeyFrom(downSyncOp: PeopleDownSyncOperation): DbPeopleDownSyncOperationKey =
         with(downSyncOp) {
-            DbDownSyncOperationKey(
+            DbPeopleDownSyncOperationKey(
                 projectId,
                 modes,
                 userId,

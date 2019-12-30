@@ -19,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ProjectLocalDataSourceTest : RealmTestsBase() {
+class ProjectLocalDataSourceImplTest : RealmTestsBase() {
 
     private lateinit var realm: Realm
     private lateinit var projectLocalDataSource: ProjectLocalDataSource

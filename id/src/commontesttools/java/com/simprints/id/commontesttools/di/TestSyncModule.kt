@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncDao
+import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
 import com.simprints.id.data.db.person.PersonRepository
@@ -87,7 +87,7 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
         peopleUpSyncDaoRule.resolveDependency { super.providePeopleUpSyncDao(database) }
 
     @Singleton
-    override fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncDao =
+    override fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): DbPeopleDownSyncOperationDao =
         peopleDownSyncDaoRule.resolveDependency { super.providePeopleDownSyncDao(database) }
 
     @Singleton
