@@ -45,6 +45,7 @@ import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPrefe
 import com.simprints.id.guidselection.GuidSelectionWorker
 import com.simprints.id.secure.ProjectAuthenticator
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorker
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.DownSyncTaskImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.workers.CountWorker
@@ -123,6 +124,7 @@ interface AppComponent {
     fun inject(faceExitFormActivity: FaceExitFormActivity)
     fun inject(fetchGuidActivity: FetchGuidActivity)
     fun inject(guidSelectionActivity: GuidSelectionActivity)
+    fun inject(imageUpSyncWorker: ImageUpSyncWorker)
 
     fun getSessionEventsManager(): SessionEventsManager
     fun getCrashReportManager(): CoreCrashReportManager
