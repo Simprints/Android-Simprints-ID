@@ -1,9 +1,6 @@
 package com.simprints.id.data.db.people_sync.down
 
 import com.simprints.id.data.db.people_sync.down.domain.*
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildModuleSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildProjectSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildUserSyncOperation
 import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
@@ -15,7 +12,8 @@ import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeExc
 
 class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                         val preferencesManager: PreferencesManager,
-                                        private val downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao) : PeopleDownSyncScopeRepository {
+                                        private val downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao,
+                                        private val peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder) : PeopleDownSyncScopeRepository {
 
     override fun getDownSyncScope(): PeopleDownSyncScope {
         val projectId = loginInfoManager.getSignedInProjectIdOrEmpty()
@@ -61,13 +59,13 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     private fun createOperations(syncScope: PeopleDownSyncScope): List<PeopleDownSyncOperation> =
         when (syncScope) {
             is ProjectSyncScope -> {
-                listOf(buildProjectSyncOperation(syncScope.projectId, syncScope.modes, null))
+                listOf(peopleDownSyncOperationBuilder.buildProjectSyncOperation(syncScope.projectId, syncScope.modes, null))
             }
             is UserSyncScope ->
-                listOf(buildUserSyncOperation(syncScope.projectId, syncScope.userId, syncScope.modes, null))
+                listOf(peopleDownSyncOperationBuilder.buildUserSyncOperation(syncScope.projectId, syncScope.userId, syncScope.modes, null))
             is ModuleSyncScope ->
                 syncScope.modules.map {
-                    buildModuleSyncOperation(syncScope.projectId, it, syncScope.modes, null)
+                    peopleDownSyncOperationBuilder.buildModuleSyncOperation(syncScope.projectId, it, syncScope.modes, null)
                 }.toList()
         }
 

@@ -15,6 +15,7 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.person.domain.Person
@@ -53,6 +54,7 @@ import kotlin.math.ceil
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleDownSyncDownloaderTaskImplTest {
 
+    val builder = PeopleDownSyncOperationBuilderImpl()
     private val modes = listOf(Modes.FACE, Modes.FINGERPRINT)
     private val projectSyncOp = PeopleDownSyncOperation(
         DEFAULT_PROJECT_ID,
@@ -128,7 +130,8 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, projectSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl ?: throw Throwable("No requests done")
+            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+                ?: throw Throwable("No requests done")
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
         }
     }
@@ -141,7 +144,8 @@ class PeopleDownSyncDownloaderTaskImplTest {
 
             runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, userSyncOp)
 
-            val peopleRequestUrl = mockServer.takeRequest().requestUrl ?: throw Throwable("No requests done")
+            val peopleRequestUrl = mockServer.takeRequest().requestUrl
+                ?: throw Throwable("No requests done")
             assertPathUrlParam(peopleRequestUrl, DEFAULT_PROJECT_ID)
             assertQueryUrlParam(peopleRequestUrl, "userId", DEFAULT_USER_ID)
         }
@@ -206,7 +210,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
     fun downloadPatients_patientSerializationFails_shouldTriggerOnError() {
         runBlocking {
             val nPeopleToDownload = 499
-            val projectDownSyncOp = PeopleDownSyncOperation.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null)
+            val projectDownSyncOp = builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null)
             val peopleToDownload = prepareResponseForDownSyncOperation(projectDownSyncOp, nPeopleToDownload)
             mockServer.enqueue(mockSuccessfulResponseWithIncorrectModels(peopleToDownload))
 
@@ -233,7 +237,7 @@ class PeopleDownSyncDownloaderTaskImplTest {
                 val lastPatientUpdateAt = 123123123L
 
                 val syncOp = projectSyncOp.copy(lastResult =
-                    PeopleDownSyncOperationResult(COMPLETE, lastPatientId, lastPatientUpdateAt, Date().time))
+                PeopleDownSyncOperationResult(COMPLETE, lastPatientId, lastPatientUpdateAt, Date().time))
 
                 runDownSyncAndVerifyConditions(nPeopleToDownload, nPeopleToDelete, syncOp)
 

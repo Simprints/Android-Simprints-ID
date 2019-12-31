@@ -35,7 +35,7 @@ data class DbPeopleDownSyncOperation(
             }
 
         @TypeConverter
-        fun fromModeToString(modes: List<Modes>): String =
+        fun fromModesToString(modes: List<Modes>): String =
             modes.joinToString(separator = MODES_STRING_SEPARATOR) { it.name }
 
         @TypeConverter
@@ -58,7 +58,7 @@ data class DbPeopleDownSyncOperation(
     }
 }
 
-class DbPeopleDownSyncOperationKey(val key: String) {
+data class DbPeopleDownSyncOperationKey(val key: String) {
 
     companion object {
         const val SEPARATOR_PARAMS_KEY = "||"
