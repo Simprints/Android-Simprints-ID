@@ -4,6 +4,8 @@ import com.simprints.core.images.SecuredImageRef
 
 data class UploadResult(val image: SecuredImageRef, val status: Status) {
 
+    fun isSuccessful() = status == Status.SUCCESSFUL
+
     enum class Status {
         SUCCESSFUL,
         FAILED
