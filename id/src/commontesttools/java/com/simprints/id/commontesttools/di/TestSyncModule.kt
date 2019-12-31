@@ -3,6 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
 import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
@@ -41,8 +42,9 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
     @Singleton
     override fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                                 preferencesManager: PreferencesManager,
-                                                syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
-        peopleDownSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase) }
+                                                syncStatusDatabase: PeopleSyncStatusDatabase,
+                                                peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder): PeopleDownSyncScopeRepository =
+        peopleDownSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase, peopleDownSyncOperationBuilder) }
 
     @Singleton
     override fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,

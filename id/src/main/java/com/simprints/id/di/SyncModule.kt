@@ -4,6 +4,8 @@ import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
 import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
@@ -39,8 +41,12 @@ open class SyncModule {
     @Singleton
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
-                                            syncStatusDatabase: PeopleSyncStatusDatabase): PeopleDownSyncScopeRepository =
-        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDaoDb)
+                                            syncStatusDatabase: PeopleSyncStatusDatabase,
+                                            peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder): PeopleDownSyncScopeRepository =
+        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDaoDb, peopleDownSyncOperationBuilder)
+
+    @Provides
+    open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationBuilder = PeopleDownSyncOperationBuilderImpl()
 
     @Provides
     open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,

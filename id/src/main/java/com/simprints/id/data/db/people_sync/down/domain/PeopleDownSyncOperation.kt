@@ -8,45 +8,7 @@ data class PeopleDownSyncOperation(val projectId: String,
                                    val userId: String?,
                                    val moduleId: String?,
                                    val modes: List<Modes>,
-                                   val lastResult: PeopleDownSyncOperationResult?) {
-    companion object {
-
-        fun buildProjectSyncOperation(projectId: String,
-                                      modes: List<Modes>,
-                                      syncOperationResult: PeopleDownSyncOperationResult?) =
-            PeopleDownSyncOperation(
-                projectId = projectId,
-                userId = null,
-                moduleId = null,
-                modes = modes,
-                lastResult = syncOperationResult
-            )
-
-        fun buildUserSyncOperation(projectId: String,
-                                   userId: String,
-                                   modes: List<Modes>,
-                                   syncOperationResult: PeopleDownSyncOperationResult?) =
-            PeopleDownSyncOperation(
-                projectId = projectId,
-                userId = userId,
-                moduleId = null,
-                modes = modes,
-                lastResult = syncOperationResult
-            )
-
-        fun buildModuleSyncOperation(projectId: String,
-                                     moduleId: String,
-                                     modes: List<Modes>,
-                                     syncOperationResult: PeopleDownSyncOperationResult?) =
-            PeopleDownSyncOperation(
-                projectId = projectId,
-                userId = null,
-                moduleId = moduleId,
-                modes = modes,
-                lastResult = syncOperationResult
-            )
-    }
-}
+                                   val lastResult: PeopleDownSyncOperationResult?)
 
 fun PeopleDownSyncOperation.fromDomainToDb(): DbPeopleDownSyncOperation =
     DbPeopleDownSyncOperation(

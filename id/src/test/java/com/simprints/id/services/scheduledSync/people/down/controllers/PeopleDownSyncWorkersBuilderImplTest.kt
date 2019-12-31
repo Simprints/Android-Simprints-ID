@@ -7,9 +7,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildModuleSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildProjectSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation.Companion.buildUserSyncOperation
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
 import com.simprints.id.domain.modality.Modes
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
@@ -29,12 +27,13 @@ import org.junit.Test
 
 class PeopleDownSyncWorkersBuilderImplTest {
 
+    val builder = PeopleDownSyncOperationBuilderImpl()
     private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
-    private val opsForProjectDownSync = listOf(buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null))
-    private val opsForUserDownSync = listOf(buildUserSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes, null))
+    private val opsForProjectDownSync = listOf(builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null))
+    private val opsForUserDownSync = listOf(builder.buildUserSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes, null))
     private val opsForModuleDownSync = listOf(
-        buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, modes, null),
-        buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, modes, null))
+        builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, modes, null),
+        builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, modes, null))
 
     private lateinit var peopleDownSyncWorkersBuilder: PeopleDownSyncWorkersBuilder
     private lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
