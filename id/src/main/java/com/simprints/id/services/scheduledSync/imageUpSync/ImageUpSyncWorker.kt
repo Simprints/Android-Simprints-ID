@@ -8,7 +8,7 @@ import com.simprints.id.data.db.image.repository.ImageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ImageUpSyncWorker(
@@ -23,28 +23,35 @@ class ImageUpSyncWorker(
     @Inject
     lateinit var imageRepository: ImageRepository
 
-    private var allUploadsSuccessful = true
-
     override fun doWork(): Result {
         (applicationContext as Application).component.inject(this)
 
-        launch {
+        val success = runBlocking(Dispatchers.IO) {
             uploadAndDeleteIfSuccessful()
         }
 
-        return if (allUploadsSuccessful)
+        return if (success)
             Result.success()
         else
             Result.retry()
     }
 
-    private suspend fun uploadAndDeleteIfSuccessful() {
-        imageRepository.uploadImages().forEach { upload ->
+    private suspend fun uploadAndDeleteIfSuccessful(): Boolean {
+        val uploads = imageRepository.uploadImages()
+
+        if (uploads.isEmpty())
+            return true
+
+        var allUploadsSuccessful = true
+
+        uploads.forEach { upload ->
             if (upload.isSuccessful())
                 imageRepository.deleteImage(upload.image)
             else
                 allUploadsSuccessful = false
         }
+
+        return allUploadsSuccessful
     }
 
 }
