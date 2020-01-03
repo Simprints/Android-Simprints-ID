@@ -28,12 +28,6 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.image.local.ImageLocalDataSource
-import com.simprints.id.data.db.image.local.ImageLocalDataSourceImpl
-import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
-import com.simprints.id.data.db.image.remote.ImageRemoteDataSourceImpl
-import com.simprints.id.data.db.image.repository.ImageRepository
-import com.simprints.id.data.db.image.repository.ImageRepositoryImpl
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -222,20 +216,6 @@ open class AppModule {
 
     @Provides
     fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
-
-    @Provides
-    fun provideImageLocalDataSource(
-        context: Context
-    ): ImageLocalDataSource = ImageLocalDataSourceImpl(context)
-
-    @Provides
-    fun provideImageRemoteDataSource(): ImageRemoteDataSource = ImageRemoteDataSourceImpl()
-
-    @Provides
-    fun provideImageRepository(
-        localDataSource: ImageLocalDataSource,
-        remoteDataSource: ImageRemoteDataSource
-    ): ImageRepository = ImageRepositoryImpl(localDataSource, remoteDataSource)
 
     @Provides
     open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
