@@ -85,6 +85,7 @@ open class DataModule {
     open fun provideImageRemoteDataSource(): ImageRemoteDataSource = ImageRemoteDataSourceImpl()
 
     @Provides
+    @Singleton
     open fun provideImageRepository(
         localDataSource: ImageLocalDataSource,
         remoteDataSource: ImageRemoteDataSource
