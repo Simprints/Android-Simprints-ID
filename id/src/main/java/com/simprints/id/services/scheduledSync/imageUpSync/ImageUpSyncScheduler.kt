@@ -27,6 +27,7 @@ class ImageUpSyncScheduler(context: Context) {
 
         return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(6, TimeUnit.HOURS)
             .setConstraints(constraints)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
             .build()
     }
 
