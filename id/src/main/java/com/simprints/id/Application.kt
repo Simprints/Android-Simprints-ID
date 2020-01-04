@@ -4,6 +4,7 @@ import androidx.multidex.MultiDexApplication
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.simprints.id.di.*
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.FileLoggingTree
 import io.fabric.sdk.android.Fabric
 import io.reactivex.exceptions.UndeliverableException
@@ -21,6 +22,8 @@ open class Application : MultiDexApplication() {
 
     lateinit var component: AppComponent
     lateinit var orchestratorComponent: OrchestratorComponent
+
+    private lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     open fun createComponent() {
         component = DaggerAppComponent
@@ -47,6 +50,7 @@ open class Application : MultiDexApplication() {
         createComponent()
         this.initModules()
         initServiceLocation()
+        initImageUpSyncScheduler()
     }
 
     open fun initModules() {
@@ -102,7 +106,12 @@ open class Application : MultiDexApplication() {
         }
     }
 
-    
+    private fun initImageUpSyncScheduler() {
+        imageUpSyncScheduler = ImageUpSyncScheduler(this).apply {
+            scheduleWork()
+        }
+    }
+
     private fun Module.defineBuildersForCoreManagers() {
         factory { component.getPreferencesManager() }
         factory { component.getAnalyticsManager() }
@@ -121,4 +130,5 @@ open class Application : MultiDexApplication() {
         super.onTerminate()
         stopKoin()
     }
+
 }
