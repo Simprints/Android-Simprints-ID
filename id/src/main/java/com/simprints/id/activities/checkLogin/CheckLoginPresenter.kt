@@ -12,6 +12,7 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,14 +21,24 @@ abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     component: AppComponent) {
 
-    @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var analyticsManager: AnalyticsManager
-    @Inject lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var loginInfoManager: LoginInfoManager
-    @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var secureDataManager: SecureDataManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+    @Inject
+    lateinit var timeHelper: TimeHelper
+    @Inject
+    lateinit var analyticsManager: AnalyticsManager
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var loginInfoManager: LoginInfoManager
+    @Inject
+    lateinit var remoteDbManager: RemoteDbManager
+    @Inject
+    lateinit var secureDataManager: SecureDataManager
+    @Inject
+    lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject
+    lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     init {
         component.inject(this)
@@ -45,6 +56,7 @@ abstract class CheckLoginPresenter(
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncSchedulerHelper.cancelAllWorkers()
+                    imageUpSyncScheduler.cancelImageUpSync()
                 }
                 else -> {
                     Timber.e(t)
@@ -66,10 +78,10 @@ abstract class CheckLoginPresenter(
     private fun checkSignedInOrThrow() {
         val isUserSignedIn =
             isEncryptedProjectSecretPresent() &&
-            isProjectIdStoredAndMatches() &&
-            isLocalKeyValid(loginInfoManager.getSignedInProjectIdOrEmpty()) &&
-            isUserIdStoredAndMatches() &&
-            isFirebaseTokenValid()
+                isProjectIdStoredAndMatches() &&
+                isLocalKeyValid(loginInfoManager.getSignedInProjectIdOrEmpty()) &&
+                isUserIdStoredAndMatches() &&
+                isFirebaseTokenValid()
 
         if (!isUserSignedIn) {
             throw NotSignedInException()

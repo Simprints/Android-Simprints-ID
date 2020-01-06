@@ -23,6 +23,7 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
 import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.CountTask
@@ -70,13 +71,25 @@ class TestAppModule(app: Application,
     override fun provideRemoteDbManager(loginInfoManager: LoginInfoManager): RemoteDbManager =
         remoteDbManagerRule.resolveDependency { super.provideRemoteDbManager(loginInfoManager) }
 
-    override fun provideDbManager(projectRepository: ProjectRepository,
-                                  remoteDbManager: RemoteDbManager,
-                                  loginInfoManager: LoginInfoManager,
-                                  preferencesManager: PreferencesManager,
-                                  peopleUpSyncMaster: PeopleUpSyncMaster,
-                                  database: SyncStatusDatabase): SignerManager =
-        dbManagerRule.resolveDependency { super.provideDbManager(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database) }
+    override fun provideSignerManager(
+        projectRepository: ProjectRepository,
+        remoteDbManager: RemoteDbManager,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager,
+        peopleUpSyncMaster: PeopleUpSyncMaster,
+        database: SyncStatusDatabase,
+        imageUpSyncScheduler: ImageUpSyncScheduler
+    ): SignerManager = dbManagerRule.resolveDependency {
+        super.provideSignerManager(
+            projectRepository,
+            remoteDbManager,
+            loginInfoManager,
+            preferencesManager,
+            peopleUpSyncMaster,
+            database,
+            imageUpSyncScheduler
+        )
+    }
 
     override fun provideSecureDataManager(preferencesManager: PreferencesManager,
                                           keystoreManager: KeystoreManager,

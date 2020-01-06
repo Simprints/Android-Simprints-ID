@@ -138,6 +138,15 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
+    fun presenterLogout_imageUpSyncWorkersAreCancelled() {
+        mockDepsForLogout(presenter)
+
+        presenter.logout()
+
+        verifyOnce(presenter.imageUpSyncScheduler) { cancelImageUpSync() }
+    }
+
+    @Test
     fun presenterLogout_longConsentsAreDeleted() {
         mockDepsForLogout(presenter)
 
@@ -160,5 +169,6 @@ class SettingsAboutPresenterTest {
         presenter.syncSchedulerHelper = mock()
         presenter.longConsentManager = mock()
         presenter.sessionEventManager = mock()
+        presenter.imageUpSyncScheduler = mock()
     }
 }

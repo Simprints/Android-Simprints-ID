@@ -11,6 +11,7 @@ import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
 import com.simprints.id.tools.extensions.trace
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -30,6 +31,7 @@ class SignerManagerTest {
     @MockK lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
     @MockK lateinit var downSyncDao: DownSyncDao
     @MockK lateinit var upSyncDao: UpSyncDao
+    @MockK lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token("some_token")
@@ -38,7 +40,7 @@ class SignerManagerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        signerManager = SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncDao, upSyncDao)
+        signerManager = SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncDao, upSyncDao, imageUpSyncScheduler)
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
         every { any<Completable>().trace(any()) }.answers { this.value }
     }
@@ -137,6 +139,16 @@ class SignerManagerTest {
         tester.awaitAndAssertSuccess()
     }
 
+    @Test
+    fun signIn_shouldScheduleImageUpSync() {
+        mockRemoteSignedIn()
+        mockStoreCredentialsLocally()
+        mockFetchingProjectInto()
+
+        signIn()
+
+        verify { imageUpSyncScheduler.scheduleImageUpSync() }
+    }
 
     @Test
     fun signOut_shouldRemoveAnyState() {
@@ -150,6 +162,15 @@ class SignerManagerTest {
         verifyLastDownSyncInfoGotDeleted()
         verifyLastUpSyncInfoGotDeleted()
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
+    }
+
+    @Test
+    fun signOut_shouldCancelImageUpSync() {
+        every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
+
+        signerManager.signOut()
+
+        verify { imageUpSyncScheduler.cancelImageUpSync() }
     }
 
     private fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token).test()
