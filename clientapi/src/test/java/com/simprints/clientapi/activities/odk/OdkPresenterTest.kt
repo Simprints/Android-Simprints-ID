@@ -84,12 +84,15 @@ class OdkPresenterTest {
     @Test
     fun handleRegistration_ShouldReturnValidOdkRegistration() {
         val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_REGISTER, mock(), mock()).apply {
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+        OdkPresenter(view, ACTION_REGISTER, sessionEventsManagerMock, mock()).apply {
             handleEnrollResponse(EnrollResponse(registerId))
         }
 
-        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        verifyOnce(view) { returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
     }
 
     @Test
@@ -115,8 +118,12 @@ class OdkPresenterTest {
     @Test
     fun handleVerification_ShouldReturnValidOdkVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, TIER_1))
+        val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+
+        OdkPresenter(view, ACTION_IDENTIFY, sessionEventsManagerMock, mock()).apply {
             handleVerifyResponse(verification)
         }
 
@@ -125,6 +132,7 @@ class OdkPresenterTest {
                 id = verification.matchResult.guidFound,
                 confidence = verification.matchResult.confidence.toString(),
                 tier = verification.matchResult.tier.toString(),
+                sessionId = sessionId,
                 flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }

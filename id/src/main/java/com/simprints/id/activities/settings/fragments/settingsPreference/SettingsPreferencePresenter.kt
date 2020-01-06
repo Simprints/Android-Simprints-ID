@@ -3,14 +3,14 @@ package com.simprints.id.activities.settings.fragments.settingsPreference
 import android.preference.ListPreference
 import android.preference.MultiSelectListPreference
 import android.preference.Preference
-import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.analytics.crashreport.CrashReportTag
 import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
+import com.simprints.id.data.db.person.domain.FingerIdentifier
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.AppComponent
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.domain.GROUP
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import javax.inject.Inject
 
 
@@ -19,7 +19,7 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     SettingsPreferenceContract.Presenter {
 
     @Inject lateinit var preferencesManager: PreferencesManager
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var syncSchedulerHelper: SyncManager
     @Inject lateinit var crashReportManager: CrashReportManager
 
     init {
@@ -27,35 +27,8 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
     }
 
     override fun start() {
-        configureSelectModulePreference()
         configureAvailableLanguageEntriesFromProjectLanguages()
         loadPreferenceValuesAndBindThemToChangeListeners()
-    }
-
-    private fun configureSelectModulePreference() {
-        clearSelectModulePreferenceOfOldValues()
-        configureVisibilityOfSelectModulePreference()
-        configureSelectModuleEntriesFromModuleIdOptions()
-    }
-
-    private fun clearSelectModulePreferenceOfOldValues() {
-        preferencesManager.selectedModules = preferencesManager.selectedModules.filter {
-            preferencesManager.moduleIdOptions.contains(it)
-        }.toSet()
-    }
-
-    private fun configureVisibilityOfSelectModulePreference() {
-        val isModuleListNonEmpty = preferencesManager.moduleIdOptions.isNotEmpty()
-        val isModuleSync = preferencesManager.syncGroup == GROUP.MODULE
-
-        view.setSelectModulePreferenceEnabled(isModuleSync and isModuleListNonEmpty) // TODO : log in analytics if XOR these conditions is true
-    }
-
-    private fun configureSelectModuleEntriesFromModuleIdOptions() {
-        val preference = view.getPreferenceForSelectModules() as MultiSelectListPreference
-
-        preference.entries = preferencesManager.moduleIdOptions.toTypedArray()
-        preference.entryValues = preferencesManager.moduleIdOptions.toTypedArray()
     }
 
     private fun configureAvailableLanguageEntriesFromProjectLanguages() {
@@ -89,9 +62,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
 
     private fun loadPreferenceValuesAndBindThemToChangeListeners() {
         loadValueAndBindChangeListener(view.getPreferenceForLanguage())
-        loadValueAndBindChangeListener(view.getPreferenceForSelectModules())
         loadValueAndBindChangeListener(view.getPreferenceForDefaultFingers())
         loadValueAndBindChangeListener(view.getPreferenceForAbout())
+        loadValueAndBindChangeListener(view.getPreferenceForSyncInformation())
     }
 
     internal fun loadValueAndBindChangeListener(preference: Preference) {
@@ -100,13 +73,16 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
                 loadLanguagePreference(preference as ListPreference)
                 preference.setChangeListener { value: String -> handleLanguagePreferenceChanged(preference, value) }
             }
-            view.getKeyForSelectModulesPreference() -> {
-                loadSelectModulesPreference(preference as MultiSelectListPreference)
-                preference.setChangeListener { value: HashSet<String> -> handleSelectModulesChanged(value) }
-            }
+
             view.getKeyForDefaultFingersPreference() -> {
                 loadDefaultFingersPreference(preference as MultiSelectListPreference)
                 preference.setChangeListener { value: HashSet<String> -> handleDefaultFingersChanged(preference, value) }
+            }
+            view.getKeyForSyncInfoPreference() -> {
+                preference.setOnPreferenceClickListener {
+                    view.openSyncInfoActivity()
+                    true
+                }
             }
             view.getKeyForAboutPreference() -> {
                 preference.setOnPreferenceClickListener {
@@ -134,10 +110,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         }
     }
 
-    internal fun loadSelectModulesPreference(preference: MultiSelectListPreference) {
-        preference.values = preferencesManager.selectedModules
-    }
-
     internal fun loadDefaultFingersPreference(preference: MultiSelectListPreference) {
         preference.values = getHashSetFromFingersMap(preferencesManager.fingerStatus).toHashSet()
     }
@@ -153,31 +125,6 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
             null
         }
         return true
-    }
-
-    private fun handleSelectModulesChanged(moduleIdHash: HashSet<String>): Boolean {
-        when {
-            moduleIdHash.size == 0 -> { handleNoModulesSelected(moduleIdHash) }
-            moduleIdHash.size > MAX_SELECTED_MODULES -> { handleTooManyModulesSelected(moduleIdHash) }
-            else -> {
-                preferencesManager.selectedModules = moduleIdHash
-                logMessageForCrashReport("Modules set to ${preferencesManager.selectedModules}")
-                setCrashlyticsKeyForModules()
-            }
-        }
-        return true
-    }
-
-    private fun handleNoModulesSelected(moduleIdHash: HashSet<String>) {
-        view.showToastForNoModulesSelected()
-        moduleIdHash.clear()
-        moduleIdHash.addAll(preferencesManager.selectedModules)
-    }
-
-    private fun handleTooManyModulesSelected(moduleIdHash: HashSet<String>) {
-        view.showToastForTooManyModulesSelected(MAX_SELECTED_MODULES)
-        moduleIdHash.clear()
-        moduleIdHash.addAll(preferencesManager.selectedModules)
     }
 
     private fun handleDefaultFingersChanged(preference: MultiSelectListPreference,
@@ -209,15 +156,9 @@ class SettingsPreferencePresenter(private val view: SettingsPreferenceContract.V
         crashReportManager.logMessageForCrashReport(CrashReportTag.SETTINGS, CrashReportTrigger.UI, message = message)
     }
 
-    private fun setCrashlyticsKeyForModules() {
-        crashReportManager.setModuleIdsCrashlyticsKey(preferencesManager.selectedModules)
-    }
-
     private fun setCrashlyticsKeyForFingers() {
         crashReportManager.setFingersSelectedCrashlyticsKey(preferencesManager.fingerStatus)
     }
 
-    companion object {
-        const val MAX_SELECTED_MODULES = 6
-    }
+
 }

@@ -8,6 +8,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.R
 import com.simprints.id.activities.coreexitform.result.CoreExitFormActivityResult
@@ -70,7 +71,7 @@ class CoreExitFormActivityTest {
 
         onView(withId(R.id.btSubmitExitForm)).check(matches(not(isEnabled())))
         onView(withId(R.id.rbOther)).perform(click())
-        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"))
+        onView(withId(R.id.exitFormText)).perform(typeText("Reason for other"), closeSoftKeyboard())
         tryOnUiUntilTimeout(1000, 200) {
             onView(withId(R.id.btSubmitExitForm)).check(matches(isEnabled()))
         }

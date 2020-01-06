@@ -95,10 +95,13 @@ class CommCarePresenterTest {
     @Test
     fun handleRegistration_ShouldReturnValidRegistration() {
         val registerId = UUID.randomUUID().toString()
+        val sessionId = UUID.randomUUID().toString()
+
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
         CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
-        verifyOnce(view) { returnRegistration(registerId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        verifyOnce(view) { returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
         verifyOnce(sessionEventsManagerMock) { runBlocking { addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) } }
     }
 
@@ -123,14 +126,18 @@ class CommCarePresenterTest {
     @Test
     fun handleVerification_ShouldReturnValidVerification() {
         val verification = VerifyResponse(MatchResult(UUID.randomUUID().toString(), 100, Tier.TIER_1))
+        val sessionId = UUID.randomUUID().toString()
 
-        CommCarePresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, mock(), mock(), mockSharedPrefs()).handleVerifyResponse(verification)
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+        CommCarePresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs()).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
                 verification.matchResult.confidence,
                 com.simprints.libsimprints.Tier.valueOf(verification.matchResult.tier.name),
                 verification.matchResult.guidFound,
+                sessionId,
                 RETURN_FOR_FLOW_COMPLETED_CHECK)
         }
     }

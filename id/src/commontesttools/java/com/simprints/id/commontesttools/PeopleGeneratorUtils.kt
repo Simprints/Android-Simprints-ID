@@ -3,36 +3,24 @@ package com.simprints.id.commontesttools
 import com.simprints.id.data.db.person.domain.FaceSample
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.domain.Person
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SubSyncScope
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import java.util.*
+import kotlin.random.Random
 
 object PeopleGeneratorUtils {
 
-    private val random = Random()
-
     fun getRandomPeople(nPeople: Int,
-                        subSyncScope: SubSyncScope,
+                        downSyncOp: PeopleDownSyncOperation,
                         toSync: List<Boolean>): MutableList<Person> =
         mutableListOf<Person>().also { fakePeople ->
             repeat(nPeople) {
                 fakePeople.add(
                     getRandomPerson(
                         UUID.randomUUID().toString(),
-                        subSyncScope.projectId,
-                        subSyncScope.userId ?: "",
-                        subSyncScope.moduleId ?: "",
+                        downSyncOp.projectId,
+                        downSyncOp.userId ?: "",
+                        downSyncOp.moduleId ?: "",
                         toSync.takeRandom()))
-            }
-        }
-
-
-    fun getRandomPeople(numberOfPeopleForEachSubScope: Int,
-                        syncScope: SyncScope,
-                        toSync: List<Boolean>): MutableList<Person> =
-        mutableListOf<Person>().also { fakePeople ->
-            syncScope.toSubSyncScopes().forEach { subScope ->
-                fakePeople.addAll(getRandomPeople(numberOfPeopleForEachSubScope, subScope, toSync))
             }
         }
 
@@ -80,7 +68,7 @@ object PeopleGeneratorUtils {
     }
 
     fun getRandomFaceSample() =
-        FaceSample(kotlin.random.Random.nextBytes(20))
+        FaceSample(Random.nextBytes(20))
 
 
     private fun getRandomTime(minutesOffset: Int = 60): Date {
@@ -90,5 +78,5 @@ object PeopleGeneratorUtils {
     }
 
     private fun <T> List<T>.takeRandom(): T =
-        this[random.nextInt(this.size)]
+        this[Random.nextInt(this.size)]
 }

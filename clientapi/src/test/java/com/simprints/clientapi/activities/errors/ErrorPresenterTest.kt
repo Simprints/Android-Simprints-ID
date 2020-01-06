@@ -10,7 +10,6 @@ import io.reactivex.Completable
 import kotlinx.coroutines.*
 import org.junit.Before
 import org.junit.Test
-import com.simprints.id.R as Rid
 
 class ErrorPresenterTest {
 
@@ -42,7 +41,7 @@ class ErrorPresenterTest {
         runBlocking {
             ErrorPresenter(view, mock()).apply {
                 start()
-                handleCloseClick()
+                handleCloseOrBackClick()
             }
             verifyOnce(view) { closeActivity() }
         }

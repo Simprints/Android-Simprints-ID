@@ -51,7 +51,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = Constants.RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(Registration(enroll.guid), flowCompletedCheck)
+            view.returnRegistration(Registration(enroll.guid), sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -78,7 +78,7 @@ class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                     matchResult.confidence,
                     matchResult.tier.fromDomainToLibsimprintsTier(),
                     matchResult.guidFound)
-                view.returnVerification(verification, flowCompletedCheck)
+                view.returnVerification(verification, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
             }
         }
     }

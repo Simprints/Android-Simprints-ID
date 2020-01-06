@@ -1,6 +1,7 @@
 package com.simprints.id.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.simprints.core.network.SimApiClient
 import com.simprints.core.tools.LanguageHelper
@@ -9,6 +10,8 @@ import com.simprints.id.activities.consent.ConsentViewModelFactory
 import com.simprints.id.activities.coreexitform.CoreExitFormViewModelFactory
 import com.simprints.id.activities.fetchguid.FetchGuidViewModelFactory
 import com.simprints.id.activities.fingerprintexitform.FingerprintExitFormViewModelFactory
+import com.simprints.id.activities.settings.fragments.moduleselection.ModuleViewModelFactory
+import com.simprints.id.activities.settings.syncinformation.SyncInformationViewModelFactory
 import com.simprints.id.data.analytics.AnalyticsManager
 import com.simprints.id.data.analytics.AnalyticsManagerImpl
 import com.simprints.id.data.analytics.crashreport.CoreCrashReportManager
@@ -28,12 +31,11 @@ import com.simprints.id.data.consent.shortconsent.ConsentRepository
 import com.simprints.id.data.consent.shortconsent.ConsentRepositoryImpl
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
-import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.loginInfo.LoginInfoManagerImpl
 import com.simprints.id.data.prefs.PreferencesManager
@@ -41,32 +43,22 @@ import com.simprints.id.data.prefs.RemoteConfigWrapper
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManagerImpl
 import com.simprints.id.data.prefs.improvedSharedPreferences.ImprovedSharedPreferences
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.*
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.data.secure.keystore.KeystoreManagerImpl
 import com.simprints.id.exitformhandler.ExitFormHelper
 import com.simprints.id.exitformhandler.ExitFormHelperImpl
+import com.simprints.id.moduleselection.ModuleRepository
+import com.simprints.id.moduleselection.ModuleRepositoryImpl
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.secure.SignerManagerImpl
 import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
-import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilderImpl
-import com.simprints.id.services.scheduledSync.peopleDownSync.tasks.*
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMasterImpl
-import com.simprints.id.services.scheduledSync.peopleUpsync.periodicFlusher.PeopleUpSyncPeriodicFlusherMaster
-import com.simprints.id.services.scheduledSync.peopleUpsync.uploader.PeopleUpSyncUploaderMaster
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
-import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManagerImpl
 import com.simprints.id.tools.*
 import com.simprints.id.tools.extensions.deviceId
 import com.simprints.id.tools.extensions.packageVersionName
@@ -74,6 +66,7 @@ import com.simprints.id.tools.utils.SimNetworkUtils
 import com.simprints.id.tools.utils.SimNetworkUtilsImpl
 import dagger.Module
 import dagger.Provides
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -89,15 +82,8 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager = LoginInfoManagerImpl(improvedSharedPreferences)
-
-    @Provides
-    @Singleton
-    open fun providePeopleUpSyncMaster(): PeopleUpSyncMaster =
-        PeopleUpSyncMasterImpl(
-            PeopleUpSyncUploaderMaster(),
-            PeopleUpSyncPeriodicFlusherMaster()
-        )
+    open fun provideLoginInfoManager(improvedSharedPreferences: ImprovedSharedPreferences): LoginInfoManager =
+        LoginInfoManagerImpl(improvedSharedPreferences)
 
     @Provides
     @Singleton
@@ -106,17 +92,14 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        peopleUpSyncMaster: PeopleUpSyncMaster,
-        database: SyncStatusDatabase,
+        syncManager: SyncManager,
         imageUpSyncScheduler: ImageUpSyncScheduler
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        peopleUpSyncMaster,
-        database.downSyncDao,
-        database.upSyncDao,
+        syncManager,
         imageUpSyncScheduler
     )
 
@@ -147,7 +130,7 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideKeystoreManager(ctx: Context): KeystoreManager = KeystoreManagerImpl(ctx)
+    open fun provideKeystoreManager(): KeystoreManager = KeystoreManagerImpl()
 
     @Provides
     @Singleton
@@ -155,8 +138,18 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideSecureDataManager(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager, randomGenerator: RandomGenerator): SecureDataManager =
-        SecureDataManagerImpl(keystoreManager, preferencesManager, randomGenerator)
+    open fun provideSecureLocalDbKeyProvider(@Named("EncryptedSharedPreferences") encryptedSharedPrefs: SharedPreferences,
+                                             randomGenerator: RandomGenerator,
+                                             unsecuredLocalDbKeyProvider: LegacyLocalDbKeyProvider): SecureLocalDbKeyProvider =
+        SecureLocalDbKeyProviderImpl(
+            encryptedSharedPrefs,
+            randomGenerator,
+            unsecuredLocalDbKeyProvider)
+
+    @Provides
+    @Singleton
+    open fun provideLegacyLocalDbKeyProvider(preferencesManager: PreferencesManager, keystoreManager: KeystoreManager): LegacyLocalDbKeyProvider =
+        LegacyLocalDbKeyProviderImpl(keystoreManager, preferencesManager)
 
     @Provides
     open fun provideLongConsentManager(ctx: Context, loginInfoManager: LoginInfoManager, crashReportManager: CrashReportManager):
@@ -182,7 +175,7 @@ open class AppModule {
     @Provides
     @Singleton
     open fun provideSessionEventsLocalDbManager(ctx: Context,
-                                                secureDataManager: SecureDataManager): SessionEventsLocalDbManager =
+                                                secureDataManager: SecureLocalDbKeyProvider): SessionEventsLocalDbManager =
         RealmSessionEventsDbManagerImpl(ctx, secureDataManager)
 
     @Provides
@@ -198,50 +191,18 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideScheduledSessionsSyncManager(): SessionEventsSyncManager =
-        SessionEventsSyncManagerImpl()
+    open fun provideSyncStatusDatabase(ctx: Context): PeopleSyncStatusDatabase =
+        PeopleSyncStatusDatabase.getDatabase(ctx)
+
 
     @Provides
-    @Singleton
-    open fun provideSyncStatusDatabase(ctx: Context): SyncStatusDatabase =
-        SyncStatusDatabase.getDatabase(ctx)
+    fun provideModuleViewModelFactory(repository: ModuleRepository) = ModuleViewModelFactory(repository)
 
     @Provides
-    @Singleton
-    open fun provideSyncScopesBuilder(loginInfoManager: LoginInfoManager, preferencesManager: PreferencesManager): SyncScopesBuilder =
-        SyncScopesBuilderImpl(loginInfoManager, preferencesManager)
-
-    @Provides
-    @Singleton
-    open fun provideDownSyncManager(syncScopesBuilder: SyncScopesBuilder): DownSyncManager =
-        DownSyncManagerImpl(syncScopesBuilder)
-
-    @Provides
-    @Singleton
-    open fun provideSyncSchedulerHelper(preferencesManager: PreferencesManager,
-                                        loginInfoManager: LoginInfoManager,
-                                        sessionEventsSyncManager: SessionEventsSyncManager,
-                                        downSyncManager: DownSyncManager): SyncSchedulerHelper =
-        SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
-
-    @Provides
-    @Singleton
-    open fun provideImageUpSyncScheduler(
-        context: Context
-    ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
-
-    @Provides
-    open fun provideCountTask(personRepository: PersonRepository): CountTask = CountTaskImpl(personRepository)
-
-    @Provides
-    fun provideSaveCountsTask(syncStatusDatabase: SyncStatusDatabase): SaveCountsTask = SaveCountsTaskImpl(syncStatusDatabase)
-
-    @Provides
-    open fun provideDownSyncTask(personLocalDataSource: PersonLocalDataSource,
-                                 syncInfoLocalDataSource: SyncInfoLocalDataSource,
-                                 personRemoteDataSource: PersonRemoteDataSource,
-                                 timeHelper: TimeHelper,
-                                 syncStatusDatabase: SyncStatusDatabase): DownSyncTask = DownSyncTaskImpl(personLocalDataSource, syncInfoLocalDataSource, personRemoteDataSource, timeHelper, syncStatusDatabase.downSyncDao)
+    fun provideModuleRepository(
+        preferencesManager: PreferencesManager,
+        crashReportManager: CrashReportManager
+    ): ModuleRepository = ModuleRepositoryImpl(preferencesManager, crashReportManager)
 
     @Provides
     @Singleton
@@ -256,6 +217,12 @@ open class AppModule {
                                          sessionEventsManager: SessionEventsManager): GuidSelectionManager =
         GuidSelectionManagerImpl(
             context.deviceId, loginInfoManager, analyticsManager, crashReportManager, timeHelper, sessionEventsManager)
+
+    @Provides
+    @Singleton
+    open fun provideImageUpSyncScheduler(
+        context: Context
+    ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
     open fun getConsentDataManager(prefs: ImprovedSharedPreferences, remoteConfigWrapper: RemoteConfigWrapper): ConsentLocalDataSource =
@@ -294,5 +261,20 @@ open class AppModule {
                                               sessionEventsManager: SessionEventsManager,
                                               timeHelper: TimeHelper) =
         FetchGuidViewModelFactory(personRepository, simNetworkUtils, sessionEventsManager, timeHelper)
+
+    @Provides
+    open fun provideSyncInformationViewModelFactory(personRepository: PersonRepository,
+                                                    personLocalDataSource: PersonLocalDataSource,
+                                                    preferencesManager: PreferencesManager,
+                                                    loginInfoManager: LoginInfoManager,
+                                                    peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository) =
+        SyncInformationViewModelFactory(personRepository, personLocalDataSource, preferencesManager,
+            loginInfoManager.getSignedInProjectIdOrEmpty(), peopleDownSyncScopeRepository)
+
+    @Provides
+    @Named("EncryptedSharedPreferences")
+    open fun provideEncryptedSharedPreferences(app: Application): SharedPreferences =
+        EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
+
 }
 

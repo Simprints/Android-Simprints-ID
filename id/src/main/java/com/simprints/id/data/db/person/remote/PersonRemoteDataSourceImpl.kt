@@ -1,22 +1,29 @@
 package com.simprints.id.data.db.person.remote
 
 import com.simprints.core.network.SimApiClient
+import com.simprints.core.tools.extentions.singleWithSuspend
 import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
-import com.simprints.id.data.db.person.domain.PeopleCount
 import com.simprints.id.data.db.person.domain.Person
 import com.simprints.id.data.db.person.remote.models.ApiGetPerson
 import com.simprints.id.data.db.person.remote.models.fromDomainToPostApi
-import com.simprints.id.data.db.person.remote.models.toDomainPeopleCount
 import com.simprints.id.data.db.person.remote.models.fromGetApiToDomain
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiLastKnownPatient
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationGroup
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperationWhereLabel
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.WhereLabelKey.*
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
+import com.simprints.id.data.db.common.models.PeopleCount
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
+import com.simprints.id.exceptions.safe.sync.EmptyPeopleOperationsParamsException
 import com.simprints.id.exceptions.unexpected.DownloadingAPersonWhoDoesntExistOnServerException
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.SyncScope
 import com.simprints.id.tools.extensions.handleResponse
 import com.simprints.id.tools.extensions.handleResult
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -24,7 +31,7 @@ import java.io.IOException
 open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManager) : PersonRemoteDataSource {
 
     override fun downloadPerson(patientId: String, projectId: String): Single<Person> =
-        getPeopleApiClient().flatMap { peopleRemoteInterface ->
+        singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
             peopleRemoteInterface.requestPerson(patientId, projectId)
                 .retry(::retryCriteria)
                 .handleResponse {
@@ -38,7 +45,7 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
         }
 
     override fun uploadPeople(projectId: String, patientsToUpload: List<Person>): Completable =
-        getPeopleApiClient().flatMapCompletable {
+        singleWithSuspend { getPeopleApiClient() }.flatMapCompletable {
             it.uploadPeople(projectId, hashMapOf("patients" to patientsToUpload.map(Person::fromDomainToPostApi)))
                 .retry(::retryCriteria)
                 .trace("uploadPatientBatch")
@@ -46,20 +53,69 @@ open class PersonRemoteDataSourceImpl(private val remoteDbManager: RemoteDbManag
                 .trace("uploadPatientBatch")
         }
 
-    override fun getDownSyncPeopleCount(syncScope: SyncScope): Single<List<PeopleCount>> =
-        getPeopleApiClient().flatMap { peopleRemoteInterface ->
-            peopleRemoteInterface.requestPeopleCount(syncScope.projectId, syncScope.userId,
-                syncScope.moduleIds?.toTypedArray()?.let { PipeSeparatorWrapperForURLListParam(*it) })
+    override fun getDownSyncPeopleCount(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): Single<List<PeopleCount>> =
+        if (peopleOperationsParams.isNotEmpty()) {
+            makeRequestForPeopleOperations(projectId, peopleOperationsParams)
+        } else {
+            Single.error(EmptyPeopleOperationsParamsException())
+        }
+
+    private fun makeRequestForPeopleOperations(projectId: String, peopleOperationsParams: List<PeopleDownSyncOperation>): Single<List<PeopleCount>> =
+        singleWithSuspend { getPeopleApiClient() }.flatMap { peopleRemoteInterface ->
+
+            peopleRemoteInterface.requestPeopleOperations(
+                projectId,
+                buildApiPeopleOperations(peopleOperationsParams))
                 .retry(::retryCriteria)
                 .handleResponse(::defaultResponseErrorHandling)
                 .trace("countRequest")
-                .map { apiPeopleCount -> apiPeopleCount.map { it.toDomainPeopleCount() } }
+                .map { response ->
+                    response.groups.map{ responseGroup ->
+                        val countsForSyncScope = responseGroup.counts
+                        PeopleCount(
+                            countsForSyncScope.create,
+                            countsForSyncScope.update,
+                            countsForSyncScope.delete)
+                    }
+                }
         }
 
-    override fun getPeopleApiClient(): Single<PeopleRemoteInterface> =
-        remoteDbManager.getCurrentToken()
-            .flatMap {
-                Single.just(buildPeopleApi(it))
+    private fun buildApiPeopleOperations(peopleOperationsParams: List<PeopleDownSyncOperation>) =
+        ApiPeopleOperations(buildGroups(peopleOperationsParams))
+
+    private fun buildGroups(peopleOperationsParams: List<PeopleDownSyncOperation>) =
+        peopleOperationsParams.map {
+            val whereLabels = mutableListOf<ApiPeopleOperationWhereLabel>()
+            val userId = it.userId
+            val moduleId = it.moduleId
+
+            if (userId?.isNotEmpty() == true) {
+                whereLabels.add(ApiPeopleOperationWhereLabel(USER.key, userId))
+            }
+
+            if (moduleId?.isNotEmpty() == true) {
+                whereLabels.add(ApiPeopleOperationWhereLabel(MODULE.key, moduleId))
+            }
+
+            whereLabels.add(ApiPeopleOperationWhereLabel(MODE.key, PipeSeparatorWrapperForURLListParam(*it.modes.toTypedArray()).toString()))
+
+            val lastKnownInfo = with(it.lastResult) {
+                if (this@with?.lastPatientId?.isNotEmpty() == true && this@with.lastPatientUpdatedAt != null) {
+                    ApiLastKnownPatient(this@with.lastPatientId, this@with.lastPatientUpdatedAt)
+                } else {
+                    null
+                }
+            }
+
+            ApiPeopleOperationGroup(lastKnownInfo, whereLabels)
+        }
+
+    override suspend fun getPeopleApiClient(): PeopleRemoteInterface =
+        remoteDbManager
+            .getCurrentToken()
+            .subscribeOn(Schedulers.io())
+            .blockingGet().let {
+                buildPeopleApi(it)
             }
 
     private fun buildPeopleApi(authToken: String): PeopleRemoteInterface =

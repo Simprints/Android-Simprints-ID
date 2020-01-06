@@ -37,20 +37,21 @@
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
+    <!-- First argument in consent text should always be program name, second is modality specific access/use case text -->
     <string name="short_consent">I would like to use your fingerprints and location so Simprints can find your records. If that\'s not OK or you have any questions let me know, otherwise please place your left thumb flat on the sensor.</string>
     <string name="confirm_consent">Tap here to confirm consent</string>
     <string name="consent_enrol_only">I\'d like to %1$s to enrol you in %2$s.&#160;</string>
-    <string name="consent_enrol">I\'d like to %1$s to enrol you in %2$s and identify you in the future.&#160;</string>
-    <string name="consent_id_verify">I\'d like to %1$s to find your records for %2$s.&#160;</string>
+    <string name="consent_enrol">I\'d like to %2$s to enrol you in %1$s and identify you in the future.&#160;</string>
+    <string name="consent_id_verify">I\'d like to %2$s to find your records for %1$s.&#160;</string>
     <string name="consent_share_data_no">Simprints, a UK-based nonprofit, will have access to your %1$s and current location.&#160;</string>
     <string name="consent_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to your %2$s and current location.&#160;</string>
     <string name="consent_collect_yes">Simprints will also use the data for research purposes.&#160;</string>
     <string name="consent_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your data to be erased.&#160;</string>
     <string name="consent_confirmation">May I %1$s? Please say \"I accept\", \"I decline\", or \"I have questions.\" </string>
 
-    <string name="consent_parental_enrol_only">I\'d like to %1$s to enrol them in %2$s.&#160;</string>
-    <string name="consent_parental_enrol">I\'d like to %1$s to enrol them in %2$s and identify them in the future.&#160;</string>
-    <string name="consent_parental_id_verify">I\'d like to %1$s to find their records for %2$s.&#160;</string>
+    <string name="consent_parental_enrol_only">I\'d like to %2$s to enrol them in %1$s.&#160;</string>
+    <string name="consent_parental_enrol">I\'d like to %2$s to enrol them in %1$s and identify them in the future.&#160;</string>
+    <string name="consent_parental_id_verify">I\'d like to %2$s to find their records for %1$s.&#160;</string>
     <string name="consent_parental_share_data_no">Simprints, a UK-based nonprofit, will have access to their %1$s and current location.&#160;</string>
     <string name="consent_parental_share_data_yes">%1$s and Simprints, a UK-based nonprofit, will have access to their %2$s and current location.&#160;</string>
     <string name="consent_parental_privacy_rights">If you accept, you may withdraw your permission at any time and ask for your child\'s data to be erased.&#160;</string>
@@ -417,23 +418,37 @@
     <string name="setting_others">OTHERS</string>
     <string name="settings_logout_subtext">You will need to be online to login again.</string>
     <string name="title_activity_settings_about">About</string>
+    <string name="title_activity_sync_information">Sync Information</string>
 
     <!--Settings Preferences titles and summaries-->
     <string name="preference_app_details_title">About</string>
     <string name="preference_sync_and_search_title">Sync &amp; Search Configuration</string>
     <string name="preference_logout_title">Log Out</string>
     <string name="preference_select_language_title">Language</string>
-    <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_select_fingers_title">Select default fingers</string>
+    <string name="preference_select_modules_title">Select modules</string>
     <string name="preference_app_version_title">App Version</string>
+    <string name="preference_sync_information_title">Sync Information</string>
     <string name="preference_scanner_version_title">Scanner Version</string>
     <string name="preference_device_id_title">Device ID</string>
     <string name="preference_summary_modules">Choose the modules you would like to sync</string>
     <string name="preference_summary_settings_fingers">Choose the fingers you would like to scan</string>
+    <string name="preference_summary_sync_information">Further details on sync</string>
     <string name="title_activity_orchestrator">Orchestrator</string>
     <string name="title_activity_exit_form">ExitFormActivity</string>
     <string name="preferences_general_key">preferences_general</string>
     <string name="preferences_app_details_key">app_details_key</string>
+    
+    <!--Sync Information Activity-->
+    <string name="select_modules_button_title">Select modules</string>
+    <string name="sync_info_records_to_upload">Records to upload</string>
+    <string name="sync_info_records_to_download">Records to download</string>
+    <string name="sync_info_records_to_delete">Records to delete</string>
+    <string name="sync_info_total_records_on_device">Total records on device</string>
+    <string name="sync_info_selected_modules">Selected modules</string>
+    <string name="sync_info_unselected_modules">Unselected modules</string>
+    <string name="sync_info_total_records">Total records</string>
+
 
     <!--Exit form-->
     <string name="refusal_toast_select_option_submit">Please select an option and submit</string>
@@ -451,4 +466,14 @@
     <string name="why_did_you_skip_biometrics">Why did you skip Biometrics?</string>
     <string name="why_did_you_skip_face">Why did you skip face scanning?</string>
     <string name="fetch_guid_checking_person_in_database">Checking person in database</string>
+    <!-- region Module selection -->
+    <string name="hint_search_modules">Search modules</string>
+    <string name="no_modules_selected">No modules selected</string>
+    <string name="no_results">No results</string>
+    <string name="selected_modules">Selected modules</string>
+    <string name="confirm_module_selection_title">Modules selected</string>
+    <string name="confirm_module_selection_yes">Confirm</string>
+    <string name="confirm_module_selection_cancel">Cancel</string>
+    <!-- endregion -->
+
 </resources>

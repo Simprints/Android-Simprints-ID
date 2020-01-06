@@ -6,19 +6,18 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.domain.Project
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.extensions.trace
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import io.reactivex.Completable
 import io.reactivex.observers.TestObserver
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 
@@ -28,9 +27,7 @@ class SignerManagerTest {
     @MockK lateinit var remoteDbManager: RemoteDbManager
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var peopleUpSyncMaster: PeopleUpSyncMaster
-    @MockK lateinit var downSyncDao: DownSyncDao
-    @MockK lateinit var upSyncDao: UpSyncDao
+    @MockK lateinit var syncManager: SyncManager
     @MockK lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
     private lateinit var signerManager: SignerManagerImpl
 
@@ -40,7 +37,15 @@ class SignerManagerTest {
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        signerManager = SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, downSyncDao, upSyncDao, imageUpSyncScheduler)
+        signerManager = SignerManagerImpl(
+            projectRepository,
+            remoteDbManager,
+            loginInfoManager,
+            preferencesManager,
+            syncManager,
+            imageUpSyncScheduler
+        )
+
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
         every { any<Completable>().trace(any()) }.answers { this.value }
     }
@@ -112,7 +117,7 @@ class SignerManagerTest {
         mockFetchingProjectInto()
         mockResumePeopleSync()
         signIn()
-        coVerify { peopleUpSyncMaster.resume(DEFAULT_PROJECT_ID) }
+        coVerify { syncManager.scheduleBackgroundSyncs() }
     }
 
     @Test
@@ -151,7 +156,7 @@ class SignerManagerTest {
     }
 
     @Test
-    fun signOut_shouldRemoveAnyState() {
+    fun signOut_shouldRemoveAnyState() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
@@ -159,13 +164,12 @@ class SignerManagerTest {
         verifyUpSyncGotPaused()
         verifyStoredCredentialsGotCleaned()
         verifyRemoteManagerGotSignedOut()
-        verifyLastDownSyncInfoGotDeleted()
-        verifyLastUpSyncInfoGotDeleted()
+        verifyLastSyncInfoGotDeleted()
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
     }
 
     @Test
-    fun signOut_shouldCancelImageUpSync() {
+    fun signOut_shouldCancelImageUpSync() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
         signerManager.signOut()
@@ -204,7 +208,7 @@ class SignerManagerTest {
         }
 
     private fun mockResumePeopleSync(error: Boolean = false) =
-        coEvery { peopleUpSyncMaster.resume(any()) }.apply {
+        coEvery { syncManager.scheduleBackgroundSyncs() }.apply {
             if (!error) {
                 this.returns(Unit)
             } else {
@@ -212,11 +216,10 @@ class SignerManagerTest {
             }
         }
 
-    private fun verifyUpSyncGotPaused() = verify { peopleUpSyncMaster.pause(DEFAULT_PROJECT_ID) }
+    private fun verifyUpSyncGotPaused() = verify { syncManager.cancelBackgroundSyncs() }
     private fun verifyStoredCredentialsGotCleaned() = verify { loginInfoManager.cleanCredentials() }
     private fun verifyRemoteManagerGotSignedOut() = verify { remoteDbManager.signOut() }
-    private fun verifyLastDownSyncInfoGotDeleted() = verify { downSyncDao.deleteAll() }
-    private fun verifyLastUpSyncInfoGotDeleted() = verify { upSyncDao.deleteAll() }
+    private fun verifyLastSyncInfoGotDeleted() = coVerify { syncManager.deleteLastSyncInfo() }
     private fun verifyAllSharedPreferencesExceptRealmKeysGotCleared() = verify { preferencesManager.clearAllSharedPreferencesExceptRealmKeys() }
 
     private fun verifySignedInFailed(it: TestObserver<Void>) {

@@ -23,6 +23,7 @@ import com.simprints.id.tools.extensions.showToast
 import com.simprints.id.tools.textWatcherOnChange
 import kotlinx.android.synthetic.main.activity_fingerprint_exit_form.*
 import org.jetbrains.anko.inputMethodManager
+import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 import javax.inject.Inject
 
 class FingerprintExitFormActivity : AppCompatActivity() {
@@ -54,6 +55,7 @@ class FingerprintExitFormActivity : AppCompatActivity() {
         fingerprintExitFormStartTime = timeHelper.now()
 
         setRadioGroupListener()
+        setLayoutChangeListener()
     }
 
     private fun injectDependencies() {
@@ -83,6 +85,16 @@ class FingerprintExitFormActivity : AppCompatActivity() {
             enableSubmitButton()
             enableFingerprintExitFormText()
             handleRadioOptionIdentifierClick(optionIdentifier)
+        }
+    }
+
+    //Changes in the layout occur when the keyboard shows up
+    private fun setLayoutChangeListener() {
+        with (fingerprintExitFormScrollView) {
+            onLayoutChange { _, _, _, _,
+                             _, _, _, _, _ ->
+                fullScroll(View.FOCUS_DOWN)
+            }
         }
     }
 

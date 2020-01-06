@@ -6,10 +6,10 @@ import com.simprints.fingerprint.data.domain.fingerprint.Fingerprint
 import com.simprints.fingerprint.data.domain.fingerprint.FingerprintIdentity
 import com.simprints.id.data.db.person.domain.FingerprintSample
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
-import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 import io.reactivex.Single
 import kotlinx.coroutines.flow.toList
 import java.io.Serializable
+import com.simprints.id.data.db.person.domain.FingerIdentifier as FingerIdentifierCore
 
 class FingerprintDbManagerImpl(private val coreFingerprintIdentityLocalDataSource: FingerprintIdentityLocalDataSource) : FingerprintDbManager {
 

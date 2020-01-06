@@ -114,6 +114,6 @@ dependencies {
     testImplementation deps.testing.coroutines_test
 
     // Mockk
-    testImplementation deps.testing.mockk
+    testImplementation deps.testing.mockk.core
     testImplementation deps.testing.truth
 }
