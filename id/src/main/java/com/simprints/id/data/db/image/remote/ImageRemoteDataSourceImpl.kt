@@ -13,7 +13,7 @@ class ImageRemoteDataSourceImpl : ImageRemoteDataSource {
         val file = File(image.path)
         val uri = Uri.fromFile(file)
 
-        val fileRef = rootRef.child(file.name)
+        val fileRef = rootRef.child("images").child(file.name)
         val uploadTask = fileRef.putFile(uri).await()
 
         val status = if (uploadTask.bytesTransferred == file.length()) {
