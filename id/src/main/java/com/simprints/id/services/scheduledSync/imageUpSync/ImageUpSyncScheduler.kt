@@ -16,6 +16,7 @@ class ImageUpSyncScheduler(context: Context) {
         )
     }
 
+    // TODO STOPSHIP
     fun cancelWork() {
         workManager.cancelUniqueWork(WORK_NAME)
     }
@@ -27,8 +28,11 @@ class ImageUpSyncScheduler(context: Context) {
 
         return PeriodicWorkRequestBuilder<ImageUpSyncWorker>(6, TimeUnit.HOURS)
             .setConstraints(constraints)
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 5, TimeUnit.SECONDS)
-            .build()
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                PeriodicWorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            ).build()
     }
 
     companion object {
