@@ -17,7 +17,6 @@ import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUpl
 import com.simprints.id.services.scheduledSync.people.up.workers.PeopleUpSyncUploaderWorker.Companion.PROGRESS_UP_SYNC
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
-import kotlin.math.max
 
 // TODO: uncomment userId when multitenancy is properly implemented
 @InternalCoroutinesApi
@@ -77,9 +76,11 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
     }
 }
 
-fun WorkInfo.extractUpSyncProgress(): Int? {
+fun WorkInfo.extractUpSyncProgress(progressCache: PeopleSyncProgressCache): Int? {
     val progress = this.progress.getInt(PROGRESS_UP_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_UP_SYNC, -1)
 
-    return max(max(progress, output), 0)
+    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    val cached = progressCache.getProgress(id.toString())
+    return maxOf(progress, output, cached)
 }
