@@ -1,8 +1,8 @@
 package com.simprints.id.data.secure
 
-import android.content.SharedPreferences
+import androidx.security.crypto.EncryptedSharedPreferences
 
 interface EncryptedSharedPreferencesFactory {
 
-    val encryptedSharedPreferences: SharedPreferences
+    val encryptedSharedPreferences: EncryptedSharedPreferences
 }

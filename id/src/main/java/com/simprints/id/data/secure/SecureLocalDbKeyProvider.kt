@@ -1,6 +1,6 @@
 package com.simprints.id.data.secure
 
-interface SecureDataManager : LocalDbKeyProvider {
+interface SecureLocalDbKeyProvider: LocalDbKeyProvider {
 
     fun setLocalDatabaseKey(projectId: String)
 

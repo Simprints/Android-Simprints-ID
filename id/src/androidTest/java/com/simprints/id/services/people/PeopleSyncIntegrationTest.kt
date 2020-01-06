@@ -13,7 +13,7 @@ import com.simprints.core.tools.extentions.resumeSafely
 import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.Application
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
-import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_LOCAL_DB_KEY
+import com.simprints.id.commontesttools.AndroidDefaultTestConstants.DEFAULT_LOCAL_DB_KEY
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.moduleSyncScope
@@ -36,7 +36,7 @@ import com.simprints.id.data.db.person.remote.models.peopleoperations.response.A
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationGroupResponse
 import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MIN_BACKOFF_SECS
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncState
@@ -80,7 +80,7 @@ class PeopleSyncIntegrationTest {
     @Inject lateinit var personLocalDataSourceSpy: PersonLocalDataSource
     @Inject lateinit var loginInfoManagerMock: LoginInfoManager
     @Inject lateinit var downSyncScopeRepositorySpy: PeopleDownSyncScopeRepository
-    @Inject lateinit var secureDataManagerMock: SecureDataManager
+    @Inject lateinit var secureLocalDbKeyProviderMock: SecureLocalDbKeyProvider
     @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val appModule by lazy {
@@ -113,7 +113,7 @@ class PeopleSyncIntegrationTest {
 
         coEvery { personRemoteDataSourceSpy.getPeopleApiClient() } returns remotePeopleApi
         every { downSyncScopeRepositorySpy.getDownSyncScope() } returns projectSyncScope
-        every { secureDataManagerMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
+        every { secureLocalDbKeyProviderMock.getLocalDbKeyOrThrow(any()) } returns DEFAULT_LOCAL_DB_KEY
         every { loginInfoManagerMock.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { loginInfoManagerMock.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
     }

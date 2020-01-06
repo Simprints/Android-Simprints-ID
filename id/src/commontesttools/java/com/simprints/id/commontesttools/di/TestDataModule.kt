@@ -10,7 +10,7 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.DataModule
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import com.simprints.testtools.common.di.DependencyRule
@@ -28,9 +28,9 @@ class TestDataModule(private val projectLocalDataSourceRule: DependencyRule = De
 
 
     override fun provideProjectLocalDataSource(ctx: Context,
-                                               secureDataManager: SecureDataManager,
+                                               secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                                loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureDataManager, loginInfoManager) }
+        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
 
     override fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
         projectRemoteDataSourceRule.resolveDependency { super.provideProjectRemoteDataSource(remoteDbManager) }
@@ -50,7 +50,8 @@ class TestDataModule(private val projectLocalDataSourceRule: DependencyRule = De
 
     @Singleton
     override fun providePersonLocalDataSource(ctx: Context,
-                                              secureDataManager: SecureDataManager,
+                                              secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                               loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureDataManager, loginInfoManager) }
+        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+
 }

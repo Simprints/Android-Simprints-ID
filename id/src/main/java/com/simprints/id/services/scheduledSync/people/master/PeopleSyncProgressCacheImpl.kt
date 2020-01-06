@@ -11,7 +11,7 @@ class PeopleSyncProgressCacheImpl(ctx: Context) : PeopleSyncProgressCache {
         sharedPrefs.getInt(workerId, 0)
 
     override fun setProgress(workerId: String, progress: Int) {
-        sharedPrefs.edit().putInt(workerId, progress).commit()
+        sharedPrefs.edit().putInt(workerId, progress).apply()
     }
 
     override fun clear() {
