@@ -49,6 +49,5 @@ open class SignerManagerImpl(private var projectRepository: ProjectRepository,
         remote.signOut()
         downSyncDao.deleteAll()
         upSyncDao.deleteAll()
-        preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
     }
 }

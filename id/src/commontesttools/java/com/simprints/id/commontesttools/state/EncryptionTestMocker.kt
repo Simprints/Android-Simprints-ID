@@ -1,19 +1,23 @@
 package com.simprints.id.commontesttools.state
 
+import android.content.Context
+import android.content.SharedPreferences
 import com.simprints.id.data.secure.keystore.KeystoreManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.testtools.common.syntax.anyNotNull
 import com.simprints.testtools.common.syntax.whenever
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.stubbing.Answer
 import kotlin.random.Random
+
+fun setupFakeEncryptedSharedPreferences(ctx: Context): SharedPreferences {
+   return ctx.getSharedPreferences("test", 0)
+}
 
 fun setupFakeKeyStore(keystoreManager: KeystoreManager) {
     val encryptAnswer = Answer<String> {
         "enc_" + it.arguments[0] as String
     }
-    whenever { keystoreManager.encryptString(anyNotNull()) } thenAnswer encryptAnswer
 
     val decryptAnswer = Answer<String> {
         (it.arguments[0] as String).replace("enc_", "")

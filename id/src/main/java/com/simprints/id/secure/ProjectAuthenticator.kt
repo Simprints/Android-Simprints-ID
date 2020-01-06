@@ -7,7 +7,7 @@ import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigWrapper
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.exceptions.safe.data.db.SimprintsInternalServerException
 import com.simprints.id.exceptions.safe.secure.AuthRequestInvalidCredentialsException
@@ -24,7 +24,7 @@ open class ProjectAuthenticator(component: AppComponent,
                                 private val attestationManager: AttestationManager = AttestationManager(),
                                 private val authenticationDataManager:AuthenticationDataManager = AuthenticationDataManager(secureApiClient)) {
 
-    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var projectRemoteDataSource: ProjectRemoteDataSource
     @Inject lateinit var signerManager: SignerManager
