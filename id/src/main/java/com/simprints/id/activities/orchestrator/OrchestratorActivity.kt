@@ -12,6 +12,7 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -27,6 +28,7 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
     @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     private var isRestored = false
 
@@ -63,6 +65,7 @@ class OrchestratorActivity : AppCompatActivity() {
             ?: throw InvalidAppRequest()
 
         vm.startModalityFlow(appRequest)
+        imageUpSyncScheduler.scheduleImageUpSync()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {

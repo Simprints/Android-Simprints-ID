@@ -15,6 +15,7 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.wheneverOnSuspend
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,7 +62,9 @@ class ImageUpSyncWorkerTest {
     @Test
     fun whenAllUploadsAreSuccessful_shouldReturnSuccess() {
         mockUploadResults()
-        val workResult = imageUpSyncWorker.doWork()
+        val workResult = runBlocking {
+            imageUpSyncWorker.doWork()
+        }
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.success())
     }
@@ -69,7 +72,9 @@ class ImageUpSyncWorkerTest {
     @Test
     fun whenAnyUploadFails_shouldReturnRetry() {
         mockUploadResults(addFailedUpload = true)
-        val workResult = imageUpSyncWorker.doWork()
+        val workResult = runBlocking {
+            imageUpSyncWorker.doWork()
+        }
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.retry())
     }
@@ -80,7 +85,9 @@ class ImageUpSyncWorkerTest {
             uploadImages()
         } thenOnBlockingReturn emptyList()
 
-        val workResult = imageUpSyncWorker.doWork()
+        val workResult = runBlocking {
+            imageUpSyncWorker.doWork()
+        }
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.success())
     }

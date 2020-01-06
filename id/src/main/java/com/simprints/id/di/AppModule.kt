@@ -54,6 +54,8 @@ import com.simprints.id.services.GuidSelectionManager
 import com.simprints.id.services.GuidSelectionManagerImpl
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
 import com.simprints.id.services.scheduledSync.SyncSchedulerHelperImpl
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncSchedulerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManager
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.DownSyncManagerImpl
 import com.simprints.id.services.scheduledSync.peopleDownSync.controllers.SyncScopesBuilder
@@ -99,13 +101,24 @@ open class AppModule {
 
     @Provides
     @Singleton
-    open fun provideDbManager(projectRepository: ProjectRepository,
-                              remoteDbManager: RemoteDbManager,
-                              loginInfoManager: LoginInfoManager,
-                              preferencesManager: PreferencesManager,
-                              peopleUpSyncMaster: PeopleUpSyncMaster,
-                              database: SyncStatusDatabase): SignerManager =
-        SignerManagerImpl(projectRepository, remoteDbManager, loginInfoManager, preferencesManager, peopleUpSyncMaster, database.downSyncDao, database.upSyncDao)
+    open fun provideSignerManager(
+        projectRepository: ProjectRepository,
+        remoteDbManager: RemoteDbManager,
+        loginInfoManager: LoginInfoManager,
+        preferencesManager: PreferencesManager,
+        peopleUpSyncMaster: PeopleUpSyncMaster,
+        database: SyncStatusDatabase,
+        imageUpSyncScheduler: ImageUpSyncScheduler
+    ): SignerManager = SignerManagerImpl(
+        projectRepository,
+        remoteDbManager,
+        loginInfoManager,
+        preferencesManager,
+        peopleUpSyncMaster,
+        database.downSyncDao,
+        database.upSyncDao,
+        imageUpSyncScheduler
+    )
 
     @Provides
     @Singleton
@@ -210,6 +223,12 @@ open class AppModule {
                                         sessionEventsSyncManager: SessionEventsSyncManager,
                                         downSyncManager: DownSyncManager): SyncSchedulerHelper =
         SyncSchedulerHelperImpl(preferencesManager, loginInfoManager, sessionEventsSyncManager, downSyncManager)
+
+    @Provides
+    @Singleton
+    open fun provideImageUpSyncScheduler(
+        context: Context
+    ): ImageUpSyncScheduler = ImageUpSyncSchedulerImpl(context)
 
     @Provides
     open fun provideCountTask(personRepository: PersonRepository): CountTask = CountTaskImpl(personRepository)
