@@ -1,33 +1,32 @@
 package com.simprints.id.services.scheduledSync.imageUpSync
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.simprints.id.Application
+import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.image.repository.ImageRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class ImageUpSyncWorker(
     context: Context,
     params: WorkerParameters
-) : Worker(context, params), CoroutineScope {
-
-    private val job = Job()
-
-    override val coroutineContext = job + Dispatchers.IO
+) : CoroutineWorker(context, params) {
 
     @Inject
     lateinit var imageRepository: ImageRepository
 
-    override fun doWork(): Result {
+    @Inject
+    lateinit var crashReportManager: CrashReportManager
+
+    override suspend fun doWork(): Result {
         (applicationContext as Application).component.inject(this)
 
-        val success = runBlocking(Dispatchers.IO) {
+        val success = try {
             uploadAndDeleteIfSuccessful()
+        } catch (ex: Exception) {
+            crashReportManager.logExceptionOrSafeException(ex)
+            false
         }
 
         return if (success)
