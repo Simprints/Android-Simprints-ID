@@ -15,11 +15,8 @@
             android:entryValues="@array/finger_values"
             android:key="@string/preference_select_fingers_key"/>
 
-        <MultiSelectListPreference
-            android:entries="@array/empty"
-            android:entryValues="@array/empty"
-            android:key="@string/preference_select_modules_key"
-            android:shouldDisableView="true"/>
+        <Preference
+            android:key="@string/preference_sync_info_key" />
     </PreferenceCategory>
 
     <PreferenceCategory android:layout="@layout/line_separator" />

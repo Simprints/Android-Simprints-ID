@@ -1,12 +1,12 @@
 package com.simprints.fingerprint.scanner.wrapper
 
-import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
-import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprint.scanner.domain.CaptureFingerprintResponse
 import com.simprints.fingerprint.scanner.domain.ScannerTriggerListener
 import com.simprints.fingerprint.scanner.domain.ScannerVersionInformation
 import com.simprints.fingerprint.scanner.exceptions.safe.*
+import com.simprints.fingerprint.scanner.exceptions.unexpected.BluetoothNotSupportedException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnexpectedScannerException
+import com.simprints.fingerprint.scanner.exceptions.unexpected.UnknownScannerIssueException
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR
 import com.simprints.fingerprintscanner.v1.SCANNER_ERROR.*
 import com.simprints.fingerprintscanner.v1.ScannerCallback
@@ -18,13 +18,12 @@ import com.simprints.fingerprintscanner.v1.Scanner as ScannerV1
 
 class ScannerWrapperV1(private val scannerV1: ScannerV1) : ScannerWrapper {
 
-    override val versionInformation: ScannerVersionInformation by lazy {
-        ScannerVersionInformation(
+    override val versionInformation: ScannerVersionInformation
+        get() = ScannerVersionInformation(
             veroVersion = 1,
             firmwareVersion = scannerV1.ucVersion.toInt(),
             un20Version = scannerV1.unVersion.toInt()
         )
-    }
 
     override fun connect(): Completable = Completable.create { result ->
         scannerV1.connect(ScannerCallbackWrapper({

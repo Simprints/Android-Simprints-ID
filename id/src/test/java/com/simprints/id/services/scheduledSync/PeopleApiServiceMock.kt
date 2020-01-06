@@ -1,11 +1,12 @@
 package com.simprints.id.services.scheduledSync
 
-import com.simprints.id.data.db.person.remote.models.ApiGetPerson
-import com.simprints.id.data.db.person.remote.models.ApiModes
-import com.simprints.id.data.db.person.remote.models.ApiPeopleCount
-import com.simprints.id.data.db.person.remote.models.ApiPostPerson
 import com.simprints.id.data.db.person.remote.PeopleRemoteInterface
 import com.simprints.id.data.db.person.remote.PipeSeparatorWrapperForURLListParam
+import com.simprints.id.data.db.person.remote.models.ApiGetPerson
+import com.simprints.id.data.db.person.remote.models.ApiModes
+import com.simprints.id.data.db.person.remote.models.ApiPostPerson
+import com.simprints.id.data.db.person.remote.models.peopleoperations.request.ApiPeopleOperations
+import com.simprints.id.data.db.person.remote.models.peopleoperations.response.ApiPeopleOperationsResponse
 import io.reactivex.Single
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -22,17 +23,23 @@ class PeopleApiServiceMock(private val delegate: BehaviorDelegate<PeopleRemoteIn
         return delegate.returning(buildSuccessResponseWith("")).uploadPeople(projectId, patientsJson)
     }
 
-    override fun downSync(projectId: String, userId: String?, moduleId: String?, lastKnownPatientId: String?, lastKnownPatientUpdatedAt: Long?, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<ResponseBody> {
+    override suspend fun downSync(projectId: String,
+                          userId: String?,
+                          moduleId: String?,
+                          lastKnownPatientId: String?,
+                          lastKnownPatientUpdatedAt: Long?,
+                          modes: PipeSeparatorWrapperForURLListParam<ApiModes>): ResponseBody {
         return delegate.returning(buildSuccessResponseWith("")).downSync(projectId, userId, moduleId, lastKnownPatientId, lastKnownPatientUpdatedAt)
     }
 
-    override fun requestPerson(patientId: String, projectId: String, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<Response<ApiGetPerson>> {
+    override fun requestPerson(patientId: String,
+                               projectId: String): Single<Response<ApiGetPerson>> {
         return delegate.returning(buildSuccessResponseWith("")).requestPerson(patientId, projectId)
     }
 
-    override fun requestPeopleCount(projectId: String, userId: String?, moduleId: PipeSeparatorWrapperForURLListParam<String>?, modes: PipeSeparatorWrapperForURLListParam<ApiModes>): Single<Response<List<ApiPeopleCount>>> {
-        return delegate.returning(buildSuccessResponseWith("[{\"projectId\":\"project-321\",\"moduleId\":\"module1\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3141}, {\"projectId\":\"project-321\",\"moduleId\":\"module2\",\"userId\":\"Bob\",\"modes\":[\"FINGERPRINT\",\"FACE\"],\"count\":3132}]"))
-            .requestPeopleCount(projectId, userId, moduleId, PipeSeparatorWrapperForURLListParam(ApiModes.FINGERPRINT, ApiModes.FACE))
+    override fun requestPeopleOperations(projectId: String, operationsJson: ApiPeopleOperations): Single<Response<ApiPeopleOperationsResponse>> {
+        return delegate.returning(buildSuccessResponseWith("{\"groups\":[{\"counts\":{\"create\":44,\"delete\":0,\"update\":0}}]}"))
+            .requestPeopleOperations(projectId, operationsJson)
     }
 
     private fun <T> buildSuccessResponseWith(body: T?): Call<T> {

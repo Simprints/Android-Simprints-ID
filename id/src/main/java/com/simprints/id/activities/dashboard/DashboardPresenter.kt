@@ -2,16 +2,15 @@ package com.simprints.id.activities.dashboard
 
 import com.simprints.id.activities.dashboard.viewModels.CardViewModel
 import com.simprints.id.activities.dashboard.viewModels.DashboardCardType
-import com.simprints.id.activities.dashboard.viewModels.syncCard.DashboardSyncCardViewModel
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
-import com.simprints.id.data.analytics.crashreport.CrashReportTag
-import com.simprints.id.data.analytics.crashreport.CrashReportTrigger
-import com.simprints.id.data.db.syncstatus.SyncStatusDatabase
+import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.data.prefs.RemoteConfigFetcher
 import com.simprints.id.di.AppComponent
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.domain.GROUP
+import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.tools.utils.SimNetworkUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,8 +26,8 @@ class DashboardPresenter(private val view: DashboardContract.View,
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteConfigFetcher: RemoteConfigFetcher
     @Inject lateinit var simNetworkUtils: SimNetworkUtils
-    @Inject lateinit var syncStatusDatabase: SyncStatusDatabase
-    @Inject lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    @Inject lateinit var syncStatusDatabase: PeopleSyncStatusDatabase
+    @Inject lateinit var peopleSyncManager: PeopleSyncManager
 
     private val cardsFactory = DashboardCardsFactory(component)
 
@@ -52,9 +51,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
             cardsFactory.createCards()
                 .map {
                     it.doOnSuccess { dashboardCard ->
-                        if (dashboardCard is DashboardSyncCardViewModel) {
-                            initSyncCardModel(dashboardCard)
-                        }
+//                        if (dashboardCard is DashboardSyncCardViewModel) {
+//                            initSyncCardModel(dashboardCard)
+//                        }
 
                         addCard(dashboardCard)
                     }
@@ -79,16 +78,17 @@ class DashboardPresenter(private val view: DashboardContract.View,
         view.stopRequestIfRequired()
     }
 
-    private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
-        viewModel.viewModelState.onSyncActionClicked = {
-            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
-            when {
-                userIsOffline() -> view.showToastForUserOffline()
-                !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
-                viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
-            }
-        }
-    }
+//    private fun initSyncCardModel(viewModel: DashboardSyncCardViewModel) {
+//        viewModel.viewModelState.onSyncActionClicked = {
+//            crashReportManager.logMessageForCrashReport(CrashReportTag.SYNC, CrashReportTrigger.UI, message = "Dashboard card sync button clicked")
+//            when {
+//                noModulesSelected() -> view.showToastForNoModulesSelected()
+//                userIsOffline() -> view.showToastForUserOffline()
+//                !viewModel.areThereRecordsToSync() -> view.showToastForRecordsUpToDate()
+//                viewModel.areThereRecordsToSync() -> userDidWantToDownSync()
+//            }
+//        }
+//    }
 
     private fun addCard(dashboardCard: CardViewModel) {
         removeCardIfExist(dashboardCard.type)
@@ -103,7 +103,9 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     override fun userDidWantToDownSync() {
-        syncSchedulerHelper.startDownSyncOnUserActionIfPossible()
+        if (preferencesManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.MANUAL] == true) {
+            peopleSyncManager.sync()
+        }
     }
 
     private fun removeCardIfExist(projectType: DashboardCardType) {
@@ -117,6 +119,12 @@ class DashboardPresenter(private val view: DashboardContract.View,
     }
 
     private fun userIsOffline() = !simNetworkUtils.isConnected()
+
+    private fun noModulesSelected() = if (preferencesManager.syncGroup == GROUP.MODULE) {
+        preferencesManager.selectedModules.isEmpty()
+    } else {
+        false
+    }
 
     private fun initOrUpdateAnalyticsKeys() {
         crashReportManager.apply {

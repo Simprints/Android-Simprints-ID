@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.enrolAppRequest
@@ -25,6 +26,8 @@ class ModalityFlowEnrolImplTest {
     companion object {
         const val NUMBER_STEPS_FACE_OR_FINGER = 2
         const val NUMBER_STEPS_FACE_AND_FINGER = 3
+        const val NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT = 1
+        const val NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT = 2
     }
 
     private lateinit var modalityFlowEnrol: ModalityFlowEnrolImpl
@@ -34,6 +37,7 @@ class ModalityFlowEnrolImplTest {
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
     @Mock lateinit var coreStepMock: Step
+    @Mock lateinit var sessionEventsManager: SessionEventsManager
 
     @Before
     fun setUp() {
@@ -46,12 +50,11 @@ class ModalityFlowEnrolImplTest {
         whenever(fingerprintStepProcessor) { buildStepToCapture() } thenReturn fingerprintStepMock
         whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn coreStepMock
-
-        modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test
     fun enrolForFace_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(true)
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
@@ -61,6 +64,7 @@ class ModalityFlowEnrolImplTest {
 
     @Test
     fun enrolForFingerprint_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(true)
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER)
@@ -69,7 +73,28 @@ class ModalityFlowEnrolImplTest {
     }
 
     @Test
+    fun enrolForFaceWithoutConsent_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(false)
+        modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE))
+
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT)
+        verifyNever(fingerprintStepProcessor) { buildStepToCapture() }
+        verifyOnce(faceStepProcessor) { buildCaptureStep() }
+    }
+
+    @Test
+    fun enrolForFingerprintWithoutConsent_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(false)
+        modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER))
+
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_OR_FINGER_WITHOUT_CONSENT)
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture() }
+        verifyNever(faceStepProcessor) { buildCaptureStep() }
+    }
+
+    @Test
     fun enrolForFaceFingerprint_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(true)
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE, FINGER))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
@@ -81,11 +106,38 @@ class ModalityFlowEnrolImplTest {
 
     @Test
     fun enrolForFingerprintFace_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(true)
         modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER, FACE))
 
         assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER)
         verifyOnce(fingerprintStepProcessor) { buildStepToCapture() }
         assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(CONSENT_ACTIVITY_NAME)
         assertThat(modalityFlowEnrol.steps[1].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+    }
+
+    @Test
+    fun enrolForFaceFingerprintWithoutConsent_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(false)
+        modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FACE, FINGER))
+
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture() }
+        verifyOnce(faceStepProcessor) { buildCaptureStep() }
+        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(FACE_ACTIVITY_NAME)
+    }
+
+    @Test
+    fun enrolForFingerprintFaceWithoutConsent_shouldCreateTheRightSteps() {
+        buildModalityFlowEnrol(false)
+        modalityFlowEnrol.startFlow(enrolAppRequest, listOf(FINGER, FACE))
+
+        assertThat(modalityFlowEnrol.steps).hasSize(NUMBER_STEPS_FACE_AND_FINGER_WITHOUT_CONSENT)
+        verifyOnce(fingerprintStepProcessor) { buildStepToCapture() }
+        assertThat(modalityFlowEnrol.steps[0].activityName).isEqualTo(FINGERPRINT_ACTIVITY_NAME)
+    }
+
+    private fun buildModalityFlowEnrol(consentRequired: Boolean) {
+        modalityFlowEnrol = ModalityFlowEnrolImpl(fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, sessionEventsManager, consentRequired)
     }
 }

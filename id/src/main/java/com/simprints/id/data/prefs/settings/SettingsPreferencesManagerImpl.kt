@@ -12,7 +12,7 @@ import com.simprints.id.data.prefs.preferenceType.remoteConfig.overridable.Overr
 import com.simprints.id.domain.GROUP
 import com.simprints.id.domain.modality.Modality
 import com.simprints.id.exceptions.unexpected.preferences.NoSuchPreferenceError
-import com.simprints.id.services.scheduledSync.peopleDownSync.models.PeopleDownSyncTrigger
+import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger
 import com.simprints.id.tools.serializers.Serializer
 
 
@@ -43,6 +43,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
         const val SELECTED_MODULES_KEY = "SelectedModules"
         val SELECTED_MODULES_DEFAULT = setOf<String>()
 
+        const val MAX_NUMBER_OF_MODULES_KEY = "MaxNbOfModules"
+        const val MAX_NUMBER_OF_MODULES_DEFAULT = 6
+
         const val SYNC_GROUP_KEY = "SyncGroup"
         val SYNC_GROUP_DEFAULT = GROUP.USER
 
@@ -71,6 +74,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
 
         const val LOGO_EXISTS_KEY = "LogoExists"
         const val LOGO_EXISTS_DEFAULT = true
+
+        const val CONSENT_REQUIRED_KEY = "ConsentRequired"
+        const val CONSENT_REQUIRED_DEFAULT = true
 
         const val PEOPLE_DOWN_SYNC_TRIGGERS_KEY = "PeopleDownSyncTriggers"
         val PEOPLE_DOWN_SYNC_TRIGGERS_DEFAULT = mapOf(
@@ -106,6 +112,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     override var selectedModules: Set<String>
         by ComplexPreference(prefs, SELECTED_MODULES_KEY, SELECTED_MODULES_DEFAULT, moduleIdOptionsStringSetSerializer)
 
+    override var maxNumberOfModules: Int
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, MAX_NUMBER_OF_MODULES_KEY, MAX_NUMBER_OF_MODULES_DEFAULT)
+
     // Sync group. Default is user
     override var syncGroup: GROUP
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, SYNC_GROUP_KEY, SYNC_GROUP_DEFAULT, groupSerializer)
@@ -129,6 +138,9 @@ open class SettingsPreferencesManagerImpl(prefs: ImprovedSharedPreferences,
     // Whether to show the Simprints logo at the top of the launch activity
     override var logoExists: Boolean
         by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, LOGO_EXISTS_KEY, LOGO_EXISTS_DEFAULT)
+
+    override var consentRequired: Boolean
+        by RemoteConfigPrimitivePreference(prefs, remoteConfigWrapper, CONSENT_REQUIRED_KEY, CONSENT_REQUIRED_DEFAULT)
 
     override var modalities: List<Modality>
         by RemoteConfigComplexPreference(prefs, remoteConfigWrapper, MODALITY_KEY, MODALITY_DEFAULT, modalitySerializer)

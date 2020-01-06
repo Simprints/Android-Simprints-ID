@@ -1,6 +1,7 @@
 package com.simprints.id.orchestrator.modality
 
 import com.google.common.truth.Truth.assertThat
+import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.domain.modality.Modality.FACE
 import com.simprints.id.domain.modality.Modality.FINGER
 import com.simprints.id.orchestrator.steps.Step
@@ -24,12 +25,15 @@ class ModalityFlowVerifyImplTest {
     companion object {
         const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY = 3
         const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY = 4
+        const val NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT = 2
+        const val NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT = 3
     }
 
     private lateinit var modalityFlowVerify: ModalityFlowVerifyImpl
     @Mock lateinit var fingerprintStepProcessor: FingerprintStepProcessor
     @Mock lateinit var faceStepProcessor: FaceStepProcessor
     @Mock lateinit var coreStepProcessor: CoreStepProcessor
+    @Mock lateinit var sessionEventsManager: SessionEventsManager
     @Mock lateinit var fingerprintStepMock: Step
     @Mock lateinit var faceStepMock: Step
     @Mock lateinit var verifyCoreStepMock: Step
@@ -48,12 +52,11 @@ class ModalityFlowVerifyImplTest {
         whenever(faceStepProcessor) { buildCaptureStep() } thenReturn faceStepMock
         whenever(coreStepProcessor) { buildStepVerify(anyNotNull(), anyNotNull()) } thenReturn verifyCoreStepMock
         whenever(coreStepProcessor) { buildStepConsent(anyNotNull()) } thenReturn consentCoreStepMock
-
-        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor, coreStepProcessor)
     }
 
     @Test
     fun identifyForFace_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(true)
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE))
 
         with(modalityFlowVerify.steps) {
@@ -66,6 +69,7 @@ class ModalityFlowVerifyImplTest {
 
     @Test
     fun identifyForFingerprint_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(true)
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER))
 
         with(modalityFlowVerify.steps) {
@@ -78,6 +82,7 @@ class ModalityFlowVerifyImplTest {
 
     @Test
     fun identifyForFaceFingerprint_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(true)
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE, FINGER))
 
         with(modalityFlowVerify.steps) {
@@ -91,6 +96,7 @@ class ModalityFlowVerifyImplTest {
 
     @Test
     fun identifyForFingerprintFace_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(true)
         modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER, FACE))
 
         with(modalityFlowVerify.steps) {
@@ -102,6 +108,61 @@ class ModalityFlowVerifyImplTest {
         }
     }
 
+    @Test
+    fun identifyForFaceWithoutConsent_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(false)
+        modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE))
+
+        with(modalityFlowVerify.steps) {
+            assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT)
+            verifyStepWasAdded(get(0), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+        }
+    }
+
+    @Test
+    fun identifyForFingerprintWithoutConsent_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(false)
+        modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER))
+
+        with(modalityFlowVerify.steps) {
+            assertThat(this).hasSize(NUMBER_STEPS_FACE_OR_FINGER_VERIFY_WITHOUT_CONSENT)
+            verifyStepWasAdded(get(0), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+        }
+    }
+
+    @Test
+    fun identifyForFaceFingerprintWithoutConsent_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(false)
+        modalityFlowVerify.startFlow(verifyAppRequest, listOf(FACE, FINGER))
+
+        with(modalityFlowVerify.steps) {
+            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
+            verifyStepWasAdded(get(0), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FACE_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FINGERPRINT_ACTIVITY_NAME)
+        }
+    }
+
+    @Test
+    fun identifyForFingerprintFaceWithoutConsent_shouldStartWithCaptureSteps() {
+        buildModalityFlowVerify(false)
+        modalityFlowVerify.startFlow(verifyAppRequest, listOf(FINGER, FACE))
+
+        with(modalityFlowVerify.steps) {
+            assertThat(this).hasSize(NUMBER_STEPS_FACE_AND_FINGER_VERIFY_WITHOUT_CONSENT)
+            verifyStepWasAdded(get(0), VERIFY_ACTIVITY_NAME)
+            verifyStepWasAdded(get(1), FINGERPRINT_ACTIVITY_NAME)
+            verifyStepWasAdded(get(2), FACE_ACTIVITY_NAME)
+        }
+    }
+
     private fun verifyStepWasAdded(step: Step, activityName: String) =
         assertThat(step.activityName).isEqualTo(activityName)
+
+    private fun buildModalityFlowVerify(consentRequired: Boolean) {
+        modalityFlowVerify = ModalityFlowVerifyImpl(fingerprintStepProcessor, faceStepProcessor,
+            coreStepProcessor, sessionEventsManager, consentRequired)
+    }
 }

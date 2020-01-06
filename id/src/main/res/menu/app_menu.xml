@@ -10,5 +10,5 @@
     <item
         android:id="@+id/debug"
         android:title="Debug"
-        android:visible="false" />
+        android:visible="true" />
 </menu>

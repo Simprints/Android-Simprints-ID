@@ -20,7 +20,7 @@ class DefaultOkHttpClientBuilder {
                 }
             }
             .apply {
-                if (BuildConfig.DEBUG) {
+                if (BuildConfig.DEBUG || BuildConfig.BUILD_TYPE == "releaseWithLogfile") {
                     addInterceptor(buildLoggingInterceptor())
                 }
             }
@@ -47,7 +47,7 @@ class DefaultOkHttpClientBuilder {
             val initialRequest = chain.request()
             val initialResponse = chain.proceed(initialRequest)
 
-            if (initialResponse.code() != 307) {
+            if (initialResponse.code != 307) {
                 return@Interceptor initialResponse
             }
 

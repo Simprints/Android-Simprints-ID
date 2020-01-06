@@ -3,13 +3,11 @@ package com.simprints.id.secure
 import com.simprints.core.tools.extentions.completableWithSuspend
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.project.ProjectRepository
-import com.simprints.id.data.db.syncstatus.downsyncinfo.DownSyncDao
-import com.simprints.id.data.db.syncstatus.upsyncinfo.UpSyncDao
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
 
@@ -18,9 +16,7 @@ open class SignerManagerImpl(
     private val remote: RemoteDbManager,
     private val loginInfoManager: LoginInfoManager,
     private val preferencesManager: PreferencesManager,
-    private val peopleUpSyncMaster: PeopleUpSyncMaster,
-    private val downSyncDao: DownSyncDao,
-    private val upSyncDao: UpSyncDao,
+    private val syncManager: SyncManager,
     private val imageUpSyncScheduler: ImageUpSyncScheduler
 ) : SignerManager {
 
@@ -31,7 +27,7 @@ open class SignerManagerImpl(
                 projectRepository.loadAndRefreshCache(projectId)
                     ?: throw Exception("project not found")
             })
-            .andThen(resumePeopleUpSync(projectId, userId))
+            .andThen(scheduleSyncs(projectId, userId))
             .andThen(scheduleImageUpSync())
             .trace("signIn")
 
@@ -41,24 +37,24 @@ open class SignerManagerImpl(
         }
 
     @Suppress("UNUSED_PARAMETER")
-    private fun resumePeopleUpSync(projectId: String, userId: String): Completable =
+    private fun scheduleSyncs(projectId: String, userId: String): Completable =
         Completable.fromAction {
-            peopleUpSyncMaster.resume(projectId/*, userId*/) // TODO: uncomment userId when multitenancy is properly implemented
+            syncManager.scheduleBackgroundSyncs()
         }
 
     private fun scheduleImageUpSync() = Completable.fromAction {
         imageUpSyncScheduler.scheduleImageUpSync()
     }
 
-    override fun signOut() {
+    override suspend fun signOut() {
         //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
-        peopleUpSyncMaster.pause(loginInfoManager.signedInProjectId/*, loginInfoManager.signedInUserId*/) // TODO: uncomment userId when multitenancy is properly implemented
         loginInfoManager.cleanCredentials()
         remote.signOut()
-        downSyncDao.deleteAll()
-        upSyncDao.deleteAll()
+        syncManager.cancelBackgroundSyncs()
+        syncManager.deleteLastSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
         imageUpSyncScheduler.cancelImageUpSync()
     }
+
 }

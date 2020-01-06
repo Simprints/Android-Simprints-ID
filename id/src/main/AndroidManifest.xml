@@ -20,17 +20,20 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".activities.faceexitform.FaceExitFormActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.fingerprintexitform.FingerprintExitFormActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.fetchguid.FetchGuidActivity" />
         <activity
             android:name=".activities.coreexitform.CoreExitFormActivity"
-            android:label="@string/title_activity_exit_form"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".activities.consent.ConsentActivity" />
+        <activity
+            android:name=".activities.consent.ConsentActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.checkLogin.openedByMainLauncher.CheckLoginFromMainLauncherActivity"
             android:launchMode="standard"
@@ -72,6 +75,10 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".activities.debug.DebugActivity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".activities.login.LoginActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
@@ -80,10 +87,6 @@
             android:name=".activities.requestLogin.RequestLoginActivity"
             android:launchMode="singleTop"
             android:noHistory="true"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".activities.debug.DebugActivity"
-            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.settings.SettingsActivity"
@@ -95,6 +98,12 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.ActionBar" />
+        <activity android:name=".activities.settings.ModuleSelectionActivity"
+            android:label="@string/preference_select_modules_title"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar.MaterialComponents"/>
+
         <activity
             android:name=".activities.dashboard.DashboardActivity"
             android:launchMode="singleTop"
@@ -116,6 +125,9 @@
                 <category android:name="LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.settings.syncinformation.SyncInformationActivity"
+            android:screenOrientation="portrait" />
 
         <meta-data
             android:name="io.fabric.ApiKey"

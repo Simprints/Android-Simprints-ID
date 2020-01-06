@@ -72,6 +72,7 @@ open class BaseClientApiTest : KoinTest {
 
             whenever(this) { createSession(anyNotNull()) } thenReturn Single.just(sessionMock)
             whenever(this) { addEvent(anyNotNull()) } thenReturn Completable.complete()
+            whenever(this) { getCurrentSession() } thenReturn Single.just(sessionMock)
         }
 
     protected fun mockAppModuleResponse(appResponse: IAppResponse,

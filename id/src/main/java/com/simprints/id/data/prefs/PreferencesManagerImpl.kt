@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
+import com.simprints.id.data.secure.SecureLocalDbKeyProviderImpl.Companion.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER
 
 
 class PreferencesManagerImpl(settings: SettingsPreferencesManager,
@@ -45,5 +45,5 @@ class PreferencesManagerImpl(settings: SettingsPreferencesManager,
     }
 
     private fun containsRealmKey(it: Map.Entry<String, Any?>) =
-        it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
+        it.key.contains(SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
 }

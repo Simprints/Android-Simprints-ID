@@ -4,6 +4,8 @@ import com.simprints.clientapi.activities.errors.ClientApiAlert
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.controllers.core.eventData.model.fromDomainToCore
 import com.simprints.clientapi.tools.ClientApiTimeHelper
+import com.simprints.core.tools.extentions.resumeSafely
+import com.simprints.core.tools.extentions.resumeWithExceptionSafely
 import com.simprints.id.data.analytics.eventdata.controllers.domain.SessionEventsManager
 import com.simprints.id.data.analytics.eventdata.models.domain.events.*
 import com.simprints.libsimprints.BuildConfig.VERSION_NAME
@@ -13,8 +15,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import com.simprints.id.data.analytics.eventdata.models.domain.events.AlertScreenEvent.AlertScreenEventType as CoreAlertScreenEventType
 
 
@@ -28,8 +28,8 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
                 coreSessionEventsManager.createSession(VERSION_NAME).flatMap {
                     addIntentParsingEvent(integration).toSingleDefault(it.id)
                 }.subscribeBy(
-                    onSuccess = { cont.resume(it) },
-                    onError = { cont.resumeWithException(it) }
+                    onSuccess = { cont.resumeSafely(it) },
+                    onError = { cont.resumeWithExceptionSafely(it) }
                 )
             }
         }
@@ -45,9 +45,9 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
     override suspend fun addCompletionCheckEvent(complete: Boolean) = suspendCancellableCoroutine<Unit> { cont ->
         try {
             addEvent(CompletionCheckEvent(timeHelper.now(), complete)).blockingAwait()
-            cont.resume(Unit)
+            cont.resumeSafely(Unit)
         } catch (t: Throwable) {
-            cont.resumeWithException(t)
+            cont.resumeWithExceptionSafely(t)
         }
     }
 
@@ -59,6 +59,16 @@ class ClientApiSessionEventsManagerImpl(private val coreSessionEventsManager: Se
 
     private fun addEvent(event: Event): Completable =
         coreSessionEventsManager.addEvent(event)
+
+    override suspend fun getCurrentSessionId(): String =
+        suspendCancellableCoroutine { cont ->
+            CoroutineScope(Dispatchers.IO).launch {
+                coreSessionEventsManager.getCurrentSession().subscribeBy(
+                    onSuccess = { cont.resumeSafely(it.id) },
+                    onError = { cont.resumeWithExceptionSafely(it) }
+                )
+            }
+        }
 
 }
 

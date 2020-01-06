@@ -63,20 +63,6 @@ class SettingsPreferencePresenterTest {
     }
 
     @Test
-    fun modulePreference_loadValueAndBindChangeListener_preferenceShouldHaveListenerBoundedAndValues() {
-        val mockPreference = Mockito.mock(MultiSelectListPreference::class.java)
-        whenever(viewMock.getPreferenceForSelectModules()).thenReturn(mockPreference)
-        whenever(viewMock.getKeyForSelectModulesPreference()).thenReturn(PREFERENCE_KEY_FOR_MODULE)
-        whenever(mockPreference.key).thenReturn(PREFERENCE_KEY_FOR_MODULE)
-        whenever(presenter) { loadSelectModulesPreference(anyNotNull()) } thenDoNothing {}
-
-        presenter.loadValueAndBindChangeListener(mockPreference)
-
-        verifyOnce(mockPreference) { setOnPreferenceChangeListener(anyNotNull()) }
-        verifyOnce(presenter) { loadSelectModulesPreference(anyNotNull()) }
-    }
-
-    @Test
     fun aboutPreference_userClicksOnIt_shouldStartAboutActivity() {
         val mockPreference = Mockito.mock(Preference::class.java)
         whenever(viewMock.getPreferenceForAbout()).thenReturn(mockPreference)

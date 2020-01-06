@@ -51,7 +51,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
         CoroutineScope(Dispatchers.Main).launch {
             val flowCompletedCheck = RETURN_FOR_FLOW_COMPLETED
             addCompletionCheckEvent(flowCompletedCheck)
-            view.returnRegistration(enroll.guid, flowCompletedCheck)
+            view.returnRegistration(enroll.guid, sessionEventsManager.getCurrentSessionId(), flowCompletedCheck)
         }
     }
 
@@ -81,6 +81,7 @@ class CommCarePresenter(private val view: CommCareContract.View,
                 verify.matchResult.confidence,
                 Tier.valueOf(verify.matchResult.tier.name),
                 verify.matchResult.guidFound,
+                sessionEventsManager.getCurrentSessionId(),
                 flowCompletedCheck
             )
         }

@@ -9,7 +9,7 @@ import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.await
@@ -28,7 +28,7 @@ import java.io.Serializable
 
 @FlowPreview
 class PersonLocalDataSourceImpl(private val appContext: Context,
-                                val secureDataManager: SecureDataManager,
+                                val secureDataManager: SecureLocalDbKeyProvider,
                                 val loginInfoManager: LoginInfoManager) : PersonLocalDataSource {
     companion object {
         const val SYNC_ID_FIELD = "syncGroupId"
@@ -70,7 +70,7 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
     override suspend fun load(query: PersonLocalDataSource.Query?): Flow<Person> =
         withContext(Dispatchers.Main) {
             Realm.getInstance(config).use {
-                it.buildQueryForPerson(query)
+                it.buildRealmQueryForPerson(query)
                     .await()
                     ?.map { it.fromDbToDomain() }
                     ?.asFlow()
@@ -87,22 +87,26 @@ class PersonLocalDataSourceImpl(private val appContext: Context,
             throw InvalidQueryToLoadRecordsException()
         }
 
-
-    override suspend fun delete(query: PersonLocalDataSource.Query) {
+    override suspend fun delete(queries: List<PersonLocalDataSource.Query>) {
         withContext(Dispatchers.Main) {
-            Realm.getInstance(config).use {
-                it.buildQueryForPerson(query)
-                    .await()?.deleteAllFromRealm()
+            Realm.getInstance(config).use { realmInstance ->
+                realmInstance.transactAwait {  realm ->
+                    queries.forEach {
+                        realm.buildRealmQueryForPerson(it)
+                            .findAll()
+                            .deleteAllFromRealm()
+                    }
+                }
             }
         }
     }
 
     override fun count(query: PersonLocalDataSource.Query): Int =
         Realm.getInstance(config).use { realm ->
-            realm.buildQueryForPerson(query).count().toInt()
+            realm.buildRealmQueryForPerson(query).count().toInt()
         }
 
-    private fun Realm.buildQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =
+    private fun Realm.buildRealmQueryForPerson(query: PersonLocalDataSource.Query?): RealmQuery<DbPerson> =
         where(DbPerson::class.java)
             .apply {
                 query?.let { query ->

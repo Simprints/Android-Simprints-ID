@@ -5,12 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.PeopleGeneratorUtils.getRandomPeople
 import com.simprints.id.data.db.RealmTestsBase
+import com.simprints.id.data.db.person.domain.FingerprintIdentity
 import com.simprints.id.data.db.person.local.models.DbPerson
 import com.simprints.id.data.db.person.local.models.fromDbToDomain
 import com.simprints.id.data.db.person.local.models.fromDomainToDb
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.InvalidQueryToLoadRecordsException
 import com.simprints.testtools.common.syntax.assertThrows
 import com.simprints.testtools.common.syntax.mock
@@ -33,7 +34,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         whenever(this) { getSignedInProjectIdOrEmpty() }
             .thenReturn(DEFAULT_PROJECT_ID)
     }
-    private val secureDataManagerMock = mock<SecureDataManager>().apply {
+    private val secureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
         whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
             .thenReturn(LocalDbKey(newDatabaseName, newDatabaseKey))
     }
@@ -41,7 +42,7 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
     @Before
     fun setup() {
         realm = Realm.getInstance(config)
-        personLocalDataSource = PersonLocalDataSourceImpl(testContext, secureDataManagerMock, loginInfoManagerMock)
+        personLocalDataSource = PersonLocalDataSourceImpl(testContext, secureLocalDbKeyProviderMock, loginInfoManagerMock)
     }
 
     @Test
@@ -52,11 +53,11 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
 
         val differentNewDatabaseName = "different_${Date().time}newDatabase"
         val differentDatabaseKey: ByteArray = "different_newKey".toByteArray().copyOf(KEY_LENGTH)
-        val differentSecureDataManagerMock = mock<SecureDataManager>().apply {
+        val differentSecureLocalDbKeyProviderMock = mock<SecureLocalDbKeyProvider>().apply {
             whenever(this) { getLocalDbKeyOrThrow(DEFAULT_PROJECT_ID) }
                 .thenReturn(LocalDbKey(differentNewDatabaseName, differentDatabaseKey))
         }
-        val differentLocalDataSource = PersonLocalDataSourceImpl(testContext, differentSecureDataManagerMock, loginInfoManagerMock)
+        val differentLocalDataSource = PersonLocalDataSourceImpl(testContext, differentSecureLocalDbKeyProviderMock, loginInfoManagerMock)
 
         val count = runBlocking { differentLocalDataSource.count() }
         assertThat(count).isEqualTo(0)
@@ -147,21 +148,23 @@ class PersonLocalDataSourceImplTest : RealmTestsBase() {
         val fingerprintIdentities = fingerprintIdentityLocalDataSource.loadFingerprintIdentities(PersonLocalDataSource.Query()).toList()
         realm.executeTransaction {
             with(fingerprintIdentities) {
-                assertThat(count()).isEqualTo(fakePerson1.fingerprintSamples.count() + fakePerson2.fingerprintSamples.count())
-                assertThat(get(0).patientId).isEqualTo(fakePerson1.patientId)
-                assertThat(get(1).patientId).isEqualTo(fakePerson1.patientId)
-                assertThat(get(2).patientId).isEqualTo(fakePerson2.patientId)
-                assertThat(get(3).patientId).isEqualTo(fakePerson2.patientId)
+                verifyIdentity(fakePerson1, get(0))
+                verifyIdentity(fakePerson2, get(1))
             }
         }
     }
 
+    private fun verifyIdentity(person: DbPerson, fingerprintIdentity: FingerprintIdentity) {
+        assertThat(fingerprintIdentity.fingerprints.count()).isEqualTo(person.fingerprintSamples.count())
+        assertThat(fingerprintIdentity.patientId).isEqualTo(person.patientId)
+    }
+
     @Test
+    @SmallTest
     fun givenInvalidSerializableQuery_aThrowableIsThrown() {
         runBlocking {
-            val fingerprintIdentityLocalDataSource = (personLocalDataSource as FingerprintIdentityLocalDataSource)
             assertThrows<InvalidQueryToLoadRecordsException> {
-                fingerprintIdentityLocalDataSource.loadFingerprintIdentities(mock())
+                (personLocalDataSource as FingerprintIdentityLocalDataSource).loadFingerprintIdentities(mock())
             }
         }
     }

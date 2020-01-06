@@ -8,6 +8,7 @@ import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
 import com.simprints.id.data.db.image.remote.ImageRemoteDataSourceImpl
 import com.simprints.id.data.db.image.repository.ImageRepository
 import com.simprints.id.data.db.image.repository.ImageRepositoryImpl
+import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.PersonRepositoryImpl
 import com.simprints.id.data.db.person.local.FingerprintIdentityLocalDataSource
@@ -21,11 +22,9 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSource
 import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSource
-import com.simprints.id.data.db.syncinfo.local.SyncInfoLocalDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
-import com.simprints.id.services.scheduledSync.peopleUpsync.PeopleUpSyncMaster
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
+import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -37,20 +36,14 @@ open class DataModule {
     @Singleton
     open fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource = PersonRemoteDataSourceImpl(remoteDbManager)
 
-
-    @Provides
-    open fun provideSyncInfoLocalDataSource(ctx: Context,
-                                            secureDataManager: SecureDataManager,
-                                            loginInfoManager: LoginInfoManager): SyncInfoLocalDataSource =
-        SyncInfoLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
-
     @Provides
     open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureDataManager,
+                                           secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                            loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        ProjectLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
+    @Singleton
     open fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
         ProjectRemoteDataSourceImpl(remoteDbManager)
 
@@ -62,15 +55,17 @@ open class DataModule {
     @Provides
     open fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
                                      personRemoteDataSource: PersonRemoteDataSource,
-                                     peopleUpSyncMaster: PeopleUpSyncMaster): PersonRepository =
-        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, peopleUpSyncMaster)
+                                     peopleUpSyncManager: PeopleUpSyncManager,
+                                     downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
+        PersonRepositoryImpl(personRemoteDataSource, personLocalDataSource, downSyncScopeRepository, peopleUpSyncManager)
 
 
     @Provides
+    @Singleton
     open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
+                                          secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        PersonLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =

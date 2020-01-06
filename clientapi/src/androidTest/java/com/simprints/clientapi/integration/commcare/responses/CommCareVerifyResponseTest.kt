@@ -42,7 +42,7 @@ class CommCareVerifyResponseTest : BaseCommCareClientApiTest() {
 
             assertThat(it.getString(VERIFICATION_GUID_KEY)).isEqualTo(appVerifyResponse.matchResult.guid)
             assertThat(it.getString(VERIFICATION_TIER_KEY)).isEqualTo(appVerifyResponse.matchResult.tier.name)
-            assertThat(it.getInt(VERIFICATION_CONFIDENCE_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence)
+            assertThat(it.getString(VERIFICATION_CONFIDENCE_KEY)).isEqualTo(appVerifyResponse.matchResult.confidence.toString())
             assertThat(it.getString(BIOMETRICS_COMPLETE_KEY)).isEqualTo(BaseClientApiTest.RETURN_FOR_FLOW_COMPLETED.toString())
         } ?: throw Exception("No bundle found")
     }

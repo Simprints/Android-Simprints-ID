@@ -31,12 +31,8 @@ class FaceOrchestratorViewModel : ViewModel() {
     fun start(iFaceRequest: IFaceRequest) {
         val request = FaceToDomainRequest.fromFaceToDomainRequest(iFaceRequest)
         when (request) {
-            is FaceCaptureRequest -> {
-                captureNeededPhotos(request)
-            }
-            is FaceMatchRequest -> {
-                startMatchingFaces(request)
-            }
+            is FaceCaptureRequest -> captureNeededPhotos(request)
+            is FaceMatchRequest -> startMatchingFaces(request)
         }
         faceRequest = request
     }
@@ -51,11 +47,13 @@ class FaceOrchestratorViewModel : ViewModel() {
     }
 
     fun captureFinished() {
-        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(generateFakeCaptureResponse()))
+        val fakeCaptureResponse = generateFakeCaptureResponse()
+        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(fakeCaptureResponse))
     }
 
     fun matchFinished() {
-        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(generateFaceMatchResponse()))
+        val fakeMatchResponse = generateFaceMatchResponse()
+        flowFinished.send(DomainToFaceResponse.fromDomainToFaceResponse(fakeMatchResponse))
     }
 
     private fun generateFakeCaptureResponse(): FaceCaptureResponse {

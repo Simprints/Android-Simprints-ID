@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker
-import androidx.work.WorkerParameters
+import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.commontesttools.di.TestAppModule
@@ -15,11 +15,10 @@ import com.simprints.id.testtools.TestApplication
 import com.simprints.id.testtools.UnitTestConfig
 import com.simprints.testtools.common.di.DependencyRule
 import com.simprints.testtools.common.syntax.wheneverOnSuspend
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 import javax.inject.Inject
@@ -35,9 +34,6 @@ class ImageUpSyncWorkerTest {
 
     @Inject
     lateinit var repository: ImageRepository
-
-    @Mock
-    lateinit var workerParams: WorkerParameters
 
     private lateinit var imageUpSyncWorker: ImageUpSyncWorker
 
@@ -56,38 +52,34 @@ class ImageUpSyncWorkerTest {
     fun setUp() {
         UnitTestConfig(this, appModule = appModule, dataModule = dataModule).fullSetup()
         MockitoAnnotations.initMocks(this)
-        imageUpSyncWorker = ImageUpSyncWorker(context, workerParams)
+        imageUpSyncWorker = TestListenableWorkerBuilder<ImageUpSyncWorker>(app).build()
     }
 
     @Test
-    fun whenAllUploadsAreSuccessful_shouldReturnSuccess() {
+    fun whenAllUploadsAreSuccessful_shouldReturnSuccess() = runBlockingTest {
         mockUploadResults()
-        val workResult = runBlocking {
-            imageUpSyncWorker.doWork()
-        }
+
+        val workResult = imageUpSyncWorker.doWork()
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.success())
     }
 
     @Test
-    fun whenAnyUploadFails_shouldReturnRetry() {
+    fun whenAnyUploadFails_shouldReturnRetry() = runBlockingTest {
         mockUploadResults(addFailedUpload = true)
-        val workResult = runBlocking {
-            imageUpSyncWorker.doWork()
-        }
+
+        val workResult = imageUpSyncWorker.doWork()
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.retry())
     }
 
     @Test
-    fun withNoImagesToUpload_shouldReturnSuccess() {
+    fun withNoImagesToUpload_shouldReturnSuccess() = runBlockingTest {
         wheneverOnSuspend(repository) {
             uploadImages()
         } thenOnBlockingReturn emptyList()
 
-        val workResult = runBlocking {
-            imageUpSyncWorker.doWork()
-        }
+        val workResult = imageUpSyncWorker.doWork()
 
         assertThat(workResult).isEqualTo(ListenableWorker.Result.success())
     }

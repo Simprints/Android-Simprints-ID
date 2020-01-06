@@ -5,13 +5,13 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
-import com.simprints.id.services.scheduledSync.SyncSchedulerHelper
+import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
@@ -34,9 +34,9 @@ abstract class CheckLoginPresenter(
     @Inject
     lateinit var remoteDbManager: RemoteDbManager
     @Inject
-    lateinit var secureDataManager: SecureDataManager
+    lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject
-    lateinit var syncSchedulerHelper: SyncSchedulerHelper
+    lateinit var syncManager: SyncManager
     @Inject
     lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
@@ -55,7 +55,7 @@ abstract class CheckLoginPresenter(
                 is DifferentProjectIdSignedInException -> view.openAlertActivityForError(DIFFERENT_PROJECT_ID_SIGNED_IN)
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser().also {
-                    syncSchedulerHelper.cancelAllWorkers()
+                    syncManager.cancelBackgroundSyncs()
                     imageUpSyncScheduler.cancelImageUpSync()
                 }
                 else -> {
