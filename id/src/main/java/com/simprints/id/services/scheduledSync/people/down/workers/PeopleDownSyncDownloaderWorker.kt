@@ -81,7 +81,7 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         logSuccess<PeopleDownSyncDownloaderWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleDownSyncDownloaderWorker>(message)
+        crashReportLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
 fun WorkInfo.extractDownSyncProgress(progressCache: PeopleSyncProgressCache): Int? {

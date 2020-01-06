@@ -67,7 +67,7 @@ class PeopleUpSyncUploaderWorker(context: Context, params: WorkerParameters) : S
         logSuccess<PeopleUpSyncUploaderWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleUpSyncUploaderWorker>(message)
+        crashReportLog<PeopleUpSyncUploaderWorker>(message)
 
     companion object {
         const val PATIENT_UPLOAD_BATCH_SIZE = 80

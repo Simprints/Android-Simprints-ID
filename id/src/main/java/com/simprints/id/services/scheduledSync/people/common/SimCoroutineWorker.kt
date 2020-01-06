@@ -35,7 +35,7 @@ abstract class SimCoroutineWorker(context: Context, params: WorkerParameters) : 
             CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "${T::class.java.simpleName} - [Succeed] $message")
     }
 
-    protected inline fun <reified T> crashlyticsLog(message: Any) {
+    protected inline fun <reified T> crashReportLog(message: Any) {
         crashReportManager.logMessageForCrashReport(
             CrashReportTag.SYNC, CrashReportTrigger.NETWORK, message = "${T::class.java.simpleName} - $message")
     }

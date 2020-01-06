@@ -59,7 +59,7 @@ class PeopleUpSyncCountWorker(context: Context, params: WorkerParameters) : SimC
         logSuccess<PeopleUpSyncUploaderWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleUpSyncUploaderWorker>(message)
+        crashReportLog<PeopleUpSyncUploaderWorker>(message)
 
 }
 
