@@ -126,7 +126,7 @@ class OrchestratorModule {
 
     @Provides
     fun provideHotCache(
-        @Named("EncryptedSharedPreferences")  sharedPrefs: SharedPreferences,
+        @Named("EncryptedSharedPreferences") sharedPrefs: SharedPreferences,
         stepEncoder: StepEncoder
     ): HotCache = HotCacheImpl(sharedPrefs, stepEncoder)
 

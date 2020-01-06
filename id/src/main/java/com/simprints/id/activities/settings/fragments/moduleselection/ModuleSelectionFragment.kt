@@ -79,7 +79,6 @@ class ModuleSelectionFragment(
     private fun refreshSyncWorkers(){
         peopleSyncManager.cancelAndRescheduleSync()
     }
-
     override fun onChipClick(module: Module) {
         updateSelectionIfPossible(module)
     }
@@ -180,7 +179,6 @@ class ModuleSelectionFragment(
     private fun handleModuleSelected(lastModuleChanged: Module) {
         lastModuleChanged.isSelected = !lastModuleChanged.isSelected
         viewModel.updateModules(modules)
-        peopleSyncManager.cancelAndRescheduleSync()
     }
 
     private fun notifyNoModulesSelected() {

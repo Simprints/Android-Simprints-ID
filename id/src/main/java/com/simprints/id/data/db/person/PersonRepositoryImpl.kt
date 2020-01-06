@@ -59,11 +59,6 @@ class PersonRepositoryImpl(val personRemoteDataSource: PersonRemoteDataSource,
 
     override suspend fun saveAndUpload(person: Person) {
         personLocalDataSource.insertOrUpdate(listOf(person.apply { toSync = true }))
-        scheduleUpsync(person.projectId, person.userId)
-    }
-
-    @Suppress("UNUSED_PARAMETER")
-    private fun scheduleUpsync(projectId: String, userId: String) {
         peopleUpSyncManager.sync()
     }
 }

@@ -5,7 +5,7 @@ import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.alert.AlertType.*
 import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInException
@@ -26,7 +26,7 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var crashReportManager: CrashReportManager
     @Inject lateinit var loginInfoManager: LoginInfoManager
     @Inject lateinit var remoteDbManager: RemoteDbManager
-    @Inject lateinit var secureDataManager: SecureDataManager
+    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var syncManager: SyncManager
 
     init {

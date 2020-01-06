@@ -8,7 +8,7 @@ import com.simprints.id.data.db.project.local.models.toDomainProject
 import com.simprints.id.data.db.project.local.models.toRealmProject
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.secure.LocalDbKey
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.exceptions.unexpected.RealmUninitialisedException
 import com.simprints.id.tools.extensions.awaitFirst
 import com.simprints.id.tools.extensions.transactAwait
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 
 @FlowPreview
 class ProjectLocalDataSourceImpl(private val appContext: Context,
-                                 val secureDataManager: SecureDataManager,
+                                 val secureDataManager: SecureLocalDbKeyProvider,
                                  val loginInfoManager: LoginInfoManager) : ProjectLocalDataSource {
 
     companion object {

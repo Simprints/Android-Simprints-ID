@@ -17,7 +17,7 @@ import com.simprints.id.data.db.project.local.ProjectLocalDataSourceImpl
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSource
 import com.simprints.id.data.db.project.remote.ProjectRemoteDataSourceImpl
 import com.simprints.id.data.loginInfo.LoginInfoManager
-import com.simprints.id.data.secure.SecureDataManager
+import com.simprints.id.data.secure.SecureLocalDbKeyProvider
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncManager
 import dagger.Module
 import dagger.Provides
@@ -32,9 +32,9 @@ open class DataModule {
 
     @Provides
     open fun provideProjectLocalDataSource(ctx: Context,
-                                           secureDataManager: SecureDataManager,
+                                           secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                            loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        ProjectLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        ProjectLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     @Singleton
@@ -57,9 +57,9 @@ open class DataModule {
     @Provides
     @Singleton
     open fun providePersonLocalDataSource(ctx: Context,
-                                          secureDataManager: SecureDataManager,
+                                          secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
                                           loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        PersonLocalDataSourceImpl(ctx, secureDataManager, loginInfoManager)
+        PersonLocalDataSourceImpl(ctx, secureLocalDbKeyProvider, loginInfoManager)
 
     @Provides
     open fun provideFingerprintRecordLocalDataSource(personLocalDataSource: PersonLocalDataSource): FingerprintIdentityLocalDataSource =
