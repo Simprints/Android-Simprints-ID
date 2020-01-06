@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.simprints.id.data.prefs.events.RecentEventsPreferencesManager
 import com.simprints.id.data.prefs.settings.SettingsPreferencesManager
-import com.simprints.id.data.secure.SecureDataManagerImpl
 
 
 class PreferencesManagerImpl(settings: SettingsPreferencesManager,
@@ -35,15 +34,4 @@ class PreferencesManagerImpl(settings: SettingsPreferencesManager,
             is String -> prefs.edit().putString(key, value).apply()
         }
     }
-
-    override fun clearAllSharedPreferencesExceptRealmKeys() {
-        prefs.all.forEach {
-            if (!containsRealmKey(it)) {
-                prefs.edit().remove(it.key).apply()
-            }
-        }
-    }
-
-    private fun containsRealmKey(it: Map.Entry<String, Any?>) =
-        it.key.contains(SecureDataManagerImpl.SHARED_PREFS_KEY_FOR_REALM_KEY_IDENTIFIER)
 }
