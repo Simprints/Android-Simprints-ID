@@ -171,9 +171,14 @@ class LibSimprintsPresenterTest {
 
     @Test
     fun handleResponseError_ShouldCallActionError() {
+
+        val sessionId = UUID.randomUUID().toString()
+        wheneverOnSuspend(clientApiSessionEventsManager) { getCurrentSessionId() } thenOnBlockingReturn sessionId
+
         LibSimprintsPresenter(view, "", clientApiSessionEventsManager, mock()).handleResponseError(ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID))
+
         verifyOnce(view) {
-            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK))
+            returnErrorToClient(anyNotNull(), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId))
         }
         verifyCompletionCheckEventWasAdded()
     }
