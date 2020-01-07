@@ -10,7 +10,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationKey
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.domain.modality.Modes
 import kotlinx.coroutines.runBlocking
@@ -23,7 +23,7 @@ import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class PeopleSyncStatusDatabaseTest {
-    private lateinit var downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao
+    private lateinit var downSyncOperationOperationDao: PeopleDownSyncOperationLocalDataSource
     private lateinit var db: PeopleSyncStatusDatabase
 
     private val projectSyncOp = PeopleDownSyncOperation(
@@ -82,7 +82,7 @@ class PeopleSyncStatusDatabaseTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
             context, PeopleSyncStatusDatabase::class.java).build()
-        downSyncOperationOperationDaoDb = db.downSyncOperationOperationDaoDb
+        downSyncOperationOperationDao = db.downSyncOperationOperationDataSource
     }
 
     @After
@@ -113,16 +113,16 @@ class PeopleSyncStatusDatabaseTest {
 
     @Test
     fun insertOrReplaceDownSyncOperation() = runBlocking {
-        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(projectSyncOp.fromDomainToDb())
+        downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(projectSyncOp.fromDomainToDb())
         val newOp = projectSyncOp.copy(lastResult = downSyncOperationResult)
-        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(newOp.fromDomainToDb())
-        val opStored = downSyncOperationOperationDaoDb.getDownSyncOperation(extractKeyFrom(newOp))
+        downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(newOp.fromDomainToDb())
+        val opStored = downSyncOperationOperationDao.getDownSyncOperation(extractKeyFrom(newOp))
         assertThat(opStored).isEqualTo(newOp.fromDomainToDb())
     }
 
     private suspend fun assertSaveAndRead(downSyncOp: PeopleDownSyncOperation) {
-        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(downSyncOp.fromDomainToDb())
-        val operation = downSyncOperationOperationDaoDb.getDownSyncOperation(extractKeyFrom(downSyncOp))
+        downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(downSyncOp.fromDomainToDb())
+        val operation = downSyncOperationOperationDao.getDownSyncOperation(extractKeyFrom(downSyncOp))
         assertThat(operation.first().fromDbToDomain()).isEqualTo(downSyncOp)
     }
 

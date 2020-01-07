@@ -1,7 +1,7 @@
 package com.simprints.id.data.db.people_sync.down
 
 import com.simprints.id.data.db.people_sync.down.domain.*
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.down.local.fromDbToDomain
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
@@ -12,7 +12,7 @@ import com.simprints.id.exceptions.unexpected.MissingArgumentForDownSyncScopeExc
 
 class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
                                         val preferencesManager: PreferencesManager,
-                                        private val downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao,
+                                        private val downSyncOperationOperationDao: PeopleDownSyncOperationLocalDataSource,
                                         private val peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder) : PeopleDownSyncScopeRepository {
 
     override fun getDownSyncScope(): PeopleDownSyncScope {
@@ -47,7 +47,7 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
     }
 
     override suspend fun refreshDownSyncOperationFromDb(opToRefresh: PeopleDownSyncOperation): PeopleDownSyncOperation {
-        val ops = downSyncOperationOperationDaoDb.getDownSyncOperationsAll()
+        val ops = downSyncOperationOperationDao.getDownSyncOperationsAll()
         return ops.firstOrNull {
             it.projectId == opToRefresh.projectId &&
                 it.userId == opToRefresh.userId &&
@@ -70,11 +70,10 @@ class PeopleDownSyncScopeRepositoryImpl(val loginInfoManager: LoginInfoManager,
         }
 
     override suspend fun insertOrUpdate(syncScopeOperation: PeopleDownSyncOperation) {
-        downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
+        downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(syncScopeOperation.fromDomainToDb())
     }
 
     override suspend fun deleteAll() {
-        downSyncOperationOperationDaoDb.deleteAll()
+        downSyncOperationOperationDao.deleteAll()
     }
-
 }
