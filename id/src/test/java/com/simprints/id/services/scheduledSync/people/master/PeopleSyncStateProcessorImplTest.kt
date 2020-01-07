@@ -52,13 +52,14 @@ class PeopleSyncStateProcessorImplTest {
     lateinit var peopleSyncStateProcessor: PeopleSyncStateProcessor
     @RelaxedMockK lateinit var personRepository: PersonRepository
     @RelaxedMockK lateinit var syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider
+    @RelaxedMockK lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     @Before
     fun setUp() {
         UnitTestConfig(this).setupWorkManager()
         MockKAnnotations.init(this)
-        peopleSyncStateProcessor = PeopleSyncStateProcessorImpl(ctx, personRepository, syncWorkersLiveDataProvider)
-        mockWorkersInfoLiveData()
+        peopleSyncStateProcessor = PeopleSyncStateProcessorImpl(ctx, personRepository, peopleSyncProgressCache, syncWorkersLiveDataProvider)
+        mockDependencies()
     }
 
     @Test
@@ -131,9 +132,10 @@ class PeopleSyncStateProcessorImplTest {
             createCommonDownSyncTags(uniqueMasterSyncId, uniqueMasterSyncId) + listOf(tagForType(DOWNLOADER))
         )
 
-    private fun mockWorkersInfoLiveData() {
+    private fun mockDependencies() {
         every { syncWorkersLiveDataProvider.getMasterWorkersLiveData() } returns masterWorkersLiveData
         every { syncWorkersLiveDataProvider.getSyncWorkersLiveData(any()) } returns syncWorkersLiveData
+        every { peopleSyncProgressCache.getProgress(any()) } returns 0
     }
 }
 

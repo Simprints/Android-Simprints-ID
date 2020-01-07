@@ -112,5 +112,5 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         logSuccess<PeopleSyncMasterWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleSyncMasterWorker>(message)
+        crashReportLog<PeopleSyncMasterWorker>(message)
 }

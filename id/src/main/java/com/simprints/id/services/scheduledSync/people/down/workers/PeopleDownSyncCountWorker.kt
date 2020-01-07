@@ -64,7 +64,7 @@ class PeopleDownSyncCountWorker(context: Context, params: WorkerParameters) : Si
         logSuccess<PeopleDownSyncCountWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleDownSyncCountWorker>(message)
+        crashReportLog<PeopleDownSyncCountWorker>(message)
 
 }
 
