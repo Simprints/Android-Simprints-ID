@@ -25,6 +25,7 @@ import timber.log.Timber
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
                                    val personRepository: PersonRepository,
+                                   val progressCache: PeopleSyncProgressCache,
                                    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
@@ -96,7 +97,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateProgressForDownSync(): Int {
         val downWorkers = this.filterByTags(tagForType(DOWNLOADER))
         val progresses = downWorkers.map { worker ->
-            worker.extractDownSyncProgress()
+            worker.extractDownSyncProgress(progressCache)
         }
 
         return progresses.filterNotNull().sum()
@@ -105,7 +106,7 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     private fun List<WorkInfo>.calculateProgressForUpSync(): Int {
         val upWorkers = this.filterByTags(tagForType(UPLOADER))
         val progresses = upWorkers.map { worker ->
-            worker.extractUpSyncProgress()
+            worker.extractUpSyncProgress(progressCache)
         }
 
         return progresses.filterNotNull().sum()

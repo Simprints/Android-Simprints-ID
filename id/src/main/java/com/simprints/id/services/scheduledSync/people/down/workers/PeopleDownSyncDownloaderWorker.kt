@@ -12,8 +12,8 @@ import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
 import com.simprints.id.services.scheduledSync.people.common.WorkerProgressCountReporter
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.OUTPUT_DOWN_SYNC
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.PROGRESS_DOWN_SYNC
+import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
 import javax.inject.Inject
-import kotlin.math.max
 
 class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters) : SimCoroutineWorker(context, params), WorkerProgressCountReporter {
 
@@ -81,12 +81,14 @@ class PeopleDownSyncDownloaderWorker(context: Context, params: WorkerParameters)
         logSuccess<PeopleDownSyncDownloaderWorker>(message)
 
     private fun crashlyticsLog(message: String) =
-        crashlyticsLog<PeopleDownSyncDownloaderWorker>(message)
+        crashReportLog<PeopleDownSyncDownloaderWorker>(message)
 }
 
-fun WorkInfo.extractDownSyncProgress(): Int? {
+fun WorkInfo.extractDownSyncProgress(progressCache: PeopleSyncProgressCache): Int? {
     val progress = this.progress.getInt(PROGRESS_DOWN_SYNC, -1)
     val output = this.outputData.getInt(OUTPUT_DOWN_SYNC, -1)
 
-    return max(max(progress, output), 0)
+    //When the worker is not running (e.g. ENQUEUED due to errors), the output and progress are cleaned.
+    val cached = progressCache.getProgress(id.toString())
+    return maxOf(progress, output, cached)
 }

@@ -62,8 +62,9 @@ open class SyncModule {
 
     @Provides
     open fun providePeopleSyncStateProcessor(ctx: Context,
+                                             progressCache: PeopleSyncProgressCache,
                                              personRepository: PersonRepository): PeopleSyncStateProcessor =
-        PeopleSyncStateProcessorImpl(ctx, personRepository)
+        PeopleSyncStateProcessorImpl(ctx, personRepository, progressCache)
 
     @Provides
     open fun providePeopleSyncManager(ctx: Context,
