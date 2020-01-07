@@ -4,9 +4,9 @@ import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
+import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -60,8 +60,9 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
 
     @Singleton
     override fun providePeopleSyncStateProcessor(ctx: Context,
+                                                 progressCache: PeopleSyncProgressCache,
                                                  personRepository: PersonRepository): PeopleSyncStateProcessor =
-        peopleSyncStateProcessor.resolveDependency { super.providePeopleSyncStateProcessor(ctx, personRepository) }
+        peopleSyncStateProcessor.resolveDependency { super.providePeopleSyncStateProcessor(ctx, progressCache, personRepository) }
 
     @Singleton
     override fun providePeopleSyncManager(ctx: Context,
@@ -85,11 +86,11 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
         peopleUpSyncWorkersBuilderRule.resolveDependency { super.providePeopleUpSyncWorkerBuilder() }
 
     @Singleton
-    override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncDao =
+    override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncOperationLocalDataSource =
         peopleUpSyncDaoRule.resolveDependency { super.providePeopleUpSyncDao(database) }
 
     @Singleton
-    override fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): DbPeopleDownSyncOperationDao =
+    override fun providePeopleDownSyncDao(database: PeopleSyncStatusDatabase): PeopleDownSyncOperationLocalDataSource =
         peopleDownSyncDaoRule.resolveDependency { super.providePeopleDownSyncDao(database) }
 
     @Singleton
@@ -99,7 +100,7 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
 
     @Singleton
     override fun provideUpSyncScopeRepository(loginInfoManager: LoginInfoManager,
-                                              dao: PeopleUpSyncDao): PeopleUpSyncScopeRepository =
-        peopleUpSyncScopeRepositoryRule.resolveDependency { super.provideUpSyncScopeRepository(loginInfoManager, dao) }
+                                              operationLocalDataSource: PeopleUpSyncOperationLocalDataSource): PeopleUpSyncScopeRepository =
+        peopleUpSyncScopeRepositoryRule.resolveDependency { super.provideUpSyncScopeRepository(loginInfoManager, operationLocalDataSource) }
 
 }

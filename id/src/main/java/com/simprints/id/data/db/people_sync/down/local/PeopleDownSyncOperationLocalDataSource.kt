@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface DbPeopleDownSyncOperationDao {
+interface PeopleDownSyncOperationLocalDataSource {
 
     @Query("select * from DbPeopleDownSyncOperation where id=:key")
     suspend fun getDownSyncOperation(key: DbPeopleDownSyncOperationKey): List<DbPeopleDownSyncOperation>

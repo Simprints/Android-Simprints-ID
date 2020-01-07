@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface PeopleUpSyncDao {
+interface PeopleUpSyncOperationLocalDataSource {
 
     @Query("select * from UpSyncStatus where id LIKE :key")
     suspend fun getUpSyncOperation(key: DbUpSyncOperationKey): DbUpSyncOperation?

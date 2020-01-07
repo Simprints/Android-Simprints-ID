@@ -70,11 +70,11 @@
 //        UnitTestConfig(this, module, dataModule = dataModule).fullSetup()
 //
 //        whenever(syncStatusDatabase.downSyncOperationDao).thenReturn(mock())
-//        whenever(syncStatusDatabase.upSyncDao).thenReturn(mock())
+//        whenever(syncStatusDatabase.upSyncOperationLocalDataSource).thenReturn(mock())
 //
 //        whenever(syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData()).thenReturn(mock())
 //        whenever(syncStatusDatabase.downSyncDao.insertOrReplaceDownSyncStatus(anyNotNull())).then { }
-//        whenever(syncStatusDatabase.upSyncDao.getUpSyncStatus()).thenReturn(mock())
+//        whenever(syncStatusDatabase.upSyncOperationLocalDataSource.getUpSyncStatus()).thenReturn(mock())
 //
 //
 //        runBlocking {

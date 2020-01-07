@@ -11,7 +11,7 @@ import com.simprints.id.commontesttools.DefaultTestConstants.projectSyncScope
 import com.simprints.id.commontesttools.DefaultTestConstants.userSyncScope
 import com.simprints.id.data.db.people_sync.down.domain.*
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.domain.GROUP
@@ -41,7 +41,7 @@ class PeopleDownSyncScopeRepositoryImplTest {
 
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
-    @MockK lateinit var downSyncOperationOperationDaoDb: DbPeopleDownSyncOperationDao
+    @MockK lateinit var downSyncOperationOperationDao: PeopleDownSyncOperationLocalDataSource
     @MockK lateinit var peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder
 
     lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
@@ -49,11 +49,11 @@ class PeopleDownSyncScopeRepositoryImplTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-        peopleDownSyncScopeRepository = spyk(PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationOperationDaoDb, peopleDownSyncOperationBuilder))
+        peopleDownSyncScopeRepository = spyk(PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, downSyncOperationOperationDao, peopleDownSyncOperationBuilder))
         every { loginInfoManager.getSignedInProjectIdOrEmpty() } returns DEFAULT_PROJECT_ID
         every { loginInfoManager.getSignedInUserIdOrEmpty() } returns DEFAULT_USER_ID
         every { preferencesManager.modalities } returns listOf(Modality.FINGER)
-        coEvery { downSyncOperationOperationDaoDb.getDownSyncOperationsAll() } returns getSyncOperationsWithLastResult()
+        coEvery { downSyncOperationOperationDao.getDownSyncOperationsAll() } returns getSyncOperationsWithLastResult()
     }
 
     @Test
@@ -177,7 +177,7 @@ class PeopleDownSyncScopeRepositoryImplTest {
 
         peopleDownSyncScopeRepository.insertOrUpdate(projectSyncOp)
 
-        coVerify { downSyncOperationOperationDaoDb.insertOrReplaceDownSyncOperation(any()) }
+        coVerify { downSyncOperationOperationDao.insertOrReplaceDownSyncOperation(any()) }
     }
 
     @Test
@@ -185,7 +185,7 @@ class PeopleDownSyncScopeRepositoryImplTest {
 
         peopleDownSyncScopeRepository.deleteAll()
 
-        coVerify { downSyncOperationOperationDaoDb.deleteAll() }
+        coVerify { downSyncOperationOperationDao.deleteAll() }
     }
 
     private fun getSyncOperationsWithLastResult() =
