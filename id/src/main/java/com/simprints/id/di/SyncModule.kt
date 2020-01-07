@@ -4,8 +4,8 @@ import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepositoryImpl
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepositoryImpl
@@ -17,8 +17,8 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactoryImpl
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImpl
 import com.simprints.id.services.scheduledSync.people.master.*
@@ -42,11 +42,11 @@ open class SyncModule {
     open fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                             preferencesManager: PreferencesManager,
                                             syncStatusDatabase: PeopleSyncStatusDatabase,
-                                            peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder): PeopleDownSyncScopeRepository =
-        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDataSource, peopleDownSyncOperationBuilder)
+                                            peopleDownSyncOperationFactory: PeopleDownSyncOperationFactory): PeopleDownSyncScopeRepository =
+        PeopleDownSyncScopeRepositoryImpl(loginInfoManager, preferencesManager, syncStatusDatabase.downSyncOperationOperationDataSource, peopleDownSyncOperationFactory)
 
     @Provides
-    open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationBuilder = PeopleDownSyncOperationBuilderImpl()
+    open fun providePeopleDownSyncOperationBuilder(): PeopleDownSyncOperationFactory = PeopleDownSyncOperationFactoryImpl()
 
     @Provides
     open fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
@@ -82,8 +82,8 @@ open class SyncModule {
 
 
     @Provides
-    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
-        PeopleDownSyncWorkersBuilderImpl(downSyncScopeRepository)
+    open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersFactory =
+        PeopleDownSyncWorkersFactoryImpl(downSyncScopeRepository)
 
 
     @Provides

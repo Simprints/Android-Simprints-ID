@@ -5,7 +5,7 @@ import androidx.work.*
 import com.simprints.id.data.analytics.crashreport.CrashReportManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.people.common.SimCoroutineWorker
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
 import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyncWorkersBuilder
 import java.util.*
 import javax.inject.Inject
@@ -13,14 +13,19 @@ import javax.inject.Inject
 class PeopleSyncMasterWorker(private val appContext: Context,
                              params: WorkerParameters) : SimCoroutineWorker(appContext, params) {
 
-    @Inject override lateinit var crashReportManager: CrashReportManager
-    @Inject lateinit var downSyncWorkerBuilder: PeopleDownSyncWorkersBuilder
-    @Inject lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
-    @Inject lateinit var preferenceManager: PreferencesManager
-    @Inject lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
+    @Inject
+    override lateinit var crashReportManager: CrashReportManager
+    @Inject
+    lateinit var downSyncWorkerFactory: PeopleDownSyncWorkersFactory
+    @Inject
+    lateinit var upSyncWorkerBuilder: PeopleUpSyncWorkersBuilder
+    @Inject
+    lateinit var preferenceManager: PreferencesManager
+    @Inject
+    lateinit var peopleSyncProgressCache: PeopleSyncProgressCache
 
     companion object {
-        var MIN_BACKOFF_SECS = 15L
+        const val MIN_BACKOFF_SECS = 15L
 
         const val MASTER_SYNC_SCHEDULERS = "MASTER_SYNC_SCHEDULERS"
         const val MASTER_SYNC_SCHEDULER_ONE_TIME = "MASTER_SYNC_SCHEDULER_ONE_TIME"
@@ -47,8 +52,8 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         UUID.randomUUID().toString()
     }
 
-    private val isPeriodicMasterWorker
-        get() = tags.contains(MASTER_SYNC_SCHEDULER_PERIODIC_TIME)
+    private val isOneTimeMasterWorker
+        get() = tags.contains(MASTER_SYNC_SCHEDULER_ONE_TIME)
 
     override suspend fun doWork(): Result {
         return try {
@@ -74,12 +79,16 @@ class PeopleSyncMasterWorker(private val appContext: Context,
         }
     }
 
-    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> =
-        if (preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == false && isPeriodicMasterWorker) {
-            emptyList()
+    private suspend fun downSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> {
+        val backgroundOnForPeriodicSync = preferenceManager.peopleDownSyncTriggers[PeopleDownSyncTrigger.PERIODIC_BACKGROUND] == true
+        val downSyncChainRequired = isOneTimeMasterWorker || backgroundOnForPeriodicSync
+
+        return if (downSyncChainRequired) {
+            downSyncWorkerFactory.buildDownSyncWorkerChain(uniqueSyncID)
         } else {
-            downSyncWorkerBuilder.buildDownSyncWorkerChain(uniqueSyncID)
+            emptyList()
         }
+    }
 
     private fun upSyncWorkersChain(uniqueSyncID: String): List<WorkRequest> =
         upSyncWorkerBuilder.buildUpSyncWorkerChain(uniqueSyncID)

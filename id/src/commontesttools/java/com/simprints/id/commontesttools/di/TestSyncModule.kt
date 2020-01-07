@@ -3,7 +3,7 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
 import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
 import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
@@ -14,7 +14,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
@@ -43,8 +43,8 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
     override fun provideDownSyncScopeRepository(loginInfoManager: LoginInfoManager,
                                                 preferencesManager: PreferencesManager,
                                                 syncStatusDatabase: PeopleSyncStatusDatabase,
-                                                peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder): PeopleDownSyncScopeRepository =
-        peopleDownSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase, peopleDownSyncOperationBuilder) }
+                                                peopleDownSyncOperationFactory: PeopleDownSyncOperationFactory): PeopleDownSyncScopeRepository =
+        peopleDownSyncScopeRepositoryRule.resolveDependency { super.provideDownSyncScopeRepository(loginInfoManager, preferencesManager, syncStatusDatabase, peopleDownSyncOperationFactory) }
 
     @Singleton
     override fun providePeopleDownSyncDownloaderTask(personLocalDataSource: PersonLocalDataSource,
@@ -78,7 +78,7 @@ class TestSyncModule(private val peopleDownSyncScopeRepositoryRule: DependencyRu
         syncManagerRule.resolveDependency { super.provideSyncManager(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository) }
 
     @Singleton
-    override fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =
+    override fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersFactory =
         peopleDownSyncWorkersBuilderRule.resolveDependency { super.provideDownSyncWorkerBuilder(downSyncScopeRepository) }
 
     @Singleton
