@@ -7,10 +7,10 @@ import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_MODULE_ID_2
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_PROJECT_ID
 import com.simprints.id.commontesttools.DefaultTestConstants.DEFAULT_USER_ID
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
 import com.simprints.id.domain.modality.Modes
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_DOWN_MASTER_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_MASTER_SYNC_ID
@@ -25,9 +25,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
-class PeopleDownSyncWorkersBuilderImplTest {
+class PeopleDownSyncWorkersFactoryImplTest {
 
-    val builder = PeopleDownSyncOperationBuilderImpl()
+    val builder = PeopleDownSyncOperationFactoryImpl()
     private val modes = listOf(Modes.FINGERPRINT, Modes.FACE)
     private val opsForProjectDownSync = listOf(builder.buildProjectSyncOperation(DEFAULT_PROJECT_ID, modes, null))
     private val opsForUserDownSync = listOf(builder.buildUserSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, modes, null))
@@ -35,20 +35,20 @@ class PeopleDownSyncWorkersBuilderImplTest {
         builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID, modes, null),
         builder.buildModuleSyncOperation(DEFAULT_PROJECT_ID, DEFAULT_MODULE_ID_2, modes, null))
 
-    private lateinit var peopleDownSyncWorkersBuilder: PeopleDownSyncWorkersBuilder
+    private lateinit var peopleDownSyncWorkersFactory: PeopleDownSyncWorkersFactory
     private lateinit var peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository
 
     @Before
     fun setUp() {
         peopleDownSyncScopeRepository = mockk(relaxed = true)
-        peopleDownSyncWorkersBuilder = PeopleDownSyncWorkersBuilderImpl(peopleDownSyncScopeRepository)
+        peopleDownSyncWorkersFactory = PeopleDownSyncWorkersFactoryImpl(peopleDownSyncScopeRepository)
     }
 
     @Test
     fun builder_forProjectDownSync_shouldReturnTheRightWorkers() = runBlocking {
         coEvery { peopleDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
 
-        val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = peopleDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(2)
@@ -58,7 +58,7 @@ class PeopleDownSyncWorkersBuilderImplTest {
     fun builder_forUserDownSync_shouldReturnTheRightWorkers() = runBlocking {
         coEvery { peopleDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForUserDownSync
 
-        val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = peopleDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(2)
@@ -68,7 +68,7 @@ class PeopleDownSyncWorkersBuilderImplTest {
     fun builder_forModuleDownSync_shouldReturnTheRightWorkers() = runBlocking {
         coEvery { peopleDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForModuleDownSync
 
-        val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain("")
+        val chain = peopleDownSyncWorkersFactory.buildDownSyncWorkerChain("")
         chain.assertNumberOfDownSyncDownloaderWorker(2)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
         assertThat(chain.size).isEqualTo(3)
@@ -78,7 +78,7 @@ class PeopleDownSyncWorkersBuilderImplTest {
     fun builder_periodicDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
         coEvery { peopleDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
         val uniqueSyncId = "uniqueSyncId"
-        val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain(uniqueSyncId)
+        val chain = peopleDownSyncWorkersFactory.buildDownSyncWorkerChain(uniqueSyncId)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
         chain.first { it.tags.contains(PeopleDownSyncDownloaderWorker::class.qualifiedName) }.assertPeopleDownSyncDownloaderWorkerTagsForPeriodic()
@@ -89,7 +89,7 @@ class PeopleDownSyncWorkersBuilderImplTest {
     fun builder_oneTimeDownSyncWorkers_shouldHaveTheRightTags() = runBlocking {
         coEvery { peopleDownSyncScopeRepository.getDownSyncOperations(any()) } returns opsForProjectDownSync
 
-        val chain = peopleDownSyncWorkersBuilder.buildDownSyncWorkerChain(null)
+        val chain = peopleDownSyncWorkersFactory.buildDownSyncWorkerChain(null)
         chain.assertNumberOfDownSyncDownloaderWorker(1)
         chain.assertPeopleDownSyncCountWorkerTagsForPeriodic(1)
         chain.first { it.tags.contains(PeopleDownSyncDownloaderWorker::class.qualifiedName) }.assertPeopleDownSyncDownloaderWorkerTagsForOneTime()

@@ -2,7 +2,7 @@ package com.simprints.id.data.db.people_sync.down.domain
 
 import com.simprints.id.domain.modality.Modes
 
-interface PeopleDownSyncOperationBuilder {
+interface PeopleDownSyncOperationFactory {
 
     fun buildProjectSyncOperation(
         projectId: String,

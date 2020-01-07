@@ -15,7 +15,7 @@ import com.simprints.id.data.db.common.FirebaseManagerImpl
 import com.simprints.id.data.db.common.RemoteDbManager
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilderImpl
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactoryImpl
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationResult.DownSyncState.COMPLETE
 import com.simprints.id.data.db.person.domain.Person
@@ -54,7 +54,7 @@ import kotlin.math.ceil
 @Config(application = TestApplication::class, shadows = [ShadowAndroidXMultiDex::class])
 class PeopleDownSyncDownloaderTaskImplTest {
 
-    val builder = PeopleDownSyncOperationBuilderImpl()
+    val builder = PeopleDownSyncOperationFactoryImpl()
     private val modes = listOf(Modes.FACE, Modes.FINGERPRINT)
     private val projectSyncOp = PeopleDownSyncOperation(
         DEFAULT_PROJECT_ID,
