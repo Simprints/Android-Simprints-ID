@@ -17,7 +17,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     @Inject lateinit var preferencesManager: PreferencesManager
     @Inject lateinit var signerManager: SignerManager
-    @Inject lateinit var syncSchedulerHelper: SyncManager
+    @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var longConsentManager: LongConsentManager
@@ -86,7 +86,7 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
 
     override suspend fun logout() {
         signerManager.signOut()
-        syncSchedulerHelper.cancelBackgroundSyncs()
+        syncManager.cancelBackgroundSyncs()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
 
