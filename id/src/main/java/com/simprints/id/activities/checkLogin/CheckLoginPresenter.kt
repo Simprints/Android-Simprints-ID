@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.safe.secure.DifferentProjectIdSignedInExcepti
 import com.simprints.id.exceptions.safe.secure.DifferentUserIdSignedInException
 import com.simprints.id.exceptions.safe.secure.NotSignedInException
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.TimeHelper
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,7 +28,6 @@ abstract class CheckLoginPresenter(
     @Inject lateinit var remoteDbManager: RemoteDbManager
     @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
     @Inject lateinit var syncManager: SyncManager
-    @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     init {
         component.inject(this)
@@ -47,7 +45,6 @@ abstract class CheckLoginPresenter(
                 is DifferentUserIdSignedInException -> view.openAlertActivityForError(DIFFERENT_USER_ID_SIGNED_IN)
                 is NotSignedInException -> handleNotSignedInUser().also {
                     syncManager.cancelBackgroundSyncs()
-                    imageUpSyncScheduler.cancelImageUpSync()
                 }
                 else -> {
                     Timber.e(t)

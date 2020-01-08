@@ -129,21 +129,12 @@ class SettingsAboutPresenterTest {
     }
 
     @Test
-    fun presenterLogout_downSyncWorkersAreCancelled() = runBlockingTest {
+    fun presenterLogout_backgroundSyncWorkersAreCancelled() = runBlockingTest {
         mockDepsForLogout(presenter)
 
         presenter.logout()
 
         coVerify { presenter.syncSchedulerHelper.cancelBackgroundSyncs() }
-    }
-
-    @Test
-    fun presenterLogout_imageUpSyncWorkersAreCancelled() = runBlockingTest {
-        mockDepsForLogout(presenter)
-
-        presenter.logout()
-
-        verify(exactly = 1) { presenter.imageUpSyncScheduler.cancelImageUpSync() }
     }
 
     @Test
@@ -169,6 +160,5 @@ class SettingsAboutPresenterTest {
         presenter.syncSchedulerHelper = mockk(relaxed = true)
         presenter.longConsentManager = mockk(relaxed = true)
         presenter.sessionEventManager = mockk(relaxed = true)
-        presenter.imageUpSyncScheduler = mockk(relaxed = true)
     }
 }

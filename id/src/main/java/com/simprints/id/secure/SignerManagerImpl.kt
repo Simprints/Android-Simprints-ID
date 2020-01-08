@@ -6,7 +6,6 @@ import com.simprints.id.data.db.project.ProjectRepository
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.extensions.trace
 import io.reactivex.Completable
@@ -16,8 +15,7 @@ open class SignerManagerImpl(
     private val remote: RemoteDbManager,
     private val loginInfoManager: LoginInfoManager,
     private val preferencesManager: PreferencesManager,
-    private val syncManager: SyncManager,
-    private val imageUpSyncScheduler: ImageUpSyncScheduler
+    private val syncManager: SyncManager
 ) : SignerManager {
 
     override fun signIn(projectId: String, userId: String, token: Token): Completable =
@@ -28,7 +26,6 @@ open class SignerManagerImpl(
                     ?: throw Exception("project not found")
             })
             .andThen(scheduleSyncs(projectId, userId))
-            .andThen(scheduleImageUpSync())
             .trace("signIn")
 
     private fun storeCredentials(userId: String, projectId: String) =
@@ -42,10 +39,6 @@ open class SignerManagerImpl(
             syncManager.scheduleBackgroundSyncs()
         }
 
-    private fun scheduleImageUpSync() = Completable.fromAction {
-        imageUpSyncScheduler.scheduleImageUpSync()
-    }
-
     override suspend fun signOut() {
         //TODO: move peopleUpSyncMaster to SyncScheduler and call .pause in CheckLoginPresenter.checkSignedInOrThrow
         //If you user clears the data (then doesn't call signout), workers still stay scheduled.
@@ -54,7 +47,6 @@ open class SignerManagerImpl(
         syncManager.cancelBackgroundSyncs()
         syncManager.deleteLastSyncInfo()
         preferencesManager.clearAllSharedPreferencesExceptRealmKeys()
-        imageUpSyncScheduler.cancelImageUpSync()
     }
 
 }
