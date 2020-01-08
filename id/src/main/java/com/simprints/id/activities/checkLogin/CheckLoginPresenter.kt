@@ -21,24 +21,15 @@ abstract class CheckLoginPresenter(
     private val view: CheckLoginContract.View,
     component: AppComponent) {
 
-    @Inject
-    lateinit var preferencesManager: PreferencesManager
-    @Inject
-    lateinit var timeHelper: TimeHelper
-    @Inject
-    lateinit var analyticsManager: AnalyticsManager
-    @Inject
-    lateinit var crashReportManager: CrashReportManager
-    @Inject
-    lateinit var loginInfoManager: LoginInfoManager
-    @Inject
-    lateinit var remoteDbManager: RemoteDbManager
-    @Inject
-    lateinit var secureDataManager: SecureLocalDbKeyProvider
-    @Inject
-    lateinit var syncManager: SyncManager
-    @Inject
-    lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
+    @Inject lateinit var preferencesManager: PreferencesManager
+    @Inject lateinit var timeHelper: TimeHelper
+    @Inject lateinit var analyticsManager: AnalyticsManager
+    @Inject lateinit var crashReportManager: CrashReportManager
+    @Inject lateinit var loginInfoManager: LoginInfoManager
+    @Inject lateinit var remoteDbManager: RemoteDbManager
+    @Inject lateinit var secureDataManager: SecureLocalDbKeyProvider
+    @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     init {
         component.inject(this)
