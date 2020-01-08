@@ -23,12 +23,12 @@ class OrchestratorActivity : AppCompatActivity() {
 
     @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
     @Inject lateinit var orchestratorViewModelFactory: OrchestratorViewModelFactory
-    lateinit var appRequest: AppRequest
-
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var timeHelper: TimeHelper
     @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
+
+    lateinit var appRequest: AppRequest
 
     private var newActivity = true
 
