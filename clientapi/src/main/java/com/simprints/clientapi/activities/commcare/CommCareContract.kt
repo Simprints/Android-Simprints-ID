@@ -17,7 +17,7 @@ interface CommCareContract {
 
         fun returnVerification(confidence: Int, tier: Tier, guid: String, sessionId: String, flowCompletedCheck: Boolean)
 
-        fun returnExitForms(reason: String, extra: String, flowCompletedCheck: Boolean)
+        fun returnExitForms(reason: String, extra: String, sessionId: String, flowCompletedCheck: Boolean)
 
         fun returnConfirmation(flowCompletedCheck: Boolean)
 

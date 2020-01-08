@@ -1,5 +1,6 @@
 package com.simprints.clientapi.activities.odk
 
+import com.nhaarman.mockitokotlin2.eq
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_CONFIRM_IDENTITY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_IDENTIFY
 import com.simprints.clientapi.activities.odk.OdkPresenter.Companion.ACTION_REGISTER
@@ -140,11 +141,13 @@ class OdkPresenterTest {
     @Test
     fun handleResponseError_ShouldCallActionError() {
         val error = ErrorResponse(ErrorResponse.Reason.INVALID_USER_ID)
-        OdkPresenter(view, "", mock(), mock()).apply {
-            handleResponseError(error)
-        }
+        val sessionId = UUID.randomUUID().toString()
+        val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
+        wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
-        verifyOnce(view) { returnErrorToClient(error, RETURN_FOR_FLOW_COMPLETED_CHECK) }
+        OdkPresenter(view, "", sessionEventsManagerMock, mock()).handleResponseError(error)
+
+        verifyOnce(view) { returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
     }
 
     @Test
