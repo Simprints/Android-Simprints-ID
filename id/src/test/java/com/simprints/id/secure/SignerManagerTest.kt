@@ -9,7 +9,6 @@ import com.simprints.id.data.db.project.domain.Project
 import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.secure.models.Token
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.tools.extensions.trace
 import com.simprints.testtools.common.syntax.awaitAndAssertSuccess
@@ -28,7 +27,6 @@ class SignerManagerTest {
     @MockK lateinit var loginInfoManager: LoginInfoManager
     @MockK lateinit var preferencesManager: PreferencesManager
     @MockK lateinit var syncManager: SyncManager
-    @MockK lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
     private lateinit var signerManager: SignerManagerImpl
 
     private val token = Token("some_token")
@@ -42,8 +40,7 @@ class SignerManagerTest {
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            syncManager,
-            imageUpSyncScheduler
+            syncManager
         )
 
         mockkStatic("com.simprints.id.tools.extensions.PerformanceMonitoring_extKt")
@@ -145,17 +142,6 @@ class SignerManagerTest {
     }
 
     @Test
-    fun signIn_shouldScheduleImageUpSync() {
-        mockRemoteSignedIn()
-        mockStoreCredentialsLocally()
-        mockFetchingProjectInto()
-
-        signIn()
-
-        verify { imageUpSyncScheduler.scheduleImageUpSync() }
-    }
-
-    @Test
     fun signOut_shouldRemoveAnyState() = runBlockingTest {
         every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
 
@@ -166,15 +152,6 @@ class SignerManagerTest {
         verifyRemoteManagerGotSignedOut()
         verifyLastSyncInfoGotDeleted()
         verifyAllSharedPreferencesExceptRealmKeysGotCleared()
-    }
-
-    @Test
-    fun signOut_shouldCancelImageUpSync() = runBlockingTest {
-        every { loginInfoManager.signedInProjectId } returns DEFAULT_PROJECT_ID
-
-        signerManager.signOut()
-
-        verify { imageUpSyncScheduler.cancelImageUpSync() }
     }
 
     private fun signIn() = signerManager.signIn(DEFAULT_PROJECT_ID, DEFAULT_USER_ID, token).test()

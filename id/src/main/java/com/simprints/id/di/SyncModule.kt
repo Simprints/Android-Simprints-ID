@@ -17,6 +17,7 @@ import com.simprints.id.data.loginInfo.LoginInfoManager
 import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.SyncSchedulerImpl
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
 import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilderImpl
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
@@ -72,13 +73,21 @@ open class SyncModule {
         PeopleSyncManagerImpl(ctx, peopleSyncStateProcessor)
 
     @Provides
-    open fun provideSyncManager(preferencesManager: PreferencesManager,
-                                sessionEventsSyncManager: SessionEventsSyncManager,
-                                peopleSyncManager: PeopleSyncManager,
-                                peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
-                                peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository): SyncManager =
-        SyncSchedulerImpl(preferencesManager, sessionEventsSyncManager, peopleSyncManager, peopleUpSyncScopeRepository, peopleDownSyncScopeRepository)
-
+    open fun provideSyncManager(
+        preferencesManager: PreferencesManager,
+        sessionEventsSyncManager: SessionEventsSyncManager,
+        peopleSyncManager: PeopleSyncManager,
+        peopleUpSyncScopeRepository: PeopleUpSyncScopeRepository,
+        peopleDownSyncScopeRepository: PeopleDownSyncScopeRepository,
+        imageUpSyncScheduler: ImageUpSyncScheduler
+    ): SyncManager = SyncSchedulerImpl(
+        preferencesManager,
+        sessionEventsSyncManager,
+        peopleSyncManager,
+        peopleUpSyncScopeRepository,
+        peopleDownSyncScopeRepository,
+        imageUpSyncScheduler
+    )
 
     @Provides
     open fun provideDownSyncWorkerBuilder(downSyncScopeRepository: PeopleDownSyncScopeRepository): PeopleDownSyncWorkersBuilder =

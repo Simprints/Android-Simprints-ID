@@ -92,15 +92,13 @@ open class AppModule {
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        syncManager: SyncManager,
-        imageUpSyncScheduler: ImageUpSyncScheduler
+        syncManager: SyncManager
     ): SignerManager = SignerManagerImpl(
         projectRepository,
         remoteDbManager,
         loginInfoManager,
         preferencesManager,
-        syncManager,
-        imageUpSyncScheduler
+        syncManager
     )
 
     @Provides

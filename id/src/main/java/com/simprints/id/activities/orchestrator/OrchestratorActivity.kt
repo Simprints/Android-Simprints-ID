@@ -12,7 +12,6 @@ import com.simprints.id.exceptions.unexpected.InvalidAppRequest
 import com.simprints.id.orchestrator.steps.Step
 import com.simprints.id.orchestrator.steps.fromDomainToModuleApi
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.tools.AndroidResourcesHelper
 import com.simprints.id.tools.TimeHelper
 import com.simprints.moduleapi.app.responses.IAppResponse
@@ -26,7 +25,6 @@ class OrchestratorActivity : AppCompatActivity() {
     @Inject lateinit var sessionEventsManager: SessionEventsManager
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var timeHelper: TimeHelper
-    @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     lateinit var appRequest: AppRequest
 
@@ -66,7 +64,6 @@ class OrchestratorActivity : AppCompatActivity() {
 
         vm.startModalityFlow(appRequest)
         syncManager.scheduleBackgroundSyncs()
-        imageUpSyncScheduler.scheduleImageUpSync()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

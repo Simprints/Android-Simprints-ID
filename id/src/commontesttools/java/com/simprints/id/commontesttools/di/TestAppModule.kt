@@ -22,7 +22,6 @@ import com.simprints.id.di.AppModule
 import com.simprints.id.secure.SecureApiInterface
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import com.simprints.id.services.scheduledSync.sessionSync.SessionEventsSyncManager
 import com.simprints.id.tools.RandomGenerator
 import com.simprints.id.tools.TimeHelper
@@ -66,16 +65,14 @@ class TestAppModule(
         remoteDbManager: RemoteDbManager,
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
-        syncManager: SyncManager,
-        imageUpSyncScheduler: ImageUpSyncScheduler
+        syncManager: SyncManager
     ): SignerManager = dbManagerRule.resolveDependency {
         super.provideSignerManager(
             projectRepository,
             remoteDbManager,
             loginInfoManager,
             preferencesManager,
-            syncManager,
-            imageUpSyncScheduler
+            syncManager
         )
     }
 

@@ -9,7 +9,6 @@ import com.simprints.id.di.AppComponent
 import com.simprints.id.domain.GROUP
 import com.simprints.id.secure.SignerManager
 import com.simprints.id.services.scheduledSync.SyncManager
-import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
 import javax.inject.Inject
 
 class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
@@ -22,7 +21,6 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     @Inject lateinit var sessionEventManager: SessionEventsManager
     @Inject lateinit var recentEventsManager: RecentEventsPreferencesManager
     @Inject lateinit var longConsentManager: LongConsentManager
-    @Inject lateinit var imageUpSyncScheduler: ImageUpSyncScheduler
 
     init {
         component.inject(this)
@@ -89,7 +87,6 @@ class SettingsAboutPresenter(private val view: SettingsAboutContract.View,
     override suspend fun logout() {
         signerManager.signOut()
         syncSchedulerHelper.cancelBackgroundSyncs()
-        imageUpSyncScheduler.cancelImageUpSync()
         longConsentManager.deleteLongConsents()
         sessionEventManager.signOut()
 
