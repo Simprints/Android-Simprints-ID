@@ -6,15 +6,11 @@ import androidx.security.crypto.EncryptedFile.FileEncryptionScheme.AES256_GCM_HK
 import androidx.security.crypto.MasterKeys
 import androidx.security.crypto.MasterKeys.AES256_GCM_SPEC
 import com.simprints.core.images.SecuredImageRef
-import com.simprints.id.core.images.Hasher
 import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 
-class ImageLocalDataSourceImpl(
-    val ctx: Context,
-    private val hasher: Hasher = Hasher()
-) : ImageLocalDataSource {
+class ImageLocalDataSourceImpl(val ctx: Context) : ImageLocalDataSource {
 
     companion object {
         private const val IMAGES_FOLDER = "images"
@@ -30,10 +26,6 @@ class ImageLocalDataSourceImpl(
     }
 
     private val masterKeyAlias = MasterKeys.getOrCreate(AES256_GCM_SPEC)
-
-    override fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef? {
-        return storeImage(image, hasher.hash(template.toString()))
-    }
 
     override fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef? {
         val file = File(imageFolderPath, filename)

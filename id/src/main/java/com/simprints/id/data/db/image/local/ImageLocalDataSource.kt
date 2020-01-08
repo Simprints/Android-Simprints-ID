@@ -5,7 +5,6 @@ import java.io.FileInputStream
 
 interface ImageLocalDataSource {
 
-    fun storeImageForEnrol(image: ByteArray, template: ByteArray): SecuredImageRef?
     fun storeImage(imageBytes: ByteArray, filename: String): SecuredImageRef?
     fun readImage(path: SecuredImageRef): FileInputStream?
     fun listImages(): List<SecuredImageRef>
