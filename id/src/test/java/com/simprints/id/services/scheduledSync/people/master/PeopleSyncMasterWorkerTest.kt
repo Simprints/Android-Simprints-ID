@@ -7,7 +7,7 @@ import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.common.truth.Truth.assertThat
 import com.simprints.id.data.prefs.PreferencesManager
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.master.PeopleDownSyncTrigger.PERIODIC_BACKGROUND
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.MASTER_SYNC_SCHEDULER_ONE_TIME
@@ -59,7 +59,7 @@ class PeopleSyncMasterWorkerTest {
         with(masterWorker) {
             crashReportManager = mockk(relaxed = true)
             resultSetter = mockk(relaxed = true)
-            downSyncWorkerBuilder = mockk(relaxed = true)
+            downSyncWorkerFactory = mockk(relaxed = true)
             upSyncWorkerBuilder = mockk(relaxed = true)
             peopleSyncProgressCache = mockk(relaxed = true)
         }
@@ -88,7 +88,7 @@ class PeopleSyncMasterWorkerTest {
             masterWorker.doWork()
 
             assertWorkerOutput(uniqueSyncId)
-            coVerify(exactly = 0) { downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
+            coVerify(exactly = 0) { downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
             coVerify(exactly = 1) { upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) }
             assertOnlyUpSyncWorkersAreEnqueued(uniqueSyncId)
         }
@@ -121,7 +121,7 @@ class PeopleSyncMasterWorkerTest {
 
     @Test
     fun doWork_errorOccurs_shouldWorkerFail() = runBlockingTest {
-        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
+        coEvery { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) } throws Throwable("IO Error")
 
         masterWorker.doWork()
 
@@ -156,12 +156,12 @@ class PeopleSyncMasterWorkerTest {
             .build()
 
     private fun assertSyncChainWasBuilt(nTimes: Int = 1) {
-        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
-        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) }
+        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
+        coVerify(exactly = nTimes) { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) }
     }
 
     private fun prepareSyncWorkers(uniqueSyncId: String) {
-        coEvery { masterWorker.downSyncWorkerBuilder.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
+        coEvery { masterWorker.downSyncWorkerFactory.buildDownSyncWorkerChain(any()) } returns buildDownSyncWorkers(uniqueSyncId)
         coEvery { masterWorker.upSyncWorkerBuilder.buildUpSyncWorkerChain(any()) } returns buildUpSyncWorkers(uniqueSyncId)
     }
 

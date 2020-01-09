@@ -3,10 +3,10 @@ package com.simprints.id.commontesttools.di
 import android.content.Context
 import com.simprints.id.data.db.people_sync.PeopleSyncStatusDatabase
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
-import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationBuilder
-import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationDao
+import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationFactory
+import com.simprints.id.data.db.people_sync.down.local.PeopleDownSyncOperationLocalDataSource
 import com.simprints.id.data.db.people_sync.up.PeopleUpSyncScopeRepository
-import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncDao
+import com.simprints.id.data.db.people_sync.up.local.PeopleUpSyncOperationLocalDataSource
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
 import com.simprints.id.data.db.person.remote.PersonRemoteDataSource
@@ -15,7 +15,7 @@ import com.simprints.id.data.prefs.PreferencesManager
 import com.simprints.id.di.SyncModule
 import com.simprints.id.services.scheduledSync.SyncManager
 import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncScheduler
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTask
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncManager
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncProgressCache
@@ -47,14 +47,13 @@ class TestSyncModule(
         loginInfoManager: LoginInfoManager,
         preferencesManager: PreferencesManager,
         syncStatusDatabase: PeopleSyncStatusDatabase,
-        peopleDownSyncOperationBuilder: PeopleDownSyncOperationBuilder
+        peopleDownSyncOperationFactory: PeopleDownSyncOperationFactory
     ): PeopleDownSyncScopeRepository = peopleDownSyncScopeRepositoryRule.resolveDependency {
         super.provideDownSyncScopeRepository(
             loginInfoManager,
             preferencesManager,
             syncStatusDatabase,
-            peopleDownSyncOperationBuilder
-        )
+            peopleDownSyncOperationFactory)
     }
 
     @Singleton
@@ -117,7 +116,7 @@ class TestSyncModule(
     @Singleton
     override fun provideDownSyncWorkerBuilder(
         downSyncScopeRepository: PeopleDownSyncScopeRepository
-    ): PeopleDownSyncWorkersBuilder = peopleDownSyncWorkersBuilderRule.resolveDependency {
+    ): PeopleDownSyncWorkersFactory = peopleDownSyncWorkersBuilderRule.resolveDependency {
         super.provideDownSyncWorkerBuilder(downSyncScopeRepository)
     }
 
@@ -128,13 +127,13 @@ class TestSyncModule(
         }
 
     @Singleton
-    override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncDao =
+    override fun providePeopleUpSyncDao(database: PeopleSyncStatusDatabase): PeopleUpSyncOperationLocalDataSource =
         peopleUpSyncDaoRule.resolveDependency { super.providePeopleUpSyncDao(database) }
 
     @Singleton
     override fun providePeopleDownSyncDao(
         database: PeopleSyncStatusDatabase
-    ): DbPeopleDownSyncOperationDao = peopleDownSyncDaoRule.resolveDependency {
+    ): PeopleDownSyncOperationLocalDataSource = peopleDownSyncDaoRule.resolveDependency {
         super.providePeopleDownSyncDao(database)
     }
 
@@ -149,9 +148,9 @@ class TestSyncModule(
     @Singleton
     override fun provideUpSyncScopeRepository(
         loginInfoManager: LoginInfoManager,
-        dao: PeopleUpSyncDao
+        operationLocalDataSource: PeopleUpSyncOperationLocalDataSource
     ): PeopleUpSyncScopeRepository = peopleUpSyncScopeRepositoryRule.resolveDependency {
-        super.provideUpSyncScopeRepository(loginInfoManager, dao)
+        super.provideUpSyncScopeRepository(loginInfoManager, operationLocalDataSource)
     }
 
 }

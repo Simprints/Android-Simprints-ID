@@ -3,7 +3,7 @@ package com.simprints.id.services.scheduledSync.people.down.controllers
 import androidx.work.WorkRequest
 import com.simprints.id.services.scheduledSync.people.master.PeopleSyncMasterWorker.Companion.TAG_PEOPLE_SYNC_ALL_WORKERS
 
-interface PeopleDownSyncWorkersBuilder {
+interface PeopleDownSyncWorkersFactory {
 
     companion object {
 
