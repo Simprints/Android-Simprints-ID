@@ -38,7 +38,7 @@ def androidx = [
         fragment        : "androidx.fragment:fragment:1.1.0-alpha04",
         preference      : "androidx.preference:preference:1.1.0-alpha03"
     ],
-    security: ['androidx.security:security-crypto:1.0.0-alpha02']
+    security : ['androidx.security:security-crypto:1.0.0-alpha02']
 ]
 
 def support = [
@@ -114,6 +114,12 @@ def koin = [
     core_ext : "org.koin:koin-core-ext:$koin_version",
     android  : "org.koin:koin-android:$koin_version",
     viewmodel: "org.koin:koin-android-viewmodel:$koin_version"
+]
+
+// RootBeer (root detection)
+def rootbeer_version = "0.0.7"
+def rootbeer = [
+    core: "com.scottyab:rootbeer-lib:$rootbeer_version"
 ]
 
 def mockito_version = "2.24.0"
@@ -199,5 +205,6 @@ ext.deps = [
     realm          : realm,
     commons_io     : commons_io,
     koin           : koin,
-    fuzzywuzzy     : fuzzywuzzy
+    fuzzywuzzy     : fuzzywuzzy,
+    rootbeer       : rootbeer
 ]
