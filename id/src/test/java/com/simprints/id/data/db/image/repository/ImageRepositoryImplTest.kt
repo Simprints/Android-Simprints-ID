@@ -5,104 +5,86 @@ import com.simprints.core.images.SecuredImageRef
 import com.simprints.id.data.db.image.local.ImageLocalDataSource
 import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
 import com.simprints.id.data.db.image.remote.UploadResult
-import com.simprints.testtools.common.syntax.whenever
-import com.simprints.testtools.common.syntax.wheneverOnSuspend
-import kotlinx.coroutines.runBlocking
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class ImageRepositoryImplTest {
 
-    @Mock
-    lateinit var localDataSource: ImageLocalDataSource
-
-    @Mock
-    lateinit var remoteDataSource: ImageRemoteDataSource
+    @MockK lateinit var localDataSource: ImageLocalDataSource
+    @MockK lateinit var remoteDataSource: ImageRemoteDataSource
 
     private lateinit var repository: ImageRepository
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this)
         repository = ImageRepositoryImpl(localDataSource, remoteDataSource)
         initialiseMocks()
     }
 
     @Test
-    fun shouldDeleteExistingImages() {
-        val deletedSuccessfully = runBlocking {
-            repository.deleteImage(SecuredImageRef(VALID_PATH))
-        }
+    fun withEmptyList_shouldConsiderUploadOperationSuccessful() = runBlockingTest {
+        every { localDataSource.listImages() } returns emptyList()
 
-        assertThat(deletedSuccessfully).isTrue()
+        val successful = repository.uploadStoredImagesAndDelete()
+
+        assertThat(successful).isTrue()
     }
 
     @Test
-    fun shouldNotDeleteNonExistingImages() {
-        val deletedSuccessfully = runBlocking {
-            repository.deleteImage(SecuredImageRef(INVALID_PATH))
-        }
+    fun withAllFilesValid_shouldUploadAndDeleteSuccessfully() = runBlockingTest {
+        configureLocalImageFiles(includeInvalidFile = false)
 
-        assertThat(deletedSuccessfully).isFalse()
+        val successful = repository.uploadStoredImagesAndDelete()
+
+        assertThat(successful).isTrue()
     }
 
     @Test
-    fun shouldUploadExistingImages() {
-        configureLocalImageFiles()
-        val uploads = runBlocking {
-            repository.uploadImages()
-        }
+    fun withNotAllFilesValid_shouldNotConsiderUploadOperationSuccessful() = runBlockingTest {
+        configureLocalImageFiles(includeInvalidFile = true)
 
-        val allUploadsSuccessful = uploads.all { it.isSuccessful() }
-        assertThat(allUploadsSuccessful).isTrue()
-    }
+        val successful = repository.uploadStoredImagesAndDelete()
 
-    @Test
-    fun shouldNotUploadNonExistingImages() {
-        configureLocalImageFiles(numberOfInvalidFiles = 2)
-        val uploads = runBlocking {
-            repository.uploadImages()
-        }
-
-        val allUploadsSuccessful = uploads.all { it.isSuccessful() }
-        val failedUploadsCount = uploads.count { !it.isSuccessful() }
-
-        assertThat(allUploadsSuccessful).isFalse()
-        assertThat(failedUploadsCount).isEqualTo(2)
+        assertThat(successful).isFalse()
     }
 
     private fun initialiseMocks() {
-        whenever(localDataSource) {
-            deleteImage(SecuredImageRef(VALID_PATH))
-        } thenReturn true
+        every {
+            localDataSource.deleteImage(SecuredImageRef(VALID_PATH))
+        } returns true
 
-        whenever(localDataSource) {
-            deleteImage(SecuredImageRef(INVALID_PATH))
-        } thenReturn false
+        every {
+            localDataSource.deleteImage(SecuredImageRef(INVALID_PATH))
+        } returns false
 
-        wheneverOnSuspend(remoteDataSource) {
-            uploadImage(SecuredImageRef(VALID_PATH))
-        } thenOnBlockingReturn UploadResult(SecuredImageRef(VALID_PATH), UploadResult.Status.SUCCESSFUL)
+        coEvery {
+            remoteDataSource.uploadImage(SecuredImageRef(VALID_PATH))
+        } returns UploadResult(SecuredImageRef(VALID_PATH), UploadResult.Status.SUCCESSFUL)
 
-        wheneverOnSuspend(remoteDataSource) {
-            uploadImage(SecuredImageRef(INVALID_PATH))
-        } thenOnBlockingReturn UploadResult(SecuredImageRef(INVALID_PATH), UploadResult.Status.FAILED)
+        coEvery {
+            remoteDataSource.uploadImage(SecuredImageRef(INVALID_PATH))
+        } returns UploadResult(SecuredImageRef(INVALID_PATH), UploadResult.Status.FAILED)
     }
 
-    private fun configureLocalImageFiles(numberOfInvalidFiles: Int = 0) {
+    private fun configureLocalImageFiles(includeInvalidFile: Boolean) {
         val files = mutableListOf(
             SecuredImageRef(VALID_PATH),
             SecuredImageRef(VALID_PATH),
             SecuredImageRef(VALID_PATH)
         ).apply {
-            repeat(numberOfInvalidFiles) {
+            if (includeInvalidFile)
                 add(SecuredImageRef(INVALID_PATH))
-            }
         }
 
-        whenever(localDataSource.listImages()) thenReturn files
+        every { localDataSource.listImages() } returns files
     }
 
     companion object {
