@@ -1,4 +1,4 @@
-package com.simprints.id.tools
+package com.simprints.clientapi.tools
 
 import android.content.Context
 import com.scottyab.rootbeer.RootBeer
