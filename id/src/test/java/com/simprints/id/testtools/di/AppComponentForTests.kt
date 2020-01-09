@@ -17,6 +17,7 @@ import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyn
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImplTest
 import dagger.BindsInstance
 import dagger.Component
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Singleton
@@ -49,5 +50,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(peopleDownSyncCountWorkerTest: PeopleDownSyncCountWorkerTest)
     fun inject(peopleDownSyncDownloaderTaskImplTest: PeopleDownSyncDownloaderTaskImplTest)
-    fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
+    @ExperimentalCoroutinesApi fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
 }
