@@ -43,7 +43,7 @@ class OdkPresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -55,7 +55,7 @@ class OdkPresenterTest {
         val identificationExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view) { identifyExtractor } thenReturn identificationExtractor
 
-        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -67,7 +67,7 @@ class OdkPresenterTest {
         val verifyExractor = VerifyRequestFactory.getMockExtractor()
         whenever(view) { verifyExtractor } thenReturn verifyExractor
 
-        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 
@@ -76,7 +76,7 @@ class OdkPresenterTest {
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
         verifyOnce(view) { handleClientRequestError(anyNotNull()) }
@@ -89,7 +89,7 @@ class OdkPresenterTest {
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
-        OdkPresenter(view, ACTION_REGISTER, sessionEventsManagerMock, mock()).apply {
+        OdkPresenter(view, ACTION_REGISTER, sessionEventsManagerMock, mock(), mock()).apply {
             handleEnrollResponse(EnrollResponse(registerId))
         }
 
@@ -102,7 +102,7 @@ class OdkPresenterTest {
         val id2 = MatchResult(UUID.randomUUID().toString(), 15, TIER_5)
         val sessionId = UUID.randomUUID().toString()
 
-        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock()).apply {
+        OdkPresenter(view, ACTION_IDENTIFY, mock(), mock(), mock()).apply {
             handleIdentifyResponse(IdentifyResponse(arrayListOf(id1, id2), sessionId))
         }
 
@@ -124,7 +124,7 @@ class OdkPresenterTest {
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
-        OdkPresenter(view, ACTION_IDENTIFY, sessionEventsManagerMock, mock()).apply {
+        OdkPresenter(view, ACTION_IDENTIFY, sessionEventsManagerMock, mock(), mock()).apply {
             handleVerifyResponse(verification)
         }
 
@@ -145,7 +145,7 @@ class OdkPresenterTest {
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
-        OdkPresenter(view, "", sessionEventsManagerMock, mock()).handleResponseError(error)
+        OdkPresenter(view, "", sessionEventsManagerMock, mock(), mock()).handleResponseError(error)
 
         verifyOnce(view) { returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
     }
@@ -155,7 +155,7 @@ class OdkPresenterTest {
         val confirmIdentify = ConfirmIdentityFactory.getMockExtractor()
         whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
 
-        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock()).apply {
+        OdkPresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mock()).apply {
             runBlocking { start() }
         }
 

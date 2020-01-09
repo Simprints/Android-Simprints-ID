@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,8 +16,9 @@ import kotlinx.coroutines.launch
 class OdkPresenter(private val view: OdkContract.View,
                    private val action: String?,
                    private val sessionEventsManager: ClientApiSessionEventsManager,
-                   private val crashReportManager: ClientApiCrashReportManager)
-    : RequestPresenter(view, sessionEventsManager), OdkContract.Presenter {
+                   private val crashReportManager: ClientApiCrashReportManager,
+                   deviceManager: DeviceManager)
+    : RequestPresenter(view, sessionEventsManager, deviceManager), OdkContract.Presenter {
 
     companion object {
         private const val PACKAGE_NAME = "com.simprints.simodkadapter"
@@ -27,6 +29,8 @@ class OdkPresenter(private val view: OdkContract.View,
     }
 
     override suspend fun start() {
+        super.start()
+
         if (action != ACTION_CONFIRM_IDENTITY) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.ODK)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)
