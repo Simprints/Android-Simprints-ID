@@ -12,11 +12,19 @@ import com.simprints.clientapi.domain.requests.BaseRequest
 import com.simprints.clientapi.domain.requests.confirmations.BaseConfirmation
 import com.simprints.clientapi.exceptions.*
 import com.simprints.clientapi.extensions.doInBackground
-
+import com.simprints.clientapi.tools.DeviceManager
 
 abstract class RequestPresenter(private val view: RequestContract.RequestView,
-                                private var eventsManager: ClientApiSessionEventsManager)
+                                private var eventsManager: ClientApiSessionEventsManager,
+                                private val deviceManager: DeviceManager)
     : RequestContract.Presenter {
+
+    override suspend fun start() {
+        if (deviceManager.isDeviceRooted()) {
+            view.handleRootedDevice()
+            return
+        }
+    }
 
     override fun processEnrollRequest() = validateAndSendRequest(
         EnrollBuilder(view.enrollExtractor, EnrollValidator(view.enrollExtractor))

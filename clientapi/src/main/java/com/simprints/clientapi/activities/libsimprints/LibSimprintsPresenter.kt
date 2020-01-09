@@ -8,6 +8,7 @@ import com.simprints.clientapi.controllers.core.eventData.ClientApiSessionEvents
 import com.simprints.clientapi.controllers.core.eventData.model.IntegrationInfo
 import com.simprints.clientapi.domain.responses.*
 import com.simprints.clientapi.extensions.isFlowCompletedWithCurrentError
+import com.simprints.clientapi.tools.DeviceManager
 import com.simprints.libsimprints.Constants.*
 import com.simprints.libsimprints.Identification
 import com.simprints.libsimprints.RefusalForm
@@ -17,14 +18,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 class LibSimprintsPresenter(private val view: LibSimprintsContract.View,
                             private val action: String?,
                             private val sessionEventsManager: ClientApiSessionEventsManager,
-                            private val crashReportManager: ClientApiCrashReportManager) :
-    RequestPresenter(view, sessionEventsManager), LibSimprintsContract.Presenter {
+                            private val crashReportManager: ClientApiCrashReportManager,
+                            deviceManager: DeviceManager) :
+    RequestPresenter(view, sessionEventsManager, deviceManager), LibSimprintsContract.Presenter {
 
     override suspend fun start() {
+        super.start()
+
         if (action != SIMPRINTS_SELECT_GUID_INTENT) {
             val sessionId = sessionEventsManager.createSession(IntegrationInfo.STANDARD)
             crashReportManager.setSessionIdCrashlyticsKey(sessionId)

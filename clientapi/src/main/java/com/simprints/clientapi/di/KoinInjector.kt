@@ -19,6 +19,8 @@ import com.simprints.clientapi.identity.CommCareGuidSelectionNotifier
 import com.simprints.clientapi.identity.OdkGuidSelectionNotifier
 import com.simprints.clientapi.tools.ClientApiTimeHelper
 import com.simprints.clientapi.tools.ClientApiTimeHelperImpl
+import com.simprints.clientapi.tools.DeviceManager
+import com.simprints.clientapi.tools.DeviceManagerImpl
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
@@ -49,6 +51,7 @@ object KoinInjector {
             defineBuildersForDomainManagers()
             defineBuildersForPresenters()
             defineBuildersForGuidSelectionNotifiers()
+            defineBuildersForDeviceManagement()
         }
 
     private fun Module.defineBuildersForDomainManagers() {
@@ -63,19 +66,23 @@ object KoinInjector {
             ErrorPresenter(view, get())
         }
         factory<LibSimprintsContract.Presenter> { (view: LibSimprintsContract.View, action: String?) ->
-            LibSimprintsPresenter(view, action, get(), get())
+            LibSimprintsPresenter(view, action, get(), get(), get())
         }
         factory<OdkContract.Presenter> { (view: OdkContract.View, action: String?) ->
-            OdkPresenter(view, action, get(), get())
+            OdkPresenter(view, action, get(), get(), get())
         }
         factory<CommCareContract.Presenter> { (view: CommCareContract.View, action: String?) ->
-            CommCarePresenter(view, action, get(), get(), get())
+            CommCarePresenter(view, action, get(), get(), get(), get())
         }
     }
 
     private fun Module.defineBuildersForGuidSelectionNotifiers() {
         factory { (context: Context) -> OdkGuidSelectionNotifier(context) }
         factory { (context: Context) -> CommCareGuidSelectionNotifier(context) }
+    }
+
+    private fun Module.defineBuildersForDeviceManagement() {
+        factory<DeviceManager> { (context: Context) -> DeviceManagerImpl(context) }
     }
 
 }
