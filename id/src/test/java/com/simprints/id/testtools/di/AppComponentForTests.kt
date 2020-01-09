@@ -12,11 +12,12 @@ import com.simprints.id.data.prefs.SettingsPreferencesManagerTest
 import com.simprints.id.di.*
 import com.simprints.id.secure.ProjectAuthenticatorTest
 import com.simprints.id.secure.ProjectSecretManagerTest
+import com.simprints.id.services.scheduledSync.imageUpSync.ImageUpSyncWorkerTest
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorkerTest
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderTaskImplTest
-
 import dagger.BindsInstance
 import dagger.Component
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Singleton
@@ -49,4 +50,5 @@ interface AppComponentForTests : AppComponent {
     fun inject(consentActivityTest: ConsentActivityTest)
     fun inject(peopleDownSyncCountWorkerTest: PeopleDownSyncCountWorkerTest)
     fun inject(peopleDownSyncDownloaderTaskImplTest: PeopleDownSyncDownloaderTaskImplTest)
+    @ExperimentalCoroutinesApi fun inject(imageUpSyncWorkerTest: ImageUpSyncWorkerTest)
 }

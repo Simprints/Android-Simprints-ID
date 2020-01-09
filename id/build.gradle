@@ -136,6 +136,7 @@ dependencies {
     implementation deps.kotlin.reflect
     implementation deps.kotlin.anko
     api deps.kotlin.coroutines_android
+    api deps.kotlin.coroutines_play_services
     implementation deps.androidx.core
     api deps.androidx.multidex
     implementation deps.androidx.appcompat

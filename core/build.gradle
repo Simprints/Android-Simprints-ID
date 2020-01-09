@@ -20,6 +20,13 @@ android {
 
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        animationsDisabled = true
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -50,12 +57,9 @@ dependencies {
     implementation project(':moduleapi')
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation deps.kotlin.coroutines_core
-
     implementation deps.testing.espresso.idling
     implementation deps.timber.core
     implementation deps.retrofit.core
@@ -63,8 +67,22 @@ dependencies {
     implementation deps.retrofit.convertergson
     implementation deps.retrofit.logging
     implementation deps.retrofit.okhttp
-
+    implementation deps.androidx.security
     implementation deps.dagger.javax
+
+    testImplementation deps.testing.truth
+    testImplementation 'junit:junit:4.12'
+
+    // Android X
+    androidTestImplementation deps.testing.androidx.core_testing
+    androidTestImplementation deps.testing.androidx.monitor
+    androidTestImplementation deps.testing.androidx.core
+    androidTestImplementation deps.testing.androidx.ext_junit
+    androidTestImplementation deps.testing.androidx.runner
+    androidTestImplementation deps.testing.androidx.rules
+    androidTestImplementation deps.testing.truth
+    androidTestUtil deps.testing.androidx.orchestrator
+    androidTestImplementation deps.testing.live_data
 }
 
 repositories {
