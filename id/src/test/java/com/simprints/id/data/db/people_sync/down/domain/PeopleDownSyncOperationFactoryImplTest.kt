@@ -9,7 +9,7 @@ import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperationR
 import com.simprints.id.data.db.people_sync.down.local.DbPeopleDownSyncOperationKey
 import org.junit.Test
 
-class PeopleDownSyncOperationBuilderImplTest {
+class PeopleDownSyncOperationFactoryImplTest {
 
     companion object {
         const val LAST_PATIENT_ID = "lastPatientId"
@@ -18,7 +18,7 @@ class PeopleDownSyncOperationBuilderImplTest {
     }
 
     val result = PeopleDownSyncOperationResult(COMPLETE, LAST_PATIENT_ID, LAST_PATIENT_UPDATED_AT, LAST_SYNC_TIME)
-    val builder = PeopleDownSyncOperationBuilderImpl()
+    val builder = PeopleDownSyncOperationFactoryImpl()
 
     @Test
     fun testBuildProjectSyncOperation() {

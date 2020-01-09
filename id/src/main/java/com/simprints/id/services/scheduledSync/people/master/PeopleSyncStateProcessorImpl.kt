@@ -25,7 +25,7 @@ import timber.log.Timber
 
 class PeopleSyncStateProcessorImpl(val ctx: Context,
                                    val personRepository: PersonRepository,
-                                   val progressCache: PeopleSyncProgressCache,
+                                   private val progressCache: PeopleSyncProgressCache,
                                    private val syncWorkersLiveDataProvider: SyncWorkersLiveDataProvider = SyncWorkersLiveDataProviderImpl(ctx)) : PeopleSyncStateProcessor {
 
     override fun getLastSyncState(): LiveData<PeopleSyncState> =
@@ -113,7 +113,9 @@ class PeopleSyncStateProcessorImpl(val ctx: Context,
     }
 
     private fun List<WorkInfo>.filterByTags(vararg tagsToFilter: String) =
-        this.filter { it.tags.firstOrNull { tagsToFilter.contains(it) } != null }.sortedBy { it ->
+        this.filter { it.tags.firstOrNull { tag ->
+            tagsToFilter.contains(tag) } != null
+        }.sortedBy { it ->
             it.tags.first { it.contains(TAG_SCHEDULED_AT) }
         }
 }

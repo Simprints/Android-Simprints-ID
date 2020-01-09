@@ -67,7 +67,7 @@
 //    @Inject lateinit var timeHelper: TimeHelper
 //
 //    private val downSyncDao by lazy { syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData() }
-//    private val upSyncDao by lazy { syncStatusDatabase.upSyncDao.getUpSyncStatus() }
+//    private val upSyncOperationLocalDataSource by lazy { syncStatusDatabase.upSyncOperationLocalDataSource.getUpSyncStatus() }
 //    private val syncScope by lazy { syncScopeBuilder.buildSyncScope()!! }
 //    private val subSyncScopes by lazy { syncScope.toSubSyncScopes() }
 //    private lateinit var dashboardCardViewModel: DashboardSyncCardViewModel
@@ -287,7 +287,7 @@
 //            1,
 //            app.component,
 //            downSyncDao,
-//            upSyncDao,
+//            upSyncOperationLocalDataSource,
 //            fakeSyncStateLiveData)
 //
 //    private fun insertASyncWorkInfoEvent(vararg states: SyncState) {
@@ -301,7 +301,7 @@
 //    }
 //
 //    private fun insertAnUpSyncStatusInDb(upSyncStatus: UpSyncStatus) {
-//        syncStatusDatabase.upSyncDao.insertLastUpSyncTime(upSyncStatus)
+//        syncStatusDatabase.upSyncOperationLocalDataSource.insertLastUpSyncTime(upSyncStatus)
 //    }
 //
 //    private fun verifyGetPeopleCountFromLocalWasCalled(requiredCallsToInitTotalCounter: Int) {

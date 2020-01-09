@@ -5,8 +5,8 @@ import com.simprints.core.tools.json.JsonHelper
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncOperation
 import com.simprints.id.data.db.people_sync.down.domain.PeopleDownSyncScope
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_DOWN_MASTER_SYNC_ID
-import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersBuilder.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_DOWN_MASTER_SYNC_ID
+import com.simprints.id.services.scheduledSync.people.down.controllers.PeopleDownSyncWorkersFactory.Companion.TAG_PEOPLE_DOWN_SYNC_ALL_WORKERS
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncCountWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker
 import com.simprints.id.services.scheduledSync.people.down.workers.PeopleDownSyncDownloaderWorker.Companion.INPUT_DOWN_SYNC_OPS
@@ -20,7 +20,7 @@ import com.simprints.id.services.scheduledSync.people.master.PeopleSyncWorkerTyp
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PeopleDownSyncWorkersBuilderImpl(val downSyncScopeRepository: PeopleDownSyncScopeRepository) : PeopleDownSyncWorkersBuilder {
+class PeopleDownSyncWorkersFactoryImpl(val downSyncScopeRepository: PeopleDownSyncScopeRepository) : PeopleDownSyncWorkersFactory {
 
     private val downSyncScope: PeopleDownSyncScope
         get() = downSyncScopeRepository.getDownSyncScope()

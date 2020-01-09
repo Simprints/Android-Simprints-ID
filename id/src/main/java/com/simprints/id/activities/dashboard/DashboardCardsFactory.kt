@@ -71,7 +71,7 @@ class DashboardCardsFactory(private val component: AppComponent) {
 //            position,
 //            component,
 //            syncStatusDatabase.downSyncDao.getDownSyncStatusLiveData(),
-//            syncStatusDatabase.upSyncDao.getUpSyncStatus(),
+//            syncStatusDatabase.upSyncOperationLocalDataSource.getUpSyncStatus(),
 //            downSyncManager.onSyncStateUpdated()))
 
     private fun createLastScannerInfoCard(position: Int = 4): Single<DashboardCardViewModel>? {

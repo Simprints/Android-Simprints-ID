@@ -84,3 +84,9 @@ fun DbPeopleDownSyncOperation.fromDbToDomain() =
             )
         }
     )
+
+fun DbPeopleDownSyncOperation.isSameOperation(compareTo: PeopleDownSyncOperation) =
+    projectId == compareTo.projectId &&
+    userId == compareTo.userId &&
+    moduleId == compareTo.moduleId &&
+    modes.toTypedArray() contentEquals compareTo.modes.toTypedArray()
