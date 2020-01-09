@@ -2,6 +2,9 @@ package com.simprints.id.commontesttools.di
 
 import android.content.Context
 import com.simprints.id.data.db.common.RemoteDbManager
+import com.simprints.id.data.db.image.local.ImageLocalDataSource
+import com.simprints.id.data.db.image.remote.ImageRemoteDataSource
+import com.simprints.id.data.db.image.repository.ImageRepository
 import com.simprints.id.data.db.people_sync.down.PeopleDownSyncScopeRepository
 import com.simprints.id.data.db.person.PersonRepository
 import com.simprints.id.data.db.person.local.PersonLocalDataSource
@@ -16,42 +19,82 @@ import com.simprints.id.services.scheduledSync.people.up.controllers.PeopleUpSyn
 import com.simprints.testtools.common.di.DependencyRule
 import javax.inject.Singleton
 
-class TestDataModule(private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
-                     private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
-                     private val personRepositoryRule: DependencyRule = DependencyRule.RealRule) : DataModule() {
+class TestDataModule(
+    private val projectLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val projectRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val projectRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val personRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val personLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val personRepositoryRule: DependencyRule = DependencyRule.RealRule,
+    private val imageLocalDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val imageRemoteDataSourceRule: DependencyRule = DependencyRule.RealRule,
+    private val imageRepositoryRule: DependencyRule = DependencyRule.RealRule
+) : DataModule() {
 
-    override fun providePersonRemoteDataSource(remoteDbManager: RemoteDbManager): PersonRemoteDataSource =
-        personRemoteDataSourceRule.resolveDependency { super.providePersonRemoteDataSource(remoteDbManager) }
+    override fun providePersonRemoteDataSource(
+        remoteDbManager: RemoteDbManager
+    ): PersonRemoteDataSource = personRemoteDataSourceRule.resolveDependency {
+        super.providePersonRemoteDataSource(remoteDbManager)
+    }
 
+    override fun provideProjectLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): ProjectLocalDataSource = projectLocalDataSourceRule.resolveDependency {
+        super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager)
+    }
 
-    override fun provideProjectLocalDataSource(ctx: Context,
-                                               secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                               loginInfoManager: LoginInfoManager): ProjectLocalDataSource =
-        projectLocalDataSourceRule.resolveDependency { super.provideProjectLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+    override fun provideProjectRemoteDataSource(
+        remoteDbManager: RemoteDbManager
+    ): ProjectRemoteDataSource = projectRemoteDataSourceRule.resolveDependency {
+        super.provideProjectRemoteDataSource(remoteDbManager)
+    }
 
-    override fun provideProjectRemoteDataSource(remoteDbManager: RemoteDbManager): ProjectRemoteDataSource =
-        projectRemoteDataSourceRule.resolveDependency { super.provideProjectRemoteDataSource(remoteDbManager) }
+    override fun provideProjectRepository(
+        projectLocalDataSource: ProjectLocalDataSource,
+        projectRemoteDataSource: ProjectRemoteDataSource
+    ): ProjectRepository = projectRepositoryRule.resolveDependency {
+        super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource)
+    }
 
-
-    override fun provideProjectRepository(projectLocalDataSource: ProjectLocalDataSource,
-                                          projectRemoteDataSource: ProjectRemoteDataSource): ProjectRepository =
-        projectRepositoryRule.resolveDependency { super.provideProjectRepository(projectLocalDataSource, projectRemoteDataSource) }
-
-    override fun providePersonRepository(personLocalDataSource: PersonLocalDataSource,
-                                         personRemoteDataSource: PersonRemoteDataSource,
-                                         peopleUpSyncManager: PeopleUpSyncManager,
-                                         downSyncScopeRepository: PeopleDownSyncScopeRepository): PersonRepository =
-        personRepositoryRule.resolveDependency {
-            super.providePersonRepository(personLocalDataSource, personRemoteDataSource, peopleUpSyncManager, downSyncScopeRepository)
-        }
+    override fun providePersonRepository(
+        personLocalDataSource: PersonLocalDataSource,
+        personRemoteDataSource: PersonRemoteDataSource,
+        peopleUpSyncManager: PeopleUpSyncManager,
+        downSyncScopeRepository: PeopleDownSyncScopeRepository
+    ): PersonRepository = personRepositoryRule.resolveDependency {
+        super.providePersonRepository(
+            personLocalDataSource,
+            personRemoteDataSource,
+            peopleUpSyncManager,
+            downSyncScopeRepository
+        )
+    }
 
     @Singleton
-    override fun providePersonLocalDataSource(ctx: Context,
-                                              secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
-                                              loginInfoManager: LoginInfoManager): PersonLocalDataSource =
-        personLocalDataSourceRule.resolveDependency { super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager) }
+    override fun providePersonLocalDataSource(
+        ctx: Context,
+        secureLocalDbKeyProvider: SecureLocalDbKeyProvider,
+        loginInfoManager: LoginInfoManager
+    ): PersonLocalDataSource = personLocalDataSourceRule.resolveDependency {
+        super.providePersonLocalDataSource(ctx, secureLocalDbKeyProvider, loginInfoManager)
+    }
+
+    override fun provideImageLocalDataSource(
+        context: Context
+    ): ImageLocalDataSource = imageLocalDataSourceRule.resolveDependency {
+        super.provideImageLocalDataSource(context)
+    }
+
+    override fun provideImageRemoteDataSource(): ImageRemoteDataSource =
+        imageRemoteDataSourceRule.resolveDependency { super.provideImageRemoteDataSource() }
+
+    override fun provideImageRepository(
+        localDataSource: ImageLocalDataSource,
+        remoteDataSource: ImageRemoteDataSource
+    ): ImageRepository = imageRepositoryRule.resolveDependency {
+        super.provideImageRepository(localDataSource, remoteDataSource)
+    }
 
 }
