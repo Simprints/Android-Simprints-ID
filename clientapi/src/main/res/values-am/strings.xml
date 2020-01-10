@@ -3,7 +3,14 @@
     <string name="configuration_error_title">የተግበቦት ስህተት</string>
     <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
     <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
-    <string name="configuration_error_message">ሲስተሙ የተግበቦት (%1$s) ስህተት አጋጥሞታል እባክዎትን የሲስተሙን አስተዳደሪ ያነጋግሩ</string>
     <string name="close">ይዝጉ</string>
+    <string name="error_occurred_title">ስህተት አጋጥሟል</string>
+    <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="different_projectId_message">የተለየ የፕሮጀክት መለያ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="different_userId_message">የተለየ የተጠቃሚ መለያ ቁጥር ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ ከሲስተሙ ዋና ገጽ ይውጡ ወይም የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_intentAction_message">በሲስተሙ ያልተፈቀደ ፍላጎት ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
+    <string name="invalid_metadata_message">ልተፈቀደ ሜታዳታ ስለተጠቀሙ  የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
 
 </resources>
