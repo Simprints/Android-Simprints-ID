@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="title_face">Face</string>
+    <string name="title_face"><Face></Face></string>
 </resources>
