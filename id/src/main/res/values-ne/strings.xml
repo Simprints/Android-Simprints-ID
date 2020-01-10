@@ -4,17 +4,8 @@
 
     <!-- AndroidManifest : activity titles throughout the app -->
     <!-- Activity Titles -->
-    <string name="register_title">भर्ना </string>
-    <string name="identify_title">पहिचान गर्नुहोस </string>
-    <string name="update_title">अपडेट</string>
-    <string name="verify_title">प्रमाणित</string>
-    <string name="help_title">सहयोग </string>
     <string name="settings_title">सेटिंगहरु</string>
-    <string name="about_title">एप्सको बारेमा</string>
     <string name="alert_title">अलर्ट</string>
-    <string name="tutorial_title">पाठ</string>
-    <string name="refusal_label">असहमति फारम</string>
-    <string name="privacy_label">गोपनीयता</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -23,43 +14,19 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <string name="short_consent">सिम्प्रिन्ट्सले तपाइँको औंलाको छाप र स्थानबाट तपाइँको सहि पहिचान गर्दछ र यसबाट हामीलाई तपाइंको जानकारी भेटाउन सजिलो हुन्छ | यसमा तपाइँलाइ अफ्ठ्यारो लाग्छ भने मलाई भन्न सक्नुहुन्छ | लाग्दैन भने कृपया आफ्नो देब्रे बुढी औंला यो स्क्यानरमा राख्नुहोस |</string>
-    <string name="confirm_consent">आफ्नो सहमति जनाउन यहाँ थिच्नुहोस</string>
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">लोड हुँदै</string>
-    <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै…</string>
-    <string name="launch_checking_permissions">"अनुमति जाँच गर्दै… "</string>
-    <string name="connect_scanner_bt_connect">Vero जडान…</string>
-    <string name="connect_scanner_wake_un20">" UN20 उठ्दै…"</string>
-    <string name="connect_scanner_setup">ঠিককরা Vero</string>
-    <string name="launch_checking_person_in_db">डेटाबेसमा व्यक्तिको खोजी गर्दै …</string>
 
 
     <!-- CollectFingerprintsActivity : screen where the scanning happens -->
     <!-- Screen Text -->
-    <string name="good_scan_direction">अर्को औंलाको लागि देब्रे तर्फ सार्नुहोस </string>
-    <string name="please_scan">स्क्यान गर्नुहोस</string>
-    <string name="poor_scan_direction">कृपया फेरी स्क्यान गर्नुहोस </string>
-    <string name="scanning">स्क्यान हुँदै छ </string>
-    <string name="good_scan_message">स्क्यान राम्रो भयो </string>
-    <string name="poor_scan_message">स्क्यान राम्रो भएन </string>
-    <string name="reconnecting_message">पुन: जडान</string>
     <!-- Button Labels -->
-    <string name="rescan_label">फेरी स्क्यान गर्नुहोस </string>
-    <string name="rescan_label_question">फेरी स्क्यान गर्नुहोस?</string>
-    <string name="scan_label">स्क्यान</string>
     <string name="cancel_button">रद्द गर्नुहोस </string>
     <string name="ok">ठिक छ </string>
-    <string name="scan">स्क्यान</string>
 
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
-    <string name="sync_data">डेटा समक्रमण गर्नुहोस्</string>
-    <string name="syncing_calculating">समक्रमण हुँदै… गिनती</string>
-    <string name="syncing_with_progress">समक्रमण हुँदै… %1$d/%2$d</string>
-    <string name="not_signed_in">साइन इन भएको छैन</string>
     <!-- Toast Messages -->
-    <string name="coming_soon">छिट्टै आउंदै छ </string>
     <!-- Finger Names -->
     <string name="l_5_finger_name">देब्रे कान्छी औंला </string>
     <string name="l_4_finger_name">देब्रे साँहिली औंला</string>
@@ -75,49 +42,17 @@
 
     <!-- MatchingActivity : the waiting screen after an identification -->
     <!-- Screen Text -->
-    <string name="please_wait">एकैछिन पर्खनुहोस, हामी पहिचान गर्दैछौं </string>
     <!-- Loading Text -->
-    <string name="loaded_candidates_one">%d व्यक्ति लोड भयो</string>
-    <string name="loaded_candidates_other">"%d व्यक्तिहरु लोड भयो "</string>
-    <string name="loading_candidates">व्यक्तिहरु लोड गर्दै …</string>
-    <string name="matching_fingerprints">औठाछापहरू मिलाई रहेको अवस्था…</string>
-    <string name="returned_results_one">"%d परिणाम फिर्ता गरियो "</string>
-    <string name="returned_results_other">"%d परिणामहरु फिर्ता गरियो "</string>
-    <string name="returning_results">परिणामहरु फिर्ता गर्दै</string>
-    <string name="tier1or2_matches_one">"%d धेरै राम्ररी मिल्ने व्यक्ति भेटिए "</string>
-    <string name="tier1or2_matches_other">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier1or2_matches_zero">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier3_matches_one">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier3_matches_other">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier3_matches_zero">%d राम्ररी मिल्ने व्यक्ति भेटिए</string>
-    <string name="tier4_matches_one">%d राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier4_matches_other">"कुनै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier4_matches_zero">"%d मिल्ने व्यक्ति भेटिए "</string>
 
 
     <!-- AlertActivity : the Simprints ID error message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">ब्लुटुथमा गल्ती देखियो  </string>
     <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
-    <string name="disconnected_title">स्क्यानर भेटिएन </string>
     <string name="verify_guid_not_found_title">व्यक्ति भेटीएन</string>
     <string name="error_occurred_title">गल्ती भयो</string>
-    <string name="low_battery_title">कम ब्याट्री</string>
     <!-- Error Message Text -->
-    <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent action), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="invalid_metadata_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid metadata), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_moduleId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no module ID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_updateId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no update GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_verifyId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no verify GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="verify_guid_not_found_online_message">प्रमाणिकरणका लागि छानिएको व्यक्ति डेटाबेसमा छैन</string>
     <string name="verify_guid_not_found_offline_message">व्यक्ति भेटीएन;  कृपया इन्टरनेटमा कनेक्ट गरि पुन प्रयास गर्नुहोस</string>
-    <string name="bluetooth_not_supported_message">एस उपकरणमा ब्लुटुथ छैन; कृपया आफ्नो सिस्टम प्रशासकलाई खबर गर्नुहोस</string>
-    <string name="bluetooth_not_enabled_message">ब्लुटुथ स्विच अन छैन; कृपया सेटिङमा गई ब्लुटुथ अन गरि पुन प्रयास गर्नुहोस</string>
-    <string name="unbonded_scanner_message">स्क्यानर र फोन जोडिएका छैनन् | सेटिंगमा गएर स्क्यानरलाइ ब्लुटुथबाट फोनसंग जोड्नुहोस र एकपल्ट फेरी प्रयास गर्नुहोस </string>
-    <string name="multiple_scanners_found_message">एउटा भन्दा बढी स्क्यानर फोनसंग   जोडिएको छ, कृपया यौटा स्क्यानर हटाउनुहोस</string>
-    <string name="disconnected_message">स्क्यानरसंग सम्पर्क हुन सकेन, अन गर्नुहोस र फोनको नजिक राख्नुहोस </string>
-    <string name="low_battery_message">स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज</string>
     <string name="unforeseen_error_message">माफ गर्नुहोस, नचिताएको गल्ती भयो | बन्द गर्नुहोस र अगाडी बढ्नुहोस |</string>
     <!-- Button Labels For Error Messages -->
     <string name="close">बन्द गर्नुहोस</string>
@@ -127,36 +62,13 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">"डेटाबेस सम्बन्धि जानकारी "</string>
-    <string name="user_count">प्रयोगकर्ता संख्या</string>
-    <string name="module_count">मोड्युल संख्या</string>
-    <string name="project_count">परियोजना संख्या</string>
     <string name="preference_app_version_title">एप्स संस्करण</string>
-    <string name="about_libsimprints_version">LibSimprints संस्करण</string>
     <string name="preference_scanner_version_title">सिम्प्रिन्ट्स संस्करण</string>
     <!-- Recovery dialogs -->
-    <string name="recovering_db">"डाटाबेस पुनःप्राप्त गर्दै… यसलाई केहि समय लग्नेछ "</string>
-    <string name="error">गल्ती भयो</string>
-    <string name="error_recovery_message">रिकभरी फाइल अपलोड गर्दा त्रुटि भयो</string>
-    <string name="success_recovery_message">रिकभरी फाइल सफलतापूर्वक अपलोड गरियो</string>
-    <string name="dismiss">खारेज गर्नुहोस्</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="nudge_mode_checkbox_name">बटन प्रणाली </string>
-    <string name="vibrate">कम्पन</string>
-    <string name="quality_threshold_empty">न्युनतम आवश्यक स्तर :</string>
-    <string name="quality_threshold_value">न्युनतम आवश्यक स्तर : %1$d</string>
-    <string name="nb_of_ids_empty">पहिचान गरिएकाहरु:</string>
-    <string name="nb_of_ids_value">पहिचान गरिएकाहरु: %1$d</string>
-    <string name="timeout_empty">समय समाप्ति (सेकेण्ड):</string>
-    <string name="timeout_value">समय समाप्ति (सेकेण्ड): %1$d</string>
-    <string name="sync_settings_label">समक्रमण सेटिङहरू</string>
-    <string name="search_settings_label">"खोजको सेटिंगहरु "</string>
-    <string name="user_label">प्रयोगकर्ता</string>
-    <string name="module_label">मोड्युल</string>
-    <string name="project_label">परियोजना</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
@@ -172,51 +84,6 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">"सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   "</string>
-    <string name="long_consent">
-        \n
-        तपाईँले यस स्क्यानरमा औँला राख्नुभयो भने यसले तपाईँको औँठाछापका साथै यो रेकर्ड गरेको स्थान, मिति र समयको जानकारी राख्छ ।   \n
-        \n
-        तपाईँका यी सबै जानकारी सिमप्रिन्टस टेक्नोलोजी लिमिटेड नामक ब्रिटिश गैर–सरकारी संस्थामा रहने छ ।
-        सिमप्रिन्टसले यो रेकर्डका आधारमा पोसिबललाई भविष्यमा तपाईँलाई चिन्न र तपाईँको स्वास्थ्य सम्बन्धि जानकारी प्रदान गर्दछ । यसका लागि सिमप्रिन्टसले यो रेकर्ड पोसिबललाई दिनेछ ।   \n
-        सिमप्रिन्टसले यो जानकारी आफ्नो सेवा राम्रो बनाउन प्रयोग गर्नेछ र चाहिएको खण्डमा अन्य विशेषज्ञहरुलाई पनि जानकारी प्रदान गर्नेछ ।   \n
-        सिमप्रिन्टसले यस जानकारीका माध्यमबाट नेपालको स्वास्थ्य स्थितिका बारेमा बुझ्न प्रयास गर्नेछ ।   \n
-        भविष्यमा सिमप्रिन्टसले अन्य संस्थाहरुलाई पनि तपाईँको पहिचान गर्न तपाईँको यो जानकारी प्रदान गर्न सक्छ ।   \n
-        सिमप्रिन्टसले २०१९ सम्म नेपालमा काम गर्ने योजना बनाएको छ । सिमप्रिन्टसले तपाईँका जानकारीहरु यसको २ वर्ष पछि सम्म राख्नेछ र त्यसपछि मेटाउनेछ ।   \n
-        सिमप्रिन्टसले कुनैपनि औँठाछापको तस्वीर राख्ने छैन ।   \n
-        सिमप्रिन्टसले नचाहिए सम्म कुनै पनि राज्यलाई तपाईँको जानकारी प्रदान गर्ने छैन ।   \n
-        सिमप्रिन्टसको सेवा लिनका लागि तपाईँलाई आँैठाछाप दिन जरुरी छैन, तर तपाईँले आँैठाछाप दिनुभएन भने स्वास्थ्य संस्थाहरुलाई भविष्यमा तपाईँको पहिचान गर्न गाह«ो हुनेछ ।   \n
-        तपाईँले एक पटक सिमप्रिन्टसलाई आफ्नो दिनुभएको छ तर अब दिन मन छैन भने म (स्वास्थ्यकर्मी) सँग सम्पर्क गर्नुहोला ।” चाहिए अनुसार स्वास्थ्यकर्मी बाहेक अरुले गरेको खण्डमा यो अंश हटाउन सक्नुहुन्छ ।
-        \n\n
-        मलाई सिमप्रिन्टससँग भएको मेरा सबै जानकारी मेटाउन मन छ । यसका लागि मैले के गर्नुपर्छ ?
-        \n\n
-        तपाईँले कुनै पनि बेला सिमप्रिन्टससँग भएको तपाईँको जानकारी मेटाउन सक्नुहुन्छ । यसका लागि तपाईँले स्वास्थ्यकर्मीलाई अन्तिम पटक औँठाछाप दिनुपर्ने हुन्छ, ता कि सिमप्रिन्टसले तपाईँको पहिचान गर्न सकोस । यस पछी सिमप्रिन्टसले तपाईँका सबै जानकारी मेटाउने छ ।   \n
-        तर तपाईँले के बुझ्नुपर्छ भने सिमप्रिन्टसले तपाईँको आँैठाछाप मेटायो भने स्वास्थ्य संस्थाहरुलाई भविष्यमा तपाईँको पहिचान गर्न गाह«ो हुनेछ ।   \n
-        सिमप्रिन्टस भनेको को हो ?   \n
-        सिमप्रिन्टस टेक्नोलोजी लिमिटेड एउटा ब्रिटिश गैर–सरकारी संस्था हो जसले पोसिबललाई तपाईँ जस्तै बिरामीहरुको स्वास्थ्य सम्बन्धि रेकर्ड राख्न मद्दत गर्दछ ।   \n
-        सिमप्रिन्टसले मेरो बारेमा के–के जानकारी राख्नेछ ?   \n
-        सिमप्रिन्टसले तपाईँको औँठाछापको रेकर्डका साथै स्क्यान लिएको स्थान, समय र मितिको जानकारी राख्नेछ ।   \n
-        सिमप्रिन्टसले तपाईँको अन्य पहिचान जस्तै नाम अथवा जन्म मितिको भने रेकर्ड राख्दैन । सिमप्रिन्टसले तपाईँको कुनै स्वास्थ्य सम्बन्धि रेकर्ड राख्दैन भने तपाईँको औँठाछापको तस्वीर पनि राख्दैन ।   \n
-        सिमप्रिन्टसले मेरो जानकारीहरु लिएर के गर्नेछ ?   \n
-        सिमप्रिन्टसले यो रेकर्डका आधारमा पोसिबललाई भविष्यमा तपाईँलाई चिन्न र तपाईँको स्वास्थ्य सम्बन्धि जानकारी प्रदान गर्दछ । यसका लागि सिमप्रिन्टसले यो रेकर्ड पोसिबललाई दिनेछ ।   \n
-        सिमप्रिन्टसले यो जानकारी आफ्नो सेवा राम्रो बनाउन प्रयोग गर्नेछ र चाहिएको खण्डमा अन्य विशेषज्ञहरुलाई पनि जानकारी प्रदान गर्नेछ ।   \n
-        सिमप्रिन्टसले यस जानकारीका माध्यमबाट नेपालको स्वास्थ्य स्थितिका बारेमा बुझ्न प्रयास गर्नेछ ।   \n
-        भविष्यमा सिमप्रिन्टसले अन्य संस्थाहरुलाई पनि तपाईँको पहिचान गर्न तपाईँको यो जानकारी प्रदान गर्न सक्छ ।   \n
-        सिमप्रिन्टसले मेरो यो जानकारी कहिले सम्म राख्नेछ ?   \n
-        सिमप्रिन्टसले २०१९ सम्म नेपालमा काम गर्ने योजना बनाएको छ । सिमप्रिन्टसले तपाईँका जानकारीहरु यसको २ वर्ष पछि सम्म राख्नेछ र त्यसपछि मेटाउनेछ ।   \n
-        के सिमप्रिन्टसले मेरो औँठाछापको तस्वीर पनि राख्छ ?   \n
-        सिमप्रिन्टसले तपाईँको औँठाछापको तस्वीर राख्दैन ।   \n
-        मैले मेरो औँठाछाप दिनै पर्छ ?   \n
-        सिमप्रिन्टसको सेवा लिनका लागि तपाईँलाई आँैठाछाप दिन जरुरी छैन, तर तपाईँले आँैठाछाप दिनुभएन भने स्वास्थ्य संस्थाहरुलाई भविष्यमा तपाईँको पहिचान गर्न गाह«ो हुनेछ ।   \n
-        \n\n
-        सिमप्रिन्टस टेक्नोलोजी लिमिटेडले यस सिमप्रिन्टस एपको डाटा मार्फत तपाईँ र अन्य   \n
-        \n
-        स्थानीय स्वास्थ्यकर्मीहरुका लागि यो एप अझै प्रभावकारी बनाउने छ । बिरामीहरुलाई सहज   \n
-        रुपमा सेवा पु¥याउनका लागि सिमप्रिन्टसले औँठाछाप लिएको ठाउँ र समय पनि रेकर्ड गर्दछ ।   \n
-        ृक्लिक गरेर÷दायाँपट्टि स्वाइप गरेर÷वा अन्य उपयुक्त कार्यका साथे सिमप्रिन्टसले यी कार्यका   \n
-        लागि डाटा प्रयोग गर।ेकोमा म सहमत छु ।   \n
-        \n
-    </string>
 
 
 </resources>
