@@ -6,15 +6,10 @@
     <!-- Activity Titles -->
     <string name="register_title">भर्ना </string>
     <string name="identify_title">पहिचान गर्नुहोस </string>
-    <string name="update_title">अपडेट</string>
     <string name="verify_title">प्रमाणित</string>
-    <string name="help_title">सहयोग </string>
     <string name="settings_title">सेटिंगहरु</string>
-    <string name="about_title">एप्सको बारेमा</string>
     <string name="alert_title">अलर्ट</string>
-    <string name="tutorial_title">पाठ</string>
     <string name="refusal_label">असहमति फारम</string>
-    <string name="privacy_label">गोपनीयता</string>
 
 
     <!-- RequestLoginActivity : screen when launched from the standalone Simprints ID app -->
@@ -24,7 +19,6 @@
     <!-- Consent Text -->
     <!-- Loading Messages-->
     <string name="connect_scanner_loading">लोड हुँदै</string>
-    <string name="updating_database">परियोजना डाटाबेस अद्यावधिक गर्दै…</string>
     <string name="connect_scanner_bt_connect">Vero जडान…</string>
     <string name="connect_scanner_wake_un20">" UN20 उठ्दै…"</string>
     <string name="connect_scanner_setup">ঠিককরা Vero</string>
@@ -50,12 +44,7 @@
 
     <!-- activity_main_drawer.xml : menu that comes out from the top left of the CollectFingerprintsActivity -->
     <!-- Sync Button Text -->
-    <string name="sync_data">डेटा समक्रमण गर्नुहोस्</string>
-    <string name="syncing_calculating">समक्रमण हुँदै… गिनती</string>
-    <string name="syncing_with_progress">समक्रमण हुँदै… %1$d/%2$d</string>
-    <string name="not_signed_in">साइन इन भएको छैन</string>
     <!-- Toast Messages -->
-    <string name="coming_soon">छिट्टै आउंदै छ </string>
     <!-- Finger Names -->
     <string name="l_5_finger_name">देब्रे कान्छी औंला </string>
     <string name="l_4_finger_name">देब्रे साँहिली औंला</string>
@@ -73,46 +62,22 @@
     <!-- Screen Text -->
     <string name="please_wait">एकैछिन पर्खनुहोस, हामी पहिचान गर्दैछौं </string>
     <!-- Loading Text -->
-    <string name="loaded_candidates_one">%d व्यक्ति लोड भयो</string>
-    <string name="loaded_candidates_other">"%d व्यक्तिहरु लोड भयो "</string>
     <string name="loading_candidates">व्यक्तिहरु लोड गर्दै …</string>
     <string name="matching_fingerprints">औठाछापहरू मिलाई रहेको अवस्था…</string>
-    <string name="returned_results_one">"%d परिणाम फिर्ता गरियो "</string>
-    <string name="returned_results_other">"%d परिणामहरु फिर्ता गरियो "</string>
-    <string name="returning_results">परिणामहरु फिर्ता गर्दै</string>
-    <string name="tier1or2_matches_one">"%d धेरै राम्ररी मिल्ने व्यक्ति भेटिए "</string>
-    <string name="tier1or2_matches_other">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier1or2_matches_zero">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier3_matches_one">%d धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier3_matches_other">"कुनै धेरै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier3_matches_zero">%d राम्ररी मिल्ने व्यक्ति भेटिए</string>
-    <string name="tier4_matches_one">%d राम्ररी मिल्ने व्यक्तिहरु भेटिए</string>
-    <string name="tier4_matches_other">"कुनै राम्ररी मिल्ने व्यक्तिहरु भेटिएन "</string>
-    <string name="tier4_matches_zero">"%d मिल्ने व्यक्ति भेटिए "</string>
 
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="bluetooth_error_title">ब्लुटुथमा गल्ती देखियो  </string>
     <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
-    <string name="disconnected_title">स्क्यानर भेटिएन </string>
     <string name="verify_guid_not_found_title">व्यक्ति भेटीएन</string>
     <string name="error_occurred_title">गल्ती भयो</string>
     <string name="low_battery_title">कम ब्याट्री</string>
     <!-- Error Message Text -->
-    <string name="invalid_intentAction_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid intent action), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="invalid_metadata_message">कन्फिगरेसन त्रुटि फेला परेको छ (invalid metadata), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_userId_message">कन्फिगरेसन त्रुटि फेला परेको छ (कुनै प्रयोगकर्ता आइडी छैन), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_moduleId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no module ID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_updateId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no update GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
-    <string name="missing_verifyId_message">कन्फिगरेसन त्रुटि फेला परेको छ (no verify GUID), कृपया आफ्नो प्रणाली व्यवस्थापकलाई सम्पर्क गर्नुहोस्।</string>
     <string name="verify_guid_not_found_online_message">प्रमाणिकरणका लागि छानिएको व्यक्ति डेटाबेसमा छैन</string>
     <string name="verify_guid_not_found_offline_message">व्यक्ति भेटीएन;  कृपया इन्टरनेटमा कनेक्ट गरि पुन प्रयास गर्नुहोस</string>
     <string name="bluetooth_not_supported_message">एस उपकरणमा ब्लुटुथ छैन; कृपया आफ्नो सिस्टम प्रशासकलाई खबर गर्नुहोस</string>
     <string name="bluetooth_not_enabled_message">ब्लुटुथ स्विच अन छैन; कृपया सेटिङमा गई ब्लुटुथ अन गरि पुन प्रयास गर्नुहोस</string>
-    <string name="unbonded_scanner_message">स्क्यानर र फोन जोडिएका छैनन् | सेटिंगमा गएर स्क्यानरलाइ ब्लुटुथबाट फोनसंग जोड्नुहोस र एकपल्ट फेरी प्रयास गर्नुहोस </string>
     <string name="multiple_scanners_found_message">एउटा भन्दा बढी स्क्यानर फोनसंग   जोडिएको छ, कृपया यौटा स्क्यानर हटाउनुहोस</string>
-    <string name="disconnected_message">स्क्यानरसंग सम्पर्क हुन सकेन, अन गर्नुहोस र फोनको नजिक राख्नुहोस </string>
     <string name="low_battery_message">स्क्यानर ब्याट्री कम, कृपया आफ्नो स्क्यानर चार्ज</string>
     <string name="unforeseen_error_message">माफ गर्नुहोस, नचिताएको गल्ती भयो | बन्द गर्नुहोस र अगाडी बढ्नुहोस |</string>
     <!-- Button Labels For Error Messages -->
@@ -123,36 +88,13 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="database_information">"डेटाबेस सम्बन्धि जानकारी "</string>
-    <string name="user_count">प्रयोगकर्ता संख्या</string>
-    <string name="module_count">मोड्युल संख्या</string>
-    <string name="project_count">परियोजना संख्या</string>
     <string name="preference_app_version_title">एप्स संस्करण</string>
-    <string name="about_libsimprints_version">LibSimprints संस्करण</string>
     <string name="preference_scanner_version_title">सिम्प्रिन्ट्स संस्करण</string>
     <!-- Recovery dialogs -->
-    <string name="recovering_db">"डाटाबेस पुनःप्राप्त गर्दै… यसलाई केहि समय लग्नेछ "</string>
-    <string name="error">गल्ती भयो</string>
-    <string name="error_recovery_message">रिकभरी फाइल अपलोड गर्दा त्रुटि भयो</string>
-    <string name="success_recovery_message">रिकभरी फाइल सफलतापूर्वक अपलोड गरियो</string>
-    <string name="dismiss">खारेज गर्नुहोस्</string>
 
 
     <!-- SettingsActivity : the detailed settings screen -->
     <!-- Setting Labels -->
-    <string name="nudge_mode_checkbox_name">बटन प्रणाली </string>
-    <string name="vibrate">कम्पन</string>
-    <string name="quality_threshold_empty">न्युनतम आवश्यक स्तर :</string>
-    <string name="quality_threshold_value">न्युनतम आवश्यक स्तर : %1$d</string>
-    <string name="nb_of_ids_empty">पहिचान गरिएकाहरु:</string>
-    <string name="nb_of_ids_value">पहिचान गरिएकाहरु: %1$d</string>
-    <string name="timeout_empty">समय समाप्ति (सेकेण्ड):</string>
-    <string name="timeout_value">समय समाप्ति (सेकेण्ड): %1$d</string>
-    <string name="sync_settings_label">समक्रमण सेटिङहरू</string>
-    <string name="search_settings_label">"खोजको सेटिंगहरु "</string>
-    <string name="user_label">प्रयोगकर्ता</string>
-    <string name="module_label">मोड्युल</string>
-    <string name="project_label">परियोजना</string>
 
 
     <!-- RefusalActivity : the screen when the user backs out of Simprints ID -->
@@ -162,8 +104,6 @@
     <string name="button_submit">पेश गर्नुहोस्</string>
     <string name="button_scan_prints">औँठाछापहरू स्क्यान गर्नुहोस्</string>
     <!-- Refusal Selection Points -->
-    <string name="scanner_not_working">स्क्यानरले कार्य गरिरहेको छैन</string>
-    <string name="beneficiary_refused">लाभार्थीले अस्वीकार गर्नुभयो</string>
     <string name="refusal_other">अन्य</string>
     <!-- Text Prompt -->
     <string name="hint_other_reason">थप जानकारी…</string>
@@ -171,7 +111,6 @@
 
     <!-- PrivacyActivity : the screen where the user can find the long consent form -->
     <!-- Long Consent -->
-    <string name="developmentworker_consent_checkbox">"सिम्प्रिन्ट्सलाई यो डाटा प्रयोग गर्न मेरो स्वीकृति छ   "</string>
 
 
 </resources>

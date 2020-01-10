@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="configuration_error_title">به تنظماتو کې تیروتنه</string>
-    <string name="configuration_error_message">د (%1$s) په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+
+    <string name="invalid_intentAction_message">د (invalid Intent Action)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="invalid_metadata_message">د (invalid metadata)په تنظیماتو کې تیروتنه رامنځته شوی، مهرباني وکړئ له اډمین سره اړیکه ونیسئ</string>
+    <string name="verify_guid_not_found_online_message">هغه کس چي د تشخیص لپاره انتخاب شوی په ډیټابیس کې شتون نلری</string>
+    <string name="verify_guid_not_found_offline_message">کس پیدا نشو، په مهربانۍ سره ځان ډاډه کړئ چې انټرنټ سره وصل یاست او بیا له سر نه کوښښ وکړئ</string>
+
 </resources>
