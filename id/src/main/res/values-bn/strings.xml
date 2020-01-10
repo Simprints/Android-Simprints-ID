@@ -211,7 +211,6 @@
     <string name="dashboard_card_sync_last_sync">সর্বশেষ সিঙ্ক: %1$s</string>
     <string name="dashboard_card_sync_needed">আপনাকে সিঙ্ক করতে হতে পারে</string>
     <string name="dashboard_card_sync_now">সিঙ্ক করুন</string>
-    <string name="dashboard_card_sync_title">তথ্য সিঙ্ক করুন</string>
     <string name="dashboard_card_syncing">সিঙ্ক করা হচ্ছে</string>
     <string name="dashboard_card_to_download">ডাউনলোড করতে</string>
     <string name="dashboard_card_to_upload">আপলোড করতে</string>

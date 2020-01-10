@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.simprints.id.Application
 import com.simprints.id.R
 import com.simprints.id.activities.alert.AlertActivityHelper
+import com.simprints.id.activities.consent.ConsentViewModel
 import com.simprints.id.activities.debug.DebugActivity
 import com.simprints.id.activities.longConsent.PrivacyNoticeActivity
 import com.simprints.id.activities.requestLogin.RequestLoginActivity
@@ -18,8 +20,9 @@ import javax.inject.Inject
 class DashboardActivity : AppCompatActivity() {
 
 
-    @Inject
-    lateinit var androidResourcesHelper: AndroidResourcesHelper
+    @Inject lateinit var androidResourcesHelper: AndroidResourcesHelper
+    lateinit var viewModel: DashboardViewModel
+    private val viewModelFactory = DashboardViewModelFactory()
 
     companion object {
         private const val SETTINGS_ACTIVITY_REQUEST_CODE = 1
@@ -33,6 +36,8 @@ class DashboardActivity : AppCompatActivity() {
         val component = (application as Application).component
         component.inject(this)
         title = androidResourcesHelper.getString(R.string.dashboard_label)
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
 
         setupActionBar()
 
