@@ -13,7 +13,6 @@
 
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
-    <string name="short_consent">سمپرنټ (Simprints) وکولې شو څو ستاسو معلومات پیدا کړي. که چیرې دغه معلومات غلط دی او یا تاسو یې په اړه پوښتنه لرئ نو ما ته ووایاست، له هغه پرته، د خپل کیڼ لاس غټه ګوته په هوار ډول په سنسور کېږدئ</string>
     <!-- Loading Messages-->
 
 
