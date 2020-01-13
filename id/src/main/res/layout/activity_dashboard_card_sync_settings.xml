@@ -1,52 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    style="@style/DashboardCardStyle"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginLeft="16dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginBottom="4dp"
-    card_view:cardCornerRadius="5dp">
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <LinearLayout
+        style="@style/DashboardCardStyleRoot"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/dashboardCardImage"
-            android:layout_width="50dp"
-            android:layout_height="60dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_margin="8dp" />
+        <TextView
+            android:id="@+id/dashboard_sync_card_title"
+            style="@style/DashboardCardStyleTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dashboard_card_sync_title" />
 
         <LinearLayout
+            android:id="@+id/dashboard_sync_card_select_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_margin="8dp"
-            android:layout_toEndOf="@id/dashboardCardImage"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_marginBottom="@dimen/activity_dashboard_card_sync_space_above_last_sync"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/dashboardCardTitle"
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:background="@color/simprints_red"
+                android:src="@drawable/error_hint_wifi" />
 
             <TextView
-                android:id="@+id/dashboardCardDescription"
-                android:layout_width="match_parent"
+                android:id="@+id/dashboard_sync_card_select_settings_message"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:maxLines="3"
-                android:textSize="15sp"
-                android:textStyle="italic" />
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:text="Please turn on internet connection in settings"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/dashboard_sync_card_select_settings_button"
+                style="@style/SimprintsButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_rounded_corners_gray"
+                android:elevation="2dp"
+                android:stateListAnimator="@null"
+                android:text="settings"
+                android:translationZ="2dp" />
         </LinearLayout>
-    </RelativeLayout>
+
+        <TextView
+            android:id="@+id/dashboard_sync_card_last_sync"
+            style="@style/DashboardCardStyleLastSync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last sync: 1 day ago" />
+    </LinearLayout>
+
 </androidx.cardview.widget.CardView>
