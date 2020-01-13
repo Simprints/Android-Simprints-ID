@@ -3,7 +3,6 @@ package com.simprints.clientapi.activities.baserequest
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.simprints.clientapi.R
 import com.simprints.clientapi.activities.errors.ClientApiAlert
@@ -85,10 +84,6 @@ abstract class RequestActivity : AppCompatActivity(), RequestContract.RequestVie
             sendCancelResult()
         else
             data?.let(::handleResponse)
-    }
-
-    override fun handleRootedDevice() {
-        Toast.makeText(this, R.string.rooted_device_detected, Toast.LENGTH_SHORT).show()
     }
 
     protected fun sendOkResult(intent: Intent) {
