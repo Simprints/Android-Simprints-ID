@@ -19,6 +19,4 @@
     <string name="close">Close</string>
     <!-- endregion -->
 
-    <string name="rooted_device_detected">Rooted device detected. Unable to log in</string>
-
 </resources>

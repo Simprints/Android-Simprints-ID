@@ -27,7 +27,6 @@ import org.junit.Before
 import org.junit.Test
 import java.util.*
 
-
 class CommCarePresenterTest {
 
     companion object {
@@ -47,7 +46,7 @@ class CommCarePresenterTest {
         val enrollmentExtractor = EnrollRequestFactory.getMockExtractor()
         whenever(view) { enrollExtractor } thenReturn enrollmentExtractor
 
-        CommCarePresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs(), mock()).apply {
+        CommCarePresenter(view, ACTION_REGISTER, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply {
             runBlocking { start() }
         }
 
@@ -59,7 +58,7 @@ class CommCarePresenterTest {
         val identifyExtractor = IdentifyRequestFactory.getMockExtractor()
         whenever(view.identifyExtractor) thenReturn identifyExtractor
 
-        CommCarePresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs(), mock()).apply {
+        CommCarePresenter(view, ACTION_IDENTIFY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply {
             runBlocking { start() }
         }
 
@@ -71,7 +70,7 @@ class CommCarePresenterTest {
         val verificationExtractor = VerifyRequestFactory.getMockExtractor()
         whenever(view.verifyExtractor) thenReturn verificationExtractor
 
-        CommCarePresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs(), mock()).apply { runBlocking { start() } }
+        CommCarePresenter(view, ACTION_VERIFY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
         verifyOnce(view) { sendSimprintsRequest(VerifyRequestFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
@@ -82,14 +81,14 @@ class CommCarePresenterTest {
         whenever(view) { confirmIdentityExtractor } thenReturn confirmIdentify
         whenever(view) { extras } thenReturn mapOf(Pair(Constants.SIMPRINTS_SESSION_ID, MOCK_SESSION_ID))
 
-        CommCarePresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs(), mock()).apply { runBlocking { start() } }
+        CommCarePresenter(view, ACTION_CONFIRM_IDENTITY, mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
 
         verifyOnce(view) { sendSimprintsConfirmation(ConfirmIdentityFactory.getValidSimprintsRequest(INTEGRATION_INFO)) }
     }
 
     @Test
     fun startPresenterWithGarbage_ShouldReturnActionError() {
-        CommCarePresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mockSharedPrefs(), mock()).apply { runBlocking { start() } }
+        CommCarePresenter(view, "Garbage", mockSessionManagerToCreateSession(), mock(), mockSharedPrefs()).apply { runBlocking { start() } }
         verifyOnce(view) { handleClientRequestError(anyNotNull()) }
     }
 
@@ -100,7 +99,7 @@ class CommCarePresenterTest {
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
-        CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs(), mock())
+        CommCarePresenter(view, Constants.SIMPRINTS_REGISTER_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs())
             .handleEnrollResponse(EnrollResponse(registerId))
         verifyOnce(view) { returnRegistration(registerId, sessionId, RETURN_FOR_FLOW_COMPLETED_CHECK) }
         verifyOnce(sessionEventsManagerMock) { runBlocking { addCompletionCheckEvent(RETURN_FOR_FLOW_COMPLETED_CHECK) } }
@@ -113,7 +112,7 @@ class CommCarePresenterTest {
         val idList = arrayListOf(id1, id2)
         val sessionId = UUID.randomUUID().toString()
 
-        CommCarePresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mock(), mock(), mockSharedPrefs(), mock()).handleIdentifyResponse(
+        CommCarePresenter(view, Constants.SIMPRINTS_IDENTIFY_INTENT, mock(), mock(), mockSharedPrefs()).handleIdentifyResponse(
             IdentifyResponse(arrayListOf(id1, id2), sessionId))
 
         verifyOnce(view) {
@@ -131,7 +130,7 @@ class CommCarePresenterTest {
 
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
-        CommCarePresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs(), mock()).handleVerifyResponse(verification)
+        CommCarePresenter(view, Constants.SIMPRINTS_VERIFY_INTENT, sessionEventsManagerMock, mock(), mockSharedPrefs()).handleVerifyResponse(verification)
 
         verifyOnce(view) {
             returnVerification(
@@ -150,7 +149,7 @@ class CommCarePresenterTest {
         val sessionEventsManagerMock = mock<ClientApiSessionEventsManager>()
         wheneverOnSuspend(sessionEventsManagerMock) { getCurrentSessionId() } thenOnBlockingReturn sessionId
 
-        CommCarePresenter(view, "", sessionEventsManagerMock, mock(), mockSharedPrefs(), mock()).handleResponseError(error)
+        CommCarePresenter(view, "", sessionEventsManagerMock, mock(), mockSharedPrefs()).handleResponseError(error)
 
         verifyOnce(view) { returnErrorToClient(eq(error), eq(RETURN_FOR_FLOW_COMPLETED_CHECK), eq(sessionId)) }
     }

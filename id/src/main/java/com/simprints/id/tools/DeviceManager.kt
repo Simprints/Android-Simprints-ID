@@ -1,4 +1,4 @@
-package com.simprints.clientapi.tools
+package com.simprints.id.tools
 
 interface DeviceManager {
     fun isDeviceRooted(): Boolean
