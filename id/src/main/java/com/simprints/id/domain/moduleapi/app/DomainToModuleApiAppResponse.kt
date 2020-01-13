@@ -33,6 +33,7 @@ object DomainToModuleApiAppResponse {
             UNEXPECTED_ERROR -> IAppErrorReason.UNEXPECTED_ERROR
             BLUETOOTH_NOT_SUPPORTED -> IAppErrorReason.BLUETOOTH_NOT_SUPPORTED
             LOGIN_NOT_COMPLETE -> IAppErrorReason.LOGIN_NOT_COMPLETE
+            ROOTED_DEVICE -> IAppErrorReason.ROOTED_DEVICE
         }
 
     private fun fromDomainToModuleApiAppEnrolResponse(enrol: AppEnrolResponse): IAppEnrolResponse = IAppEnrolResponseImpl(enrol.guid)
