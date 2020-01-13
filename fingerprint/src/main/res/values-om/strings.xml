@@ -43,8 +43,6 @@
     <string name="title_fingerprint">Ashaaraa Qubaa</string>
     <string name="try_again_label">Irra deebi\'ii yaali</string>
     <string name="try_another_finger">Quba biraa haa yaallu</string>
-    <string name="verify_guid_not_found_offline_message">Namni arti barbaadde hin argamne,maaloo tajaajia interneetii argachuu kee mirkaneeffadhuu irra deebi\'ii yaali.</string>
-    <string name="verify_guid_not_found_title">Namni argame hin jiru</string>
     <string name="verify_title">Mirkaneeffannaa</string>
     <string name="unforeseen_error_message">Maaloo irra deebi\'ii yaaliitii yoo \'Simprints\' kee hin hojjetu ta\'e,suppervaayizera kee quunnami.</string>
     <string name="button_scan_prints">Ashaaraa qubaa fuudhi</string>
@@ -72,9 +70,7 @@
     <string name="scanner_error_turn_scanner_on_message">1. Iskaanarii bani \n 2. Irra deebi\'ii yaali kan jedhu tuqi</string>
     <string name="scanning">Scan\' gochaa jira</string>
     <string name="settings_label">Seetingii bilbilaa</string>
-    <string name="verify_guid_not_found_online_message">Namni mirkaneessaaf filatame daataa beezii keessa hin jiru.</string>
     <string name="bluetooth_error_pair_scanner_and_device_title">Skaanarii fi meshaa walquunnamsisi</string>
     <string name="low_battery_message">Chaarjiin tiriikaa (battery) iskaanarii gadi aanaa dha, maaloo iskaanarii kee chaarjii godhi.</string>
     <string name="pair_scanner_label">Mijeessaa</string>
-    <string name="privacy_notice_text"><u>Yaadachiisa iccitiin eegamu</u></string>
 </resources>

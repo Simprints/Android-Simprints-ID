@@ -7,8 +7,6 @@
     <string name="register_title">भर्ना </string>
     <string name="identify_title">पहिचान गर्नुहोस </string>
     <string name="verify_title">प्रमाणित</string>
-    <string name="settings_title">सेटिंगहरु</string>
-    <string name="alert_title">अलर्ट</string>
     <string name="refusal_label">असहमति फारम</string>
 
 
@@ -18,7 +16,6 @@
     <!-- SetupActivity : the loading screen -->
     <!-- Consent Text -->
     <!-- Loading Messages-->
-    <string name="connect_scanner_loading">लोड हुँदै</string>
     <string name="connect_scanner_bt_connect">Vero जडान…</string>
     <string name="connect_scanner_wake_un20">" UN20 उठ्दै…"</string>
     <string name="connect_scanner_setup">ঠিককরা Vero</string>
@@ -38,7 +35,6 @@
     <string name="rescan_label_question">फेरी स्क्यान गर्नुहोस?</string>
     <string name="scan_label">स्क्यान</string>
     <string name="cancel_button">रद्द गर्नुहोस </string>
-    <string name="ok">ठिक छ </string>
     <string name="scan">स्क्यान</string>
 
 
@@ -68,13 +64,9 @@
 
     <!-- AlertActivity : the Simprints ID reason message screen -->
     <!-- Error Message Titles -->
-    <string name="configuration_error_title">कन्फिगरेसनमा गल्ती</string>
-    <string name="verify_guid_not_found_title">व्यक्ति भेटीएन</string>
     <string name="error_occurred_title">गल्ती भयो</string>
     <string name="low_battery_title">कम ब्याट्री</string>
     <!-- Error Message Text -->
-    <string name="verify_guid_not_found_online_message">प्रमाणिकरणका लागि छानिएको व्यक्ति डेटाबेसमा छैन</string>
-    <string name="verify_guid_not_found_offline_message">व्यक्ति भेटीएन;  कृपया इन्टरनेटमा कनेक्ट गरि पुन प्रयास गर्नुहोस</string>
     <string name="bluetooth_not_supported_message">एस उपकरणमा ब्लुटुथ छैन; कृपया आफ्नो सिस्टम प्रशासकलाई खबर गर्नुहोस</string>
     <string name="bluetooth_not_enabled_message">ब्लुटुथ स्विच अन छैन; कृपया सेटिङमा गई ब्लुटुथ अन गरि पुन प्रयास गर्नुहोस</string>
     <string name="multiple_scanners_found_message">एउटा भन्दा बढी स्क्यानर फोनसंग   जोडिएको छ, कृपया यौटा स्क्यानर हटाउनुहोस</string>
@@ -88,8 +80,6 @@
 
     <!-- DebugActivity : the screen that shows project statistics and version numbers -->
     <!-- Screen Text -->
-    <string name="preference_app_version_title">एप्स संस्करण</string>
-    <string name="preference_scanner_version_title">सिम्प्रिन्ट्स संस्करण</string>
     <!-- Recovery dialogs -->
 
 

@@ -4,7 +4,6 @@
     <string name="guid_selection_data_sent">መረጃው ተልኳል</string>
     <string name="guid_selection_result_sent">ውጤቱ ተልኳል</string>
     <string name="close">ይዝጉ</string>
-    <string name="error_occurred_title">ስህተት አጋጥሟል</string>
     <string name="invalid_projectId_message">የተሳሳተ የፕሮጀክት መለያ ስለተተቀሙ የተግባቦት ስህተት አጋጥሟል  ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="invalid_selectedId_message">የተሳሳተ የመለያ ምርጫ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
     <string name="invalid_sessionId_message">የተሳሳተ የቆይታ መለያ ስላደረጉ የተግባቦት ስህተት አጋጥሟል ፤እባክዎ የቅርብ ተጠሪዎን ያነጋግሩ</string>
