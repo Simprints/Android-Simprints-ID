@@ -1,22 +1,25 @@
 package com.simprints.id.activities.dashboard.cards.sync
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.text.format.DateUtils
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.simprints.id.R
 import com.simprints.id.activities.dashboard.cards.sync.DashboardSyncCardState.*
 import com.simprints.id.tools.AndroidResourcesHelper
 import java.util.*
+import android.widget.LinearLayout
+import org.jetbrains.anko.layoutInflater
 
-class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper) : DashboardSyncCardDisplayer {
 
-    private var defaultColor: Int = 0
+class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResourcesHelper,
+                                     val ctx: Context) : DashboardSyncCardDisplayer {
 
+    private lateinit var root: LinearLayout
     private lateinit var viewForDefaultState: View
     private lateinit var viewForSyncFailedState: View
     private lateinit var viewForTryAgainState: View
@@ -26,117 +29,111 @@ class DashboardSyncCardDisplayerImpl(val androidResourcesHelper: AndroidResource
     private lateinit var viewForConnectingState: View
     private lateinit var viewForCompleteState: View
 
-    override fun initViews(cardViews: ViewGroup) {
-        with(cardViews) {
-            defaultColor = progressCardStateText().textColors.defaultColor
+    override fun initRoot(rootLayout: LinearLayout) {
+        root = rootLayout
+        viewForDefaultState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_default, root, false)
+        viewForSyncFailedState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_failed, root, false)
+        viewForTryAgainState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_try_again, root, false)
+        viewForNoModulesState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_modules, root, false)
+        viewForOfflineState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_settings, root, false)
+        viewForProgressState = ctx.layoutInflater.inflate(R.layout.activity_dashboard_card_sync_progress, root, false)
+        viewForConnectingState = viewForProgressState
+        viewForCompleteState = viewForProgressState
 
-            viewForDefaultState = findViewById(R.id.activity_dashboard_card_sync_default)
-            viewForSyncFailedState = findViewById(R.id.activity_dashboard_card_sync_failed)
-            viewForTryAgainState = findViewById(R.id.activity_dashboard_card_sync_try_again)
-            viewForNoModulesState = findViewById(R.id.dashboard_sync_card_select_modules)
-            viewForOfflineState = findViewById(R.id.activity_dashboard_card_sync_settings)
-            viewForProgressState = findViewById(R.id.activity_dashboard_card_sync_progress)
-            viewForConnectingState = findViewById(R.id.activity_dashboard_card_sync_progress)
-            viewForCompleteState = findViewById(R.id.activity_dashboard_card_sync_progress)
-        }
     }
 
     override fun displayState(syncCardState: DashboardSyncCardState) {
-        hideCardViews()
+        removeOldViewState()
         when (syncCardState) {
-            is SyncDefault -> displaySyncDefaultState(syncCardState)
-            is SyncFailed -> displaySyncFailedState(syncCardState)
-            is SyncTryAgain -> displayTryAgainState(syncCardState)
-            is SyncNoModules -> displayNoModulesState(syncCardState)
-            is SyncOffline -> displaySyncOffline(syncCardState)
-            is SyncProgress -> displayProgress(syncCardState)
-            is SyncConnecting -> displaySyncConnecting(syncCardState)
-            is SyncComplete -> displaySyncComplete(syncCardState)
+            is SyncDefault -> prepareSyncDefaultStateView(syncCardState)
+            is SyncFailed -> prepareSyncFailedStateView(syncCardState)
+            is SyncTryAgain -> prepareTryAgainStateView(syncCardState)
+            is SyncNoModules -> prepareNoModulesStateView(syncCardState)
+            is SyncOffline -> prepareSyncOfflineView(syncCardState)
+            is SyncProgress -> prepareProgressView(syncCardState)
+            is SyncConnecting -> prepareSyncConnectingView(syncCardState)
+            is SyncComplete -> prepareSyncCompleteView(syncCardState)
+        }.also {
+            root.addView(it)
         }
     }
 
     @SuppressLint("ResourceAsColor")
-    private fun displaySyncComplete(syncCardState: SyncComplete) {
-        with(viewForProgressState) {
+    private fun prepareSyncCompleteView(syncCardState: SyncComplete): View =
+        viewForCompleteState.apply {
             progressCardConnectingProgress().visibility = GONE
             progressCardSyncProgress().visibility = GONE
             progressCardStateText().visibility = VISIBLE
             progressCardStateText().setTextColor(R.color.simprints_green)
             progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_complete)
-            displayLastSyncTime(syncCardState, this.lastSyncText())
+            displayLastSyncTime(syncCardState, lastSyncText())
 
-            viewForCompleteState.visibility = VISIBLE
+            visibility = VISIBLE
         }
-    }
 
-    private fun displaySyncConnecting(syncCardState: SyncConnecting) {
-        with(viewForProgressState) {
+
+    private fun prepareSyncConnectingView(syncCardState: SyncConnecting): View =
+        viewForConnectingState.apply {
             progressCardConnectingProgress().visibility = VISIBLE
             progressCardConnectingProgress().isIndeterminate = true
             progressCardSyncProgress().visibility = VISIBLE
             progressCardSyncProgress().isIndeterminate = true
             progressCardSyncProgress().progress = syncCardState.progress / syncCardState.total
             progressCardStateText().visibility = VISIBLE
-            progressCardStateText().setTextColor(defaultColor)
             progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_connecting)
-            displayLastSyncTime(syncCardState, this.lastSyncText())
+            displayLastSyncTime(syncCardState, lastSyncText())
 
-            viewForConnectingState.visibility = VISIBLE
+            visibility = VISIBLE
         }
-    }
 
-    private fun displayProgress(syncCardState: SyncProgress) {
-        with(viewForProgressState) {
+    private fun prepareProgressView(syncCardState: SyncProgress): View =
+        viewForProgressState.apply {
             progressCardConnectingProgress().visibility = GONE
             progressCardSyncProgress().visibility = VISIBLE
             progressCardSyncProgress().progress = syncCardState.progress / syncCardState.total
             progressCardStateText().visibility = VISIBLE
-            progressCardStateText().setTextColor(defaultColor)
             progressCardStateText().text = androidResourcesHelper.getString(R.string.sync_card_progress, arrayOf(syncCardState.progress / syncCardState.total))
-            displayLastSyncTime(syncCardState, this.lastSyncText())
+            displayLastSyncTime(syncCardState, lastSyncText())
 
-            viewForProgressState.visibility = VISIBLE
+            visibility = VISIBLE
         }
-    }
 
-    private fun displaySyncOffline(syncCardState: DashboardSyncCardState) {
-        displayLastSyncTime(syncCardState, viewForOfflineState.lastSyncText())
-        viewForOfflineState.visibility = VISIBLE
-    }
+    private fun prepareSyncOfflineView(syncCardState: DashboardSyncCardState): View =
+        viewForOfflineState.apply {
+            displayLastSyncTime(syncCardState, lastSyncText())
+            visibility = VISIBLE
+        }
 
-    private fun displayNoModulesState(syncCardState: DashboardSyncCardState) {
-        displayLastSyncTime(syncCardState, viewForNoModulesState.lastSyncText())
-        viewForNoModulesState.visibility = VISIBLE
-    }
+    private fun prepareNoModulesStateView(syncCardState: DashboardSyncCardState): View =
+        viewForNoModulesState.apply {
+            displayLastSyncTime(syncCardState, lastSyncText())
+            visibility = VISIBLE
+        }
 
-    private fun displayTryAgainState(syncCardState: DashboardSyncCardState) {
-        displayLastSyncTime(syncCardState, viewForTryAgainState.lastSyncText())
-        viewForTryAgainState.visibility = VISIBLE
-    }
+    private fun prepareTryAgainStateView(syncCardState: DashboardSyncCardState): View =
+        viewForTryAgainState.apply {
+            displayLastSyncTime(syncCardState, lastSyncText())
+            visibility = VISIBLE
+        }
 
-    private fun displaySyncDefaultState(syncCardState: DashboardSyncCardState) {
-        displayLastSyncTime(syncCardState, viewForDefaultState.lastSyncText())
-        viewForDefaultState.visibility = VISIBLE
-    }
+    private fun prepareSyncDefaultStateView(syncCardState: DashboardSyncCardState): View =
+        viewForDefaultState.apply {
+            displayLastSyncTime(syncCardState, lastSyncText())
+            visibility = VISIBLE
+        }
 
-    private fun displaySyncFailedState(syncCardState: DashboardSyncCardState) {
-        displayLastSyncTime(syncCardState, viewForSyncFailedState.lastSyncText())
-        viewForSyncFailedState.visibility = VISIBLE
-    }
+    private fun prepareSyncFailedStateView(syncCardState: DashboardSyncCardState): View =
+        viewForSyncFailedState.apply {
+            displayLastSyncTime(syncCardState, lastSyncText())
+            visibility = VISIBLE
+        }
 
     private fun displayLastSyncTime(syncCardState: DashboardSyncCardState, textView: TextView) {
         textView.text = DateUtils.getRelativeTimeSpanString(syncCardState.lastSyncTime.time, Calendar.getInstance().timeInMillis, DateUtils.MINUTE_IN_MILLIS)
     }
 
-    private fun hideCardViews() {
-        viewForDefaultState.visibility = GONE
-        viewForSyncFailedState.visibility = GONE
-        viewForTryAgainState.visibility = GONE
-        viewForNoModulesState.visibility = GONE
-        viewForOfflineState.visibility = GONE
-        viewForProgressState.visibility = GONE
-        viewForConnectingState.visibility = GONE
-        viewForCompleteState.visibility = GONE
+    private fun removeOldViewState() {
+        root.removeAllViews()
     }
 
     private fun View.progressCardConnectingProgress() = this.findViewById<ProgressBar>(R.id.dashboard_sync_card_indeterminate_progress)

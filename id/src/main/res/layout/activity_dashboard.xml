@@ -26,40 +26,17 @@
         android:background="?attr/colorPrimary">
 
         <LinearLayout
+            android:id="@+id/dashboard_cards"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/syncCards"
+                android:id="@+id/dashboard_sync_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_default"
-                    layout="@layout/activity_dashboard_card_sync_default" />
-
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_failed"
-                    layout="@layout/activity_dashboard_card_sync_failed" />
-
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_try_again"
-                    layout="@layout/activity_dashboard_card_sync_try_again" />
-
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_modules"
-                    layout="@layout/activity_dashboard_card_sync_modules" />
-
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_settings"
-                    layout="@layout/activity_dashboard_card_sync_settings" />
-
-                <!-- State: Progress, Connecting, Complete !-->
-                <include
-                    android:id="@+id/activity_dashboard_card_sync_progress"
-                    layout="@layout/activity_dashboard_card_sync_progress" />
             </LinearLayout>
 
         </LinearLayout>

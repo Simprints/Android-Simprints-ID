@@ -50,9 +50,11 @@ class DashboardActivity : AppCompatActivity() {
     }
 
     private fun observeForSyncCardState() {
+        syncCardDisplayer.initRoot(dashboard_sync_card)
         viewModel.syncCardState.observe(this, Observer<DashboardSyncCardState> {
             syncCardDisplayer.displayState(it)
         })
+        viewModel.emit()
     }
 
     private fun setupActionBar() {
