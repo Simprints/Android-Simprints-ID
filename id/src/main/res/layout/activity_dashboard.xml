@@ -19,14 +19,29 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:orientation="vertical">
+        android:background="?attr/colorPrimary">
 
-        <include layout="@layout/activity_dashboard_card_project_info"/>
-        <include layout="@layout/activity_dashboard_card_sync"/>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <include layout="@layout/activity_dashboard_card_sync_progress" />
+
+            <include layout="@layout/activity_dashboard_card_sync_modules" />
+
+            <include layout="@layout/activity_dashboard_card_sync_start" />
+
+            <include layout="@layout/activity_dashboard_card_sync_try_again" />
+
+            <include layout="@layout/activity_dashboard_card_sync_settings" />
+
+            <include layout="@layout/activity_dashboard_card_sync_failed" />
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

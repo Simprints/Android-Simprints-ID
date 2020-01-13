@@ -47,6 +47,7 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupActionBar() {
         dashboardToolbar.title = androidResourcesHelper.getString(R.string.dashboard_label)
         setSupportActionBar(dashboardToolbar)
+        supportActionBar?.elevation = 4F
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
