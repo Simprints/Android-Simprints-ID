@@ -262,7 +262,8 @@ open class AppModule {
         EncryptedSharedPreferencesFactoryImpl(app).encryptedSharedPreferences
 
     @Provides
-    open fun provideDashboardSyncCardDisplayer(androidResourcesHelper: AndroidResourcesHelper): DashboardSyncCardDisplayer =
-        DashboardSyncCardDisplayerImpl(androidResourcesHelper)
+    open fun provideDashboardSyncCardDisplayer(androidResourcesHelper: AndroidResourcesHelper,
+                                               ctx: Context): DashboardSyncCardDisplayer =
+        DashboardSyncCardDisplayerImpl(androidResourcesHelper, ctx)
 }
 
